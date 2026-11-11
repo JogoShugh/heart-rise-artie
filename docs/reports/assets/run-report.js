@@ -145,11 +145,15 @@
     return p;
   };
   const requestText = (req) => {
-    const headers = Object.entries(req.headers || {}).filter(([k]) => /^(if-match|if-none-match|prefer|accept)$/i.test(k));
+    const headers = Object.entries(req.headers || {})
+      .filter(([k]) => /^(if-match|if-none-match|prefer|accept|content-type)$/i.test(k));
     return [`${req.method} ${req.url}`, ...headers.map(([k, v]) => `${k}: ${v}`)].join("   ");
   };
   const answerText = (res) => {
-    const kept = Object.entries(res.headers || {}).filter(([k]) => /^(location|content-location|etag)$/i.test(k));
+    // What the answer says about itself and about the next request: where, which version, which profile, how to
+    // authenticate and sign, and what a PATCH may be.
+    const kept = Object.entries(res.headers || {}).filter(([k]) =>
+      /^(location|content-location|etag|content-profile|www-authenticate|accept-signature|accept-patch)$/i.test(k));
     return [`HTTP ${res.status}`, ...kept.map(([k, v]) => `${k}: ${v}`)].join("   ");
   };
 
@@ -497,8 +501,9 @@
     // Hypermedia: requests whose address came from the server.
     const { entries, fromServer } = provenance();
     Object.assign(facts, { fromServer: fromServer.size, entries: [...entries] });
-    // A script's own entry is its bookmark, the one address it may know: not judged.
-    const entering = steps.filter((s) => neutral(s) && verbOf(s) === "enter").length;
+    // A script's own entry is its bookmark, the one address it may know: not judged. Over HTTP, the trace marks
+    // that step "entry".
+    const entering = steps.filter((s) => (neutral(s) && verbOf(s) === "enter") || (!neutral(s) && s.entry)).length;
     const judged = n - entering;
     facts.hyperOf = judged;
     const hyper = tile("Hypermedia", `${fromServer.size} / ${judged}`,

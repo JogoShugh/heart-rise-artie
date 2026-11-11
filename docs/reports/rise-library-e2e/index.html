@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RISE: The Library and Ana, End to End</title>
-<meta name="description" content="Ana asks Riverside Public Library to tell her when loan 3310 can be renewed. The library answers on her reply, in order: progress, two refused answers, a signed result, its replay, a different result refused, and a failure.">
+<meta name="description" content="Ana asks Riverside Public Library to tell her when loan 3310 can be renewed, signed with her key; the library answers on her reply by its forms, each answer signed and naming the watch it answers, and every address after the entry handed over.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -183,18 +183,18 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
 <main class="rr-wrap">
   <header>
     <h1>RISE: The Library and Ana, End to End</h1>
-    <p class="rr-lede">Ana asks Riverside Public Library to tell her when loan 3310 can be renewed. The library answers on her reply, in order: progress, two refused answers, a signed result, its replay, a different result refused, and a failure.</p>
+    <p class="rr-lede">Ana asks Riverside Public Library to tell her when loan 3310 can be renewed, signed with her key; the library answers on her reply by its forms, each answer signed and naming the watch it answers, and every address after the entry handed over.</p>
   </header>
   <div id="run-report"></div>
 </main>
 <pre hidden id="run-trace">steps:
-- at: "2026-11-09T07:01:03.079343Z"
+- at: "2026-11-11T05:35:00.191635Z"
   mode: "script"
   say: "Ana reads the library's entry, as HAL Schema Forms"
   params: {}
   request:
     method: "GET"
-    url: "/"
+    url: "https://riverside-library.example/"
     headers:
       Authorization: "Basic &lt;token&gt;"
       Accept: "application/hal+json"
@@ -203,20 +203,41 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
   response:
     status: 200
     headers:
-      ETag: "\"index-hsf-d1c387d90315e842\""
+      ETag: "\"index-hsf-e666c99bd6bab702\""
       Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
     body:
       title: "Riverside Public Library"
       _links:
         self:
           href: "/"
+        alternate:
+        - href: "/"
+          type: "application/hal+json"
+          profile: "https://w3id.org/heart-rise/hal-schema-forms"
+        - href: "/"
+          type: "application/prs.hal-forms+json"
+          profile: "https://w3id.org/heart-rise/hal-forms"
+        - href: "/"
+          type: "text/html"
+        - href: "/"
+          type: "application/json"
         service-desc:
           href: "/openapi.json"
           type: "application/vnd.oai.openapi+json;version=3.1"
+        hr:keys:
+          href: "/keys"
+          type: "application/jwk-set+json"
         curies:
         - name: "library"
           href: "/profiles/library#{rel}"
           templated: true
+        - name: "hr"
+          href: "https://w3id.org/heart-rise/rels/{rel}"
+          templated: true
+        hr:affordances:
+          href: "/affordances"
+          type: "application/hal+json"
       _forms:
         library:search-accounts:
           _links:
@@ -435,6 +456,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           hr:integrity: "sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU="
       hr:manifest:
         forms:
+          hr:cancel:
+          - "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
           library:get-account:
           - "sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0="
           library:get-loan:
@@ -459,25 +482,206 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           - "sha256-2yobtIXyUq2XWIROrft3DpPzBOtSD/yJSvNcYEcSE5g="
           library:tell-me-when-renewable:
           - "sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU="
-        digest: "sha256-LbDBqTwTSmJZg48JxAtePjKj+Bmhnb1rAyTqrBY5Mdo="
+        digest: "sha256-1leoxsXzkQ14Bcdd6GFTxC0WxteTbl6xL0bfLWP2hPU="
   expect: 200
-  ms: 73
-- at: "2026-11-09T07:01:03.163354Z"
+  ms: 67
+  entry: true
+- at: "2026-11-11T05:35:00.263278Z"
   mode: "script"
-  say: "Ana asks to be told when loan 3310 can be renewed, with reply r-7f3 and her\
-    \ key"
+  say: "Ana follows the entry's {relation} link"
+  params:
+    relation: "hr:affordances"
+  request:
+    method: "GET"
+    url: "https://riverside-library.example/affordances"
+    headers:
+      Authorization: "Basic &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+    body: null
+  response:
+    status: 200
+    headers:
+      ETag: "\"affordances-eaa80e01e45efbac\""
+      Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+    body:
+      _links:
+        self:
+          href: "/affordances"
+        curies:
+        - name: "hr"
+          href: "https://w3id.org/heart-rise/rels/{rel}"
+          templated: true
+      forms:
+        sha256-2yobtIXyUq2XWIROrft3DpPzBOtSD/yJSvNcYEcSE5g=:
+          relation: "library:search-watches"
+        sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=:
+          relation: "library:get-loan"
+        sha256-HehVbRBB2+7tl0d6s3KNl5J4e1VLDO21aUP8s2rAel4=:
+          relation: "library:get-watch"
+        sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=:
+          relation: "library:tell-me-when-renewable"
+          _links:
+            describedby:
+              href: "/schemas/2af51786a9d2f804"
+              type: "application/schema+json"
+        sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=:
+          relation: "library:report-problem"
+          _links:
+            describedby:
+              href: "/schemas/6770c985e2914e09"
+              type: "application/schema+json"
+        sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=:
+          relation: "library:search-loans"
+        sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=:
+          relation: "library:renew"
+          _links:
+            describedby:
+              href: "/schemas/efddc7bd8bbcef73"
+              type: "application/schema+json"
+        sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=:
+          relation: "library:return"
+          _links:
+            describedby:
+              href: "/schemas/efddc7bd8bbcef73"
+              type: "application/schema+json"
+        sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc=:
+          relation: "library:get-member"
+        sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=:
+          relation: "hr:cancel"
+          _links:
+            describedby:
+              href: "/schemas/35f65fac527144fc"
+              type: "application/schema+json"
+        sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=:
+          relation: "library:search-accounts"
+        sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=:
+          relation: "library:get-account"
+        sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=:
+          relation: "library:search-members"
+  expect: 200
+  ms: 27
+- at: "2026-11-11T05:35:00.291468Z"
+  mode: "script"
+  say: "Ana reads the schema of {relation}, found by its integrity"
+  params:
+    relation: "library:tell-me-when-renewable"
+  request:
+    method: "GET"
+    url: "https://riverside-library.example/schemas/2af51786a9d2f804"
+    headers:
+      Authorization: "Basic &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/schema+json"
+    body:
+      properties:
+        _links:
+          properties:
+            hr:keys:
+              properties:
+                href:
+                  format: "uri"
+                  type: "string"
+                type:
+                  const: "application/jwk-set+json"
+              required:
+              - "href"
+              - "type"
+              type: "object"
+            hr:reply-to:
+              properties:
+                href:
+                  format: "uri"
+                  type: "string"
+                profile:
+                  enum:
+                  - "https://w3id.org/heart-rise/hal-schema-forms"
+                  - "https://w3id.org/heart-rise/hal-forms"
+                type:
+                  const: "application/hal+json"
+              required:
+              - "href"
+              - "type"
+              - "profile"
+              type: "object"
+          required:
+          - "hr:reply-to"
+          - "hr:keys"
+          type: "object"
+        loan:
+          title: "Loan number"
+          type: "integer"
+      required:
+      - "loan"
+      - "_links"
+      type: "object"
+  expect: 200
+  ms: 0
+- at: "2026-11-11T05:35:00.292641Z"
+  mode: "script"
+  say: "Ana asks to be told when loan {loan} can be renewed, unsigned"
   params:
     loan: 3310
     reply: "r-7f3"
   request:
     method: "POST"
-    url: "/actions/tell-me-when-renewable"
+    url: "https://riverside-library.example/actions/tell-me-when-renewable"
     headers:
       Authorization: "Basic &lt;token&gt;"
       Accept: "application/hal+json"
       Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-      If-Match: "\"index-hsf-d1c387d90315e842\""
-      Content-Type: "application/hal+json"
+      If-Match: "\"index-hsf-e666c99bd6bab702\""
+      Content-Type: "application/json"
+    body:
+      loan: 3310
+      _links:
+        hr:reply-to:
+          href: "https://caller.example/replies/r-7f3"
+          type: "application/hal+json"
+          profile: "https://w3id.org/heart-rise/hal-schema-forms"
+        hr:keys:
+          href: "https://caller.example/keys"
+          type: "application/jwk-set+json"
+  response:
+    status: 401
+    headers:
+      Content-Type: "application/problem+json"
+      WWW-Authenticate: "Signature realm=\"Riverside Public Library\""
+      Accept-Signature: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+        );keyid=\"ana-2026-11\";alg=\"ed25519\""
+    body:
+      type: "https://w3id.org/heart-rise/problems/signature-required"
+      title: "A signature is required"
+      status: 401
+      detail: "Each act here is signed by the key ana-2026-11."
+  expect: 401
+  ms: 2
+- at: "2026-11-11T05:35:00.298169Z"
+  mode: "script"
+  say: "Ana asks to be told when loan {loan} can be renewed, with reply {reply}, signed\
+    \ with her key"
+  params:
+    loan: 3310
+    reply: "r-7f3"
+  request:
+    method: "POST"
+    url: "https://riverside-library.example/actions/tell-me-when-renewable"
+    headers:
+      Authorization: "Basic &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      If-Match: "\"index-hsf-e666c99bd6bab702\""
+      Content-Type: "application/json"
+      Content-Digest: "sha-256=:nuTN0WiSl5jJtdcQp+OPBWw9OiIyGo5DDt6C9q60xqQ=:"
+      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+        );created=1794153600;keyid=\"ana-2026-11\";alg=\"ed25519\""
+      Signature: "sig1=:elA6r+RBM+jm2VmGTHv9kbDGaWKspfHvlIiI3rHFc0GmgKbUOLvhyUtsVZeCewdzVOCr8+A17br9FfrcwCkaAw==:"
     body:
       loan: 3310
       _links:
@@ -492,8 +696,10 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     status: 201
     headers:
       Location: "/watches/1"
-      ETag: "\"seq-1.hsf.L0.ab9c4c2820a3ea7d\""
+      ETag: "\"seq-1.hsf.L0.d3529f382d9bcd50\""
       Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json"
     body:
       id: 1
       loan: 3310
@@ -515,18 +721,36 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
         hr:reply-to:
           href: "https://caller.example/replies/r-7f3"
         hr:keys:
-          href: "https://caller.example/keys"
-      _forms: {}
+          href: "/keys"
+          type: "application/jwk-set+json"
+      _forms:
+        hr:cancel:
+          title: "Cancel the request"
+          description: "Withdraws a request before it is answered: no answer will\
+            \ come."
+          _links:
+            target:
+              href: "/watches/1"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
+          schema:
+            properties:
+              standing:
+                const: "cancelled"
+            required:
+            - "standing"
+            type: "object"
+            $id: "/schemas/35f65fac527144fc"
+          hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 201
   ms: 20
-- at: "2026-11-09T07:01:03.184014Z"
+- at: "2026-11-11T05:35:00.318737Z"
   mode: "script"
-  say: "Ana reads her watch on loan 3310"
-  params:
-    loan: 3310
+  say: "Ana reads her watch: its keys, its reply, and her cancel"
+  params: {}
   request:
     method: "GET"
-    url: "/watches/1"
+    url: "https://riverside-library.example/watches/1"
     headers:
       Authorization: "Basic &lt;token&gt;"
       Accept: "application/hal+json"
@@ -535,8 +759,10 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
   response:
     status: 200
     headers:
-      ETag: "\"seq-1.hsf.L0.ab9c4c2820a3ea7d\""
+      ETag: "\"seq-1.hsf.L0.d3529f382d9bcd50\""
       Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json"
     body:
       id: 1
       loan: 3310
@@ -558,924 +784,37 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
         hr:reply-to:
           href: "https://caller.example/replies/r-7f3"
         hr:keys:
-          href: "https://caller.example/keys"
-      _forms: {}
-  expect: 200
-  ms: 1
-- at: "2026-11-09T07:01:03.186294Z"
-  mode: "script"
-  say: "The library reads Ana's reply r-7f3 for its ETag and form"
-  params:
-    reply: "r-7f3"
-  request:
-    method: "GET"
-    url: "/replies/r-7f3"
-    headers:
-      Authorization: "Bearer &lt;token&gt;"
-      Accept: "application/hal+json"
-      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-    body: null
-  response:
-    status: 200
-    headers:
-      ETag: "\"seq-1.hsf.L0.836ec25588cde3c0\""
-      Content-Type: "application/hal+json"
-    body:
-      reply: "r-7f3"
-      state: "awaiting"
-      _links:
-        self:
-          href: "/replies/r-7f3"
-        curies:
-        - name: "hr"
-          href: "/profiles/hr#{rel}"
-          templated: true
-        - name: "hr"
-          href: "https://w3id.org/heart-rise/rels/{rel}"
-          templated: true
-        hr:unavailable:
-          href: "/unavailable/fc81f545088ea825"
-          type: "application/json"
-          integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
+          href: "/keys"
+          type: "application/jwk-set+json"
       _forms:
-        hr:progress:
-          title: "Report progress"
-          description: "Tells the caller how far the work has got."
+        hr:cancel:
+          title: "Cancel the request"
+          description: "Withdraws a request before it is answered: no answer will\
+            \ come."
           _links:
             target:
-              href: "/replies/r-7f3/actions/progress"
-          method: "PUT"
-          contentType: "application/json"
+              href: "/watches/1"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
           schema:
             properties:
-              note:
-                type: "string"
-              percent:
-                maximum: 100
-                minimum: 0
-                type: "integer"
+              standing:
+                const: "cancelled"
             required:
-            - "percent"
+            - "standing"
             type: "object"
-            $id: "/schemas/01c9d6edf2078e6b"
-          hr:integrity: "sha256-QtjNb5WpR/kRbuDpYHPp7eHU7X4JKA2DNl793YROQtA="
-        hr:completed:
-          title: "Report completed"
-          description: "Sends the result: the work is done."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/completed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              result:
-                type: "object"
-            required:
-            - "result"
-            type: "object"
-            $id: "/schemas/7849137b825e616c"
-          hr:integrity: "sha256-qOpcrT87h4fPbAUjzWig2C2OI2b3GXHSPzlYIizsFrg="
-        hr:failed:
-          title: "Report failed"
-          description: "Says the work failed, with a problem document."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/failed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              detail:
-                type: "string"
-              title:
-                type: "string"
-            required:
-            - "title"
-            type: "object"
-            $id: "/schemas/d6066bd8090ffb27"
-          hr:integrity: "sha256-gRRu2b4Yc+5zxX/J01dxFWiISiRw33Q+EgX1RoKdLXI="
-  expect: 200
-  ms: 4
-- at: "2026-11-09T07:01:03.195383Z"
-  mode: "script"
-  say: "The library reports progress of 0 percent on reply r-7f3"
-  params:
-    reply: "r-7f3"
-    relation: "progress"
-  request:
-    method: "PUT"
-    url: "/replies/r-7f3/actions/progress"
-    headers:
-      Authorization: "Bearer &lt;token&gt;"
-      Accept: "application/hal+json"
-      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-      If-Match: "\"seq-1.hsf.L0.836ec25588cde3c0\""
-      Content-Type: "application/hal+json"
-      Content-Digest: "sha-256=:DrlvCE3ANfSXOQABqtsagEPUIEMOEQsPDzMsH+Zmrr4=:"
-      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
-        );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:iyYVrrdl5JNLizB7JrT/9QA99cMUI7tHdnypjQ0WqZg4EYSLXhkFHRHUnOHe2oEv/PdPs+fTI7ApAqL39oJwAQ==:"
-    body:
-      percent: 0
-      note: "one ahead in the hold queue"
-  response:
-    status: 200
-    headers:
-      ETag: "\"seq-2.hsf.L0.efd689e6aeddfbc1\""
-      Content-Type: "application/hal+json"
-    body:
-      reply: "r-7f3"
-      state: "awaiting"
-      percent: 0
-      note: "one ahead in the hold queue"
-      _links:
-        self:
-          href: "/replies/r-7f3"
-        curies:
-        - name: "hr"
-          href: "/profiles/hr#{rel}"
-          templated: true
-        - name: "hr"
-          href: "https://w3id.org/heart-rise/rels/{rel}"
-          templated: true
-        hr:unavailable:
-          href: "/unavailable/fc81f545088ea825"
-          type: "application/json"
-          integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
-      _forms:
-        hr:progress:
-          title: "Report progress"
-          description: "Tells the caller how far the work has got."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/progress"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              note:
-                type: "string"
-              percent:
-                maximum: 100
-                minimum: 0
-                type: "integer"
-            required:
-            - "percent"
-            type: "object"
-            $id: "/schemas/01c9d6edf2078e6b"
-          hr:integrity: "sha256-QtjNb5WpR/kRbuDpYHPp7eHU7X4JKA2DNl793YROQtA="
-        hr:completed:
-          title: "Report completed"
-          description: "Sends the result: the work is done."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/completed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              result:
-                type: "object"
-            required:
-            - "result"
-            type: "object"
-            $id: "/schemas/7849137b825e616c"
-          hr:integrity: "sha256-qOpcrT87h4fPbAUjzWig2C2OI2b3GXHSPzlYIizsFrg="
-        hr:failed:
-          title: "Report failed"
-          description: "Says the work failed, with a problem document."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/failed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              detail:
-                type: "string"
-              title:
-                type: "string"
-            required:
-            - "title"
-            type: "object"
-            $id: "/schemas/d6066bd8090ffb27"
-          hr:integrity: "sha256-gRRu2b4Yc+5zxX/J01dxFWiISiRw33Q+EgX1RoKdLXI="
-  expect: 200
-  ms: 10
-- at: "2026-11-09T07:01:03.206211Z"
-  mode: "script"
-  say: "The library reads Ana's reply r-7f3 for its ETag and form"
-  params:
-    reply: "r-7f3"
-  request:
-    method: "GET"
-    url: "/replies/r-7f3"
-    headers:
-      Authorization: "Bearer &lt;token&gt;"
-      Accept: "application/hal+json"
-      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-    body: null
-  response:
-    status: 200
-    headers:
-      ETag: "\"seq-2.hsf.L0.efd689e6aeddfbc1\""
-      Content-Type: "application/hal+json"
-    body:
-      reply: "r-7f3"
-      state: "awaiting"
-      percent: 0
-      note: "one ahead in the hold queue"
-      _links:
-        self:
-          href: "/replies/r-7f3"
-        curies:
-        - name: "hr"
-          href: "/profiles/hr#{rel}"
-          templated: true
-        - name: "hr"
-          href: "https://w3id.org/heart-rise/rels/{rel}"
-          templated: true
-        hr:unavailable:
-          href: "/unavailable/fc81f545088ea825"
-          type: "application/json"
-          integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
-      _forms:
-        hr:progress:
-          title: "Report progress"
-          description: "Tells the caller how far the work has got."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/progress"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              note:
-                type: "string"
-              percent:
-                maximum: 100
-                minimum: 0
-                type: "integer"
-            required:
-            - "percent"
-            type: "object"
-            $id: "/schemas/01c9d6edf2078e6b"
-          hr:integrity: "sha256-QtjNb5WpR/kRbuDpYHPp7eHU7X4JKA2DNl793YROQtA="
-        hr:completed:
-          title: "Report completed"
-          description: "Sends the result: the work is done."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/completed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              result:
-                type: "object"
-            required:
-            - "result"
-            type: "object"
-            $id: "/schemas/7849137b825e616c"
-          hr:integrity: "sha256-qOpcrT87h4fPbAUjzWig2C2OI2b3GXHSPzlYIizsFrg="
-        hr:failed:
-          title: "Report failed"
-          description: "Says the work failed, with a problem document."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/failed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              detail:
-                type: "string"
-              title:
-                type: "string"
-            required:
-            - "title"
-            type: "object"
-            $id: "/schemas/d6066bd8090ffb27"
-          hr:integrity: "sha256-gRRu2b4Yc+5zxX/J01dxFWiISiRw33Q+EgX1RoKdLXI="
-  expect: 200
-  ms: 4
-- at: "2026-11-09T07:01:03.211503Z"
-  mode: "script"
-  say: "The library reports progress of 50 percent on reply r-7f3"
-  params:
-    reply: "r-7f3"
-    relation: "progress"
-  request:
-    method: "PUT"
-    url: "/replies/r-7f3/actions/progress"
-    headers:
-      Authorization: "Bearer &lt;token&gt;"
-      Accept: "application/hal+json"
-      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-      If-Match: "\"seq-2.hsf.L0.efd689e6aeddfbc1\""
-      Content-Type: "application/hal+json"
-      Content-Digest: "sha-256=:NtXxp5MwZcS40XbAE1NVf4NP8NxYfHta8DO1oFsmHNI=:"
-      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
-        );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:DnHfwbIRwIb3GYpVpKoBNH46Vg0gvWnXWQMvb8hVMK5gM82Huz/FTUgk868bru6KEiJCIfevbBBeoR8VPWaRCg==:"
-    body:
-      percent: 50
-      note: "the hold is with the next reader"
-  response:
-    status: 200
-    headers:
-      ETag: "\"seq-3.hsf.L0.e7ff0c0f23b80d9b\""
-      Content-Type: "application/hal+json"
-    body:
-      reply: "r-7f3"
-      state: "awaiting"
-      percent: 50
-      note: "the hold is with the next reader"
-      _links:
-        self:
-          href: "/replies/r-7f3"
-        curies:
-        - name: "hr"
-          href: "/profiles/hr#{rel}"
-          templated: true
-        - name: "hr"
-          href: "https://w3id.org/heart-rise/rels/{rel}"
-          templated: true
-        hr:unavailable:
-          href: "/unavailable/fc81f545088ea825"
-          type: "application/json"
-          integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
-      _forms:
-        hr:progress:
-          title: "Report progress"
-          description: "Tells the caller how far the work has got."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/progress"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              note:
-                type: "string"
-              percent:
-                maximum: 100
-                minimum: 0
-                type: "integer"
-            required:
-            - "percent"
-            type: "object"
-            $id: "/schemas/01c9d6edf2078e6b"
-          hr:integrity: "sha256-QtjNb5WpR/kRbuDpYHPp7eHU7X4JKA2DNl793YROQtA="
-        hr:completed:
-          title: "Report completed"
-          description: "Sends the result: the work is done."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/completed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              result:
-                type: "object"
-            required:
-            - "result"
-            type: "object"
-            $id: "/schemas/7849137b825e616c"
-          hr:integrity: "sha256-qOpcrT87h4fPbAUjzWig2C2OI2b3GXHSPzlYIizsFrg="
-        hr:failed:
-          title: "Report failed"
-          description: "Says the work failed, with a problem document."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/failed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              detail:
-                type: "string"
-              title:
-                type: "string"
-            required:
-            - "title"
-            type: "object"
-            $id: "/schemas/d6066bd8090ffb27"
-          hr:integrity: "sha256-gRRu2b4Yc+5zxX/J01dxFWiISiRw33Q+EgX1RoKdLXI="
-  expect: 200
-  ms: 9
-- at: "2026-11-09T07:01:03.222341Z"
-  mode: "script"
-  say: "The library reads Ana's reply r-7f3 for its ETag and form"
-  params:
-    reply: "r-7f3"
-  request:
-    method: "GET"
-    url: "/replies/r-7f3"
-    headers:
-      Authorization: "Bearer &lt;token&gt;"
-      Accept: "application/hal+json"
-      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-    body: null
-  response:
-    status: 200
-    headers:
-      ETag: "\"seq-3.hsf.L0.e7ff0c0f23b80d9b\""
-      Content-Type: "application/hal+json"
-    body:
-      reply: "r-7f3"
-      state: "awaiting"
-      percent: 50
-      note: "the hold is with the next reader"
-      _links:
-        self:
-          href: "/replies/r-7f3"
-        curies:
-        - name: "hr"
-          href: "/profiles/hr#{rel}"
-          templated: true
-        - name: "hr"
-          href: "https://w3id.org/heart-rise/rels/{rel}"
-          templated: true
-        hr:unavailable:
-          href: "/unavailable/fc81f545088ea825"
-          type: "application/json"
-          integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
-      _forms:
-        hr:progress:
-          title: "Report progress"
-          description: "Tells the caller how far the work has got."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/progress"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              note:
-                type: "string"
-              percent:
-                maximum: 100
-                minimum: 0
-                type: "integer"
-            required:
-            - "percent"
-            type: "object"
-            $id: "/schemas/01c9d6edf2078e6b"
-          hr:integrity: "sha256-QtjNb5WpR/kRbuDpYHPp7eHU7X4JKA2DNl793YROQtA="
-        hr:completed:
-          title: "Report completed"
-          description: "Sends the result: the work is done."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/completed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              result:
-                type: "object"
-            required:
-            - "result"
-            type: "object"
-            $id: "/schemas/7849137b825e616c"
-          hr:integrity: "sha256-qOpcrT87h4fPbAUjzWig2C2OI2b3GXHSPzlYIizsFrg="
-        hr:failed:
-          title: "Report failed"
-          description: "Says the work failed, with a problem document."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/failed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              detail:
-                type: "string"
-              title:
-                type: "string"
-            required:
-            - "title"
-            type: "object"
-            $id: "/schemas/d6066bd8090ffb27"
-          hr:integrity: "sha256-gRRu2b4Yc+5zxX/J01dxFWiISiRw33Q+EgX1RoKdLXI="
-  expect: 200
-  ms: 6
-- at: "2026-11-09T07:01:03.229717Z"
-  mode: "script"
-  say: "A result signed with another key, claiming the library's keyid, is sent on\
-    \ reply r-7f3"
-  params:
-    reply: "r-7f3"
-    relation: "completed"
-  request:
-    method: "PUT"
-    url: "/replies/r-7f3/actions/completed"
-    headers:
-      Authorization: "Bearer &lt;token&gt;"
-      Accept: "application/hal+json"
-      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-      If-Match: "\"seq-3.hsf.L0.e7ff0c0f23b80d9b\""
-      Content-Type: "application/hal+json"
-      Content-Digest: "sha-256=:J2285ifUU8b/H/xaWAzdIT6r1TBh1b+EwBaqhDqpztQ=:"
-      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
-        );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:cdPRYaHEyVh4RizsF2AnVrcXGp9FULugSKvaHwblufD1mbNBGAsT/sDFxmlfP0z+aDL7ozgPFv2Z72gXoPQtAQ==:"
-    body:
-      result:
-        loan: 3310
-        renewableFrom: "2026-12-03"
-  response:
-    status: 401
-    headers:
-      Content-Type: "application/problem+json"
-    body:
-      title: "The signature does not verify"
-      status: 401
-  expect: 401
-  ms: 1
-- at: "2026-11-09T07:01:03.231822Z"
-  mode: "script"
-  say: "The library reads Ana's reply r-7f3 for its ETag and form"
-  params:
-    reply: "r-7f3"
-  request:
-    method: "GET"
-    url: "/replies/r-7f3"
-    headers:
-      Authorization: "Bearer &lt;token&gt;"
-      Accept: "application/hal+json"
-      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-    body: null
-  response:
-    status: 200
-    headers:
-      ETag: "\"seq-3.hsf.L0.e7ff0c0f23b80d9b\""
-      Content-Type: "application/hal+json"
-    body:
-      reply: "r-7f3"
-      state: "awaiting"
-      percent: 50
-      note: "the hold is with the next reader"
-      _links:
-        self:
-          href: "/replies/r-7f3"
-        curies:
-        - name: "hr"
-          href: "/profiles/hr#{rel}"
-          templated: true
-        - name: "hr"
-          href: "https://w3id.org/heart-rise/rels/{rel}"
-          templated: true
-        hr:unavailable:
-          href: "/unavailable/fc81f545088ea825"
-          type: "application/json"
-          integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
-      _forms:
-        hr:progress:
-          title: "Report progress"
-          description: "Tells the caller how far the work has got."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/progress"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              note:
-                type: "string"
-              percent:
-                maximum: 100
-                minimum: 0
-                type: "integer"
-            required:
-            - "percent"
-            type: "object"
-            $id: "/schemas/01c9d6edf2078e6b"
-          hr:integrity: "sha256-QtjNb5WpR/kRbuDpYHPp7eHU7X4JKA2DNl793YROQtA="
-        hr:completed:
-          title: "Report completed"
-          description: "Sends the result: the work is done."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/completed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              result:
-                type: "object"
-            required:
-            - "result"
-            type: "object"
-            $id: "/schemas/7849137b825e616c"
-          hr:integrity: "sha256-qOpcrT87h4fPbAUjzWig2C2OI2b3GXHSPzlYIizsFrg="
-        hr:failed:
-          title: "Report failed"
-          description: "Says the work failed, with a problem document."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/failed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              detail:
-                type: "string"
-              title:
-                type: "string"
-            required:
-            - "title"
-            type: "object"
-            $id: "/schemas/d6066bd8090ffb27"
-          hr:integrity: "sha256-gRRu2b4Yc+5zxX/J01dxFWiISiRw33Q+EgX1RoKdLXI="
-  expect: 200
-  ms: 3
-- at: "2026-11-09T07:01:03.235725Z"
-  mode: "script"
-  say: "An unsigned result is sent on reply r-7f3"
-  params:
-    reply: "r-7f3"
-    relation: "completed"
-  request:
-    method: "PUT"
-    url: "/replies/r-7f3/actions/completed"
-    headers:
-      Authorization: "Bearer &lt;token&gt;"
-      Accept: "application/hal+json"
-      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-      If-Match: "\"seq-3.hsf.L0.e7ff0c0f23b80d9b\""
-      Content-Type: "application/hal+json"
-    body:
-      result:
-        loan: 3310
-        renewableFrom: "2026-12-03"
-  response:
-    status: 401
-    headers:
-      Content-Type: "application/problem+json"
-    body:
-      title: "The signature does not verify"
-      status: 401
-  expect: 401
-  ms: 0
-- at: "2026-11-09T07:01:03.235906Z"
-  mode: "script"
-  say: "The library reads Ana's reply r-7f3 for its ETag and form"
-  params:
-    reply: "r-7f3"
-  request:
-    method: "GET"
-    url: "/replies/r-7f3"
-    headers:
-      Authorization: "Bearer &lt;token&gt;"
-      Accept: "application/hal+json"
-      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-    body: null
-  response:
-    status: 200
-    headers:
-      ETag: "\"seq-3.hsf.L0.e7ff0c0f23b80d9b\""
-      Content-Type: "application/hal+json"
-    body:
-      reply: "r-7f3"
-      state: "awaiting"
-      percent: 50
-      note: "the hold is with the next reader"
-      _links:
-        self:
-          href: "/replies/r-7f3"
-        curies:
-        - name: "hr"
-          href: "/profiles/hr#{rel}"
-          templated: true
-        - name: "hr"
-          href: "https://w3id.org/heart-rise/rels/{rel}"
-          templated: true
-        hr:unavailable:
-          href: "/unavailable/fc81f545088ea825"
-          type: "application/json"
-          integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
-      _forms:
-        hr:progress:
-          title: "Report progress"
-          description: "Tells the caller how far the work has got."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/progress"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              note:
-                type: "string"
-              percent:
-                maximum: 100
-                minimum: 0
-                type: "integer"
-            required:
-            - "percent"
-            type: "object"
-            $id: "/schemas/01c9d6edf2078e6b"
-          hr:integrity: "sha256-QtjNb5WpR/kRbuDpYHPp7eHU7X4JKA2DNl793YROQtA="
-        hr:completed:
-          title: "Report completed"
-          description: "Sends the result: the work is done."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/completed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              result:
-                type: "object"
-            required:
-            - "result"
-            type: "object"
-            $id: "/schemas/7849137b825e616c"
-          hr:integrity: "sha256-qOpcrT87h4fPbAUjzWig2C2OI2b3GXHSPzlYIizsFrg="
-        hr:failed:
-          title: "Report failed"
-          description: "Says the work failed, with a problem document."
-          _links:
-            target:
-              href: "/replies/r-7f3/actions/failed"
-          method: "PUT"
-          contentType: "application/json"
-          schema:
-            properties:
-              detail:
-                type: "string"
-              title:
-                type: "string"
-            required:
-            - "title"
-            type: "object"
-            $id: "/schemas/d6066bd8090ffb27"
-          hr:integrity: "sha256-gRRu2b4Yc+5zxX/J01dxFWiISiRw33Q+EgX1RoKdLXI="
-  expect: 200
-  ms: 4
-- at: "2026-11-09T07:01:03.241076Z"
-  mode: "script"
-  say: "The hold on loan 3310 is returned, and the library sends the result on reply\
-    \ r-7f3, signed"
-  params:
-    reply: "r-7f3"
-    relation: "completed"
-  request:
-    method: "PUT"
-    url: "/replies/r-7f3/actions/completed"
-    headers:
-      Authorization: "Bearer &lt;token&gt;"
-      Accept: "application/hal+json"
-      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-      If-Match: "\"seq-3.hsf.L0.e7ff0c0f23b80d9b\""
-      Content-Type: "application/hal+json"
-      Content-Digest: "sha-256=:J2285ifUU8b/H/xaWAzdIT6r1TBh1b+EwBaqhDqpztQ=:"
-      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
-        );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:e4WyXAbwa4wrYKqed8JuLWONmbXAmYCerH5NbLyLwldhgoH1WlwbMT2aFZziZyvGs+Ev63QsrSFmqjpZhchxCQ==:"
-    body:
-      result:
-        loan: 3310
-        renewableFrom: "2026-12-03"
-  response:
-    status: 200
-    headers:
-      ETag: "\"seq-4.hsf.L0.d6b53c7332f978b5\""
-      Content-Type: "application/hal+json"
-    body:
-      reply: "r-7f3"
-      state: "completed"
-      percent: 50
-      note: "the hold is with the next reader"
-      result:
-        loan: 3310
-        renewableFrom: "2026-12-03"
-      _links:
-        self:
-          href: "/replies/r-7f3"
-        curies:
-        - name: "hr"
-          href: "/profiles/hr#{rel}"
-          templated: true
-        - name: "hr"
-          href: "https://w3id.org/heart-rise/rels/{rel}"
-          templated: true
-        hr:unavailable:
-          href: "/unavailable/c754f2c87a2ae644"
-          type: "application/json"
-          integrity: "sha256-x1TyyHoq5kQ4yW/4qqDPvZjbsu1Jl5fdhfT/U6Dcf/U="
-      _forms: {}
-  expect: 200
-  ms: 7
-- at: "2026-11-09T07:01:03.248991Z"
-  mode: "script"
-  say: "The library reads Ana's reply r-7f3 for its ETag and form"
-  params:
-    reply: "r-7f3"
-  request:
-    method: "GET"
-    url: "/replies/r-7f3"
-    headers:
-      Authorization: "Bearer &lt;token&gt;"
-      Accept: "application/hal+json"
-      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-    body: null
-  response:
-    status: 200
-    headers:
-      ETag: "\"seq-4.hsf.L0.d6b53c7332f978b5\""
-      Content-Type: "application/hal+json"
-    body:
-      reply: "r-7f3"
-      state: "completed"
-      percent: 50
-      note: "the hold is with the next reader"
-      result:
-        loan: 3310
-        renewableFrom: "2026-12-03"
-      _links:
-        self:
-          href: "/replies/r-7f3"
-        curies:
-        - name: "hr"
-          href: "/profiles/hr#{rel}"
-          templated: true
-        - name: "hr"
-          href: "https://w3id.org/heart-rise/rels/{rel}"
-          templated: true
-        hr:unavailable:
-          href: "/unavailable/c754f2c87a2ae644"
-          type: "application/json"
-          integrity: "sha256-x1TyyHoq5kQ4yW/4qqDPvZjbsu1Jl5fdhfT/U6Dcf/U="
-      _forms: {}
-  expect: 200
-  ms: 0
-- at: "2026-11-09T07:01:03.250893Z"
-  mode: "script"
-  say: "The same result is sent again on reply r-7f3"
-  params:
-    reply: "r-7f3"
-    relation: "completed"
-  request:
-    method: "PUT"
-    url: "/replies/r-7f3/actions/completed"
-    headers:
-      Authorization: "Bearer &lt;token&gt;"
-      Accept: "application/hal+json"
-      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-      If-Match: "\"seq-4.hsf.L0.d6b53c7332f978b5\""
-      Content-Type: "application/hal+json"
-      Content-Digest: "sha-256=:J2285ifUU8b/H/xaWAzdIT6r1TBh1b+EwBaqhDqpztQ=:"
-      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
-        );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:CF4lFYJqRCXy/MbgldiFBUz977HBY3tr0CWd4TSAP4Nr1N8lpMc4wqC2vpDUzOXeTkO8CRctG1m5TEm1htCDBQ==:"
-    body:
-      result:
-        loan: 3310
-        renewableFrom: "2026-12-03"
-  response:
-    status: 200
-    headers:
-      ETag: "\"seq-4.hsf.L0.d6b53c7332f978b5\""
-      Content-Type: "application/hal+json"
-    body:
-      reply: "r-7f3"
-      state: "completed"
-      percent: 50
-      note: "the hold is with the next reader"
-      result:
-        loan: 3310
-        renewableFrom: "2026-12-03"
-      _links:
-        self:
-          href: "/replies/r-7f3"
-        curies:
-        - name: "hr"
-          href: "/profiles/hr#{rel}"
-          templated: true
-        - name: "hr"
-          href: "https://w3id.org/heart-rise/rels/{rel}"
-          templated: true
-        hr:unavailable:
-          href: "/unavailable/c754f2c87a2ae644"
-          type: "application/json"
-          integrity: "sha256-x1TyyHoq5kQ4yW/4qqDPvZjbsu1Jl5fdhfT/U6Dcf/U="
-      _forms: {}
+            $id: "/schemas/35f65fac527144fc"
+          hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 200
   ms: 2
-- at: "2026-11-09T07:01:03.253782Z"
+- at: "2026-11-11T05:35:00.321532Z"
   mode: "script"
-  say: "The library reads Ana's reply r-7f3 for its ETag and form"
+  say: "The library reads Ana's reply {reply}, linked from the watch, for its forms"
   params:
     reply: "r-7f3"
   request:
     method: "GET"
-    url: "/replies/r-7f3"
+    url: "https://caller.example/replies/r-7f3"
     headers:
       Authorization: "Bearer &lt;token&gt;"
       Accept: "application/hal+json"
@@ -1484,13 +823,501 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
   response:
     status: 200
     headers:
-      ETag: "\"seq-4.hsf.L0.d6b53c7332f978b5\""
+      ETag: "\"seq-1.hsf.L0.4b9d1ff05d6161a9\""
       Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json, application/problem+json"
+    body:
+      reply: "r-7f3"
+      state: "awaiting"
+      _links:
+        self:
+          href: "/replies/r-7f3"
+        curies:
+        - name: "hr"
+          href: "https://w3id.org/heart-rise/rels/{rel}"
+          templated: true
+        hr:unavailable:
+          href: "/unavailable/fc81f545088ea825"
+          type: "application/json"
+          integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
+        version-history:
+          href: "/replies/r-7f3/history"
+          type: "application/hal+json"
+      _forms:
+        hr:progress:
+          title: "Report progress"
+          description: "Tells the caller how far the work has got."
+          _links:
+            target:
+              href: "/replies/r-7f3"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
+          schema:
+            properties:
+              _links:
+                properties:
+                  hr:in-reply-to:
+                    properties:
+                      href:
+                        format: "uri"
+                        type: "string"
+                      type:
+                        type: "string"
+                    required:
+                    - "href"
+                    type: "object"
+                type: "object"
+              note:
+                default: null
+                type:
+                - "string"
+                - "null"
+              percent:
+                maximum: 100
+                minimum: 0
+                type: "integer"
+              state:
+                const: "awaiting"
+            required:
+            - "state"
+            - "percent"
+            type: "object"
+            $id: "/schemas/4e65bab7eacf4181"
+          hr:integrity: "sha256-Nd1ygCaXQ22SSol2I5e+dt8BBWFCNdCLOKJQ+NtUhaM="
+        hr:completed:
+          title: "Report completed"
+          description: "Sends the result: the work is done."
+          _links:
+            target:
+              href: "/replies/r-7f3"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
+          schema:
+            properties:
+              _links:
+                properties:
+                  hr:in-reply-to:
+                    properties:
+                      href:
+                        format: "uri"
+                        type: "string"
+                      type:
+                        type: "string"
+                    required:
+                    - "href"
+                    type: "object"
+                type: "object"
+              note:
+                type:
+                - "string"
+                - "null"
+              result:
+                additionalProperties: true
+                properties:
+                  loan:
+                    type: "integer"
+                  renewableFrom:
+                    format: "date"
+                    type: "string"
+                required:
+                - "loan"
+                - "renewableFrom"
+                type: "object"
+              state:
+                const: "completed"
+            required:
+            - "state"
+            - "result"
+            type: "object"
+            $id: "/schemas/8c8339a0496fc0e0"
+          hr:integrity: "sha256-kgt//qwBRQQK6kBEUOyBZDHXAX+ADUZ7kq0zJJsT+Pc="
+        hr:failed:
+          title: "Report failed"
+          description: "Says the work failed, with a problem document."
+          _links:
+            target:
+              href: "/replies/r-7f3"
+          method: "PATCH"
+          contentType: "application/problem+json"
+          schema:
+            properties:
+              _links:
+                properties:
+                  hr:in-reply-to:
+                    properties:
+                      href:
+                        format: "uri"
+                        type: "string"
+                      type:
+                        type: "string"
+                    required:
+                    - "href"
+                    type: "object"
+                type: "object"
+              detail:
+                type: "string"
+              state:
+                const: "failed"
+              title:
+                type: "string"
+              type:
+                format: "uri"
+                type: "string"
+            required:
+            - "state"
+            - "type"
+            - "title"
+            type: "object"
+            $id: "/schemas/3b56ba1aaf3f6c04"
+          hr:integrity: "sha256-qqKB8OT+lCxISpxnfev1gx+hr8Oee1Ji2BwZKrQxjPw="
+  expect: 200
+  ms: 8
+- at: "2026-11-11T05:35:00.331577Z"
+  mode: "script"
+  say: "The library reports progress of {percent} percent, naming the watch it answers\
+    \ for"
+  params:
+    relation: "hr:progress"
+    watch: "https://riverside-library.example/watches/1"
+    percent: 0
+  request:
+    method: "PATCH"
+    url: "https://caller.example/replies/r-7f3"
+    headers:
+      Authorization: "Bearer &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      If-Match: "\"seq-1.hsf.L0.4b9d1ff05d6161a9\""
+      Content-Type: "application/merge-patch+json"
+      Content-Digest: "sha-256=:Qi6RLw5+5KDVBDMkp+fc0O8Kmn5p5A4/j5TWEtkb02M=:"
+      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+        );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
+      Signature: "sig1=:ie6VtANwj6eMQFMJS4oikoJzI6cy55L3j8Q0d9oSI6mPI/AgPea55BQ5tDUpSk6bGDOprvMeC9LeEHMuR8+NBA==:"
+    body:
+      state: "awaiting"
+      percent: 0
+      note: "one ahead in the hold queue"
+      _links:
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/1"
+          type: "application/hal+json"
+  response:
+    status: 200
+    headers:
+      ETag: "\"seq-2.hsf.L0.344dd45bedc7e77b\""
+      Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json, application/problem+json"
+    body:
+      reply: "r-7f3"
+      state: "awaiting"
+      percent: 0
+      note: "one ahead in the hold queue"
+      _links:
+        self:
+          href: "/replies/r-7f3"
+        curies:
+        - name: "hr"
+          href: "https://w3id.org/heart-rise/rels/{rel}"
+          templated: true
+        hr:unavailable:
+          href: "/unavailable/fc81f545088ea825"
+          type: "application/json"
+          integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/1"
+        version-history:
+          href: "/replies/r-7f3/history"
+          type: "application/hal+json"
+      _forms:
+        hr:progress:
+          title: "Report progress"
+          description: "Tells the caller how far the work has got."
+          _links:
+            target:
+              href: "/replies/r-7f3"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
+          schema:
+            properties:
+              _links:
+                properties:
+                  hr:in-reply-to:
+                    properties:
+                      href:
+                        format: "uri"
+                        type: "string"
+                      type:
+                        type: "string"
+                    required:
+                    - "href"
+                    type: "object"
+                type: "object"
+              note:
+                default: null
+                type:
+                - "string"
+                - "null"
+              percent:
+                maximum: 100
+                minimum: 0
+                type: "integer"
+              state:
+                const: "awaiting"
+            required:
+            - "state"
+            - "percent"
+            type: "object"
+            $id: "/schemas/4e65bab7eacf4181"
+          hr:integrity: "sha256-Nd1ygCaXQ22SSol2I5e+dt8BBWFCNdCLOKJQ+NtUhaM="
+        hr:completed:
+          title: "Report completed"
+          description: "Sends the result: the work is done."
+          _links:
+            target:
+              href: "/replies/r-7f3"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
+          schema:
+            properties:
+              _links:
+                properties:
+                  hr:in-reply-to:
+                    properties:
+                      href:
+                        format: "uri"
+                        type: "string"
+                      type:
+                        type: "string"
+                    required:
+                    - "href"
+                    type: "object"
+                type: "object"
+              note:
+                type:
+                - "string"
+                - "null"
+              result:
+                additionalProperties: true
+                properties:
+                  loan:
+                    type: "integer"
+                  renewableFrom:
+                    format: "date"
+                    type: "string"
+                required:
+                - "loan"
+                - "renewableFrom"
+                type: "object"
+              state:
+                const: "completed"
+            required:
+            - "state"
+            - "result"
+            type: "object"
+            $id: "/schemas/8c8339a0496fc0e0"
+          hr:integrity: "sha256-kgt//qwBRQQK6kBEUOyBZDHXAX+ADUZ7kq0zJJsT+Pc="
+        hr:failed:
+          title: "Report failed"
+          description: "Says the work failed, with a problem document."
+          _links:
+            target:
+              href: "/replies/r-7f3"
+          method: "PATCH"
+          contentType: "application/problem+json"
+          schema:
+            properties:
+              _links:
+                properties:
+                  hr:in-reply-to:
+                    properties:
+                      href:
+                        format: "uri"
+                        type: "string"
+                      type:
+                        type: "string"
+                    required:
+                    - "href"
+                    type: "object"
+                type: "object"
+              detail:
+                type: "string"
+              state:
+                const: "failed"
+              title:
+                type: "string"
+              type:
+                format: "uri"
+                type: "string"
+            required:
+            - "state"
+            - "type"
+            - "title"
+            type: "object"
+            $id: "/schemas/3b56ba1aaf3f6c04"
+          hr:integrity: "sha256-qqKB8OT+lCxISpxnfev1gx+hr8Oee1Ji2BwZKrQxjPw="
+  expect: 200
+  ms: 16
+- at: "2026-11-11T05:35:00.349239Z"
+  mode: "script"
+  say: "An answer that names another watch, {watch}, is sent"
+  params:
+    relation: "hr:progress"
+    watch: "https://riverside-library.example/watches/99"
+    percent: 50
+  request:
+    method: "PATCH"
+    url: "https://caller.example/replies/r-7f3"
+    headers:
+      Authorization: "Bearer &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      If-Match: "\"seq-2.hsf.L0.344dd45bedc7e77b\""
+      Content-Type: "application/merge-patch+json"
+      Content-Digest: "sha-256=:FjW7VI6D6ClFOJjFdBwYyHMnj6QEGHgTeq9S5GFSWTw=:"
+      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+        );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
+      Signature: "sig1=:eIBr01xrGlkHN+2ALErvMjdsd85kEH6STnhnydx9yUPSuyuK9t72JBSGvRYbD+Xn2+R/0JO4YEGaWTX9/Um3CQ==:"
+    body:
+      state: "awaiting"
+      percent: 50
+      _links:
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/99"
+          type: "application/hal+json"
+  response:
+    status: 409
+    headers:
+      Content-Type: "application/problem+json"
+    body:
+      type: "https://w3id.org/heart-rise/problems/link-conflict"
+      title: "The act names another resource than the state keeps"
+      status: 409
+      detail: "The answer names another watch than the one Ana's request created,\
+        \ https://riverside-library.example/watches/1"
+      rel: "hr:in-reply-to"
+  expect: 409
+  ms: 4
+- at: "2026-11-11T05:35:00.354527Z"
+  mode: "script"
+  say: "A result signed with another key, claiming the library's keyid, is sent"
+  params:
+    relation: "hr:completed"
+    watch: "https://riverside-library.example/watches/1"
+  request:
+    method: "PATCH"
+    url: "https://caller.example/replies/r-7f3"
+    headers:
+      Authorization: "Bearer &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      If-Match: "\"seq-2.hsf.L0.344dd45bedc7e77b\""
+      Content-Type: "application/merge-patch+json"
+      Content-Digest: "sha-256=:yBl7TkpQB16N2JT6aLLqne93Ta6TwNpogPuGerq3AXs=:"
+      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+        );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
+      Signature: "sig1=:zM6KjCo9ddo7AJUR2HnAwkpORBOrqP4orD6CA7wid3GNveixEdTQRXb67tax2k6NZGdE71dA4GpYnN37qYrvDA==:"
+    body:
+      state: "completed"
+      result:
+        loan: 3310
+        renewableFrom: "2026-12-03"
+      _links:
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/1"
+          type: "application/hal+json"
+  response:
+    status: 401
+    headers:
+      Content-Type: "application/problem+json"
+      WWW-Authenticate: "Signature realm=\"Ana's replies\""
+      Accept-Signature: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+        );keyid=\"library-2026-11\";alg=\"ed25519\""
+    body:
+      type: "https://w3id.org/heart-rise/problems/invalid-signature"
+      title: "The signature does not verify"
+      status: 401
+      detail: "Each act here is signed by the key library-2026-11."
+  expect: 401
+  ms: 4
+- at: "2026-11-11T05:35:00.359137Z"
+  mode: "script"
+  say: "An unsigned result is sent"
+  params:
+    relation: "hr:completed"
+    watch: "https://riverside-library.example/watches/1"
+  request:
+    method: "PATCH"
+    url: "https://caller.example/replies/r-7f3"
+    headers:
+      Authorization: "Bearer &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      If-Match: "\"seq-2.hsf.L0.344dd45bedc7e77b\""
+      Content-Type: "application/merge-patch+json"
+    body:
+      state: "completed"
+      result:
+        loan: 3310
+        renewableFrom: "2026-12-03"
+      _links:
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/1"
+          type: "application/hal+json"
+  response:
+    status: 401
+    headers:
+      Content-Type: "application/problem+json"
+      WWW-Authenticate: "Signature realm=\"Ana's replies\""
+      Accept-Signature: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+        );keyid=\"library-2026-11\";alg=\"ed25519\""
+    body:
+      type: "https://w3id.org/heart-rise/problems/signature-required"
+      title: "A signature is required"
+      status: 401
+      detail: "Each act here is signed by the key library-2026-11."
+  expect: 401
+  ms: 2
+- at: "2026-11-11T05:35:00.362086Z"
+  mode: "script"
+  say: "The hold is returned, and the library sends the result, signed"
+  params:
+    relation: "hr:completed"
+    watch: "https://riverside-library.example/watches/1"
+  request:
+    method: "PATCH"
+    url: "https://caller.example/replies/r-7f3"
+    headers:
+      Authorization: "Bearer &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      If-Match: "\"seq-2.hsf.L0.344dd45bedc7e77b\""
+      Content-Type: "application/merge-patch+json"
+      Content-Digest: "sha-256=:yBl7TkpQB16N2JT6aLLqne93Ta6TwNpogPuGerq3AXs=:"
+      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+        );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
+      Signature: "sig1=:9qt+yAbBWSe7S5KhvfdIXoonKTar4/6mPLAG3vVH+Zb0VUjnPjzw90113MMaexZ1oFI3zMwqsx5U3QdkyUoCDQ==:"
+    body:
+      state: "completed"
+      result:
+        loan: 3310
+        renewableFrom: "2026-12-03"
+      _links:
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/1"
+          type: "application/hal+json"
+  response:
+    status: 200
+    headers:
+      ETag: "\"seq-3.hsf.L0.c5098fe109187ab0\""
+      Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json, application/problem+json"
     body:
       reply: "r-7f3"
       state: "completed"
-      percent: 50
-      note: "the hold is with the next reader"
+      percent: 100
       result:
         loan: 3310
         renewableFrom: "2026-12-03"
@@ -1499,41 +1326,109 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           href: "/replies/r-7f3"
         curies:
         - name: "hr"
-          href: "/profiles/hr#{rel}"
-          templated: true
-        - name: "hr"
           href: "https://w3id.org/heart-rise/rels/{rel}"
           templated: true
         hr:unavailable:
-          href: "/unavailable/c754f2c87a2ae644"
+          href: "/unavailable/ce71c00d4cf1b49f"
           type: "application/json"
-          integrity: "sha256-x1TyyHoq5kQ4yW/4qqDPvZjbsu1Jl5fdhfT/U6Dcf/U="
+          integrity: "sha256-znHADUzxtJ+uhI/xjQiNaP8KufWAMoKU5MFN/+LV5fA="
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/1"
+        version-history:
+          href: "/replies/r-7f3/history"
+          type: "application/hal+json"
       _forms: {}
   expect: 200
-  ms: 1
-- at: "2026-11-09T07:01:03.25558Z"
+  ms: 9
+- at: "2026-11-11T05:35:00.372067Z"
   mode: "script"
-  say: "A different result is sent on reply r-7f3, after the answer"
+  say: "The same result is sent again, and is answered as the first was"
   params:
-    reply: "r-7f3"
-    relation: "completed"
+    relation: "hr:completed"
+    watch: "https://riverside-library.example/watches/1"
   request:
-    method: "PUT"
-    url: "/replies/r-7f3/actions/completed"
+    method: "PATCH"
+    url: "https://caller.example/replies/r-7f3"
     headers:
       Authorization: "Bearer &lt;token&gt;"
       Accept: "application/hal+json"
       Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-      If-Match: "\"seq-4.hsf.L0.d6b53c7332f978b5\""
-      Content-Type: "application/hal+json"
-      Content-Digest: "sha-256=:KSrs6zxj9VCe0mLwhN5AdvwhhsIlA8Qq1HuAhMiATbA=:"
+      If-Match: "\"seq-3.hsf.L0.c5098fe109187ab0\""
+      Content-Type: "application/merge-patch+json"
+      Content-Digest: "sha-256=:yBl7TkpQB16N2JT6aLLqne93Ta6TwNpogPuGerq3AXs=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:gyKD7zPxDQ1Fgsxowt/+bVQm7nJ98z7c6OZnHNmnKtKlbUYYnpQKy1EdBxgW/Z4dOwfIyH5tJUtb/ReSnmRRDA==:"
+      Signature: "sig1=:X0XT3kjZMwPlanFaan1h16/BYP4GfFnDMRfrFO2NZVOE3W0g8PeJZaku95GPYXS37jt7t3S8GWBYQh/OrDzoCA==:"
     body:
+      state: "completed"
+      result:
+        loan: 3310
+        renewableFrom: "2026-12-03"
+      _links:
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/1"
+          type: "application/hal+json"
+  response:
+    status: 200
+    headers:
+      ETag: "\"seq-3.hsf.L0.c5098fe109187ab0\""
+      Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json, application/problem+json"
+    body:
+      reply: "r-7f3"
+      state: "completed"
+      percent: 100
+      result:
+        loan: 3310
+        renewableFrom: "2026-12-03"
+      _links:
+        self:
+          href: "/replies/r-7f3"
+        curies:
+        - name: "hr"
+          href: "https://w3id.org/heart-rise/rels/{rel}"
+          templated: true
+        hr:unavailable:
+          href: "/unavailable/ce71c00d4cf1b49f"
+          type: "application/json"
+          integrity: "sha256-znHADUzxtJ+uhI/xjQiNaP8KufWAMoKU5MFN/+LV5fA="
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/1"
+        version-history:
+          href: "/replies/r-7f3/history"
+          type: "application/hal+json"
+      _forms: {}
+  expect: 200
+  ms: 4
+- at: "2026-11-11T05:35:00.377346Z"
+  mode: "script"
+  say: "A different result is sent, after the answer"
+  params:
+    relation: "hr:completed"
+    watch: "https://riverside-library.example/watches/1"
+  request:
+    method: "PATCH"
+    url: "https://caller.example/replies/r-7f3"
+    headers:
+      Authorization: "Bearer &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      If-Match: "\"seq-3.hsf.L0.c5098fe109187ab0\""
+      Content-Type: "application/merge-patch+json"
+      Content-Digest: "sha-256=:Z04fjVGxnDkA5p6r0mH2WK3gCu9EM2SU/9OrTyeYEHc=:"
+      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+        );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
+      Signature: "sig1=:M4FTr+nAV41XIFTJFvRQc5ymSMiQ+9nLTz3ibxGE7oWAby/JiICFN29ZPdyZgDZqeXsqFAoXapSZxGdYep9dCA==:"
+    body:
+      state: "completed"
       result:
         loan: 3310
         renewableFrom: "2026-12-10"
+      _links:
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/1"
+          type: "application/hal+json"
   response:
     status: 409
     headers:
@@ -1544,16 +1439,16 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       status: 409
       detail: "hr:completed is not offered now: The reply is completed, so it takes\
         \ no more."
-      rel: "/profiles/hr#completed"
+      rel: "https://w3id.org/heart-rise/rels/completed"
   expect: 409
-  ms: 3
-- at: "2026-11-09T07:01:03.25953Z"
+  ms: 4
+- at: "2026-11-11T05:35:00.381644Z"
   mode: "script"
-  say: "Ana reads the library's entry, as HAL Schema Forms"
+  say: "Ana reads her watch after the answer: no cancel, and why"
   params: {}
   request:
     method: "GET"
-    url: "/"
+    url: "https://riverside-library.example/watches/1"
     headers:
       Authorization: "Basic &lt;token&gt;"
       Accept: "application/hal+json"
@@ -1562,281 +1457,152 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
   response:
     status: 200
     headers:
-      ETag: "\"index-hsf-d1c387d90315e842\""
+      ETag: "\"seq-2.hsf.L0.98d14692da8dda2d\""
       Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json"
     body:
-      title: "Riverside Public Library"
+      id: 1
+      loan: 3310
+      standing: "answered"
       _links:
         self:
-          href: "/"
-        service-desc:
-          href: "/openapi.json"
-          type: "application/vnd.oai.openapi+json;version=3.1"
+          href: "/watches/1"
         curies:
         - name: "library"
           href: "/profiles/library#{rel}"
           templated: true
-      _forms:
-        library:search-accounts:
-          _links:
-            target:
-              href: "/accounts{?name}"
-              templated: true
-          method: "GET"
-          title: "Find accounts by name"
-          description: "Lists the accounts whose member's name has the text."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              name:
-                type: "string"
-                minLength: 1
-                title: "Name"
-                description: "Part of the member's name; case is ignored"
-            required:
-            - "name"
-          hr:integrity: "sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM="
-        library:get-account:
-          _links:
-            target:
-              href: "/accounts/{id}"
-              templated: true
-          method: "GET"
-          title: "Get an account by library card number"
-          description: "Goes to one member's account, given the number on their library\
-            \ card."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              id:
-                type: "integer"
-                minimum: 1
-                title: "Library card number"
-                description: "The number on the back of the library card"
-            required:
-            - "id"
-          hr:integrity: "sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0="
-        library:search-members:
-          _links:
-            target:
-              href: "/members{?company}"
-              templated: true
-          method: "GET"
-          title: "Find members by company"
-          description: "Lists the members in the company group whose name has the\
-            \ text, five to a page."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              company:
-                type: "string"
-                minLength: 1
-                title: "Company"
-                description: "Part of the company's name; case is ignored"
-            required: []
-          hr:integrity: "sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc="
-        library:get-member:
-          _links:
-            target:
-              href: "/members/{id}"
-              templated: true
-          method: "GET"
-          title: "Get a member of a company group by library card number"
-          description: "Goes to one member of a company group, given the number on\
-            \ their library card."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              id:
-                type: "integer"
-                minimum: 1
-                title: "Library card number"
-                description: "The number on the back of the library card"
-            required:
-            - "id"
-          hr:integrity: "sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc="
-        library:search-loans:
-          _links:
-            target:
-              href: "/loans{?name}"
-              templated: true
-          method: "GET"
-          title: "Find loans by title"
-          description: "Lists the loans whose book's title has the text."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              name:
-                type: "string"
-                minLength: 1
-                title: "Name"
-                description: "Part of the book's title; case is ignored"
-            required:
-            - "name"
-          hr:integrity: "sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU="
-        library:get-loan:
-          _links:
-            target:
-              href: "/loans/{id}"
-              templated: true
-          method: "GET"
-          title: "Get a loan by number"
-          description: "Goes to one loan, given its number."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              id:
-                type: "integer"
-                minimum: 1
-                title: "Loan number"
-                description: "The loan's number, on the receipt"
-            required:
-            - "id"
-          hr:integrity: "sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8="
-        library:search-watches:
-          _links:
-            target:
-              href: "/watches{?name}"
-              templated: true
-          method: "GET"
-          title: "Find watches"
-          description: "Lists the watches the library holds."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              name:
-                type: "string"
-                minLength: 1
-                title: "Name"
-                description: ""
-            required:
-            - "name"
-          hr:integrity: "sha256-2yobtIXyUq2XWIROrft3DpPzBOtSD/yJSvNcYEcSE5g="
-        library:get-watch:
-          _links:
-            target:
-              href: "/watches/{id}"
-              templated: true
-          method: "GET"
-          title: "Get a watch by number"
-          description: "Goes to one watch, given its number."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              id:
-                type: "integer"
-                minimum: 1
-                title: "Watch number"
-                description: "The watch's number, in its Location"
-            required:
-            - "id"
-          hr:integrity: "sha256-HehVbRBB2+7tl0d6s3KNl5J4e1VLDO21aUP8s2rAel4="
-        library:tell-me-when-renewable:
-          _links:
-            target:
-              href: "/actions/tell-me-when-renewable"
-          method: "POST"
-          contentType: "application/json"
-          title: "Tell me when renewable"
-          description: "Brings a watch into being: the library tells the caller when\
-            \ the loan can be renewed."
-          schema:
-            properties:
-              _links:
-                properties:
-                  hr:keys:
-                    properties:
-                      href:
-                        format: "uri"
-                        type: "string"
-                      type:
-                        const: "application/jwk-set+json"
-                    required:
-                    - "href"
-                    - "type"
-                    type: "object"
-                  hr:reply-to:
-                    properties:
-                      href:
-                        format: "uri"
-                        type: "string"
-                      profile:
-                        enum:
-                        - "https://w3id.org/heart-rise/hal-schema-forms"
-                        - "https://w3id.org/heart-rise/hal-forms"
-                      type:
-                        const: "application/hal+json"
-                    required:
-                    - "href"
-                    - "type"
-                    - "profile"
-                    type: "object"
-                required:
-                - "hr:reply-to"
-                - "hr:keys"
-                type: "object"
-              loan:
-                title: "Loan number"
-                type: "integer"
-            required:
-            - "loan"
-            - "_links"
-            type: "object"
-            $id: "/schemas/2af51786a9d2f804"
-          hr:integrity: "sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU="
-      hr:manifest:
-        forms:
-          library:get-account:
-          - "sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0="
-          library:get-loan:
-          - "sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8="
-          library:get-member:
-          - "sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc="
-          library:get-watch:
-          - "sha256-HehVbRBB2+7tl0d6s3KNl5J4e1VLDO21aUP8s2rAel4="
-          library:renew:
-          - "sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0="
-          library:report-problem:
-          - "sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k="
-          library:return:
-          - "sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo="
-          library:search-accounts:
-          - "sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM="
-          library:search-loans:
-          - "sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU="
-          library:search-members:
-          - "sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc="
-          library:search-watches:
-          - "sha256-2yobtIXyUq2XWIROrft3DpPzBOtSD/yJSvNcYEcSE5g="
-          library:tell-me-when-renewable:
-          - "sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU="
-        digest: "sha256-LbDBqTwTSmJZg48JxAtePjKj+Bmhnb1rAyTqrBY5Mdo="
+        - name: "hr"
+          href: "https://w3id.org/heart-rise/rels/{rel}"
+          templated: true
+        hr:unavailable:
+          href: "/unavailable/6a3fa383b7696963"
+          type: "application/json"
+          integrity: "sha256-aj+jg7dpaWNe0+Zre2PKcNGS3SbY2+VQc4DcGhPoIUA="
+        hr:reply-to:
+          href: "https://caller.example/replies/r-7f3"
+        hr:keys:
+          href: "/keys"
+          type: "application/jwk-set+json"
+      _forms: {}
   expect: 200
   ms: 0
-- at: "2026-11-09T07:01:03.26015Z"
+- at: "2026-11-11T05:35:00.382719Z"
   mode: "script"
-  say: "Ana asks to be told when loan 3310 can be renewed, with reply r-b04 and her\
-    \ key"
+  say: "Ana reads why the watch offers no cancel"
+  params: {}
+  request:
+    method: "GET"
+    url: "https://riverside-library.example/unavailable/6a3fa383b7696963"
+    headers:
+      Authorization: "Basic &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/json"
+    body:
+      unavailable:
+      - reason: "The library has answered this request, so there is nothing to cancel."
+        rel: "https://w3id.org/heart-rise/rels/cancel"
+        title: "Cancel the request"
+  expect: 200
+  ms: 0
+- at: "2026-11-11T05:35:00.382993Z"
+  mode: "script"
+  say: "Ana cancels anyway, by the form she read before"
+  params:
+    relation: "hr:cancel"
+  request:
+    method: "PATCH"
+    url: "https://riverside-library.example/watches/1"
+    headers:
+      Authorization: "Basic &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      If-Match: "\"seq-2.hsf.L0.98d14692da8dda2d\""
+      Content-Type: "application/merge-patch+json"
+    body:
+      standing: "cancelled"
+  response:
+    status: 409
+    headers:
+      Content-Type: "application/problem+json"
+    body:
+      type: "https://w3id.org/heart-rise/problems/not-offered"
+      title: "The act is not offered in the resource's current state"
+      status: 409
+      detail: "hr:cancel is not offered now: The library has answered this request,\
+        \ so there is nothing to cancel."
+      rel: "https://w3id.org/heart-rise/rels/cancel"
+  expect: 409
+  ms: 1
+- at: "2026-11-11T05:35:00.384174Z"
+  mode: "script"
+  say: "The library reads the reply's history, by the link its last answer gave"
+  params:
+    relation: "version-history"
+  request:
+    method: "GET"
+    url: "https://caller.example/replies/r-7f3/history"
+    headers:
+      Authorization: "Bearer &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/hal+json"
+    body:
+      _links:
+        self:
+          href: "/replies/r-7f3/history"
+          type: "application/hal+json"
+        up:
+          href: "/replies/r-7f3"
+      changes:
+      - at: "2026-11-11T05:35:00.347249Z"
+        replaced: "\"seq-1.hsf.L0.4b9d1ff05d6161a9\""
+        signatureInput: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+          );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
+        signature: "sig1=:ie6VtANwj6eMQFMJS4oikoJzI6cy55L3j8Q0d9oSI6mPI/AgPea55BQ5tDUpSk6bGDOprvMeC9LeEHMuR8+NBA==:"
+        _links:
+          self:
+            href: "/replies/r-7f3/history#change-1"
+      - at: "2026-11-11T05:35:00.371211Z"
+        replaced: "\"seq-2.hsf.L0.344dd45bedc7e77b\""
+        signatureInput: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+          );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
+        signature: "sig1=:9qt+yAbBWSe7S5KhvfdIXoonKTar4/6mPLAG3vVH+Zb0VUjnPjzw90113MMaexZ1oFI3zMwqsx5U3QdkyUoCDQ==:"
+        _links:
+          self:
+            href: "/replies/r-7f3/history#change-2"
+          predecessor-version:
+            href: "/replies/r-7f3/history#change-1"
+  expect: 200
+  ms: 0
+- at: "2026-11-11T05:35:00.385456Z"
+  mode: "script"
+  say: "Ana asks again, with reply {reply}, on the entry's ETag she already holds"
   params:
     loan: 3310
     reply: "r-b04"
   request:
     method: "POST"
-    url: "/actions/tell-me-when-renewable"
+    url: "https://riverside-library.example/actions/tell-me-when-renewable"
     headers:
       Authorization: "Basic &lt;token&gt;"
       Accept: "application/hal+json"
       Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-      If-Match: "\"index-hsf-d1c387d90315e842\""
-      Content-Type: "application/hal+json"
+      If-Match: "\"index-hsf-e666c99bd6bab702\""
+      Content-Type: "application/json"
+      Content-Digest: "sha-256=:qCL1zgiAvPIsM5WCE1mO1ZgktaIBdxZ+Li442ZkKEPo=:"
+      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+        );created=1794153600;keyid=\"ana-2026-11\";alg=\"ed25519\""
+      Signature: "sig1=:PdVUJbBEVuv1Md92lF//a9GbeZoKaxK8JxDyWdkC7qGNEzmBIJSZ/OJD/+jnUO/kfr/jLXMBpxNIVHRU58RIAw==:"
     body:
       loan: 3310
       _links:
@@ -1851,8 +1617,10 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     status: 201
     headers:
       Location: "/watches/2"
-      ETag: "\"seq-1.hsf.L0.c270b0c281827f70\""
+      ETag: "\"seq-1.hsf.L0.25381f7a08fc6766\""
       Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json"
     body:
       id: 2
       loan: 3310
@@ -1874,18 +1642,36 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
         hr:reply-to:
           href: "https://caller.example/replies/r-b04"
         hr:keys:
-          href: "https://caller.example/keys"
-      _forms: {}
+          href: "/keys"
+          type: "application/jwk-set+json"
+      _forms:
+        hr:cancel:
+          title: "Cancel the request"
+          description: "Withdraws a request before it is answered: no answer will\
+            \ come."
+          _links:
+            target:
+              href: "/watches/2"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
+          schema:
+            properties:
+              standing:
+                const: "cancelled"
+            required:
+            - "standing"
+            type: "object"
+            $id: "/schemas/35f65fac527144fc"
+          hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 201
-  ms: 1
-- at: "2026-11-09T07:01:03.261792Z"
+  ms: 2
+- at: "2026-11-11T05:35:00.388294Z"
   mode: "script"
-  say: "Ana reads her watch on loan 3310"
-  params:
-    loan: 3310
+  say: "Ana reads her second watch"
+  params: {}
   request:
     method: "GET"
-    url: "/watches/2"
+    url: "https://riverside-library.example/watches/2"
     headers:
       Authorization: "Basic &lt;token&gt;"
       Accept: "application/hal+json"
@@ -1894,8 +1680,10 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
   response:
     status: 200
     headers:
-      ETag: "\"seq-1.hsf.L0.c270b0c281827f70\""
+      ETag: "\"seq-1.hsf.L0.25381f7a08fc6766\""
       Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json"
     body:
       id: 2
       loan: 3310
@@ -1917,18 +1705,37 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
         hr:reply-to:
           href: "https://caller.example/replies/r-b04"
         hr:keys:
-          href: "https://caller.example/keys"
-      _forms: {}
+          href: "/keys"
+          type: "application/jwk-set+json"
+      _forms:
+        hr:cancel:
+          title: "Cancel the request"
+          description: "Withdraws a request before it is answered: no answer will\
+            \ come."
+          _links:
+            target:
+              href: "/watches/2"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
+          schema:
+            properties:
+              standing:
+                const: "cancelled"
+            required:
+            - "standing"
+            type: "object"
+            $id: "/schemas/35f65fac527144fc"
+          hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 200
   ms: 1
-- at: "2026-11-09T07:01:03.263072Z"
+- at: "2026-11-11T05:35:00.390256Z"
   mode: "script"
-  say: "The library reads Ana's reply r-b04 for its ETag and form"
+  say: "The library reads Ana's reply {reply} for its forms"
   params:
     reply: "r-b04"
   request:
     method: "GET"
-    url: "/replies/r-b04"
+    url: "https://caller.example/replies/r-b04"
     headers:
       Authorization: "Bearer &lt;token&gt;"
       Accept: "application/hal+json"
@@ -1937,8 +1744,10 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
   response:
     status: 200
     headers:
-      ETag: "\"seq-1.hsf.L0.0ce8447e7bb9e691\""
+      ETag: "\"seq-1.hsf.L0.80c93494a1d4b2d8\""
       Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json, application/problem+json"
     body:
       reply: "r-b04"
       state: "awaiting"
@@ -1947,101 +1756,222 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           href: "/replies/r-b04"
         curies:
         - name: "hr"
-          href: "/profiles/hr#{rel}"
-          templated: true
-        - name: "hr"
           href: "https://w3id.org/heart-rise/rels/{rel}"
           templated: true
         hr:unavailable:
           href: "/unavailable/fc81f545088ea825"
           type: "application/json"
           integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
+        version-history:
+          href: "/replies/r-b04/history"
+          type: "application/hal+json"
       _forms:
         hr:progress:
           title: "Report progress"
           description: "Tells the caller how far the work has got."
           _links:
             target:
-              href: "/replies/r-b04/actions/progress"
-          method: "PUT"
-          contentType: "application/json"
+              href: "/replies/r-b04"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
           schema:
             properties:
+              _links:
+                properties:
+                  hr:in-reply-to:
+                    properties:
+                      href:
+                        format: "uri"
+                        type: "string"
+                      type:
+                        type: "string"
+                    required:
+                    - "href"
+                    type: "object"
+                type: "object"
               note:
-                type: "string"
+                default: null
+                type:
+                - "string"
+                - "null"
               percent:
                 maximum: 100
                 minimum: 0
                 type: "integer"
+              state:
+                const: "awaiting"
             required:
+            - "state"
             - "percent"
             type: "object"
-            $id: "/schemas/01c9d6edf2078e6b"
-          hr:integrity: "sha256-QtjNb5WpR/kRbuDpYHPp7eHU7X4JKA2DNl793YROQtA="
+            $id: "/schemas/4e65bab7eacf4181"
+          hr:integrity: "sha256-Nd1ygCaXQ22SSol2I5e+dt8BBWFCNdCLOKJQ+NtUhaM="
         hr:completed:
           title: "Report completed"
           description: "Sends the result: the work is done."
           _links:
             target:
-              href: "/replies/r-b04/actions/completed"
-          method: "PUT"
-          contentType: "application/json"
+              href: "/replies/r-b04"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
           schema:
             properties:
-              result:
+              _links:
+                properties:
+                  hr:in-reply-to:
+                    properties:
+                      href:
+                        format: "uri"
+                        type: "string"
+                      type:
+                        type: "string"
+                    required:
+                    - "href"
+                    type: "object"
                 type: "object"
+              note:
+                type:
+                - "string"
+                - "null"
+              result:
+                additionalProperties: true
+                properties:
+                  loan:
+                    type: "integer"
+                  renewableFrom:
+                    format: "date"
+                    type: "string"
+                required:
+                - "loan"
+                - "renewableFrom"
+                type: "object"
+              state:
+                const: "completed"
             required:
+            - "state"
             - "result"
             type: "object"
-            $id: "/schemas/7849137b825e616c"
-          hr:integrity: "sha256-qOpcrT87h4fPbAUjzWig2C2OI2b3GXHSPzlYIizsFrg="
+            $id: "/schemas/8c8339a0496fc0e0"
+          hr:integrity: "sha256-kgt//qwBRQQK6kBEUOyBZDHXAX+ADUZ7kq0zJJsT+Pc="
         hr:failed:
           title: "Report failed"
           description: "Says the work failed, with a problem document."
           _links:
             target:
-              href: "/replies/r-b04/actions/failed"
-          method: "PUT"
-          contentType: "application/json"
+              href: "/replies/r-b04"
+          method: "PATCH"
+          contentType: "application/problem+json"
           schema:
             properties:
+              _links:
+                properties:
+                  hr:in-reply-to:
+                    properties:
+                      href:
+                        format: "uri"
+                        type: "string"
+                      type:
+                        type: "string"
+                    required:
+                    - "href"
+                    type: "object"
+                type: "object"
               detail:
                 type: "string"
+              state:
+                const: "failed"
               title:
                 type: "string"
+              type:
+                format: "uri"
+                type: "string"
             required:
+            - "state"
+            - "type"
             - "title"
             type: "object"
-            $id: "/schemas/d6066bd8090ffb27"
-          hr:integrity: "sha256-gRRu2b4Yc+5zxX/J01dxFWiISiRw33Q+EgX1RoKdLXI="
+            $id: "/schemas/3b56ba1aaf3f6c04"
+          hr:integrity: "sha256-qqKB8OT+lCxISpxnfev1gx+hr8Oee1Ji2BwZKrQxjPw="
   expect: 200
-  ms: 3
-- at: "2026-11-09T07:01:03.26775Z"
+  ms: 8
+- at: "2026-11-11T05:35:00.399154Z"
   mode: "script"
-  say: "The library has no record of the hold on loan 3310, and sends the failure"
+  say: "The failure is sent as a merge patch, not the problem document its form asks\
+    \ for"
   params:
-    reply: "r-b04"
-    relation: "failed"
+    relation: "hr:failed"
+    watch: "https://riverside-library.example/watches/2"
   request:
-    method: "PUT"
-    url: "/replies/r-b04/actions/failed"
+    method: "PATCH"
+    url: "https://caller.example/replies/r-b04"
     headers:
       Authorization: "Bearer &lt;token&gt;"
       Accept: "application/hal+json"
       Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
-      If-Match: "\"seq-1.hsf.L0.0ce8447e7bb9e691\""
-      Content-Type: "application/problem+json"
-      Content-Digest: "sha-256=:EMvUVtF1LWvw+ruHe0OgjZkpYol2Bqy78rFjYJB2odc=:"
+      If-Match: "\"seq-1.hsf.L0.80c93494a1d4b2d8\""
+      Content-Type: "application/merge-patch+json"
+      Content-Digest: "sha-256=:zsjWtnnA0fCKoPJekUenhxTRFVc/lkO5E489YUb5PzU=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:EdQ5Cnz0gFfRCrOyvH4kAHaFNZBttv6+HOYq0Ot4DNs2QThi4LnDQgPoXQzNVI+v7m/NB+rpB/sHjcaku0SlAg==:"
+      Signature: "sig1=:zT/BPflWZDTZRI+0KzCp2Ggvm23daUoeKkfl0jvxZSVNPxpEEVq2tvLb3sQmXQkl0cffF5ODwUxAPkxYFXf1Bg==:"
     body:
+      state: "failed"
+      type: "https://riverside-library.example/problems/no-hold-record"
       title: "No hold record for loan 3310"
+      _links:
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/2"
+          type: "application/hal+json"
+  response:
+    status: 415
+    headers:
+      Content-Type: "application/problem+json"
+      Accept-Patch: "application/merge-patch+json, application/problem+json"
+    body:
+      type: "https://w3id.org/heart-rise/problems/unsupported-media-type"
+      title: "The body is not of a type the act takes"
+      status: 415
+      detail: "the state failed is sent as application/problem+json, not application/merge-patch+json"
+      accepted:
+      - "application/merge-patch+json"
+      - "application/problem+json"
+  expect: 415
+  ms: 3
+- at: "2026-11-11T05:35:00.403555Z"
+  mode: "script"
+  say: "The library has no record of the hold, and sends the failure as a problem\
+    \ document"
+  params:
+    relation: "hr:failed"
+    watch: "https://riverside-library.example/watches/2"
+  request:
+    method: "PATCH"
+    url: "https://caller.example/replies/r-b04"
+    headers:
+      Authorization: "Bearer &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      If-Match: "\"seq-1.hsf.L0.80c93494a1d4b2d8\""
+      Content-Type: "application/problem+json"
+      Content-Digest: "sha-256=:zsjWtnnA0fCKoPJekUenhxTRFVc/lkO5E489YUb5PzU=:"
+      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+        );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
+      Signature: "sig1=:zT/BPflWZDTZRI+0KzCp2Ggvm23daUoeKkfl0jvxZSVNPxpEEVq2tvLb3sQmXQkl0cffF5ODwUxAPkxYFXf1Bg==:"
+    body:
+      state: "failed"
+      type: "https://riverside-library.example/problems/no-hold-record"
+      title: "No hold record for loan 3310"
+      _links:
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/2"
+          type: "application/hal+json"
   response:
     status: 200
     headers:
-      ETag: "\"seq-2.hsf.L0.540065d75e9abd9d\""
+      ETag: "\"seq-2.hsf.L0.9824fa6fc1a6c532\""
       Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json, application/problem+json"
     body:
       reply: "r-b04"
       state: "failed"
@@ -2050,18 +1980,456 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           href: "/replies/r-b04"
         curies:
         - name: "hr"
-          href: "/profiles/hr#{rel}"
+          href: "https://w3id.org/heart-rise/rels/{rel}"
+          templated: true
+        hr:unavailable:
+          href: "/unavailable/0cf34eedc1841aa4"
+          type: "application/json"
+          integrity: "sha256-DPNO7cGEGqTGKniDIVzWdvWnmmL0PhHJEXHIy+iib3k="
+        hr:in-reply-to:
+          href: "https://riverside-library.example/watches/2"
+        version-history:
+          href: "/replies/r-b04/history"
+          type: "application/hal+json"
+      _embedded:
+        problem:
+          type: "https://riverside-library.example/problems/no-hold-record"
+          title: "No hold record for loan 3310"
+      _forms: {}
+  expect: 200
+  ms: 9
+- at: "2026-11-11T05:35:00.414096Z"
+  mode: "script"
+  say: "Ana asks a third time, with reply {reply}"
+  params:
+    loan: 3310
+    reply: "r-c21"
+  request:
+    method: "POST"
+    url: "https://riverside-library.example/actions/tell-me-when-renewable"
+    headers:
+      Authorization: "Basic &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      If-Match: "\"index-hsf-e666c99bd6bab702\""
+      Content-Type: "application/json"
+      Content-Digest: "sha-256=:bMU7gKSEUjSaOqohv4DcnetaXXaa2cSHzRPa+c9RdmE=:"
+      Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
+        );created=1794153600;keyid=\"ana-2026-11\";alg=\"ed25519\""
+      Signature: "sig1=:rC5rwJGWHBeehlsgxbpMp9701KvTsL4Jau+EPn9ag/MKSFB0yY7wXTISYJvSs7EE7CvmeBy24eakLEXnWKOBAA==:"
+    body:
+      loan: 3310
+      _links:
+        hr:reply-to:
+          href: "https://caller.example/replies/r-c21"
+          type: "application/hal+json"
+          profile: "https://w3id.org/heart-rise/hal-schema-forms"
+        hr:keys:
+          href: "https://caller.example/keys"
+          type: "application/jwk-set+json"
+  response:
+    status: 201
+    headers:
+      Location: "/watches/3"
+      ETag: "\"seq-1.hsf.L0.854b51f9d027f61f\""
+      Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json"
+    body:
+      id: 3
+      loan: 3310
+      standing: "awaiting"
+      _links:
+        self:
+          href: "/watches/3"
+        curies:
+        - name: "library"
+          href: "/profiles/library#{rel}"
           templated: true
         - name: "hr"
           href: "https://w3id.org/heart-rise/rels/{rel}"
           templated: true
         hr:unavailable:
-          href: "/unavailable/898c98d781f9b82a"
+          href: "/unavailable/fc81f545088ea825"
           type: "application/json"
-          integrity: "sha256-iYyY14H5uCoiqEZt92eXhavWiTDMKQ5ZdNf9EeHHyc0="
+          integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
+        hr:reply-to:
+          href: "https://caller.example/replies/r-c21"
+        hr:keys:
+          href: "/keys"
+          type: "application/jwk-set+json"
+      _forms:
+        hr:cancel:
+          title: "Cancel the request"
+          description: "Withdraws a request before it is answered: no answer will\
+            \ come."
+          _links:
+            target:
+              href: "/watches/3"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
+          schema:
+            properties:
+              standing:
+                const: "cancelled"
+            required:
+            - "standing"
+            type: "object"
+            $id: "/schemas/35f65fac527144fc"
+          hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
+  expect: 201
+  ms: 2
+- at: "2026-11-11T05:35:00.4171Z"
+  mode: "script"
+  say: "Ana reads her third watch, which offers {relation}"
+  params:
+    relation: "hr:cancel"
+  request:
+    method: "GET"
+    url: "https://riverside-library.example/watches/3"
+    headers:
+      Authorization: "Basic &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+    body: null
+  response:
+    status: 200
+    headers:
+      ETag: "\"seq-1.hsf.L0.854b51f9d027f61f\""
+      Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json"
+    body:
+      id: 3
+      loan: 3310
+      standing: "awaiting"
+      _links:
+        self:
+          href: "/watches/3"
+        curies:
+        - name: "library"
+          href: "/profiles/library#{rel}"
+          templated: true
+        - name: "hr"
+          href: "https://w3id.org/heart-rise/rels/{rel}"
+          templated: true
+        hr:unavailable:
+          href: "/unavailable/fc81f545088ea825"
+          type: "application/json"
+          integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
+        hr:reply-to:
+          href: "https://caller.example/replies/r-c21"
+        hr:keys:
+          href: "/keys"
+          type: "application/jwk-set+json"
+      _forms:
+        hr:cancel:
+          title: "Cancel the request"
+          description: "Withdraws a request before it is answered: no answer will\
+            \ come."
+          _links:
+            target:
+              href: "/watches/3"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
+          schema:
+            properties:
+              standing:
+                const: "cancelled"
+            required:
+            - "standing"
+            type: "object"
+            $id: "/schemas/35f65fac527144fc"
+          hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
+  expect: 200
+  ms: 1
+- at: "2026-11-11T05:35:00.419111Z"
+  mode: "script"
+  say: "Ana cancels the request, by the watch's form"
+  params:
+    relation: "hr:cancel"
+  request:
+    method: "PATCH"
+    url: "https://riverside-library.example/watches/3"
+    headers:
+      Authorization: "Basic &lt;token&gt;"
+      Accept: "application/hal+json"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      If-Match: "\"seq-1.hsf.L0.854b51f9d027f61f\""
+      Content-Type: "application/merge-patch+json"
+    body:
+      standing: "cancelled"
+  response:
+    status: 200
+    headers:
+      ETag: "\"seq-2.hsf.L0.99da04b6a11f0e4e\""
+      Content-Type: "application/hal+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+      Accept-Patch: "application/merge-patch+json"
+    body:
+      id: 3
+      loan: 3310
+      standing: "cancelled"
+      _links:
+        self:
+          href: "/watches/3"
+        curies:
+        - name: "library"
+          href: "/profiles/library#{rel}"
+          templated: true
+        - name: "hr"
+          href: "https://w3id.org/heart-rise/rels/{rel}"
+          templated: true
+        hr:unavailable:
+          href: "/unavailable/685b11505c8ac203"
+          type: "application/json"
+          integrity: "sha256-aFsRUFyKwgMR1dtWorFahDReDDIJFHkdgMqoO9Dck/c="
+        hr:reply-to:
+          href: "https://caller.example/replies/r-c21"
+        hr:keys:
+          href: "/keys"
+          type: "application/jwk-set+json"
       _forms: {}
   expect: 200
-  ms: 6
+  ms: 2
+- at: "2026-11-11T05:35:00.42187Z"
+  mode: "script"
+  say: "Ana's reply {reply}, read as HTML"
+  params:
+    reply: "r-c21"
+  request:
+    method: "GET"
+    url: "https://caller.example/replies/r-c21"
+    headers:
+      Authorization: "Bearer &lt;token&gt;"
+      Accept: "text/html"
+      Accept-Profile: "&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;"
+    body: null
+  response:
+    status: 200
+    headers:
+      ETag: "\"seq-1.html.L0.27aede1e3221c9e6\""
+      Content-Type: "text/html;charset=UTF-8"
+    body: "&lt;!doctype html&gt;\n&lt;html lang=\"en\"&gt;&lt;head&gt;&lt;meta charset=\"utf-8\"&gt;&lt;meta\
+      \ name=\"viewport\" content=\"width=device-width, initial-scale=1\"&gt;&lt;title&gt;/replies/r-c21&lt;/title&gt;&lt;link\
+      \ rel=\"stylesheet\" href=\"/heart/assets/heart.6abd5e20cc57.css\"&gt;&lt;script defer\
+      \ src=\"/heart/assets/htmx-2.0.4.min.e209dda5c823.js\"&gt;&lt;/script&gt;&lt;script defer\
+      \ src=\"/heart/assets/ajv2020-8.17.1.min.d2f97a24636c.js\"&gt;&lt;/script&gt;&lt;script\
+      \ defer src=\"/heart/assets/heart-forms.e3ecd1103c5a.js\"&gt;&lt;/script&gt;&lt;/head&gt;&lt;body\
+      \ hx-headers='{\"Accept\": \"text/html\"}'&gt;&lt;main id=\"resource\" data-etag=\"\
+      &amp;quot;seq-1.html.L0.27aede1e3221c9e6&amp;quot;\"&gt;&lt;nav class=\"links\" aria-label=\"\
+      Links\"&gt;&lt;a rel=\"version-history\" href=\"/replies/r-c21/history\"&gt;Version history&lt;/a&gt;&lt;/nav&gt;&lt;h1&gt;/replies/r-c21&lt;/h1&gt;&lt;div\
+      \ class=\"layout\"&gt;&lt;div class=\"info\"&gt;&lt;dl class=\"state\"&gt;&lt;div class=\"member\"\
+      &gt;&lt;dt title=\"reply\"&gt;Reply&lt;/dt&gt;&lt;dd&gt;r-c21&lt;/dd&gt;&lt;/div&gt;&lt;div class=\"member\"&gt;&lt;dt\
+      \ title=\"state\"&gt;State&lt;/dt&gt;&lt;dd&gt;awaiting&lt;/dd&gt;&lt;/div&gt;&lt;/dl&gt;&lt;/div&gt;&lt;aside class=\"\
+      side\" aria-label=\"Acts\"&gt;&lt;div class=\"acts\" role=\"toolbar\" aria-label=\"\
+      Acts\"&gt;&lt;button type=\"button\" class=\"act\" data-rel=\"hr:progress\" data-dialog=\"\
+      act-hr-progress\"&gt;Report progress&lt;/button&gt;&lt;button type=\"button\" class=\"act\"\
+      \ data-rel=\"hr:completed\" data-dialog=\"act-hr-completed\"&gt;Report completed&lt;/button&gt;&lt;button\
+      \ type=\"button\" class=\"act\" data-rel=\"hr:failed\" data-dialog=\"act-hr-failed\"\
+      &gt;Report failed&lt;/button&gt;&lt;/div&gt;&lt;/aside&gt;&lt;/div&gt;&lt;dialog id=\"act-hr-progress\" aria-labelledby=\"\
+      act-hr-progress-title\"&gt;&lt;form data-rel=\"hr:progress\" hx-patch=\"/replies/r-c21\"\
+      \ hx-headers=\"{&amp;quot;If-Match&amp;quot;:&amp;quot;\\&amp;quot;seq-1.html.L0.27aede1e3221c9e6\\\
+      &amp;quot;&amp;quot;,&amp;quot;Accept&amp;quot;:&amp;quot;text/html&amp;quot;}\" hx-target=\"#resource\"\
+      \ hx-select=\"#resource\" hx-swap=\"outerHTML\"&gt;&lt;h2 id=\"act-hr-progress-title\"\
+      &gt;Report progress&lt;/h2&gt;&lt;p class=\"desc\"&gt;Tells the caller how far the work has\
+      \ got.&lt;/p&gt;&lt;div class=\"field\"&gt;&lt;label for=\"act-hr-progress-state\"&gt;State&lt;span\
+      \ class=\"required\" aria-hidden=\"true\"&gt;*&lt;/span&gt;&lt;/label&gt;&lt;input type=\"text\"\
+      \ id=\"act-hr-progress-state\" name=\"state\" required&gt;&lt;/div&gt;&lt;div class=\"field\"\
+      &gt;&lt;label for=\"act-hr-progress-percent\"&gt;Percent&lt;span class=\"required\" aria-hidden=\"\
+      true\"&gt;*&lt;/span&gt;&lt;/label&gt;&lt;input type=\"number\" id=\"act-hr-progress-percent\"\
+      \ name=\"percent\" required min=\"0\" max=\"100\" step=\"1\"&gt;&lt;/div&gt;&lt;div class=\"\
+      field\"&gt;&lt;label for=\"act-hr-progress-note\"&gt;Note&lt;/label&gt;&lt;input type=\"text\"\
+      \ id=\"act-hr-progress-note\" name=\"note\"&gt;&lt;/div&gt;&lt;div class=\"field\"&gt;&lt;label\
+      \ for=\"act-hr-progress-_links\"&gt;Links&lt;/label&gt;&lt;input type=\"text\" id=\"act-hr-progress-_links\"\
+      \ name=\"_links\"&gt;&lt;/div&gt;&lt;script type=\"application/schema+json\" class=\"schema\"\
+      &gt;{\"properties\":{\"_links\":{\"properties\":{\"hr:in-reply-to\":{\"properties\"\
+      :{\"href\":{\"format\":\"uri\",\"type\":\"string\"},\"type\":{\"type\":\"string\"\
+      }},\"required\":[\"href\"],\"type\":\"object\"}},\"type\":\"object\"},\"note\"\
+      :{\"default\":null,\"type\":[\"string\",\"null\"]},\"percent\":{\"maximum\"\
+      :100,\"minimum\":0,\"type\":\"integer\"},\"state\":{\"const\":\"awaiting\"}},\"\
+      required\":[\"state\",\"percent\"],\"type\":\"object\",\"$id\":\"/schemas/4e65bab7eacf4181\"\
+      }&lt;/script&gt;&lt;div class=\"problem\" role=\"alert\" hidden&gt;&lt;/div&gt;&lt;div class=\"buttons\"\
+      &gt;&lt;button type=\"button\" class=\"quiet\" data-close&gt;Cancel&lt;/button&gt;&lt;button type=\"\
+      submit\"&gt;Report progress&lt;/button&gt;&lt;/div&gt;&lt;/form&gt;&lt;/dialog&gt;&lt;dialog id=\"act-hr-completed\"\
+      \ aria-labelledby=\"act-hr-completed-title\"&gt;&lt;form data-rel=\"hr:completed\"\
+      \ hx-patch=\"/replies/r-c21\" hx-headers=\"{&amp;quot;If-Match&amp;quot;:&amp;quot;\\&amp;quot;seq-1.html.L0.27aede1e3221c9e6\\\
+      &amp;quot;&amp;quot;,&amp;quot;Accept&amp;quot;:&amp;quot;text/html&amp;quot;}\" hx-target=\"#resource\"\
+      \ hx-select=\"#resource\" hx-swap=\"outerHTML\"&gt;&lt;h2 id=\"act-hr-completed-title\"\
+      &gt;Report completed&lt;/h2&gt;&lt;p class=\"desc\"&gt;Sends the result: the work is done.&lt;/p&gt;&lt;div\
+      \ class=\"field\"&gt;&lt;label for=\"act-hr-completed-state\"&gt;State&lt;span class=\"\
+      required\" aria-hidden=\"true\"&gt;*&lt;/span&gt;&lt;/label&gt;&lt;input type=\"text\" id=\"act-hr-completed-state\"\
+      \ name=\"state\" required&gt;&lt;/div&gt;&lt;div class=\"field\"&gt;&lt;label for=\"act-hr-completed-result\"\
+      &gt;Result&lt;span class=\"required\" aria-hidden=\"true\"&gt;*&lt;/span&gt;&lt;/label&gt;&lt;input\
+      \ type=\"text\" id=\"act-hr-completed-result\" name=\"result\" required&gt;&lt;/div&gt;&lt;div\
+      \ class=\"field\"&gt;&lt;label for=\"act-hr-completed-note\"&gt;Note&lt;/label&gt;&lt;input type=\"\
+      text\" id=\"act-hr-completed-note\" name=\"note\"&gt;&lt;/div&gt;&lt;div class=\"field\"\
+      &gt;&lt;label for=\"act-hr-completed-_links\"&gt;Links&lt;/label&gt;&lt;input type=\"text\" id=\"\
+      act-hr-completed-_links\" name=\"_links\"&gt;&lt;/div&gt;&lt;script type=\"application/schema+json\"\
+      \ class=\"schema\"&gt;{\"properties\":{\"_links\":{\"properties\":{\"hr:in-reply-to\"\
+      :{\"properties\":{\"href\":{\"format\":\"uri\",\"type\":\"string\"},\"type\"\
+      :{\"type\":\"string\"}},\"required\":[\"href\"],\"type\":\"object\"}},\"type\"\
+      :\"object\"},\"note\":{\"type\":[\"string\",\"null\"]},\"result\":{\"additionalProperties\"\
+      :true,\"properties\":{\"loan\":{\"type\":\"integer\"},\"renewableFrom\":{\"\
+      format\":\"date\",\"type\":\"string\"}},\"required\":[\"loan\",\"renewableFrom\"\
+      ],\"type\":\"object\"},\"state\":{\"const\":\"completed\"}},\"required\":[\"\
+      state\",\"result\"],\"type\":\"object\",\"$id\":\"/schemas/8c8339a0496fc0e0\"\
+      }&lt;/script&gt;&lt;div class=\"problem\" role=\"alert\" hidden&gt;&lt;/div&gt;&lt;div class=\"buttons\"\
+      &gt;&lt;button type=\"button\" class=\"quiet\" data-close&gt;Cancel&lt;/button&gt;&lt;button type=\"\
+      submit\"&gt;Report completed&lt;/button&gt;&lt;/div&gt;&lt;/form&gt;&lt;/dialog&gt;&lt;dialog id=\"act-hr-failed\"\
+      \ aria-labelledby=\"act-hr-failed-title\"&gt;&lt;form data-rel=\"hr:failed\" hx-patch=\"\
+      /replies/r-c21\" hx-headers=\"{&amp;quot;If-Match&amp;quot;:&amp;quot;\\&amp;quot;seq-1.html.L0.27aede1e3221c9e6\\\
+      &amp;quot;&amp;quot;,&amp;quot;Accept&amp;quot;:&amp;quot;text/html&amp;quot;}\" hx-target=\"#resource\"\
+      \ hx-select=\"#resource\" hx-swap=\"outerHTML\"&gt;&lt;h2 id=\"act-hr-failed-title\"\
+      &gt;Report failed&lt;/h2&gt;&lt;p class=\"desc\"&gt;Says the work failed, with a problem document.&lt;/p&gt;&lt;div\
+      \ class=\"field\"&gt;&lt;label for=\"act-hr-failed-state\"&gt;State&lt;span class=\"required\"\
+      \ aria-hidden=\"true\"&gt;*&lt;/span&gt;&lt;/label&gt;&lt;input type=\"text\" id=\"act-hr-failed-state\"\
+      \ name=\"state\" required&gt;&lt;/div&gt;&lt;div class=\"field\"&gt;&lt;label for=\"act-hr-failed-type\"\
+      &gt;Type&lt;span class=\"required\" aria-hidden=\"true\"&gt;*&lt;/span&gt;&lt;/label&gt;&lt;input type=\"\
+      text\" id=\"act-hr-failed-type\" name=\"type\" required&gt;&lt;/div&gt;&lt;div class=\"\
+      field\"&gt;&lt;label for=\"act-hr-failed-title\"&gt;Title&lt;span class=\"required\" aria-hidden=\"\
+      true\"&gt;*&lt;/span&gt;&lt;/label&gt;&lt;input type=\"text\" id=\"act-hr-failed-title\" name=\"\
+      title\" required&gt;&lt;/div&gt;&lt;div class=\"field\"&gt;&lt;label for=\"act-hr-failed-detail\"\
+      &gt;Detail&lt;/label&gt;&lt;input type=\"text\" id=\"act-hr-failed-detail\" name=\"detail\"\
+      &gt;&lt;/div&gt;&lt;div class=\"field\"&gt;&lt;label for=\"act-hr-failed-_links\"&gt;Links&lt;/label&gt;&lt;input\
+      \ type=\"text\" id=\"act-hr-failed-_links\" name=\"_links\"&gt;&lt;/div&gt;&lt;script type=\"\
+      application/schema+json\" class=\"schema\"&gt;{\"properties\":{\"_links\":{\"properties\"\
+      :{\"hr:in-reply-to\":{\"properties\":{\"href\":{\"format\":\"uri\",\"type\"\
+      :\"string\"},\"type\":{\"type\":\"string\"}},\"required\":[\"href\"],\"type\"\
+      :\"object\"}},\"type\":\"object\"},\"detail\":{\"type\":\"string\"},\"state\"\
+      :{\"const\":\"failed\"},\"title\":{\"type\":\"string\"},\"type\":{\"format\"\
+      :\"uri\",\"type\":\"string\"}},\"required\":[\"state\",\"type\",\"title\"],\"\
+      type\":\"object\",\"$id\":\"/schemas/3b56ba1aaf3f6c04\"}&lt;/script&gt;&lt;div class=\"\
+      problem\" role=\"alert\" hidden&gt;&lt;/div&gt;&lt;div class=\"buttons\"&gt;&lt;button type=\"\
+      button\" class=\"quiet\" data-close&gt;Cancel&lt;/button&gt;&lt;button type=\"submit\"&gt;Report\
+      \ failed&lt;/button&gt;&lt;/div&gt;&lt;/form&gt;&lt;/dialog&gt;&lt;/main&gt;&lt;div id=\"announce\" class=\"\
+      announce\" role=\"status\" aria-live=\"polite\"&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;\n"
+  expect: 200
+  ms: 37
+- at: "2026-11-11T05:35:00.459026Z"
+  mode: "script"
+  say: "Ana's reply {reply}, read as HAL-FORMS"
+  params:
+    reply: "r-c21"
+  request:
+    method: "GET"
+    url: "https://caller.example/replies/r-c21"
+    headers:
+      Authorization: "Bearer &lt;token&gt;"
+      Accept: "application/prs.hal-forms+json"
+    body: null
+  response:
+    status: 200
+    headers:
+      ETag: "\"seq-1.hf.L0.da3ea8a534fda676\""
+      Content-Type: "application/prs.hal-forms+json"
+      Content-Profile: "&lt;https://w3id.org/heart-rise/hal-forms&gt;"
+      Accept-Patch: "application/merge-patch+json, application/problem+json"
+    body:
+      reply: "r-c21"
+      state: "awaiting"
+      _links:
+        self:
+          href: "/replies/r-c21"
+        curies:
+        - name: "hr"
+          href: "https://w3id.org/heart-rise/rels/{rel}"
+          templated: true
+        version-history:
+          href: "/replies/r-c21/history"
+          type: "application/hal+json"
+      _templates:
+        progress:
+          title: "Report progress"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
+          target: "/replies/r-c21"
+          properties:
+          - name: "state"
+            required: true
+            type: "text"
+          - name: "percent"
+            required: true
+            type: "number"
+            min: 0
+            max: 100
+          - name: "note"
+            required: false
+            type: "text"
+          - name: "_links"
+            required: false
+            type: "text"
+        completed:
+          title: "Report completed"
+          method: "PATCH"
+          contentType: "application/merge-patch+json"
+          target: "/replies/r-c21"
+          properties:
+          - name: "state"
+            required: true
+            type: "text"
+          - name: "result"
+            required: true
+            type: "text"
+          - name: "note"
+            required: false
+            type: "text"
+          - name: "_links"
+            required: false
+            type: "text"
+        failed:
+          title: "Report failed"
+          method: "PATCH"
+          contentType: "application/problem+json"
+          target: "/replies/r-c21"
+          properties:
+          - name: "state"
+            required: true
+            type: "text"
+          - name: "type"
+            required: true
+            type: "text"
+          - name: "title"
+            required: true
+            type: "text"
+          - name: "detail"
+            required: false
+            type: "text"
+          - name: "_links"
+            required: false
+            type: "text"
+  expect: 200
+  ms: 189
+- at: "2026-11-11T05:35:00.648353Z"
+  mode: "script"
+  say: "Ana's reply {reply}, asked for as XML, which it is not served in"
+  params:
+    reply: "r-c21"
+  request:
+    method: "GET"
+    url: "https://caller.example/replies/r-c21"
+    headers:
+      Authorization: "Bearer &lt;token&gt;"
+      Accept: "application/xml"
+    body: null
+  response:
+    status: 406
+    headers:
+      Content-Type: "application/problem+json"
+    body:
+      type: "https://w3id.org/heart-rise/problems/not-acceptable"
+      title: "Accept names no format this server produces"
+      status: 406
+      detail: "Accept names no format this server produces"
+      alternates:
+      - type: "application/hal+json"
+        profile: "https://w3id.org/heart-rise/hal-schema-forms"
+      - type: "application/prs.hal-forms+json"
+        profile: "https://w3id.org/heart-rise/hal-forms"
+      - type: "text/html"
+      - type: "application/json"
+  expect: 406
+  ms: 2
 </pre>
 <script>
 /*! js-yaml 4.1.0 https://github.com/nodeca/js-yaml @license MIT */
@@ -2378,11 +2746,15 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     return p;
   };
   const requestText = (req) => {
-    const headers = Object.entries(req.headers || {}).filter(([k]) => /^(if-match|if-none-match|prefer|accept)$/i.test(k));
+    const headers = Object.entries(req.headers || {})
+      .filter(([k]) => /^(if-match|if-none-match|prefer|accept|content-type)$/i.test(k));
     return [`${req.method} ${req.url}`, ...headers.map(([k, v]) => `${k}: ${v}`)].join("   ");
   };
   const answerText = (res) => {
-    const kept = Object.entries(res.headers || {}).filter(([k]) => /^(location|content-location|etag)$/i.test(k));
+    // What the answer says about itself and about the next request: where, which version, which profile, how to
+    // authenticate and sign, and what a PATCH may be.
+    const kept = Object.entries(res.headers || {}).filter(([k]) =>
+      /^(location|content-location|etag|content-profile|www-authenticate|accept-signature|accept-patch)$/i.test(k));
     return [`HTTP ${res.status}`, ...kept.map(([k, v]) => `${k}: ${v}`)].join("   ");
   };
 
@@ -2730,8 +3102,9 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     // Hypermedia: requests whose address came from the server.
     const { entries, fromServer } = provenance();
     Object.assign(facts, { fromServer: fromServer.size, entries: [...entries] });
-    // A script's own entry is its bookmark, the one address it may know: not judged.
-    const entering = steps.filter((s) => neutral(s) && verbOf(s) === "enter").length;
+    // A script's own entry is its bookmark, the one address it may know: not judged. Over HTTP, the trace marks
+    // that step "entry".
+    const entering = steps.filter((s) => (neutral(s) && verbOf(s) === "enter") || (!neutral(s) && s.entry)).length;
     const judged = n - entering;
     facts.hyperOf = judged;
     const hyper = tile("Hypermedia", `${fromServer.size} / ${judged}`,
