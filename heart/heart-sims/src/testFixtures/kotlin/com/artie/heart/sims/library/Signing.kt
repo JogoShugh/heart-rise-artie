@@ -10,10 +10,19 @@ import org.http4k.core.Status
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.PublicKey
+import java.security.SecureRandom
+import java.security.spec.NamedParameterSpec
 
-/** A party's signing key (Ed25519, RFC 8037), named by its key id, and a signer that only claims it. */
+/**
+ * A party's signing key (Ed25519, RFC 8037), named by its key id, and a signer that only claims it. A test key: made
+ * from a seed of its key id, so every process that runs the example, the simulator's and a client's, holds the same
+ * one and checks the other's signatures.
+ */
 open class SigningKey(val keyId: String) {
-    val pair: KeyPair by lazy { KeyPairGenerator.getInstance("Ed25519").generateKeyPair() }
+    val pair: KeyPair by lazy {
+        val seeded = SecureRandom.getInstance("SHA1PRNG").apply { setSeed(keyId.toByteArray()) }
+        KeyPairGenerator.getInstance("Ed25519").apply { initialize(NamedParameterSpec.ED25519, seeded) }.generateKeyPair()
+    }
 
     /** The party's signer: its requests are signed with [pair], under [keyId]. */
     val signer: Signer by lazy { Signer(pair.private, keyId) }

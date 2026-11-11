@@ -431,11 +431,11 @@ class LibrarySteps {
             "loan" to loan,
             "_links" to mapOf(
                 "hr:reply-to" to mapOf(
-                    "href" to "https://caller.example/replies/$reply",
+                    "href" to "${CallerService.ORIGIN}/replies/$reply",
                     "type" to "application/hal+json",
                     "profile" to "https://w3id.org/heart-rise/hal-schema-forms",
                 ),
-                "hr:keys" to mapOf("href" to "https://caller.example/keys", "type" to "application/jwk-set+json"),
+                "hr:keys" to mapOf("href" to "${CallerService.ORIGIN}/keys", "type" to "application/jwk-set+json"),
             ),
         )
         val target = form["_links"]["target"]["href"].asText()
@@ -476,7 +476,7 @@ class LibrarySteps {
         val read = library.handler(Request(Method.GET, Signatures.KEYS))
         assertEquals(Signatures.JWK_SET, read.header("Content-Type"), read.bodyString())
         val jwk = mapper.readTree(read.bodyString())["keys"].single { it["kid"].asText() == keyId }
-        val signed = LibraryKey.signer.sign("PATCH", "https://caller.example/replies/r-7f3", "{}", "\"v1\"", SIGNED_AT)
+        val signed = LibraryKey.signer.sign("PATCH", "${CallerService.ORIGIN}/replies/r-7f3", "{}", "\"v1\"", SIGNED_AT)
         assertTrue(Signatures.verify(signed, "{}", Signatures.keyOf(mapper.convertValue(jwk, Map::class.java))))
     }
 
@@ -521,7 +521,7 @@ class LibrarySteps {
         val read = caller.handler(request(Method.GET, reply, ACCEPT.getValue(HSF), REPLY_AUTH))
         val ifMatch = checkNotNull(read.header("ETag")) { "no ETag: ${read.bodyString()}" }
         val sent = mapper.writeValueAsString(mapOf("percent" to percent))
-        val signed = LibraryKey.signer.sign("PUT", "https://caller.example$path", sent, ifMatch, SIGNED_AT)
+        val signed = LibraryKey.signer.sign("PUT", "${CallerService.ORIGIN}$path", sent, ifMatch, SIGNED_AT)
         val put = request(Method.PUT, path, ACCEPT.getValue(HSF), REPLY_AUTH).header("If-Match", ifMatch)
         answer = caller.handler(signedRequest(put.header("Content-Type", "application/json"), signed, sent))
     }
@@ -589,7 +589,7 @@ class LibrarySteps {
             checkNotNull(read.header("ETag")) { "no ETag: ${read.bodyString()}" }
         }
         val form = replyForms.getValue(relation)
-        val signed = signer?.sign(form.method.name, "https://caller.example${form.target}", sent, ifMatch, SIGNED_AT)
+        val signed = signer?.sign(form.method.name, "${CallerService.ORIGIN}${form.target}", sent, ifMatch, SIGNED_AT)
         lastSigned = signed
         lastSent = sent
         lastContentType = form.contentType

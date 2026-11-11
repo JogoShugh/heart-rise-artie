@@ -289,12 +289,13 @@
     || (neutral(step) ? verbOf(step) : step.request.method === "GET" ? "follow" : step.request.method);
   const resourceOf = (step) => pathOf(urlOf(step)).split("?")[0].split("/actions/")[0];
 
-  // Every address an answer hands the client: hrefs and form targets anywhere in it, and Location headers.
+  // Every address an answer hands the client: hrefs and form targets anywhere in it, a schema's $ref (HAL Schema
+  // Forms links a schema held elsewhere so), and Location headers.
   const addresses = (body, into) => {
     if (Array.isArray(body)) body.forEach((v) => addresses(v, into));
     else if (body && typeof body === "object") {
       Object.entries(body).forEach(([k, v]) => {
-        if (k === "href" && typeof v === "string") into.add(pathOf(v));
+        if ((k === "href" || k === "$ref") && typeof v === "string") into.add(pathOf(v));
         else addresses(v, into);
       });
     }

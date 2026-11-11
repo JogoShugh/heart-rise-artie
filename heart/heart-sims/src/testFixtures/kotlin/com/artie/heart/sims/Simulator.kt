@@ -6,7 +6,9 @@ import com.artie.heart.sims.deploy.Region
 import com.artie.heart.sims.github.GitHubService
 import com.artie.heart.sims.employees.Change
 import com.artie.heart.sims.employees.EmployeesService
+import com.artie.heart.sims.library.CallerService
 import com.artie.heart.sims.library.LibraryService
+import com.artie.heart.sims.library.RiseParties
 import com.artie.heart.Rung
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -52,15 +54,19 @@ class Simulator(private val alone: String? = null) {
     val deploy = DeployService()
     val github = GitHubService()
     val employees = EmployeesService()
-    val library = LibraryService()
+    val library = LibraryService(keysAt = { href -> RiseParties.keysAt(caller.handler, href) })
 
-    private val faults = listOf(BUILD, DEPLOY, GITHUB, EMPLOYEES, LIBRARY, ELSEWHERE).associateWith { Faults() }
+    /** Ana's replies, beside the library: each party finds the other's keys through links, as over HTTP. */
+    val caller: CallerService = CallerService(watchKeys = { watch -> RiseParties.watchKeys(library.handler, watch) })
+
+    private val faults = listOf(BUILD, DEPLOY, GITHUB, EMPLOYEES, LIBRARY, REPLIES, ELSEWHERE).associateWith { Faults() }
     private val services: Map<String, HttpHandler> = mapOf(
         BUILD to faults.getValue(BUILD).filter.then(build.handler),
         DEPLOY to faults.getValue(DEPLOY).filter.then(deploy.handler),
         GITHUB to faults.getValue(GITHUB).filter.then(github.handler),
         EMPLOYEES to faults.getValue(EMPLOYEES).filter.then(employees.handler),
         LIBRARY to faults.getValue(LIBRARY).filter.then(library.handler),
+        REPLIES to faults.getValue(REPLIES).filter.then(caller.handler),
         ELSEWHERE to faults.getValue(ELSEWHERE).filter.then(elsewhere),
     )
     private val mapper = ObjectMapper().findAndRegisterModules()
@@ -105,7 +111,10 @@ class Simulator(private val alone: String? = null) {
     /** The faults of the service at [host]. */
     fun faults(host: String): Faults = faults[host] ?: throw IllegalArgumentException("no service $host")
 
-    val handler: HttpHandler = { request ->
+    val handler: HttpHandler = handlerFor(alone)
+
+    /** The simulator, serving [alone] at its root to a client that names no service; the control routes beside it. */
+    fun handlerFor(alone: String?): HttpHandler = { request ->
         val host = request.header(HOST_HEADER)
             ?: request.uri.host.takeIf { it in services }
             ?: alone.takeUnless { request.uri.path.startsWith("/_sim/") }
@@ -204,6 +213,25 @@ class Simulator(private val alone: String? = null) {
         "/_sim/employees/employees" bind GET to {
             Response(Status.OK).header("Content-Type", "application/json").body(mapper.writeValueAsString(employees.all()))
         },
+        // RISE: the library lends The Hobbit with a hold waiting, and Ana opens her replies.
+        "/_sim/rise" bind POST to {
+            library.lend(listOf(RiseParties.HOBBIT))
+            RiseParties.REPLIES.forEach(caller::open)
+            Response(Status.NO_CONTENT)
+        },
+        "/_sim/library/holds/{loan}/release" bind POST to { request ->
+            library.releaseHold(request.path("loan").orEmpty().toLong())
+            Response(Status.NO_CONTENT)
+        },
+        // The library's own record that it has answered a watch, and Ana's that a watch answers her reply.
+        "/_sim/library/watches/{id}/answered" bind POST to { request ->
+            library.answered(request.path("id").orEmpty().toLong())
+            Response(Status.NO_CONTENT)
+        },
+        "/_sim/replies/{reply}/asked" bind POST to { request ->
+            caller.asked(request.path("reply").orEmpty(), request.bodyString())
+            Response(Status.NO_CONTENT)
+        },
         "/_sim/log" bind GET to {
             Response(Status.OK).header("Content-Type", "application/json").body(mapper.writeValueAsString(log))
         },
@@ -224,6 +252,9 @@ class Simulator(private val alone: String? = null) {
 
         /** Riverside Public Library, the library of "The Web That Wasn't": a member's loans, renewed and returned. */
         const val LIBRARY = "library.test"
+
+        /** Ana's replies, where the library answers her requests (RISE). */
+        const val REPLIES = "replies.test"
 
         /** Another origin, for an act a form sends away from the service it came from. */
         const val ELSEWHERE = "elsewhere.test"

@@ -34,8 +34,12 @@ class CallerService(
     /** The watch each reply answers for: the Location of the 201 that brought it into being, absolute. */
     private val watches = mutableMapOf<String, String>()
 
-    /** Opens the reply named [reference], awaiting. */
-    fun open(reference: String) = store.open(reference)
+    /** Opens the reply named [reference], awaiting: a new reply, with no watch and no history yet. */
+    fun open(reference: String) {
+        store.open(reference)
+        watches.remove(reference)
+        histories.remove(reference)
+    }
 
     /** The library brought the watch at [location] into being for Ana's request with reply [reference]. */
     fun asked(reference: String, location: String) {
@@ -148,7 +152,7 @@ class CallerService(
         const val PREDECESSOR = "predecessor-version"
 
         /** Where Ana's service is: the origin her replies' signed target URIs name. */
-        const val ORIGIN = "https://caller.example"
+        const val ORIGIN = "http://localhost:8141"
 
         /** The Bearer token the library presents to Ana's replies. */
         const val LIBRARY_TOKEN = "riverside-library-reply-token"

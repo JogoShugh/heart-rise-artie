@@ -300,7 +300,7 @@ class HeartLibrary(
 
     companion object {
         /** Where the library is: the origin its signed target URIs, and its watches' absolute addresses, name. */
-        const val ORIGIN = "https://riverside-library.example"
+        const val ORIGIN = "http://localhost:8140"
 
         /** Where a caller asks to be told when a loan can be renewed: the entry's act. */
         const val TELL_ME = "/actions/tell-me-when-renewable"

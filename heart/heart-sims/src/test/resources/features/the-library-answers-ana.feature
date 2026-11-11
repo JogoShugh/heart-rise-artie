@@ -52,7 +52,7 @@ Feature: The library answers Ana on her reply, and Ana checks each answer by the
     And each change after the first links the one before as "predecessor-version"
 
   Scenario: An answer that names another watch than Ana's is refused, and changes nothing
-    When the library reports progress of 50 percent on reply r-7f3, for the watch "https://riverside-library.example/watches/99"
+    When the library reports progress of 50 percent on reply r-7f3, for the watch "http://localhost:8140/watches/99"
     Then the library is refused with 409
     And reply r-7f3 is still awaiting
 
