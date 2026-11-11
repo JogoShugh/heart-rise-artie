@@ -5,6 +5,7 @@ import com.artie.heart.HeartResource
 import com.artie.heart.HtmlAssets
 import com.artie.heart.HtmlView
 import com.artie.heart.Negotiation
+import com.artie.heart.AFFORDANCES
 import com.artie.heart.Layers
 import com.artie.heart.Listing
 import com.artie.heart.OpenApiDocument
@@ -84,6 +85,7 @@ class HeartHttp(
 
     private fun shared(listings: List<Listing>): List<RoutingHttpHandler> = listOf(
         "/" bind GET to indexHandler::index,
+        AFFORDANCES bind GET to indexHandler::affordances,
         OpenApiDocument.PATH bind GET to published::openApi,
         SwaggerUi.PATH bind GET to SwaggerUi::page,
         SwaggerUi.files(),

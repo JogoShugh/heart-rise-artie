@@ -1,5 +1,6 @@
 package com.artie.heart.spring
 
+import com.artie.heart.AFFORDANCES
 import com.artie.heart.Caller
 import com.artie.heart.Listing
 import com.artie.heart.OpenApiDocument
@@ -55,6 +56,7 @@ class HeartAutoConfiguration {
                 Caller.holder.asContextElement(request.headers().firstHeader(HttpHeaders.AUTHORIZATION))
             }
             GET("/") { index.index(it) }
+            GET(AFFORDANCES) { index.affordances(it) }
             // Lists the domain declares for its forms' choices (HAL-SCHEMA-FORMS-HR Rule 8).
             listings.orderedStream().forEach { listing ->
                 val handler = ListingHandler(listing)

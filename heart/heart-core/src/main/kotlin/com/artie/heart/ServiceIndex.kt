@@ -32,6 +32,18 @@ class ServiceIndex(
     private val mapper = ObjectMapper()
     val title: String = title ?: types.first().profile.title
 
+    /** The index's own forms in HAL Schema Forms, keyed by relation, self-describing (Rules 6 and 7). */
+    private val indexForms: Map<String, Map<String, Any>> = found.flatMap { type ->
+        val finding = checkNotNull(type.finding)
+        val forms = FindingForms(type)
+        listOf(
+            type.profile.key(finding.search.relation) to
+                schemaForm(type, forms.searchTarget, finding.search.relation, forms.searchSchema),
+            type.profile.key(finding.lookup.relation) to
+                schemaForm(type, forms.lookupTarget, finding.lookup.relation, forms.lookupSchema),
+        ) + type.bookmarkActs.map { type.profile.key(it.relation) to actForm(type, it) }
+    }.toMap()
+
     private val bodies: Map<Dialect, String> = mapOf(
         Dialect.JSONSCHEMA to mapper.writeValueAsString(schemaFormsIndex()),
         Dialect.HALFORMS to mapper.writeValueAsString(halFormsIndex()),
@@ -53,26 +65,17 @@ class ServiceIndex(
 
     fun homeValidator(maxRung: Rung): String = "\"index-home-${ContentAddress.address(home(maxRung))}\""
 
-    private fun schemaFormsIndex(): Map<String, Any> {
-        // HAL-SCHEMA-FORMS-HR Rules 6 and 7: keyed by relation, and self-describing.
-        val forms = found.flatMap { type ->
-            val finding = checkNotNull(type.finding)
-            val forms = FindingForms(type)
-            listOf(
-                type.profile.key(finding.search.relation) to
-                    schemaForm(type, forms.searchTarget, finding.search.relation, forms.searchSchema),
-                type.profile.key(finding.lookup.relation) to
-                    schemaForm(type, forms.lookupTarget, finding.lookup.relation, forms.lookupSchema),
-            ) + type.bookmarkActs.map { type.profile.key(it.relation) to actForm(type, it) }
-        }.toMap()
-        return mapOf(
-            "title" to title,
-            // The forms' hr:integrity and the hr:manifest member are named by heart-core's hr vocabulary.
-            "_links" to links() + ("curies" to (found.flatMap { it.profile.curies } + Layers.HR_CURIE).distinct()),
-            "_forms" to forms,
-            MANIFEST to manifest(forms, types),
-        )
-    }
+    /** The index's affordances, served at [AFFORDANCES] and linked from the index as `hr:affordances`. */
+    fun affordances(): String = mapper.writeValueAsString(affordancesOf(indexForms, types))
+
+    private fun schemaFormsIndex(): Map<String, Any> = mapOf(
+        "title" to title,
+        // The forms' hr:integrity and the hr:manifest member are named by heart-core's hr vocabulary.
+        "_links" to links() + ("curies" to (found.flatMap { it.profile.curies } + Layers.HR_CURIE).distinct()) +
+            (AFFORDANCES_REL to mapOf("href" to AFFORDANCES, "type" to Dialect.JSONSCHEMA.mediaType)),
+        "_forms" to indexForms,
+        MANIFEST to manifest(indexForms, types),
+    )
 
     /** The type that declares the index's act at [path], if any, and the act. */
     fun actAt(path: String): Pair<ResourceType<*, *>, Act>? =
@@ -112,21 +115,6 @@ class ServiceIndex(
         }.toMap(),
     )
 
-    private fun schemaForm(
-        type: ResourceType<*, *>,
-        target: String,
-        relation: String,
-        schema: Map<String, Any>,
-    ): Map<String, Any> = mapOf(
-        "_links" to mapOf("target" to mapOf("href" to target, "templated" to true)),
-        "method" to "GET",
-        "title" to type.profile.relation(relation).title,
-        "description" to type.profile.relation(relation).description,
-        "schema" to schema,
-        // HAL-SCHEMA-FORMS-HR Rule 10: the bookmark's forms are pinned as a resource's are.
-        FORM_INTEGRITY to FormIntegrity.of(target, "GET", FormIntegrity.ofSchema(schema)),
-    )
-
     /** A HAL-FORMS GET template: its properties become the query string of the collection. */
     private fun halFormsTemplate(type: ResourceType<*, *>, relation: String, property: Map<String, Any>) =
         mapOf(
@@ -136,6 +124,50 @@ class ServiceIndex(
             "properties" to listOf(property),
         )
 
+}
+
+/** One of the index's GET forms: a search or a lookup, its target a template its own fields fill. */
+private fun schemaForm(
+    type: ResourceType<*, *>,
+    target: String,
+    relation: String,
+    schema: Map<String, Any>,
+): Map<String, Any> = mapOf(
+    "_links" to mapOf("target" to mapOf("href" to target, "templated" to true)),
+    "method" to "GET",
+    "title" to type.profile.relation(relation).title,
+    "description" to type.profile.relation(relation).description,
+    "schema" to schema,
+    // HAL-SCHEMA-FORMS-HR Rule 10: the bookmark's forms are pinned as a resource's are.
+    FORM_INTEGRITY to FormIntegrity.of(target, "GET", FormIntegrity.ofSchema(schema)),
+)
+
+/** Where the index's affordances are served, and the relation the index links them by. */
+const val AFFORDANCES = "/affordances"
+private const val AFFORDANCES_REL = "hr:affordances"
+
+/** The media type of a JSON Schema served apart from its form. */
+private const val SCHEMA_TYPE = "application/schema+json"
+
+/**
+ * The index's affordances: every form the server can offer, by its integrity, as the manifest names it, with its
+ * relation and a link to the schema it uses where that schema is served apart. A client that meets an integrity it
+ * has not seen finds the schema from here by links, never by a path it knows in advance.
+ */
+private fun affordancesOf(forms: Map<String, Map<String, Any>>, types: List<ResourceType<*, *>>): Map<String, Any> {
+    val own = forms.map { (rel, form) ->
+        Triple(form.getValue(FORM_INTEGRITY) as String, rel, (form["schema"] as? Map<*, *>)?.get("\$id") as String?)
+    }
+    val listed = (own + types.flatMap { Layers(it).affordances })
+        .distinctBy { it.first }
+        .sortedBy { it.first }
+        .associate { (integrity, rel, schema) ->
+            integrity to mapOf("relation" to rel) + listOfNotNull(
+                schema?.let { "_links" to mapOf("describedby" to mapOf("href" to it, "type" to SCHEMA_TYPE)) },
+            )
+        }
+    val links = mapOf("self" to mapOf("href" to AFFORDANCES), "curies" to listOf(Layers.HR_CURIE))
+    return mapOf("_links" to links, "forms" to listed)
 }
 
 /** The body an act takes. */

@@ -141,6 +141,15 @@ Feature: HEART conformance over HTTP, for any declared resource type
     Then the response status is 200
     And the home document names the resource's collection
 
+  Scenario: The bookmark links its affordances, from which each form's schema is reached by links alone
+    The manifest names every form by its integrity. A client that has not seen a form's schema finds it by
+    following links, from the bookmark to its affordances, then by the form's integrity to the schema, and
+    never knows a schema's address in advance.
+    When a client gets "/" as hal-schema-forms
+    And the client follows the "hr:affordances" link
+    Then the response status is 200
+    And every form the resource offers is listed there by its integrity, with a link to the schema it uses
+
   Scenario: A page of results is revalidated with 304 while nothing in it changed
     A client that watches a list reads it again and again (spec/PLAN-LISTENERS.md, slice 2). A page is a Layer 1
     resource like any other: no-cache, with an ETag, so asking again costs no body while nothing changed.

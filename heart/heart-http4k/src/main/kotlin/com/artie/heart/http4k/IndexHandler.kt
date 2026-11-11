@@ -1,5 +1,6 @@
 package com.artie.heart.http4k
 
+import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
 import com.artie.heart.FieldTitle
 import com.artie.heart.Found
@@ -52,6 +53,13 @@ class IndexHandler(
                     .replaceHeader(LINK, "${Negotiation.profileLinks(dialect)}, $SERVICE_DESC_LINK")
             }
         }
+    }
+
+    /** The index's affordances, linked from it as `hr:affordances`: revalidated, in HAL Schema Forms. */
+    fun affordances(request: Request): Response {
+        val body = index.affordances()
+        val etag = "\"affordances-${ContentAddress.address(body)}\""
+        return layer1(Published.revalidated(request, etag, Dialect.JSONSCHEMA.mediaType) { body }, Dialect.JSONSCHEMA)
     }
 
     fun search(resource: HeartResource<*, *>, request: Request): Response {

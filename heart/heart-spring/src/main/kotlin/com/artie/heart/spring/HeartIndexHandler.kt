@@ -1,5 +1,6 @@
 package com.artie.heart.spring
 
+import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
 import com.artie.heart.FieldTitle
 import com.artie.heart.Found
@@ -49,6 +50,13 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
                 }
             }
         }
+    }
+
+    /** The index's affordances, linked from it as `hr:affordances`: revalidated, in HAL Schema Forms. */
+    suspend fun affordances(request: ServerRequest): ServerResponse {
+        val body = index.affordances()
+        val etag = "\"affordances-${ContentAddress.address(body)}\""
+        return answer(request, etag, Dialect.JSONSCHEMA.mediaType, body) { layer1(it, Dialect.JSONSCHEMA) }
     }
 
     suspend fun search(resource: HeartResource<*, *>, request: ServerRequest): ServerResponse = page(

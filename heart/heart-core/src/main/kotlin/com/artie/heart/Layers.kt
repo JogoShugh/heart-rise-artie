@@ -45,6 +45,17 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         }
     }
 
+    /** Each act's form as the index's affordances list it: its integrity, its relation, its schema's address. */
+    val affordances: List<Triple<String, String, String?>> by lazy {
+        type.acts.map { act ->
+            Triple(
+                form(act, false).getValue(FORM_INTEGRITY) as String,
+                type.profile.key(act.relation),
+                SCHEMAS + ContentAddress.address(schemaBodies.getValue(act.name)),
+            )
+        }
+    }
+
     /** The acts [key] offers, by name, in order. */
     fun offered(key: K): List<String> = type.offers.offered(content.known(key))
 
