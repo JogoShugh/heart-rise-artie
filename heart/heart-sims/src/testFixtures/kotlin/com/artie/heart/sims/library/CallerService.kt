@@ -16,6 +16,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.then
 import java.security.PublicKey
+import java.time.Instant
 
 /**
  * Ana's side of the exchange: a HEART service of replies, each awaiting until the library answers it. Only the library,
@@ -44,10 +45,13 @@ class CallerService(
     /** Whether a reply named [reference] is open. */
     fun has(reference: String): Boolean = store.get(reference) != null
 
+    /** Each reply's changes, oldest first: when, the ETag each replaced, and the signature each came with. */
+    private val histories = mutableMapOf<String, MutableList<Map<String, Any?>>>()
+
     /** The caller's HEART service: the replies, served to the library's Bearer token, each act signed by the library. */
-    val handler: HttpHandler = signedActs().then(
+    val handler: HttpHandler = history().then(signedActs()).then(
         HeartHttp(
-            listOf(Replies.resource(store, RENEWABLE)),
+            listOf(Replies.resource(store, RENEWABLE) { reply -> mapOf(VERSION_HISTORY to historyLink(reply.reference)) }),
             Credentials.parse(users = "", tokens = Tokens.sha256(LIBRARY_TOKEN)),
             HeartSettings(title = REALM, realm = Replies.PROFILE.name, keys = mapOf(AnaKey.KEY_ID to AnaKey.pair.public)),
         ),
@@ -75,6 +79,48 @@ class CallerService(
         }
     }
 
+    /**
+     * A reply's history (RFC 5829 `version-history`), served at its own address: and each act that changed a
+     * reply, recorded with what proves it, the signature it came with. A repeat answered as the first changes
+     * nothing, so it records nothing.
+     */
+    private fun history(): Filter = Filter { next ->
+        { request ->
+            val reference = request.uri.path.removePrefix("/replies/").substringBefore('/')
+            if (request.method == Method.GET && request.uri.path.endsWith("/history")) {
+                Response(Status.OK).header("Content-Type", "application/hal+json").body(
+                    mapper.writeValueAsString(
+                        mapOf(
+                            "_links" to mapOf("self" to historyLink(reference), "up" to mapOf("href" to "/replies/$reference")),
+                            "changes" to histories[reference].orEmpty(),
+                        ),
+                    ),
+                )
+            } else {
+                next(request).also { answer ->
+                    val changed = answer.status.successful && answer.header("ETag") != request.header("If-Match")
+                    if (request.method != Method.GET && changed) record(reference, request)
+                }
+            }
+        }
+    }
+
+    private fun record(reference: String, request: Request) {
+        val changes = histories.getOrPut(reference) { mutableListOf() }
+        val number = changes.size + 1
+        val at = { n: Int -> mapOf("href" to "/replies/$reference/history#change-$n") }
+        changes += linkedMapOf(
+            "at" to Instant.now().toString(),
+            "replaced" to request.header("If-Match"),
+            "signatureInput" to request.header("Signature-Input"),
+            "signature" to request.header("Signature"),
+            "_links" to listOfNotNull("self" to at(number), if (number > 1) PREDECESSOR to at(number - 1) else null)
+                .toMap(),
+        )
+    }
+
+    private fun historyLink(reference: String) = mapOf("href" to "/replies/$reference/history", "type" to "application/hal+json")
+
     /** The watch an act says it answers for, if it says. */
     private fun namedWatch(request: Request): String? = runCatching {
         mapper.readTree(request.bodyString()).path("_links").path(Replies.IN_REPLY_TO).path("href").asText(null)
@@ -96,6 +142,10 @@ class CallerService(
 
     companion object {
         private const val REALM = "Ana's replies"
+
+        /** RFC 5829: a resource's history, and a version's predecessor. */
+        const val VERSION_HISTORY = "version-history"
+        const val PREDECESSOR = "predecessor-version"
 
         /** Where Ana's service is: the origin her replies' signed target URIs name. */
         const val ORIGIN = "https://caller.example"

@@ -297,6 +297,7 @@ class LibrarySteps {
     /** The watch the library brought into being for Ana's request, as the 201's Location named it, absolute. */
     private var anaWatch: String? = null
     private var watchRead: Response? = null
+    private var historyAt: String? = null
 
     @Given("Ana's reply {word} is awaiting")
     fun replyAwaiting(reply: String) = caller.open(reply)
@@ -326,6 +327,34 @@ class LibrarySteps {
         val read = mapper.readTree(replyBody(reply))
         assertEquals(checkNotNull(anaWatch), read["_links"][rel]?.get("href")?.asText(), read.toString())
     }
+
+    @Then("reply {word} links {string} to its history")
+    fun linksHistory(reply: String, rel: String) {
+        val read = mapper.readTree(replyBody(reply))
+        historyAt = checkNotNull(read["_links"][rel]?.get("href")?.asText()) { "no $rel: $read" }
+    }
+
+    @Then("its history lists {int} changes, each with its time, the ETag it replaced and the signature it came with")
+    fun historyLists(count: Int) {
+        val changes = history()
+        assertEquals(count, changes.size(), changes.toString())
+        changes.forEach { change ->
+            listOf("at", "replaced", "signatureInput", "signature").forEach { member ->
+                assertTrue(change[member]?.asText().orEmpty().isNotEmpty(), "no $member: $change")
+            }
+        }
+    }
+
+    @Then("each change after the first links the one before as {string}")
+    fun predecessors(rel: String) {
+        history().toList().zipWithNext().forEach { (before, after) ->
+            assertEquals(before["_links"]["self"]["href"], after["_links"][rel]["href"], after.toString())
+        }
+    }
+
+    private fun history(): JsonNode = mapper.readTree(
+        caller.handler(request(Method.GET, checkNotNull(historyAt), ACCEPT.getValue(HSF), REPLY_AUTH)).bodyString(),
+    )["changes"]
 
     @When("Ana reads her watch")
     fun readsWatch() {

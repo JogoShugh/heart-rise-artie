@@ -44,6 +44,13 @@ Feature: The library answers Ana on her reply, and Ana checks each answer by the
     Then the library read Ana's reply once, for both answers
     And reply r-7f3 is awaiting at 50 percent
 
+  Scenario: The reply keeps its history: each change, when, the ETag it replaced, and the signature it came with
+    When the library reports progress of 0 percent on reply r-7f3, with the note "one ahead in the hold queue"
+    And the library reports progress of 50 percent on reply r-7f3, with the note "the hold is with the next reader"
+    Then reply r-7f3 links "version-history" to its history
+    And its history lists 2 changes, each with its time, the ETag it replaced and the signature it came with
+    And each change after the first links the one before as "predecessor-version"
+
   Scenario: An answer that names another watch than Ana's is refused, and changes nothing
     When the library reports progress of 50 percent on reply r-7f3, for the watch "https://riverside-library.example/watches/99"
     Then the library is refused with 409

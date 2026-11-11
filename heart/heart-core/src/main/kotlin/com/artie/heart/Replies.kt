@@ -126,7 +126,7 @@ object Replies {
         vocabulary = "$HEART_RISE_PROFILE/rels/",
     )
 
-    private fun type(result: String) = ResourceType(
+    private fun type(result: String, links: (Reply) -> Map<String, Any?>) = ResourceType(
         collection = "replies",
         profile = PROFILE,
         acts = listOf(
@@ -159,7 +159,8 @@ object Replies {
             // The request the reply answers, from its first answer on; and a failure's problem, embedded.
             hypermediaOf = { reply ->
                 Hypermedia(
-                    links = listOfNotNull(reply.inReplyTo?.let { IN_REPLY_TO to mapOf("href" to it) }).toMap(),
+                    links = listOfNotNull(reply.inReplyTo?.let { IN_REPLY_TO to mapOf("href" to it) }).toMap() +
+                        links(reply),
                     embedded = listOfNotNull(reply.problem?.let { "problem" to it }).toMap(),
                 )
             },
@@ -169,10 +170,15 @@ object Replies {
 
     /**
      * The reply resource over [store], whose owner wants a [result] of this shape (a JSON Schema): each act's state
-     * is replaced in it, or replayed when it repeats.
+     * is replaced in it, or replayed when it repeats. [links] are the owner's own links on each reply, such as
+     * its history, which the owner keeps.
      */
-    fun resource(store: ReplyStore, result: String = ANY_RESULT): HeartResource<Reply, String> = HeartResource(
-        layers = Layers(type(result)),
+    fun resource(
+        store: ReplyStore,
+        result: String = ANY_RESULT,
+        links: (Reply) -> Map<String, Any?> = { emptyMap() },
+    ): HeartResource<Reply, String> = HeartResource(
+        layers = Layers(type(result, links)),
         loadAt = { variables ->
             store.get(variables.getValue("reply"))
                 ?: throw ResourceNotFoundException("no reply ${variables["reply"]}")
