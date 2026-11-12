@@ -32,6 +32,8 @@ data class Pull(
     val requestedReviewers: MutableList<String> = mutableListOf(),
     /** The names of its labels. */
     val labels: MutableList<String> = mutableListOf(),
+    /** The commit its merge made, once merged; GitHub's example sha until then. */
+    var mergeCommit: String? = null,
 )
 
 /** A branch as the small GitHub keeps it: its repository, name, head commit, and whether it is protected. */
@@ -127,6 +129,12 @@ class GitHubUpstream {
 
     /** Heads that move just before GitHub merges: another push lands first. */
     val movesBeforeMerge = mutableMapOf<Long, String>()
+
+    /**
+     * How a merge is made, when the pull requests are kept somewhere real: given the pull request and the merge
+     * method, it makes the merge and gives its commit. With none, a merge makes no commit and names `merge-{head}`.
+     */
+    var merger: ((Pull, String) -> String)? = null
 
     /** What happens to a pull request just after it is next read: GitHub works something out, or someone writes. */
     val afterNextRead = mutableMapOf<Long, (Pull) -> Unit>()
@@ -535,15 +543,18 @@ class GitHubUpstream {
 
     private fun merge(pull: Pull, request: Request): Response {
         movesBeforeMerge.remove(pull.number)?.let { pull.head = it }
-        val sha = mapper.readTree(request.bodyString()).path("sha").asText(null)
+        val asked = mapper.readTree(request.bodyString())
+        val sha = asked.path("sha").asText(null)
         return when {
             pull.number in unmergeable -> message(Status.METHOD_NOT_ALLOWED, unmergeable.getValue(pull.number))
             sha != null && sha != pull.head ->
                 message(Status.CONFLICT, "Head branch was modified. Review and try the merge again.")
             else -> {
+                val commit = merger?.invoke(pull, asked.path("merge_method").asText("merge")) ?: "merge-${pull.head}"
                 pull.state = "closed"
                 pull.merged = true
-                json(Response(Status.OK), mapOf("sha" to "merge-${pull.head}", "merged" to true, "message" to "Merged"))
+                pull.mergeCommit = commit
+                json(Response(Status.OK), mapOf("sha" to commit, "merged" to true, "message" to "Merged"))
             }
         }
     }
@@ -669,6 +680,7 @@ class GitHubUpstream {
         pull.mergeable?.takeIf { open }?.let { put("mergeable", it) } ?: putNull("mergeable")
         put("mergeable_state", if (open) pull.mergeableState else "unknown")
         (path("head") as ObjectNode).put("sha", pull.head)
+        pull.mergeCommit?.let { put("merge_commit_sha", it) }
         val repo = path("base").path("repo") as ObjectNode
         repo.put("name", pull.repo).put("full_name", "${pull.owner}/${pull.repo}")
         (repo.path("owner") as ObjectNode).put("login", pull.owner)

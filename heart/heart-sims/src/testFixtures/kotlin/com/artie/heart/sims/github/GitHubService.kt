@@ -15,7 +15,11 @@ import java.nio.file.Path
  * API we do not own, so its shape is GitHub's. A reset starts a fresh small
  * GitHub with the seed: repository acme/web, pull request 482 by ada, issue 7.
  */
-class GitHubService(private val connector: Path = findConnector()) {
+class GitHubService(
+    private val connector: Path = findConnector(),
+    /** Where acme/web's pull requests are kept, as branches, when they are kept for real; null for the seed's. */
+    private val repository: GitRepository? = null,
+) {
     @Volatile
     var upstream = GitHubUpstream()
         private set
@@ -45,7 +49,16 @@ class GitHubService(private val connector: Path = findConnector()) {
     fun reset() {
         upstream = GitHubUpstream().apply {
             callers[TOKEN] = AUTHOR
-            pulls += Pull(OWNER, REPO, PULL, state = "open", title = "Speed up the nightly build", head = "3f2a9c1")
+            val kept = repository
+            if (kept == null) {
+                pulls += Pull(OWNER, REPO, PULL, state = "open", title = "Speed up the nightly build", head = "3f2a9c1")
+            } else {
+                // Each pr-N branch is pull request N, titled by its commit, its head the branch's tip.
+                kept.pullBranches().forEach { (number, branch) ->
+                    pulls += Pull(OWNER, REPO, number, state = "open", title = kept.subject(branch), head = kept.head(branch))
+                }
+                merger = { pull, method -> kept.merge("pr-${pull.number}", method, "${pull.title} (#${pull.number})") }
+            }
             issues += Issue(
                 OWNER, REPO, ISSUE, title = "The nightly build is slow", state = "open", stateReason = null,
                 locked = false, author = AUTHOR, labels = mutableListOf("ci"),
