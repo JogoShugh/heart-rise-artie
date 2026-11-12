@@ -37,9 +37,12 @@
 <main>
   <h1>The Release, Message by Message</h1>
   <ul>
-    <li>Black: ARTIE's requests and their answers, numbered as the steps of its trace.</li>
-    <li>Grey: the parties' own messages, which ARTIE never sees. The answers to its replies come from each reply's
-      change of state between two reads. Jenkins' part comes from the CI wrapper's log of the notifications it got.</li>
+    <li>Red: ARTIE's HEART requests to each party, numbered as the steps of its trace, and their answers.</li>
+    <li>Green: RISE, ARTIE's replies read until answered, and each party's signed answer to them, worked out from
+      each reply's change of state between two reads.</li>
+    <li>Blue: the parties' own messages, which ARTIE never sees: the watch's looks, and Jenkins' part, from the CI
+      wrapper's log of the notifications it got.</li>
+    <li>Yellow notes: the links an answer handed over. Every address after an entry came from one.</li>
     <li>Drawn by PlantUML from the run's trace (<code>sequence.mjs</code>). Tap the diagram for the full view: drag to
       move, scroll or pinch to zoom.</li>
   </ul>
