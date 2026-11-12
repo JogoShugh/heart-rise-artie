@@ -32,6 +32,7 @@ fun main(args: Array<String>) {
     if (args.firstOrNull() != "capture") return release.serve()
     // capture GOAL OUT name=value…: the parties served, the release goal walked once with Claude, then done.
     thread(isDaemon = true) { release.serve() }
+    check(awaitServing("http://$host:${Release.DEV_PORT}/", SERVING_SECONDS)) { "the parties never served" }
     val inputs = args.drop(CAPTURE_INPUTS).associate { it.substringBefore('=') to it.substringAfter('=') }
     val stopped = capture(Path.of(args[1]), Path.of(args[2]), inputs, replies.get(), masks)
     println(stopped ?: "captured in ${args[2]}")
@@ -39,3 +40,4 @@ fun main(args: Array<String>) {
 }
 
 private const val CAPTURE_INPUTS = 3
+private const val SERVING_SECONDS = 30L

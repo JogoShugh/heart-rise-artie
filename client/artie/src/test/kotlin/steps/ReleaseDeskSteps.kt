@@ -22,6 +22,7 @@ import io.cucumber.java.en.When
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.server.asServer
 import kotlin.concurrent.thread
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -89,6 +90,29 @@ class ReleaseDeskSteps {
         waited?.join(seconds * MILLIS)
         val (changed, at) = checkNotNull(woke) { "the run is still waiting" }
         assertTrue(changed && at - askedAt <= seconds * MILLIS, "changed: $changed, after ${at - askedAt} ms")
+    }
+
+    private var server: org.http4k.server.Http4kServer? = null
+    private var waitedOk = false
+
+    @Given("nothing serves yet at {string}, and something will in {int} second")
+    fun servesLater(url: String, seconds: Int) {
+        thread {
+            Thread.sleep(seconds * MILLIS)
+            server = { _: Request -> Response(org.http4k.core.Status.OK) }
+                .asServer(org.http4k.server.SunHttp(java.net.URI(url).port)).start()
+        }
+    }
+
+    @When("the capture waits for {string} for up to {int} seconds")
+    fun captureWaits(url: String, seconds: Int) {
+        waitedOk = heart.release.awaitServing(url, seconds.toLong())
+    }
+
+    @Then("it went on once that answered")
+    fun wentOn() {
+        server?.stop()
+        assertTrue(waitedOk, "it never answered")
     }
 
     private var presented: Credential? = null

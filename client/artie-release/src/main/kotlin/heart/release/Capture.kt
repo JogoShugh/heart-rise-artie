@@ -14,6 +14,27 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /**
+ * Waits until something answers at [url], at most [seconds]: a capture in the parties' own process begins only once
+ * they serve. Whether it answered.
+ */
+fun awaitServing(url: String, seconds: Long): Boolean {
+    val end = System.currentTimeMillis() + seconds * MILLIS
+    val client = java.net.http.HttpClient.newHttpClient()
+    val request = java.net.http.HttpRequest.newBuilder(java.net.URI(url)).GET().build()
+    while (System.currentTimeMillis() < end) {
+        val answered = runCatching {
+            client.send(request, java.net.http.HttpResponse.BodyHandlers.discarding()).statusCode()
+        }.isSuccess
+        if (answered) return true
+        Thread.sleep(POLL_MILLIS)
+    }
+    return false
+}
+
+private const val MILLIS = 1000L
+private const val POLL_MILLIS = 200L
+
+/**
  * The release goal's one inference run (goal-rise.feature): the desk's ARTIE walks the goal file at [goal] with
  * Claude planning each move and choosing each act, asking with the desk's [replies], signing as the desk, given
  * [inputs]; its capture is written to [out], for artie generate to keep as the release script every run after reads,
