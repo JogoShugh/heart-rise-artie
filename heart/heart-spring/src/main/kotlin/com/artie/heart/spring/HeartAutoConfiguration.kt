@@ -84,7 +84,7 @@ class HeartAutoConfiguration {
             }
             onError<Throwable> { failure, request ->
                 val html = HttpNegotiation.wantsHtml(request.headers().asHttpHeaders())
-                HttpRefusals.of(failure, auth.challenges, html) ?: throw failure
+                HttpRefusals.of(failure, auth.challenges, html, request.path()) ?: throw failure
             }
         }
 

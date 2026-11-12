@@ -10,6 +10,7 @@ import com.artie.heart.NotAcceptableException
 import com.artie.heart.NotOfferedException
 import com.artie.heart.PROBLEM_TYPES
 import com.artie.heart.PreconditionRequiredException
+import com.artie.heart.ProblemLinks
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.RuleRefusedException
 import com.artie.heart.StaleWriteConflict
@@ -39,7 +40,13 @@ object Refusals {
             try {
                 next(request)
             } catch (failure: RuntimeException) {
-                of(failure, mapper, realm) ?: throw failure
+                val refused = of(failure, mapper, realm) ?: throw failure
+                // A problem links the resource it was refused on (ProblemLinks); a plain error stays as it is.
+                if (refused.header("Content-Type") == PROBLEM_JSON) {
+                    refused.body(ProblemLinks.into(refused.bodyString(), request.uri.path))
+                } else {
+                    refused
+                }
             }
         }
     }

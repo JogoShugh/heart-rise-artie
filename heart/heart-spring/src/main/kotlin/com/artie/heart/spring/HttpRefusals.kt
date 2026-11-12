@@ -10,6 +10,7 @@ import com.artie.heart.NotAcceptableException
 import com.artie.heart.NotOfferedException
 import com.artie.heart.PROBLEM_TYPES
 import com.artie.heart.PreconditionRequiredException
+import com.artie.heart.ProblemLinks
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.RuleRefusedException
 import com.artie.heart.StaleWriteConflict
@@ -43,8 +44,15 @@ object HttpRefusals {
      * The answer for [failure], or null when it is not a refusal heart-spring knows; a 401 offers [challenges].
      * When [html], a refusal is HTML for the browser that asked.
      */
-    suspend fun of(failure: Throwable, challenges: List<String>, html: Boolean = false): ServerResponse? {
+    suspend fun of(
+        failure: Throwable,
+        challenges: List<String>,
+        html: Boolean = false,
+        path: String = "/",
+    ): ServerResponse? {
+        // A problem links the resource it was refused on (ProblemLinks).
         val refusal = refusal(failure)
+            ?.let { Refusal(it.status, it.type, it.title, it.members + ProblemLinks.of(path)) }
         val plain = plainError(failure)
         return when {
             refusal != null -> respond(refusal, failure, challenges, html)

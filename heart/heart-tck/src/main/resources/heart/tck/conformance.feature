@@ -78,11 +78,14 @@ Feature: HEART conformance over HTTP, for any declared resource type
     And the response names the resource in Content-Location
     And the response has a new ETag
 
-  Scenario Outline: A refused act is a problem of type <type>, and changes nothing
+  Scenario Outline: A refused act is a problem of type <type>, links the resource it refused, and changes nothing
+    A refusal is a state too: its problem document (RFC 9457) carries _links, an extension member, so a client
+    goes on by links. "about" (RFC 6903) is the resource the act was refused on: read it again, act again.
     When a client gets the resource as hal-schema-forms
     And the client sends <act> with <body> and <validator>
     Then the response status is <status>
     And the response is a problem of type "<type>"
+    And the problem links "about" to the resource
     And the resource is unchanged
 
     Examples:
@@ -205,12 +208,13 @@ Feature: HEART conformance over HTTP, for any declared resource type
       | Basic  |
       | Bearer |
     And the response is a problem of type "not-authenticated"
+    And the problem links "about" to <about>
 
     Examples:
-      | what            | does                                    |
-      | The resource    | gets the resource as hal-schema-forms   |
-      | The bookmark    | gets "/" as hal-schema-forms            |
-      | The offered act | sends the offered act with its valid body |
+      | what            | does                                      | about        |
+      | The resource    | gets the resource as hal-schema-forms     | the resource |
+      | The bookmark    | gets "/" as hal-schema-forms              | "/"          |
+      | The offered act | sends the offered act with its valid body | the resource |
 
   Scenario Outline: The <rel> layer is open to a caller with no credential
     When a client gets the resource as hal-schema-forms with Prefer "<prefer>"
@@ -247,6 +251,7 @@ Feature: HEART conformance over HTTP, for any declared resource type
     When the client sends the bookmark act with <body> and <validator>
     Then the response status is <status>
     And the response is a problem of type "<type>"
+    And the problem links "about" to "/"
     And the collection holds as many resources as before
 
     Examples:

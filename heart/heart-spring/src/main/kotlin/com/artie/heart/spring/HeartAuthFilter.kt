@@ -7,6 +7,7 @@ import com.artie.heart.Layers
 import com.artie.heart.Negotiation
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.PROBLEM_TYPES
+import com.artie.heart.ProblemLinks
 import org.springframework.core.Ordered
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -56,7 +57,12 @@ class HeartAuthFilter(private val credentials: HeartCredentials, private val rea
         response.headers.contentType =
             if (html) MediaType.parseMediaType(HtmlView.MEDIA_TYPE) else MediaType.APPLICATION_PROBLEM_JSON
         response.headers[HttpHeaders.WWW_AUTHENTICATE] = challenges
-        val body = if (html) HtmlProblem.signIn(String(PROBLEM), realm).toByteArray() else PROBLEM
+        val path = exchange.request.path.pathWithinApplication().value()
+        val body = if (html) {
+            HtmlProblem.signIn(String(PROBLEM), realm).toByteArray()
+        } else {
+            ProblemLinks.into(String(PROBLEM), path).toByteArray()
+        }
         return response.writeWith(Mono.just(response.bufferFactory().wrap(body)))
     }
 

@@ -13,6 +13,25 @@ package com.artie.heart
  */
 const val PROBLEM_TYPES = "https://w3id.org/heart-rise/problems/"
 
+/**
+ * A refusal is a state too, so its problem document carries `_links`, an extension member RFC 9457 allows, and a
+ * client goes on by links. `about` (RFC 6903) is the resource the request was refused on: an act's owner, the index
+ * for the index's own acts, or the resource read.
+ */
+object ProblemLinks {
+    /** The resource [path] names: the owner of an act at `{owner}/actions/{act}`, else the path itself. */
+    fun resourceOf(path: String): String = path.substringBefore(ACTIONS).ifEmpty { "/" }
+
+    /** The `_links` member of a problem refused at [path]. */
+    fun of(path: String): Map<String, Any> = mapOf("_links" to mapOf("about" to mapOf("href" to resourceOf(path))))
+
+    /** [problem], a JSON object's text, with the `_links` of a refusal at [path] after its members. */
+    fun into(problem: String, path: String): String {
+        val href = resourceOf(path).replace("\\", "\\\\").replace("\"", "\\\"")
+        return problem.trimEnd().removeSuffix("}") + ""","_links":{"about":{"href":"$href"}}}"""
+    }
+}
+
 /** 401: a resource finds the caller's credential no longer good, as an upstream that rejects it does. */
 class CallerUnauthorizedException(message: String) : RuntimeException(message)
 
