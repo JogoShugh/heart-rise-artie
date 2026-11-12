@@ -47,12 +47,12 @@
       move, scroll or pinch to zoom.</li>
   </ul>
   <div class="bar" role="tablist" aria-label="Run">
-    <button role="tab" aria-selected="true" data-run="pass">Passing: 482</button>
-    <button role="tab" aria-selected="false" data-run="fail">Stopped: 483</button>
+    <button role="tab" aria-selected="true" data-run="pass">Released: 501</button>
+    <button role="tab" aria-selected="false" data-run="fail">Stopped: 504</button>
     <button type="button" id="full">Full view</button>
     <a id="open" href="pass.svg" target="_blank" rel="noopener">Open image</a>
   </div>
-  <div class="frame"><img id="small" src="pass.svg" alt="Sequence diagram of the release of pull request 482"></div>
+  <div class="frame"><img id="small" src="pass.svg" alt="Sequence diagram of the release of pull request 501"></div>
 </main>
 <dialog id="dialog" aria-label="Sequence diagram, full view">
   <div class="tools">
@@ -81,7 +81,7 @@
     run = tab.dataset.run;
     document.querySelectorAll("[data-run]").forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
     small.src = big.src = $("open").href = $("open2").href = `${run}.svg`;
-    small.alt = `Sequence diagram of the release of pull request ${run === "pass" ? 482 : 483}`;
+    small.alt = `Sequence diagram of the release of pull request ${run === "pass" ? 501 : 504}`;
   }));
   const show = () => { dialog.showModal(); if (big.complete) fit(); else big.onload = fit; };
   $("full").addEventListener("click", show);

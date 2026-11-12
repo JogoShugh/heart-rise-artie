@@ -78,12 +78,14 @@ steps:
                                   _links:
                                     "env:smoke-run": {href: "http://192.168.1.18:8200/reports/merge-watch-release/"}
                               - keep-as: promotion
+                              - note: "Released: promoted ${merged.merge_commit_sha} to Dev."
                         # Otherwise, comment on {pr} with the scenarios that failed.
                         otherwise:
                           - at: ${pr.@self}
                             steps:
                               - act: github:comment
                                 fields: {body: "Not promoted to Dev: smoke scenarios ${smoke.failed} failed."}
+                          - note: "Stopped as it should: smoke ${smoke.failed} failed, so not promoted; said why on the pull request."
                     # Or, once {build} has failed, comment on {pr} with what failed, linking the log.
                     failed:
                       - at: ${pr.@self}

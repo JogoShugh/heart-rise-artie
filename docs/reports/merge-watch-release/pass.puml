@@ -15,10 +15,10 @@ skinparam SequenceGroupBodyBackGroundColor transparent
 skinparam SequenceDividerBackgroundColor #F2F2F2
 skinparam LegendBackgroundColor #F7F7F7
 skinparam LegendFontSize 12
-title <size:18>Release of pull request 482, passing</size>
-box "ARTIE and the replies it makes" #EEEEEE
-actor ARTIE as ARTIE
-participant "ARTIE's replies\n:8160" as P8160
+title <size:18>Release of pull request 501: promoted to Dev</size>
+box "The release desk: ARTIE and the replies it keeps" #EEEEEE
+actor "ARTIE\n(in the desk)" as ARTIE
+participant "Desk replies\n:8160" as P8160
 end box
 participant "GitHub\n(gateway :8098)" as P8098
 participant "Offer watch\n:8099" as P8099
@@ -29,109 +29,141 @@ end box
 participant "Preview\n:8180" as P8180
 participant "Dev\n:8190" as P8190
 == Open the pull request ==
-ARTIE -[#A80036]> P8098 : <b>1</b> GET /\n<i>ARTIE reads GitHub's entry, through the gateway</i>
+ARTIE -[#A80036]> P8098 : <b>1</b> GET /\n<i>enter http://192.168.1.18:8098/</i>
 P8098 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8098 : <b>2</b> GET /repos/acme/web/pulls/482\n<i>ARTIE opens pull request {pull} as pr</i>
+ARTIE -[#A80036]> P8098 : <b>2</b> GET /repos/acme/web/pulls/501\n<i>act github:pulls-get, owner acme, repo web, pull_number 501</i>
 P8098 -[#A80036]-> ARTIE : 200 OK <b>open</b>
 == Watch ==
-ARTIE -[#1B7F3B]> P8160 : <b>3</b> POST /_release/replies/r-pr-482-1794459598\n<i>ARTIE makes its reply {reply}, before asking</i>
-P8160 -[#1B7F3B]-> ARTIE : 204 No Content
-ARTIE -[#A80036]> P8099 : <b>4</b> GET /\n<i>ARTIE reads the offer watch's entry</i>
+ARTIE -[#A80036]> P8099 : <b>3</b> GET /\n<i>enter http://192.168.1.18:8099/</i>
 P8099 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8099 : <b>5</b> POST /actions/watch\n<i>with </i><b>hr:reply-to</b><i>, </i><b>hr:keys</b>\n<i>ARTIE asks to be told when {pr} offers {offers}, on reply {reply} as watch</i>
+ARTIE -[#A80036]> P8099 : <b>4</b> POST /actions/watch\n<i>act watcher:watch, resource http://192.168.1.18:8098/repos/acme/web/pulls/501, offers github:merge, looks 600, _links …</i>
 P8099 -[#A80036]-> ARTIE : 201 Created
-note right of P8099
-<b>Location</b> = /watches/1
-end note
-loop #E9F5EC until the reply is answered
-P8099 -[#1F4FB8]> P8098 : <b>·</b> GET /repos/acme/web/pulls/482\nlooks every 3 s, until it offers github:merge
-ARTIE -[#1B7F3B]> P8160 : <b>6</b> GET /replies/r-pr-482-1794459598\n<i>Once {watch} says it can be merged: ARTIE's reply {reply} is awaiting</i>
-P8160 -[#1B7F3B]-> ARTIE : 200 OK <b>awaiting</b>
-P8099 -[#1B7F3B]> P8160 : <b>·</b> PATCH /replies/r-pr-482-1794459598\n<b>hr:progress</b>, signed by its key\n"Still looking: github:merge is not offered yet"
-ARTIE -[#1B7F3B]> P8160 : <b>7</b> GET /replies/r-pr-482-1794459598\n<i>Once {watch} says it can be merged: ARTIE's reply {reply} is awaiting</i>
-P8160 -[#1B7F3B]-> ARTIE : 200 OK <b>awaiting</b>
-P8099 -[#1B7F3B]> P8160 : <b>·</b> PATCH /replies/r-pr-482-1794459598\n<b>hr:completed</b>, signed by its key
-ARTIE -[#1B7F3B]> P8160 : <b>8</b> GET /replies/r-pr-482-1794459598\n<i>Once {watch} says it can be merged: ARTIE's reply {reply} is completed</i>
-P8160 -[#1B7F3B]-> ARTIE : 200 OK <b>completed</b>
-note right of P8160
-<b>_links.about</b> = /repos/acme/web/pulls/482
-<b>_links.hr:in-reply-to</b> = /watches/1
-end note
-end
 == Merge ==
-ARTIE -[#A80036]> P8098 : <b>9</b> GET /repos/acme/web/pulls/482\n<i>ARTIE follows the pull request the answer links, to merge it</i>
-P8098 -[#A80036]-> ARTIE : 200 OK <b>open</b>
-ARTIE -[#A80036]> P8098 : <b>10</b> PUT /repos/acme/web/pulls/482/actions/merge\n<i>ARTIE merges it by squashing as merged</i>
-P8098 -[#A80036]-> ARTIE : 200 OK <b>closed</b>
-ARTIE -[#A80036]> P8098 : <b>11</b> GET /repos/acme/web/pulls/482\n<i>ARTIE reads {pr} as merged, for its merge commit</i>
-P8098 -[#A80036]-> ARTIE : 200 OK <b>closed</b>
-== Build, by Jenkins ==
-ARTIE -[#1B7F3B]> P8160 : <b>12</b> POST /_release/replies/r-build-3fb2a0f-1794459609\n<i>ARTIE makes its reply {reply}, before asking</i>
-P8160 -[#1B7F3B]-> ARTIE : 204 No Content
-ARTIE -[#A80036]> P8170 : <b>13</b> GET /\n<i>ARTIE reads the CI wrapper's entry</i>
-P8170 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8170 : <b>14</b> POST /actions/build\n<i>with </i><b>hr:reply-to</b><i>, </i><b>hr:keys</b>\n<i>ARTIE builds commit {commit}, asking to be told how it goes, on reply {reply} as build</i>
-P8170 -[#A80036]-> ARTIE : 201 Created
-note right of P8170
-<b>Location</b> = /builds/1
-end note
 loop #E9F5EC until the reply is answered
+ARTIE -[#1B7F3B]> P8160 : <b>5</b> GET /replies/r1-1794510139558\n<i>return to http://192.168.1.18:8160/replies/r1-1794510139558</i>
+P8160 -[#1B7F3B]-> ARTIE : 200 OK <b>awaiting</b>
+P8099 -[#1F4FB8]> P8098 : <b>·</b> GET /repos/acme/web/pulls/501\nlooks every 3 s, until it offers github:merge
+P8099 -[#1B7F3B]> P8160 : <b>·</b> PATCH /replies/r1-1794510139558\n<b>hr:completed</b>, signed by its key
+ARTIE -[#1B7F3B]> P8160 : <b>6</b> GET /replies/r1-1794510139558\n<i>return to http://192.168.1.18:8160/replies/r1-1794510139558</i>
+P8160 -[#1B7F3B]-> ARTIE : 200 OK <b>completed</b>
+end
+ARTIE -[#A80036]> P8099 : <b>7</b> GET /watches/1\n<i>follow hr:in-reply-to</i>
+P8099 -[#A80036]-> ARTIE : 200 OK
+ARTIE -[#A80036]> P8098 : <b>8</b> GET /repos/acme/web/pulls/501\n<i>follow about</i>
+P8098 -[#A80036]-> ARTIE : 200 OK <b>open</b>
+ARTIE -[#A80036]> P8098 : <b>9</b> PUT /repos/acme/web/pulls/501/actions/merge\n<i>act github:merge, merge_method squash</i>
+P8098 -[#A80036]-> ARTIE : 200 OK <b>closed</b>
+ARTIE -[#A80036]> P8098 : <b>10</b> GET /repos/acme/web/pulls/501\n<i>return to http://192.168.1.18:8098/repos/acme/web/pulls/501</i>
+P8098 -[#A80036]-> ARTIE : 200 OK <b>closed</b>
+ARTIE -[#A80036]> P8098 : <b>11</b> GET /repos/acme/web/pulls/501\n<i>return to http://192.168.1.18:8098/repos/acme/web/pulls/501</i>
+P8098 -[#A80036]-> ARTIE : 304
+== Build, by Jenkins ==
+ARTIE -[#A80036]> P8170 : <b>12</b> GET /\n<i>enter http://192.168.1.18:8170/</i>
+P8170 -[#A80036]-> ARTIE : 200 OK
+ARTIE -[#A80036]> P8170 : <b>13</b> POST /actions/build\n<i>act ci:build, commit 9e5128779e3acbdf17094621857194a4ca79a296, _links …</i>
+P8170 -[#A80036]-> ARTIE : 201 Created
+loop #E9F5EC until the reply is answered
+ARTIE -[#1B7F3B]> P8160 : <b>14</b> GET /replies/r2-1794510148092\n<i>return to http://192.168.1.18:8160/replies/r2-1794510148092</i>
+P8160 -[#1B7F3B]-> ARTIE : 200 OK <b>awaiting</b>
 P8170 -[#1F4FB8]> P8171 : <b>·</b> POST /job/app/buildWithParameters\nSHA, RELEASE_BUILD, PREVIEW_PORT
 P8171 -[#1F4FB8]> P8170 : <b>·</b> POST /hooks/jenkins\nQUEUED, STARTED (Notification plugin)
-ARTIE -[#1B7F3B]> P8160 : <b>15</b> GET /replies/r-build-3fb2a0f-1794459609\n<i>Once {build} has succeeded, or failed: ARTIE's reply {reply} is awaiting</i>
-P8160 -[#1B7F3B]-> ARTIE : 200 OK <b>awaiting</b>
-P8170 -[#1B7F3B]> P8160 : <b>·</b> PATCH /replies/r-build-3fb2a0f-1794459609\n<b>hr:progress</b>, signed by its key\n"Jenkins build #5 started"
-ARTIE -[#1B7F3B]> P8160 : <b>16</b> GET /replies/r-build-3fb2a0f-1794459609\n<i>Once {build} has succeeded, or failed: ARTIE's reply {reply} is awaiting</i>
-P8160 -[#1B7F3B]-> ARTIE : 200 OK <b>awaiting</b>
 P8171 -[#1F4FB8]> P8180 : <b>·</b> starts the library at the commit
 P8171 -[#1F4FB8]> P8170 : <b>·</b> POST /hooks/jenkins\nCOMPLETED, FINALIZED: SUCCESS, with its artifacts
-P8170 -[#1B7F3B]> P8160 : <b>·</b> PATCH /replies/r-build-3fb2a0f-1794459609\n<b>hr:completed</b>, signed by its key
-ARTIE -[#1B7F3B]> P8160 : <b>17</b> GET /replies/r-build-3fb2a0f-1794459609\n<i>Once {build} has succeeded, or failed: ARTIE's reply {reply} is completed</i>
+P8170 -[#1B7F3B]> P8160 : <b>·</b> PATCH /replies/r2-1794510148092\n<b>hr:completed</b>, signed by its key
+ARTIE -[#1B7F3B]> P8160 : <b>15</b> GET /replies/r2-1794510148092\n<i>return to http://192.168.1.18:8160/replies/r2-1794510148092</i>
 P8160 -[#1B7F3B]-> ARTIE : 200 OK <b>completed</b>
-note right of P8160
-<b>_links.ci:deployment</b> = /
-<b>_links.ci:smoke-test</b> = /builds/1/artifacts/smoke.goal.md
-<b>_links.ci:log</b> = /builds/1/log
-<b>_links.hr:in-reply-to</b> = /builds/1
-end note
 end
-ARTIE -[#A80036]> P8170 : <b>18</b> GET /builds/1/artifacts/smoke.goal.md\n<i>ARTIE reads the smoke script {build} links as ci:smoke-test</i>
+ARTIE -[#A80036]> P8170 : <b>16</b> GET /builds/1\n<i>follow hr:in-reply-to</i>
 P8170 -[#A80036]-> ARTIE : 200 OK
-== Smoke test, on the preview ==
-ARTIE -[#A80036]> P8180 : <b>19</b> GET /\n<i>S1: ARTIE reads the preview {preview} the build deployed as preview</i>
+== Smoke test, the captured script, on the preview ==
+ARTIE -[#A80036]> P8180 : <b>17</b> GET /\n<i>enter http://192.168.1.18:8180/</i>
 P8180 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8180 : <b>20</b> GET /loans?name=Matilda\n<i>S1: search the loans for {name}</i>
+ARTIE -[#A80036]> P8180 : <b>18</b> GET /loans?name=Charlotte's Web\n<i>act library:search-loans, name Charlotte's Web</i>
 P8180 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8180 : <b>21</b> GET /loans/3311\n<i>S2: open the loan {loan}</i>
+ARTIE -[#A80036]> P8180 : <b>19</b> GET /loans/3312\n<i>follow item, titled Charlotte's Web</i>
 P8180 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8180 : <b>22</b> POST /loans/3311/actions/renew\n<i>S3: renew it</i>
+ARTIE -[#A80036]> P8180 : <b>20</b> GET /loans?name=Charlotte's+Web\n<i>return to http://192.168.1.18:8180/loans?name=Charlotte%27s+Web</i>
 P8180 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8180 : <b>23</b> GET /loans/3311\n<i>S3: read it again: due {expected}?</i>
+ARTIE -[#A80036]> P8180 : <b>21</b> GET /\n<i>return to http://192.168.1.18:8180/</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>22</b> GET /loans?name=Charlotte's Web\n<i>act library:search-loans, name Charlotte's Web</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>23</b> GET /loans/3312\n<i>follow item, titled Charlotte's Web</i>
+P8180 -[#A80036]-> ARTIE : 304
+note over ARTIE #E6F4EA : <b>24</b> check: held
+ARTIE -[#A80036]> P8180 : <b>25</b> GET /loans?name=Charlotte's+Web\n<i>return to http://192.168.1.18:8180/loans?name=Charlotte%27s+Web</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>26</b> GET /\n<i>return to http://192.168.1.18:8180/</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>27</b> GET /loans?name=Matilda\n<i>act library:search-loans, name Matilda</i>
 P8180 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8180 : <b>24</b> POST /loans/3311/actions/renew\n<i>S4: renew it again, with the version read before the renewal</i>
-P8180 -[#A80036]-> ARTIE : 412 Precondition Failed
-ARTIE -[#A80036]> P8180 : <b>25</b> GET /loans/3311\n<i>S5: read the loan, for its form to report a problem</i>
+ARTIE -[#A80036]> P8180 : <b>28</b> GET /loans/3311\n<i>follow item, titled Matilda</i>
 P8180 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8180 : <b>26</b> GET /problem-kinds\n<i>S5: read the kinds of problem the library lists</i>
+ARTIE -[#A80036]> P8180 : <b>29</b> POST /loans/3311/actions/renew\n<i>act library:renew</i>
 P8180 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8180 : <b>27</b> POST /loans/3311/actions/report-problem\n<i>S5: report {problem} on the loan</i>
+ARTIE -[#A80036]> P8180 : <b>30</b> GET /loans/3311\n<i>return to http://192.168.1.18:8180/loans/3311</i>
 P8180 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8180 : <b>28</b> GET /loans/3311\n<i>S5: the loan shows the problem reported</i>
+note over ARTIE #E6F4EA : <b>31</b> check: held
+ARTIE -[#A80036]> P8180 : <b>32</b> GET /loans?name=Matilda\n<i>return to http://192.168.1.18:8180/loans?name=Matilda</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>33</b> GET /\n<i>return to http://192.168.1.18:8180/</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>34</b> GET /loans?name=Matilda\n<i>act library:search-loans, name Matilda</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>35</b> GET /loans/3311\n<i>follow item, titled Matilda</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>36</b> POST /loans/3311/actions/renew\n<i>act library:renew</i>
 P8180 -[#A80036]-> ARTIE : 200 OK
-note over ARTIE #FFF9B0 : <b>Smoke: 5 of 5 passed (S1, S2, S3, S4, S5)</b>
+ARTIE -[#A80036]> P8180 : <b>37</b> GET /loans/3311\n<i>return to http://192.168.1.18:8180/loans/3311</i>
+P8180 -[#A80036]-> ARTIE : 200 OK
+ARTIE -[#A80036]> P8180 : <b>38</b> POST /loans/3311/actions/renew\n<i>act library:renew</i>
+P8180 -[#A80036]-> ARTIE : 412 Precondition Failed <i>(expected: stale)</i>
+ARTIE -[#A80036]> P8180 : <b>38</b> GET /loans/3311\n<i>act library:renew</i>
+P8180 -[#A80036]-> ARTIE : 304 <i>(expected: stale)</i>
+ARTIE -[#A80036]> P8180 : <b>39</b> GET /loans?name=Matilda\n<i>return to http://192.168.1.18:8180/loans?name=Matilda</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>40</b> GET /\n<i>return to http://192.168.1.18:8180/</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>41</b> GET /loans?name=Charlotte's Web\n<i>act library:search-loans, name Charlotte's Web</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>42</b> GET /loans/3312\n<i>follow item, titled Charlotte's Web</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>43</b> GET /problem-kinds\n<i>act library:report-problem, problem damaged, comment Spine cracked.</i>
+P8180 -[#A80036]-> ARTIE : 200 OK
+ARTIE -[#A80036]> P8180 : <b>43</b> POST /loans/3312/actions/report-problem\n<i>act library:report-problem, problem damaged, comment Spine cracked.</i>
+P8180 -[#A80036]-> ARTIE : 200 OK
+ARTIE -[#A80036]> P8180 : <b>44</b> GET /loans/3312\n<i>return to http://192.168.1.18:8180/loans/3312</i>
+P8180 -[#A80036]-> ARTIE : 200 OK
+note over ARTIE #E6F4EA : <b>45</b> check: held
+ARTIE -[#A80036]> P8180 : <b>46</b> GET /loans?name=Charlotte's+Web\n<i>return to http://192.168.1.18:8180/loans?name=Charlotte%27s+Web</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8180 : <b>47</b> GET /\n<i>return to http://192.168.1.18:8180/</i>
+P8180 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8170 : <b>48</b> GET /builds/1/artifacts/smoke.heart.yaml\n<i>return to http://192.168.1.18:8170/builds/1</i>
+P8170 -[#A80036]-> ARTIE : 200 OK
+ARTIE -[#A80036]> P8170 : <b>48</b> GET /builds/1\n<i>return to http://192.168.1.18:8170/builds/1</i>
+P8170 -[#A80036]-> ARTIE : 304
 == Promote ==
-ARTIE -[#A80036]> P8190 : <b>29</b> GET /\n<i>ARTIE reads the environments' entry</i>
+ARTIE -[#A80036]> P8190 : <b>49</b> GET /\n<i>enter http://192.168.1.18:8190/</i>
 P8190 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8190 : <b>30</b> GET /environments/1\n<i>ARTIE opens Dev</i>
+ARTIE -[#A80036]> P8190 : <b>50</b> GET /environments/1\n<i>act env:get-environment, id 1</i>
 P8190 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8190 : <b>31</b> POST /environments/1/actions/promote\n<i>ARTIE promotes commit {commit} to Dev, citing the smoke run as promotion</i>
+ARTIE -[#A80036]> P8190 : <b>51</b> POST /environments/1/actions/promote\n<i>act env:promote, commit 9e5128779e3acbdf17094621857194a4ca79a296, smoke …, _links …</i>
 P8190 -[#A80036]-> ARTIE : 200 OK
-ARTIE -[#A80036]> P8190 : <b>32</b> GET /environments/1\n<i>ARTIE reads Dev: it serves {commit}</i>
-P8190 -[#A80036]-> ARTIE : 200 OK
+ARTIE -[#A80036]> P8170 : <b>52</b> GET /builds/1\n<i>return to http://192.168.1.18:8170/builds/1</i>
+P8170 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8170 : <b>53</b> GET /builds/1\n<i>return to http://192.168.1.18:8170/builds/1</i>
+P8170 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8098 : <b>54</b> GET /repos/acme/web/pulls/501\n<i>return to http://192.168.1.18:8098/repos/acme/web/pulls/501</i>
+P8098 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8099 : <b>55</b> GET /watches/1\n<i>return to http://192.168.1.18:8099/watches/1</i>
+P8099 -[#A80036]-> ARTIE : 304
+ARTIE -[#A80036]> P8098 : <b>56</b> GET /repos/acme/web/pulls/501\n<i>return to http://192.168.1.18:8098/repos/acme/web/pulls/501</i>
+P8098 -[#A80036]-> ARTIE : 304
 legend left
-  <color:#A80036><b>Red</b></color>: ARTIE's HEART requests to each party, numbered as the steps of its trace, and their answers
-  <color:#1B7F3B><b>Green</b></color>: RISE: ARTIE's replies, read until answered, and each party's signed answer to them
+  <color:#A80036><b>Red</b></color>: ARTIE's HEART requests to each party, numbered as the steps of the desk's trace
+  <color:#1B7F3B><b>Green</b></color>: RISE: the desk's replies, read until answered, and each party's signed answer
   <color:#1F4FB8><b>Blue</b></color>: the parties' own messages, which ARTIE never sees: the watch's looks, Jenkins' part
-  Yellow notes: the links an answer handed over; every address after an entry came from one
+  Notes: the smoke script's checks, held or failed
 endlegend
 @enduml

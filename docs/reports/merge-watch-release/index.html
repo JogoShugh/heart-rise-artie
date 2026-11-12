@@ -31,19 +31,19 @@
 <body>
 <header>
   <h1>Merge Watch Release</h1>
-  <p>A pull request released to Dev across five HEART parties, every wait a RISE reply: watched until it can be merged,
-    merged in git, built by a real Jenkins, smoke tested on the preview it deployed, and promoted, or stopped.</p>
+  <p>Reason once, then run again with other inputs and no model: the smoke test captured from one run with Claude,
+    then five pull requests released by ARTIE across five HEART parties, each with its own inputs, zero model calls.</p>
   <div role="tablist" aria-label="Part">
     <button role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true">Overview</button>
-    <button role="tab" id="tab-pass" aria-controls="panel-pass" aria-selected="false">Passing: pull request 482</button>
-    <button role="tab" id="tab-fail" aria-controls="panel-fail" aria-selected="false">Stopped: pull request 483</button>
+    <button role="tab" id="tab-pass" aria-controls="panel-pass" aria-selected="false">Released: pull request 501</button>
+    <button role="tab" id="tab-fail" aria-controls="panel-fail" aria-selected="false">Stopped: pull request 504</button>
     <button role="tab" id="tab-sequence" aria-controls="panel-sequence" aria-selected="false">Sequence</button>
     <button role="tab" id="tab-junctions" aria-controls="panel-junctions" aria-selected="false">Junctions</button>
   </div>
 </header>
 <iframe id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" src="overview.html" title="Overview"></iframe>
-<iframe id="panel-pass" role="tabpanel" aria-labelledby="tab-pass" src="pass.html" title="Pull request 482, passing" hidden></iframe>
-<iframe id="panel-fail" role="tabpanel" aria-labelledby="tab-fail" src="fail.html" title="Pull request 483, stopped" hidden></iframe>
+<iframe id="panel-pass" role="tabpanel" aria-labelledby="tab-pass" src="runs/pr-501.html" title="Pull request 501, released" hidden></iframe>
+<iframe id="panel-fail" role="tabpanel" aria-labelledby="tab-fail" src="runs/pr-504.html" title="Pull request 504, stopped" hidden></iframe>
 <iframe id="panel-sequence" role="tabpanel" aria-labelledby="tab-sequence" src="sequence.html" title="Sequence" hidden></iframe>
 <iframe id="panel-junctions" role="tabpanel" aria-labelledby="tab-junctions" src="junctions.html" title="Junctions" hidden></iframe>
 <script>
