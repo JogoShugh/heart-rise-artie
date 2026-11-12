@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Release Junctions</title>
+<style>
+  :root { --bg: #f6f5f1; --fg: #1d211f; --soft: #5b625e; --line: #dcdcd4; --card: #ffffff; --accent: #2f6b4f; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+      --accent: #7cc4a0; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+    --accent: #7cc4a0; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { padding: 1rem max(16px, env(safe-area-inset-left, 0px)) 3rem; max-width: 1500px; margin: 0 auto; }
+  h1 { margin: .2rem 0 .3rem; font-size: 1.5rem; }
+  p { color: var(--soft); max-width: 80ch; margin: .2rem 0; }
+  code { font: .88em ui-monospace, Menlo, monospace; }
+  [role="tablist"] { display: flex; gap: .4rem; flex-wrap: wrap; margin: 1rem 0 .6rem; }
+  [role="tab"] { font: inherit; font-size: .9rem; padding: .4rem .75rem; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--card); color: var(--fg); cursor: pointer; }
+  [role="tab"][aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); }
+  .facts { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .6rem .8rem; margin-bottom: .8rem; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+  @media (max-width: 800px) { .pair { grid-template-columns: 1fr; } }
+  figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  figcaption { padding: .45rem .7rem; font-weight: 600; border-bottom: 1px solid var(--line); }
+  figcaption small { font-weight: 400; color: var(--soft); }
+  .shot { height: 70vh; min-height: 24rem; overflow: auto; }
+  .shot img { display: block; width: 100%; height: auto; }
+</style>
+</head>
+<body>
+<main>
+  <h1>The Release, Junction by Junction</h1>
+  <p>Each party's resource at the moment the release passed through it, the same address two ways: HAL Explorer 1.2.3
+    asking for HAL-FORMS (served on each party's own origin by <code>explorer-proxy.mjs</code>), and the HTML page for
+    people. Taken after both runs: the watch, reply and build are pull request 482's; the preview is the library as
+    pull request 483's build deployed it, after its smoke test.</p>
+  <div role="tablist" aria-label="Junction" id="tabs"></div>
+  <div id="panels"></div>
+</main>
+<script>
+  const J = [
+    ["1-watch", "The offer watch", "http://192.168.1.18:8099/watches/1", "Answered: the pull request offered github:merge. It links the pull request it watched (about), ARTIE's reply and the watcher's keys."],
+    ["2-reply-completed", "ARTIE's reply, completed by the build", "http://192.168.1.18:8160/replies/r-build-…", "Completed by the CI wrapper's signed PATCH: its result names the build and commit, and links the deployment, the smoke script and the log; hr:in-reply-to names the build. A completed reply offers no more acts."],
+    ["3-build", "The build", "http://192.168.1.18:8170/builds/1", "Succeeded: Jenkins build number, the commit, and the ci: links to what it made."],
+    ["4-preview-loan", "The preview: a loan", "http://192.168.1.18:8180/loans/3311", "Matilda, renewed and reported by the smoke run; what it offers now (renew, report a problem, return)."],
+    ["5-dev", "Dev", "http://192.168.1.18:8190/environments/1", "Serving pull request 482's merge commit, promoted citing its smoke run; promote still offered for the next release."],
+  ];
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+  const tabs = document.getElementById("tabs"), panels = document.getElementById("panels");
+  J.forEach(([id, name, address, what], i) => {
+    const tab = el("button", null, `${i + 1}. ${name}`);
+    Object.assign(tab, { id: `tab-${id}`, type: "button" });
+    tab.setAttribute("role", "tab"); tab.setAttribute("aria-controls", `panel-${id}`);
+    tabs.append(tab);
+    const panel = el("section"); panel.id = `panel-${id}`; panel.setAttribute("role", "tabpanel");
+    const facts = el("div", "facts"), p = el("p");
+    p.append(el("code", null, `GET ${address}`), document.createTextNode(`: ${what}`));
+    facts.append(p);
+    const pair = el("div", "pair");
+    [["hal-forms", "HAL Explorer", "application/prs.hal-forms+json"], ["html", "The page", "text/html"]].forEach(([kind, title, sub]) => {
+      const fig = el("figure"), cap = el("figcaption", null, title + " ");
+      cap.append(el("small", null, sub));
+      const shot = el("div", "shot"), link = el("a"), img = el("img");
+      Object.assign(img, { src: `img/${id}-${kind}.png`, alt: `${title} at ${address}`, loading: "lazy" });
+      Object.assign(link, { href: img.src, target: "_blank", rel: "noopener" });
+      link.append(img); shot.append(link); fig.append(cap, shot); pair.append(fig);
+    });
+    panel.append(facts, pair); panels.append(panel);
+  });
+  const all = [...tabs.children];
+  const show = (id) => all.forEach((tab) => {
+    const on = tab.id === `tab-${id}`;
+    tab.setAttribute("aria-selected", String(on));
+    document.getElementById(tab.getAttribute("aria-controls")).hidden = !on;
+  });
+  all.forEach((tab) => tab.addEventListener("click", () => show(tab.id.slice(4))));
+  show(J[0][0]);
+</script>
+</body>
+</html>
