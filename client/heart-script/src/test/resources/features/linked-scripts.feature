@@ -52,7 +52,34 @@ Feature: A script enters other parties, and runs the scripts their links hand ov
       | follow | item "Build 1"                          |
       | send   | GET /builds/1/smoke                     |
       | enter  | scripted://service/preview              |
+      | return | /                                       |
       | return | /builds/1                               |
+
+  Scenario: A scenario that fails deep in its steps leaves the next one where it began, client and script alike
+    When this script held as data runs
+      """yaml
+      heart: 1
+      kind: kept
+      start: scripted://service/
+      steps:
+        - scenario: A
+          steps:
+            - follow: item
+              title: Build 1
+              then:
+                - check: [{field: state, is: failed}]
+        - scenario: B
+          steps:
+            - follow: item
+              title: Build 1
+            - note: "B at ${state.title}"
+      """
+    Then the script finished
+    And the script noted "B at Build 1"
+    And the run's scenarios were
+      | scenario | passed |
+      | A        | false  |
+      | B        | true   |
 
   Scenario: A script enters another party's entry, runs its steps there, and comes back
     When this script held as data runs

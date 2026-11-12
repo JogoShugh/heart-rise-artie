@@ -28,7 +28,9 @@ fun Here.scenario(name: String, block: Here.() -> Unit) {
         Scenario(name, false, stopped.reason.removeSurrounding("\""))
     }
     run.scenarios += outcome
-    if (held.address != from) held = arrived(run.step, "\"scenario\"", navigator.recall(from))
+    // A scenario that failed inside a step's block left the client where it failed, whatever is held here: read
+    // again where the scenario began, so the next one starts there, client and script alike.
+    if (!outcome.passed || held.address != from) held = arrived(run.step, "\"scenario\"", navigator.recall(from))
 }
 
 /**

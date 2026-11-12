@@ -12,6 +12,12 @@ inputs:
   watcher: {default: "http://192.168.1.18:8099"}
   ci: {default: "http://192.168.1.18:8170"}
   dev: {default: "http://192.168.1.18:8190"}
+  # What the smoke test is given on this release: the slots its captured script fills, a value each.
+  book: {default: "The Hobbit"}
+  author: {default: "J. R. R. Tolkien"}
+  renewable: {default: "Matilda"}
+  problem: {default: "missing-pages"}
+  comment: {default: "Pages 12 to 14."}
 start: ${github}/
 steps:
   # In {owner}/{repo}, open pull request {pull} `as pr`
@@ -49,7 +55,13 @@ steps:
                     steps:
                       - follow: hr:in-reply-to
                       - run-script: ci:smoke-test
-                        inputs: {deployed: "${build.result._links.ci:deployment.href}"}
+                        inputs:
+                          deployed: "${build.result._links.ci:deployment.href}"
+                          book: "${book}"
+                          author: "${author}"
+                          renewable: "${renewable}"
+                          problem: "${problem}"
+                          comment: "${comment}"
                         as: smoke
                       - note: "Smoke: ${smoke.passing} of ${smoke.of} passed. Failed: ${smoke.failed}"
                       # At {dev}, if {smoke.passed}, promote the merged commit, citing {smoke} `as promotion`

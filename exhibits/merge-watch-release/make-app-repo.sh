@@ -28,5 +28,19 @@ git checkout -q -b pr-483
 printf 'renewal.weeks=0\n' > library.properties
 git commit -q -am "Renewals: hand-out week"
 
+# Variants: each its own number, title and change, released by the same kept scripts with their own inputs.
+variant() { # number title weeks note
+  git checkout -q main
+  git checkout -q -b "pr-$1"
+  printf 'renewal.weeks=%s\n' "$3" > library.properties
+  printf '\n%s\n' "$4" >> README.md
+  git commit -q -am "$2"
+}
+variant 501 "Renewals: two weeks for short loans" 2 "Short loans renew two weeks at a time."
+variant 502 "Renewals: four weeks over the summer" 4 "Over the summer a loan renews four weeks at a time."
+variant 503 "Renewals: one week while stock is short" 1 "While stock is short a loan renews one week at a time."
+variant 504 "Renewals: none during the audit" 0 "During the stock audit, renewing is paused."
+variant 505 "Say who to ask about renewals" 3 "Ask at the desk about renewals."
+
 git checkout -q main
 git log --all --oneline --graph

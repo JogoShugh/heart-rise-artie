@@ -36,6 +36,11 @@ class RiseSteps(private val steps: ScriptSteps) {
         steps.replies = null
     }
 
+    @Then("the run's scenarios were")
+    fun scenariosWere(table: DataTable) {
+        assertEquals(table.asMaps(), steps.run.scenarios.map { mapOf("scenario" to it.name, "passed" to "${it.passed}") })
+    }
+
     @Then("the host was told, in order")
     fun toldInOrder(table: DataTable) {
         assertEquals(table.asLists().drop(1).map { row -> row.map { it ?: "" } }, told)
