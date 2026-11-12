@@ -41,7 +41,8 @@ private class GoalRun(val goal: Goal, val planner: Planner, val run: Run, val ma
         run.source = ""
         run.place = { place }
         run.planned = moves
-        heart(goal.start) {
+        // A start that is an input, `{deployed}`, is wherever the run is given (run-goal.feature).
+        heart(GoalText.fill(goal.start, goal.inputs.map { it.name }.toSet(), run::value)) {
             filled = GoalText.fill(goal.text, goal.inputs.map { it.name }.toSet(), run::value)
             // As the person wrote it, each input a name: a value made of inputs is theirs by its parts.
             run.goal = goal.text

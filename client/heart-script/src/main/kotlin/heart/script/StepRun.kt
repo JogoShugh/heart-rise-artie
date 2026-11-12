@@ -53,7 +53,8 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
         run.source = ""
         run.place = { script.place }
         run.planned = moves
-        heart(goal.start) {
+        // A start that is an input, `{deployed}`, is wherever the run is given (run-goal.feature).
+        heart(GoalText.fill(goal.start, inputs, run::value)) {
             // The person's words: a value the run sent that they hold is theirs.
             run.goal = (listOf(goal.context) + StepText.all(goal.steps)).joinToString("\n")
             path += held.address

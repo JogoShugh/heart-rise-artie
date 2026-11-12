@@ -70,6 +70,54 @@ Feature: artie run a goal file: a goal in words, planned by the client's planner
       | act("issues-get", "number" to number, inferred = "open issue $number") { |
       | act("close", inferred = "close it")                       |
 
+  Scenario: A goal starts where an input says, and the script made from it starts there by that input
+    A smoke test runs against whichever deployment a build made: its start is an input, given on
+    every run, and the script made from one run starts wherever the next run says.
+    Given the file "smoke.goal.md" is
+      """
+      ---
+      start: "{deployed}"
+      inputs:
+        deployed:
+        number:
+      ---
+
+      Open issue {number}.
+      """
+    And the planner will move
+      | move   | words              | sentence | opens |
+      | act    | open issue $number | 1        |       |
+      | done   |                    | 1        |       |
+      | finish |                    |          |       |
+    And the reasoner chooses
+      | intent        | selection | relation   | fields           |
+      | open issue 10 | act       | issues-get | {"number": "10"} |
+    When artie is run with
+      | argument                     |
+      | run                          |
+      | smoke.goal.md                |
+      | deployed=scripted://service/ |
+      | number=10                    |
+      | --reasoner                   |
+      | claude                       |
+      | --trace                      |
+      | smoke.trace.yaml             |
+    Then artie exits 0
+    When artie is run with
+      | argument         |
+      | generate         |
+      | smoke.trace.yaml |
+      | --out            |
+      | smoke.heart.yaml |
+      | --script         |
+      | smoke.goal.md    |
+      | --format         |
+      | yaml             |
+    Then artie exits 0
+    And the file "smoke.heart.yaml" has these lines
+      | line                  |
+      | start: ${deployed}    |
+
   Scenario: The capture keeps the client's count of model calls and tokens
     Given the planner will move
       | move   | words              | sentence | opens |

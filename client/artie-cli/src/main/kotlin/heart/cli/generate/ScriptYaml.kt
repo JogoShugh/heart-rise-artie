@@ -76,7 +76,9 @@ class ScriptYaml(
         asked = asked(watch)
         val steps = steps(walked) + watch
         val kind = if (options.intents) "intent" else "kept"
-        val document = linkedMapOf<String, Any?>("heart" to 1, "kind" to kind, "start" to capture.entry)
+        // A start the run was given as an input is that input, for wherever the next run is given.
+        val start = capture.inputGiven(capture.entry)?.let { "\${$it}" } ?: capture.entry
+        val document = linkedMapOf<String, Any?>("heart" to 1, "kind" to kind, "start" to start)
         val inputs = capture.inputs.mapValues { (name, input) -> declared(input, bindings.inputTypes[name]) }
         return (header() + YamlText.lines(document) + "" +
             (if (inputs.isEmpty()) emptyList() else YamlText.lines(mapOf("inputs" to inputs)) + "") +
