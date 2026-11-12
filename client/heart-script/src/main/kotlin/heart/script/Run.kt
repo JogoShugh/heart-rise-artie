@@ -290,8 +290,17 @@ class Run(
         if (interactive) prompt(question, default) else default.also { defaultsUsed += question to it }
 
     companion object {
-        /** The run the current script belongs to. */
-        var current: Run = Run()
+        /**
+         * The run the current script belongs to, on this thread and the threads it starts (a watch's listeners and
+         * polls): several hosts can run scripts in one process at once, each its own run (hosted.feature).
+         */
+        var current: Run
+            get() = threadRun.get()
+            set(run) = threadRun.set(run)
+
+        private val threadRun = object : InheritableThreadLocal<Run>() {
+            override fun initialValue() = Run()
+        }
 
         /** What a script's frames are named after: its source, a .kts. */
         private const val SCRIPT = ".kts"
