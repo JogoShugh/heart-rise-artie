@@ -58,7 +58,7 @@ fun Here.runScript(rel: String, inputs: Map<String, String>, named: String, titl
     }
     run.trace += child.trace
     run.notes += child.notes
-    run.kept[named] = Run.Kept(held.address, State(outcome(child.scenarios, stopped)))
+    run.kept[named] = Run.Kept(held.address, State(outcome(child.scenarios, stopped)), inPlace = true)
     held = arrived(step, "\"$rel\"", navigator.recall(held.address))
 }
 
@@ -75,6 +75,8 @@ private fun outcome(scenarios: List<Scenario>, stopped: ScriptStopped?): JsonObj
     val failed = scenarios.filterNot { it.passed }.map { it.name }
     put("passed", JsonPrimitive(stopped == null && failed.isEmpty()))
     put("failed", JsonPrimitive(failed.joinToString(", ")))
+    put("passing", JsonPrimitive(scenarios.size - failed.size))
+    put("of", JsonPrimitive(scenarios.size))
     put("scenarios", JsonArray(scenarios.map { scenario ->
         buildJsonObject {
             put("name", JsonPrimitive(scenario.name))

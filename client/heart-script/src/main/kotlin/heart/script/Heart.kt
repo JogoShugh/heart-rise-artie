@@ -194,7 +194,7 @@ internal fun refused(step: Int, what: String, answer: Answer.Refused) =
  * a leading slash makes it a JSON Pointer (RFC 6901), for nested state (`/head/sha`). A missing member is
  * null, never an error.
  */
-class State internal constructor(private val root: JsonObject) {
+class State internal constructor(internal val root: JsonObject) {
     operator fun get(member: String): Any? = plain(node(member))
 
     /** Whether [member] is there at all, null or not, and its value. */

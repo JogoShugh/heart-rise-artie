@@ -32,6 +32,9 @@ internal fun Here.heldAt(name: String, facts: Facts.() -> Unit): Boolean {
     val kept = requireNotNull(run.kept[name]) {
         "nothing is kept as \"$name\"; keepAs(\"$name\") where it is reached"
     }
+    if (kept.inPlace) {
+        return Here(navigator, run, Representation(kept.address, kept.state.root, emptySet(), emptyMap())).holds(facts)
+    }
     var holding = false
     at(kept.address) { holding = holds(facts) }
     return holding

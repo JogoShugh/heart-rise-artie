@@ -4,8 +4,9 @@ Feature: A script enters other parties, and runs the scripts their links hand ov
   link, as a build links the smoke test it archived: `run-script` reads the script the link leads
   to, runs it with the inputs given, and keeps its outcome by name. A smoke test is scenarios:
   `scenario` runs its steps, and a check that fails there fails the scenario, not the script, so
-  every scenario runs and the outcome says which passed. An address a party hands over in a
-  result's links may be read, as any link's.
+  every scenario runs and the outcome says which passed, and how many of how many. The outcome is
+  no resource: a fact about it is read where it is kept, and `given` goes on by it, `then` or
+  `otherwise`.
 
   Background:
     Given a service holds these resources
@@ -33,10 +34,18 @@ Feature: A script enters other parties, and runs the scripts their links hand ov
         - run-script: ci:smoke-test
           inputs: {deployed: "scripted://service/preview"}
           as: smoke
-        - note: "passed: ${smoke.passed}; failed: ${smoke.failed}"
+        - note: "passed: ${smoke.passed}; failed: ${smoke.failed}; ${smoke.passing} of ${smoke.of}"
+        - given: [{at: smoke, field: passed, is: true}]
+          then:
+            - note: promote it
+          otherwise:
+            - note: say which failed
       """
     Then the script finished
-    And the script noted "passed: false; failed: S2"
+    And the script noted, in order
+      | note                              |
+      | passed: false; failed: S2; 1 of 2 |
+      | say which failed                  |
     And the client was asked, in order
       | call   | what                                    |
       | enter  | scripted://service/                     |

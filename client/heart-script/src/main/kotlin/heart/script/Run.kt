@@ -91,7 +91,13 @@ class Run(
     internal val reasoned = java.util.concurrent.ConcurrentHashMap<Triple<String, String, Set<String>>, Choice>()
 
     /** A resource kept by name: the address the server gave it, and its state when it was kept. */
-    internal class Kept(val address: String, val state: State, val validator: String? = null)
+    internal class Kept(
+        val address: String,
+        val state: State,
+        val validator: String? = null,
+        /** Whether it is no resource, an outcome kept (linked-scripts.feature): facts about it are read in place. */
+        val inPlace: Boolean = false,
+    )
 
     /** The replies the run's host keeps (RISE, rise.feature); null when it keeps none. Set before the run. */
     var replies: Replies? = null

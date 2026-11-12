@@ -186,8 +186,10 @@ internal val MAKERS: Map<String, Maker> = linkedMapOf(
             otherwise = { why -> otherwise?.let { made(it, why) } },
         ) { inner(once, "steps", reading) }
     },
-    "given" to Maker(setOf("given", "then")) { step, reading ->
-        given(facts(step["given"], reading)) then { inner(step, "then", reading) }
+    "given" to Maker(setOf("given", "then", "otherwise")) { step, reading ->
+        given(facts(step["given"], reading)) then { inner(step, "then", reading) } otherwise {
+            inner(step, "otherwise", reading)
+        }
     },
     "doing" to Maker(setOf("doing", "steps")) { step, reading ->
         doing(reading.text(step["doing"].toString())) { inner(step, "steps", reading) }
