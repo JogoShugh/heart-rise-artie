@@ -17,6 +17,24 @@ private val WORDS = setOf("intent", "inferred", "from-intent")
 private fun Here.inner(step: Map<*, *>, key: String, reading: Reading) =
     (step[key] as? List<*>)?.let { made(it, reading.why) }
 
+/**
+ * [acting], the act [rel]; with [expected], a refusal by its words (`stale`, kept-versions.feature), it must be refused
+ * so, and the script goes on where it was; done, or refused otherwise, the script stops, saying what it expected.
+ */
+private fun Here.refusedAs(rel: String, expected: String?, acting: Here.() -> Unit) {
+    if (expected == null) return acting()
+    val refused = try {
+        acting()
+        null
+    } catch (stopped: ScriptStopped) {
+        stopped.refused ?: throw stopped
+    }
+    if (refused?.kind?.words != expected) {
+        val was = refused?.let { "refused as ${it.kind.words}" } ?: "done"
+        throw ScriptStopped(run.step, "\"$rel\"", "\"expected refused as $expected, was $was\"")
+    }
+}
+
 /** A block of [step]'s [key], for a function that takes one; null when it has none. */
 private fun block(step: Map<*, *>, key: String, reading: Reading): (Here.() -> Unit)? =
     (step[key] as? List<*>)?.let { steps -> { made(steps, reading.why) } }
@@ -74,16 +92,18 @@ internal val REASONED = Maker(WORDS + setOf("reasoned", "then")) { step, reading
 
 /** The makers, by the key that names each step. */
 internal val MAKERS: Map<String, Maker> = linkedMapOf(
-    "act" to Maker(setOf("act", "fields", "then", "as-of") + WORDS) { step, reading ->
+    "act" to Maker(setOf("act", "fields", "then", "as-of", "refused-as") + WORDS) { step, reading ->
         val values = values(step, reading)
         val words = said(step, reading)
-        act(
-            step["act"].toString(),
-            intent = words.intent, inferred = words.inferred, fromIntent = words.fromIntent,
-            fields = { values.forEach { (name, value) -> name to value } },
-            block = block(step, "then", reading),
-            asOf = step["as-of"]?.toString(),
-        )
+        refusedAs(step["act"].toString(), step["refused-as"]?.toString()) {
+            act(
+                step["act"].toString(),
+                intent = words.intent, inferred = words.inferred, fromIntent = words.fromIntent,
+                fields = { values.forEach { (name, value) -> name to value } },
+                block = block(step, "then", reading),
+                asOf = step["as-of"]?.toString(),
+            )
+        }
     },
     "act-once" to Maker(setOf("act-once", "fields", "listed-in")) { step, reading ->
         val values = values(step, reading)

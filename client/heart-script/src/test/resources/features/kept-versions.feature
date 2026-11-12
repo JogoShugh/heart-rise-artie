@@ -51,6 +51,27 @@ Feature: Resources kept by name: their own address, a check that a value moved, 
       | returned | finished                                                      |
       | lent     | stopped at step 2, "check": "state: expected not lent, was lent" |
 
+  Scenario Outline: An act may be expected to be refused, and goes on only if it was, as it said
+    Given the server will refuse "renew" at "/loan" as stale: "the loan moved on"
+    When this script held as data runs
+      """yaml
+      heart: 1
+      kind: kept
+      start: scripted://service/
+      steps:
+        - follow: item
+          title: Matilda
+        - act: renew
+          refused-as: <expected>
+        - note: went on
+      """
+    Then the script <outcome>
+
+    Examples:
+      | expected      | outcome                                                                                  |
+      | stale         | finished                                                                                 |
+      | invalid input | stopped at step 2, "renew": "expected refused as invalid input, was refused as stale"    |
+
   Scenario: An act as of the version kept by name carries that version, not the one held
     When this script held as data runs
       """yaml
