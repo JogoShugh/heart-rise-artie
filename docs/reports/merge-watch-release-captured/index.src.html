@@ -45,10 +45,10 @@
 
   <div class="tiles">
     <div class="tile cost"><b>1 run with Claude: 24 calls</b>
-      <span>claude-sonnet-5-5 · 38,102 input tokens · 3,352 output · 35,246 read from cache · 63 steps in 53 s ·
+      <span>claude-sonnet-5-5 · 38,107 input tokens · 3,297 output · 35,246 read from cache · 63 steps in 56 s ·
         <a href="runs/capture.html">the capture</a></span></div>
     <div class="tile pass"><b>5 replays: 0 calls</b>
-      <span>release.heart.yaml, generated from the capture · 58 to 63 steps, about 20 s each</span></div>
+      <span>release.heart.yaml, generated from the capture · 58 to 63 steps, about 25 s each</span></div>
     <div class="tile pass"><b>5 of 5 as expected</b>
       <span>501, 502, 503 and 505 promoted to Dev · 504 stopped by smoke scenario S3, and said so on its pull request</span></div>
   </div>
@@ -61,7 +61,8 @@
       covers ran with no model: At a party, Once a reply, Run the script, If.</li>
     <li><b>The walk kept as a script.</b> <code>artie generate</code> wrote every value as the input or the name it
       came from: the pull request to watch is <code>${pr.@self}</code>, the build's commit
-      <code>${merged.merge_commit_sha}</code>, Dev's environment <code>${environment}</code>.</li>
+      <code>${merged.merge_commit_sha}</code>, Dev's environment <code>${environment}</code>, the smoke score it
+      cites <code>${smoke.passing}</code> of <code>${smoke.of}</code>.</li>
     <li><b>Five releases, five sets of inputs.</b> A different pull request and policy change each, and a different
       book, problem and comment for the smoke test. Same script every time; the real Jenkins builds each.</li>
   </ul>
@@ -75,13 +76,6 @@
     <tr><td><a href="runs/pr-504.html">504</a></td><td>renewals: none (0 weeks)</td><td>Charlotte's Web · E. B. White · missing-pages · "Pages 40 to 44."</td><td>0</td><td>stopped, as it should: S3 failed; not promoted; commented "Not promoted to Dev: smoke scenarios S3 failed."</td></tr>
     <tr><td><a href="runs/pr-505.html">505</a></td><td>a README line only</td><td>The Hobbit · J. R. R. Tolkien · damaged · "Water damage on the cover."</td><td>0</td><td>promoted to Dev</td></tr>
   </table></div>
-
-  <h2>What is not yet right</h2>
-  <ul>
-    <li>The promote step cites the smoke score as written in the capture (<code>passed: 5, of: 5</code>), not read from
-      <code>${smoke.passing}</code> and <code>${smoke.of}</code>. It holds while promotion follows only a full pass of
-      five scenarios.</li>
-  </ul>
 
   <h2>The goal, and the script kept from it</h2>
   <details><summary>release.goal.md, the plain-text goal</summary><pre>@@RELEASE_GOAL@@</pre></details>

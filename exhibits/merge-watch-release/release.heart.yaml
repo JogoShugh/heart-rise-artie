@@ -58,11 +58,11 @@ steps:
       reply: watch
       steps:
         - follow: hr:in-reply-to
-          inferred: follow the hr:in-reply-to link
+          inferred: follow the in-reply-to link to the watch
           from-intent: follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing
           then:
             - follow: about
-              inferred: follow the about link
+              inferred: follow the about link to the pull request
               from-intent: follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing
               then:
                 - act: github:merge
@@ -109,15 +109,15 @@ steps:
           - act: env:get-environment
             fields:
               id: ${environment}
-            inferred: get environment ${environment}
+            inferred: open environment ${environment}
             from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
             then:
               - act: env:promote
                 fields:
                   commit: ${merged.merge_commit_sha}
                   smoke:
-                    passed: 5
-                    of: 5
+                    passed: ${smoke.passing}
+                    of: ${smoke.of}
                 intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
                 then:
                   - check:
