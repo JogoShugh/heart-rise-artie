@@ -163,7 +163,8 @@ internal fun outcomeOf(answer: Answer): String = when (answer) {
 }
 
 /** A client whose every call is a step of [run]'s trace: so any client's run is traced alike. */
-internal class TracingNavigator(private val inner: Navigator, private val run: Run) : Navigator {
+internal class TracingNavigator(private val inner: Navigator, private val run: Run) :
+    Navigator, Reads by Reads.of(inner) {
     private var at = ""
 
     override fun enter(entry: String): Answer =

@@ -96,6 +96,9 @@ class Run(
     /** The replies the run's host keeps (RISE, rise.feature); null when it keeps none. Set before the run. */
     var replies: Replies? = null
 
+    /** Each scenario's outcome, in the order they ran (linked-scripts.feature). */
+    val scenarios = java.util.concurrent.CopyOnWriteArrayList<Scenario>()
+
     /** The replies the script asked with, by the name it kept each as. */
     internal val replied = java.util.concurrent.ConcurrentHashMap<String, Reply>()
 

@@ -18,6 +18,8 @@ val cucumberVersion = "7.18.0"
 
 dependencies {
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    // A kept script a party hands over by link, read as artie run reads one (linked-scripts.feature).
+    implementation("org.yaml:snakeyaml:2.2")
 
     // The features' steps and scripted service, shared with add-ons' features (heart-script-test).
     testFixturesApi(kotlin("test"))

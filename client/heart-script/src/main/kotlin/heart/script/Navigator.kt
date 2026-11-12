@@ -230,6 +230,20 @@ interface Navigator {
         Reasoned(null, Answer.Refused(Refusal.NoReasoner, Side.CLIENT, "this client has no reasoner"))
 }
 
+/** A client that reads what a link leads to as it is, beside HEART representations (linked-scripts.feature). */
+fun interface Reads {
+    /**
+     * What the link [rel] titled [title] leads to, read as it is, not as a HEART representation: a kept script a
+     * party hands over (linked-scripts.feature). Null when there is no such link.
+     */
+    fun read(rel: String, title: String?): Received?
+
+    companion object {
+        /** What [navigator] reads, if it reads; else nothing. */
+        fun of(navigator: Navigator): Reads = navigator as? Reads ?: Reads { _, _ -> null }
+    }
+}
+
 /**
  * A client whose reasoner also writes: a bare script's one reasoned line, where there is no form to choose from,
  * only text to send. [write] gives the words [intent] asks for; null when it wrote nothing.

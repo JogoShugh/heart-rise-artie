@@ -19,7 +19,7 @@ data class Link(val at: String, val relation: String, val title: String?, val to
  * by address, their forms and links. Every call is recorded, as the client
  * would have been asked it, so a feature can say what a script did.
  */
-class ScriptedService : Navigator, Wire, Writes {
+class ScriptedService : Navigator, Wire, Writes, Reads {
     val resources = mutableMapOf<String, Map<String, String>>()
     val forms = mutableListOf<Form>()
     val links = mutableListOf<Link>()
@@ -114,6 +114,12 @@ class ScriptedService : Navigator, Wire, Writes {
         val (expected, answer) = answers.removeFirst()
         check(expected == "${sent.method} ${sent.url}") { "the server expected $expected" }
         return answer
+    }
+
+    /** What a link leads to, read as it is: the server's next answer, as a bare call's is. */
+    override fun read(rel: String, title: String?): Received? {
+        val to = links.firstOrNull { it.at == held && it.relation == rel && it.title == title }?.to ?: return null
+        return send(Sent("GET", to, emptyMap(), null))
     }
 
     override fun why(rel: String): String? = when (rel) {
