@@ -7,9 +7,13 @@ import java.security.PublicKey
  * Riverside Public Library's loans, served as a HEART service by heart-core ([HeartLibrary]). A reset lends Ana
  * Torres the seed's three books again; [lend] lends her others.
  */
-class LibraryService(keysAt: (String) -> Map<String, PublicKey> = { emptyMap() }) {
+class LibraryService(
+    keysAt: (String) -> Map<String, PublicKey> = { emptyMap() },
+    /** The library's rules, as its policy file says them. */
+    policy: LibraryPolicy = LibraryPolicy(),
+) {
     private val ledger = Ledger()
-    private val heart = HeartLibrary(ledger, keysAt)
+    private val heart = HeartLibrary(ledger, keysAt, policy)
 
     init {
         reset()

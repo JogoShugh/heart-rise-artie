@@ -45,6 +45,8 @@ class HeartLibrary(
     private val ledger: Ledger,
     /** The keys at a `hr:keys` address, by key id: how the library reads the keys a request names. */
     private val keysAt: (String) -> Map<String, PublicKey> = { emptyMap() },
+    /** The library's rules, as its policy file says them. */
+    private val policy: LibraryPolicy = LibraryPolicy(),
 ) {
     private val mapper = ObjectMapper()
 
@@ -278,7 +280,7 @@ class HeartLibrary(
 
     /** The loan after [act]. A problem's kind is one of the library's list: heart-core checked it against it. */
     private fun acted(loan: Loan, act: String, input: ActInput): Loan = when (act) {
-        "renew" -> loan.renewed()
+        "renew" -> loan.renewed(policy.renewalWeeks)
         "report-problem" -> loan.reportedNow(Report(input.json["problem"].asText(), input.json["comment"]?.asText()))
         else -> loan.returnedNow()
     }

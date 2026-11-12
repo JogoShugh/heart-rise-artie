@@ -46,6 +46,21 @@ Feature: Riverside Public Library: each loan offers what its state allows, to a 
     Then the answer is 200
     And loan 3311 is due "2026-12-03", renewed 1 time
 
+  Scenario Outline: A library whose policy file renews <weeks> weeks at a time moves the due date that far
+    The library's rules live in its policy file, kept with its code, so a commit can change them: what a
+    build deploys is what that commit says. A policy file with no renewal period keeps three weeks.
+    Given the library's policy file reads "<policy>"
+    When Ana renews loan 3311
+    Then the answer is 200
+    And loan 3311 is due "<due>", renewed 1 time
+
+    Examples:
+      | policy           | weeks | due        |
+      | renewal.weeks=3  | 3     | 2026-12-03 |
+      | renewal.weeks=0  | 0     | 2026-11-12 |
+      | renewal.weeks=6  | 6     | 2026-12-24 |
+      | # no rules       | 3     | 2026-12-03 |
+
   Scenario Outline: A renewal sent anyway for loan <loan> is refused, and the loan is as it was
     The server holds the same rule it shows: an act it doesn't offer is
     refused before anything changes.

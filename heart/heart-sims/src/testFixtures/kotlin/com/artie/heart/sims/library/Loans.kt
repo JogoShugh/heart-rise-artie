@@ -33,8 +33,9 @@ data class Loan(
             else -> RENEWABLE
         }
 
-    /** Renewed: due three weeks later, counted. */
-    fun renewed(): Loan = copy(due = due.plusWeeks(RENEWAL_WEEKS), renewals = renewals + 1, version = version + 1)
+    /** Renewed: due [weeks] later, three by default, counted. */
+    fun renewed(weeks: Long = RENEWAL_WEEKS): Loan =
+        copy(due = due.plusWeeks(weeks), renewals = renewals + 1, version = version + 1)
 
     fun returnedNow(): Loan = copy(returned = true, version = version + 1)
 

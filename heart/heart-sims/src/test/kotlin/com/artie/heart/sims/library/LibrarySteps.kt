@@ -23,7 +23,13 @@ import kotlin.test.assertTrue
 
 /** library.feature: Riverside Public Library, read and acted on in memory, as each dialect's client would. */
 class LibrarySteps {
-    private val library = LibraryService(keysAt = ::keysAt)
+    private var library = LibraryService(keysAt = ::keysAt)
+
+    /** The library from now on serves the rules [policy], a policy file's text; a `#` line says none. */
+    @Given("the library's policy file reads {string}")
+    fun policy(policy: String) {
+        library = LibraryService(keysAt = ::keysAt, policy = LibraryPolicy.of(policy))
+    }
     private val mapper = ObjectMapper()
     private var answer: Response? = null
     private var dialect = HSF
