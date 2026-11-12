@@ -18,7 +18,12 @@ import java.net.URI
  * The response records which scheme was sent ([HeartResponse.credentialSent]),
  * so a refusal can say so without the credential.
  */
-class AuthTransport(private val credentials: CredentialSource, private val next: Transport) : Transport {
+class AuthTransport(
+    private val credentials: CredentialSource,
+    private val next: Transport,
+    /** Networks a host lets ARTIE send credentials to over plain HTTP too (hosted.feature); none by default. */
+    private val plainHttp: List<AddressMask> = emptyList(),
+) : Transport {
 
     override fun send(request: HeartRequest): HeartResponse {
         require(runCatching { URI(request.url).rawUserInfo }.getOrNull() == null) {
@@ -31,7 +36,7 @@ class AuthTransport(private val credentials: CredentialSource, private val next:
     }
 
     private fun send(request: HeartRequest, origin: Origin, credential: Credential): HeartResponse {
-        require(origin.scheme != "http" || origin.loopback) {
+        require(origin.scheme != "http" || origin.loopback || plainHttp.any { origin.host in it }) {
             "ARTIE will not send a credential over plain HTTP to $origin; nothing was sent"
         }
         val response = sendWith(request, credential)

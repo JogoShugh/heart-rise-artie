@@ -66,6 +66,36 @@ Feature: ARTIE hosted in a service
       """
     Then every request on the wire had header "Authorization" set to "Bearer desk-token"
 
+  Scenario Outline: A host may let ARTIE send its credentials over plain HTTP to addresses in a mask
+    ARTIE never sends a credential over plain HTTP beyond the machine, unless its host names the
+    addresses it may: a network written as a mask (CIDR), such as a home network. Only an address
+    written as numbers is in a mask; a name never is, whatever it resolves to.
+    Given the service answers GET "<origin>/beds/2" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-1.hsf.L0"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 2
+      _links:
+        self: {href: /beds/2}
+      """
+    And the host "desk" gives ARTIE the token "desk-token" for "<origin>"
+    And the host "desk" lets ARTIE send credentials over plain HTTP to "192.168.0.0/16"
+    When the host "desk" runs this kept script with ARTIE:
+      """yaml
+      start: <origin>/beds/2
+      steps: []
+      """
+    Then what reached the wire for "<origin>/beds/2" was "<sent>"
+
+    Examples:
+      | origin                   | sent                         |
+      | http://192.168.1.18:8301 | GET, with Bearer desk-token  |
+      | http://10.0.0.5:8301     | nothing                      |
+      | http://garden.local:8301 | nothing                      |
+
   Scenario: Each act ARTIE sends for a host is signed with the host's key
     Given the host "desk" gives ARTIE its signing key "desk-2026-11"
     When the host "desk" runs this kept script with ARTIE:

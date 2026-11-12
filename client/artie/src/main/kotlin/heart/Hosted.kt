@@ -16,12 +16,16 @@ class Hosted(
     private val signing: SigningKey? = null,
     private val wire: Transport = HttpTransport(),
     private val name: String = "host",
+    /** Networks the host lets ARTIE send credentials to over plain HTTP, as masks: `192.168.0.0/16`. */
+    plainHttp: List<String> = emptyList(),
 ) {
+    private val masks = plainHttp.map(::AddressMask)
+
     /** A client of its own, for one run: its own cache and trace, on the host's wire. */
     fun navigator(): Navigator {
         val signed = signing?.let { SigningTransport(it, wire) } ?: wire
         val named = UserAgentTransport("${UserAgentTransport.DEFAULT} ($name)", TraceContextTransport(Trace(), signed))
-        val transport = CachingTransport(IntegrityCheck(AuthTransport(credentials, named)))
+        val transport = CachingTransport(IntegrityCheck(AuthTransport(credentials, named, masks)))
         return ArtieNavigator(ArtieClient(transport))
     }
 
@@ -34,6 +38,9 @@ class Hosted(
             null
         } catch (stop: ScriptStopped) {
             stop
+        } catch (refused: IllegalArgumentException) {
+            // ARTIE refused before sending (a credential over plain HTTP): the host gets the run back, stopped.
+            ScriptStopped(run.step, "", "\"${refused.message}\"")
         }
         return HostedRun(run, stopped)
     }

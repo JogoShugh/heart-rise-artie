@@ -32,6 +32,7 @@ import kotlin.test.assertTrue
 class HostedSteps(private val ctx: ClientContext) {
     private val tokens = mutableMapOf<String, Pair<String, String>>()
     private val keys = mutableMapOf<String, SigningKey>()
+    private val masks = mutableMapOf<String, List<String>>()
     private val publicKeys = mutableMapOf<String, PublicKey>()
     private val runs = ConcurrentHashMap<String, HostedRun>()
     private val held = mutableMapOf<String, CountDownLatch>()
@@ -51,6 +52,18 @@ class HostedSteps(private val ctx: ClientContext) {
     @Given("the host {string} gives ARTIE the token {string} for {string}")
     fun token(host: String, token: String, origin: String) {
         tokens[host] = origin to token
+    }
+
+    @Given("the host {string} lets ARTIE send credentials over plain HTTP to {string}")
+    fun plainHttp(host: String, mask: String) {
+        masks[host] = listOf(mask)
+    }
+
+    @Then("what reached the wire for {string} was {string}")
+    fun reached(url: String, sent: String) {
+        val seen = ctx.transport.requests.filter { it.url == url }
+            .map { "${it.method}, with ${it.header("Authorization") ?: "no credential"}" }
+        assertEquals(sent, seen.singleOrNull() ?: if (seen.isEmpty()) "nothing" else seen.toString())
     }
 
     @Given("the host {string} gives ARTIE its signing key {string}")
@@ -155,7 +168,7 @@ class HostedSteps(private val ctx: ClientContext) {
                 ?.takeIf { (at, _) -> Origin.of(at) == origin }?.let { (_, token) -> Credential.Bearer(token) }
         }
         val wire = waitingOn[host]?.let { other -> heldUntil(other) } ?: shared
-        return Hosted(credentials = credentials, signing = keys[host], wire = wire, name = host)
+        return Hosted(credentials, keys[host], wire, host, masks[host].orEmpty())
     }
 
     /** The scripted service, which answers only once [other] has its run back. */
