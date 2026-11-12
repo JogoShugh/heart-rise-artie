@@ -97,6 +97,19 @@ internal val MAKERS: Map<String, Maker> = linkedMapOf(
             block = block(step, "then", reading),
         )
     },
+    "ask" to Maker(setOf("ask", "fields", "reply")) { step, reading ->
+        ask(step["ask"].toString(), step["reply"].toString(), values(step, reading).toMap())
+    },
+    "once-answered" to Maker(setOf("once-answered")) { step, reading ->
+        val once = step["once-answered"] as? Map<*, *> ?: stop("once-answered holds the reply it waits on, and steps")
+        val otherwise = once["otherwise"] as? List<*>
+        onceAnswered(
+            once["reply"].toString(),
+            giveUp = span(once["give-up"]) ?: 30.minutes,
+            failed = block(once, "failed", reading),
+            otherwise = { why -> otherwise?.let { made(it, why) } },
+        ) { inner(once, "steps", reading) }
+    },
     "keep-as" to Maker(setOf("keep-as")) { step, _ -> keepAs(step["keep-as"].toString()) },
     "sync" to Maker(setOf("sync")) { _, _ -> sync() },
     "note" to Maker(setOf("note")) { step, reading -> note(reading.text(step["note"].toString())) },

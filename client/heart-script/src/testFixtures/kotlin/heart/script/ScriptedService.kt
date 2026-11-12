@@ -232,6 +232,7 @@ class ScriptedService : Navigator, Wire, Writes {
         is Number -> JsonPrimitive(value)
         is Boolean -> JsonPrimitive(value)
         is List<*> -> JsonArray(value.map { element(it) })
+        is Map<*, *> -> JsonObject(value.entries.associate { (name, member) -> name.toString() to element(member) })
         else -> JsonPrimitive(value.toString())
     }
 }

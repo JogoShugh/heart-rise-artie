@@ -93,6 +93,12 @@ class Run(
     /** A resource kept by name: the address the server gave it, and its state when it was kept. */
     internal class Kept(val address: String, val state: State)
 
+    /** The replies the run's host keeps (RISE, rise.feature); null when it keeps none. Set before the run. */
+    var replies: Replies? = null
+
+    /** The replies the script asked with, by the name it kept each as. */
+    internal val replied = java.util.concurrent.ConcurrentHashMap<String, Reply>()
+
     /** Another entry than the script's: an environment, another binding. Set before the run. */
     var entry: String? = null
 

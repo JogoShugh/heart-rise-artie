@@ -101,7 +101,11 @@ class ScriptSteps {
     @When("this script held as data runs")
     fun runsAsData(text: String) = runsAsData(text, Run(navigator = { service }, pause = {}))
 
+    /** The replies the host keeps, given to each run (rise.feature); null when it keeps none. */
+    var replies: Replies? = null
+
     private fun runsAsData(text: String, with: Run) {
+        with.replies = replies
         run = with
         Run.current = with
         try {

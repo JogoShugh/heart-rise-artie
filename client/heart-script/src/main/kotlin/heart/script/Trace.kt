@@ -193,8 +193,9 @@ internal class TracingNavigator(private val inner: Navigator, private val run: R
      */
     private val handed: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
 
-    /** A refusal of [address] when the server never handed it over; null when it did. */
-    private fun unhanded(address: String): Answer.Refused? = if (address in handed) null else
+    /** A refusal of [address] when neither the server nor the run's host handed it over; null when one did. */
+    private fun unhanded(address: String): Answer.Refused? =
+        if (address in handed || run.replied.values.any { it.address == address }) null else
         Answer.Refused(Refusal.NotOffered, Side.CLIENT, "$address is no address the server handed over in this run")
 
     override fun why(rel: String): String? = inner.why(rel)

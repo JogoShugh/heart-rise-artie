@@ -303,5 +303,7 @@ private fun json(value: Any?): JsonElement = when (value) {
     is Number -> JsonPrimitive(value)
     is Boolean -> JsonPrimitive(value)
     is List<*> -> JsonArray(value.map { json(it) })
+    // An object, such as a RISE envelope's links (rise.feature).
+    is Map<*, *> -> JsonObject(value.entries.associate { (name, member) -> name.toString() to json(member) })
     else -> JsonPrimitive(value.toString())
 }
