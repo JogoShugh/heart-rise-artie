@@ -33,9 +33,12 @@ internal fun asked(made: Map<String, Any?>, reply: String): List<Map<String, Any
 /** The names the run's acts went as of, and its Verify: facts read: `${before.due}` reads `before`. */
 internal fun namesRead(capture: Capture): Set<String> = capture.steps.flatMap { step ->
     val marks = capture.marks(step)
-    val facts = (marks["facts"] as? List<*>).orEmpty().flatMap { (it as? Map<*, *>)?.values.orEmpty() }
-        .flatMap { value -> NAME.findAll(value.toString()).map { it.groupValues[1] } }
-    listOfNotNull(marks["as-of"]?.toString()) + facts
+    // Every name a mark reads again, a fact's, a script's input's, an Otherwise's: `${name.member}`, `${name.@self}`.
+    val read = listOf("facts", "inputs", "otherwise").flatMap { key ->
+        NAME.findAll(marks[key]?.toString().orEmpty()).map { it.groupValues[1] }
+    }
+    val given = (marks["given"] as? List<*>).orEmpty().mapNotNull { (it as? Map<*, *>)?.get("at")?.toString() }
+    listOfNotNull(marks["as-of"]?.toString()) + read + given
 }.toSet()
 
 private val NAME = Regex("""\$\{([A-Za-z_][A-Za-z0-9_]*)\.""")

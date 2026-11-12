@@ -96,7 +96,8 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 val outer = scenario
                 scenario = step.scenario ?: outer
                 // At another party, or once a reply is answered, then its words (goal-rise.feature).
-                crossParty.done(step, here, opener) { done, at, within -> intent(done, at, within) }
+                val done = { said: Step.Intent, at: Here, within: Int? -> intent(said, at, within); Unit }
+                if (!branch.done(step, here, opener, done)) crossParty.done(step, here, opener, done)
                 scenario = outer
             }
             is Step.Verify -> if (!namedFacts.verified(step, here, opener)) single(step, here, opener)
@@ -114,6 +115,9 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
 
     /** Steps at another party, asking to be told, or waiting on a reply (goal-rise.feature). */
     private val crossParty = CrossParty(run, script, marks, ::fill) { name, kept -> named[name] = kept }
+
+    /** If on a name's member, its Otherwise as written (goal-rise.feature). */
+    private val branch = Branch(run, script, marks, ::fill) { name -> names[name] }
 
     /** The scenario the step now is in, if any (goal-scenarios.feature). */
     private var scenario: String? = null

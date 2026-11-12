@@ -53,6 +53,47 @@ Feature: A goal that crosses parties and waits on their answers: At, asking to b
     And the script "smoke-run.heart.yaml" has a line with "book: ${book}"
     And the script "smoke-run.heart.yaml" has no line with "act: library"
 
+  Scenario: If on an outcome kept by name: the branch walked is the planner's, the other kept as written
+    A capture walks one branch. `If {name.member}, …` is checked with no model; the branch taken is
+    the planner's, kept as the run made it. Its `Otherwise, …` is written so ARTIE can do it as it
+    stands, `at {resource}, act REL with FIELD = "value"`: kept as written, so a run that takes it
+    needs no model either.
+    Given the desk serves a build that links its smoke script and its deployment
+    And the file "branch.goal.md" is
+      """
+      ---
+      start: "{build}"
+      inputs:
+        build:
+        desk:
+        book: { default: "Matilda" }
+      ---
+
+      Smoke test what the build made, then go on by how it went.
+
+      - Run the script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book} `as smoke`
+      - If {smoke.passed}, follow the deployment it links
+        Otherwise, at {desk}, act desk:release with pull = "9"
+      """
+    And the planner will move
+      | move | words                         | opens |
+      | act  | follow the deployment it links | yes   |
+      | done |                               |       |
+    And ARTIE's reasoner will choose, in order
+      | form | follow        | fields |
+      |      | ci:deployment |        |
+    When the goal "branch.goal.md" runs with ARTIE in the desk, captured in "branch.trace.yaml", given
+      | name  | value                            |
+      | build | http://localhost:8160/test-build |
+      | desk  | http://localhost:8160/           |
+    Then the run finished
+    When artie generated "branch.heart.yaml" as data from "branch.trace.yaml" and "branch.goal.md"
+    Then the script "branch.heart.yaml" has a line with "- given:"
+    And the script "branch.heart.yaml" has a line with "at: smoke"
+    And the script "branch.heart.yaml" has a line with "follow: ci:deployment"
+    And the script "branch.heart.yaml" has a line with "enter: ${desk}"
+    And the script "branch.heart.yaml" has a line with "act: desk:release"
+
   Scenario: The goal runs once with the planner, and the script made from it runs with none
     Given the planner will move
       | move | words                                                          | opens |

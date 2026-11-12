@@ -176,6 +176,11 @@ class ScriptYaml(
             when (walked.kind) {
                 "enter" -> linkedMapOf("enter" to walked.value, "steps" to steps(walked.block))
                 "run-script" -> ranScript(capture.marks(walked.step))
+                "given" -> capture.marks(walked.step).let { marks ->
+                    linkedMapOf("given" to marks["given"], "then" to steps(walked.block)).also { made ->
+                        (marks["otherwise"] as? List<*>)?.takeIf { it.isNotEmpty() }?.let { made["otherwise"] = it }
+                    }
+                }
                 else -> linkedMapOf(
                     "once-answered" to linkedMapOf("reply" to walked.value, "steps" to steps(walked.block)),
                 )
