@@ -91,6 +91,24 @@ class ReleaseDeskSteps {
         assertTrue(changed && at - askedAt <= seconds * MILLIS, "changed: $changed, after ${at - askedAt} ms")
     }
 
+    private var presented: Credential? = null
+
+    @When("the desk's ARTIE is asked for its credential at {string}")
+    fun credentialAt(origin: String) {
+        presented = heart.release.PartyCredentials.credentialFor(Origin.of(origin))
+    }
+
+    @Then("it presents {string}")
+    fun presents(expected: String) {
+        val (scheme, secret) = expected.split(' ').let { it[0] to it.getOrNull(1) }
+        val wanted = when (scheme) {
+            "Bearer" -> Credential.Bearer(checkNotNull(secret))
+            "Basic" -> checkNotNull(secret).split(':').let { Credential.Basic(it[0], it[1]) }
+            else -> null
+        }
+        assertEquals(wanted, presented)
+    }
+
     @Given("the desk's release script is:")
     fun releaseScript(text: String) {
         script = yaml.readValue(text, Map::class.java)

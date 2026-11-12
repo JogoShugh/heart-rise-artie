@@ -1,0 +1,91 @@
+# The release, kept as a script held as data: release.goal.md, as the release desk's ARTIE runs it. Every value
+# flows by name (`keep-as`, `${name.member}`); every wait is a reply the desk keeps (`ask`, `once-answered`); every
+# address after a party's entry is one an answer handed over, followed by its link or read where it was kept. Each
+# step goes on only from the one before it: the build is asked for once merged, the smoke run once built.
+heart: 1
+kind: kept
+inputs:
+  pull: {type: integer}
+  owner: {default: acme}
+  repo: {default: web}
+  github: {default: "http://192.168.1.18:8098"}
+  watcher: {default: "http://192.168.1.18:8099"}
+  ci: {default: "http://192.168.1.18:8170"}
+  dev: {default: "http://192.168.1.18:8190"}
+start: ${github}/
+steps:
+  # In {owner}/{repo}, open pull request {pull} `as pr`
+  - act: github:pulls-get
+    fields: {owner: "${owner}", repo: "${repo}", pull_number: "${pull}"}
+  - keep-as: pr
+  # At {watcher}, ask to be told when {pr} offers `github:merge` `as watch`
+  - enter: ${watcher}/
+    steps:
+      - ask: watcher:watch
+        fields: {resource: "${pr.@self}", offers: "github:merge", looks: 600}
+        reply: watch
+      # Once {watch} says it does, follow the pull request it links, and merge it by squashing `as merged`
+      - once-answered:
+          reply: watch
+          give-up: 30m
+          steps:
+            - follow: hr:in-reply-to
+            - follow: about
+            - act: github:merge
+              fields: {merge_method: squash}
+            - at: ${pr.@self}
+              steps:
+                - keep-as: merged
+            # At {ci}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`
+            - enter: ${ci}/
+              steps:
+                - ask: ci:build
+                  fields: {commit: "${merged.merge_commit_sha}"}
+                  reply: build
+                - once-answered:
+                    reply: build
+                    give-up: 20m
+                    # Once {build} has succeeded: run the smoke script it links on the deployment it links `as smoke`
+                    steps:
+                      - follow: hr:in-reply-to
+                      - run-script: ci:smoke-test
+                        inputs: {deployed: "${build.result._links.ci:deployment.href}"}
+                        as: smoke
+                      # At {dev}, if {smoke.passed}, promote the merged commit, citing {smoke} `as promotion`
+                      - given: [{at: smoke, field: passed, is: true}]
+                        then:
+                          - enter: ${dev}/
+                            steps:
+                              - act: env:get-environment
+                                fields: {id: 1}
+                              - act: env:promote
+                                fields:
+                                  commit: "${merged.merge_commit_sha}"
+                                  smoke: {passed: "${smoke.passing}", of: "${smoke.of}"}
+                                  _links:
+                                    "env:smoke-run": {href: "http://192.168.1.18:8200/reports/merge-watch-release/"}
+                              - keep-as: promotion
+                        # Otherwise, comment on {pr} with the scenarios that failed.
+                        otherwise:
+                          - at: ${pr.@self}
+                            steps:
+                              - act: github:comment
+                                fields: {body: "Not promoted to Dev: smoke scenarios ${smoke.failed} failed."}
+                    # Or, once {build} has failed, comment on {pr} with what failed, linking the log.
+                    failed:
+                      - at: ${pr.@self}
+                        steps:
+                          - act: github:comment
+                            fields: {body: "Not released: ${build.detail}. Log: ${build._links.ci:log.href}"}
+          # The watch gave up: say so on {pr}.
+          failed:
+            - at: ${pr.@self}
+              steps:
+                - act: github:comment
+                  fields: {body: "Not released: ${watch.detail}."}
+          # Or give up after 30 minutes, and comment on {pr} why.
+          otherwise:
+            - at: ${pr.@self}
+              steps:
+                - act: github:comment
+                  fields: {body: "Not released: ${why}."}

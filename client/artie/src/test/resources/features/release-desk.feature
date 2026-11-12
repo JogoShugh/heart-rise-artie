@@ -31,6 +31,20 @@ Feature: The release desk: services that call others through ARTIE, and answer t
       """
     Then the run woke within 2 seconds, told the reply changed
 
+  Scenario Outline: The desk's ARTIE presents at each party that party's own test credential, and nowhere else
+    When the desk's ARTIE is asked for its credential at "<origin>"
+    Then it presents "<credential>"
+
+    Examples:
+      | origin                   | credential                |
+      | http://192.168.1.18:8098 | Bearer github-token       |
+      | http://192.168.1.18:8099 | Bearer watcher-token      |
+      | http://192.168.1.18:8160 | Bearer artie-reply-token  |
+      | http://192.168.1.18:8170 | Bearer ci-token           |
+      | http://192.168.1.18:8180 | Basic 21000451:1234       |
+      | http://192.168.1.18:8190 | Bearer env-token          |
+      | http://192.168.1.18:9999 | none                      |
+
   Scenario: The desk releases a pull request by running its kept script with ARTIE
     Given the desk's release script is:
       """yaml

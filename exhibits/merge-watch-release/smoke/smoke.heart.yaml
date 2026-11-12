@@ -1,0 +1,55 @@
+# The smoke test, kept as a script held as data: smoke.goal.md's five scenarios, each from the library's entry. The
+# build archives it from the commit it built, and links it as ci:smoke-test; the release desk's ARTIE runs it against
+# the deployment the build links, and goes on by which scenarios passed. A scenario that fails does not stop the rest.
+heart: 1
+kind: kept
+inputs:
+  deployed: {question: "Which deployment of the library?"}
+start: ${deployed}
+steps:
+  - scenario: S1
+    steps:
+      - act: library:search-loans
+        fields: {name: Matilda}
+      - follow: item
+        title: Matilda
+  - scenario: S2
+    steps:
+      - act: library:search-loans
+        fields: {name: Matilda}
+      - follow: item
+        title: Matilda
+      - check:
+          - {field: author, is: Roald Dahl}
+          - {field: title, is: Matilda}
+  - scenario: S3
+    steps:
+      - act: library:search-loans
+        fields: {name: Matilda}
+      - follow: item
+        title: Matilda
+      - keep-as: before
+      - act: library:renew
+      - check:
+          - {field: due, is-not: "${before.due}"}
+  - scenario: S4
+    steps:
+      - act: library:search-loans
+        fields: {name: Matilda}
+      - follow: item
+        title: Matilda
+      - keep-as: read
+      - act: library:renew
+      - act: library:renew
+        as-of: read
+        refused-as: stale
+  - scenario: S5
+    steps:
+      - act: library:search-loans
+        fields: {name: Matilda}
+      - follow: item
+        title: Matilda
+      - act: library:report-problem
+        fields: {problem: missing-pages, comment: "Pages 12 to 14."}
+      - check:
+          - {field: /reported/problem, is: missing-pages}
