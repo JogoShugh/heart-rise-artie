@@ -46,6 +46,11 @@ class GitHubService(
         }
     }
 
+    /** GitHub has worked out whether pull request [number] can be merged: [mergeable], or null while it hasn't. */
+    fun mergeable(number: Long, mergeable: Boolean?) {
+        upstream.pulls.first { it.number == number }.mergeable = mergeable
+    }
+
     fun reset() {
         upstream = GitHubUpstream().apply {
             callers[TOKEN] = AUTHOR
