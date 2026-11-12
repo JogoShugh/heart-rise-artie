@@ -51,6 +51,7 @@ steps:
                       - run-script: ci:smoke-test
                         inputs: {deployed: "${build.result._links.ci:deployment.href}"}
                         as: smoke
+                      - note: "Smoke: ${smoke.passing} of ${smoke.of} passed. Failed: ${smoke.failed}"
                       # At {dev}, if {smoke.passed}, promote the merged commit, citing {smoke} `as promotion`
                       - given: [{at: smoke, field: passed, is: true}]
                         then:

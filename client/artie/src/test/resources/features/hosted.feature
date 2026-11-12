@@ -173,6 +173,37 @@ Feature: ARTIE hosted in a service
     Then the host "desk" has its run back, ended
     And the run of the host "desk" noted "care passed: true"
 
+  Scenario: An act as of a version read before is refused as stale, and ARTIE sends it once
+    ARTIE acts again after a 412 when the form is still offered once the server has caught up. An
+    act as of a version kept by name is meant to meet the 412: ARTIE sends it as written, once.
+    Given the service answers POST "http://localhost:8301/beds/2/actions/water-cell" with:
+      """
+      412 Precondition Failed
+      Content-Type: application/problem+json
+
+      type: https://w3id.org/heart-rise/problems/stale
+      title: The resource changed since it was read
+      status: 412
+      """
+    When the host "desk" runs this kept script with ARTIE:
+      """yaml
+      start: http://localhost:8301/beds/2
+      steps:
+        - keep-as: before
+        - act: waterCell
+          fields: {milliliters: 100}
+        - sync: true
+        - act: waterCell
+          fields: {milliliters: 100}
+          as-of: before
+          refused-as: stale
+      """
+    Then the host "desk" has its run back, ended
+    And the acts on the wire carried:
+      | method | url                                                | If-Match       |
+      | POST   | http://localhost:8301/beds/2/actions/water-cell    | "seq-1.hsf.L0" |
+      | POST   | http://localhost:8301/beds/2/actions/water-cell    | "seq-1.hsf.L0" |
+
   Scenario: Two hosts in one process each keep their own run
     Given the host "watch" reads its entry only once the host "desk" has its run back
     When the hosts run, at the same time, each with ARTIE:

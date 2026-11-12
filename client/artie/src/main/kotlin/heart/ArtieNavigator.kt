@@ -106,7 +106,8 @@ class ArtieNavigator(
                 }
                 // What the act writes, changed by someone else since it was read: sending it again would overwrite.
                 val overwrites = { body.keys.filter { read?.get(it) != client.current?.state?.get(it) } }
-                if (offRails) first else decidedAgain(first, holds, overwrites, send)
+                // An act as of a version read before is meant to meet the 412: it is sent once, as written.
+                if (offRails || asOf != null) first else decidedAgain(first, holds, overwrites, send)
             }
         return UsedAffordances.with(answered, used)
     }

@@ -71,6 +71,13 @@ class HostedSteps(private val ctx: ClientContext) {
         }
     }
 
+    @Then("the acts on the wire carried:")
+    fun actsCarried(table: DataTable) {
+        val acts = ctx.transport.requests.filter { it.method != "GET" }
+            .map { mapOf("method" to it.method, "url" to it.url, "If-Match" to it.header("If-Match").orEmpty()) }
+        assertEquals(table.asMaps(), acts)
+    }
+
     @Then("the host {string} has its run back, ended")
     fun ranToEnd(host: String) {
         ended(host)

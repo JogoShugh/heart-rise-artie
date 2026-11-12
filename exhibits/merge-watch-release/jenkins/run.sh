@@ -29,7 +29,7 @@ docker run -d --name merge-release-jenkins \
   --add-host host.docker.internal:host-gateway \
   -e JENKINS_ADMIN_USER -e JENKINS_ADMIN_PASSWORD \
   -v "$work:/repos:ro" \
-  -v "$root/heart/heart-sims/build/sims/lib:/sims/lib:ro" \
+  -v "$root/heart/heart-sims/build/sims:/sims:ro" \
   merge-release-jenkins >/dev/null
 export JENKINS_ADMIN_USER JENKINS_ADMIN_PASSWORD
 for i in $(seq 1 120); do
