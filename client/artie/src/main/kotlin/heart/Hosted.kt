@@ -26,12 +26,14 @@ class Hosted(
 
     /** A client of its own, for one run: its own cache and trace, on the host's wire. */
     fun navigator(): Navigator {
-        val signed = signing?.let { SigningTransport(it, wire) } ?: wire
+        // Every exchange on the wire is kept for the run's capture, credentials written `<token>`, as sent: signed.
+        val log = ExchangeLog(wire)
+        val signed = signing?.let { SigningTransport(it, log) } ?: log
         val named = UserAgentTransport("${UserAgentTransport.DEFAULT} ($name)", TraceContextTransport(Trace(), signed))
         val bare = AuthTransport(credentials, named, masks)
         val transport = CachingTransport(IntegrityCheck(bare))
         // A script a link hands over is read as it is, below the cache, as a bare call is.
-        return WiredNavigator(ArtieNavigator(ArtieClient(transport)), bare)
+        return WiredNavigator(ArtieNavigator(ArtieClient(transport), exchangeLog = log), bare)
     }
 
     /** Runs [script], a kept script held as data, with [inputs]; the run comes back, ended or stopped. */

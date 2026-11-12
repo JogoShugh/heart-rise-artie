@@ -97,6 +97,20 @@ Feature: ARTIE hosted in a service
       | http://10.0.0.5:8301     | nothing                      |
       | http://garden.local:8301 | nothing                      |
 
+  Scenario: A hosted run keeps each step's exchanges for its report, credentials never in them
+    Given the host "desk" gives ARTIE the token "desk-token" for "http://localhost:8301"
+    When the host "desk" runs this kept script with ARTIE:
+      """yaml
+      start: http://localhost:8301/beds/2
+      steps:
+        - act: waterCell
+          fields: {milliliters: 100}
+      """
+    Then the run of the host "desk" kept these exchanges:
+      | step          | method | url                                             | status | Authorization |
+      | enter         | GET    | http://localhost:8301/beds/2                    | 200    | <token>       |
+      | act waterCell | POST   | http://localhost:8301/beds/2/actions/water-cell | 200    | <token>       |
+
   Scenario: Each act ARTIE sends for a host is signed with the host's key
     Given the host "desk" gives ARTIE its signing key "desk-2026-11"
     When the host "desk" runs this kept script with ARTIE:
