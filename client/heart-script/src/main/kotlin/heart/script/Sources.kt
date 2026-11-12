@@ -20,12 +20,14 @@ internal object Sources {
 
     fun values(step: TraceStep, run: Run, earlier: List<TraceStep>): JsonObject = buildJsonObject {
         val words = step.asked.say.takeIf { step.asked.mode == "intent" }
+        val cited = Citations(step, run)
         step.asked.params.filterKeys { it !in SELECTION }.forEach { (name, value) ->
             put(name, buildJsonObject {
                 put("value", element(value))
                 // Its type, as the form's schema says: a generator writes "91" sent for an integer as 91.
                 step.used?.types?.get(name)?.let { put("type", it) }
-                put("from", JsonArray(of(text(value), run, earlier, words)))
+                put("from", JsonArray(cited.whole(text(value)) + of(text(value), run, earlier, words)))
+                cited.members(text(value)).takeIf { it.isNotEmpty() }?.let { put("cited", JsonObject(it)) }
             })
         }
     }

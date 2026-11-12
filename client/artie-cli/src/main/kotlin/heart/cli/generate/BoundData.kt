@@ -63,6 +63,32 @@ internal fun filled(text: String, type: String?, names: Map<String, String>, rea
     return KotlinText.pieces(text, names).joinToString("") { (part, name) -> name?.let(read) ?: part }
 }
 
+/** The path that reads [source] again when it is a member of an outcome kept by name: `smoke.of`; else null. */
+internal fun keptPath(source: Any?): String? {
+    val kept = source.map()["kept"]?.toString() ?: return null
+    return kept + source.map()["pointer"].toString().split('/').drop(1).joinToString("") { ".$it" }
+}
+
+/**
+ * This argument as data, read again from an outcome kept by name where the goal's step named it, `{smoke.of}`
+ * ([info]: its value's sources): the whole value, unless an input gave it; else each scalar its `cited` names.
+ */
+internal fun Argument.citing(info: Map<*, *>): Argument {
+    val from = info["from"].list()
+    val whole = from.firstNotNullOfOrNull { keptPath(it) }?.takeIf { from.none { it.map()["input"] != null } }
+    val cited = info["cited"].map()
+    fun at(value: Any?, pointer: String): Any? = when (value) {
+        is Map<*, *> -> value.mapValues { (key, member) -> at(member, "$pointer/$key") }
+        is List<*> -> value.mapIndexed { i, member -> at(member, "$pointer/$i") }
+        else -> keptPath(cited[pointer])?.let(::reference) ?: value
+    }
+    return when {
+        whole != null -> Argument(field, expression, review, named, reference(whole))
+        cited.isEmpty() -> this
+        else -> Argument(field, expression, review, named, at(value, ""))
+    }
+}
+
 private fun parsed(text: String): JsonElement? = runCatching { Json.parseToJsonElement(text) }.getOrNull()
 
 /** [element] as data, each string one of [read]'s texts its reference. */

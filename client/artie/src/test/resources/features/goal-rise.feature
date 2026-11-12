@@ -95,6 +95,40 @@ Feature: A goal that crosses parties and waits on their answers: At, asking to b
     And the script "branch.heart.yaml" has a line with "enter: ${desk}"
     And the script "branch.heart.yaml" has a line with "act: desk:release"
 
+  Scenario: A value an outcome kept by name gave is read from that outcome again, as the goal's step named it
+    The goal's step names what it sends, `{smoke.of}`: the value the planner sent is read again from
+    the outcome kept as smoke, not from another answer that happened to hold the same value.
+    Given the desk serves a build that links its smoke script and its deployment
+    And the file "cited.goal.md" is
+      """
+      ---
+      start: "{build}"
+      inputs:
+        build:
+        desk:
+        book: { default: "Matilda" }
+      ---
+
+      Smoke test what the build made, then release as many as it ran.
+
+      - Run the script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book} `as smoke`
+      - If {smoke.passed}, at {desk}, release pull request {smoke.of}
+      """
+    And the planner will move
+      | move | words                   | opens |
+      | act  | release pull request 1  | yes   |
+      | done |                         |       |
+    And ARTIE's reasoner will choose, in order
+      | form         | follow | fields      |
+      | desk:release |        | {"pull": 1} |
+    When the goal "cited.goal.md" runs with ARTIE in the desk, captured in "cited.trace.yaml", given
+      | name  | value                            |
+      | build | http://localhost:8160/test-build |
+      | desk  | http://localhost:8160/           |
+    Then the run finished
+    When artie generated "cited.heart.yaml" as data from "cited.trace.yaml" and "cited.goal.md"
+    Then the script "cited.heart.yaml" has a line with "pull: ${smoke.of}"
+
   Scenario: The goal runs once with the planner, and the script made from it runs with none
     Given the planner will move
       | move | words                                                          | opens |

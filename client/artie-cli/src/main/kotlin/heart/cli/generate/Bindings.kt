@@ -103,6 +103,7 @@ class Bindings(
     fun arguments(step: Step): List<Argument> = step.params.entries
         .filter { it.key != "relation" && !(step.follows && it.key == "title") }
         .map { (field, value) -> argument(step, field.toString(), value) }
+        .map { it.citing(step.values[it.field].map()) }
 
     private fun argument(step: Step, field: String, value: Any?): Argument {
         val info = step.values[field].map()
