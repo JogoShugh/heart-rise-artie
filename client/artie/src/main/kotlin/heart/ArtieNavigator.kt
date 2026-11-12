@@ -138,7 +138,8 @@ class ArtieNavigator(
      * choice against the representation and the form's schema, then makes it. A rejected choice is refused here,
      * by the client, and nothing is sent.
      */
-    override fun reason(intent: String): Reasoned {
+    override fun reason(intent: String, asOf: String?): Reasoned {
+        (client as? ArtieClient)?.asOf = asOf
         val thinker = reasoner
         val at = client.current?.url
         if (thinker == null || at == null) {

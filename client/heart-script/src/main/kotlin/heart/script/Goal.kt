@@ -204,6 +204,10 @@ sealed interface Move {
         val sentence: Int?,
         val opens: Boolean = false,
         override val reason: String? = null,
+        /** As of the version a step named this, not the one held (goal-scenarios.feature). */
+        val asOf: String? = null,
+        /** The refusal the step says the act should meet, by its words (`stale`); null when it should be done. */
+        val refusedAs: String? = null,
     ) : Move
 
     /** Back to [to], an address on the path or a word naming one ("the issue"), closing the blocks since. */

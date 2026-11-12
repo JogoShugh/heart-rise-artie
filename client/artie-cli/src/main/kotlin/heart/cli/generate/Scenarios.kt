@@ -9,6 +9,16 @@ package heart.cli.generate
 internal fun scenarioOf(capture: Capture, walked: Walked): String? =
     (walked as? Walked.Selection)?.let { capture.marks(it.step)["scenario"]?.toString() }
 
+/** The names the run's acts went as of, and its Verify: facts read: `${before.due}` reads `before`. */
+internal fun namesRead(capture: Capture): Set<String> = capture.steps.flatMap { step ->
+    val marks = capture.marks(step)
+    val facts = (marks["facts"] as? List<*>).orEmpty().flatMap { (it as? Map<*, *>)?.values.orEmpty() }
+        .flatMap { value -> NAME.findAll(value.toString()).map { it.groupValues[1] } }
+    listOfNotNull(marks["as-of"]?.toString()) + facts
+}.toSet()
+
+private val NAME = Regex("""\$\{([A-Za-z_][A-Za-z0-9_]*)\.""")
+
 /** [made], each statement's steps; those of one scenario, side by side, written as that scenario's. */
 internal fun scenarios(made: List<Pair<String?, List<Map<String, Any?>>>>): List<Map<String, Any?>> {
     val written = mutableListOf<Map<String, Any?>>()

@@ -166,7 +166,9 @@ class ScriptYaml(
     private fun step(walked: Walked): List<Map<String, Any?>> = when (walked) {
         is Walked.Selection -> selection(walked)
         is Walked.Sync -> listOf(mapOf("sync" to true))
-        is Walked.Waits -> listOf(readAgain(bindings, capture, waited(walked.step)))
+        // A Verify: fact read by name is kept as written, the name read again (goal-scenarios.feature).
+        is Walked.Waits -> capture.marks(walked.step)["facts"]?.let { listOf(mapOf("check" to it)) }
+            ?: listOf(readAgain(bindings, capture, waited(walked.step)))
     }
 
     /**
@@ -192,13 +194,24 @@ class ScriptYaml(
             }
             Call.Act -> made.putAll(act(step))
         }
+        // As of a version a step named, and the refusal it expected (goal-scenarios.feature).
+        val marks = capture.marks(step)
+        listOf("as-of", "refused-as").forEach { key -> marks[key]?.let { made[key] = it.toString() } }
+        // What the step named, kept by that name where a later step acts as of it or reads it.
+        val named = marks["as"]?.toString()?.takeIf { it in readByName }?.let { mapOf("keep-as" to it) }
         // A step that opens none holds no block: what it led to is kept where it stands.
-        if (!step.opens) return listOf(made) + selection.block.keeps.map { mapOf("keep-as" to it.keptAs) }.distinct()
+        if (!step.opens) {
+            return listOf(made) + (listOfNotNull(named) + selection.block.keeps.map { mapOf("keep-as" to it.keptAs) })
+                .distinct()
+        }
         // A resource made new is read again first; then what the act changed is checked, then the steps in it.
-        made["then"] = listOfNotNull(mapOf("sync" to true).takeIf { selection.fresh }) +
-            (made["then"] as? List<*>).orEmpty() + steps(selection.block)
+        made["then"] = (listOfNotNull(mapOf("sync" to true).takeIf { selection.fresh }, named) +
+            (made["then"] as? List<*>).orEmpty() + steps(selection.block)).distinct()
         return listOf(made)
     }
+
+    /** The names a later step acts as of, or a Verify: fact reads: each kept where its step named it. */
+    private val readByName: Set<String> by lazy { namesRead(capture) }
 
     /** An act as the run made it: its relation, each value it sent, and its words. */
     private fun act(step: Step): Map<String, Any?> {

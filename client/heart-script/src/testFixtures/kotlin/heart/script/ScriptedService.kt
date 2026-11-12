@@ -185,7 +185,7 @@ class ScriptedService : Navigator, Wire, Writes, Reads {
     /** Why the server doesn't offer an act, by relation, where a feature says. */
     val whyNot = mutableMapOf<String, String>()
 
-    override fun reason(intent: String): Reasoned {
+    override fun reason(intent: String, asOf: String?): Reasoned {
         // The run may tell the reasoner more after the words, as "<words>. <more>": the words are the step's.
         val words = (reasons.keys + reasonsHolding.keys.map { it.first } + asksHolding.keys.map { it.first })
             .firstOrNull { intent == it || intent.startsWith("$it. ") } ?: intent

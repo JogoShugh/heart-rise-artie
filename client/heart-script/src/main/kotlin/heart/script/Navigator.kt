@@ -233,9 +233,10 @@ interface Navigator {
 
     /**
      * Hand [intent] to the client's reasoner, which chooses one selection from what the held representation
-     * offers; the client checks it and makes it. A client with no reasoner refuses.
+     * offers; the client checks it and makes it. A client with no reasoner refuses. [asOf], a version the client
+     * held before, is the one the act goes on (goal-scenarios.feature).
      */
-    fun reason(intent: String): Reasoned =
+    fun reason(intent: String, asOf: String? = null): Reasoned =
         Reasoned(null, Answer.Refused(Refusal.NoReasoner, Side.CLIENT, "this client has no reasoner"))
 }
 

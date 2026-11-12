@@ -128,6 +128,8 @@ class ClaudePlanner(
         return when (text("move")) {
             "act" -> Move.Act(
                 text("words").orEmpty(), sentence, input["opens"]?.jsonPrimitive?.booleanOrNull == true, why,
+                asOf = text("as_of")?.takeIf { it.isNotBlank() },
+                refusedAs = text("refused")?.takeIf { it.isNotBlank() },
             )
             "back" -> Move.Back(text("to").orEmpty(), why)
             "wait" -> Move.Wait(text("relation").orEmpty(), reason = why)
@@ -168,7 +170,9 @@ class ClaudePlanner(
               act needs (for example "comment on it: Fixed in 1.2 by #132."). Write a value that is one of the
               inputs as ${'$'}name, never its value. Give the number of the sentence it serves. Set opens to
               true when you will make more moves at what the act leads to, or will come back here after it
-              (an act that makes a new resource, such as a comment, leads to that resource).
+              (an act that makes a new resource, such as a comment, leads to that resource). When the step asks
+              to act on a version read before ("as of {before}"), set as_of to that name, from <named>; when it
+              says the act should be refused, set refused to how (stale, not offered, invalid input).
             - "back": to a resource on the <path>, by its address, closing what was opened since.
             - "wait": until the resource held offers a form, before acting on it. Give the form's exact name,
               as in <forms> or as it will be named there, in relation (for example "github:merge").
@@ -225,6 +229,14 @@ class ClaudePlanner(
                     putJsonObject("words") { put("type", "string") }
                     putJsonObject("sentence") { put("type", "integer") }
                     putJsonObject("opens") { put("type", "boolean") }
+                    putJsonObject("as_of") {
+                        put("type", "string")
+                        put("description", "For an act on a version read before: the name in <named> it was read as.")
+                    }
+                    putJsonObject("refused") {
+                        put("type", "string")
+                        put("description", "For an act the step says should be refused: how, such as stale.")
+                    }
                     putJsonObject("to") { put("type", "string") }
                     putJsonObject("relation") { put("type", "string") }
                     putJsonObject("facts") { put("type", "object") }

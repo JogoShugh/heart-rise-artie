@@ -333,7 +333,10 @@ class GoalSteps(
     private fun move(row: Map<String, String>): Move {
         val sentence = row["sentence"]?.takeIf { it.isNotBlank() }?.toInt()
         return when (val kind = row.getValue("move")) {
-            "act" -> Move.Act(row.getValue("words"), sentence, row["opens"] == "yes")
+            "act" -> Move.Act(
+                row.getValue("words"), sentence, row["opens"] == "yes",
+                asOf = row["as of"]?.takeIf { it.isNotBlank() }, refusedAs = row["refused"]?.takeIf { it.isNotBlank() },
+            )
             // A goal in steps' done is for the step now, whatever sentence it names.
             "done" -> Move.Done(sentence ?: 0)
             "back" -> Move.Back(row["to"] ?: row.getValue("words"))

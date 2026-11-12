@@ -57,7 +57,8 @@ class Capture(val name: String, text: String) {
 
     /** Rule 8: only a run that finished is generated from; a watch's refusals, while it decided, are its own. */
     fun finished() {
-        stepped.firstOrNull { it.outcome in UNFINISHED }?.let {
+        // A refusal its step said to expect (`refused-as`, goal-scenarios.feature) is the step done as meant.
+        stepped.firstOrNull { it.outcome in UNFINISHED && marks(it)["refused-as"] == null }?.let {
             throw BadArguments("can't generate from $name: step ${it.number} was ${it.outcome}")
         }
     }

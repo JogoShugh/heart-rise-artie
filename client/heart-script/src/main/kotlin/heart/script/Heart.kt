@@ -119,7 +119,7 @@ class Here internal constructor(
             rel != null -> acted(
                 step, rel, values.toMap() + Fields().also { fields?.invoke(it) }.values, said, block, version,
             )
-            said.words != null -> reasoned(step, said, block)
+            said.words != null -> reasoned(step, said, block, version)
             else -> throw ScriptStopped(step, "\"act\"", "\"act needs a relation, or an intent\"")
         }
     }

@@ -97,7 +97,8 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 intent(step, here, opener)
                 scenario = outer
             }
-            is Step.Wait, is Step.Verify -> single(step, here, opener)
+            is Step.Verify -> if (!namedFacts.verified(step, here, opener)) single(step, here, opener)
+            is Step.Wait -> single(step, here, opener)
             // Whenevers side by side are one watch, run at the first of them.
             is Step.Whenever -> goal.beside(step).takeIf { it.first() === step }?.let { watch.whenever(it, here) }
             // The watch a Whenever ran ended when its Until held: nothing is left to do.
@@ -105,6 +106,9 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
         }
         done += step
     }
+
+    /** `Verify:` facts that read names, checked as written (goal-scenarios.feature). */
+    private val namedFacts = NamedFacts(script, marks, ::fill, moves)
 
     /** The scenario the step now is in, if any (goal-scenarios.feature). */
     private var scenario: String? = null
@@ -163,10 +167,16 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
         var exits = 0
         var entered = false
         val traced = run.trace.size
+        // As of the version a step named (goal-scenarios.feature): that resource, as it was named, kept by its name.
+        move.asOf?.let { name ->
+            val named = names[name] ?: return 0.also { moves += "$words: refused, no step named $name" }
+            run.kept[name] = Run.Kept(named.address, State(named.state), named.validator)
+            marks.asOf(line, name)
+        }
         try {
             // Every act opens a block: what it led to is held until the step is done, and then the run is back
             // where the step began, whether the act made a resource (a comment) or not.
-            here.act(intent = words) {
+            here.act(intent = words, asOf = move.asOf) {
                 entered = true
                 marks.acted(step, line)
                 scenario?.let { marks.scenario(line, it) }
@@ -180,8 +190,15 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
             }
         } catch (stopped: ScriptStopped) {
             val refused = stopped.refused?.takeUnless { entered } ?: throw stopped
-            while (run.trace.size > traced) run.trace.removeAt(run.trace.lastIndex)
-            moves += "$words: refused, ${refused.kind.words}: ${refused.detail}"
+            if (refused.kind.words == move.refusedAs) {
+                // The refusal the step said to expect: the act did what it was for, and the capture keeps it.
+                marks.refusedAs(line, refused.kind.words)
+                scenario?.let { marks.scenario(line, it) }
+                moves += "$words: refused as expected, ${refused.kind.words}: ${refused.detail}"
+            } else {
+                while (run.trace.size > traced) run.trace.removeAt(run.trace.lastIndex)
+                moves += "$words: refused, ${refused.kind.words}: ${refused.detail}"
+            }
         }
         // The block just left was one of the blocks to leave.
         return if (exits == DONE) DONE else maxOf(exits - 1, 0)
@@ -291,6 +308,21 @@ internal class StepMarks(private val run: Run, private val spoken: (String) -> S
     /** The act on [line] is part of the scenario [name]. */
     fun scenario(line: Int, name: String) {
         mark(line)["scenario"] = name
+    }
+
+    /** The act on [line] went as of the version the step named [name] led to. */
+    fun asOf(line: Int, name: String) {
+        mark(line)["as-of"] = name
+    }
+
+    /** The act on [line] met the refusal its step said to expect, by its words. */
+    fun refusedAs(line: Int, kind: String) {
+        mark(line)["refused-as"] = kind
+    }
+
+    /** The check on [line] is the step's own facts, each a name read again: kept as written. */
+    fun facts(line: Int, facts: List<Map<String, String>>) {
+        mark(line)["facts"] = facts
     }
 
     private fun mark(line: Int) = run.marks.getOrPut(line) { mutableMapOf() }
