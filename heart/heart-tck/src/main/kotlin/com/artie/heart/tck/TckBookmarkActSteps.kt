@@ -50,6 +50,12 @@ class TckBookmarkActSteps(private val fixture: TckFixture, private val world: Tc
         assertEquals(location, world.json.path("_links").path("self").path("href").asText())
     }
 
+    /** RFC 9110 §10.2.2: Location is a single URI; two would read as one list a client can't follow. */
+    @Then("the response carries Location once")
+    fun locatedOnce() {
+        assertEquals(1, world.last.responseHeaders[HttpHeaders.LOCATION]?.size, "${world.last.responseHeaders}")
+    }
+
     @Then("the new resource can be read where Location says")
     fun readable() {
         val location = checkNotNull(world.last.responseHeaders.location).toString()

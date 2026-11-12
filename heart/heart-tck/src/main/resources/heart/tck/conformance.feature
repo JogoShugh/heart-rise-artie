@@ -237,6 +237,7 @@ Feature: HEART conformance over HTTP, for any declared resource type
     When the client sends the bookmark act with its valid body and the index's ETag
     Then the response status is 201
     And the response names the new resource in Location and in Content-Location
+    And the response carries Location once
     And the new resource can be read where Location says
 
   @bookmark-act

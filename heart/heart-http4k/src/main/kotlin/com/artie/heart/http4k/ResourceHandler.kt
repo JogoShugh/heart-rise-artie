@@ -274,7 +274,8 @@ class ResourceHandler<S, K>(
         fun added(response: Response, done: Acted<*>): Response {
             val headed = done.headers.entries.fold(response) { r, (name, value) -> r.header(name, value) }
             // An act that brought another resource into being: 201, and Location names it (RFC 9110 §15.3.2).
-            return done.created?.let { headed.status(Status.CREATED).header(LOCATION, it) } ?: headed
+            // One Location (RFC 9110 §10.2.2): a bookmark act's answer names it already.
+            return done.created?.let { headed.status(Status.CREATED).replaceHeader(LOCATION, it) } ?: headed
         }
 
         fun body(request: Request): String? = request.bodyString().ifEmpty { null }

@@ -15,7 +15,7 @@ git config user.name "Ada Lovelace"
 git config user.email "ada@example.invalid"
 
 printf 'renewal.weeks=3\n' > library.properties
-cp "$here/smoke/smoke.goal.md" smoke/
+cp "$here/smoke/smoke.goal.md" "$here/smoke/smoke.heart.yaml" smoke/
 printf '# Riverside Public Library\n\nThe library app, as the release builds and deploys it.\n' > README.md
 git add -A && git commit -q -m "Riverside Public Library: policy file and smoke goal"
 
