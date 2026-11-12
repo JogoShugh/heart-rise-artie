@@ -27,6 +27,9 @@
   .tile b { display: block; font-size: 1.1rem; }
   .tile span { color: var(--soft); font-size: .9rem; }
   .wrap { overflow-x: auto; }
+  figure.diagram { margin: .8rem 0 1rem; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .5rem; }
+  figure.diagram svg { display: block; width: 100%; min-width: 720px; height: auto; }
+  figure.diagram figcaption { color: var(--soft); font-size: .9rem; padding: .5rem .3rem .2rem; }
   table { border-collapse: collapse; width: 100%; background: var(--card); font-size: .9rem; }
   th, td { text-align: left; vertical-align: top; border: 1px solid var(--line); padding: .4rem .55rem; }
   details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; margin: .5rem 0; }
@@ -37,10 +40,171 @@
 <body>
 <main>
   <h1>The Merge Watch Release</h1>
-  <p>A pull request released to Dev across five parties, each its own HEART service at its own address: GitHub through
-    the gateway, an offer watch, a real Jenkins behind a wrapper, the preview it deploys, and Dev. Every wait is a RISE
-    reply ARTIE made before asking, answered signed by the party it asked. Every address after each party's entry was
-    handed over by an answer.</p>
+  <p>A pull request released to Dev across five parties.</p>
+  <ul>
+    <li>Each party is its own HEART service at its own address:
+      <ul>
+        <li>GitHub, through the gateway</li>
+        <li>an offer watch</li>
+        <li>a real Jenkins, behind a wrapper</li>
+        <li>the preview Jenkins deploys</li>
+        <li>Dev</li>
+      </ul>
+    </li>
+    <li>Every wait is a RISE reply. ARTIE makes the reply before it asks; the party it asks answers it, signed.</li>
+    <li>Every address after a party's entry is handed over by an answer's links.</li>
+  </ul>
+
+  <h2>The flow</h2>
+  <figure class="diagram">
+    <div class="wrap">
+    <svg viewBox="0 0 900 880" role="img" style="color: var(--fg)" font-family="system-ui, -apple-system, sans-serif"
+      aria-label="Activity diagram: ARTIE opens the pull request, asks the offer watch, which answers when it can be merged; ARTIE merges, asks CI to build, which answers after Jenkins deploys the preview; ARTIE runs the smoke script against the preview, then promotes to Dev if all pass or comments on the pull request if any fail.">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+        <marker id="aha" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" style="fill: var(--pass-edge)"/>
+        </marker>
+      </defs>
+      <!-- lanes -->
+      <g style="fill: var(--code)">
+        <rect x="150" y="0" width="150" height="880"/><rect x="450" y="0" width="150" height="880"/>
+        <rect x="750" y="0" width="150" height="880"/>
+      </g>
+      <g font-size="12.5" font-weight="600" text-anchor="middle" fill="currentColor">
+        <text x="75" y="20">ARTIE</text><text x="225" y="20">GitHub</text><text x="375" y="20">Offer watch</text>
+        <text x="525" y="20">CI + Jenkins</text><text x="675" y="20">Preview</text><text x="825" y="20">Dev</text>
+      </g>
+      <g font-size="10" text-anchor="middle" style="fill: var(--soft)" font-family="ui-monospace, Menlo, monospace">
+        <text x="75" y="35">replies :8160</text><text x="225" y="35">gateway :8098</text><text x="375" y="35">:8099</text>
+        <text x="525" y="35">:8170 / :8171</text><text x="675" y="35">:8180</text><text x="825" y="35">:8190</text>
+      </g>
+      <line x1="0" y1="44" x2="900" y2="44" style="stroke: var(--line)"/>
+
+      <!-- start -->
+      <circle cx="75" cy="66" r="7" fill="currentColor"/>
+
+      <!-- actions -->
+      <g fill="none" stroke="currentColor" stroke-width="1.2">
+        <rect x="11" y="90" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="161" y="90" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="150" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="210" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="311" y="210" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="161" y="270" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="311" y="270" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="330" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="311" y="330" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="390" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="161" y="390" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="450" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="461" y="450" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="461" y="510" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="611" y="510" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="570" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="461" y="570" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <path d="M75,632 L93,650 L75,668 L57,650 Z" style="fill: var(--card)"/>
+        <rect x="161" y="630" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="690" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="611" y="690" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <path d="M75,752 L93,770 L75,788 L57,770 Z" style="fill: var(--card)"/>
+        <rect x="761" y="750" width="128" height="40" rx="10" style="fill: var(--pass); stroke: var(--pass-edge)"/>
+        <rect x="161" y="810" width="128" height="40" rx="10" style="fill: var(--stop); stroke: var(--stop-edge)"/>
+      </g>
+      <g font-size="12" text-anchor="middle" fill="currentColor">
+        <text x="75" y="107">Open the PR</text><text x="225" y="107">PR 482</text>
+        <text x="75" y="167">Make reply r1</text>
+        <text x="75" y="227">Ask the watch</text><text x="375" y="227">Watch PR 482</text>
+        <text x="225" y="287">PR 482</text><text x="375" y="287">Look every 3 s</text>
+        <text x="75" y="347">Once r1 completed</text><text x="375" y="347">Answer r1</text>
+        <text x="75" y="407">Merge, squashing</text><text x="225" y="407">Merge commit</text>
+        <text x="75" y="467">Make r2, ask build</text><text x="525" y="467">Start Jenkins job</text>
+        <text x="525" y="527">Jenkins builds</text><text x="675" y="527">Preview up</text>
+        <text x="75" y="587">Once r2 answered</text><text x="525" y="587">Answer r2</text>
+        <text x="225" y="647">Comment on PR</text>
+        <text x="75" y="707">Run smoke script</text><text x="675" y="707">S1 to S5</text>
+        <text x="825" y="767">Promote</text>
+        <text x="225" y="827">Comment on PR</text>
+      </g>
+      <g font-size="10" text-anchor="middle" style="fill: var(--soft)" font-family="ui-monospace, Menlo, monospace">
+        <text x="75" y="122">by links</text><text x="225" y="122">not yet mergeable</text>
+        <text x="75" y="182">hr:reply-to</text>
+        <text x="75" y="242">watcher:watch</text><text x="375" y="242">for github:merge</text>
+        <text x="225" y="302">now offers merge</text><text x="375" y="302">GET the PR</text>
+        <text x="75" y="362">follow its link</text><text x="375" y="362">completed, links PR</text>
+        <text x="75" y="422">github:merge</text><text x="225" y="422">real git, main</text>
+        <text x="75" y="482">ci:build {sha}</text><text x="525" y="482">SHA, reply r2</text>
+        <text x="525" y="542">clone, test, deploy</text><text x="675" y="542">that commit</text>
+        <text x="75" y="602">build state</text><text x="525" y="602">on Jenkins' webhook</text>
+        <text x="225" y="662">stage, ci:log</text>
+        <text x="75" y="722">ci:smoke-test</text><text x="675" y="722">on ci:deployment</text>
+        <text x="825" y="782">env:promote</text>
+        <text x="225" y="842">failed scenarios</text>
+      </g>
+
+      <!-- control flow and requests -->
+      <g fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ah)">
+        <line x1="75" y1="73" x2="75" y2="90"/>
+        <line x1="139" y1="110" x2="161" y2="110"/>
+        <line x1="75" y1="130" x2="75" y2="150"/>
+        <line x1="75" y1="190" x2="75" y2="210"/>
+        <line x1="139" y1="230" x2="311" y2="230"/>
+        <line x1="375" y1="250" x2="375" y2="270"/>
+        <line x1="311" y1="290" x2="289" y2="290"/>
+        <path d="M439,282 C474,282 474,298 439,298"/>
+        <line x1="375" y1="310" x2="375" y2="330"/>
+        <line x1="75" y1="370" x2="75" y2="390"/>
+        <line x1="139" y1="410" x2="161" y2="410"/>
+        <line x1="75" y1="430" x2="75" y2="450"/>
+        <line x1="139" y1="470" x2="461" y2="470"/>
+        <line x1="525" y1="490" x2="525" y2="510"/>
+        <line x1="589" y1="530" x2="611" y2="530"/>
+        <line x1="525" y1="550" x2="525" y2="570"/>
+        <line x1="75" y1="610" x2="75" y2="632"/>
+        <line x1="93" y1="650" x2="161" y2="650"/>
+        <line x1="289" y1="650" x2="319" y2="650"/>
+        <line x1="75" y1="668" x2="75" y2="690"/>
+        <line x1="139" y1="710" x2="611" y2="710"/>
+        <line x1="75" y1="730" x2="75" y2="752"/>
+        <line x1="93" y1="770" x2="761" y2="770"/>
+        <line x1="825" y1="790" x2="825" y2="812"/>
+        <polyline points="75,788 75,830 161,830"/>
+        <line x1="289" y1="830" x2="319" y2="830"/>
+      </g>
+      <!-- RISE answers -->
+      <g fill="none" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#aha)" style="stroke: var(--pass-edge)">
+        <line x1="311" y1="350" x2="139" y2="350"/>
+        <line x1="461" y1="590" x2="139" y2="590"/>
+      </g>
+      <g font-size="11" text-anchor="middle" fill="currentColor">
+        <text x="225" y="223">asks, reply r1</text>
+        <text x="300" y="463">asks, reply r2</text>
+        <text x="375" y="703">runs against the preview</text>
+        <text x="427" y="763">all 5 passed (482)</text>
+        <text x="127" y="643" font-style="italic">failed</text>
+        <text x="478" y="294" text-anchor="start" font-style="italic">until offered</text>
+        <text x="82" y="684" text-anchor="start" font-style="italic">succeeded</text>
+        <text x="82" y="812" text-anchor="start" font-style="italic">S3 failed (483)</text>
+      </g>
+      <g font-size="11" text-anchor="middle" font-weight="600" style="fill: var(--pass-edge)">
+        <text x="225" y="343">signed PATCH to r1</text>
+        <text x="300" y="583">signed PATCH to r2, links</text>
+      </g>
+
+      <!-- ends -->
+      <g fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="330" cy="650" r="9"/><circle cx="825" cy="823" r="9"/><circle cx="330" cy="830" r="9"/>
+      </g>
+      <g fill="currentColor">
+        <circle cx="330" cy="650" r="5"/><circle cx="825" cy="823" r="5"/><circle cx="330" cy="830" r="5"/>
+      </g>
+    </svg>
+    </div>
+    <figcaption>One column per party, time going down. ARTIE asks twice and waits twice. Each wait ends with a signed
+      answer to the reply ARTIE made (dashed). Pull request 482 ends promoted to Dev; 483 ends with a comment.</figcaption>
+  </figure>
 
   <div class="tiles">
     <div class="tile pass"><b>Pull request 482: released</b><span>watched, merged in git, built by Jenkins, smoke 5 of 5, promoted to Dev. See <em>Passing</em>.</span></div>
