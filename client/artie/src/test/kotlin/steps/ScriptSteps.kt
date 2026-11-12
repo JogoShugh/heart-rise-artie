@@ -97,6 +97,7 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
         stopped = null
         navigators = more
         val run = fresh(inputs, navigator)
+        run.replies = ctx.replies
         lastRun = run
         Run.current = run
         try {

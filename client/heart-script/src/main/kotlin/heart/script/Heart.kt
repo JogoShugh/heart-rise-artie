@@ -107,6 +107,8 @@ class Here internal constructor(
         fromIntent: String? = null,
         /** Act as of the version of the resource kept by this name, not the one held (kept-versions.feature). */
         asOf: String? = null,
+        /** For an act in words: fields the host adds to what the reasoner chooses, a reply's envelope. */
+        with: Map<String, Any?> = emptyMap(),
         fields: (Fields.() -> Unit)? = null,
         block: (Here.() -> Unit)? = null,
     ) {
@@ -119,7 +121,7 @@ class Here internal constructor(
             rel != null -> acted(
                 step, rel, values.toMap() + Fields().also { fields?.invoke(it) }.values, said, block, version,
             )
-            said.words != null -> reasoned(step, said, block, version)
+            said.words != null -> reasoned(step, said, block, version, with)
             else -> throw ScriptStopped(step, "\"act\"", "\"act needs a relation, or an intent\"")
         }
     }

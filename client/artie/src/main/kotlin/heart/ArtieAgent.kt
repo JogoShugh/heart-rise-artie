@@ -1,5 +1,7 @@
 package heart
 
+import kotlinx.serialization.json.JsonObject
+
 /** What became of one intent. Every rejection is a recorded event (SPEC §10.3), not a bad request. */
 sealed interface Decision {
     /** The selection passed every check and was not sent (decide only). */
@@ -45,14 +47,20 @@ class ArtieAgent(private val client: HeartRiseClient, private val reasoner: Reas
      * descriptor (SPEC §8.5) and asks again, with the detail shown, at most
      * once per form.
      */
-    fun decide(intent: String, url: String): Decision {
+    fun decide(intent: String, url: String, with: JsonObject = JsonObject(emptyMap())): Decision {
         val synced = client.enter(url)
         // HAL-SCHEMA-FORMS-HR Rule 8: the reasoner is shown each form's choices as a closed set.
         var offers = synced.affordances.values.map {
             Offer(it.rel, client.choices(it.rel)?.shownSchema() ?: it.schema, it.title, it.description)
         }
         while (true) {
-            val selection = reasoner.reason(intent, synced.state, offers, linkOffers(synced))
+            val chosen = reasoner.reason(intent, synced.state, offers, linkOffers(synced))
+            // What the host adds to the act it chose, a reply's envelope (goal-rise.feature), checked with the rest.
+            val selection = if (chosen is Selection.Act && with.isNotEmpty()) {
+                chosen.copy(fields = JsonObject(chosen.fields + with))
+            } else {
+                chosen
+            }
             if (selection !is Selection.Describe) return checked(selection, synced)
             val offer = offers.firstOrNull { it.name == selection.affordance && it.detail == null }
                 ?: return describeRejected(selection, synced)
@@ -80,8 +88,13 @@ class ArtieAgent(private val client: HeartRiseClient, private val reasoner: Reas
      * Sync, reason, check, then act or follow. [readAs] is the ETag of the resource as the step read it, the read
      * its words were decided from: an act on it, changed since, is not sent ([Decision.Changed]).
      */
-    fun handle(intent: String, url: String, readAs: String? = null): Decision {
-        val decided = decide(intent, url)
+    fun handle(
+        intent: String,
+        url: String,
+        readAs: String? = null,
+        with: JsonObject = JsonObject(emptyMap()),
+    ): Decision {
+        val decided = decide(intent, url, with)
         return when (val selection = (decided as? Decision.Selected)?.selection) {
             is Selection.Act -> if (changedSince(readAs)) Decision.Changed(selection) else act(selection)
             is Selection.Follow -> Decision.Followed(selection, client.follow(selection.rel, selection.title))

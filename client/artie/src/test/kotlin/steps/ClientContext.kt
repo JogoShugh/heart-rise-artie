@@ -76,7 +76,15 @@ class ClientContext {
     var credentials: CredentialSource = CredentialSources.NONE
 
     /** A client's own stack below its name and trace: its cache, the integrity check, then its credentials. */
-    private fun stack() = CachingTransport(IntegrityCheck(AuthTransport(credentials, wire)))
+    private fun stack() = CachingTransport(
+        IntegrityCheck(AuthTransport(credentials, signing?.let { heart.SigningTransport(it, wire) } ?: wire)),
+    )
+
+    /** The key each client signs its acts with, as a host's ARTIE does (goal-rise.feature); none by default. */
+    var signing: heart.SigningKey? = null
+
+    /** The replies a goal run asks with, as a host keeps them (goal-rise.feature); none by default. */
+    var replies: heart.script.Replies? = null
     val cache: CachingTransport by lazy { stack() }
 
     /** A bare script's way out (bare-script.feature): ARTIE's name, trace and credentials, no cache, no check. */

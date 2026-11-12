@@ -12,15 +12,28 @@ internal object Detours {
 
     fun trimmed(root: Node, capture: Capture): Node {
         val used = used(capture)
-        prune(root, used) { capture.marks(it)["scenario"] != null }
+        val scope = { step: Step -> SCOPES.any { it in capture.marks(step) } }
+        prune(root, used, { capture.marks(it)["scenario"] != null }, scope, inScope = false)
         return root
     }
 
-    /** A scenario's selections are never a detour: in a smoke test, reading is the test (goal-scenarios.feature). */
-    private fun prune(node: Node, used: Set<Int>, scenario: (Step) -> Boolean) {
+    /**
+     * A scenario's selections are never a detour: in a smoke test, reading is the test (goal-scenarios.feature). Nor
+     * is a party entered or a reply waited on, nor anything done there (goal-rise.feature): following the links an
+     * answer hands over is what the wait was for.
+     */
+    private fun prune(
+        node: Node,
+        used: Set<Int>,
+        scenario: (Step) -> Boolean,
+        scope: (Step) -> Boolean,
+        inScope: Boolean,
+    ) {
         val members = members(node, used)
-        node.children.removeAll { it !in members && !needed(it, used) && !scenario(it.step) }
-        node.children.forEach { prune(it, used, scenario) }
+        if (!inScope) {
+            node.children.removeAll { it !in members && !needed(it, used) && !scenario(it.step) && !scope(it.step) }
+        }
+        node.children.forEach { prune(it, used, scenario, scope, inScope || scope(it.step)) }
     }
 
     /**

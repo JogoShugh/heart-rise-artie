@@ -171,6 +171,14 @@ class ScriptYaml(
         // A Verify: fact read by name is kept as written, the name read again (goal-scenarios.feature).
         is Walked.Waits -> capture.marks(walked.step)["facts"]?.let { listOf(mapOf("check" to it)) }
             ?: listOf(readAgain(bindings, capture, waited(walked.step)))
+        // Another party's entry, or a reply waited on, as the goal's step opened it (goal-rise.feature).
+        is Walked.Scope -> listOf(
+            if (walked.kind == "enter") {
+                linkedMapOf("enter" to walked.value, "steps" to steps(walked.block))
+            } else {
+                linkedMapOf("once-answered" to linkedMapOf("reply" to walked.value, "steps" to steps(walked.block)))
+            },
+        )
     }
 
     /**
@@ -198,18 +206,24 @@ class ScriptYaml(
         }
         // As of a version a step named, and the refusal it expected (goal-scenarios.feature).
         val marks = capture.marks(step)
-        listOf("as-of", "refused-as").forEach { key -> marks[key]?.let { made[key] = it.toString() } }
+        made.putAll(versioned(marks))
+        // An act that asked to be told, on a reply the host kept by its step's name (goal-rise.feature): the reply's
+        // envelope is the ask's to make, and what it led to is held after it.
+        val reply = marks["ask"]?.toString()
         // What the step named, kept by that name where a later step acts as of it or reads it.
         val named = marks["as"]?.toString()?.takeIf { it in readByName }?.let { mapOf("keep-as" to it) }
-        // A step that opens none holds no block: what it led to is kept where it stands.
-        if (!step.opens) {
-            return listOf(made) + (listOfNotNull(named) + selection.block.keeps.map { mapOf("keep-as" to it.keptAs) })
-                .distinct()
+        return when {
+            reply != null -> asked(made, reply) + steps(selection.block)
+            // A step that opens none holds no block: what it led to is kept where it stands.
+            !step.opens -> listOf(made) +
+                (listOfNotNull(named) + selection.block.keeps.map { mapOf("keep-as" to it.keptAs) }).distinct()
+            else -> {
+                // A resource made new is read again first; then what the act changed is checked, then the steps in it.
+                made["then"] = (listOfNotNull(mapOf("sync" to true).takeIf { selection.fresh }, named) +
+                    (made["then"] as? List<*>).orEmpty() + steps(selection.block)).distinct()
+                listOf(made)
+            }
         }
-        // A resource made new is read again first; then what the act changed is checked, then the steps in it.
-        made["then"] = (listOfNotNull(mapOf("sync" to true).takeIf { selection.fresh }, named) +
-            (made["then"] as? List<*>).orEmpty() + steps(selection.block)).distinct()
-        return listOf(made)
     }
 
     /** The names a later step acts as of, or a Verify: fact reads: each kept where its step named it. */

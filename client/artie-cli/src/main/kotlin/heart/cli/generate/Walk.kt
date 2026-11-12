@@ -20,6 +20,12 @@ class Block(
     val opener: String? = null,
 )
 
+/** This block with no reads again of its own: a scope's waits read the reply again, which the scope does itself. */
+internal fun Block.withoutSyncs() = Block(keeps, watched, statements.filterNot { it is Walked.Sync }, listed, opener)
+
+/** The marks by which a goal's step opened a block of its own (goal-rise.feature). */
+internal val SCOPES = listOf("enter", "once-answered")
+
 /** One statement of a generated script: a step of the run, and its row. */
 sealed interface Walked {
     val step: Step
@@ -32,6 +38,12 @@ sealed interface Walked {
 
     /** A wait or a check, as the run's script wrote it. */
     class Waits(override val step: Step) : Walked
+
+    /**
+     * A block a goal's step opened by its words (goal-rise.feature): `enter` another party's entry, [value] its
+     * address as the script reads it, or `once-answered`, [value] the reply it waits on; [block] its steps.
+     */
+    class Scope(override val step: Step, val kind: String, val value: String, val block: Block) : Walked
 }
 
 /** How a selection is made again. */

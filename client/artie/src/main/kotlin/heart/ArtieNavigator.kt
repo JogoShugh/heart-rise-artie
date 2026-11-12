@@ -138,7 +138,7 @@ class ArtieNavigator(
      * choice against the representation and the form's schema, then makes it. A rejected choice is refused here,
      * by the client, and nothing is sent.
      */
-    override fun reason(intent: String, asOf: String?): Reasoned {
+    override fun reason(intent: String, asOf: String?, with: Map<String, Any?>): Reasoned {
         (client as? ArtieClient)?.asOf = asOf
         val thinker = reasoner
         val at = client.current?.url
@@ -154,7 +154,7 @@ class ArtieNavigator(
         // The step's words were decided from the resource as held now: an act on it changed since is not sent.
         val readAs = before?.etag
         val failed = answer("reason") {
-            decided = ArtieAgent(client, thinker).handle(intent, at, readAs)
+            decided = ArtieAgent(client, thinker).handle(intent, at, readAs, json(with) as JsonObject)
             client.current!!
         }
         val reasoned = when (val d = decided) {

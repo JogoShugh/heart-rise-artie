@@ -173,6 +173,9 @@ class ScriptWriter(
             is Walked.Selection -> selection(walked, depth)
             is Walked.Sync -> listOf("${pad}sync()")
             is Walked.Waits -> waits(step, pad)
+            // `enter("…") { … }` or `onceAnswered("…") { … }`, as the goal's step opened it (goal-rise.feature).
+            is Walked.Scope -> listOf("$pad${KOTLIN_SCOPES.getValue(walked.kind)}(\"${walked.value}\") {") +
+                block(walked.block, depth + 1) + "$pad}"
         }
         return lines.mapIndexed { i, line ->
             if (i == 0) derivations.anchor("${step.number}", step.line, line) else line
@@ -250,6 +253,9 @@ class ScriptWriter(
 
     private companion object {
         const val INDENT = "    "
+
+        /** Each scope a goal's step opens, as the Kotlin DSL calls it. */
+        val KOTLIN_SCOPES = mapOf("enter" to "enter", "once-answered" to "onceAnswered")
         const val WIDTH = 120
     }
 }
@@ -276,7 +282,11 @@ internal class Walker(
     /** What [node]'s step is in the script: a selection, a sync, a wait or a check; null for none of these. */
     private fun walked(node: Node): Walked? {
         val step = node.step
+        // A block a goal's step opened by its words: another party's entry, or a reply waited on (goal-rise.feature).
+        val scope = capture.marks(step).let { marks -> SCOPES.firstOrNull { it in marks }?.let { it to marks[it] } }
         return when {
+            // A wait's own reads again are the scope's, not the script's: its block keeps what was done in it.
+            scope != null -> Walked.Scope(step, scope.first, scope.second.toString(), walk(node).withoutSyncs())
             step.relation != null -> selection(node)
             step.say == "sync" -> Walked.Sync(step)
             step.say == "until" || step.say == "check" -> Walked.Waits(step)

@@ -62,17 +62,27 @@ class Said(val intent: String? = null, val inferred: String? = null, val fromInt
  * return. A run must allow it (`--reasoner`). The same words on the same resource, offering the same, are the
  * choice made before in this run, made again with no model.
  */
-internal fun Here.reasoned(step: Int, said: Said, block: (Here.() -> Unit)?, asOf: String? = null) {
+// Each is one part of the act, as the step said it.
+@Suppress("LongParameterList")
+internal fun Here.reasoned(
+    step: Int,
+    said: Said,
+    block: (Here.() -> Unit)?,
+    asOf: String? = null,
+    with: Map<String, Any?> = emptyMap(),
+) {
     val intent = checkNotNull(said.words)
     if (!run.reasoning) {
         throw ScriptStopped(step, "\"intent\"", "\"act(intent = …) needs a reasoner, and this run has none\"")
     }
     // A goal's planner keeps its own decisions, and its capture each move as it was reasoned: only a script's.
-    val key = Triple(intent, held.address, held.offered).takeIf { run.goal == null && asOf == null }
+    val key = Triple(intent, held.address, held.offered).takeIf { run.goal == null && asOf == null && with.isEmpty() }
     key?.let { run.reasoned[it] }?.let { chosen -> return again(step, chosen, said, block) }
     val before = run.trace.size
     // As of a version read before, the act is meant to meet what changed since: chosen once, never again.
-    val decided = if (asOf != null) Decided(navigator.reason(intent, asOf), 0) else decided(step, intent)
+    // So is an act that carries what its host adds, a reply's envelope: one act, as the step asked.
+    val once = asOf != null || with.isNotEmpty()
+    val decided = if (once) Decided(navigator.reason(intent, asOf, with), 0) else decided(step, intent)
     val reasoned = decided.reasoned
     // A step that took acts toward its words is no one choice to make again: it is decided again each time.
     val kept = key?.takeIf { decided.toward == 0 && reasoned.answer !is Answer.Refused }

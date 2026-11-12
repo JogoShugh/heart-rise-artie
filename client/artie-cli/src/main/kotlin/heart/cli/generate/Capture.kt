@@ -137,7 +137,11 @@ class Node(val step: Step) {
         fun of(capture: Capture): Node {
             val root = Node(capture.steps.first())
             val open = ArrayDeque(listOf(root))
-            capture.stepped.drop(1).filterNot { it.say.startsWith("return to") }.forEach { step ->
+            // A wait on a reply reads it at its address: a step of its own, the block the goal's step opened.
+            // Its first read only: the wait's reads again, and the way back, are the scope's own.
+            val opened = mutableSetOf<Int?>()
+            val kept = { step: Step -> SCOPES.any { it in capture.marks(step) } && opened.add(step.line) }
+            capture.stepped.drop(1).filterNot { it.say.startsWith("return to") && !kept(it) }.forEach { step ->
                 while (open.size > 1 && open.last().step.line != step.within) open.removeLast()
                 val node = Node(step)
                 open.last().children += node

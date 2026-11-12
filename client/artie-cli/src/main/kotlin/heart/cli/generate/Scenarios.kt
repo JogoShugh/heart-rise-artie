@@ -9,6 +9,19 @@ package heart.cli.generate
 internal fun scenarioOf(capture: Capture, walked: Walked): String? =
     (walked as? Walked.Selection)?.let { capture.marks(it.step)["scenario"]?.toString() }
 
+/** An act's version and refusal, as [marks] say them: `as-of` a name, and `refused-as` the refusal it expected. */
+internal fun versioned(marks: Map<*, *>): Map<String, String> =
+    listOf("as-of", "refused-as").mapNotNull { key -> marks[key]?.let { key to it.toString() } }.toMap()
+
+/** [made], an act, as the ask it was: its relation and fields but the envelope, and the reply it was asked on. */
+internal fun asked(made: Map<String, Any?>, reply: String): List<Map<String, Any?>> {
+    val ask = linkedMapOf<String, Any?>("ask" to made["act"])
+    val fields = (made["fields"] as? Map<*, *>)?.filterKeys { it != "_links" }
+    fields?.takeIf { it.isNotEmpty() }?.let { ask["fields"] = it }
+    ask["reply"] = reply
+    return listOf(ask)
+}
+
 /** The names the run's acts went as of, and its Verify: facts read: `${before.due}` reads `before`. */
 internal fun namesRead(capture: Capture): Set<String> = capture.steps.flatMap { step ->
     val marks = capture.marks(step)

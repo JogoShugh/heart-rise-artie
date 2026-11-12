@@ -95,7 +95,8 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 // A scenario's acts, its sub-steps' too, are marked as it, for the script made from the run.
                 val outer = scenario
                 scenario = step.scenario ?: outer
-                intent(step, here, opener)
+                // At another party, or once a reply is answered, then its words (goal-rise.feature).
+                crossParty.done(step, here, opener) { done, at, within -> intent(done, at, within) }
                 scenario = outer
             }
             is Step.Verify -> if (!namedFacts.verified(step, here, opener)) single(step, here, opener)
@@ -110,6 +111,9 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
 
     /** `Verify:` facts that read names, checked as written (goal-scenarios.feature). */
     private val namedFacts = NamedFacts(script, marks, ::fill, moves)
+
+    /** Steps at another party, asking to be told, or waiting on a reply (goal-rise.feature). */
+    private val crossParty = CrossParty(run, script, marks, ::fill)
 
     /** The scenario the step now is in, if any (goal-scenarios.feature). */
     private var scenario: String? = null
@@ -177,8 +181,9 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
         try {
             // Every act opens a block: what it led to is held until the step is done, and then the run is back
             // where the step began, whether the act made a resource (a comment) or not.
-            here.act(intent = words, asOf = move.asOf) {
+            here.act(intent = words, asOf = move.asOf, with = crossParty.envelope(step, line)) {
                 entered = true
+                crossParty.askedAt(step, held.address)
                 marks.acted(step, line)
                 scenario?.let { marks.scenario(line, it) }
                 path += held.address
@@ -324,6 +329,11 @@ internal class StepMarks(private val run: Run, private val spoken: (String) -> S
     /** The check on [line] is the step's own facts, each a name read again: kept as written. */
     fun facts(line: Int, facts: List<Map<String, String>>) {
         mark(line)["facts"] = facts
+    }
+
+    /** The step on [line] is marked [key], [value]: what the script made from the run makes of it. */
+    fun put(line: Int, key: String, value: Any) {
+        mark(line)[key] = value
     }
 
     private fun mark(line: Int) = run.marks.getOrPut(line) { mutableMapOf() }
