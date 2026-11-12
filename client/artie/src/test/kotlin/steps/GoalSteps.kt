@@ -47,7 +47,7 @@ class GoalSteps(
     }
 
     /** The reasoner of the last goal run, to count what it was asked. */
-    private var reasoner: ScriptedReasoner? = null
+    internal var reasoner: ScriptedReasoner? = null
 
     @Then("the planner was shown the goal with {string}")
     fun goalShown(words: String) {

@@ -142,6 +142,13 @@ class GoalRiseSteps(
         assertTrue(asked.header("Signature-Input").orEmpty().contains("keyid=\"${ArtieKey.KEY_ID}\""), "$asked")
     }
 
+    @Then("the reasoner was shown {string} without {string}, the run's to fill")
+    fun shownWithout(form: String, field: String) {
+        val shown = checkNotNull(goals.reasoner).shown.flatten().first { it.name == form }
+        val properties = shown.schema["properties"]?.toString().orEmpty()
+        assertTrue("\"$field\"" !in properties && "\"$field\"" !in shown.schema["required"].toString(), "$shown")
+    }
+
     @When("{string} runs with ARTIE in the desk, given")
     fun scriptRunsInDesk(script: String, table: DataTable) {
         val given = table.asMaps().associate { it.getValue("name") to it.getValue("value") }

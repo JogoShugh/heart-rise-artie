@@ -50,8 +50,10 @@ class ArtieAgent(private val client: HeartRiseClient, private val reasoner: Reas
     fun decide(intent: String, url: String, with: JsonObject = JsonObject(emptyMap())): Decision {
         val synced = client.enter(url)
         // HAL-SCHEMA-FORMS-HR Rule 8: the reasoner is shown each form's choices as a closed set.
+        // What the host adds to the act (a reply's envelope) is the run's to fill: the reasoner isn't shown it.
         var offers = synced.affordances.values.map {
-            Offer(it.rel, client.choices(it.rel)?.shownSchema() ?: it.schema, it.title, it.description)
+            val shown = without(client.choices(it.rel)?.shownSchema() ?: it.schema, with.keys)
+            Offer(it.rel, shown, it.title, it.description)
         }
         while (true) {
             val chosen = reasoner.reason(intent, synced.state, offers, linkOffers(synced))
@@ -139,6 +141,17 @@ class ArtieAgent(private val client: HeartRiseClient, private val reasoner: Reas
         }
 
     private companion object {
+        /** [schema] with the fields [filled] taken out of its properties and what it requires. */
+        fun without(schema: JsonObject, filled: Set<String>): JsonObject {
+            if (filled.isEmpty()) return schema
+            val properties = (schema["properties"] as? JsonObject)?.let { JsonObject(it - filled) }
+            val required = (schema["required"] as? kotlinx.serialization.json.JsonArray)?.let { all ->
+                kotlinx.serialization.json.JsonArray(all.filterNot { it.toString().trim('"') in filled })
+            }
+            val kept = listOfNotNull(properties?.let { "properties" to it }, required?.let { "required" to it })
+            return JsonObject(schema + kept)
+        }
+
         const val NO_DETAIL = "The server gives no further description of this action."
     }
 }

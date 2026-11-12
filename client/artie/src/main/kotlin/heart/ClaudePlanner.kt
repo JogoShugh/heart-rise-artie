@@ -172,7 +172,9 @@ class ClaudePlanner(
               true when you will make more moves at what the act leads to, or will come back here after it
               (an act that makes a new resource, such as a comment, leads to that resource). When the step asks
               to act on a version read before ("as of {before}"), set as_of to that name, from <named>; when it
-              says the act should be refused, set refused to how (stale, not offered, invalid input).
+              says the act should be refused, set refused to how (stale, not offered, invalid input). A step
+              that asks to be told is asked on a reply the run keeps: the run adds the reply's links itself
+              (hr:reply-to, hr:keys): never ask for them, and leave them out of your words.
             - "back": to a resource on the <path>, by its address, closing what was opened since.
             - "wait": until the resource held offers a form, before acting on it. Give the form's exact name,
               as in <forms> or as it will be named there, in relation (for example "github:merge").

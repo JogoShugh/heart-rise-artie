@@ -93,6 +93,16 @@ Feature: Claude plans a goal run, one move at a time
       | calls | input | output | cache_read | cache_write |
       | 1     | 120   | 30     | 900        | 40          |
 
+  Scenario: The planner is told the run adds a reply's links to an act that asks to be told
+    Live, the release goal's capture stopped at its ask: the planner, shown the watch's form, which
+    requires hr:reply-to and hr:keys, asked the person what to put there. The run adds them itself,
+    on a reply the host keeps (goal-rise.feature): the planner is told so, and to leave them out.
+    Given the Claude API will answer with the move {"move": "finish"}
+    When the planner is asked its next move
+    Then the planner's system prompt says
+      | part                                                                          |
+      | the run adds the reply's links itself (hr:reply-to, hr:keys): never ask for them |
+
   Scenario: The planner is told a follow moves it and makes nothing, so from a list it follows on to the item
     Live, told only that following a link to a list makes no branch, the
     planner went back from the branch list each time it got there, never on

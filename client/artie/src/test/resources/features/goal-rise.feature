@@ -113,6 +113,7 @@ Feature: A goal that crosses parties and waits on their answers: At, asking to b
       | watcher | http://localhost:8099/ |
     Then the run finished
     And the watch was asked with the desk's reply, signed by the desk
+    And the reasoner was shown "watcher:watch" without "_links", the run's to fill
     When artie generated "watch.heart.yaml" as data from "watch.trace.yaml" and "watch.goal.md"
     Then the script "watch.heart.yaml" has a line with "- enter: ${watcher}"
     And the script "watch.heart.yaml" has a line with "- ask: watcher:watch"
