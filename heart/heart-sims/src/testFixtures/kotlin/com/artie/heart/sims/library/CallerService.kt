@@ -6,7 +6,9 @@ import com.artie.heart.http4k.Credentials
 import com.artie.heart.http4k.HeartHttp
 import com.artie.heart.http4k.HeartSettings
 import com.artie.heart.sims.Tokens
+import com.artie.heart.HEART_RISE_PROFILE
 import com.artie.heart.PROBLEM_TYPES
+import com.artie.heart.ProblemLinks
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
@@ -73,11 +75,11 @@ class CallerService(
             val key = SignedRequests.keyIdOf(request)?.let { keys[it] }
             when {
                 request.method == Method.GET -> next(request)
-                watch == null -> conflict("No request of Ana's awaits an answer here")
+                watch == null -> conflict(request, null, "No request of Ana's awaits an answer here")
                 key == null || !SignedRequests.signedBy(request, ORIGIN, key) ->
                     SignedRequests.unauthorized(request, REALM, keys.keys.firstOrNull() ?: LibraryKey.KEY_ID)
                 namedWatch(request).let { it != null && it != watch } ->
-                    conflict("The answer names another watch than the one Ana's request created, $watch")
+                    conflict(request, watch, "The answer names another watch than the one Ana's request created, $watch")
                 else -> next(request)
             }
         }
@@ -130,19 +132,30 @@ class CallerService(
         mapper.readTree(request.bodyString()).path("_links").path(Replies.IN_REPLY_TO).path("href").asText(null)
     }.getOrNull()
 
-    private fun conflict(detail: String): Response = Response(Status.CONFLICT)
-        .header("Content-Type", "application/problem+json")
-        .body(
-            mapper.writeValueAsString(
-                mapOf(
-                    "type" to PROBLEM_TYPES + "link-conflict",
-                    "title" to "The act names another resource than the state keeps",
-                    "status" to Status.CONFLICT.code,
-                    "detail" to detail,
-                    "rel" to Replies.IN_REPLY_TO,
+    /** The hr CURIE, for a refusal that names the request it keeps by `hr:in-reply-to`. */
+    private val HR_CURIE = mapOf("name" to "hr", "href" to "$HEART_RISE_PROFILE/rels/{rel}", "templated" to true)
+
+    /** 409 on [request]: it links the reply refused, and [watch], the one the reply keeps, when there is one. */
+    private fun conflict(request: Request, watch: String?, detail: String): Response {
+        val about = ProblemLinks.resourceOf(request.uri.path)
+        val links = mapOf("about" to mapOf("href" to about)) +
+            listOfNotNull(watch?.let { Replies.IN_REPLY_TO to mapOf("href" to it) }) +
+            listOfNotNull(watch?.let { "curies" to listOf(HR_CURIE) })
+        return Response(Status.CONFLICT)
+            .header("Content-Type", "application/problem+json")
+            .body(
+                mapper.writeValueAsString(
+                    mapOf(
+                        "type" to PROBLEM_TYPES + "link-conflict",
+                        "title" to "The act names another resource than the state keeps",
+                        "status" to Status.CONFLICT.code,
+                        "detail" to detail,
+                        "rel" to Replies.IN_REPLY_TO,
+                        "_links" to links,
+                    ),
                 ),
-            ),
-        )
+            )
+    }
 
     companion object {
         private const val REALM = "Ana's replies"

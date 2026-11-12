@@ -20,6 +20,7 @@ Feature: Riverside Public Library tells Ana when a held loan can be renewed
     When Ana asks to be told when loan 3310 can be renewed, with reply r-7f3 and her key, <signature>
     Then the library is refused with 401, as the problem "<problem>"
     And the refusal asks for a Signature, over "@method" "@target-uri" "content-digest" "if-match", by the key "ana-2026-11"
+    And the refusal links "about" to "/"
     And the library holds no watch
 
     Examples:

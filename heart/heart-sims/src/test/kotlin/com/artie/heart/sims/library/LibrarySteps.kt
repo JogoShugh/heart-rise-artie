@@ -708,6 +708,14 @@ class LibrarySteps {
         assertEquals("sig1=($components);keyid=\"$key\";alg=\"ed25519\"", answer?.header("Accept-Signature"))
     }
 
+    /** A refusal is a state too: its problem carries `_links` (an RFC 9457 extension member). */
+    @Then("the refusal links {string} to {string}")
+    fun refusalLinks(rel: String, href: String) =
+        assertEquals(href, mapper.readTree(body())["_links"]?.get(rel)?.get("href")?.asText(), body())
+
+    @Then("the refusal links {string} to Ana's watch")
+    fun refusalLinksWatch(rel: String) = refusalLinks(rel, checkNotNull(anaWatch))
+
     @Then("the refusal says hr:completed is not offered")
     fun refusalSays() = assertTrue(body().contains("hr:completed is not offered"), body())
 

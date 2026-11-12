@@ -54,6 +54,8 @@ Feature: The library answers Ana on her reply, and Ana checks each answer by the
   Scenario: An answer that names another watch than Ana's is refused, and changes nothing
     When the library reports progress of 50 percent on reply r-7f3, for the watch "http://localhost:8140/watches/99"
     Then the library is refused with 409
+    And the refusal links "about" to "/replies/r-7f3"
+    And the refusal links "hr:in-reply-to" to Ana's watch
     And reply r-7f3 is still awaiting
 
   Scenario: The hold clears, and the library sends the result, signed
@@ -81,6 +83,7 @@ Feature: The library answers Ana on her reply, and Ana checks each answer by the
     When the library sends the result on reply r-7f3 <signature>: loan 3310 can be renewed from 2026-12-03
     Then the library is refused with 401, as the problem "<problem>"
     And the refusal asks for a Signature, over "@method" "@target-uri" "content-digest" "if-match", by the key "library-2026-11"
+    And the refusal links "about" to "/replies/r-7f3"
     And reply r-7f3 is still awaiting
 
     Examples:

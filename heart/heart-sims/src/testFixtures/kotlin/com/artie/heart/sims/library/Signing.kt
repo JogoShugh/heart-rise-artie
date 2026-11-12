@@ -1,6 +1,7 @@
 package com.artie.heart.sims.library
 
 import com.artie.heart.PROBLEM_TYPES
+import com.artie.heart.ProblemLinks
 import com.artie.heart.Signatures
 import com.artie.heart.Signed
 import com.artie.heart.Signer
@@ -87,8 +88,11 @@ object SignedRequests {
             .header("WWW-Authenticate", "Signature realm=\"$realm\"")
             .header("Accept-Signature", acceptSignature(keyId))
             .body(
-                """{"type": "$PROBLEM_TYPES$type", "title": "$title", "status": 401, """ +
-                    """"detail": "Each act here is signed by the key $keyId."}""",
+                ProblemLinks.into(
+                    """{"type": "$PROBLEM_TYPES$type", "title": "$title", "status": 401, """ +
+                        """"detail": "Each act here is signed by the key $keyId."}""",
+                    request.uri.path,
+                ),
             )
     }
 }
