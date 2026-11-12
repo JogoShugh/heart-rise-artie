@@ -37,6 +37,9 @@ class ArtieNavigator(
      */
     private val guarding: String? = null,
 ) : Navigator, heart.script.Writes by ReasonerWriter(reasoner) {
+    /** The representation ARTIE holds now, as the server sent it, links with their targets; null before the entry. */
+    val holding: HeartRepresentation? get() = client.current
+
     /** Whether this run is off the rails: no lock file, no schema check, no reading again, a 412 stops it. */
     private var offRails = guarding == OFF_THE_RAILS
 

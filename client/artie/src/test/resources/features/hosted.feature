@@ -27,6 +27,7 @@ Feature: ARTIE hosted in a service
             type: object
             properties:
               milliliters: {type: integer}
+              _links: {type: object}
       """
     And the service answers POST "http://localhost:8301/beds/2/actions/water-cell" with:
       """
@@ -115,6 +116,62 @@ Feature: ARTIE hosted in a service
       | @target-uri    |
       | content-digest |
       | if-match       |
+
+  Scenario: ARTIE asks with a reply its host keeps, the envelope in the act's body
+    Given the host "desk" keeps replies, opening "http://localhost:8160/replies/r1" with its keys at "http://localhost:8160/keys"
+    When the host "desk" runs this kept script with ARTIE:
+      """yaml
+      start: http://localhost:8301/beds/2
+      steps:
+        - ask: waterCell
+          fields: {milliliters: 100}
+          reply: watering
+      """
+    Then the host "desk" has its run back, ended
+    And the POST to "http://localhost:8301/beds/2/actions/water-cell" carried the body:
+      """json
+      {"milliliters":100,"_links":{"hr:reply-to":{"href":"http://localhost:8160/replies/r1"},"hr:keys":{"href":"http://localhost:8160/keys"}}}
+      """
+    And the host "desk" was told the reply "http://localhost:8160/replies/r1" was asked at "http://localhost:8301/beds/2"
+
+  Scenario: ARTIE runs the kept script a link hands over, with inputs
+    Given the service answers GET "http://localhost:8301/garden" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "garden-1"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      name: The garden
+      _links:
+        self: {href: /garden}
+        care:script: {href: /garden/care.heart.yaml}
+      """
+    And the service answers GET "http://localhost:8301/garden/care.heart.yaml" with:
+      """
+      200 OK
+      Content-Type: application/yaml
+
+      heart: 1
+      kind: kept
+      inputs: {bed: {}}
+      start: ${bed}
+      steps:
+        - scenario: planted
+          steps:
+            - check: [{field: status, is: PLANTED}]
+      """
+    When the host "desk" runs this kept script with ARTIE:
+      """yaml
+      start: http://localhost:8301/garden
+      steps:
+        - run-script: care:script
+          inputs: {bed: "http://localhost:8301/beds/2"}
+          as: care
+        - note: "care passed: ${care.passed}"
+      """
+    Then the host "desk" has its run back, ended
+    And the run of the host "desk" noted "care passed: true"
 
   Scenario: Two hosts in one process each keep their own run
     Given the host "watch" reads its entry only once the host "desk" has its run back

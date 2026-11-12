@@ -11,6 +11,8 @@ import heart.HostedRun
 import heart.Origin
 import heart.SigningKey
 import heart.Transport
+import heart.script.Replies
+import heart.script.Reply
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -33,6 +35,8 @@ class HostedSteps(private val ctx: ClientContext) {
     private val tokens = mutableMapOf<String, Pair<String, String>>()
     private val keys = mutableMapOf<String, SigningKey>()
     private val masks = mutableMapOf<String, List<String>>()
+    private val replies = mutableMapOf<String, Replies>()
+    private val asked = mutableListOf<Pair<String, String>>()
     private val publicKeys = mutableMapOf<String, PublicKey>()
     private val runs = ConcurrentHashMap<String, HostedRun>()
     private val held = mutableMapOf<String, CountDownLatch>()
@@ -52,6 +56,41 @@ class HostedSteps(private val ctx: ClientContext) {
     @Given("the host {string} gives ARTIE the token {string} for {string}")
     fun token(host: String, token: String, origin: String) {
         tokens[host] = origin to token
+    }
+
+    @Given("the host {string} keeps replies, opening {string} with its keys at {string}")
+    fun keepsReplies(host: String, address: String, keys: String) {
+        replies[host] = object : Replies {
+            override fun open() = Reply(address, keys)
+
+            override fun asked(reply: Reply, request: String) {
+                asked += reply.address to request
+            }
+
+            override fun await(reply: Reply, atMost: kotlin.time.Duration) = false
+        }
+    }
+
+    @Then("the host {string} has its run back, ended")
+    fun ranToEnd(host: String) {
+        ended(host)
+    }
+
+    @Then("the POST to {string} carried the body:")
+    fun carried(url: String, body: String) {
+        val post = ctx.transport.requests.single { it.method == "POST" && it.url == url }
+        assertEquals(body.trim(), post.body)
+    }
+
+    @Then("the host {string} was told the reply {string} was asked at {string}")
+    fun toldAsked(host: String, reply: String, request: String) {
+        assertTrue(replies.containsKey(host))
+        assertEquals(listOf(reply to request), asked)
+    }
+
+    @Then("the run of the host {string} noted {string}")
+    fun noted(host: String, note: String) {
+        assertTrue(note in ended(host).run.notes, "notes: ${ended(host).run.notes}")
     }
 
     @Given("the host {string} lets ARTIE send credentials over plain HTTP to {string}")
@@ -168,7 +207,7 @@ class HostedSteps(private val ctx: ClientContext) {
                 ?.takeIf { (at, _) -> Origin.of(at) == origin }?.let { (_, token) -> Credential.Bearer(token) }
         }
         val wire = waitingOn[host]?.let { other -> heldUntil(other) } ?: shared
-        return Hosted(credentials, keys[host], wire, host, masks[host].orEmpty())
+        return Hosted(credentials, keys[host], wire, host, masks[host].orEmpty(), replies[host])
     }
 
     /** The scripted service, which answers only once [other] has its run back. */
