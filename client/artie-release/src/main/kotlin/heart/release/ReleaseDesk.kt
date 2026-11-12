@@ -34,6 +34,8 @@ import kotlin.concurrent.thread
 data class Release(
     val id: Long,
     val pull: Long,
+    /** The release's other inputs, as the person asking gave them: what its script fills its slots with. */
+    val inputs: Map<String, String> = emptyMap(),
     val state: String = ReleaseDesk.RUNNING,
     val notes: List<String> = emptyList(),
     val stopped: String? = null,
@@ -67,7 +69,9 @@ class ReleaseDesk(
             idOf = { it.id },
             versionOf = { it.version },
             bodyOf = {
-                linkedMapOf("id" to it.id, "pull" to it.pull, "state" to it.state, "notes" to it.notes)
+                linkedMapOf(
+                    "id" to it.id, "pull" to it.pull, "inputs" to it.inputs, "state" to it.state, "notes" to it.notes,
+                )
                     .also { body -> it.stopped?.let { why -> body["stopped"] = why } }
             },
             hypermediaOf = { release ->
@@ -91,7 +95,9 @@ class ReleaseDesk(
         perform = { current, _, _ -> Acted(current) },
         find = { _, id -> releases.values.filter { id == null || it.id == id }.map { Found(it.id, "#${it.pull}") } },
         performAtBookmark = { _, input ->
-            val release = Release(next.getAndIncrement(), input.json["pull"].asLong())
+            val given = input.json.properties().filter { (name, _) -> name != "pull" }
+                .associate { (name, value) -> name to value.asText() }
+            val release = Release(next.getAndIncrement(), input.json["pull"].asLong(), given)
             releases[release.id] = release
             start(release)
             Acted(release, created = "/releases/${release.id}")
@@ -121,7 +127,7 @@ class ReleaseDesk(
     fun run(id: Long): HostedRun? = runs[id]
 
     private fun start(release: Release) = thread(name = "release-${release.id}") {
-        val run = artie(replies).run(script(), mapOf("pull" to "${release.pull}"))
+        val run = artie(replies).run(script(), release.inputs + ("pull" to "${release.pull}"))
         runs[release.id] = run
         releases[release.id] = release.copy(
             state = if (run.stopped == null) ENDED else STOPPED,
@@ -147,8 +153,16 @@ class ReleaseDesk(
   "type": "object",
   "required": ["pull"],
   "properties": {
-    "pull": {"type": "integer", "minimum": 1, "title": "Pull request", "description": "The pull request to release"}
-  }
+    "pull": {"type": "integer", "minimum": 1, "title": "Pull request", "description": "The pull request to release"},
+    "book": {"type": "string", "title": "Book", "description": "The book the smoke test finds and reads"},
+    "author": {"type": "string", "title": "Author", "description": "Who wrote it, as the smoke test checks"},
+    "problem": {
+      "type": "string", "enum": ["damaged", "missing-pages", "wrong-book", "lost"],
+      "title": "Problem", "description": "The kind of problem the smoke test reports"
+    },
+    "comment": {"type": "string", "title": "Comment", "description": "What the smoke test says of the problem"}
+  },
+  "additionalProperties": false
 }"""
 
         val PROFILE = Profile(

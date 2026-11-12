@@ -114,8 +114,8 @@ class ReleaseDeskSteps {
         script = yaml.readValue(text, Map::class.java)
     }
 
-    @When("a person asks the desk to release pull request {int}")
-    fun asksToRelease(pull: Int) {
+    @When("a person asks the desk to release pull request {int}, with:")
+    fun asksToRelease(pull: Int, table: DataTable) {
         lateinit var made: ReleaseDesk
         val artie = { kept: heart.script.Replies ->
             val credentials = object : CredentialSource {
@@ -130,7 +130,7 @@ class ReleaseDeskSteps {
         answered = made.handler(
             Request(Method.POST, "$DESK/actions/release").header(AUTH, "Bearer ${ReleaseDesk.TOKEN}")
                 .header("Content-Type", "application/json").header("If-Match", entry.header("ETag").orEmpty())
-                .body("""{"pull": $pull}"""),
+                .body(json.writeValueAsString(mapOf("pull" to pull) + table.asMap())),
         )
     }
 
