@@ -36,6 +36,11 @@ class RiseSteps(private val steps: ScriptSteps) {
         steps.replies = null
     }
 
+    @Then("trace step {int} expected {string}")
+    fun traceExpected(number: Int, expected: String) {
+        assertEquals(expected, steps.run.trace[number - 1].expect)
+    }
+
     @Then("the run's scenarios were")
     fun scenariosWere(table: DataTable) {
         assertEquals(table.asMaps(), steps.run.scenarios.map { mapOf("scenario" to it.name, "passed" to "${it.passed}") })

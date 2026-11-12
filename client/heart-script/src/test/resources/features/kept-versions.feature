@@ -72,6 +72,22 @@ Feature: Resources kept by name: their own address, a check that a value moved, 
       | stale         | finished                                                                                 |
       | invalid input | stopped at step 2, "renew": "expected refused as invalid input, was refused as stale"    |
 
+  Scenario: An act refused as expected says so in the trace, so its report counts it as planned
+    Given the server will refuse "renew" at "/loan" as stale: "the loan moved on"
+    When this script held as data runs
+      """yaml
+      heart: 1
+      kind: kept
+      start: scripted://service/
+      steps:
+        - follow: item
+          title: Matilda
+        - act: renew
+          refused-as: stale
+      """
+    Then the script finished
+    And trace step 3 expected "stale"
+
   Scenario: An act as of the version kept by name carries that version, not the one held
     When this script held as data runs
       """yaml

@@ -33,6 +33,8 @@ private fun Here.refusedAs(rel: String, expected: String?, acting: Here.() -> Un
         val was = refused?.let { "refused as ${it.kind.words}" } ?: "done"
         throw ScriptStopped(run.step, "\"$rel\"", "\"expected refused as $expected, was $was\"")
     }
+    // The trace says it was expected, so a report counts the refusal as planned.
+    run.trace.lastOrNull()?.takeIf { it.outcome == "refused" }?.expect = expected
 }
 
 /** A block of [step]'s [key], for a function that takes one; null when it has none. */
