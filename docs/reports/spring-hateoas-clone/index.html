@@ -46,12 +46,14 @@
     <button role="tab" id="tab-side" aria-controls="panel-side" aria-selected="false">Side by side</button>
     <button role="tab" id="tab-real" aria-controls="panel-real" aria-selected="false">ARTIE on Spring's example</button>
     <button role="tab" id="tab-clone" aria-controls="panel-clone" aria-selected="false">ARTIE on the clone</button>
+    <button role="tab" id="tab-explorer" aria-controls="panel-explorer" aria-selected="false">HAL Explorer on both</button>
   </div>
 </header>
 <iframe id="panel-proof" role="tabpanel" aria-labelledby="tab-proof" src="proof.html" title="The proof"></iframe>
 <iframe id="panel-side" role="tabpanel" aria-labelledby="tab-side" src="side.html" title="Side by side" hidden></iframe>
 <iframe id="panel-real" role="tabpanel" aria-labelledby="tab-real" src="artie-real.html" title="ARTIE on Spring's example" hidden></iframe>
 <iframe id="panel-clone" role="tabpanel" aria-labelledby="tab-clone" src="artie-clone.html" title="ARTIE on the clone" hidden></iframe>
+<iframe id="panel-explorer" role="tabpanel" aria-labelledby="tab-explorer" src="hal-explorer.html" title="HAL Explorer on both" hidden></iframe>
 <script>
   const tabs = [...document.querySelectorAll('[role="tab"]')];
   const show = (name) => tabs.forEach((tab) => {

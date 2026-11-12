@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merge Watch, Junction by Junction</title>
+<meta name="description" content="The GitHub gateway at each junction of the merge watch, as HAL Explorer reads its HAL-FORMS templates and as a browser renders its HTML, side by side.">
+<style>
+  :root { --bg: #f6f5f1; --fg: #1d211f; --soft: #5b625e; --line: #dcdcd4; --card: #ffffff; --accent: #2f6b4f;
+    --gone: #9b2c2c; --new: #2f6b4f; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+      --accent: #7cc4a0; --gone: #f0a0a0; --new: #7cc4a0; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+    --accent: #7cc4a0; --gone: #f0a0a0; --new: #7cc4a0; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { padding: 1rem max(16px, env(safe-area-inset-left, 0px)) 3rem; max-width: 1500px; margin: 0 auto; }
+  h1 { margin: .2rem 0 .3rem; font-size: 1.5rem; text-wrap: balance; }
+  h2 { font-size: 1.1rem; margin: 1rem 0 .4rem; }
+  p, li { color: var(--soft); max-width: 80ch; }
+  code { font: .88em ui-monospace, Menlo, monospace; }
+  [role="tablist"] { display: flex; gap: .4rem; flex-wrap: wrap; margin: 1rem 0 .6rem; }
+  [role="tab"] { font: inherit; font-size: .9rem; padding: .4rem .75rem; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--card); color: var(--fg); cursor: pointer; }
+  [role="tab"][aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); }
+  .facts { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .6rem .8rem; margin-bottom: .8rem; }
+  .facts p { margin: .2rem 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .3rem; }
+  .chip { font: 12px ui-monospace, Menlo, monospace; padding: .1rem .4rem; border: 1px solid var(--line); border-radius: 4px; }
+  .chip.new { border-color: var(--new); color: var(--new); }
+  .chip.gone { border-color: var(--gone); color: var(--gone); text-decoration: line-through; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+  @media (max-width: 800px) { .pair { grid-template-columns: 1fr; } }
+  figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  figcaption { padding: .45rem .7rem; font-weight: 600; border-bottom: 1px solid var(--line); }
+  figcaption small { font-weight: 400; color: var(--soft); }
+  .shot { height: 70vh; min-height: 24rem; overflow: auto; }
+  .shot img { display: block; width: 100%; height: auto; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; border: 1px solid var(--line); padding: .35rem .5rem; }
+  .wrap { overflow-x: auto; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Merge Watch, Junction by Junction</h1>
+  <p>The GitHub gateway (heart-gateway with its GitHub connector, in front of heart-sims' small GitHub), walked through
+    the merge watch's junctions. At each one, the same address two ways: HAL Explorer 1.2.3 asking for
+    <code>application/prs.hal-forms+json</code>, HEART's L0 HAL-FORMS with its <code>_templates</code>; and a browser
+    asking for <code>text/html</code>, HEART's page for people. The acts between junctions were sent by each
+    template's own target and method, with the ETag just read.</p>
+
+  <div class="wrap"><table>
+    <tr><th>#</th><th>Junction</th><th>Address</th><th>HAL-FORMS templates</th><th>What changed</th></tr>
+    <tbody id="summary"></tbody>
+  </table></div>
+
+  <div role="tablist" aria-label="Junction" id="tabs"></div>
+  <div id="panels"></div>
+
+  <h2>What this shows</h2>
+  <ul>
+    <li><b>The offers follow the state.</b> Pull request 482 offers merge and close while it is open and mergeable; once
+      merged, only comment, label and edit are left. The watch's issue offers close until it is closed, then reopen.</li>
+    <li><b>Both renderings carry the same acts.</b> Each template HAL Explorer lists is a button on the HTML page, from
+      the same declaration.</li>
+    <li><b>The bookmark has no HAL-FORMS templates.</b> Its ten searches and lookups are GETs with templated targets
+      (<code>/repos/{owner}/{repo}/pulls{?labels}</code>), which a HAL-FORMS template can't express, so HEART leaves
+      them out of HAL-FORMS. The HTML page offers all ten, and HAL Schema Forms carries them as <code>_forms</code>. A
+      HAL-FORMS client has to be handed a deeper address to start from.</li>
+    <li><b>A list has nothing to act on.</b> The labelled pull requests are links (<code>item</code>), no templates.</li>
+  </ul>
+
+  <h2>How it was made</h2>
+  <ul>
+    <li>Gateway: <code>java -cp 'heart/heart-sims/build/sims/lib/*' com.artie.heart.sims.MainKt 8098 github.test</code>,
+      reset first (<code>POST /_sim/reset</code>): repository acme/web, pull request 482 by ada.</li>
+    <li>HAL Explorer 1.2.3: the webjar <code>org.webjars:hal-explorer:1.2.3</code> from Maven Central (SHA-1
+      <code>bb865006448dd6bb27866e9e3b9cf340a21f274c</code>, checked), served at <code>/explorer/</code> by
+      <code>explorer-proxy.mjs</code> on the gateway's own origin, so it reads the gateway with no CORS; the proxy adds
+      the sim's test credential for the browser, which can't send one.</li>
+    <li>The walk and the screenshots: <code>merge-junctions.sh</code>, headless Chrome. Each HAL-FORMS answer is kept
+      as captured (<code>N-name.hal-forms.json</code>).</li>
+  </ul>
+</main>
+<script>
+  const J = [
+    ["1-bookmark", "The bookmark", "/", [], "Where every client starts."],
+    ["2-repository", "The repository", "/repos/acme/web", ["repository-open-issue"], "Followed from the bookmark's “Get a repository”."],
+    ["3-watch-opened", "The watch's issue, opened", "/repos/acme/web/issues/483", ["issue-close", "issue-close-not-planned", "issue-close-duplicate", "issue-edit", "issue-lock", "issue-label", "issue-unlabel", "issue-assign", "issue-unassign", "issue-set-milestone", "issue-comment", "issue-add-sub-issue", "issue-remove-sub-issue"], "Opened by repository-open-issue: “Merge watch”, the issue whose closing stops the watch."],
+    ["4-pulls-labelled", "Pull requests labelled dependencies", "/repos/acme/web/pulls?labels=dependencies", [], "Pull request 482 labelled dependencies by pull-label; the watch lists what it watches."],
+    ["5-pull-mergeable", "Pull request 482, mergeable", "/repos/acme/web/pulls/482", ["pull-close", "pull-merge", "pull-comment", "pull-label", "pull-edit", "pull-request-review", "pull-update-branch"], "Open, mergeable: the watch's moment to merge."],
+    ["6-pull-merged", "Pull request 482, merged", "/repos/acme/web/pulls/482", ["pull-comment", "pull-label", "pull-edit"], "Merged by pull-merge, squashing: merge, close, review and update-branch are offered no more."],
+    ["7-watch-closed", "The watch's issue, closed", "/repos/acme/web/issues/483", ["issue-reopen", "issue-edit", "issue-lock", "issue-label", "issue-unlabel", "issue-assign", "issue-unassign", "issue-set-milestone", "issue-comment", "issue-add-sub-issue", "issue-remove-sub-issue"], "Closed by issue-close: the watch stops. Reopen is offered now."],
+  ];
+  const previous = { "6-pull-merged": "5-pull-mergeable", "7-watch-closed": "3-watch-opened" };
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+  const byId = Object.fromEntries(J.map((j) => [j[0], j]));
+  const chips = (id) => {
+    const box = el("div", "chips"), now = byId[id][3], before = previous[id] ? byId[previous[id]][3] : null;
+    if (!now.length && !before) box.append(el("span", "chip", "none"));
+    now.forEach((t) => box.append(el("span", "chip" + (before && !before.includes(t) ? " new" : ""), t)));
+    (before || []).filter((t) => !now.includes(t)).forEach((t) => box.append(el("span", "chip gone", t)));
+    return box;
+  };
+  const summary = document.getElementById("summary"), tabs = document.getElementById("tabs"), panels = document.getElementById("panels");
+  J.forEach(([id, name, address, templates, what], i) => {
+    const row = el("tr");
+    row.append(el("td", null, String(i + 1)), el("td", null, name));
+    const a = el("td"); a.append(el("code", null, address)); row.append(a);
+    row.append(el("td", null, templates.length ? String(templates.length) : "none"), el("td", null, what));
+    summary.append(row);
+    const tab = el("button", null, `${i + 1}. ${name}`);
+    Object.assign(tab, { id: `tab-${id}`, type: "button" });
+    tab.setAttribute("role", "tab"); tab.setAttribute("aria-controls", `panel-${id}`);
+    tabs.append(tab);
+    const panel = el("section"); panel.id = `panel-${id}`; panel.setAttribute("role", "tabpanel");
+    const facts = el("div", "facts");
+    const p = el("p"); p.append(el("code", null, `GET ${address}`), document.createTextNode(`: ${what}`));
+    facts.append(p, el("p", null, "HAL-FORMS templates (green: new since the junction before; struck: gone):"), chips(id));
+    const pair = el("div", "pair");
+    [["hal-forms", "HAL Explorer", "application/prs.hal-forms+json, L0"], ["html", "The page", "text/html"]].forEach(([kind, title, sub]) => {
+      const fig = el("figure"), cap = el("figcaption", null, title + " ");
+      cap.append(el("small", null, sub));
+      const shot = el("div", "shot"), link = el("a"), img = el("img");
+      Object.assign(img, { src: `img/${id}-${kind}.png`, alt: `${title} at ${address}`, loading: "lazy" });
+      Object.assign(link, { href: img.src, target: "_blank", rel: "noopener" });
+      link.append(img); shot.append(link); fig.append(cap, shot); pair.append(fig);
+    });
+    panel.append(facts, pair); panels.append(panel);
+  });
+  const all = [...tabs.children];
+  const show = (id) => all.forEach((tab) => {
+    const on = tab.id === `tab-${id}`;
+    tab.setAttribute("aria-selected", String(on));
+    document.getElementById(tab.getAttribute("aria-controls")).hidden = !on;
+  });
+  all.forEach((tab) => tab.addEventListener("click", () => show(tab.id.slice(4))));
+  const wanted = location.hash.slice(1);
+  show(byId[wanted] ? wanted : J[0][0]);
+</script>
+</body>
+</html>
