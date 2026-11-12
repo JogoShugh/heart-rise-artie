@@ -1,5 +1,5 @@
 steps:
-- at: "2026-11-12T04:52:13.683242Z"
+- at: "2026-11-12T04:59:58.166963Z"
   mode: "script"
   say: "ARTIE reads GitHub's entry, through the gateway"
   params: {}
@@ -562,9 +562,9 @@ steps:
           - "sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8="
         digest: "sha256-9z/yNKYISVPJET5QcWtBBmjhu+uk34DJbVlyDzGulgc="
   expect: 200
-  ms: 7
+  ms: 6
   entry: true
-- at: "2026-11-12T04:52:13.9764Z"
+- at: "2026-11-12T04:59:58.462544Z"
   mode: "script"
   say: "ARTIE opens pull request {pull} `as pr`"
   params:
@@ -579,7 +579,7 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-0.hsf.L0.ccd1034ed0f4eb98\""
+      ETag: "\"seq-0.hsf.L0.5536ae384a0fd761\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
@@ -602,7 +602,7 @@ steps:
       head:
         label: "acme:new-topic"
         ref: "new-topic"
-        sha: "29256dfab76148f3a5bc70ef20cfeba1b297c27d"
+        sha: "99cf898a4125b80786411e9da4796dc967b55c68"
       id: 1000482
       labels: []
       locked: true
@@ -1699,15 +1699,15 @@ steps:
             $id: "/schemas/62f60422b20449be"
           hr:integrity: "sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8="
   expect: 200
-  ms: 276
-- at: "2026-11-12T04:52:13.982221Z"
+  ms: 278
+- at: "2026-11-12T04:59:58.469006Z"
   mode: "script"
   say: "ARTIE makes its reply {reply}, before asking"
   params:
-    reply: "r-pr-482-1794459133"
+    reply: "r-pr-482-1794459598"
   request:
     method: "POST"
-    url: "http://192.168.1.18:8160/_release/replies/r-pr-482-1794459133"
+    url: "http://192.168.1.18:8160/_release/replies/r-pr-482-1794459598"
     headers:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
@@ -1717,8 +1717,9 @@ steps:
     headers: {}
     body: null
   expect: 204
-  ms: 1
-- at: "2026-11-12T04:52:13.984805Z"
+  ms: 2
+  entry: true
+- at: "2026-11-12T04:59:58.471571Z"
   mode: "script"
   say: "ARTIE reads the offer watch's entry"
   params: {}
@@ -1877,13 +1878,13 @@ steps:
   expect: 200
   ms: 2
   entry: true
-- at: "2026-11-12T04:52:14.027718Z"
+- at: "2026-11-12T04:59:58.518869Z"
   mode: "script"
   say: "ARTIE asks to be told when {pr} offers {offers}, on reply {reply} `as watch`"
   params:
     pr: "http://192.168.1.18:8098/repos/acme/web/pulls/482"
     offers: "github:merge"
-    reply: "r-pr-482-1794459133"
+    reply: "r-pr-482-1794459598"
     relation: "watcher:watch"
   request:
     method: "POST"
@@ -1893,24 +1894,24 @@ steps:
       Accept: "application/hal+json"
       If-Match: "\"index-hsf-c8ab1f3c28e950d1\""
       Content-Type: "application/json"
-      Content-Digest: "sha-256=:Qrfgnd0ZxWqjqTzOgulg0GnONl3WwJZLC6K3FjJTkcQ=:"
+      Content-Digest: "sha-256=:/WBwjok7vnLRxzRcrkkpiQvLdwigRIkBRdecLulorys=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
-        );created=1794459133;keyid=\"artie-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:oSrV1U9Mo8mfm8buRL9kQnYdVn/grpGKrD1CczInS1/n6agRU5+KL7JSulwKRYcDwq/1823pM3RkkMHZ9jr1Bg==:"
+        );created=1794459598;keyid=\"artie-2026-11\";alg=\"ed25519\""
+      Signature: "sig1=:3XYDBd5MCbeaq2g2HpvbaF8i2DUigq0vcQvaNQwDSjp0pp1hpTyRFw7C6cmjKVzubq5bmclsiZ2m5rF7ECz4DQ==:"
     body:
       resource: "http://192.168.1.18:8098/repos/acme/web/pulls/482"
       offers: "github:merge"
       looks: 40
       _links:
         hr:reply-to:
-          href: "http://192.168.1.18:8160/replies/r-pr-482-1794459133"
+          href: "http://192.168.1.18:8160/replies/r-pr-482-1794459598"
         hr:keys:
           href: "http://192.168.1.18:8160/keys"
   response:
     status: 201
     headers:
       Location: "/watches/1"
-      ETag: "\"seq-0.hsf.L0.9ec34be690d9f594\""
+      ETag: "\"seq-0.hsf.L0.bebab0ad49b87cc3\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
@@ -1935,22 +1936,22 @@ steps:
         about:
           href: "http://192.168.1.18:8098/repos/acme/web/pulls/482"
         hr:reply-to:
-          href: "http://192.168.1.18:8160/replies/r-pr-482-1794459133"
+          href: "http://192.168.1.18:8160/replies/r-pr-482-1794459598"
         hr:keys:
           href: "/keys"
           type: "application/jwk-set+json"
       _forms: {}
   expect: 201
-  ms: 25
-- at: "2026-11-12T04:52:14.051242Z"
+  ms: 28
+- at: "2026-11-12T04:59:58.543826Z"
   mode: "script"
   say: "Once {watch} says it can be merged: ARTIE's reply {reply} is awaiting"
   params:
     watch: "http://192.168.1.18:8099/watches/1"
-    reply: "r-pr-482-1794459133"
+    reply: "r-pr-482-1794459598"
   request:
     method: "GET"
-    url: "http://192.168.1.18:8160/replies/r-pr-482-1794459133"
+    url: "http://192.168.1.18:8160/replies/r-pr-482-1794459598"
     headers:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
@@ -1958,15 +1959,15 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-1.hsf.L0.b75d809d62f8630a\""
+      ETag: "\"seq-1.hsf.L0.a36bb9a638ed2fb2\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
-      reply: "r-pr-482-1794459133"
+      reply: "r-pr-482-1794459598"
       state: "awaiting"
       _links:
         self:
-          href: "/replies/r-pr-482-1794459133"
+          href: "/replies/r-pr-482-1794459598"
         curies:
         - name: "hr"
           href: "https://w3id.org/heart-rise/rels/{rel}"
@@ -1981,7 +1982,7 @@ steps:
           description: "Tells the caller how far the work has got."
           _links:
             target:
-              href: "/replies/r-pr-482-1794459133"
+              href: "/replies/r-pr-482-1794459598"
           method: "PATCH"
           contentType: "application/merge-patch+json"
           schema:
@@ -2022,7 +2023,7 @@ steps:
           description: "Sends the result: the work is done."
           _links:
             target:
-              href: "/replies/r-pr-482-1794459133"
+              href: "/replies/r-pr-482-1794459598"
           method: "PATCH"
           contentType: "application/merge-patch+json"
           schema:
@@ -2061,7 +2062,7 @@ steps:
           description: "Says the work failed, with a problem document."
           _links:
             target:
-              href: "/replies/r-pr-482-1794459133"
+              href: "/replies/r-pr-482-1794459598"
           method: "PATCH"
           contentType: "application/problem+json"
           schema:
@@ -2098,15 +2099,15 @@ steps:
           hr:integrity: "sha256-lU0r2LFtHRt/6h/aAZHWVXGl2ByYhCzFfvdPbrhxRDI="
   expect: 200
   ms: 9
-- at: "2026-11-12T04:52:15.083517Z"
+- at: "2026-11-12T04:59:59.599373Z"
   mode: "script"
   say: "Once {watch} says it can be merged: ARTIE's reply {reply} is awaiting"
   params:
     watch: "http://192.168.1.18:8099/watches/1"
-    reply: "r-pr-482-1794459133"
+    reply: "r-pr-482-1794459598"
   request:
     method: "GET"
-    url: "http://192.168.1.18:8160/replies/r-pr-482-1794459133"
+    url: "http://192.168.1.18:8160/replies/r-pr-482-1794459598"
     headers:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
@@ -2114,17 +2115,17 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-2.hsf.L0.30a0d852823ec5ef\""
+      ETag: "\"seq-2.hsf.L0.dcdda589356f9f16\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
-      reply: "r-pr-482-1794459133"
+      reply: "r-pr-482-1794459598"
       state: "awaiting"
       percent: 0
       note: "Still looking: github:merge is not offered yet"
       _links:
         self:
-          href: "/replies/r-pr-482-1794459133"
+          href: "/replies/r-pr-482-1794459598"
         curies:
         - name: "hr"
           href: "https://w3id.org/heart-rise/rels/{rel}"
@@ -2141,7 +2142,7 @@ steps:
           description: "Tells the caller how far the work has got."
           _links:
             target:
-              href: "/replies/r-pr-482-1794459133"
+              href: "/replies/r-pr-482-1794459598"
           method: "PATCH"
           contentType: "application/merge-patch+json"
           schema:
@@ -2182,7 +2183,7 @@ steps:
           description: "Sends the result: the work is done."
           _links:
             target:
-              href: "/replies/r-pr-482-1794459133"
+              href: "/replies/r-pr-482-1794459598"
           method: "PATCH"
           contentType: "application/merge-patch+json"
           schema:
@@ -2221,7 +2222,7 @@ steps:
           description: "Says the work failed, with a problem document."
           _links:
             target:
-              href: "/replies/r-pr-482-1794459133"
+              href: "/replies/r-pr-482-1794459598"
           method: "PATCH"
           contentType: "application/problem+json"
           schema:
@@ -2257,16 +2258,16 @@ steps:
             $id: "/schemas/3ee822291d3d75a3"
           hr:integrity: "sha256-lU0r2LFtHRt/6h/aAZHWVXGl2ByYhCzFfvdPbrhxRDI="
   expect: 200
-  ms: 12
-- at: "2026-11-12T04:52:21.248723Z"
+  ms: 13
+- at: "2026-11-12T05:00:08.907262Z"
   mode: "script"
   say: "Once {watch} says it can be merged: ARTIE's reply {reply} is completed"
   params:
     watch: "http://192.168.1.18:8099/watches/1"
-    reply: "r-pr-482-1794459133"
+    reply: "r-pr-482-1794459598"
   request:
     method: "GET"
-    url: "http://192.168.1.18:8160/replies/r-pr-482-1794459133"
+    url: "http://192.168.1.18:8160/replies/r-pr-482-1794459598"
     headers:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
@@ -2274,23 +2275,23 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-3.hsf.L0.7365578a8ce19753\""
+      ETag: "\"seq-3.hsf.L0.d6470f825538753d\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
-      reply: "r-pr-482-1794459133"
+      reply: "r-pr-482-1794459598"
       state: "completed"
       percent: 100
       result:
         resource: "http://192.168.1.18:8098/repos/acme/web/pulls/482"
         offers: "github:merge"
-        etag: "\"seq-0.hsf.L0.4246245f597103fc\""
+        etag: "\"seq-0.hsf.L0.c753e049b53ac026\""
         _links:
           about:
             href: "http://192.168.1.18:8098/repos/acme/web/pulls/482"
       _links:
         self:
-          href: "/replies/r-pr-482-1794459133"
+          href: "/replies/r-pr-482-1794459598"
         curies:
         - name: "hr"
           href: "https://w3id.org/heart-rise/rels/{rel}"
@@ -2303,8 +2304,8 @@ steps:
           href: "http://192.168.1.18:8099/watches/1"
       _forms: {}
   expect: 200
-  ms: 4
-- at: "2026-11-12T04:52:21.275357Z"
+  ms: 8
+- at: "2026-11-12T05:00:08.939072Z"
   mode: "script"
   say: "ARTIE follows the pull request the answer links, to merge it"
   params: {}
@@ -2318,7 +2319,7 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-0.hsf.L0.4246245f597103fc\""
+      ETag: "\"seq-0.hsf.L0.c753e049b53ac026\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
@@ -2341,7 +2342,7 @@ steps:
       head:
         label: "acme:new-topic"
         ref: "new-topic"
-        sha: "29256dfab76148f3a5bc70ef20cfeba1b297c27d"
+        sha: "99cf898a4125b80786411e9da4796dc967b55c68"
       id: 1000482
       labels: []
       locked: true
@@ -3471,8 +3472,8 @@ steps:
             $id: "/schemas/62f60422b20449be"
           hr:integrity: "sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8="
   expect: 200
-  ms: 26
-- at: "2026-11-12T04:52:21.381498Z"
+  ms: 31
+- at: "2026-11-12T05:00:09.048473Z"
   mode: "script"
   say: "ARTIE merges it by squashing `as merged`"
   params:
@@ -3483,14 +3484,14 @@ steps:
     headers:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
-      If-Match: "\"seq-0.hsf.L0.4246245f597103fc\""
+      If-Match: "\"seq-0.hsf.L0.c753e049b53ac026\""
       Content-Type: "application/json"
     body:
       merge_method: "squash"
   response:
     status: 200
     headers:
-      ETag: "\"seq-0.hsf.L0.6ef23a0d6df2a96d\""
+      ETag: "\"seq-0.hsf.L0.9fdb2313f2abcee6\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
@@ -3513,12 +3514,12 @@ steps:
       head:
         label: "acme:new-topic"
         ref: "new-topic"
-        sha: "29256dfab76148f3a5bc70ef20cfeba1b297c27d"
+        sha: "99cf898a4125b80786411e9da4796dc967b55c68"
       id: 1000482
       labels: []
       locked: true
       maintainer_can_modify: true
-      merge_commit_sha: "aed10c37a2a23a56349fce2973b054d4508b1009"
+      merge_commit_sha: "3fb2a0f2a1fec58e35a2b8b6eae1432fc68e5579"
       mergeable: null
       mergeable_state: "unknown"
       merged: true
@@ -4542,8 +4543,8 @@ steps:
             $id: "/schemas/9f05e4cceb013a00"
           hr:integrity: "sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk="
   expect: 200
-  ms: 104
-- at: "2026-11-12T04:52:21.406748Z"
+  ms: 106
+- at: "2026-11-12T05:00:09.077671Z"
   mode: "script"
   say: "ARTIE reads {pr} as merged, for its merge commit"
   params:
@@ -4558,7 +4559,7 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-0.hsf.L0.6ef23a0d6df2a96d\""
+      ETag: "\"seq-0.hsf.L0.9fdb2313f2abcee6\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
@@ -4581,12 +4582,12 @@ steps:
       head:
         label: "acme:new-topic"
         ref: "new-topic"
-        sha: "29256dfab76148f3a5bc70ef20cfeba1b297c27d"
+        sha: "99cf898a4125b80786411e9da4796dc967b55c68"
       id: 1000482
       labels: []
       locked: true
       maintainer_can_modify: true
-      merge_commit_sha: "aed10c37a2a23a56349fce2973b054d4508b1009"
+      merge_commit_sha: "3fb2a0f2a1fec58e35a2b8b6eae1432fc68e5579"
       mergeable: null
       mergeable_state: "unknown"
       merged: true
@@ -5610,15 +5611,15 @@ steps:
             $id: "/schemas/9f05e4cceb013a00"
           hr:integrity: "sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk="
   expect: 200
-  ms: 24
-- at: "2026-11-12T04:52:21.409575Z"
+  ms: 28
+- at: "2026-11-12T05:00:09.081959Z"
   mode: "script"
   say: "ARTIE makes its reply {reply}, before asking"
   params:
-    reply: "r-build-aed10c3-1794459141"
+    reply: "r-build-3fb2a0f-1794459609"
   request:
     method: "POST"
-    url: "http://192.168.1.18:8160/_release/replies/r-build-aed10c3-1794459141"
+    url: "http://192.168.1.18:8160/_release/replies/r-build-3fb2a0f-1794459609"
     headers:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
@@ -5628,8 +5629,9 @@ steps:
     headers: {}
     body: null
   expect: 204
-  ms: 0
-- at: "2026-11-12T04:52:21.411483Z"
+  ms: 1
+  entry: true
+- at: "2026-11-12T05:00:09.084187Z"
   mode: "script"
   say: "ARTIE reads the CI wrapper's entry"
   params: {}
@@ -5776,15 +5778,15 @@ steps:
           - "sha256-2IZyHeGi/2jls3tA4EzNgDfIOIRnFPeU8tqdJCB0y6U="
         digest: "sha256-Lms+xqQ30YywEvn/mDNe5JZRIkgA8CJbv5EIgXxE5e8="
   expect: 200
-  ms: 1
+  ms: 2
   entry: true
-- at: "2026-11-12T04:52:21.508627Z"
+- at: "2026-11-12T05:00:09.167909Z"
   mode: "script"
   say: "ARTIE builds commit {commit}, asking to be told how it goes, on reply {reply}\
     \ `as build`"
   params:
-    commit: "aed10c37a2a23a56349fce2973b054d4508b1009"
-    reply: "r-build-aed10c3-1794459141"
+    commit: "3fb2a0f2a1fec58e35a2b8b6eae1432fc68e5579"
+    reply: "r-build-3fb2a0f-1794459609"
     relation: "ci:build"
   request:
     method: "POST"
@@ -5794,27 +5796,27 @@ steps:
       Accept: "application/hal+json"
       If-Match: "\"index-hsf-c38dd2ad2b54aa08\""
       Content-Type: "application/json"
-      Content-Digest: "sha-256=:2jVfrlYpOJDOpT8XxrUq905jgKS9JHchSUbzllBcU0Y=:"
+      Content-Digest: "sha-256=:7SpHaRbUey7DdhKAEBZyABjMHSoy5AxUxpgo6sd62As=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
-        );created=1794459141;keyid=\"artie-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:36Qvooi+4xmPEyOxTJESOo4rJAifKdCk6jZRHkJvCc8VtBx++6ygCa1LoAa9HQY5iBSxAuhWB1zptmGvTx+tAg==:"
+        );created=1794459609;keyid=\"artie-2026-11\";alg=\"ed25519\""
+      Signature: "sig1=:aIideMp1blYPE/RuiSBBjD2KXr7p/FXiCLEBYCoDvzRpUo6cZ81EadevgUjozTlT/nkHZnxCImxiEH4brot2Dw==:"
     body:
-      commit: "aed10c37a2a23a56349fce2973b054d4508b1009"
+      commit: "3fb2a0f2a1fec58e35a2b8b6eae1432fc68e5579"
       _links:
         hr:reply-to:
-          href: "http://192.168.1.18:8160/replies/r-build-aed10c3-1794459141"
+          href: "http://192.168.1.18:8160/replies/r-build-3fb2a0f-1794459609"
         hr:keys:
           href: "http://192.168.1.18:8160/keys"
   response:
     status: 201
     headers:
       Location: "/builds/1"
-      ETag: "\"seq-0.hsf.L0.df58e3f8522dd3f2\""
+      ETag: "\"seq-0.hsf.L0.a06783babb42ac0b\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
       id: 1
-      commit: "aed10c37a2a23a56349fce2973b054d4508b1009"
+      commit: "3fb2a0f2a1fec58e35a2b8b6eae1432fc68e5579"
       standing: "queued"
       jenkinsBuild: null
       _links:
@@ -5832,7 +5834,7 @@ steps:
           type: "application/json"
           integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
         hr:reply-to:
-          href: "http://192.168.1.18:8160/replies/r-build-aed10c3-1794459141"
+          href: "http://192.168.1.18:8160/replies/r-build-3fb2a0f-1794459609"
         hr:keys:
           href: "/keys"
           type: "application/jwk-set+json"
@@ -5840,16 +5842,16 @@ steps:
           href: "/builds/1/log"
       _forms: {}
   expect: 201
-  ms: 95
-- at: "2026-11-12T04:52:21.523796Z"
+  ms: 82
+- at: "2026-11-12T05:00:09.183905Z"
   mode: "script"
   say: "Once {build} has succeeded, or failed: ARTIE's reply {reply} is awaiting"
   params:
     build: "http://192.168.1.18:8170/builds/1"
-    reply: "r-build-aed10c3-1794459141"
+    reply: "r-build-3fb2a0f-1794459609"
   request:
     method: "GET"
-    url: "http://192.168.1.18:8160/replies/r-build-aed10c3-1794459141"
+    url: "http://192.168.1.18:8160/replies/r-build-3fb2a0f-1794459609"
     headers:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
@@ -5857,15 +5859,15 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-1.hsf.L0.ba53a2e9d6a673c9\""
+      ETag: "\"seq-1.hsf.L0.a2ef31930d609ba1\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
-      reply: "r-build-aed10c3-1794459141"
+      reply: "r-build-3fb2a0f-1794459609"
       state: "awaiting"
       _links:
         self:
-          href: "/replies/r-build-aed10c3-1794459141"
+          href: "/replies/r-build-3fb2a0f-1794459609"
         curies:
         - name: "hr"
           href: "https://w3id.org/heart-rise/rels/{rel}"
@@ -5880,7 +5882,7 @@ steps:
           description: "Tells the caller how far the work has got."
           _links:
             target:
-              href: "/replies/r-build-aed10c3-1794459141"
+              href: "/replies/r-build-3fb2a0f-1794459609"
           method: "PATCH"
           contentType: "application/merge-patch+json"
           schema:
@@ -5921,7 +5923,7 @@ steps:
           description: "Sends the result: the work is done."
           _links:
             target:
-              href: "/replies/r-build-aed10c3-1794459141"
+              href: "/replies/r-build-3fb2a0f-1794459609"
           method: "PATCH"
           contentType: "application/merge-patch+json"
           schema:
@@ -5960,7 +5962,7 @@ steps:
           description: "Says the work failed, with a problem document."
           _links:
             target:
-              href: "/replies/r-build-aed10c3-1794459141"
+              href: "/replies/r-build-3fb2a0f-1794459609"
           method: "PATCH"
           contentType: "application/problem+json"
           schema:
@@ -5996,16 +5998,16 @@ steps:
             $id: "/schemas/3ee822291d3d75a3"
           hr:integrity: "sha256-lU0r2LFtHRt/6h/aAZHWVXGl2ByYhCzFfvdPbrhxRDI="
   expect: 200
-  ms: 6
-- at: "2026-11-12T04:52:29.723317Z"
+  ms: 7
+- at: "2026-11-12T05:00:15.383339Z"
   mode: "script"
   say: "Once {build} has succeeded, or failed: ARTIE's reply {reply} is awaiting"
   params:
     build: "http://192.168.1.18:8170/builds/1"
-    reply: "r-build-aed10c3-1794459141"
+    reply: "r-build-3fb2a0f-1794459609"
   request:
     method: "GET"
-    url: "http://192.168.1.18:8160/replies/r-build-aed10c3-1794459141"
+    url: "http://192.168.1.18:8160/replies/r-build-3fb2a0f-1794459609"
     headers:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
@@ -6013,17 +6015,17 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-2.hsf.L0.7c7a159c8f82fc73\""
+      ETag: "\"seq-2.hsf.L0.3805162c96c43b6a\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
-      reply: "r-build-aed10c3-1794459141"
+      reply: "r-build-3fb2a0f-1794459609"
       state: "awaiting"
       percent: 10
-      note: "Jenkins build #1 started"
+      note: "Jenkins build #5 started"
       _links:
         self:
-          href: "/replies/r-build-aed10c3-1794459141"
+          href: "/replies/r-build-3fb2a0f-1794459609"
         curies:
         - name: "hr"
           href: "https://w3id.org/heart-rise/rels/{rel}"
@@ -6040,7 +6042,7 @@ steps:
           description: "Tells the caller how far the work has got."
           _links:
             target:
-              href: "/replies/r-build-aed10c3-1794459141"
+              href: "/replies/r-build-3fb2a0f-1794459609"
           method: "PATCH"
           contentType: "application/merge-patch+json"
           schema:
@@ -6081,7 +6083,7 @@ steps:
           description: "Sends the result: the work is done."
           _links:
             target:
-              href: "/replies/r-build-aed10c3-1794459141"
+              href: "/replies/r-build-3fb2a0f-1794459609"
           method: "PATCH"
           contentType: "application/merge-patch+json"
           schema:
@@ -6120,7 +6122,7 @@ steps:
           description: "Says the work failed, with a problem document."
           _links:
             target:
-              href: "/replies/r-build-aed10c3-1794459141"
+              href: "/replies/r-build-3fb2a0f-1794459609"
           method: "PATCH"
           contentType: "application/problem+json"
           schema:
@@ -6156,16 +6158,16 @@ steps:
             $id: "/schemas/3ee822291d3d75a3"
           hr:integrity: "sha256-lU0r2LFtHRt/6h/aAZHWVXGl2ByYhCzFfvdPbrhxRDI="
   expect: 200
-  ms: 6
-- at: "2026-11-12T04:52:30.749556Z"
+  ms: 13
+- at: "2026-11-12T05:00:18.476648Z"
   mode: "script"
   say: "Once {build} has succeeded, or failed: ARTIE's reply {reply} is completed"
   params:
     build: "http://192.168.1.18:8170/builds/1"
-    reply: "r-build-aed10c3-1794459141"
+    reply: "r-build-3fb2a0f-1794459609"
   request:
     method: "GET"
-    url: "http://192.168.1.18:8160/replies/r-build-aed10c3-1794459141"
+    url: "http://192.168.1.18:8160/replies/r-build-3fb2a0f-1794459609"
     headers:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
@@ -6173,16 +6175,16 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-3.hsf.L0.56dfa5f96121f022\""
+      ETag: "\"seq-3.hsf.L0.f6a69eba778f4562\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
-      reply: "r-build-aed10c3-1794459141"
+      reply: "r-build-3fb2a0f-1794459609"
       state: "completed"
       percent: 100
       result:
         build: "http://192.168.1.18:8170/builds/1"
-        commit: "aed10c37a2a23a56349fce2973b054d4508b1009"
+        commit: "3fb2a0f2a1fec58e35a2b8b6eae1432fc68e5579"
         _links:
           ci:deployment:
             href: "http://192.168.1.18:8180/"
@@ -6192,7 +6194,7 @@ steps:
             href: "http://192.168.1.18:8170/builds/1/log"
       _links:
         self:
-          href: "/replies/r-build-aed10c3-1794459141"
+          href: "/replies/r-build-3fb2a0f-1794459609"
         curies:
         - name: "hr"
           href: "https://w3id.org/heart-rise/rels/{rel}"
@@ -6205,8 +6207,8 @@ steps:
           href: "http://192.168.1.18:8170/builds/1"
       _forms: {}
   expect: 200
-  ms: 10
-- at: "2026-11-12T04:52:30.849718Z"
+  ms: 5
+- at: "2026-11-12T05:00:18.55716Z"
   mode: "script"
   say: "ARTIE reads the smoke script {build} links as ci:smoke-test"
   params:
@@ -6234,8 +6236,8 @@ steps:
       \ choosing from the kinds the library lists, with a short\n  comment; the loan\
       \ should show the problem reported. `S5`\n"
   expect: 200
-  ms: 99
-- at: "2026-11-12T04:52:30.92147Z"
+  ms: 80
+- at: "2026-11-12T05:00:18.63098Z"
   mode: "script"
   say: "S1: ARTIE reads the preview {preview} the build deployed `as preview`"
   params:
@@ -6539,8 +6541,8 @@ steps:
           - "sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU="
         digest: "sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs="
   expect: 200
-  ms: 71
-- at: "2026-11-12T04:52:31.176159Z"
+  ms: 73
+- at: "2026-11-12T05:00:18.886613Z"
   mode: "script"
   say: "S1: search the loans for {name}"
   params:
@@ -6567,8 +6569,8 @@ steps:
         - href: "/loans/3311"
           title: "Matilda"
   expect: 200
-  ms: 252
-- at: "2026-11-12T04:52:31.188649Z"
+  ms: 254
+- at: "2026-11-12T05:00:18.899555Z"
   mode: "script"
   say: "S2: open the loan {loan}"
   params:
@@ -6669,7 +6671,7 @@ steps:
           hr:integrity: "sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo="
   expect: 200
   ms: 12
-- at: "2026-11-12T04:52:31.206692Z"
+- at: "2026-11-12T05:00:18.916689Z"
   mode: "script"
   say: "S3: renew it"
   params:
@@ -6771,8 +6773,8 @@ steps:
             $id: "/schemas/efddc7bd8bbcef73"
           hr:integrity: "sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo="
   expect: 200
-  ms: 13
-- at: "2026-11-12T04:52:31.213536Z"
+  ms: 12
+- at: "2026-11-12T05:00:18.925029Z"
   mode: "script"
   say: "S3: read it again: due {expected}?"
   params:
@@ -6872,8 +6874,8 @@ steps:
             $id: "/schemas/efddc7bd8bbcef73"
           hr:integrity: "sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo="
   expect: 200
-  ms: 6
-- at: "2026-11-12T04:52:31.219883Z"
+  ms: 7
+- at: "2026-11-12T05:00:18.931998Z"
   mode: "script"
   say: "S4: renew it again, with the version read before the renewal"
   params:
@@ -6900,8 +6902,8 @@ steps:
         about:
           href: "/loans/3311"
   expect: 412
-  ms: 5
-- at: "2026-11-12T04:52:31.225434Z"
+  ms: 6
+- at: "2026-11-12T05:00:18.937834Z"
   mode: "script"
   say: "S5: read the loan, for its form to report a problem"
   params: {}
@@ -7001,7 +7003,7 @@ steps:
           hr:integrity: "sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo="
   expect: 200
   ms: 5
-- at: "2026-11-12T04:52:31.229824Z"
+- at: "2026-11-12T05:00:18.941668Z"
   mode: "script"
   say: "S5: read the kinds of problem the library lists"
   params: {}
@@ -7028,8 +7030,8 @@ steps:
       - value: "lost"
         prompt: "I can't find it"
   expect: 200
-  ms: 4
-- at: "2026-11-12T04:52:31.242449Z"
+  ms: 3
+- at: "2026-11-12T05:00:18.962111Z"
   mode: "script"
   say: "S5: report {problem} on the loan"
   params:
@@ -7137,8 +7139,8 @@ steps:
             $id: "/schemas/efddc7bd8bbcef73"
           hr:integrity: "sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo="
   expect: 200
-  ms: 12
-- at: "2026-11-12T04:52:31.25381Z"
+  ms: 20
+- at: "2026-11-12T05:00:18.96706Z"
   mode: "script"
   say: "S5: the loan shows the problem reported"
   params: {}
@@ -7240,13 +7242,9 @@ steps:
             $id: "/schemas/efddc7bd8bbcef73"
           hr:integrity: "sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo="
   expect: 200
-  ms: 11
-- at: "2026-11-12T04:52:31.257075Z"
-  mode: "script"
-  say: "Smoke: 5 of 5 passed (S1, S2, S3, S4, S5)"
-  params: {}
+  ms: 4
   summary: "Smoke: 5 of 5 passed (S1, S2, S3, S4, S5)"
-- at: "2026-11-12T04:52:31.263157Z"
+- at: "2026-11-12T05:00:18.970033Z"
   mode: "script"
   say: "ARTIE reads the environments' entry"
   params: {}
@@ -7345,9 +7343,9 @@ steps:
           - "sha256-+kLMid35ehVXE6lZ8NPW9fAUf894a5w8W65YOXhQWOo="
         digest: "sha256-opORDhoHcFqCqtAJ8ZvbjVHzYBTuvrOsW3PMMi2b4NU="
   expect: 200
-  ms: 5
+  ms: 1
   entry: true
-- at: "2026-11-12T04:52:31.271391Z"
+- at: "2026-11-12T05:00:18.973187Z"
   mode: "script"
   say: "ARTIE opens Dev"
   params: {}
@@ -7361,13 +7359,13 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-0.hsf.L0.e56b96a05c8ce773\""
+      ETag: "\"seq-0.hsf.L0.dceedfba9f27d8f1\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
       id: 1
       name: "dev"
-      commit: "52363dcad334f4a8429db52f21d9b62f39244fdd"
+      commit: "06aac80f729cbb64bc598d0134179a5157d536a0"
       promotedAt: null
       standing: "serving"
       _links:
@@ -7433,12 +7431,12 @@ steps:
             $id: "/schemas/3f8012dc12e1b34c"
           hr:integrity: "sha256-TwXThZ20UPUIctrpRXRoHqarKKsEilvB0sVwvK1PY4s="
   expect: 200
-  ms: 7
-- at: "2026-11-12T04:52:31.283166Z"
+  ms: 2
+- at: "2026-11-12T05:00:18.977918Z"
   mode: "script"
   say: "ARTIE promotes commit {commit} to Dev, citing the smoke run `as promotion`"
   params:
-    commit: "aed10c37a2a23a56349fce2973b054d4508b1009"
+    commit: "3fb2a0f2a1fec58e35a2b8b6eae1432fc68e5579"
     relation: "env:promote"
   request:
     method: "POST"
@@ -7446,10 +7444,10 @@ steps:
     headers:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
-      If-Match: "\"seq-0.hsf.L0.e56b96a05c8ce773\""
+      If-Match: "\"seq-0.hsf.L0.dceedfba9f27d8f1\""
       Content-Type: "application/json"
     body:
-      commit: "aed10c37a2a23a56349fce2973b054d4508b1009"
+      commit: "3fb2a0f2a1fec58e35a2b8b6eae1432fc68e5579"
       smoke:
         passed: 5
         of: 5
@@ -7459,14 +7457,14 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-1.hsf.L0.7711ba07b6c32ce3\""
+      ETag: "\"seq-1.hsf.L0.cf48c33f4e0259e8\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
       id: 1
       name: "dev"
-      commit: "aed10c37a2a23a56349fce2973b054d4508b1009"
-      promotedAt: "2026-11-12T04:52:31.278978Z"
+      commit: "3fb2a0f2a1fec58e35a2b8b6eae1432fc68e5579"
+      promotedAt: "2026-11-12T05:00:18.975896Z"
       standing: "serving"
       _links:
         self:
@@ -7533,12 +7531,12 @@ steps:
             $id: "/schemas/3f8012dc12e1b34c"
           hr:integrity: "sha256-TwXThZ20UPUIctrpRXRoHqarKKsEilvB0sVwvK1PY4s="
   expect: 200
-  ms: 10
-- at: "2026-11-12T04:52:31.286533Z"
+  ms: 4
+- at: "2026-11-12T05:00:18.980507Z"
   mode: "script"
   say: "ARTIE reads Dev: it serves {commit}"
   params:
-    commit: "aed10c37a2a23a56349fce2973b054d4508b1009"
+    commit: "3fb2a0f2a1fec58e35a2b8b6eae1432fc68e5579"
   request:
     method: "GET"
     url: "http://192.168.1.18:8190/environments/1"
@@ -7549,14 +7547,14 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-1.hsf.L0.7711ba07b6c32ce3\""
+      ETag: "\"seq-1.hsf.L0.cf48c33f4e0259e8\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
       id: 1
       name: "dev"
-      commit: "aed10c37a2a23a56349fce2973b054d4508b1009"
-      promotedAt: "2026-11-12T04:52:31.278978Z"
+      commit: "3fb2a0f2a1fec58e35a2b8b6eae1432fc68e5579"
+      promotedAt: "2026-11-12T05:00:18.975896Z"
       standing: "serving"
       _links:
         self:

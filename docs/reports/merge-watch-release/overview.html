@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Release, Overview</title>
+<style>
+  :root { --bg: #f6f5f1; --fg: #1d211f; --soft: #5b625e; --line: #dcdcd4; --card: #ffffff; --code: #f0efe9;
+    --pass: #e6f4ea; --pass-edge: #2f6b4f; --stop: #fdecea; --stop-edge: #a33a3a; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+      --code: #1f2522; --pass: #16321f; --pass-edge: #7cc4a0; --stop: #3a1b1b; --stop-edge: #f0a0a0; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+    --code: #1f2522; --pass: #16321f; --pass-edge: #7cc4a0; --stop: #3a1b1b; --stop-edge: #f0a0a0; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1000px; margin: 0 auto; padding: 1rem max(16px, env(safe-area-inset-left, 0px)) 3rem; }
+  h1 { font-size: 1.5rem; margin: .2rem 0 .3rem; text-wrap: balance; }
+  h2 { font-size: 1.1rem; margin: 1.6rem 0 .5rem; }
+  p, li { color: var(--soft); max-width: 78ch; }
+  code { font: .88em ui-monospace, Menlo, monospace; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: .6rem; margin: 1rem 0; }
+  .tile { border-radius: 8px; padding: .7rem .8rem; border: 1px solid; }
+  .tile.pass { background: var(--pass); border-color: var(--pass-edge); }
+  .tile.stop { background: var(--stop); border-color: var(--stop-edge); }
+  .tile b { display: block; font-size: 1.1rem; }
+  .tile span { color: var(--soft); font-size: .9rem; }
+  .wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; border: 1px solid var(--line); padding: .4rem .55rem; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; margin: .5rem 0; }
+  summary { cursor: pointer; padding: .55rem .8rem; font-weight: 600; }
+  pre { margin: 0; padding: .7rem .8rem; background: var(--code); overflow-x: auto; font: 12.5px/1.45 ui-monospace, Menlo, monospace; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<main>
+  <h1>The Merge Watch Release</h1>
+  <p>A pull request released to Dev across five parties, each its own HEART service at its own address: GitHub through
+    the gateway, an offer watch, a real Jenkins behind a wrapper, the preview it deploys, and Dev. Every wait is a RISE
+    reply ARTIE made before asking, answered signed by the party it asked. Every address after each party's entry was
+    handed over by an answer.</p>
+
+  <div class="tiles">
+    <div class="tile pass"><b>Pull request 482: released</b><span>watched, merged in git, built by Jenkins, smoke 5 of 5, promoted to Dev. See <em>Passing</em>.</span></div>
+    <div class="tile stop"><b>Pull request 483: stopped</b><span>merged and built, but renewals are set to zero weeks: smoke S3 fails, 4 of 5, so it is not promoted; ARTIE comments why. See <em>Stopped</em>.</span></div>
+  </div>
+
+  <h2>The parties</h2>
+  <div class="wrap"><table>
+    <tr><th>Party</th><th>Address</th><th>What it is</th><th>What it offers</th></tr>
+    <tr><td>GitHub</td><td><code>:8098</code></td><td>heart-gateway with its GitHub connector, in front of the small GitHub, which keeps acme/web's pull requests as branches of a real git repository</td><td><code>github:merge</code> once GitHub has worked out a pull request can be merged; <code>github:comment</code></td></tr>
+    <tr><td>Offer watch</td><td><code>:8099</code></td><td>a RISE service that tells a reply when a resource offers an act, by HEART alone</td><td><code>watcher:watch</code></td></tr>
+    <tr><td>ARTIE's replies</td><td><code>:8160</code></td><td>heart-core's reply resource; each act on a reply must be signed by a key the request it answers links</td><td><code>hr:progress</code>, <code>hr:completed</code>, <code>hr:failed</code>, to the party asked</td></tr>
+    <tr><td>CI</td><td><code>:8170</code></td><td>the wrapper, in front of the real Jenkins (<code>jenkins/jenkins:lts-jdk21</code>, Notification plugin) on <code>:8171</code></td><td><code>ci:build</code>; a succeeded build links <code>ci:deployment</code>, <code>ci:smoke-test</code>, <code>ci:log</code></td></tr>
+    <tr><td>Preview</td><td><code>:8180</code></td><td>Riverside Public Library at the built commit, started by the Jenkins job, its rules from the commit's policy file</td><td>search, renew, report a problem</td></tr>
+    <tr><td>Dev</td><td><code>:8190</code></td><td>the environment a release ends in</td><td><code>env:promote</code>, citing the smoke run; refused by rule unless every scenario passed</td></tr>
+  </table></div>
+
+  <h2>What happened, in order</h2>
+  <ol>
+    <li>ARTIE reads the gateway's entry and opens the pull request.</li>
+    <li>It makes its reply, then asks the offer watch to be told when the pull request offers <code>github:merge</code>. GitHub is still working out mergeability; the watch says it is still looking, then, once GitHub has, answers the reply, linking the pull request.</li>
+    <li>ARTIE follows that link and merges by squashing: a real commit on main in git. It reads the merge commit's sha from the pull request.</li>
+    <li>It makes another reply and asks the CI wrapper to build that commit. The wrapper starts the Jenkins job; Jenkins' notifications become signed answers: progress, then completed, linking the deployment, the smoke script it archived, and the log.</li>
+    <li>ARTIE reads the smoke script the build links, and runs the scenarios against the deployment it links.</li>
+    <li>All passed: it promotes the merged commit to Dev, citing the smoke run. Not all: it comments on the pull request with those that failed.</li>
+  </ol>
+
+  <h2>Smoke scenarios</h2>
+  <div class="wrap"><table>
+    <tr><th></th><th>Scenario</th><th>482</th><th>483</th></tr>
+    <tr><td>S1</td><td>Search the loans for "Matilda": it is listed</td><td>passed</td><td>passed</td></tr>
+    <tr><td>S2</td><td>Open the loan: its author and due date, and renewing offered</td><td>passed</td><td>passed</td></tr>
+    <tr><td>S3</td><td>Renew: due three weeks later</td><td>passed</td><td>failed: due 2026-11-12, not 2026-12-03</td></tr>
+    <tr><td>S4</td><td>Renew again on the version read before: refused as stale (412), linking the loan</td><td>passed</td><td>passed</td></tr>
+    <tr><td>S5</td><td>Report "missing pages", from the kinds the library lists: the loan shows it</td><td>passed</td><td>passed</td></tr>
+  </table></div>
+
+  <h2>What is and isn't ARTIE yet</h2>
+  <ul>
+    <li><b>These runs were made by <code>ReleaseTrace</code></b> (heart-sims tests), a scripted client that plays ARTIE's part step by step, by the
+      goal below, by links alone. It is not yet ARTIE running <code>release.goal.md</code>: that needs two additions to the goal grammar,
+      <code>At {url}</code> (another party's entry, mid-goal) and running a script a link hands over. Those are the next step.</li>
+    <li>The smoke scenarios are coded in the same client, from <code>smoke.goal.md</code>; the build archives and links that goal. Capturing it as
+      a kept script, walked once by ARTIE with the model, comes with the grammar.</li>
+    <li>ARTIE's replies are made through the release's control route (<code>POST /_release/replies/{reply}</code>), as ARTIE's runner will
+      make them itself.</li>
+    <li>The offer watch is its own party, not part of the gateway: the gateway has no watch, and this one works for any HEART resource.</li>
+  </ul>
+
+  <h2>The goals</h2>
+  <details><summary>release.goal.md</summary><pre>---
+start: http://localhost:8098/
+inputs:
+  owner:   { default: acme }
+  repo:    { default: web }
+  pull:    { question: "Which pull request?" }
+  watcher: { default: http://localhost:8099/ }
+  jenkins: { default: http://localhost:8170/ }
+  dev:     { default: http://localhost:8190/ }
+---
+
+Release a pull request to Dev once it can be merged and its build passes its smoke test.
+
+- In {owner}/{repo}, open pull request {pull} `as pr`
+- At {watcher}, ask to be told when {pr} offers `github:merge` `as watch`
+- Once {watch} says it does, follow the pull request it links, and merge it by squashing `as merged`
+  Or give up after 30 minutes, and comment on {pr} why.
+- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`
+- Once {build} has succeeded:
+  - Follow its `ci:deployment` link `as preview`
+  - Run the smoke script {build} links as `ci:smoke-test`, with deployed = {preview} `as smoke`
+  Or, once {build} has failed, comment on {pr} with the stage that failed, linking the log {build} links as `ci:log`.
+- At {dev}, open Dev; if {smoke.passed}, promote commit {merged.merge_commit_sha}, citing {smoke} `as promotion`
+  Otherwise, comment on {pr} with the scenarios that failed and why.</pre></details>
+  <details><summary>smoke.goal.md, kept in the library's repository, archived by each build</summary><pre>---
+start: "{deployed}"
+inputs:
+  deployed: { question: "Which deployment of the library?" }
+---
+
+Check that the library works as a member would use it. Each scenario starts at the library's entry.
+
+- Find a loan: search the loans for "Matilda"; it should list "Matilda". `S1`
+- Read it: open that loan; it should say who wrote it and when it is due, and offer renewing. `S2`
+- Renew: renew it; its due date should move three weeks later. `S3`
+- A refusal is explained: renew it again with the version read before the renewal; it should be refused as stale,
+  and the refusal should link the loan to read again. `S4`
+- Report a problem: report "missing pages" on the loan, choosing from the kinds the library lists, with a short
+  comment; the loan should show the problem reported. `S5`</pre></details>
+
+  <h2>Run it again</h2>
+  <details><summary>Commands</summary><pre>sh exhibits/merge-watch-release/make-app-repo.sh
+./gradlew -p heart :heart-sims:installSims
+sh exhibits/merge-watch-release/jenkins/run.sh
+RELEASE_HOST=192.168.1.18 RELEASE_REPOSITORY=$PWD/exhibits/merge-watch-release/work/library-app \
+  JENKINS_ADMIN_PASSWORD=… JENKINS_HOOK_SECRET=… \
+  java -cp 'heart/heart-sims/build/sims/lib/*' com.artie.heart.sims.MainKt release
+RELEASE_LIVE=192.168.1.18 RELEASE_PULL=482 RELEASE_TRACE_OUT=$PWD/docs/reports/merge-watch-release/pass.yaml \
+  ./gradlew -p heart :heart-sims:test --tests '*ReleaseTrace*' --rerun
+RELEASE_LIVE=192.168.1.18 RELEASE_PULL=483 RELEASE_TRACE_OUT=$PWD/docs/reports/merge-watch-release/fail.yaml \
+  ./gradlew -p heart :heart-sims:test --tests '*ReleaseTrace*' --rerun</pre></details>
+</main>
+</body>
+</html>

@@ -295,12 +295,18 @@ private class ReleaseRun(private val host: String, private val pull: Long) {
     ) {
         val method = if (path.endsWith("/asked") || path.endsWith("/mergeable")) Method.PUT else Method.POST
         val request = Request(method, at(port) + path).body(body)
-        if (say == null) check(client(request).status.successful) { path } else send(say, 204, request, params)
+        // ARTIE's own reply, at an address it chose: an entry of its own, as a bookmark is.
+        if (say == null) {
+            check(client(request).status.successful) { path }
+        } else {
+            send(say, NO_CONTENT, request, params, entry = true)
+        }
     }
 
+    /** What the run concluded from the step just done, said as that step's answer. */
     private fun note(text: String) {
-        steps += linkedMapOf("at" to now(), "mode" to "script", "say" to text, "params" to emptyMap<String, Any>(),
-            "summary" to text)
+        val last = steps.removeAt(steps.lastIndex)
+        steps += last + ("summary" to text)
     }
 
     private fun send(
@@ -370,6 +376,7 @@ private class ReleaseRun(private val host: String, private val pull: Long) {
         const val PREVIEW_PORT = 8180
         const val SCENARIOS = 5
         const val OK = 200
+        const val NO_CONTENT = 204
         const val STALE = 412
         const val MAX_LOOKS = 40
         const val WORKS_OUT_MILLIS = 7000L
