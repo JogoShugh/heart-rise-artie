@@ -12,7 +12,7 @@ internal fun scenarioOf(capture: Capture, walked: Walked): String? =
 /** A script a link hands over, run as the goal's step said (goal-rise.feature): on what, with what, kept by name. */
 internal fun ranScript(marks: Map<*, *>): Map<String, Any?> =
     linkedMapOf<String, Any?>("run-script" to marks["run-script"]).also { made ->
-        marks["on"]?.let { made["on"] = it }
+        marks["on-link"]?.let { made["on-link"] = it }
         (marks["inputs"] as? Map<*, *>)?.takeIf { it.isNotEmpty() }?.let { made["inputs"] = it }
         made["as"] = marks["as"]
     }
@@ -30,19 +30,22 @@ internal fun asked(
     made: Map<String, Any?>,
     reply: String,
     named: Map<String, String> = emptyMap(),
+    sent: Map<*, *> = emptyMap<String, Any?>(),
 ): List<Map<String, Any?>> {
     val ask = linkedMapOf<String, Any?>("ask" to made["act"])
+    // By the value as sent: an address that a step named is read where it was named, never built from its parts.
     val fields = (made["fields"] as? Map<*, *>)?.filterKeys { it != "_links" }
-        ?.mapValues { (_, value) -> named[value?.toString()]?.let { "\${$it.@self}" } ?: value }
+        ?.mapValues { (field, value) -> named[sent[field]?.toString()]?.let { "\${$it.@self}" } ?: value }
     fields?.takeIf { it.isNotEmpty() }?.let { ask["fields"] = it }
     ask["reply"] = reply
     return listOf(ask)
 }
 
-/** Each address a goal's step named, by that name: what its act led to, `as pr`. */
-internal fun namedAddresses(capture: Capture): Map<String, String> = capture.steps.mapNotNull { step ->
-    capture.marks(step)["as"]?.toString()?.let { name -> step.address?.let { it to name } }
-}.toMap()
+/** Each address a goal's step named before step [before], by that name: what its act led to, `as pr`. */
+internal fun namedAddresses(capture: Capture, before: Int): Map<String, String> =
+    capture.steps.filter { it.number < before }.mapNotNull { step ->
+        capture.marks(step)["as"]?.toString()?.let { name -> step.address?.let { it to name } }
+    }.toMap()
 
 /** The names the run's acts went as of, and its Verify: facts read: `${before.due}` reads `before`. */
 internal fun namesRead(capture: Capture): Set<String> = capture.steps.flatMap { step ->

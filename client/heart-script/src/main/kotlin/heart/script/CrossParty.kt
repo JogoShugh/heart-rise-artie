@@ -61,7 +61,8 @@ internal class CrossParty(
         val line = this.script.written("runScript(\"$rel\")", opener)
         marks.put(line, "run-script", rel)
         marks.put(line, "as", name)
-        on.takeIf { it.isNotBlank() }?.let { marks.put(line, "on", it) }
+        // `on-link`, not `on`: YAML 1.1 reads a bare `on` as true.
+        on.takeIf { it.isNotBlank() }?.let { marks.put(line, "on-link", it) }
         marks.put(line, "inputs", written.mapValues { (_, value) -> NamedFacts.slots(value) })
         val deployed = on.takeIf { it.isNotBlank() }?.let { link ->
             "deployed" to (Links.of(here.navigator).href(link, null) ?: stop("no $link link to run the script on"))

@@ -143,9 +143,9 @@ internal val MAKERS: Map<String, Maker> = linkedMapOf(
     "scenario" to Maker(setOf("scenario", "steps")) { step, reading ->
         scenario(reading.text(step["scenario"].toString())) { inner(step, "steps", reading) }
     },
-    "run-script" to Maker(setOf("run-script", "title", "inputs", "as", "on")) { step, reading ->
-        // `on: REL`: the script runs on what the link REL here leads to, given as its input `deployed`.
-        val on = step["on"]?.toString()?.let { rel ->
+    "run-script" to Maker(setOf("run-script", "title", "inputs", "as", "on-link")) { step, reading ->
+        // `on-link: REL`: the script runs on what the link REL here leads to, given as its input `deployed`.
+        val on = step["on-link"]?.toString()?.let { rel ->
             "deployed" to (Links.of(navigator).href(rel, null) ?: stop("no $rel link to run the script on"))
         }
         val inputs = (step["inputs"] as? Map<*, *>).orEmpty()

@@ -50,6 +50,7 @@ Feature: A goal that crosses parties and waits on their answers: At, asking to b
     And the run kept "smoke" with "passed" true
     When artie generated "smoke-run.heart.yaml" as data from "smoke-run.trace.yaml" and "smoke-run.goal.md"
     Then the script "smoke-run.heart.yaml" has a line with "- run-script: ci:smoke-test"
+    And the script "smoke-run.heart.yaml" has a line with "on-link: ci:deployment"
     And the script "smoke-run.heart.yaml" has a line with "book: ${book}"
     And the script "smoke-run.heart.yaml" has no line with "act: library"
 
