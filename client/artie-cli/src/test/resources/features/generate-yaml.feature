@@ -31,6 +31,55 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
       | field  | type    |
       | number | integer |
 
+  Scenario: A refusal the run expected, or one in a script a step ran, is no reason not to generate
+    A release's capture holds the smoke script its step ran, and that script's planned refusal (S4, a
+    renewal as of the version read before, refused as stale, expected so). The script made from the
+    release is the release's own steps: the smoke script's are its own, and it expected its refusal.
+    Given the file "release.trace.yaml" is
+      """
+      ---
+      run:
+        inputs: {}
+        source: |-
+          runScript("ci:smoke-test")
+        marks:
+          "1": {run-script: "ci:smoke-test", as: smoke, inputs: {}}
+      ---
+      mode: script
+      say: enter {entry}
+      params:
+        entry: scripted://service/
+      opens: true
+      outcome: done
+      ---
+      mode: script
+      say: act {relation}
+      params:
+        relation: renew
+      outcome: refused
+      expect: stale
+      refused: {kind: stale, by: the server, detail: the loan moved on}
+      ---
+      mode: script
+      say: return to {address}
+      line: 1
+      params:
+        address: /
+      outcome: done
+      """
+    When artie is run with
+      | argument           |
+      | generate           |
+      | release.trace.yaml |
+      | --out              |
+      | release.heart.yaml |
+      | --format           |
+      | yaml               |
+    Then artie exits 0
+    And the file "release.heart.yaml" has these lines
+      | line                         |
+      | - run-script: ci:smoke-test  |
+
   Scenario: A reasoned run becomes a script as data, a value an earlier answer gave read from the resource kept
     Given the script "close.kts" is
       """kotlin

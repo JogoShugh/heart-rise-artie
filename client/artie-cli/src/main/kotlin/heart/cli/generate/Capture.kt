@@ -57,8 +57,12 @@ class Capture(val name: String, text: String) {
 
     /** Rule 8: only a run that finished is generated from; a watch's refusals, while it decided, are its own. */
     fun finished() {
-        // A refusal its step said to expect (`refused-as`, goal-scenarios.feature) is the step done as meant.
-        stepped.firstOrNull { it.outcome in UNFINISHED && marks(it)["refused-as"] == null }?.let {
+        // A refusal its step said to expect (`refused-as`, goal-scenarios.feature) is the step done as meant; so is
+        // one a script a goal's step ran expected, its own (goal-rise.feature).
+        val meant = { step: Step ->
+            marks(step)["refused-as"] != null || step.expected != null && step.expected == step.refused["kind"]
+        }
+        stepped.firstOrNull { it.outcome in UNFINISHED && !meant(it) }?.let {
             throw BadArguments("can't generate from $name: step ${it.number} was ${it.outcome}")
         }
     }
@@ -76,6 +80,9 @@ class Step(val number: Int, private val doc: Map<*, *>) {
     val within: Int? = (doc["within"] as? Number)?.toInt()
     val opens: Boolean = doc["opens"] == true
     val outcome: String = doc["outcome"]?.toString().orEmpty()
+
+    /** The refusal the step expected, by its words (`stale`); null when it expected to be done. */
+    val expected: String? = doc["expect"]?.toString()
 
     /** Where the client was after the step: what its act led to (goal-rise.feature). */
     val address: String? = doc["address"]?.toString()
