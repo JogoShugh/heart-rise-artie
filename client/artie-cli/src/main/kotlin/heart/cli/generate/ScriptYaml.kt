@@ -128,10 +128,19 @@ class ScriptYaml(
         }
         val decided = decided(block, capture)
         val inside = decided.values.flatten().toSet().takeIf { movable(block, decided.keys) }.orEmpty()
-        return keeps(block).filter { it["keep-as"] !in inside } + block.statements.flatMap { walked ->
-            decided[walked]?.let { kept -> listOf(decide(kept, step(walked))) } ?: step(walked)
+        val made = block.statements.map { walked ->
+            val named = scenarioOf(capture, walked)?.takeIf { it != inScenario }
+            val outer = inScenario
+            inScenario = named ?: outer
+            val steps = decided[walked]?.let { kept -> listOf(decide(kept, step(walked))) } ?: step(walked)
+            inScenario = outer
+            named to steps
         }
+        return keeps(block).filter { it["keep-as"] !in inside } + scenarios(made)
     }
+
+    /** The scenario the steps being written are in, so a scenario's own acts are not wrapped in it again. */
+    private var inScenario: String? = null
 
     /**
      * [members] of one list, each acted on by the first of the run's acts it offers now, in the order the run first

@@ -51,6 +51,32 @@ Feature: A goal file in Markdown: front matter, then words or steps, every rule 
       | line 16:     verify: it is closed                            |
       | a goal in steps: 7 steps, nothing sent                       |
 
+  Scenario: A step marked as a scenario says so, a smoke test's steps each one
+    Given the file "smoke.goal.md" is
+      """
+      ---
+      start: scripted://service/
+      ---
+
+      Check the library.
+
+      - Find a loan `scenario S1`
+      - Renew it `scenario S2`
+      """
+    When artie is run with
+      | argument      |
+      | run           |
+      | smoke.goal.md |
+      | --plan-only   |
+    Then artie exits 0
+    And artie prints
+      | line                                         |
+      | start scripted://service/                    |
+      | context: Check the library.                  |
+      | line 7: Find a loan (scenario S1)            |
+      | line 8: Renew it (scenario S2)               |
+      | a goal in steps: 2 steps, nothing sent       |
+
   Scenario: A goal in words is paragraphs only, read sentence by sentence
     Given the file "words.goal.md" is
       """

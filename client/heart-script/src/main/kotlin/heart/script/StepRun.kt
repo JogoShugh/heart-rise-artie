@@ -90,7 +90,13 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
         stepCount = 0
         began = path.lastIndex
         when (step) {
-            is Step.Intent -> intent(step, here, opener)
+            is Step.Intent -> {
+                // A scenario's acts, its sub-steps' too, are marked as it, for the script made from the run.
+                val outer = scenario
+                scenario = step.scenario ?: outer
+                intent(step, here, opener)
+                scenario = outer
+            }
             is Step.Wait, is Step.Verify -> single(step, here, opener)
             // Whenevers side by side are one watch, run at the first of them.
             is Step.Whenever -> goal.beside(step).takeIf { it.first() === step }?.let { watch.whenever(it, here) }
@@ -99,6 +105,9 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
         }
         done += step
     }
+
+    /** The scenario the step now is in, if any (goal-scenarios.feature). */
+    private var scenario: String? = null
 
     /** Where on the path the step now began: back goes no further. */
     private var began = 0
@@ -160,6 +169,7 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
             here.act(intent = words) {
                 entered = true
                 marks.acted(step, line)
+                scenario?.let { marks.scenario(line, it) }
                 path += held.address
                 // What was done, not only where it led: a follow is no act, whatever the words asked.
                 val taken = run.trace.getOrNull(traced)
@@ -276,6 +286,11 @@ internal class StepMarks(private val run: Run, private val spoken: (String) -> S
             val job = at == lines.lastIndex && !step.scopes
             mark(line)[if (job) "intent" else "fromIntent"] = words
         }
+    }
+
+    /** The act on [line] is part of the scenario [name]. */
+    fun scenario(line: Int, name: String) {
+        mark(line)["scenario"] = name
     }
 
     private fun mark(line: Int) = run.marks.getOrPut(line) { mutableMapOf() }

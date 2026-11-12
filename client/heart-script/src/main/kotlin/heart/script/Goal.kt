@@ -110,6 +110,8 @@ sealed interface Step {
         val otherwise: Otherwise? = null,
         /** `If …,`: the condition the step's words are for; null when they are for every time. */
         val condition: String? = null,
+        /** `scenario NAME`: one scenario of a smoke test, kept as that scenario (goal-scenarios.feature). */
+        val scenario: String? = null,
     ) : Step {
         /** Whether the words, when the condition holds, are to leave the resource: its other steps are not done. */
         val leaves: Boolean get() = condition != null && LEAVE.containsMatchIn(words)

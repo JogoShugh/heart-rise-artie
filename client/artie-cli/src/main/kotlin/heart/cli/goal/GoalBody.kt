@@ -159,6 +159,7 @@ internal class StepReader(val file: String, val inputs: List<String>, val line: 
         return Step.Intent(
             once?.second ?: given?.second ?: read.text, line(item), marks.name, marks.moves, marks.reasoned,
             sub?.let(::items).orEmpty(), once?.let { Once(it.first, tail.giveUp) }, tail.otherwise, given?.first,
+            marks.scenario,
         )
     }
 

@@ -95,6 +95,12 @@ class ReplaySteps(
     /** Each script artie generated as data, and its lock file, as generated. */
     private val generatedText = mutableMapOf<String, String>()
 
+    @Then("the run's scenarios were")
+    fun scenariosWere(table: DataTable) {
+        val run = checkNotNull(scripts.lastRun) { "no run" }
+        assertEquals(table.asMaps(), run.scenarios.map { mapOf("scenario" to it.name, "passed" to "${it.passed}") })
+    }
+
     @Then("about its kept script, the run said {string}")
     fun saidAboutKept(said: String) = assertEquals(said, aboutKept.joinToString("; "))
 

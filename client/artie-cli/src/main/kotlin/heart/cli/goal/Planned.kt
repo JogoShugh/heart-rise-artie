@@ -49,6 +49,7 @@ private fun marks(step: Step.Intent): String = listOfNotNull(
     step.name?.let { " (as $it)" },
     step.moves?.let { " (moves $it)" },
     " (reasoned)".takeIf { step.reasoned },
+    step.scenario?.let { " (scenario $it)" },
 ).joinToString("")
 
 /** How many steps [step] is, with the steps under it. */

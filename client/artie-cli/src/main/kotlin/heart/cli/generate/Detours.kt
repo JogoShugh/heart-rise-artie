@@ -12,14 +12,15 @@ internal object Detours {
 
     fun trimmed(root: Node, capture: Capture): Node {
         val used = used(capture)
-        prune(root, used)
+        prune(root, used) { capture.marks(it)["scenario"] != null }
         return root
     }
 
-    private fun prune(node: Node, used: Set<Int>) {
+    /** A scenario's selections are never a detour: in a smoke test, reading is the test (goal-scenarios.feature). */
+    private fun prune(node: Node, used: Set<Int>, scenario: (Step) -> Boolean) {
         val members = members(node, used)
-        node.children.removeAll { it !in members && !needed(it, used) }
-        node.children.forEach { prune(it, used) }
+        node.children.removeAll { it !in members && !needed(it, used) && !scenario(it.step) }
+        node.children.forEach { prune(it, used, scenario) }
     }
 
     /**
