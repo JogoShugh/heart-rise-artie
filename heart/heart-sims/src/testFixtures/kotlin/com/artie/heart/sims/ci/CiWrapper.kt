@@ -23,7 +23,7 @@ import com.artie.heart.http4k.HeartSettings
 import com.artie.heart.sims.Tokens
 import com.artie.heart.sims.library.SignedRequests
 import com.artie.heart.sims.library.SigningKey
-import com.artie.heart.sims.rise.Answerer
+import com.artie.heart.sims.rise.Answers
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.http4k.core.Filter
@@ -73,7 +73,7 @@ data class Build(
  */
 class CiWrapper(
     private val jenkins: Jenkins,
-    private val answerer: Answerer,
+    private val answerer: Answers,
     private val hookSecret: String,
     private val origin: String = ORIGIN,
     private val previewHost: String = "localhost",

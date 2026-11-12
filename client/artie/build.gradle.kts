@@ -45,6 +45,8 @@ dependencies {
     testImplementation(project(":heart-script-host"))
     // script-replay.feature: artie generate's scripts and lock files, run with ARTIE against the gateway.
     testImplementation(project(":artie-cli"))
+    // release-desk.feature: the release's parties, calling and answering through ARTIE.
+    testImplementation(project(":artie-release"))
     // bdd-gates: the client's architecture boundary as a failing test.
     testImplementation("com.lemonappdev:konsist:0.17.3")
 }

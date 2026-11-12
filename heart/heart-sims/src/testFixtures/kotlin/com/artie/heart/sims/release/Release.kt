@@ -5,7 +5,9 @@ import com.artie.heart.sims.ci.CiWrapper
 import com.artie.heart.sims.ci.JenkinsHttp
 import com.artie.heart.sims.github.GitHubService
 import com.artie.heart.sims.github.GitRepository
+import com.artie.heart.sims.library.SigningKey
 import com.artie.heart.sims.rise.Answerer
+import com.artie.heart.sims.rise.Answers
 import com.artie.heart.sims.rise.ArtieKey
 import com.artie.heart.sims.rise.Keys
 import com.artie.heart.sims.rise.OfferWatcher
@@ -41,8 +43,22 @@ class Release(
     jenkinsUser: String,
     jenkinsPassword: String,
     hookSecret: String,
+    /** How the parties answer replies, and who serves on 8160: by hand and ARTIE's replies, unless a host says. */
+    private val hosting: Hosting = Hosting(),
 ) {
+    /**
+     * What a host of the release changes (client/artie-release): how each party answers replies, by its signing
+     * key, and what serves on the replies' port, given the replies.
+     */
+    class Hosting(
+        val answers: ((SigningKey) -> Answers)? = null,
+        val front: ((ReplyService) -> HttpHandler)? = null,
+    )
+
     private val client = JavaHttpClient()
+
+    private fun answersBy(key: SigningKey): Answers =
+        hosting.answers?.invoke(key) ?: Answerer(client, key.signer, "Bearer $REPLY_TOKEN")
     private fun origin(port: Int) = "http://$host:$port"
 
     /** The credential ARTIE's services and the watcher present at each party, by port. */
@@ -73,14 +89,14 @@ class Release(
 
     val watcher = OfferWatcher(
         reader = credentialed,
-        answerer = Answerer(client, WatcherKey.signer, "Bearer $REPLY_TOKEN"),
+        answerer = answersBy(WatcherKey),
         origin = origin(WATCHER_PORT),
         callerKeys = { href -> Keys(client).at(href) },
     )
 
     val ci = CiWrapper(
         jenkins = JenkinsHttp(client, JENKINS, jenkinsUser, jenkinsPassword),
-        answerer = Answerer(client, CiKey.signer, "Bearer $REPLY_TOKEN"),
+        answerer = answersBy(CiKey),
         hookSecret = hookSecret,
         origin = origin(CI_PORT),
         previewHost = host,
@@ -130,7 +146,7 @@ class Release(
         listOf(
             GITHUB_PORT to githubWithControls,
             WATCHER_PORT to watcher.handler,
-            REPLIES_PORT to repliesWithControls,
+            REPLIES_PORT to (hosting.front?.invoke(replies) ?: repliesWithControls),
             CI_PORT to ci.handler,
             DEV_PORT to dev.handler,
         ).map { (port, handler) ->

@@ -1,0 +1,50 @@
+Feature: The release desk: services that call others through ARTIE, and answer through it
+  ARTIE never serves. The parties do, and each runs ARTIE inside it to call the others: the release
+  desk, to release a pull request by its kept script; the offer watch and the CI wrapper, to answer
+  the replies they were asked on. The desk keeps the replies its run asks with, and wakes the run
+  when one is answered; the run then reads the reply, as any resource. Each party signs with its own
+  key, so a reply can tell who answered it.
+
+  Scenario: A party answers a reply through ARTIE, signed with its own key
+    Given the desk keeps a reply, asked for at the watch "http://localhost:8099/watches/1"
+    When the watch answers the reply through ARTIE with "completed":
+      """yaml
+      state: completed
+      result: {resource: "http://localhost:8098/repos/acme/web/pulls/482", offers: "github:merge"}
+      _links: {"hr:in-reply-to": {href: "http://localhost:8099/watches/1"}}
+      """
+    Then the reply reads:
+      | member                  | value                                          |
+      | /state                  | completed                                      |
+      | /result/offers          | github:merge                                   |
+      | /_links/hr:in-reply-to/href | http://localhost:8099/watches/1            |
+    And the answer was signed by the key "watcher-2026-11"
+
+  Scenario: A run waiting on its reply wakes when the reply is answered
+    Given the desk keeps a reply, asked for at the watch "http://localhost:8099/watches/1"
+    And a run waits on the reply for up to 10 seconds
+    When the watch answers the reply through ARTIE with "completed":
+      """yaml
+      state: completed
+      result: {resource: "http://localhost:8098/repos/acme/web/pulls/482"}
+      _links: {"hr:in-reply-to": {href: "http://localhost:8099/watches/1"}}
+      """
+    Then the run woke within 2 seconds, told the reply changed
+
+  Scenario: The desk releases a pull request by running its kept script with ARTIE
+    Given the desk's release script is:
+      """yaml
+      heart: 1
+      kind: kept
+      inputs: {pull: {}}
+      start: http://localhost:8160/
+      steps:
+        - note: "releasing pull request ${pull}"
+      """
+    When a person asks the desk to release pull request 482
+    Then the desk answered 201, at "/releases/1"
+    And "/releases/1" reads, once the run is over:
+      | member | value                          |
+      | /pull  | 482                            |
+      | /state | ended                          |
+      | /notes/0 | releasing pull request 482   |

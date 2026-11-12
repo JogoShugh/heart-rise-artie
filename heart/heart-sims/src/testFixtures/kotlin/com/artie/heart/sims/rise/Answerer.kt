@@ -21,11 +21,11 @@ class Answerer(
     private val client: HttpHandler,
     private val signer: Signer,
     private val authorization: String? = null,
-) {
+) : Answers {
     private val mapper = ObjectMapper()
 
     /** Answers [reply] with [relation] (`progress`, `completed`, `failed`) and [body]; the reply service's answer. */
-    fun answer(reply: String, relation: String, body: Map<String, Any?>): Response {
+    override fun answer(reply: String, relation: String, body: Map<String, Any?>): Response {
         val read = client(authorized(Request(Method.GET, reply)).header("Accept", Dialect.JSONSCHEMA.mediaType))
         check(read.status.successful) { "the reply $reply answered ${read.status.code}" }
         val etag = checkNotNull(read.header("ETag")) { "the reply $reply gave no ETag" }

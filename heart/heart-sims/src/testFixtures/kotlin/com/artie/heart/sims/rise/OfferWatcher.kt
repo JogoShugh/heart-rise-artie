@@ -66,7 +66,7 @@ data class OfferWatch(
  */
 class OfferWatcher(
     private val reader: HttpHandler,
-    private val answerer: Answerer,
+    private val answerer: Answers,
     private val origin: String = ORIGIN,
     tokens: List<String> = listOf(TOKEN),
     private val callerKeys: (String) -> Map<String, PublicKey> = { emptyMap() },
