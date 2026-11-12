@@ -1,5 +1,6 @@
 package heart
 
+import heart.script.Links
 import heart.script.Navigator
 import heart.script.Reads
 import heart.script.Received
@@ -15,7 +16,7 @@ import java.net.URI
  * validator, since nothing but the script sets a header.
  */
 class WiredNavigator(val navigator: Navigator, private val wire: Transport) :
-    Navigator by navigator, Wire, Writes, Reads {
+    Navigator by navigator, Wire, Writes, Reads, Links by Links.of(navigator) {
     /** The words [navigator]'s reasoner writes, when it writes. */
     override fun write(intent: String): String? = (navigator as? Writes)?.write(intent)
 

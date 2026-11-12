@@ -90,7 +90,7 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
     fun runGoal(
         goal: heart.script.Goal,
         planner: heart.script.Planner,
-        navigator: ArtieNavigator,
+        navigator: Navigator,
         inputs: Map<String, String>,
         more: (() -> Navigator)? = null,
     ): Run {

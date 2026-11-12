@@ -24,7 +24,7 @@ class Block(
 internal fun Block.withoutSyncs() = Block(keeps, watched, statements.filterNot { it is Walked.Sync }, listed, opener)
 
 /** The marks by which a goal's step opened a block of its own (goal-rise.feature). */
-internal val SCOPES = listOf("enter", "once-answered")
+internal val SCOPES = listOf("enter", "once-answered", "run-script")
 
 /** One statement of a generated script: a step of the run, and its row. */
 sealed interface Walked {

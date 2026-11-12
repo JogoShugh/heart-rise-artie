@@ -255,7 +255,7 @@ class ScriptWriter(
         const val INDENT = "    "
 
         /** Each scope a goal's step opens, as the Kotlin DSL calls it. */
-        val KOTLIN_SCOPES = mapOf("enter" to "enter", "once-answered" to "onceAnswered")
+        val KOTLIN_SCOPES = mapOf("enter" to "enter", "once-answered" to "onceAnswered", "run-script" to "runScript")
         const val WIDTH = 120
     }
 }

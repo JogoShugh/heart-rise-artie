@@ -9,6 +9,14 @@ package heart.cli.generate
 internal fun scenarioOf(capture: Capture, walked: Walked): String? =
     (walked as? Walked.Selection)?.let { capture.marks(it.step)["scenario"]?.toString() }
 
+/** A script a link hands over, run as the goal's step said (goal-rise.feature): on what, with what, kept by name. */
+internal fun ranScript(marks: Map<*, *>): Map<String, Any?> =
+    linkedMapOf<String, Any?>("run-script" to marks["run-script"]).also { made ->
+        marks["on"]?.let { made["on"] = it }
+        (marks["inputs"] as? Map<*, *>)?.takeIf { it.isNotEmpty() }?.let { made["inputs"] = it }
+        made["as"] = marks["as"]
+    }
+
 /** An act's version and refusal, as [marks] say them: `as-of` a name, and `refused-as` the refusal it expected. */
 internal fun versioned(marks: Map<*, *>): Map<String, String> =
     listOf("as-of", "refused-as").mapNotNull { key -> marks[key]?.let { key to it.toString() } }.toMap()

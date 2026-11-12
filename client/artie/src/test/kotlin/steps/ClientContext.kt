@@ -83,6 +83,9 @@ class ClientContext {
     /** The key each client signs its acts with, as a host's ARTIE does (goal-rise.feature); none by default. */
     var signing: heart.SigningKey? = null
 
+    /** Whether a goal run's client is wired as a host wires it, reading what links lead to as it is. */
+    var wired = false
+
     /** The replies a goal run asks with, as a host keeps them (goal-rise.feature); none by default. */
     var replies: heart.script.Replies? = null
     val cache: CachingTransport by lazy { stack() }

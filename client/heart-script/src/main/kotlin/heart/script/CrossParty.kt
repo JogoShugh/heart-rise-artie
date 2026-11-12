@@ -11,6 +11,8 @@ internal class CrossParty(
     private val script: MoveLines,
     private val marks: StepMarks,
     private val fill: (String) -> String,
+    /** Keeps what a step named, by its name, as the goal's later steps read it. */
+    private val keep: (String, Representation) -> Unit,
 ) {
     /** The steps whose ask was made: one reply each. */
     private val asked = mutableSetOf<Step>()
@@ -20,7 +22,9 @@ internal class CrossParty(
         val at = AT.matchEntire(step.words.trim())
         val reply = step.once?.condition?.let { ONCE.find(it) }?.groupValues?.get(1)
             ?.takeIf { run.replied.containsKey(it) }
+        val running = RUN.matchEntire(step.words.trim())
         when {
+            running != null -> ranScript(step, here, opener, running)
             at != null -> {
                 val (party, rest) = at.destructured
                 val line = script.written("enter(\"{$party}\") {", opener)
@@ -42,6 +46,30 @@ internal class CrossParty(
             }
             else -> intent(step, here, opener)
         }
+    }
+
+    /**
+     * `Run the script it links as REL, on the deployment it links as REL, with NAME = {value}, …`: the script held
+     * here links, run on what the other link leads to (its input `deployed`) with those inputs, its outcome kept by
+     * the step's name; with no model, as the script made from the run does it.
+     */
+    private fun ranScript(step: Step.Intent, here: Here, opener: Int?, said: MatchResult) {
+        val (rel, on, with) = said.destructured
+        val written = with.split(',').map { it.trim() }.filter { '=' in it }
+            .associate { it.substringBefore('=').trim() to it.substringAfter('=').trim() }
+        val name = step.name ?: "outcome"
+        val line = this.script.written("runScript(\"$rel\")", opener)
+        marks.put(line, "run-script", rel)
+        marks.put(line, "as", name)
+        on.takeIf { it.isNotBlank() }?.let { marks.put(line, "on", it) }
+        marks.put(line, "inputs", written.mapValues { (_, value) -> NamedFacts.slots(value) })
+        val deployed = on.takeIf { it.isNotBlank() }?.let { link ->
+            "deployed" to (Links.of(here.navigator).href(link, null) ?: stop("no $link link to run the script on"))
+        }
+        here.runScript(rel, written.mapValues { (_, value) -> fill(value) } + listOfNotNull(deployed), name)
+        val kept = run.kept.getValue(name)
+        run.notes += "$name: passed ${kept.state["passed"]}"
+        keep(name, Representation(kept.address, kept.state.root, emptySet(), emptyMap()))
     }
 
     /**
@@ -70,6 +98,10 @@ internal class CrossParty(
         val AT = Regex("""(?i)^at\s+\{(\w+)}\s*,\s*(.+)$""", RegexOption.DOT_MATCHES_ALL)
         val ONCE = Regex("""^\s*\{(\w+)}""")
         val ASK = Regex("""(?i)\bask(ing)?\s+to\s+be\s+told\b""")
+        val RUN = Regex(
+            """(?i)^run the (?:[\w-]+ )*script (?:it|\{\w+}) links as (\S+?)""" +
+                """(?:,\s*on the [\w-]+ it links as (\S+?))?(?:,\s*with (.+))?$""",
+        )
     }
 }
 

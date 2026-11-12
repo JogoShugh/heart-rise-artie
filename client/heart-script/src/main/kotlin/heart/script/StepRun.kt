@@ -113,7 +113,7 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
     private val namedFacts = NamedFacts(script, marks, ::fill, moves)
 
     /** Steps at another party, asking to be told, or waiting on a reply (goal-rise.feature). */
-    private val crossParty = CrossParty(run, script, marks, ::fill)
+    private val crossParty = CrossParty(run, script, marks, ::fill) { name, kept -> named[name] = kept }
 
     /** The scenario the step now is in, if any (goal-scenarios.feature). */
     private var scenario: String? = null

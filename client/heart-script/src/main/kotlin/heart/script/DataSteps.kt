@@ -143,9 +143,13 @@ internal val MAKERS: Map<String, Maker> = linkedMapOf(
     "scenario" to Maker(setOf("scenario", "steps")) { step, reading ->
         scenario(reading.text(step["scenario"].toString())) { inner(step, "steps", reading) }
     },
-    "run-script" to Maker(setOf("run-script", "title", "inputs", "as")) { step, reading ->
+    "run-script" to Maker(setOf("run-script", "title", "inputs", "as", "on")) { step, reading ->
+        // `on: REL`: the script runs on what the link REL here leads to, given as its input `deployed`.
+        val on = step["on"]?.toString()?.let { rel ->
+            "deployed" to (Links.of(navigator).href(rel, null) ?: stop("no $rel link to run the script on"))
+        }
         val inputs = (step["inputs"] as? Map<*, *>).orEmpty()
-            .map { (name, value) -> name.toString() to reading.text(value.toString()) }.toMap()
+            .map { (name, value) -> name.toString() to reading.text(value.toString()) }.toMap() + listOfNotNull(on)
         val named = step["as"]?.toString() ?: stop("run-script keeps its outcome as a name: as")
         runScript(step["run-script"].toString(), inputs, named, step["title"]?.let { reading.text(it.toString()) })
     },

@@ -111,7 +111,9 @@ class GoalSteps(
             return
         }
         reasoner = ScriptedReasoner(*choices.toTypedArray())
+        // As a host wires it (goal-rise.feature): reading what a link leads to as it is, on the scenario's wire.
         val navigator = ArtieNavigator(ctx.client, reasoner)
+            .let { if (ctx.wired) heart.WiredNavigator(it, ctx.bare) else it }
         // Each listener of a watch with listeners (Whenevers side by side) asks for a client of its own.
         val run = scripts.runGoal(goal, planner(), navigator, given) {
             ArtieNavigator(ctx.newClient(ctx.dialect, ctx.rung), reasoner)

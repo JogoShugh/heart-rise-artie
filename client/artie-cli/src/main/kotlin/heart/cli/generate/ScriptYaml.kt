@@ -173,10 +173,12 @@ class ScriptYaml(
             ?: listOf(readAgain(bindings, capture, waited(walked.step)))
         // Another party's entry, or a reply waited on, as the goal's step opened it (goal-rise.feature).
         is Walked.Scope -> listOf(
-            if (walked.kind == "enter") {
-                linkedMapOf("enter" to walked.value, "steps" to steps(walked.block))
-            } else {
-                linkedMapOf("once-answered" to linkedMapOf("reply" to walked.value, "steps" to steps(walked.block)))
+            when (walked.kind) {
+                "enter" -> linkedMapOf("enter" to walked.value, "steps" to steps(walked.block))
+                "run-script" -> ranScript(capture.marks(walked.step))
+                else -> linkedMapOf(
+                    "once-answered" to linkedMapOf("reply" to walked.value, "steps" to steps(walked.block)),
+                )
             },
         )
     }

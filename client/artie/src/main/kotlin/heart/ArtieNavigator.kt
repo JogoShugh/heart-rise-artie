@@ -36,7 +36,7 @@ class ArtieNavigator(
      * `look-then-leap` does once the entry's forms are as the lock file pins them; any other keeps it.
      */
     private val guarding: String? = null,
-) : Navigator, heart.script.Writes by ReasonerWriter(reasoner) {
+) : Navigator, heart.script.Writes by ReasonerWriter(reasoner), heart.script.Links by HeldLinks(client) {
     /** The representation ARTIE holds now, as the server sent it, links with their targets; null before the entry. */
     val holding: HeartRepresentation? get() = client.current
 

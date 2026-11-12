@@ -31,7 +31,7 @@ internal class NamedFacts(
         return true
     }
 
-    private companion object {
+    internal companion object {
         /** `body is not {read.body}`, `author is {author}`, `reported.problem is missing-pages`. */
         val FACT = Regex("""^([A-Za-z_][\w.:-]*)\s+is\s+(not\s+)?(.+)$""")
 

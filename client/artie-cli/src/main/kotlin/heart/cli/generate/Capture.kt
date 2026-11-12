@@ -141,7 +141,10 @@ class Node(val step: Step) {
             // Its first read only: the wait's reads again, and the way back, are the scope's own.
             val opened = mutableSetOf<Int?>()
             val kept = { step: Step -> SCOPES.any { it in capture.marks(step) } && opened.add(step.line) }
-            capture.stepped.drop(1).filterNot { it.say.startsWith("return to") && !kept(it) }.forEach { step ->
+            // A goal run's steps each stand for a line of its script: a script a step ran is that step's own.
+            val nested = { step: Step -> capture.source != null && step.line == null }
+            val skipped = { step: Step -> step.say.startsWith("return to") && !kept(step) || nested(step) }
+            capture.stepped.drop(1).filterNot(skipped).forEach { step ->
                 while (open.size > 1 && open.last().step.line != step.within) open.removeLast()
                 val node = Node(step)
                 open.last().children += node

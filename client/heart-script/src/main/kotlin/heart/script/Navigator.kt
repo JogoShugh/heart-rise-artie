@@ -241,6 +241,19 @@ interface Navigator {
         Reasoned(null, Answer.Refused(Refusal.NoReasoner, Side.CLIENT, "this client has no reasoner"))
 }
 
+/**
+ * A client that says where a link of what it holds leads, by relation and title: a deployment a build links, given to
+ * the script the build links as the address to run it at (goal-rise.feature). Null when there is no such link.
+ */
+fun interface Links {
+    fun href(rel: String, title: String?): String?
+
+    companion object {
+        /** Where [navigator]'s links lead, if it says; else nowhere. */
+        fun of(navigator: Navigator): Links = navigator as? Links ?: Links { _, _ -> null }
+    }
+}
+
 /** A client that reads what a link leads to as it is, beside HEART representations (linked-scripts.feature). */
 fun interface Reads {
     /**
