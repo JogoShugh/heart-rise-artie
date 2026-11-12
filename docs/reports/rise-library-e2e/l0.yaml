@@ -1,5 +1,5 @@
 steps:
-- at: "2026-11-11T11:49:20.117773Z"
+- at: "2026-11-12T00:05:20.682871Z"
   mode: "script"
   say: "Ana reads the library's entry, as HAL Schema Forms"
   params: {}
@@ -303,9 +303,9 @@ steps:
           - "sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU="
         digest: "sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs="
   expect: 200
-  ms: 3
+  ms: 71
   entry: true
-- at: "2026-11-11T11:49:20.139278Z"
+- at: "2026-11-12T00:05:20.771876Z"
   mode: "script"
   say: "Ana asks to be told when loan {loan} can be renewed, unsigned"
   params:
@@ -343,8 +343,8 @@ steps:
       status: 401
       detail: "Each act here is signed by the key ana-2026-11."
   expect: 401
-  ms: 2
-- at: "2026-11-11T11:49:20.149995Z"
+  ms: 4
+- at: "2026-11-12T00:05:20.78466Z"
   mode: "script"
   say: "Ana asks to be told when loan {loan} can be renewed, with reply {reply}, signed\
     \ with her key"
@@ -425,8 +425,8 @@ steps:
             $id: "/schemas/35f65fac527144fc"
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 201
-  ms: 4
-- at: "2026-11-11T11:49:20.156131Z"
+  ms: 13
+- at: "2026-11-12T00:05:20.799412Z"
   mode: "script"
   say: "Ana reads her watch: its keys, its reply, and her cancel"
   params: {}
@@ -489,7 +489,7 @@ steps:
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 200
   ms: 3
-- at: "2026-11-11T11:49:20.160499Z"
+- at: "2026-11-12T00:05:20.802903Z"
   mode: "script"
   say: "The library reads Ana's reply {reply}, linked from the watch, for its forms"
   params:
@@ -505,7 +505,7 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-1.hsf.L0.4b9d1ff05d6161a9\""
+      ETag: "\"seq-1.hsf.L0.2912de67215baf3a\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
       Accept-Patch: "application/merge-patch+json, application/problem+json"
@@ -538,6 +538,7 @@ steps:
           schema:
             properties:
               _links:
+                additionalProperties: true
                 properties:
                   hr:in-reply-to:
                     properties:
@@ -565,8 +566,8 @@ steps:
             - "state"
             - "percent"
             type: "object"
-            $id: "/schemas/4e65bab7eacf4181"
-          hr:integrity: "sha256-Nd1ygCaXQ22SSol2I5e+dt8BBWFCNdCLOKJQ+NtUhaM="
+            $id: "/schemas/a951d497d0c0cace"
+          hr:integrity: "sha256-lth/U9FdkkRbkOnZ0GTOSQs5rITIWl19hc0SNpW0Fm8="
         hr:completed:
           title: "Report completed"
           description: "Sends the result: the work is done."
@@ -578,6 +579,7 @@ steps:
           schema:
             properties:
               _links:
+                additionalProperties: true
                 properties:
                   hr:in-reply-to:
                     properties:
@@ -612,8 +614,8 @@ steps:
             - "state"
             - "result"
             type: "object"
-            $id: "/schemas/8c8339a0496fc0e0"
-          hr:integrity: "sha256-kgt//qwBRQQK6kBEUOyBZDHXAX+ADUZ7kq0zJJsT+Pc="
+            $id: "/schemas/72199fd622adf0b4"
+          hr:integrity: "sha256-Gxx2HK2zxgbYDTbHFZWw62PXifofNVtQFjWCvKur0ao="
         hr:failed:
           title: "Report failed"
           description: "Says the work failed, with a problem document."
@@ -625,6 +627,7 @@ steps:
           schema:
             properties:
               _links:
+                additionalProperties: true
                 properties:
                   hr:in-reply-to:
                     properties:
@@ -651,11 +654,11 @@ steps:
             - "type"
             - "title"
             type: "object"
-            $id: "/schemas/3b56ba1aaf3f6c04"
-          hr:integrity: "sha256-qqKB8OT+lCxISpxnfev1gx+hr8Oee1Ji2BwZKrQxjPw="
+            $id: "/schemas/3ee822291d3d75a3"
+          hr:integrity: "sha256-lU0r2LFtHRt/6h/aAZHWVXGl2ByYhCzFfvdPbrhxRDI="
   expect: 200
-  ms: 6
-- at: "2026-11-11T11:49:20.174382Z"
+  ms: 8
+- at: "2026-11-12T00:05:20.819192Z"
   mode: "script"
   say: "The library reports progress of {percent} percent, naming the watch it answers\
     \ for"
@@ -670,12 +673,12 @@ steps:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
-      If-Match: "\"seq-1.hsf.L0.4b9d1ff05d6161a9\""
+      If-Match: "\"seq-1.hsf.L0.2912de67215baf3a\""
       Content-Type: "application/merge-patch+json"
       Content-Digest: "sha-256=:otKqxVB1vy/ZayIiS0413qifO0TkJLMiaSbMV/1HZys=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:BoMjDZXgGXe8jI2PsX/49JprDQufQeJ9q2KQuGfBYge3OvsthTYfIB1SWm5cfZgA5uD2LyDRFU+kVxGwVEgADg==:"
+      Signature: "sig1=:PEk3/DPUWkW7cH6qQJmEQQ4xH3K+soQs69lRLsSOSJ3qnfIvCBE3+kPp0oRZhziZTGWc2vZKV/v4uiC5zBqUBw==:"
     body:
       state: "awaiting"
       percent: 0
@@ -687,7 +690,7 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-2.hsf.L0.0cb81f356edf7db1\""
+      ETag: "\"seq-2.hsf.L0.1c3fc62f347d356f\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
       Accept-Patch: "application/merge-patch+json, application/problem+json"
@@ -724,6 +727,7 @@ steps:
           schema:
             properties:
               _links:
+                additionalProperties: true
                 properties:
                   hr:in-reply-to:
                     properties:
@@ -751,8 +755,8 @@ steps:
             - "state"
             - "percent"
             type: "object"
-            $id: "/schemas/4e65bab7eacf4181"
-          hr:integrity: "sha256-Nd1ygCaXQ22SSol2I5e+dt8BBWFCNdCLOKJQ+NtUhaM="
+            $id: "/schemas/a951d497d0c0cace"
+          hr:integrity: "sha256-lth/U9FdkkRbkOnZ0GTOSQs5rITIWl19hc0SNpW0Fm8="
         hr:completed:
           title: "Report completed"
           description: "Sends the result: the work is done."
@@ -764,6 +768,7 @@ steps:
           schema:
             properties:
               _links:
+                additionalProperties: true
                 properties:
                   hr:in-reply-to:
                     properties:
@@ -798,8 +803,8 @@ steps:
             - "state"
             - "result"
             type: "object"
-            $id: "/schemas/8c8339a0496fc0e0"
-          hr:integrity: "sha256-kgt//qwBRQQK6kBEUOyBZDHXAX+ADUZ7kq0zJJsT+Pc="
+            $id: "/schemas/72199fd622adf0b4"
+          hr:integrity: "sha256-Gxx2HK2zxgbYDTbHFZWw62PXifofNVtQFjWCvKur0ao="
         hr:failed:
           title: "Report failed"
           description: "Says the work failed, with a problem document."
@@ -811,6 +816,7 @@ steps:
           schema:
             properties:
               _links:
+                additionalProperties: true
                 properties:
                   hr:in-reply-to:
                     properties:
@@ -837,11 +843,11 @@ steps:
             - "type"
             - "title"
             type: "object"
-            $id: "/schemas/3b56ba1aaf3f6c04"
-          hr:integrity: "sha256-qqKB8OT+lCxISpxnfev1gx+hr8Oee1Ji2BwZKrQxjPw="
+            $id: "/schemas/3ee822291d3d75a3"
+          hr:integrity: "sha256-lU0r2LFtHRt/6h/aAZHWVXGl2ByYhCzFfvdPbrhxRDI="
   expect: 200
-  ms: 8
-- at: "2026-11-11T11:49:20.184286Z"
+  ms: 13
+- at: "2026-11-12T00:05:20.834254Z"
   mode: "script"
   say: "An answer that names another watch, {watch}, is sent"
   params:
@@ -855,12 +861,12 @@ steps:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
-      If-Match: "\"seq-2.hsf.L0.0cb81f356edf7db1\""
+      If-Match: "\"seq-2.hsf.L0.1c3fc62f347d356f\""
       Content-Type: "application/merge-patch+json"
       Content-Digest: "sha-256=:d+5DMGFN6UGboWdr+0uTg2BdQ7u2QuwR8Dk1Et5KFZc=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:Sw0P6cbkRUYpZ6GZdUCCO2iQ069owilvFRx7mME4dnIVEwZ3WAlKoCiAAeJkaY0zJi+A7FXQHCn6lBStvmNsDw==:"
+      Signature: "sig1=:aJ42K5C3zgCxGHBMc2nXgi7TuO7jr0JQi3K8GRuRBbR95NVJgXX7oyJV/veJKSR8KlfLdKFLagwVvFKQ6odBAA==:"
     body:
       state: "awaiting"
       percent: 50
@@ -881,7 +887,7 @@ steps:
       rel: "hr:in-reply-to"
   expect: 409
   ms: 4
-- at: "2026-11-11T11:49:20.190095Z"
+- at: "2026-11-12T00:05:20.840406Z"
   mode: "script"
   say: "A result signed with another key, claiming the library's keyid, is sent"
   params:
@@ -894,12 +900,12 @@ steps:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
-      If-Match: "\"seq-2.hsf.L0.0cb81f356edf7db1\""
+      If-Match: "\"seq-2.hsf.L0.1c3fc62f347d356f\""
       Content-Type: "application/merge-patch+json"
       Content-Digest: "sha-256=:DM73mHpUssFOVNR4oyVKhIeNRaD2EWV4DWzxhvMREho=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:OQ0s8OYfKsDZmRG3uXIkMbVV81aybA+HxNWCH9xdoxQ9sJ1/8GjFENmbr8h4lpIaJ76rWzSr3FeWy4RS973oCA==:"
+      Signature: "sig1=:mrvB8Y8F/Ij8jcP1TRhYr6UtNkNru+2kSeMYOUWJbm8BKTnJjB58wY1wT1pSxC9UkBE+hl14tWykR8YmB3aTCA==:"
     body:
       state: "completed"
       result:
@@ -923,7 +929,7 @@ steps:
       detail: "Each act here is signed by the key library-2026-11."
   expect: 401
   ms: 3
-- at: "2026-11-11T11:49:20.193483Z"
+- at: "2026-11-12T00:05:20.844208Z"
   mode: "script"
   say: "An unsigned result is sent"
   params:
@@ -936,7 +942,7 @@ steps:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
-      If-Match: "\"seq-2.hsf.L0.0cb81f356edf7db1\""
+      If-Match: "\"seq-2.hsf.L0.1c3fc62f347d356f\""
       Content-Type: "application/merge-patch+json"
     body:
       state: "completed"
@@ -960,8 +966,8 @@ steps:
       status: 401
       detail: "Each act here is signed by the key library-2026-11."
   expect: 401
-  ms: 2
-- at: "2026-11-11T11:49:20.198334Z"
+  ms: 3
+- at: "2026-11-12T00:05:20.849775Z"
   mode: "script"
   say: "The hold is returned, and the library sends the result, signed"
   params:
@@ -974,12 +980,12 @@ steps:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
-      If-Match: "\"seq-2.hsf.L0.0cb81f356edf7db1\""
+      If-Match: "\"seq-2.hsf.L0.1c3fc62f347d356f\""
       Content-Type: "application/merge-patch+json"
       Content-Digest: "sha-256=:DM73mHpUssFOVNR4oyVKhIeNRaD2EWV4DWzxhvMREho=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:vW3yq5ntOibZN8Gm2V4dIxq4xOYO83gN7NcjMZ2KbRAo8vTRXS0tgd60ejHaYKbQ593yP03/3anfKMLYAjG9Dw==:"
+      Signature: "sig1=:NwHq1itTxSmLsUHLYzRENb95NmcAKevGmtiSjZeg2kB4htet00daQ/vy+BDmQt1JTSsQ0l3FO7kFCHtDAzkHCA==:"
     body:
       state: "completed"
       result:
@@ -1021,8 +1027,8 @@ steps:
           type: "application/hal+json"
       _forms: {}
   expect: 200
-  ms: 7
-- at: "2026-11-11T11:49:20.208212Z"
+  ms: 8
+- at: "2026-11-12T00:05:20.860774Z"
   mode: "script"
   say: "The same result is sent again, and is answered as the first was"
   params:
@@ -1082,8 +1088,8 @@ steps:
           type: "application/hal+json"
       _forms: {}
   expect: 200
-  ms: 3
-- at: "2026-11-11T11:49:20.212721Z"
+  ms: 4
+- at: "2026-11-12T00:05:20.866218Z"
   mode: "script"
   say: "A different result is sent, after the answer"
   params:
@@ -1123,8 +1129,8 @@ steps:
         \ no more."
       rel: "https://w3id.org/heart-rise/rels/completed"
   expect: 409
-  ms: 3
-- at: "2026-11-11T11:49:20.216894Z"
+  ms: 4
+- at: "2026-11-12T00:05:20.871287Z"
   mode: "script"
   say: "Ana reads her watch after the answer: no cancel, and why"
   params: {}
@@ -1169,7 +1175,7 @@ steps:
       _forms: {}
   expect: 200
   ms: 1
-- at: "2026-11-11T11:49:20.218726Z"
+- at: "2026-11-12T00:05:20.873512Z"
   mode: "script"
   say: "Ana reads why the watch offers no cancel"
   params: {}
@@ -1191,8 +1197,8 @@ steps:
         rel: "https://w3id.org/heart-rise/rels/cancel"
         title: "Cancel the request"
   expect: 200
-  ms: 0
-- at: "2026-11-11T11:49:20.219951Z"
+  ms: 1
+- at: "2026-11-12T00:05:20.875146Z"
   mode: "script"
   say: "Ana cancels anyway, by the form she read before"
   params:
@@ -1221,7 +1227,7 @@ steps:
       rel: "https://w3id.org/heart-rise/rels/cancel"
   expect: 409
   ms: 1
-- at: "2026-11-11T11:49:20.221632Z"
+- at: "2026-11-12T00:05:20.877Z"
   mode: "script"
   say: "The library reads the reply's history, by the link its last answer gave"
   params:
@@ -1246,19 +1252,19 @@ steps:
         up:
           href: "/replies/r-7f3"
       changes:
-      - at: "2026-11-11T11:49:20.182370Z"
-        replaced: "\"seq-1.hsf.L0.4b9d1ff05d6161a9\""
+      - at: "2026-11-12T00:05:20.832015Z"
+        replaced: "\"seq-1.hsf.L0.2912de67215baf3a\""
         signatureInput: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
           );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-        signature: "sig1=:BoMjDZXgGXe8jI2PsX/49JprDQufQeJ9q2KQuGfBYge3OvsthTYfIB1SWm5cfZgA5uD2LyDRFU+kVxGwVEgADg==:"
+        signature: "sig1=:PEk3/DPUWkW7cH6qQJmEQQ4xH3K+soQs69lRLsSOSJ3qnfIvCBE3+kPp0oRZhziZTGWc2vZKV/v4uiC5zBqUBw==:"
         _links:
           self:
             href: "/replies/r-7f3/history#change-1"
-      - at: "2026-11-11T11:49:20.204959Z"
-        replaced: "\"seq-2.hsf.L0.0cb81f356edf7db1\""
+      - at: "2026-11-12T00:05:20.857678Z"
+        replaced: "\"seq-2.hsf.L0.1c3fc62f347d356f\""
         signatureInput: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
           );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-        signature: "sig1=:vW3yq5ntOibZN8Gm2V4dIxq4xOYO83gN7NcjMZ2KbRAo8vTRXS0tgd60ejHaYKbQ593yP03/3anfKMLYAjG9Dw==:"
+        signature: "sig1=:NwHq1itTxSmLsUHLYzRENb95NmcAKevGmtiSjZeg2kB4htet00daQ/vy+BDmQt1JTSsQ0l3FO7kFCHtDAzkHCA==:"
         _links:
           self:
             href: "/replies/r-7f3/history#change-2"
@@ -1266,7 +1272,7 @@ steps:
             href: "/replies/r-7f3/history#change-1"
   expect: 200
   ms: 1
-- at: "2026-11-11T11:49:20.223834Z"
+- at: "2026-11-12T00:05:20.879499Z"
   mode: "script"
   say: "Ana asks again, with reply {reply}, on the entry's ETag she already holds"
   params:
@@ -1346,8 +1352,8 @@ steps:
             $id: "/schemas/35f65fac527144fc"
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 201
-  ms: 3
-- at: "2026-11-11T11:49:20.228172Z"
+  ms: 4
+- at: "2026-11-12T00:05:20.884687Z"
   mode: "script"
   say: "Ana reads her second watch"
   params: {}
@@ -1410,7 +1416,7 @@ steps:
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 200
   ms: 2
-- at: "2026-11-11T11:49:20.230487Z"
+- at: "2026-11-12T00:05:20.887453Z"
   mode: "script"
   say: "The library reads Ana's reply {reply} for its forms"
   params:
@@ -1426,7 +1432,7 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-1.hsf.L0.80c93494a1d4b2d8\""
+      ETag: "\"seq-1.hsf.L0.c0cff82a0e3dc2c7\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
       Accept-Patch: "application/merge-patch+json, application/problem+json"
@@ -1459,6 +1465,7 @@ steps:
           schema:
             properties:
               _links:
+                additionalProperties: true
                 properties:
                   hr:in-reply-to:
                     properties:
@@ -1486,8 +1493,8 @@ steps:
             - "state"
             - "percent"
             type: "object"
-            $id: "/schemas/4e65bab7eacf4181"
-          hr:integrity: "sha256-Nd1ygCaXQ22SSol2I5e+dt8BBWFCNdCLOKJQ+NtUhaM="
+            $id: "/schemas/a951d497d0c0cace"
+          hr:integrity: "sha256-lth/U9FdkkRbkOnZ0GTOSQs5rITIWl19hc0SNpW0Fm8="
         hr:completed:
           title: "Report completed"
           description: "Sends the result: the work is done."
@@ -1499,6 +1506,7 @@ steps:
           schema:
             properties:
               _links:
+                additionalProperties: true
                 properties:
                   hr:in-reply-to:
                     properties:
@@ -1533,8 +1541,8 @@ steps:
             - "state"
             - "result"
             type: "object"
-            $id: "/schemas/8c8339a0496fc0e0"
-          hr:integrity: "sha256-kgt//qwBRQQK6kBEUOyBZDHXAX+ADUZ7kq0zJJsT+Pc="
+            $id: "/schemas/72199fd622adf0b4"
+          hr:integrity: "sha256-Gxx2HK2zxgbYDTbHFZWw62PXifofNVtQFjWCvKur0ao="
         hr:failed:
           title: "Report failed"
           description: "Says the work failed, with a problem document."
@@ -1546,6 +1554,7 @@ steps:
           schema:
             properties:
               _links:
+                additionalProperties: true
                 properties:
                   hr:in-reply-to:
                     properties:
@@ -1572,11 +1581,11 @@ steps:
             - "type"
             - "title"
             type: "object"
-            $id: "/schemas/3b56ba1aaf3f6c04"
-          hr:integrity: "sha256-qqKB8OT+lCxISpxnfev1gx+hr8Oee1Ji2BwZKrQxjPw="
+            $id: "/schemas/3ee822291d3d75a3"
+          hr:integrity: "sha256-lU0r2LFtHRt/6h/aAZHWVXGl2ByYhCzFfvdPbrhxRDI="
   expect: 200
-  ms: 5
-- at: "2026-11-11T11:49:20.23663Z"
+  ms: 6
+- at: "2026-11-12T00:05:20.894481Z"
   mode: "script"
   say: "The failure is sent as a merge patch, not the problem document its form asks\
     \ for"
@@ -1590,12 +1599,12 @@ steps:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
-      If-Match: "\"seq-1.hsf.L0.80c93494a1d4b2d8\""
+      If-Match: "\"seq-1.hsf.L0.c0cff82a0e3dc2c7\""
       Content-Type: "application/merge-patch+json"
       Content-Digest: "sha-256=:PZRy+72t0e9p2oYzQP02EbNBQj4rUZ+uSv8eEiKaQSM=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:CxgI6aYkj4y8zV2q3qz3hbZV43zgSt9DNfCg+fd/9Gl42r7dkOTs9Qj104efE056PVlp5d1eGJkXti/xt1kbBQ==:"
+      Signature: "sig1=:eUVF7w38tYdaaTxeNEZR9iMGDAOOqvilOTp5Xsr8Js3SHTcLeuhRiTKB7DDHU3WsFm0BQavehQpLUE6J4ixPDA==:"
     body:
       state: "failed"
       type: "https://riverside-library.example/problems/no-hold-record"
@@ -1619,7 +1628,7 @@ steps:
       - "application/problem+json"
   expect: 415
   ms: 3
-- at: "2026-11-11T11:49:20.240666Z"
+- at: "2026-11-12T00:05:20.89895Z"
   mode: "script"
   say: "The library has no record of the hold, and sends the failure as a problem\
     \ document"
@@ -1633,12 +1642,12 @@ steps:
       Authorization: "Bearer <token>"
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
-      If-Match: "\"seq-1.hsf.L0.80c93494a1d4b2d8\""
+      If-Match: "\"seq-1.hsf.L0.c0cff82a0e3dc2c7\""
       Content-Type: "application/problem+json"
       Content-Digest: "sha-256=:PZRy+72t0e9p2oYzQP02EbNBQj4rUZ+uSv8eEiKaQSM=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:CxgI6aYkj4y8zV2q3qz3hbZV43zgSt9DNfCg+fd/9Gl42r7dkOTs9Qj104efE056PVlp5d1eGJkXti/xt1kbBQ==:"
+      Signature: "sig1=:eUVF7w38tYdaaTxeNEZR9iMGDAOOqvilOTp5Xsr8Js3SHTcLeuhRiTKB7DDHU3WsFm0BQavehQpLUE6J4ixPDA==:"
     body:
       state: "failed"
       type: "https://riverside-library.example/problems/no-hold-record"
@@ -1679,8 +1688,8 @@ steps:
           title: "No hold record for loan 3310"
       _forms: {}
   expect: 200
-  ms: 6
-- at: "2026-11-11T11:49:20.248861Z"
+  ms: 8
+- at: "2026-11-12T00:05:20.909024Z"
   mode: "script"
   say: "Ana asks a third time, with reply {reply}"
   params:
@@ -1761,7 +1770,7 @@ steps:
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 201
   ms: 3
-- at: "2026-11-11T11:49:20.2531Z"
+- at: "2026-11-12T00:05:20.913475Z"
   mode: "script"
   say: "Ana reads her third watch, which offers {relation}"
   params:
@@ -1824,8 +1833,8 @@ steps:
             $id: "/schemas/35f65fac527144fc"
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 200
-  ms: 1
-- at: "2026-11-11T11:49:20.255329Z"
+  ms: 2
+- at: "2026-11-12T00:05:20.916175Z"
   mode: "script"
   say: "Ana cancels the request, by the watch's form"
   params:
@@ -1873,8 +1882,8 @@ steps:
           type: "application/jwk-set+json"
       _forms: {}
   expect: 200
-  ms: 2
-- at: "2026-11-11T11:49:20.258127Z"
+  ms: 3
+- at: "2026-11-12T00:05:20.919589Z"
   mode: "script"
   say: "Ana's reply {reply}, read as HTML"
   params:
@@ -1890,7 +1899,7 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"seq-1.html.L0.27aede1e3221c9e6\""
+      ETag: "\"seq-1.html.L0.14e8abd4b190234d\""
       Content-Type: "text/html;charset=UTF-8"
     body: "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><meta\
       \ name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>/replies/r-c21</title><link\
@@ -1899,7 +1908,7 @@ steps:
       \ src=\"/heart/assets/ajv2020-8.17.1.min.d2f97a24636c.js\"></script><script\
       \ defer src=\"/heart/assets/heart-forms.e3ecd1103c5a.js\"></script></head><body\
       \ hx-headers='{\"Accept\": \"text/html\"}'><main id=\"resource\" data-etag=\"\
-      &quot;seq-1.html.L0.27aede1e3221c9e6&quot;\"><nav class=\"links\" aria-label=\"\
+      &quot;seq-1.html.L0.14e8abd4b190234d&quot;\"><nav class=\"links\" aria-label=\"\
       Links\"><a rel=\"version-history\" href=\"/replies/r-c21/history\">Version history</a></nav><h1>/replies/r-c21</h1><div\
       \ class=\"layout\"><div class=\"info\"><dl class=\"state\"><div class=\"member\"\
       ><dt title=\"reply\">Reply</dt><dd>r-c21</dd></div><div class=\"member\"><dt\
@@ -1911,7 +1920,7 @@ steps:
       \ type=\"button\" class=\"act\" data-rel=\"hr:failed\" data-dialog=\"act-hr-failed\"\
       >Report failed</button></div></aside></div><dialog id=\"act-hr-progress\" aria-labelledby=\"\
       act-hr-progress-title\"><form data-rel=\"hr:progress\" hx-patch=\"/replies/r-c21\"\
-      \ hx-headers=\"{&quot;If-Match&quot;:&quot;\\&quot;seq-1.html.L0.27aede1e3221c9e6\\\
+      \ hx-headers=\"{&quot;If-Match&quot;:&quot;\\&quot;seq-1.html.L0.14e8abd4b190234d\\\
       &quot;&quot;,&quot;Accept&quot;:&quot;text/html&quot;}\" hx-target=\"#resource\"\
       \ hx-select=\"#resource\" hx-swap=\"outerHTML\"><h2 id=\"act-hr-progress-title\"\
       >Report progress</h2><p class=\"desc\">Tells the caller how far the work has\
@@ -1925,42 +1934,43 @@ steps:
       \ id=\"act-hr-progress-note\" name=\"note\"></div><div class=\"field\"><label\
       \ for=\"act-hr-progress-_links\">Links</label><input type=\"text\" id=\"act-hr-progress-_links\"\
       \ name=\"_links\"></div><script type=\"application/schema+json\" class=\"schema\"\
-      >{\"properties\":{\"_links\":{\"properties\":{\"hr:in-reply-to\":{\"properties\"\
+      >{\"properties\":{\"_links\":{\"additionalProperties\":true,\"properties\":{\"\
+      hr:in-reply-to\":{\"properties\":{\"href\":{\"format\":\"uri\",\"type\":\"string\"\
+      },\"type\":{\"type\":\"string\"}},\"required\":[\"href\"],\"type\":\"object\"\
+      }},\"type\":\"object\"},\"note\":{\"default\":null,\"type\":[\"string\",\"null\"\
+      ]},\"percent\":{\"maximum\":100,\"minimum\":0,\"type\":\"integer\"},\"state\"\
+      :{\"const\":\"awaiting\"}},\"required\":[\"state\",\"percent\"],\"type\":\"\
+      object\",\"$id\":\"/schemas/a951d497d0c0cace\"}</script><div class=\"problem\"\
+      \ role=\"alert\" hidden></div><div class=\"buttons\"><button type=\"button\"\
+      \ class=\"quiet\" data-close>Cancel</button><button type=\"submit\">Report progress</button></div></form></dialog><dialog\
+      \ id=\"act-hr-completed\" aria-labelledby=\"act-hr-completed-title\"><form data-rel=\"\
+      hr:completed\" hx-patch=\"/replies/r-c21\" hx-headers=\"{&quot;If-Match&quot;:&quot;\\\
+      &quot;seq-1.html.L0.14e8abd4b190234d\\&quot;&quot;,&quot;Accept&quot;:&quot;text/html&quot;}\"\
+      \ hx-target=\"#resource\" hx-select=\"#resource\" hx-swap=\"outerHTML\"><h2\
+      \ id=\"act-hr-completed-title\">Report completed</h2><p class=\"desc\">Sends\
+      \ the result: the work is done.</p><div class=\"field\"><label for=\"act-hr-completed-state\"\
+      >State<span class=\"required\" aria-hidden=\"true\">*</span></label><input type=\"\
+      text\" id=\"act-hr-completed-state\" name=\"state\" required></div><div class=\"\
+      field\"><label for=\"act-hr-completed-result\">Result<span class=\"required\"\
+      \ aria-hidden=\"true\">*</span></label><input type=\"text\" id=\"act-hr-completed-result\"\
+      \ name=\"result\" required></div><div class=\"field\"><label for=\"act-hr-completed-note\"\
+      >Note</label><input type=\"text\" id=\"act-hr-completed-note\" name=\"note\"\
+      ></div><div class=\"field\"><label for=\"act-hr-completed-_links\">Links</label><input\
+      \ type=\"text\" id=\"act-hr-completed-_links\" name=\"_links\"></div><script\
+      \ type=\"application/schema+json\" class=\"schema\">{\"properties\":{\"_links\"\
+      :{\"additionalProperties\":true,\"properties\":{\"hr:in-reply-to\":{\"properties\"\
       :{\"href\":{\"format\":\"uri\",\"type\":\"string\"},\"type\":{\"type\":\"string\"\
       }},\"required\":[\"href\"],\"type\":\"object\"}},\"type\":\"object\"},\"note\"\
-      :{\"default\":null,\"type\":[\"string\",\"null\"]},\"percent\":{\"maximum\"\
-      :100,\"minimum\":0,\"type\":\"integer\"},\"state\":{\"const\":\"awaiting\"}},\"\
-      required\":[\"state\",\"percent\"],\"type\":\"object\",\"$id\":\"/schemas/4e65bab7eacf4181\"\
-      }</script><div class=\"problem\" role=\"alert\" hidden></div><div class=\"buttons\"\
-      ><button type=\"button\" class=\"quiet\" data-close>Cancel</button><button type=\"\
-      submit\">Report progress</button></div></form></dialog><dialog id=\"act-hr-completed\"\
-      \ aria-labelledby=\"act-hr-completed-title\"><form data-rel=\"hr:completed\"\
-      \ hx-patch=\"/replies/r-c21\" hx-headers=\"{&quot;If-Match&quot;:&quot;\\&quot;seq-1.html.L0.27aede1e3221c9e6\\\
-      &quot;&quot;,&quot;Accept&quot;:&quot;text/html&quot;}\" hx-target=\"#resource\"\
-      \ hx-select=\"#resource\" hx-swap=\"outerHTML\"><h2 id=\"act-hr-completed-title\"\
-      >Report completed</h2><p class=\"desc\">Sends the result: the work is done.</p><div\
-      \ class=\"field\"><label for=\"act-hr-completed-state\">State<span class=\"\
-      required\" aria-hidden=\"true\">*</span></label><input type=\"text\" id=\"act-hr-completed-state\"\
-      \ name=\"state\" required></div><div class=\"field\"><label for=\"act-hr-completed-result\"\
-      >Result<span class=\"required\" aria-hidden=\"true\">*</span></label><input\
-      \ type=\"text\" id=\"act-hr-completed-result\" name=\"result\" required></div><div\
-      \ class=\"field\"><label for=\"act-hr-completed-note\">Note</label><input type=\"\
-      text\" id=\"act-hr-completed-note\" name=\"note\"></div><div class=\"field\"\
-      ><label for=\"act-hr-completed-_links\">Links</label><input type=\"text\" id=\"\
-      act-hr-completed-_links\" name=\"_links\"></div><script type=\"application/schema+json\"\
-      \ class=\"schema\">{\"properties\":{\"_links\":{\"properties\":{\"hr:in-reply-to\"\
-      :{\"properties\":{\"href\":{\"format\":\"uri\",\"type\":\"string\"},\"type\"\
-      :{\"type\":\"string\"}},\"required\":[\"href\"],\"type\":\"object\"}},\"type\"\
-      :\"object\"},\"note\":{\"type\":[\"string\",\"null\"]},\"result\":{\"additionalProperties\"\
-      :true,\"properties\":{\"loan\":{\"type\":\"integer\"},\"renewableFrom\":{\"\
-      format\":\"date\",\"type\":\"string\"}},\"required\":[\"loan\",\"renewableFrom\"\
-      ],\"type\":\"object\"},\"state\":{\"const\":\"completed\"}},\"required\":[\"\
-      state\",\"result\"],\"type\":\"object\",\"$id\":\"/schemas/8c8339a0496fc0e0\"\
-      }</script><div class=\"problem\" role=\"alert\" hidden></div><div class=\"buttons\"\
-      ><button type=\"button\" class=\"quiet\" data-close>Cancel</button><button type=\"\
+      :{\"type\":[\"string\",\"null\"]},\"result\":{\"additionalProperties\":true,\"\
+      properties\":{\"loan\":{\"type\":\"integer\"},\"renewableFrom\":{\"format\"\
+      :\"date\",\"type\":\"string\"}},\"required\":[\"loan\",\"renewableFrom\"],\"\
+      type\":\"object\"},\"state\":{\"const\":\"completed\"}},\"required\":[\"state\"\
+      ,\"result\"],\"type\":\"object\",\"$id\":\"/schemas/72199fd622adf0b4\"}</script><div\
+      \ class=\"problem\" role=\"alert\" hidden></div><div class=\"buttons\"><button\
+      \ type=\"button\" class=\"quiet\" data-close>Cancel</button><button type=\"\
       submit\">Report completed</button></div></form></dialog><dialog id=\"act-hr-failed\"\
       \ aria-labelledby=\"act-hr-failed-title\"><form data-rel=\"hr:failed\" hx-patch=\"\
-      /replies/r-c21\" hx-headers=\"{&quot;If-Match&quot;:&quot;\\&quot;seq-1.html.L0.27aede1e3221c9e6\\\
+      /replies/r-c21\" hx-headers=\"{&quot;If-Match&quot;:&quot;\\&quot;seq-1.html.L0.14e8abd4b190234d\\\
       &quot;&quot;,&quot;Accept&quot;:&quot;text/html&quot;}\" hx-target=\"#resource\"\
       \ hx-select=\"#resource\" hx-swap=\"outerHTML\"><h2 id=\"act-hr-failed-title\"\
       >Report failed</h2><p class=\"desc\">Says the work failed, with a problem document.</p><div\
@@ -1975,20 +1985,20 @@ steps:
       >Detail</label><input type=\"text\" id=\"act-hr-failed-detail\" name=\"detail\"\
       ></div><div class=\"field\"><label for=\"act-hr-failed-_links\">Links</label><input\
       \ type=\"text\" id=\"act-hr-failed-_links\" name=\"_links\"></div><script type=\"\
-      application/schema+json\" class=\"schema\">{\"properties\":{\"_links\":{\"properties\"\
-      :{\"hr:in-reply-to\":{\"properties\":{\"href\":{\"format\":\"uri\",\"type\"\
-      :\"string\"},\"type\":{\"type\":\"string\"}},\"required\":[\"href\"],\"type\"\
-      :\"object\"}},\"type\":\"object\"},\"detail\":{\"type\":\"string\"},\"state\"\
-      :{\"const\":\"failed\"},\"title\":{\"type\":\"string\"},\"type\":{\"format\"\
-      :\"uri\",\"type\":\"string\"}},\"required\":[\"state\",\"type\",\"title\"],\"\
-      type\":\"object\",\"$id\":\"/schemas/3b56ba1aaf3f6c04\"}</script><div class=\"\
-      problem\" role=\"alert\" hidden></div><div class=\"buttons\"><button type=\"\
-      button\" class=\"quiet\" data-close>Cancel</button><button type=\"submit\">Report\
-      \ failed</button></div></form></dialog></main><div id=\"announce\" class=\"\
-      announce\" role=\"status\" aria-live=\"polite\"></div></body></html>\n"
+      application/schema+json\" class=\"schema\">{\"properties\":{\"_links\":{\"additionalProperties\"\
+      :true,\"properties\":{\"hr:in-reply-to\":{\"properties\":{\"href\":{\"format\"\
+      :\"uri\",\"type\":\"string\"},\"type\":{\"type\":\"string\"}},\"required\":[\"\
+      href\"],\"type\":\"object\"}},\"type\":\"object\"},\"detail\":{\"type\":\"string\"\
+      },\"state\":{\"const\":\"failed\"},\"title\":{\"type\":\"string\"},\"type\"\
+      :{\"format\":\"uri\",\"type\":\"string\"}},\"required\":[\"state\",\"type\"\
+      ,\"title\"],\"type\":\"object\",\"$id\":\"/schemas/3ee822291d3d75a3\"}</script><div\
+      \ class=\"problem\" role=\"alert\" hidden></div><div class=\"buttons\"><button\
+      \ type=\"button\" class=\"quiet\" data-close>Cancel</button><button type=\"\
+      submit\">Report failed</button></div></form></dialog></main><div id=\"announce\"\
+      \ class=\"announce\" role=\"status\" aria-live=\"polite\"></div></body></html>\n"
   expect: 200
-  ms: 7
-- at: "2026-11-11T11:49:20.265743Z"
+  ms: 19
+- at: "2026-11-12T00:05:20.93969Z"
   mode: "script"
   say: "Ana's reply {reply}, read as HAL-FORMS"
   params:
@@ -2081,8 +2091,8 @@ steps:
             required: false
             type: "text"
   expect: 200
-  ms: 3
-- at: "2026-11-11T11:49:20.269727Z"
+  ms: 91
+- at: "2026-11-12T00:05:21.031452Z"
   mode: "script"
   say: "Ana's reply {reply}, asked for as XML, which it is not served in"
   params:
@@ -2111,4 +2121,4 @@ steps:
       - type: "text/html"
       - type: "application/json"
   expect: 406
-  ms: 1
+  ms: 3
