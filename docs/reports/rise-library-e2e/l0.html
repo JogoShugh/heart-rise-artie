@@ -188,7 +188,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
   <div id="run-report"></div>
 </main>
 <pre hidden id="run-trace">steps:
-- at: "2026-11-12T00:05:20.682871Z"
+- at: "2026-11-12T00:43:26.047151Z"
   mode: "script"
   say: "Ana reads the library's entry, as HAL Schema Forms"
   params: {}
@@ -492,9 +492,9 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           - "sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU="
         digest: "sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs="
   expect: 200
-  ms: 71
+  ms: 77
   entry: true
-- at: "2026-11-12T00:05:20.771876Z"
+- at: "2026-11-12T00:43:26.145533Z"
   mode: "script"
   say: "Ana asks to be told when loan {loan} can be renewed, unsigned"
   params:
@@ -531,9 +531,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       title: "A signature is required"
       status: 401
       detail: "Each act here is signed by the key ana-2026-11."
+      _links:
+        about:
+          href: "/"
   expect: 401
   ms: 4
-- at: "2026-11-12T00:05:20.78466Z"
+- at: "2026-11-12T00:43:26.160228Z"
   mode: "script"
   say: "Ana asks to be told when loan {loan} can be renewed, with reply {reply}, signed\
     \ with her key"
@@ -614,8 +617,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
             $id: "/schemas/35f65fac527144fc"
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 201
-  ms: 13
-- at: "2026-11-12T00:05:20.799412Z"
+  ms: 15
+- at: "2026-11-12T00:43:26.17777Z"
   mode: "script"
   say: "Ana reads her watch: its keys, its reply, and her cancel"
   params: {}
@@ -677,8 +680,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
             $id: "/schemas/35f65fac527144fc"
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 200
-  ms: 3
-- at: "2026-11-12T00:05:20.802903Z"
+  ms: 4
+- at: "2026-11-12T00:43:26.182082Z"
   mode: "script"
   say: "The library reads Ana's reply {reply}, linked from the watch, for its forms"
   params:
@@ -847,7 +850,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           hr:integrity: "sha256-lU0r2LFtHRt/6h/aAZHWVXGl2ByYhCzFfvdPbrhxRDI="
   expect: 200
   ms: 8
-- at: "2026-11-12T00:05:20.819192Z"
+- at: "2026-11-12T00:43:26.199221Z"
   mode: "script"
   say: "The library reports progress of {percent} percent, naming the watch it answers\
     \ for"
@@ -1035,8 +1038,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
             $id: "/schemas/3ee822291d3d75a3"
           hr:integrity: "sha256-lU0r2LFtHRt/6h/aAZHWVXGl2ByYhCzFfvdPbrhxRDI="
   expect: 200
-  ms: 13
-- at: "2026-11-12T00:05:20.834254Z"
+  ms: 15
+- at: "2026-11-12T00:43:26.216112Z"
   mode: "script"
   say: "An answer that names another watch, {watch}, is sent"
   params:
@@ -1074,9 +1077,18 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       detail: "The answer names another watch than the one Ana's request created,\
         \ http://localhost:8140/watches/1"
       rel: "hr:in-reply-to"
+      _links:
+        about:
+          href: "/replies/r-7f3"
+        hr:in-reply-to:
+          href: "http://localhost:8140/watches/1"
+        curies:
+        - name: "hr"
+          href: "https://w3id.org/heart-rise/rels/{rel}"
+          templated: true
   expect: 409
-  ms: 4
-- at: "2026-11-12T00:05:20.840406Z"
+  ms: 5
+- at: "2026-11-12T00:43:26.223059Z"
   mode: "script"
   say: "A result signed with another key, claiming the library's keyid, is sent"
   params:
@@ -1094,7 +1106,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       Content-Digest: "sha-256=:DM73mHpUssFOVNR4oyVKhIeNRaD2EWV4DWzxhvMREho=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:mrvB8Y8F/Ij8jcP1TRhYr6UtNkNru+2kSeMYOUWJbm8BKTnJjB58wY1wT1pSxC9UkBE+hl14tWykR8YmB3aTCA==:"
+      Signature: "sig1=:FOOHCTQxeIMBMtIfmLp/k8d6MEbkXGtXgWqIUqRag4wHAHjb3fy+TuEbHtwWYZbjZFOSm5KNmJc3KF0ou+H3Bg==:"
     body:
       state: "completed"
       result:
@@ -1116,9 +1128,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       title: "The signature does not verify"
       status: 401
       detail: "Each act here is signed by the key library-2026-11."
+      _links:
+        about:
+          href: "/replies/r-7f3"
   expect: 401
-  ms: 3
-- at: "2026-11-12T00:05:20.844208Z"
+  ms: 4
+- at: "2026-11-12T00:43:26.227588Z"
   mode: "script"
   say: "An unsigned result is sent"
   params:
@@ -1154,9 +1169,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       title: "A signature is required"
       status: 401
       detail: "Each act here is signed by the key library-2026-11."
+      _links:
+        about:
+          href: "/replies/r-7f3"
   expect: 401
-  ms: 3
-- at: "2026-11-12T00:05:20.849775Z"
+  ms: 2
+- at: "2026-11-12T00:43:26.232768Z"
   mode: "script"
   say: "The hold is returned, and the library sends the result, signed"
   params:
@@ -1216,8 +1234,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           type: "application/hal+json"
       _forms: {}
   expect: 200
-  ms: 8
-- at: "2026-11-12T00:05:20.860774Z"
+  ms: 10
+- at: "2026-11-12T00:43:26.246115Z"
   mode: "script"
   say: "The same result is sent again, and is answered as the first was"
   params:
@@ -1277,8 +1295,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           type: "application/hal+json"
       _forms: {}
   expect: 200
-  ms: 4
-- at: "2026-11-12T00:05:20.866218Z"
+  ms: 5
+- at: "2026-11-12T00:43:26.252861Z"
   mode: "script"
   say: "A different result is sent, after the answer"
   params:
@@ -1317,9 +1335,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       detail: "hr:completed is not offered now: The reply is completed, so it takes\
         \ no more."
       rel: "https://w3id.org/heart-rise/rels/completed"
+      _links:
+        about:
+          href: "/replies/r-7f3"
   expect: 409
-  ms: 4
-- at: "2026-11-12T00:05:20.871287Z"
+  ms: 5
+- at: "2026-11-12T00:43:26.258305Z"
   mode: "script"
   say: "Ana reads her watch after the answer: no cancel, and why"
   params: {}
@@ -1363,8 +1384,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           type: "application/jwk-set+json"
       _forms: {}
   expect: 200
-  ms: 1
-- at: "2026-11-12T00:05:20.873512Z"
+  ms: 2
+- at: "2026-11-12T00:43:26.260734Z"
   mode: "script"
   say: "Ana reads why the watch offers no cancel"
   params: {}
@@ -1387,7 +1408,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
         title: "Cancel the request"
   expect: 200
   ms: 1
-- at: "2026-11-12T00:05:20.875146Z"
+- at: "2026-11-12T00:43:26.262157Z"
   mode: "script"
   say: "Ana cancels anyway, by the form she read before"
   params:
@@ -1414,9 +1435,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       detail: "hr:cancel is not offered now: The library has answered this request,\
         \ so there is nothing to cancel."
       rel: "https://w3id.org/heart-rise/rels/cancel"
+      _links:
+        about:
+          href: "/watches/1"
   expect: 409
-  ms: 1
-- at: "2026-11-12T00:05:20.877Z"
+  ms: 2
+- at: "2026-11-12T00:43:26.264432Z"
   mode: "script"
   say: "The library reads the reply's history, by the link its last answer gave"
   params:
@@ -1441,7 +1465,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
         up:
           href: "/replies/r-7f3"
       changes:
-      - at: "2026-11-12T00:05:20.832015Z"
+      - at: "2026-11-12T00:43:26.213761Z"
         replaced: "\"seq-1.hsf.L0.2912de67215baf3a\""
         signatureInput: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
           );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
@@ -1449,7 +1473,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
         _links:
           self:
             href: "/replies/r-7f3/history#change-1"
-      - at: "2026-11-12T00:05:20.857678Z"
+      - at: "2026-11-12T00:43:26.242305Z"
         replaced: "\"seq-2.hsf.L0.1c3fc62f347d356f\""
         signatureInput: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
           );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
@@ -1461,7 +1485,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
             href: "/replies/r-7f3/history#change-1"
   expect: 200
   ms: 1
-- at: "2026-11-12T00:05:20.879499Z"
+- at: "2026-11-12T00:43:26.266906Z"
   mode: "script"
   say: "Ana asks again, with reply {reply}, on the entry's ETag she already holds"
   params:
@@ -1542,7 +1566,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 201
   ms: 4
-- at: "2026-11-12T00:05:20.884687Z"
+- at: "2026-11-12T00:43:26.272948Z"
   mode: "script"
   say: "Ana reads her second watch"
   params: {}
@@ -1605,7 +1629,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 200
   ms: 2
-- at: "2026-11-12T00:05:20.887453Z"
+- at: "2026-11-12T00:43:26.275848Z"
   mode: "script"
   say: "The library reads Ana's reply {reply} for its forms"
   params:
@@ -1774,7 +1798,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           hr:integrity: "sha256-lU0r2LFtHRt/6h/aAZHWVXGl2ByYhCzFfvdPbrhxRDI="
   expect: 200
   ms: 6
-- at: "2026-11-12T00:05:20.894481Z"
+- at: "2026-11-12T00:43:26.283689Z"
   mode: "script"
   say: "The failure is sent as a merge patch, not the problem document its form asks\
     \ for"
@@ -1815,9 +1839,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       accepted:
       - "application/merge-patch+json"
       - "application/problem+json"
+      _links:
+        about:
+          href: "/replies/r-b04"
   expect: 415
-  ms: 3
-- at: "2026-11-12T00:05:20.89895Z"
+  ms: 4
+- at: "2026-11-12T00:43:26.289228Z"
   mode: "script"
   say: "The library has no record of the hold, and sends the failure as a problem\
     \ document"
@@ -1877,8 +1904,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           title: "No hold record for loan 3310"
       _forms: {}
   expect: 200
-  ms: 8
-- at: "2026-11-12T00:05:20.909024Z"
+  ms: 7
+- at: "2026-11-12T00:43:26.2992Z"
   mode: "script"
   say: "Ana asks a third time, with reply {reply}"
   params:
@@ -1959,7 +1986,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 201
   ms: 3
-- at: "2026-11-12T00:05:20.913475Z"
+- at: "2026-11-12T00:43:26.3039Z"
   mode: "script"
   say: "Ana reads her third watch, which offers {relation}"
   params:
@@ -2023,7 +2050,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 200
   ms: 2
-- at: "2026-11-12T00:05:20.916175Z"
+- at: "2026-11-12T00:43:26.306621Z"
   mode: "script"
   say: "Ana cancels the request, by the watch's form"
   params:
@@ -2072,7 +2099,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       _forms: {}
   expect: 200
   ms: 3
-- at: "2026-11-12T00:05:20.919589Z"
+- at: "2026-11-12T00:43:26.310609Z"
   mode: "script"
   say: "Ana's reply {reply}, read as HTML"
   params:
@@ -2186,8 +2213,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       submit\"&gt;Report failed&lt;/button&gt;&lt;/div&gt;&lt;/form&gt;&lt;/dialog&gt;&lt;/main&gt;&lt;div id=\"announce\"\
       \ class=\"announce\" role=\"status\" aria-live=\"polite\"&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;\n"
   expect: 200
-  ms: 19
-- at: "2026-11-12T00:05:20.93969Z"
+  ms: 21
+- at: "2026-11-12T00:43:26.332397Z"
   mode: "script"
   say: "Ana's reply {reply}, read as HAL-FORMS"
   params:
@@ -2280,8 +2307,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
             required: false
             type: "text"
   expect: 200
-  ms: 91
-- at: "2026-11-12T00:05:21.031452Z"
+  ms: 101
+- at: "2026-11-12T00:43:26.434306Z"
   mode: "script"
   say: "Ana's reply {reply}, asked for as XML, which it is not served in"
   params:
@@ -2309,6 +2336,9 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
         profile: "https://w3id.org/heart-rise/hal-forms"
       - type: "text/html"
       - type: "application/json"
+      _links:
+        about:
+          href: "/replies/r-c21"
   expect: 406
   ms: 3
 </pre>

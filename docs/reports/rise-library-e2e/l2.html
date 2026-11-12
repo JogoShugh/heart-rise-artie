@@ -188,7 +188,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
   <div id="run-report"></div>
 </main>
 <pre hidden id="run-trace">steps:
-- at: "2026-11-12T00:05:21.286148Z"
+- at: "2026-11-12T00:43:26.706327Z"
   mode: "script"
   say: "Ana reads the library's entry, as HAL Schema Forms"
   params: {}
@@ -277,7 +277,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
   expect: 200
   ms: 1
   entry: true
-- at: "2026-11-12T00:05:21.287972Z"
+- at: "2026-11-12T00:43:26.70839Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -420,7 +420,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           templated: true
   expect: 200
   ms: 1
-- at: "2026-11-12T00:05:21.29112Z"
+- at: "2026-11-12T00:43:26.712154Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -452,7 +452,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       type: "object"
   expect: 200
   ms: 1
-- at: "2026-11-12T00:05:21.292352Z"
+- at: "2026-11-12T00:43:26.71344Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -483,8 +483,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       - "id"
       type: "object"
   expect: 200
-  ms: 0
-- at: "2026-11-12T00:05:21.293316Z"
+  ms: 1
+- at: "2026-11-12T00:43:26.71481Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -516,7 +516,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       type: "object"
   expect: 200
   ms: 0
-- at: "2026-11-12T00:05:21.294449Z"
+- at: "2026-11-12T00:43:26.715963Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -547,8 +547,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       - "name"
       type: "object"
   expect: 200
-  ms: 1
-- at: "2026-11-12T00:05:21.295824Z"
+  ms: 0
+- at: "2026-11-12T00:43:26.717108Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -580,7 +580,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       type: "object"
   expect: 200
   ms: 1
-- at: "2026-11-12T00:05:21.297088Z"
+- at: "2026-11-12T00:43:26.718378Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -611,7 +611,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       type: "object"
   expect: 200
   ms: 0
-- at: "2026-11-12T00:05:21.298181Z"
+- at: "2026-11-12T00:43:26.719606Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -642,8 +642,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       - "name"
       type: "object"
   expect: 200
-  ms: 0
-- at: "2026-11-12T00:05:21.299132Z"
+  ms: 1
+- at: "2026-11-12T00:43:26.720949Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -705,8 +705,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       - "_links"
       type: "object"
   expect: 200
-  ms: 1
-- at: "2026-11-12T00:05:21.300617Z"
+  ms: 0
+- at: "2026-11-12T00:43:26.722393Z"
   mode: "script"
   say: "Ana asks to be told when loan {loan} can be renewed, unsigned"
   params:
@@ -744,9 +744,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       title: "A signature is required"
       status: 401
       detail: "Each act here is signed by the key ana-2026-11."
+      _links:
+        about:
+          href: "/"
   expect: 401
   ms: 1
-- at: "2026-11-12T00:05:21.303011Z"
+- at: "2026-11-12T00:43:26.724533Z"
   mode: "script"
   say: "Ana asks to be told when loan {loan} can be renewed, with reply {reply}, signed\
     \ with her key"
@@ -812,7 +815,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           type: "application/jwk-set+json"
   expect: 201
   ms: 3
-- at: "2026-11-12T00:05:21.306991Z"
+- at: "2026-11-12T00:43:26.729439Z"
   mode: "script"
   say: "Ana reads her watch: its keys, its reply, and her cancel"
   params: {}
@@ -859,7 +862,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           type: "application/jwk-set+json"
   expect: 200
   ms: 1
-- at: "2026-11-12T00:05:21.308823Z"
+- at: "2026-11-12T00:43:26.731023Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -909,8 +912,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
           type: "application/json"
   expect: 200
-  ms: 0
-- at: "2026-11-12T00:05:21.309868Z"
+  ms: 1
+- at: "2026-11-12T00:43:26.732385Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -938,7 +941,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       type: "object"
   expect: 200
   ms: 0
-- at: "2026-11-12T00:05:21.310969Z"
+- at: "2026-11-12T00:43:26.733385Z"
   mode: "script"
   say: "The library reads Ana's reply {reply}, linked from the watch, for its forms"
   params:
@@ -979,8 +982,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           href: "/replies/r-7f3/history"
           type: "application/hal+json"
   expect: 200
-  ms: 3
-- at: "2026-11-12T00:05:21.314686Z"
+  ms: 5
+- at: "2026-11-12T00:43:26.739026Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -1056,8 +1059,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
           type: "application/json"
   expect: 200
-  ms: 0
-- at: "2026-11-12T00:05:21.315844Z"
+  ms: 1
+- at: "2026-11-12T00:43:26.740284Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -1116,7 +1119,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       type: "object"
   expect: 200
   ms: 0
-- at: "2026-11-12T00:05:21.316918Z"
+- at: "2026-11-12T00:43:26.741356Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -1166,8 +1169,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       - "title"
       type: "object"
   expect: 200
-  ms: 1
-- at: "2026-11-12T00:05:21.318089Z"
+  ms: 0
+- at: "2026-11-12T00:43:26.742496Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -1219,7 +1222,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       type: "object"
   expect: 200
   ms: 0
-- at: "2026-11-12T00:05:21.321382Z"
+- at: "2026-11-12T00:43:26.746049Z"
   mode: "script"
   say: "The library reports progress of {percent} percent, naming the watch it answers\
     \ for"
@@ -1281,7 +1284,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           type: "application/hal+json"
   expect: 200
   ms: 4
-- at: "2026-11-12T00:05:21.326671Z"
+- at: "2026-11-12T00:43:26.751861Z"
   mode: "script"
   say: "An answer that names another watch, {watch}, is sent"
   params:
@@ -1320,9 +1323,18 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       detail: "The answer names another watch than the one Ana's request created,\
         \ http://localhost:8140/watches/1"
       rel: "hr:in-reply-to"
+      _links:
+        about:
+          href: "/replies/r-7f3"
+        hr:in-reply-to:
+          href: "http://localhost:8140/watches/1"
+        curies:
+        - name: "hr"
+          href: "https://w3id.org/heart-rise/rels/{rel}"
+          templated: true
   expect: 409
   ms: 3
-- at: "2026-11-12T00:05:21.330757Z"
+- at: "2026-11-12T00:43:26.756138Z"
   mode: "script"
   say: "A result signed with another key, claiming the library's keyid, is sent"
   params:
@@ -1341,7 +1353,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       Content-Digest: "sha-256=:DM73mHpUssFOVNR4oyVKhIeNRaD2EWV4DWzxhvMREho=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:DyWBPmQMA2hauroe1SzGKVhOO7c/O74eTxWaQRbyBumxeiON7InN4eye6eBSyvVg3HWELRE8IStlofRGbl9sAQ==:"
+      Signature: "sig1=:+zCFmiYnUPpbHU3I2ZPvNY8r3NutFokz0z1mWSrEqtio+b/qCAiQI3F170rOPQWaPS0HVYjJIdJpNlOu6FAgAA==:"
     body:
       state: "completed"
       result:
@@ -1363,9 +1375,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       title: "The signature does not verify"
       status: 401
       detail: "Each act here is signed by the key library-2026-11."
+      _links:
+        about:
+          href: "/replies/r-7f3"
   expect: 401
-  ms: 2
-- at: "2026-11-12T00:05:21.333795Z"
+  ms: 3
+- at: "2026-11-12T00:43:26.75953Z"
   mode: "script"
   say: "An unsigned result is sent"
   params:
@@ -1402,9 +1417,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       title: "A signature is required"
       status: 401
       detail: "Each act here is signed by the key library-2026-11."
+      _links:
+        about:
+          href: "/replies/r-7f3"
   expect: 401
   ms: 2
-- at: "2026-11-12T00:05:21.338161Z"
+- at: "2026-11-12T00:43:26.763931Z"
   mode: "script"
   say: "The hold is returned, and the library sends the result, signed"
   params:
@@ -1466,8 +1484,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           href: "/replies/r-7f3/history"
           type: "application/hal+json"
   expect: 200
-  ms: 4
-- at: "2026-11-12T00:05:21.342742Z"
+  ms: 5
+- at: "2026-11-12T00:43:26.769825Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -1499,7 +1517,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           type: "application/json"
   expect: 200
   ms: 1
-- at: "2026-11-12T00:05:21.345873Z"
+- at: "2026-11-12T00:43:26.772579Z"
   mode: "script"
   say: "The same result is sent again, and is answered as the first was"
   params:
@@ -1561,8 +1579,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           href: "/replies/r-7f3/history"
           type: "application/hal+json"
   expect: 200
-  ms: 5
-- at: "2026-11-12T00:05:21.352306Z"
+  ms: 4
+- at: "2026-11-12T00:43:26.778524Z"
   mode: "script"
   say: "A different result is sent, after the answer"
   params:
@@ -1602,9 +1620,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       detail: "hr:completed is not offered now: The reply is completed, so it takes\
         \ no more."
       rel: "https://w3id.org/heart-rise/rels/completed"
+      _links:
+        about:
+          href: "/replies/r-7f3"
   expect: 409
   ms: 3
-- at: "2026-11-12T00:05:21.356001Z"
+- at: "2026-11-12T00:43:26.782414Z"
   mode: "script"
   say: "Ana reads her watch after the answer: no cancel, and why"
   params: {}
@@ -1651,7 +1672,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           type: "application/jwk-set+json"
   expect: 200
   ms: 2
-- at: "2026-11-12T00:05:21.358264Z"
+- at: "2026-11-12T00:43:26.784821Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -1685,8 +1706,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           integrity: "sha256-aj+jg7dpaWNe0+Zre2PKcNGS3SbY2+VQc4DcGhPoIUA="
           type: "application/json"
   expect: 200
-  ms: 0
-- at: "2026-11-12T00:05:21.359372Z"
+  ms: 1
+- at: "2026-11-12T00:43:26.786075Z"
   mode: "script"
   say: "Ana reads why the watch offers no cancel"
   params: {}
@@ -1710,7 +1731,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
         title: "Cancel the request"
   expect: 200
   ms: 0
-- at: "2026-11-12T00:05:21.360529Z"
+- at: "2026-11-12T00:43:26.787322Z"
   mode: "script"
   say: "Ana cancels anyway, by the form she read before"
   params:
@@ -1738,9 +1759,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       detail: "hr:cancel is not offered now: The library has answered this request,\
         \ so there is nothing to cancel."
       rel: "https://w3id.org/heart-rise/rels/cancel"
+      _links:
+        about:
+          href: "/watches/1"
   expect: 409
   ms: 1
-- at: "2026-11-12T00:05:21.362438Z"
+- at: "2026-11-12T00:43:26.789396Z"
   mode: "script"
   say: "The library reads the reply's history, by the link its last answer gave"
   params:
@@ -1766,7 +1790,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
         up:
           href: "/replies/r-7f3"
       changes:
-      - at: "2026-11-12T00:05:21.325365Z"
+      - at: "2026-11-12T00:43:26.750060Z"
         replaced: "\"seq-1.hsf.L2.cb8f9d245b2e22a9\""
         signatureInput: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
           );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
@@ -1774,7 +1798,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
         _links:
           self:
             href: "/replies/r-7f3/history#change-1"
-      - at: "2026-11-12T00:05:21.341820Z"
+      - at: "2026-11-12T00:43:26.768965Z"
         replaced: "\"seq-2.hsf.L2.dc83f129cd1c43e1\""
         signatureInput: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
           );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
@@ -1786,7 +1810,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
             href: "/replies/r-7f3/history#change-1"
   expect: 200
   ms: 0
-- at: "2026-11-12T00:05:21.36406Z"
+- at: "2026-11-12T00:43:26.791242Z"
   mode: "script"
   say: "Ana asks again, with reply {reply}, on the entry's ETag she already holds"
   params:
@@ -1850,8 +1874,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           href: "/keys"
           type: "application/jwk-set+json"
   expect: 201
-  ms: 2
-- at: "2026-11-12T00:05:21.367763Z"
+  ms: 3
+- at: "2026-11-12T00:43:26.795364Z"
   mode: "script"
   say: "Ana reads her second watch"
   params: {}
@@ -1898,7 +1922,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           type: "application/jwk-set+json"
   expect: 200
   ms: 1
-- at: "2026-11-12T00:05:21.369818Z"
+- at: "2026-11-12T00:43:26.797087Z"
   mode: "script"
   say: "The library reads Ana's reply {reply} for its forms"
   params:
@@ -1939,8 +1963,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           href: "/replies/r-b04/history"
           type: "application/hal+json"
   expect: 200
-  ms: 2
-- at: "2026-11-12T00:05:21.373004Z"
+  ms: 3
+- at: "2026-11-12T00:43:26.801464Z"
   mode: "script"
   say: "The failure is sent as a merge patch, not the problem document its form asks\
     \ for"
@@ -1982,9 +2006,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       accepted:
       - "application/merge-patch+json"
       - "application/problem+json"
+      _links:
+        about:
+          href: "/replies/r-b04"
   expect: 415
-  ms: 2
-- at: "2026-11-12T00:05:21.376446Z"
+  ms: 4
+- at: "2026-11-12T00:43:26.806464Z"
   mode: "script"
   say: "The library has no record of the hold, and sends the failure as a problem\
     \ document"
@@ -2047,7 +2074,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           title: "No hold record for loan 3310"
   expect: 200
   ms: 4
-- at: "2026-11-12T00:05:21.38099Z"
+- at: "2026-11-12T00:43:26.811118Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -2079,7 +2106,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           type: "application/json"
   expect: 200
   ms: 0
-- at: "2026-11-12T00:05:21.383497Z"
+- at: "2026-11-12T00:43:26.813555Z"
   mode: "script"
   say: "Ana asks a third time, with reply {reply}"
   params:
@@ -2144,7 +2171,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           type: "application/jwk-set+json"
   expect: 201
   ms: 3
-- at: "2026-11-12T00:05:21.387651Z"
+- at: "2026-11-12T00:43:26.817548Z"
   mode: "script"
   say: "Ana reads her third watch, which offers {relation}"
   params:
@@ -2191,8 +2218,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           href: "/keys"
           type: "application/jwk-set+json"
   expect: 200
-  ms: 1
-- at: "2026-11-12T00:05:21.389464Z"
+  ms: 2
+- at: "2026-11-12T00:43:26.819811Z"
   mode: "script"
   say: "Ana cancels the request, by the watch's form"
   params:
@@ -2243,7 +2270,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           type: "application/jwk-set+json"
   expect: 200
   ms: 2
-- at: "2026-11-12T00:05:21.391749Z"
+- at: "2026-11-12T00:43:26.822112Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -2277,8 +2304,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
           integrity: "sha256-aFsRUFyKwgMR1dtWorFahDReDDIJFHkdgMqoO9Dck/c="
           type: "application/json"
   expect: 200
-  ms: 1
-- at: "2026-11-12T00:05:21.393049Z"
+  ms: 0
+- at: "2026-11-12T00:43:26.823212Z"
   mode: "script"
   say: "Ana's reply {reply}, read as HTML"
   params:
@@ -2393,8 +2420,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       submit\"&gt;Report failed&lt;/button&gt;&lt;/div&gt;&lt;/form&gt;&lt;/dialog&gt;&lt;/main&gt;&lt;div id=\"announce\"\
       \ class=\"announce\" role=\"status\" aria-live=\"polite\"&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;\n"
   expect: 200
-  ms: 8
-- at: "2026-11-12T00:05:21.401353Z"
+  ms: 10
+- at: "2026-11-12T00:43:26.833405Z"
   mode: "script"
   say: "Ana's reply {reply}, read as HAL-FORMS"
   params:
@@ -2489,7 +2516,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
             type: "text"
   expect: 200
   ms: 3
-- at: "2026-11-12T00:05:21.405048Z"
+- at: "2026-11-12T00:43:26.837422Z"
   mode: "script"
   say: "Ana's reply {reply}, asked for as XML, which it is not served in"
   params:
@@ -2518,6 +2545,9 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
         profile: "https://w3id.org/heart-rise/hal-forms"
       - type: "text/html"
       - type: "application/json"
+      _links:
+        about:
+          href: "/replies/r-c21"
   expect: 406
   ms: 2
 </pre>
