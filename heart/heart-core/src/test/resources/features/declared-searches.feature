@@ -81,12 +81,20 @@ Feature: Searches and lookups by the fields a type declares
       | state     |
       | page      |
 
-  Scenario: HAL-FORMS cannot template a target, so its index leaves these forms out
+  Scenario: HAL-FORMS cannot template a target, so its index links these searches as templated links instead
+    A HAL-FORMS target is one address, but HAL's own links may be URI templates (RFC 6570), which a HAL-FORMS
+    client such as HAL Explorer fills from the variables it names. So the bookmark is never a dead end: each
+    search and lookup a template can't carry is a templated link, under its relation, titled, its CURIE declared.
     When the pull requests' service index is rendered in HAL-FORMS
     Then it has none of these templates
       | template  |
       | listPulls |
       | getPull   |
+    And it links these, as templates
+      | relation   | href                                 | title              |
+      | pulls:list | /repos/{owner}/{repo}/pulls{?state}  | List pull requests |
+      | pulls:get  | /repos/{owner}/{repo}/pulls/{number} | Get a pull request |
+    And it declares the CURIE "pulls"
 
   Scenario: A collection path variable with no field is refused when the type is declared
     When a pull request type is found at "/repos/{owner}/{repo}/pulls" with no field "repo"

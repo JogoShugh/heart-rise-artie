@@ -21,6 +21,7 @@ import io.cucumber.java.en.When
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 
 /** A pull request type found as GitHub lists them: by the fields it declares. */
 class FindingSteps {
@@ -150,6 +151,19 @@ class FindingSteps {
         assertEquals(operationId, operation.path("operationId").asText())
         val parameters = table.asMaps().map { it.getValue("parameter") }
         assertEquals(parameters, operation.path("parameters").map { it.path("name").asText() })
+    }
+
+    @Then("it links these, as templates")
+    fun templatedLinks(table: DataTable) = table.asMaps().forEach { row ->
+        val link = read.path("_links").path(row.getValue("relation"))
+        val seen = listOf(link.path("href").asText(), link.path("templated").asBoolean(), link.path("title").asText())
+        assertEquals(listOf(row.getValue("href"), true, row.getValue("title")), seen, "links: ${read.path("_links")}")
+    }
+
+    @Then("it declares the CURIE {string}")
+    fun declaresCurie(name: String) {
+        val links = read.path("_links")
+        assertTrue(links.path("curies").any { it.path("name").asText() == name }, "$links")
     }
 
     @Then("it has none of these templates")

@@ -106,7 +106,7 @@ class ServiceIndex(
 
     private fun halFormsIndex(): Map<String, Any> = mapOf(
         "title" to title,
-        "_links" to links(),
+        "_links" to links() + templatedLinks(found),
         "_templates" to found.flatMap { type ->
             val finding = checkNotNull(type.finding)
             // A HAL-FORMS target cannot be templated, so a declared collection path has no template here.
@@ -147,6 +147,26 @@ class ServiceIndex(
             "properties" to listOf(property),
         )
 
+}
+
+/**
+ * The searches and lookups of [found] that a HAL-FORMS template can't carry, a declared collection path's, whose
+ * targets have variables: HAL links them instead, as URI templates (RFC 6570) under their relations, titled, so the
+ * bookmark is never a dead end for a HAL-FORMS client; with the CURIEs their relations are written in.
+ */
+private fun templatedLinks(found: List<ResourceType<*, *>>): Map<String, Any> {
+    val declared = found.filter { FindingForms(it).declared }
+    if (declared.isEmpty()) return emptyMap()
+    val links = declared.flatMap { type ->
+        val finding = checkNotNull(type.finding)
+        val forms = FindingForms(type)
+        listOf(finding.search.relation to forms.searchTarget, finding.lookup.relation to forms.lookupTarget)
+            .map { (relation, target) ->
+                type.profile.key(relation) to
+                    mapOf("href" to target, "templated" to true, "title" to type.profile.relation(relation).title)
+            }
+    }.toMap()
+    return links + ("curies" to declared.flatMap { it.profile.curies }.distinct())
 }
 
 /**
