@@ -2,8 +2,8 @@
 start: "{deployed}"
 inputs:
   deployed: { question: "Which deployment of the library?" }
-  book: { default: "Matilda" }
-  author: { default: "Roald Dahl" }
+  book: { default: "The Hobbit" }
+  author: { default: "J. R. R. Tolkien" }
   renewable: { default: "Matilda" }
   problem: { default: "missing-pages" }
   comment: { default: "Pages 12 to 14." }
