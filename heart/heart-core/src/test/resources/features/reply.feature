@@ -59,6 +59,26 @@ Feature: Ana's reply takes the library's answer once, and a repeat of that answe
     Then the reply act was performed
     And reply r-7f3 links "hr:in-reply-to" to "https://riverside-library.example/watches/1"
 
+  Scenario: Each answer's form takes the back-link if it is sent, never asks for it, and takes other links too
+    Not every system links both ways: an answer may come without hr:in-reply-to, and may carry links the reply
+    doesn't name. The schema says so, rather than leaving it to JSON Schema's defaults.
+    Given reply r-7f3 is awaiting
+    Then each form of reply r-7f3 says this of the links an answer carries
+      | form         | links required | hr:in-reply-to | other links |
+      | hr:progress  | no             | optional       | allowed     |
+      | hr:completed | no             | optional       | allowed     |
+      | hr:failed    | no             | optional       | allowed     |
+
+  Scenario Outline: An answer is taken with <links>
+    Given reply r-7f3 is awaiting
+    When a client acts on reply r-7f3 with "progress", validator current, and body <body>
+    Then the reply act was performed
+
+    Examples:
+      | links                       | body                                                                                                          |
+      | no back-link                | {"state": "awaiting", "percent": 10}                                                                          |
+      | a link the reply doesn't name | {"state": "awaiting", "percent": 10, "_links": {"related": {"href": "https://riverside-library.example/loans/3310"}}} |
+
   Scenario: An answer that names another request than the one the reply keeps is refused, and changes nothing
     Given reply r-7f3 is awaiting
     And reply r-7f3 took the progress {"state": "awaiting", "percent": 0, "_links": {"hr:in-reply-to": {"href": "https://riverside-library.example/watches/1"}}}

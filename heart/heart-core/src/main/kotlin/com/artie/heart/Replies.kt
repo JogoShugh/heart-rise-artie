@@ -76,8 +76,12 @@ object Replies {
     /** The link to the request an answer answers. */
     const val IN_REPLY_TO = "hr:in-reply-to"
 
-    /** An answer's links: the request it answers, which the reply keeps from the first answer on. */
-    private const val LINKS = """"_links": {"type": "object", "properties": {"$IN_REPLY_TO": {"type": "object", """ +
+    /**
+     * An answer's links, all optional: not every system links both ways. The request it answers, which the reply
+     * keeps from the first answer on, if it is named; and any other link, said in so many words.
+     */
+    private const val LINKS = """"_links": {"type": "object", "additionalProperties": true, """ +
+        """"properties": {"$IN_REPLY_TO": {"type": "object", """ +
         """"required": ["href"], "properties": {"href": {"type": "string", "format": "uri"}, """ +
         """"type": {"type": "string"}}}}}"""
 

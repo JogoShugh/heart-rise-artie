@@ -53,6 +53,28 @@ class ReplyViewSteps(private val world: ReplyWorld) {
         assertEquals(table.asLists().drop(1), seen)
     }
 
+    /** What each form's schema says, in so many words, of an answer's `_links`. */
+    @Then("""^each form of reply (r-\w+) says this of the links an answer carries$""")
+    fun linksSaid(reference: String, table: DataTable) {
+        val forms = layer1(reference)["_forms"] as Map<*, *>
+        val seen = forms.map { (key, form) ->
+            val schema = (form as Map<*, *>)["schema"] as Map<*, *>
+            val links = (schema["properties"] as Map<*, *>)["_links"] as Map<*, *>
+            val inReplyTo = when {
+                Replies.IN_REPLY_TO in (links["required"] as? List<*>).orEmpty() -> "required"
+                Replies.IN_REPLY_TO in (links["properties"] as Map<*, *>) -> "optional"
+                else -> "absent"
+            }
+            listOf(
+                key.toString(),
+                if ("_links" in (schema["required"] as? List<*>).orEmpty()) "yes" else "no",
+                inReplyTo,
+                if (links["additionalProperties"] == true) "allowed" else "unsaid",
+            )
+        }
+        assertEquals(table.asLists().drop(1), seen)
+    }
+
     @Then("""^reply (r-\w+) declares exactly one CURIE "(\w+)", at "([^"]+)"$""")
     fun curie(reference: String, name: String, href: String) {
         val curies = (layer1(reference)["_links"] as Map<*, *>)["curies"] as List<*>
