@@ -761,7 +761,7 @@ Then("the client holds {string}, gone", function (path) {
     assert.equal(this.me.heart.current.gone, true);
 });
 
-// ---- The employees service: a HEART service, or handicapped as Spring HATEOAS's affordances example ----
+// ---- The employees service: a HEART service, or answering as stock Spring HATEOAS's affordances example ----
 
 const employeesService = "http://employees.test";
 
@@ -780,8 +780,8 @@ Given("someone else will change employee {int}'s role to {string} right after a 
     await sims.meddleEmployee(id, role);
 });
 
-Given("the employees service is handicapped as Spring HATEOAS", async function () {
-    await sims.handicapEmployees("spring");
+Given("the employees service answers as stock Spring HATEOAS", async function () {
+    await sims.employeesAnswerAs("stock-spring");
 });
 
 When("it enters the employees service at its bookmark", async function () {

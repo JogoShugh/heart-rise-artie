@@ -16,15 +16,15 @@ import org.http4k.routing.routes
 
 /**
  * The employees as Spring HATEOAS's own affordances example
- * (spring-projects/spring-hateoas-examples, module affordances) serves them,
- * byte for byte in shape, copied from a run of it on 1 November 2026. It is no
- * HEART service, and does nothing a HEART service would: HAL-FORMS only, its
- * templates' methods in lower case, no profile, no ETag, absolute links, and every
- * act answered 204 with no body (a create and an update name the employee in
+ * (spring-projects/spring-hateoas-examples, module affordances) serves them out of the box,
+ * byte for byte, copied from a run of it on 1 November 2026 and checked against it since
+ * (SpringCloneTrace). It is no HEART service, and does nothing a HEART service would:
+ * HAL-FORMS only, its templates' methods in lower case, no profile, no ETag, absolute links,
+ * and every act answered 204 with no body (a create and an update name the employee in
  * Location). Asked for application/hal+json, it answers its own JSON: a `links`
  * array, no forms.
  */
-class SpringHandicap(private val staff: Staff) {
+class StockSpring(private val staff: Staff) {
     private val mapper = ObjectMapper()
 
     val handler: HttpHandler = routes(

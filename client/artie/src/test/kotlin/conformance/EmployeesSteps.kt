@@ -1,6 +1,7 @@
 package conformance
 
 import com.artie.heart.sims.employees.Change
+import com.artie.heart.sims.employees.EmployeesService
 import heart.Dialect
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
@@ -9,7 +10,7 @@ import io.cucumber.java.en.When
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.assertEquals
 
-/** Steps for employees.feature: a HEART service, or handicapped as Spring HATEOAS's affordances example. */
+/** Steps for employees.feature: a HEART service, or answering as stock Spring HATEOAS's affordances example. */
 class EmployeesSteps(private val world: World) {
     private val actor get() = world.actor
 
@@ -25,8 +26,8 @@ class EmployeesSteps(private val world: World) {
     @Given("someone else will change employee {int}'s role to {string} right after a client reads him")
     fun meddles(id: Int, role: String) = world.sims.employees.meddle(id.toLong(), role)
 
-    @Given("the employees service is handicapped as Spring HATEOAS")
-    fun handicapped() = world.sims.employees.handicapAsSpring()
+    @Given("the employees service answers as stock Spring HATEOAS")
+    fun stockSpring() = world.sims.employees.answerAs(EmployeesService.Mode.STOCK_SPRING)
 
     @When("it enters the employees service at its bookmark")
     fun enterBookmark() {

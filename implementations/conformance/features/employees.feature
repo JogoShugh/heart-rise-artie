@@ -1,10 +1,10 @@
-Feature: The employees service, a HEART service that can be handicapped as Spring HATEOAS ships
+Feature: The employees service, a HEART service that can answer as stock Spring HATEOAS does
   The employees service holds Spring HATEOAS's example employees, Frodo, ring
   bearer, and Bilbo, burglar, served by heart-core: a profile, ETags, and both
   dialects. A new employee comes from hiring, which its bookmark offers; a dismissed
   one stays, with nothing more to offer.
 
-  Handicapped as Spring, it answers as Spring HATEOAS's own affordances example
+  Switched to stock Spring, it answers as Spring HATEOAS's own affordances example
   (spring-projects/spring-hateoas-examples) does, a service that knows nothing of
   HEART: HAL-FORMS only, its templates' methods in lower case, no profile, no ETag,
   and every act answered 204 with no body. A HEART client meets it in HAL-FORMS,
@@ -97,8 +97,8 @@ Feature: The employees service, a HEART service that can be handicapped as Sprin
       | HAL-FORMS        | L0   | searchEmployees        | update       |
       | HAL Schema Forms | L2   | staff:search-employees | staff:update |
 
-  Scenario: Handicapped as Spring, it is walked by every affordance it offers
-    Given the employees service is handicapped as Spring HATEOAS
+  Scenario: As stock Spring, it is walked by every affordance it offers
+    Given the employees service answers as stock Spring HATEOAS
     And a client asking in HAL-FORMS at rung L0 for the employees service
     When it enters the employees of the employees service
     Then it offers exactly these acts
@@ -122,8 +122,8 @@ Feature: The employees service, a HEART service that can be handicapped as Sprin
       | Bilbo     |
       | Samwise   |
 
-  Scenario: Handicapped as Spring and asked in HEART's reference dialect, it names no profile, and a HEART client takes no controls from it
-    Given the employees service is handicapped as Spring HATEOAS
+  Scenario: As stock Spring and asked in HEART's reference dialect, it names no profile, and a HEART client takes no controls from it
+    Given the employees service answers as stock Spring HATEOAS
     And a client asking in HAL Schema Forms at rung L0 for the employees service
     When it enters the employees of the employees service
     Then it holds data only: its state, no forms, no links

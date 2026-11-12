@@ -185,9 +185,8 @@ class Simulator(private val alone: String? = null) {
             startDeploying(request.path("name").orEmpty())
             Response(Status.NO_CONTENT)
         },
-        "/_sim/employees/handicap" bind PUT to { request ->
-            require(request.bodyString().trim() == "spring") { "the employees service is handicapped only as spring" }
-            employees.handicapAsSpring()
+        "/_sim/employees/mode" bind PUT to { request ->
+            employees.answerAs(EmployeesService.Mode.of(request.bodyString().trim()))
             Response(Status.NO_CONTENT)
         },
         "/_sim/employees/changes" bind PUT to { request ->
@@ -247,7 +246,7 @@ class Simulator(private val alone: String? = null) {
         const val DEPLOY = "deploy.test"
         const val GITHUB = "github.test"
 
-        /** Spring HATEOAS's example employees, as a HEART service, or handicapped as Spring serves them. */
+        /** Spring HATEOAS's example employees, as a HEART service, or as stock Spring serves them. */
         const val EMPLOYEES = "employees.test"
 
         /** Riverside Public Library, the library of "The Web That Wasn't": a member's loans, renewed and returned. */
