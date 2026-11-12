@@ -24,6 +24,7 @@ fun main(args: Array<String>) {
     if (args.firstOrNull() == "release") {
         Release(
             host = System.getenv("RELEASE_HOST") ?: "localhost",
+            repository = Path.of(checkNotNull(System.getenv("RELEASE_REPOSITORY")) { "RELEASE_REPOSITORY" }),
             jenkinsUser = System.getenv("JENKINS_ADMIN_USER") ?: "artie",
             jenkinsPassword = checkNotNull(System.getenv("JENKINS_ADMIN_PASSWORD")) { "JENKINS_ADMIN_PASSWORD" },
             hookSecret = checkNotNull(System.getenv("JENKINS_HOOK_SECRET")) { "JENKINS_HOOK_SECRET" },
