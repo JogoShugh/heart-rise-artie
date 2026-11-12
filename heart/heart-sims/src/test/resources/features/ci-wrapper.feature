@@ -48,7 +48,7 @@ Feature: The CI wrapper: a real Jenkins job served as a HEART service that answe
     Then build 1 links these
       | relation      | href                                         |
       | ci:deployment | http://localhost:8180/                        |
-      | ci:smoke-test | /builds/1/artifacts/smoke.goal.md             |
+      | ci:smoke-test | /builds/1/artifacts/smoke.heart.yaml          |
       | ci:log        | /builds/1/log                                 |
     And reply r-91's result links the same three
 
@@ -62,7 +62,7 @@ Feature: The CI wrapper: a real Jenkins job served as a HEART service that answe
   Scenario: The build's log and the files it archived are read through the wrapper, as Jenkins keeps them
     Given the caller has asked to build commit "9b1e2d4", with reply r-91
     And Jenkins notifies the wrapper that build 1 is FINALIZED SUCCESS, with the secret
-    When the caller reads "/builds/1/artifacts/smoke.goal.md"
-    Then the wrapper answers 200, with what Jenkins archived as "smoke.goal.md"
+    When the caller reads "/builds/1/artifacts/smoke.heart.yaml"
+    Then the wrapper answers 200, with what Jenkins archived as "smoke.heart.yaml"
     When the caller reads "/builds/1/log"
     Then the wrapper answers 200, with Jenkins' console text

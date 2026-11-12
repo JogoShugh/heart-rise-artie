@@ -21,7 +21,7 @@ import kotlin.test.assertTrue
 /** A Jenkins in memory: what it was asked to build, and what each build archived and logged. */
 class FakeJenkins : Jenkins {
     val asked = mutableListOf<Pair<String, Map<String, String>>>()
-    val archived = mapOf("smoke.goal.md" to "Check that the library works as a member would use it.\n")
+    val archived = mapOf("smoke.heart.yaml" to "heart: 1\nkind: kept\nsteps: []\n")
     val console = "== checkout 9b1e2d4\nFinished: SUCCESS\n"
 
     override fun build(job: String, parameters: Map<String, String>) {
@@ -158,7 +158,7 @@ class CiSteps {
         val links = now.path("result").path("_links")
         assertEquals("http://localhost:8180/", links.path(CiWrapper.DEPLOYMENT).path("href").asText(), "$now")
         val smoke = links.path(CiWrapper.SMOKE_TEST).path("href").asText()
-        assertEquals("${CiWrapper.ORIGIN}/builds/1/artifacts/smoke.goal.md", smoke)
+        assertEquals("${CiWrapper.ORIGIN}/builds/1/artifacts/${CiWrapper.SMOKE_SCRIPT}", smoke)
         assertEquals("${CiWrapper.ORIGIN}/builds/1/log", links.path(CiWrapper.LOG).path("href").asText())
     }
 

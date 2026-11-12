@@ -212,7 +212,7 @@ class CiWrapper(
         val made = if (build.standing == Build.SUCCEEDED) {
             mapOf(
                 DEPLOYMENT to mapOf("href" to "http://$previewHost:${build.previewPort ?: DEFAULT_PREVIEW_PORT}/"),
-                SMOKE_TEST to mapOf("href" to "$base/builds/${build.id}/artifacts/$SMOKE_GOAL"),
+                SMOKE_TEST to mapOf("href" to "$base/builds/${build.id}/artifacts/$SMOKE_SCRIPT"),
             )
         } else {
             emptyMap()
@@ -251,7 +251,8 @@ class CiWrapper(
         const val DEPLOYMENT = "ci:deployment"
         const val SMOKE_TEST = "ci:smoke-test"
         const val LOG = "ci:log"
-        const val SMOKE_GOAL = "smoke.goal.md"
+        /** The kept smoke script the build archives from the commit's `smoke/`, held as data, run by ARTIE. */
+        const val SMOKE_SCRIPT = "smoke.heart.yaml"
         private const val DEFAULT_PREVIEW_PORT = 8180
         private const val LOGGED = 600
         private const val STARTED_PERCENT = 10
