@@ -28,7 +28,7 @@ docker run -d --name merge-release-jenkins \
   -p 8171:8080 -p 8180:8180 \
   --add-host host.docker.internal:host-gateway \
   -e JENKINS_ADMIN_USER -e JENKINS_ADMIN_PASSWORD \
-  -v "$work/library-app:/repos/library-app:ro" \
+  -v "$work:/repos:ro" \
   -v "$root/heart/heart-sims/build/sims/lib:/sims/lib:ro" \
   merge-release-jenkins >/dev/null
 export JENKINS_ADMIN_USER JENKINS_ADMIN_PASSWORD

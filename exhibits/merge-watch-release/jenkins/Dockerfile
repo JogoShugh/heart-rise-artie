@@ -3,7 +3,8 @@
 # init.groovy.d and jobs/.
 FROM jenkins/jenkins:lts-jdk21
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true"
-# Notification reads test results through the JUnit plugin's classes, so it needs that plugin beside it.
-RUN jenkins-plugin-cli --plugins notification junit
+# Notification reads test results through the JUnit plugin's classes and expands its messages with Token Macro, so
+# it needs both beside it.
+RUN jenkins-plugin-cli --plugins notification junit token-macro
 COPY --chown=jenkins:jenkins init.groovy.d/ /usr/share/jenkins/ref/init.groovy.d/
 COPY --chown=jenkins:jenkins jobs/ /usr/share/jenkins/ref/jobs/
