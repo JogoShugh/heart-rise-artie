@@ -1,0 +1,13 @@
+1 enter http://localhost:8097/employees: done
+note: the list offers [default]; embeds {employees=2}
+2 act default, firstName Samwise, lastName Gamgee, role gardener: done
+note: after the create, the list embeds {employees=3}
+3 follow employees: done
+note: an employee: {"id":1,"firstName":"Frodo","lastName":"Baggins","role":"ring bearer"}, offering [default, deleteEmployee]
+4 act default, firstName Frodo, lastName Baggins, role ring bearer, retired: done
+note: after the update: {"id":1,"firstName":"Frodo","lastName":"Baggins","role":"ring bearer, retired"}
+5 act deleteEmployee: done
+note: after the delete: held as it was, gone
+6 return to http://localhost:8097/employees: done
+note: back at the list: ["Bilbo", "Samwise"]
+finished, 6 steps; acted: default 2, deleteEmployee 1; noted 6
