@@ -58,9 +58,11 @@ class ScriptedService : Navigator, Wire, Writes, Reads {
     /** What happens to the process as the client acts, by relation, before it sends: a stop, where a feature says. */
     val onAct = mutableMapOf<String, () -> Unit>()
 
-    override fun act(rel: String, fields: Map<String, Any?>): Answer {
+    override fun act(rel: String, fields: Map<String, Any?>, asOf: String?): Answer {
         onAct[rel]?.invoke()
-        asked += "act" to (if (fields.isEmpty()) rel else "$rel ${json(fields)}")
+        val version = asOf?.let { " as of \"$it\"" }.orEmpty()
+        asked += "act" to (if (fields.isEmpty()) rel + version else "$rel ${json(fields)}$version")
+        versions[held] = (versions[held] ?: 0) + 1
         val key = "$rel at $held"
         refusals[key]?.takeIf { (refusedTimes[key] ?: 1) > 0 }?.let { refusal ->
             refusedTimes[key]?.let { refusedTimes[key] = it - 1 }
@@ -220,8 +222,11 @@ class ScriptedService : Navigator, Wire, Writes, Reads {
             forms.filter { it.at == address }.map { it.relation }.toSet(),
             links.filter { it.at == address }.groupBy({ it.relation }, { it.title }),
             embeds.filter { it.at == address }.groupBy({ it.relation }, { Embedded(it.title, stateOf(it.to), it.to) }),
-        )
+        ).also { it.validator = "$address@${versions[address] ?: 0}" }
     }
+
+    /** How many times each resource was acted on: its version, as its validator names it. */
+    private val versions = mutableMapOf<String, Int>()
 
     /** An embedded resource's state: its whole body where a feature gives one, as a held resource's is. */
     private fun stateOf(address: String): JsonObject {

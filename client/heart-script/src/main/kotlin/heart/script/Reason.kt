@@ -8,7 +8,16 @@ import kotlinx.serialization.json.JsonPrimitive
  * `act(rel, …)` as step [step]: the form [rel] with [fields], refused here, by the client, before anything is sent,
  * when the manifest doesn't offer it. The step keeps what the act is for, in words: [said].
  */
-internal fun Here.acted(step: Int, rel: String, fields: Map<String, Any?>, said: Said, block: (Here.() -> Unit)?) {
+// Each is one part of the act, as the script wrote it.
+@Suppress("LongParameterList")
+internal fun Here.acted(
+    step: Int,
+    rel: String,
+    fields: Map<String, Any?>,
+    said: Said,
+    block: (Here.() -> Unit)?,
+    asOf: String? = null,
+) {
     if (rel !in held.offered) {
         val reason = navigator.why(rel) ?: "no reason given"
         val refusal = Answer.Refused(Refusal.NotOffered, Side.CLIENT, reason)
@@ -17,7 +26,7 @@ internal fun Here.acted(step: Int, rel: String, fields: Map<String, Any?>, said:
         if (fallsBack(said, refusal)) return reasoned(step, said, block)
         throw refused(step, "\"$rel\"", refusal)
     }
-    val answer = navigator.act(rel, fields)
+    val answer = navigator.act(rel, fields, asOf)
     // The step just traced is this act's: it keeps what the act is for.
     run.trace.lastOrNull()?.said(said)
     if (answer is Answer.Refused && fallsBack(said, answer)) return reasoned(step, said, block)

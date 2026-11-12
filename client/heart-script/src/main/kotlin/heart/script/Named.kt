@@ -10,7 +10,7 @@ import kotlin.properties.ReadOnlyProperty
 
 /** Keep the resource held here under [name], its address the one the server gave, and its state now. */
 fun Here.keepAs(name: String) {
-    run.kept[name] = Run.Kept(held.address, state)
+    run.kept[name] = Run.Kept(held.address, state, held.validator)
 }
 
 /**

@@ -191,10 +191,17 @@ class ArtieClient(
 
     override val sendsValidators: Boolean get() = care.validators
 
+    /**
+     * The version the next act goes on instead of the one held: one the client held before (kept-versions.feature),
+     * so the server can say the resource moved on. Taken by that act alone.
+     */
+    var asOf: String? = null
+
     /** The validator an act on [held] carries: the one held, or none when the run sends blind writes. */
     private val validatorFor: (HeartRepresentation) -> String? = { held ->
+        val version = asOf.also { asOf = null }
         // A representation sent with no validator is acted on with an empty one: still conditional, never blind.
-        if (care.validators) held.etag.orEmpty() else null
+        if (care.validators) version ?: held.etag.orEmpty() else null
     }
 
     /** Stale and not offered re-sync first, so the client never keeps a manifest the server has refused. */

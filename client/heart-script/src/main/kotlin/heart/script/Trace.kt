@@ -172,8 +172,8 @@ internal class TracingNavigator(private val inner: Navigator, private val run: R
 
     override val entered: String? get() = inner.entered
 
-    override fun act(rel: String, fields: Map<String, Any?>): Answer =
-        traced({ actAsked(rel, fields) }) { inner.act(rel, fields) }
+    override fun act(rel: String, fields: Map<String, Any?>, asOf: String?): Answer =
+        traced({ actAsked(rel, fields) }) { inner.act(rel, fields, asOf) }
 
     override fun follow(rel: String, title: String?): Answer =
         traced({ followAsked(rel, title) }) { inner.follow(rel, title) }

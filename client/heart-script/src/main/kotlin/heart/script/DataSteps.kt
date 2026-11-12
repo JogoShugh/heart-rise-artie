@@ -55,7 +55,11 @@ private fun Facts.fact(fact: Map<*, *>, reading: Reading) {
 private fun checked(list: Any?, reading: Reading): List<Fact> =
     (list as? List<*>).orEmpty().map { it as? Map<*, *> ?: stop("a fact is not a map: $it") }.map { fact ->
         val field = fact["field"].toString()
-        val matcher = if ("is" in fact) equalTo(reading.value(fact["is"])) else contains(reading.value(fact["has"]))
+        val matcher = when {
+            "is" in fact -> equalTo(reading.value(fact["is"]))
+            "is-not" in fact -> notEqualTo(reading.value(fact["is-not"]))
+            else -> contains(reading.value(fact["has"]))
+        }
         Fact(field, matcher)
     }
 
@@ -70,7 +74,7 @@ internal val REASONED = Maker(WORDS + setOf("reasoned", "then")) { step, reading
 
 /** The makers, by the key that names each step. */
 internal val MAKERS: Map<String, Maker> = linkedMapOf(
-    "act" to Maker(setOf("act", "fields", "then") + WORDS) { step, reading ->
+    "act" to Maker(setOf("act", "fields", "then", "as-of") + WORDS) { step, reading ->
         val values = values(step, reading)
         val words = said(step, reading)
         act(
@@ -78,6 +82,7 @@ internal val MAKERS: Map<String, Maker> = linkedMapOf(
             intent = words.intent, inferred = words.inferred, fromIntent = words.fromIntent,
             fields = { values.forEach { (name, value) -> name to value } },
             block = block(step, "then", reading),
+            asOf = step["as-of"]?.toString(),
         )
     },
     "act-once" to Maker(setOf("act-once", "fields", "listed-in")) { step, reading ->

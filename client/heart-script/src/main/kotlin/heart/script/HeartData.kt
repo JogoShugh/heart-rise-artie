@@ -90,6 +90,8 @@ internal class Reading(private val run: Run, private val here: Here?, val why: S
         return when {
             name == "why" && members.isEmpty() -> why ?: NO_REASON
             name == "state" && here != null -> here.state[pointer(members)]
+            // `${name.@self}`: the address the resource kept as name was kept at, as the server handed it over.
+            run.kept[name] != null && members == listOf(SELF) -> run.kept.getValue(name).address
             run.kept[name] != null -> run.kept.getValue(name).state[pointer(members)]
             members.isEmpty() && run.declared.any { it.name == name } -> typed(name)
             else -> stop("\${$path} reads nothing: no input, and nothing kept, is named $name")
@@ -111,6 +113,7 @@ internal class Reading(private val run: Run, private val here: Here?, val why: S
         "/" + members.joinToString("/") { it.replace("~", "~0").replace("/", "~1") }
 
     private companion object {
-        val REFERENCE = Regex("""\$\{([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z0-9_:-]+)*)}""")
+        val REFERENCE = Regex("""\$\{([A-Za-z_][A-Za-z0-9_]*(?:\.@?[A-Za-z0-9_:-]+)*)}""")
+        const val SELF = "@self"
     }
 }

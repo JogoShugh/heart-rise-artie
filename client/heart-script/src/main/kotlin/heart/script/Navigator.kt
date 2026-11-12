@@ -21,7 +21,13 @@ class Representation(
      * for, a template that needs values, a link out of HEART: [links] keeps them, as the server sent them.
      */
     val followable: Map<String, List<String?>> = links,
-)
+) {
+    /**
+     * The version the server named this representation by (its ETag), for an act as of it (kept-versions.feature);
+     * null when it named none. The client sets it, for the run's record and acts only: a script never reads it.
+     */
+    var validator: String? = null
+}
 
 /**
  * A resource the held one embeds (SPEC §6.1): its title and its state, read in
@@ -176,8 +182,11 @@ interface Navigator {
      */
     val entered: String? get() = null
 
-    /** Select the form [rel], with [fields]: the client knows whether it reads or acts. */
-    fun act(rel: String, fields: Map<String, Any?>): Answer
+    /**
+     * Select the form [rel], with [fields]: the client knows whether it reads or acts. [asOf], a version the client
+     * held of the resource before, is the one the act goes on, not the one held now (kept-versions.feature).
+     */
+    fun act(rel: String, fields: Map<String, Any?>, asOf: String? = null): Answer
 
     /** Select the link [rel] titled [title] (null: the one with no title). */
     fun follow(rel: String, title: String?): Answer

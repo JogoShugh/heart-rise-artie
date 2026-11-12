@@ -105,13 +105,20 @@ class Here internal constructor(
         intent: String? = null,
         inferred: String? = null,
         fromIntent: String? = null,
+        /** Act as of the version of the resource kept by this name, not the one held (kept-versions.feature). */
+        asOf: String? = null,
         fields: (Fields.() -> Unit)? = null,
         block: (Here.() -> Unit)? = null,
     ) {
         val step = ++run.step
         val said = Said(intent, inferred, fromIntent)
+        val version = asOf?.let { name ->
+            run.kept[name]?.validator ?: throw ScriptStopped(step, "\"$rel\"", "\"no version is kept as $name\"")
+        }
         when {
-            rel != null -> acted(step, rel, values.toMap() + Fields().also { fields?.invoke(it) }.values, said, block)
+            rel != null -> acted(
+                step, rel, values.toMap() + Fields().also { fields?.invoke(it) }.values, said, block, version,
+            )
             said.words != null -> reasoned(step, said, block)
             else -> throw ScriptStopped(step, "\"act\"", "\"act needs a relation, or an intent\"")
         }

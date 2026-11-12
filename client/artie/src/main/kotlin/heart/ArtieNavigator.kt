@@ -80,8 +80,9 @@ class ArtieNavigator(
      * fields are checked against the form's schema (SPEC §6.3), as ARTIE's reasoner path does: a value the schema
      * doesn't allow is refused here, by the client. Either way nothing is sent.
      */
-    override fun act(rel: String, fields: Map<String, Any?>): Answer {
+    override fun act(rel: String, fields: Map<String, Any?>, asOf: String?): Answer {
         val body = JsonObject(fields.mapValues { (_, v) -> json(v) })
+        (client as? ArtieClient)?.asOf = asOf
         if (held?.waiting(client.current, rel) == true) catchUp.until(rel)
         val used = UsedAffordances.form(reading(client), rel, body, held, client.sendsValidators)
         val form = client.current?.affordance(rel)
@@ -297,7 +298,7 @@ private fun representation(held: HeartRepresentation, reaches: (HeartLink) -> Bo
     followable = held.linksByRel.filterKeys { it != "self" }
         .mapValues { (_, links) -> links.filter { it != held.forms && reaches(it) }.map { it.title } }
         .filterValues { it.isNotEmpty() },
-)
+).also { it.validator = held.etag }
 
 /** A script's field value, as JSON. */
 private fun json(value: Any?): JsonElement = when (value) {
