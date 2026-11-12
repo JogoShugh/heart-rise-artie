@@ -86,7 +86,7 @@ Feature: Resources kept by name: their own address, a check that a value moved, 
           refused-as: stale
       """
     Then the script finished
-    And trace step 3 expected "stale"
+    And trace step 3 says it expected to be refused as "stale"
 
   Scenario: An act as of the version kept by name carries that version, not the one held
     When this script held as data runs

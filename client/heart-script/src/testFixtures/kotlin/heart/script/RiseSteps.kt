@@ -36,7 +36,7 @@ class RiseSteps(private val steps: ScriptSteps) {
         steps.replies = null
     }
 
-    @Then("trace step {int} expected {string}")
+    @Then("trace step {int} says it expected to be refused as {string}")
     fun traceExpected(number: Int, expected: String) {
         assertEquals(expected, steps.run.trace[number - 1].expect)
     }
