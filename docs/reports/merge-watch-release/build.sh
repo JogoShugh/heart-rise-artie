@@ -12,6 +12,18 @@ sh "$assets/build-run-report.sh" "$here/pass.yaml" "$here/pass.html" "Release of
 sh "$assets/build-run-report.sh" "$here/fail.yaml" "$here/fail.html" "Release of Pull Request 483, Stopped" \
   "The same release for pull request 483, which sets renewals to zero weeks: built and deployed, smoke scenario S3 fails, so it is not promoted, and ARTIE says why on the pull request."
 
+# The sequence diagrams: PlantUML from each trace, rendered when a plantuml.jar is at hand (PLANTUML_JAR, or
+# exhibits/merge-watch-release/tools/plantuml.jar, which tools/get-plantuml.sh fetches); else the SVGs kept are used.
+node "$here/sequence.mjs" "$here/pass.yaml" "$here/pass.puml" "Release of pull request 482, passing"
+node "$here/sequence.mjs" "$here/fail.yaml" "$here/fail.puml" "Release of pull request 483, stopped"
+jar=${PLANTUML_JAR:-$exhibit/tools/plantuml.jar}
+if [ -f "$jar" ]; then
+  java -Djava.awt.headless=true -jar "$jar" -tsvg "$here/pass.puml" "$here/fail.puml"
+  echo "rendered pass.svg, fail.svg"
+else
+  echo "no plantuml.jar: kept the SVGs as they were (run exhibits/merge-watch-release/tools/get-plantuml.sh)"
+fi
+
 escape() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' "$1"; }
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT

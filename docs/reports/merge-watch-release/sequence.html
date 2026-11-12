@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Release Sequence</title>
+<style>
+  :root { --bg: #f6f5f1; --fg: #1d211f; --soft: #5b625e; --line: #dcdcd4; --card: #ffffff; --accent: #2f6b4f; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+      --accent: #7cc4a0; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+    --accent: #7cc4a0; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 1rem max(16px, env(safe-area-inset-left, 0px)) 3rem; }
+  h1 { font-size: 1.5rem; margin: .2rem 0 .3rem; }
+  ul { color: var(--soft); margin: .3rem 0 .8rem; padding-left: 1.2rem; }
+  .bar { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; margin: .8rem 0; }
+  button, .bar a { font: inherit; font-size: .9rem; padding: .4rem .8rem; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--card); color: var(--fg); cursor: pointer; text-decoration: none; }
+  [role="tab"][aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); }
+  .frame { background: #fff; border: 1px solid var(--line); border-radius: 8px; overflow: auto; max-height: 75vh; }
+  .frame img { display: block; width: 100%; height: auto; min-width: 900px; cursor: zoom-in; }
+  dialog { width: 100vw; height: 100vh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: #fff; }
+  dialog::backdrop { background: rgba(0, 0, 0, .6); }
+  .view { position: absolute; inset: 0; overflow: hidden; touch-action: none; cursor: grab; }
+  .view img { position: absolute; left: 0; top: 0; transform-origin: 0 0; user-select: none; -webkit-user-drag: none; }
+  .tools { position: absolute; top: max(10px, env(safe-area-inset-top, 0px)); right: 10px; display: flex; gap: .4rem; z-index: 1; }
+  .tools button, .tools a { background: #1d211f; color: #fff; border-color: #1d211f; font-size: .9rem; padding: .4rem .7rem;
+    border-radius: 6px; text-decoration: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>The Release, Message by Message</h1>
+  <ul>
+    <li>Black: ARTIE's requests and their answers, numbered as the steps of its trace.</li>
+    <li>Grey: the parties' own messages, which ARTIE never sees. The answers to its replies come from each reply's
+      change of state between two reads. Jenkins' part comes from the CI wrapper's log of the notifications it got.</li>
+    <li>Drawn by PlantUML from the run's trace (<code>sequence.mjs</code>). Tap the diagram for the full view: drag to
+      move, scroll or pinch to zoom.</li>
+  </ul>
+  <div class="bar" role="tablist" aria-label="Run">
+    <button role="tab" aria-selected="true" data-run="pass">Passing: 482</button>
+    <button role="tab" aria-selected="false" data-run="fail">Stopped: 483</button>
+    <button type="button" id="full">Full view</button>
+    <a id="open" href="pass.svg" target="_blank" rel="noopener">Open image</a>
+  </div>
+  <div class="frame"><img id="small" src="pass.svg" alt="Sequence diagram of the release of pull request 482"></div>
+</main>
+<dialog id="dialog" aria-label="Sequence diagram, full view">
+  <div class="tools">
+    <button type="button" data-zoom="1.25" aria-label="Zoom in">+</button>
+    <button type="button" data-zoom="0.8" aria-label="Zoom out">−</button>
+    <button type="button" id="fit">Fit width</button>
+    <a id="open2" href="pass.svg" target="_blank" rel="noopener">Open image</a>
+    <button type="button" id="close">Close</button>
+  </div>
+  <div class="view" id="view"><img id="big" src="pass.svg" alt="Sequence diagram, full view"></div>
+</dialog>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const small = $("small"), big = $("big"), view = $("view"), dialog = $("dialog");
+  let run = "pass", scale = 1, x = 0, y = 0;
+  const draw = () => { big.style.transform = `translate(${x}px, ${y}px) scale(${scale})`; };
+  const fit = () => {
+    const w = big.naturalWidth || 1700;
+    scale = view.clientWidth / w; x = 0; y = 0; draw();
+  };
+  const zoom = (by, cx = view.clientWidth / 2, cy = view.clientHeight / 2) => {
+    const next = Math.min(6, Math.max(0.1, scale * by));
+    x = cx - (cx - x) * (next / scale); y = cy - (cy - y) * (next / scale); scale = next; draw();
+  };
+  document.querySelectorAll("[data-run]").forEach((tab) => tab.addEventListener("click", () => {
+    run = tab.dataset.run;
+    document.querySelectorAll("[data-run]").forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
+    small.src = big.src = $("open").href = $("open2").href = `${run}.svg`;
+    small.alt = `Sequence diagram of the release of pull request ${run === "pass" ? 482 : 483}`;
+  }));
+  const show = () => { dialog.showModal(); if (big.complete) fit(); else big.onload = fit; };
+  $("full").addEventListener("click", show);
+  small.addEventListener("click", show);
+  $("close").addEventListener("click", () => dialog.close());
+  $("fit").addEventListener("click", fit);
+  document.querySelectorAll("[data-zoom]").forEach((b) => b.addEventListener("click", () => zoom(Number(b.dataset.zoom))));
+  view.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const r = view.getBoundingClientRect();
+    zoom(e.deltaY < 0 ? 1.1 : 0.9, e.clientX - r.left, e.clientY - r.top);
+  }, { passive: false });
+  const points = new Map();
+  let pinch = null;
+  view.addEventListener("pointerdown", (e) => { view.setPointerCapture(e.pointerId); points.set(e.pointerId, [e.clientX, e.clientY]); });
+  view.addEventListener("pointermove", (e) => {
+    const last = points.get(e.pointerId);
+    if (!last) return;
+    points.set(e.pointerId, [e.clientX, e.clientY]);
+    if (points.size === 2) {
+      const [a, b] = [...points.values()];
+      const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+      if (pinch) zoom(d / pinch, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
+      pinch = d;
+    } else {
+      x += e.clientX - last[0]; y += e.clientY - last[1]; draw();
+    }
+  });
+  const up = (e) => { points.delete(e.pointerId); if (points.size < 2) pinch = null; };
+  view.addEventListener("pointerup", up);
+  view.addEventListener("pointercancel", up);
+</script>
+</body>
+</html>

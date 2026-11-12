@@ -37,12 +37,14 @@
     <button role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true">Overview</button>
     <button role="tab" id="tab-pass" aria-controls="panel-pass" aria-selected="false">Passing: pull request 482</button>
     <button role="tab" id="tab-fail" aria-controls="panel-fail" aria-selected="false">Stopped: pull request 483</button>
+    <button role="tab" id="tab-sequence" aria-controls="panel-sequence" aria-selected="false">Sequence</button>
     <button role="tab" id="tab-junctions" aria-controls="panel-junctions" aria-selected="false">Junctions</button>
   </div>
 </header>
 <iframe id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" src="overview.html" title="Overview"></iframe>
 <iframe id="panel-pass" role="tabpanel" aria-labelledby="tab-pass" src="pass.html" title="Pull request 482, passing" hidden></iframe>
 <iframe id="panel-fail" role="tabpanel" aria-labelledby="tab-fail" src="fail.html" title="Pull request 483, stopped" hidden></iframe>
+<iframe id="panel-sequence" role="tabpanel" aria-labelledby="tab-sequence" src="sequence.html" title="Sequence" hidden></iframe>
 <iframe id="panel-junctions" role="tabpanel" aria-labelledby="tab-junctions" src="junctions.html" title="Junctions" hidden></iframe>
 <script>
   const tabs = [...document.querySelectorAll('[role="tab"]')];

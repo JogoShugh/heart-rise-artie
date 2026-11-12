@@ -1,0 +1,100 @@
+@startuml
+!theme plain
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 320
+skinparam ParticipantPadding 12
+title Release of pull request 483, stopped
+actor "ARTIE" as ARTIE
+participant "GitHub\n(gateway :8098)" as P8098
+participant "ARTIE's replies\n:8160" as P8160
+participant "Offer watch\n:8099" as P8099
+participant "CI wrapper\n:8170" as P8170
+participant "Jenkins\n:8171" as P8171
+participant "Preview\n:8180" as P8180
+participant "Dev\n:8190" as P8190
+== Open the pull request ==
+ARTIE -> P8098 : <b>1</b> GET /\n<i>ARTIE reads GitHub's entry, through the gateway</i>
+P8098 --> ARTIE : 200 OK
+ARTIE -> P8098 : <b>2</b> GET /repos/acme/web/pulls/483\n<i>ARTIE opens pull request {pull} as pr</i>
+P8098 --> ARTIE : 200 OK open
+== Watch ==
+ARTIE -> P8160 : <b>3</b> POST /_release/replies/r-pr-483-1794459640\n<i>ARTIE makes its reply {reply}, before asking</i>
+P8160 --> ARTIE : 204 No Content
+ARTIE -> P8099 : <b>4</b> GET /\n<i>ARTIE reads the offer watch's entry</i>
+P8099 --> ARTIE : 200 OK
+ARTIE -> P8099 : <b>5</b> POST /actions/watch\n<i>ARTIE asks to be told when {pr} offers {offers}, on reply {reply} as watch</i>
+P8099 --> ARTIE : 201 Created
+P8099 -[#888888]> P8098 : <color:#666666>GET /repos/acme/web/pulls/483</color>\n<color:#666666>looks every 3 s, until it offers github:merge</color>
+ARTIE -> P8160 : <b>6</b> GET /replies/r-pr-483-1794459640\n<i>Once {watch} says it can be merged: ARTIE's reply {reply} is awaiting</i>
+P8160 --> ARTIE : 200 OK awaiting
+P8099 -[#888888]> P8160 : <color:#666666>PATCH /replies/r-pr-483-1794459640</color>\n<color:#666666>hr:progress, "Still looking: github:merge is not offered yet", signed</color>
+ARTIE -> P8160 : <b>7</b> GET /replies/r-pr-483-1794459640\n<i>Once {watch} says it can be merged: ARTIE's reply {reply} is awaiting</i>
+P8160 --> ARTIE : 200 OK awaiting
+P8099 -[#888888]> P8160 : <color:#666666>PATCH /replies/r-pr-483-1794459640</color>\n<color:#666666>hr:completed, signed</color>
+ARTIE -> P8160 : <b>8</b> GET /replies/r-pr-483-1794459640\n<i>Once {watch} says it can be merged: ARTIE's reply {reply} is completed</i>
+P8160 --> ARTIE : 200 OK completed
+== Merge ==
+ARTIE -> P8098 : <b>9</b> GET /repos/acme/web/pulls/483\n<i>ARTIE follows the pull request the answer links, to merge it</i>
+P8098 --> ARTIE : 200 OK open
+ARTIE -> P8098 : <b>10</b> PUT /repos/acme/web/pulls/483/actions/merge\n<i>ARTIE merges it by squashing as merged</i>
+P8098 --> ARTIE : 200 OK closed
+ARTIE -> P8098 : <b>11</b> GET /repos/acme/web/pulls/483\n<i>ARTIE reads {pr} as merged, for its merge commit</i>
+P8098 --> ARTIE : 200 OK closed
+== Build, by Jenkins ==
+ARTIE -> P8160 : <b>12</b> POST /_release/replies/r-build-33b5212-1794459651\n<i>ARTIE makes its reply {reply}, before asking</i>
+P8160 --> ARTIE : 204 No Content
+ARTIE -> P8170 : <b>13</b> GET /\n<i>ARTIE reads the CI wrapper's entry</i>
+P8170 --> ARTIE : 200 OK
+ARTIE -> P8170 : <b>14</b> POST /actions/build\n<i>ARTIE builds commit {commit}, asking to be told how it goes, on reply {reply} as build</i>
+P8170 --> ARTIE : 201 Created
+P8170 -[#888888]> P8171 : <color:#666666>POST /job/app/buildWithParameters</color>\n<color:#666666>SHA, RELEASE_BUILD, PREVIEW_PORT</color>
+P8171 -[#888888]> P8170 : <color:#666666>POST /hooks/jenkins</color>\n<color:#666666>QUEUED, STARTED (Notification plugin)</color>
+ARTIE -> P8160 : <b>15</b> GET /replies/r-build-33b5212-1794459651\n<i>Once {build} has succeeded, or failed: ARTIE's reply {reply} is awaiting</i>
+P8160 --> ARTIE : 200 OK awaiting
+P8170 -[#888888]> P8160 : <color:#666666>PATCH /replies/r-build-33b5212-1794459651</color>\n<color:#666666>hr:progress, "Jenkins build #6 started", signed</color>
+ARTIE -> P8160 : <b>16</b> GET /replies/r-build-33b5212-1794459651\n<i>Once {build} has succeeded, or failed: ARTIE's reply {reply} is awaiting</i>
+P8160 --> ARTIE : 200 OK awaiting
+P8171 -[#888888]> P8180 : <color:#666666>starts the library at the commit</color>
+P8171 -[#888888]> P8170 : <color:#666666>POST /hooks/jenkins</color>\n<color:#666666>COMPLETED, FINALIZED: SUCCESS, artifacts</color>
+P8170 -[#888888]> P8160 : <color:#666666>PATCH /replies/r-build-33b5212-1794459651</color>\n<color:#666666>hr:completed, signed</color>
+ARTIE -> P8160 : <b>17</b> GET /replies/r-build-33b5212-1794459651\n<i>Once {build} has succeeded, or failed: ARTIE's reply {reply} is completed</i>
+P8160 --> ARTIE : 200 OK completed
+ARTIE -> P8170 : <b>18</b> GET /builds/2/artifacts/smoke.goal.md\n<i>ARTIE reads the smoke script {build} links as ci:smoke-test</i>
+P8170 --> ARTIE : 200 OK
+== Smoke test, on the preview ==
+ARTIE -> P8180 : <b>19</b> GET /\n<i>S1: ARTIE reads the preview {preview} the build deployed as preview</i>
+P8180 --> ARTIE : 200 OK
+ARTIE -> P8180 : <b>20</b> GET /loans?name=Matilda\n<i>S1: search the loans for {name}</i>
+P8180 --> ARTIE : 200 OK
+ARTIE -> P8180 : <b>21</b> GET /loans/3311\n<i>S2: open the loan {loan}</i>
+P8180 --> ARTIE : 200 OK
+ARTIE -> P8180 : <b>22</b> POST /loans/3311/actions/renew\n<i>S3: renew it</i>
+P8180 --> ARTIE : 200 OK
+ARTIE -> P8180 : <b>23</b> GET /loans/3311\n<i>S3: read it again: due {expected}?</i>
+P8180 --> ARTIE : 200 OK
+note over ARTIE : S3 failed: due 2026-11-12, not 2026-12-03
+ARTIE -> P8180 : <b>24</b> POST /loans/3311/actions/renew\n<i>S4: renew it again, with the version read before the renewal</i>
+P8180 --> ARTIE : 412 stale
+ARTIE -> P8180 : <b>25</b> GET /loans/3311\n<i>S5: read the loan, for its form to report a problem</i>
+P8180 --> ARTIE : 200 OK
+ARTIE -> P8180 : <b>26</b> GET /problem-kinds\n<i>S5: read the kinds of problem the library lists</i>
+P8180 --> ARTIE : 200 OK
+ARTIE -> P8180 : <b>27</b> POST /loans/3311/actions/report-problem\n<i>S5: report {problem} on the loan</i>
+P8180 --> ARTIE : 200 OK
+ARTIE -> P8180 : <b>28</b> GET /loans/3311\n<i>S5: the loan shows the problem reported</i>
+P8180 --> ARTIE : 200 OK
+note over ARTIE : Smoke: 4 of 5 passed (S1, S2, S4, S5)
+== Stopped: say why on the pull request ==
+ARTIE -> P8098 : <b>29</b> GET /repos/acme/web/pulls/483\n<i>ARTIE reads {pr}, for its form to comment</i>
+P8098 --> ARTIE : 200 OK closed
+ARTIE -> P8098 : <b>30</b> POST /repos/acme/web/pulls/483/actions/comment\n<i>ARTIE comments on {pr} with the scenarios that failed</i>
+P8098 --> ARTIE : 201 Created closed
+legend right
+  black: ARTIE's requests and their answers, numbered as the steps of its trace
+  grey: the parties' own messages, which ARTIE never sees: answers to its replies,
+  read from each reply's change of state; Jenkins' part, from the CI wrapper's log
+endlegend
+@enduml
