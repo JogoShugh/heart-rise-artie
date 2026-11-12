@@ -67,10 +67,11 @@
       merged, only comment, label and edit are left. The watch's issue offers close until it is closed, then reopen.</li>
     <li><b>Both renderings carry the same acts.</b> Each template HAL Explorer lists is a button on the HTML page, from
       the same declaration.</li>
-    <li><b>The bookmark has no HAL-FORMS templates.</b> Its ten searches and lookups are GETs with templated targets
-      (<code>/repos/{owner}/{repo}/pulls{?labels}</code>), which a HAL-FORMS template can't express, so HEART leaves
-      them out of HAL-FORMS. The HTML page offers all ten, and HAL Schema Forms carries them as <code>_forms</code>. A
-      HAL-FORMS client has to be handed a deeper address to start from.</li>
+    <li><b>The bookmark's searches are templated links in HAL-FORMS.</b> Its ten searches and lookups are GETs with
+      templated targets (<code>/repos/{owner}/{repo}/pulls{?labels}</code>), which a HAL-FORMS template can't express.
+      HAL's own links can be URI templates (RFC 6570), so in HAL-FORMS each is a templated link under its relation,
+      titled; HAL Explorer lists them, each with a dialog to fill its variables. The HTML page offers the same ten as
+      buttons, and HAL Schema Forms as <code>_forms</code>.</li>
     <li><b>A list has nothing to act on.</b> The labelled pull requests are links (<code>item</code>), no templates.</li>
   </ul>
 
@@ -88,7 +89,7 @@
 </main>
 <script>
   const J = [
-    ["1-bookmark", "The bookmark", "/", [], "Where every client starts."],
+    ["1-bookmark", "The bookmark", "/", [], "Where every client starts: no templates, ten templated links, one per search and lookup."],
     ["2-repository", "The repository", "/repos/acme/web", ["repository-open-issue"], "Followed from the bookmark's “Get a repository”."],
     ["3-watch-opened", "The watch's issue, opened", "/repos/acme/web/issues/483", ["issue-close", "issue-close-not-planned", "issue-close-duplicate", "issue-edit", "issue-lock", "issue-label", "issue-unlabel", "issue-assign", "issue-unassign", "issue-set-milestone", "issue-comment", "issue-add-sub-issue", "issue-remove-sub-issue"], "Opened by repository-open-issue: “Merge watch”, the issue whose closing stops the watch."],
     ["4-pulls-labelled", "Pull requests labelled dependencies", "/repos/acme/web/pulls?labels=dependencies", [], "Pull request 482 labelled dependencies by pull-label; the watch lists what it watches."],
