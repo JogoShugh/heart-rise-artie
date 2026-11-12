@@ -117,6 +117,14 @@ class HostedSteps(private val ctx: ClientContext) {
         assertTrue(note in ended(host).run.notes, "notes: ${ended(host).run.notes}")
     }
 
+    @Given("the host {string} gives ARTIE a reasoner that will choose {string} with {}")
+    fun reasoner(host: String, form: String, fields: String) {
+        val chosen = kotlinx.serialization.json.Json.parseToJsonElement(fields) as kotlinx.serialization.json.JsonObject
+        reasoners[host] = ScriptedReasoner(heart.Selection.Act(form, chosen))
+    }
+
+    private val reasoners = mutableMapOf<String, heart.Reasoner>()
+
     @Given("the host {string} lets ARTIE send credentials over plain HTTP to {string}")
     fun plainHttp(host: String, mask: String) {
         masks[host] = listOf(mask)
@@ -232,6 +240,7 @@ class HostedSteps(private val ctx: ClientContext) {
         }
         val wire = waitingOn[host]?.let { other -> heldUntil(other) } ?: shared
         return Hosted(credentials, keys[host], wire, host, masks[host].orEmpty(), replies[host])
+            .also { it.reasoner = reasoners[host] }
     }
 
     /** The scripted service, which answers only once [other] has its run back. */

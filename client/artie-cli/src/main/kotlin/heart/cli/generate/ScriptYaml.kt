@@ -220,7 +220,7 @@ class ScriptYaml(
         // What the step named, kept by that name where a later step acts as of it or reads it.
         val named = marks["as"]?.toString()?.takeIf { it in readByName }?.let { mapOf("keep-as" to it) }
         return when {
-            reply != null -> asked(made, reply) + steps(selection.block)
+            reply != null -> asked(made, reply, namedAddresses(capture)) + steps(selection.block)
             // A step that opens none holds no block: what it led to is kept where it stands.
             !step.opens -> listOf(made) +
                 (listOfNotNull(named) + selection.block.keeps.map { mapOf("keep-as" to it.keptAs) }).distinct()

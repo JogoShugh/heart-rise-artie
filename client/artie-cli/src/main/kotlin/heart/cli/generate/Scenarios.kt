@@ -21,14 +21,28 @@ internal fun ranScript(marks: Map<*, *>): Map<String, Any?> =
 internal fun versioned(marks: Map<*, *>): Map<String, String> =
     listOf("as-of", "refused-as").mapNotNull { key -> marks[key]?.let { key to it.toString() } }.toMap()
 
-/** [made], an act, as the ask it was: its relation and fields but the envelope, and the reply it was asked on. */
-internal fun asked(made: Map<String, Any?>, reply: String): List<Map<String, Any?>> {
+/**
+ * [made], an act, as the ask it was: its relation and fields but the envelope, and the reply it was asked on. A
+ * field that sends the address of a resource a step named, the pull request to watch, is that name's address
+ * ([named]: each address by the name its step gave it), for whatever it is on the next run.
+ */
+internal fun asked(
+    made: Map<String, Any?>,
+    reply: String,
+    named: Map<String, String> = emptyMap(),
+): List<Map<String, Any?>> {
     val ask = linkedMapOf<String, Any?>("ask" to made["act"])
     val fields = (made["fields"] as? Map<*, *>)?.filterKeys { it != "_links" }
+        ?.mapValues { (_, value) -> named[value?.toString()]?.let { "\${$it.@self}" } ?: value }
     fields?.takeIf { it.isNotEmpty() }?.let { ask["fields"] = it }
     ask["reply"] = reply
     return listOf(ask)
 }
+
+/** Each address a goal's step named, by that name: what its act led to, `as pr`. */
+internal fun namedAddresses(capture: Capture): Map<String, String> = capture.steps.mapNotNull { step ->
+    capture.marks(step)["as"]?.toString()?.let { name -> step.address?.let { it to name } }
+}.toMap()
 
 /** The names the run's acts went as of, and its Verify: facts read: `${before.due}` reads `before`. */
 internal fun namesRead(capture: Capture): Set<String> = capture.steps.flatMap { step ->

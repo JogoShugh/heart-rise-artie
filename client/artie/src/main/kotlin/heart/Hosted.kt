@@ -24,6 +24,12 @@ class Hosted(
 ) {
     private val masks = plainHttp.map(::AddressMask)
 
+    /**
+     * The reasoner ARTIE chooses with, for the one run a goal is captured from, its planner the reasoner's own
+     * (hosted.feature); null, as for every run of the script kept from it: no model.
+     */
+    var reasoner: Reasoner? = null
+
     /** A client of its own, for one run: its own cache and trace, on the host's wire. */
     fun navigator(): Navigator {
         // Every exchange on the wire is kept for the run's capture, credentials written `<token>`, as sent: signed.
@@ -33,12 +39,13 @@ class Hosted(
         val bare = AuthTransport(credentials, named, masks)
         val transport = CachingTransport(IntegrityCheck(bare))
         // A script a link hands over is read as it is, below the cache, as a bare call is.
-        return WiredNavigator(ArtieNavigator(ArtieClient(transport), exchangeLog = log), bare)
+        return WiredNavigator(ArtieNavigator(ArtieClient(transport), reasoner, exchangeLog = log), bare)
     }
 
     /** Runs [script], a kept script held as data, with [inputs]; the run comes back, ended or stopped. */
     fun run(script: Map<*, *>, inputs: Map<String, String> = emptyMap()): HostedRun {
         val run = Run(inputs = inputs, navigator = ::navigator)
+        run.reasoning = reasoner != null
         run.replies = replies
         Run.current = run
         val stopped = try {

@@ -16,6 +16,8 @@ repositories {
 
 dependencies {
     implementation(project(":artie"))
+    // A goal file read as artie run reads one, for the release goal's one capture.
+    implementation(project(":artie-cli"))
     // The parties: GitHub through its gateway, the offer watch, the CI wrapper, Dev, and heart-core's replies.
     implementation(testFixtures("com.artie.heart:heart-sims"))
     // A kept script, read as artie run reads one.

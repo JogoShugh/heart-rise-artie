@@ -218,6 +218,19 @@ Feature: ARTIE hosted in a service
       | POST   | http://localhost:8301/beds/2/actions/water-cell    | "seq-1.hsf.L0" |
       | POST   | http://localhost:8301/beds/2/actions/water-cell    | "seq-1.hsf.L0" |
 
+  Scenario: A host may give ARTIE a reasoner, for the one run a goal is captured from
+    Given the host "desk" gives ARTIE a reasoner that will choose "waterCell" with {"milliliters": 100}
+    When the host "desk" runs this kept script with ARTIE:
+      """yaml
+      start: http://localhost:8301/beds/2
+      steps:
+        - intent: water the bed
+      """
+    Then the host "desk" has its run back, ended
+    And the acts on the wire carried:
+      | method | url                                             | If-Match       |
+      | POST   | http://localhost:8301/beds/2/actions/water-cell | "seq-1.hsf.L0" |
+
   Scenario: Two hosts in one process each keep their own run
     Given the host "watch" reads its entry only once the host "desk" has its run back
     When the hosts run, at the same time, each with ARTIE:

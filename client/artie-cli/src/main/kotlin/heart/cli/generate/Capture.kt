@@ -76,6 +76,9 @@ class Step(val number: Int, private val doc: Map<*, *>) {
     val within: Int? = (doc["within"] as? Number)?.toInt()
     val opens: Boolean = doc["opens"] == true
     val outcome: String = doc["outcome"]?.toString().orEmpty()
+
+    /** Where the client was after the step: what its act led to (goal-rise.feature). */
+    val address: String? = doc["address"]?.toString()
     val params: Map<*, *> = doc["params"].map()
     val values: Map<*, *> = doc["values"].map()
     val chose: Map<*, *> = doc["chose"].map()

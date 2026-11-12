@@ -2,6 +2,7 @@ package heart.release
 
 import com.artie.heart.sims.release.Release
 import java.nio.file.Path
+import kotlin.concurrent.thread
 
 /**
  * The merge watch release, with ARTIE inside its parties ([hosting]), served as heart-sims' Release serves them. Set
@@ -15,16 +16,26 @@ import java.nio.file.Path
  * | JENKINS_ADMIN_USER, JENKINS_ADMIN_PASSWORD, JENKINS_HOOK_SECRET | as jenkins/run.sh started Jenkins with |
  * | RELEASE_PLAIN_HTTP | networks ARTIE may send credentials to over plain HTTP, as masks; default 192.168.0.0/16 |
  */
-fun main() {
+fun main(args: Array<String>) {
     val env = System.getenv()
     val host = env["RELEASE_HOST"] ?: "localhost"
     val masks = (env["RELEASE_PLAIN_HTTP"] ?: "192.168.0.0/16").split(',').map { it.trim() }.filter { it.isNotEmpty() }
-    Release(
+    val replies = java.util.concurrent.CompletableFuture<DeskReplies>()
+    val release = Release(
         host,
         Path.of(env.getValue("RELEASE_REPOSITORY")),
         env["JENKINS_ADMIN_USER"] ?: "artie",
         env.getValue("JENKINS_ADMIN_PASSWORD"),
         env.getValue("JENKINS_HOOK_SECRET"),
-        hosting(host, Path.of(env.getValue("RELEASE_SCRIPT")), masks),
-    ).serve()
+        hosting(host, Path.of(env.getValue("RELEASE_SCRIPT")), masks) { replies.complete(it) },
+    )
+    if (args.firstOrNull() != "capture") return release.serve()
+    // capture GOAL OUT name=value…: the parties served, the release goal walked once with Claude, then done.
+    thread(isDaemon = true) { release.serve() }
+    val inputs = args.drop(CAPTURE_INPUTS).associate { it.substringBefore('=') to it.substringAfter('=') }
+    val stopped = capture(Path.of(args[1]), Path.of(args[2]), inputs, replies.get(), masks)
+    println(stopped ?: "captured in ${args[2]}")
+    kotlin.system.exitProcess(if (stopped == null) 0 else 1)
 }
+
+private const val CAPTURE_INPUTS = 3

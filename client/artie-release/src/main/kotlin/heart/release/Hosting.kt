@@ -19,12 +19,18 @@ import java.nio.file.Path
  * ARTIE, each signing with its own key; on the replies' port, the release desk, at [host], running the kept script
  * at [script] with ARTIE, which signs as the desk and may send credentials over plain HTTP to [masks].
  */
-fun hosting(host: String, script: Path, masks: List<String>): Release.Hosting = Release.Hosting(
+fun hosting(
+    host: String,
+    script: Path,
+    masks: List<String>,
+    /** Told of the desk's replies once it keeps them: a capture run in this process asks with them. */
+    kept: (DeskReplies) -> Unit = {},
+): Release.Hosting = Release.Hosting(
     answers = { key -> ArtieAnswers(key.keyId, SigningKey(key.keyId, key.pair.private), Release.REPLY_TOKEN, masks) },
     front = { service ->
         ReleaseDesk(
             script = { org.yaml.snakeyaml.Yaml().load<Map<*, *>>(Files.readString(script)) },
-            replies = DeskReplies(service, "http://$host:${Release.REPLIES_PORT}"),
+            replies = DeskReplies(service, "http://$host:${Release.REPLIES_PORT}").also(kept),
             artie = { kept ->
                 Hosted(
                     PartyCredentials, SigningKey(ArtieKey.KEY_ID, ArtieKey.pair.private), name = "desk",

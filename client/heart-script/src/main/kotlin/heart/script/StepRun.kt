@@ -97,7 +97,9 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 scenario = step.scenario ?: outer
                 // At another party, or once a reply is answered, then its words (goal-rise.feature).
                 val done = { said: Step.Intent, at: Here, within: Int? -> intent(said, at, within); Unit }
-                if (!branch.done(step, here, opener, done)) crossParty.done(step, here, opener, done)
+                // A branch's words may cross parties too: `If {smoke.passed}, at {dev}, promote …`.
+                val crossing = { said: Step.Intent, at: Here, within: Int? -> crossParty.done(said, at, within, done) }
+                if (!branch.done(step, here, opener, crossing)) crossParty.done(step, here, opener, done)
                 scenario = outer
             }
             is Step.Verify -> if (!namedFacts.verified(step, here, opener)) single(step, here, opener)
