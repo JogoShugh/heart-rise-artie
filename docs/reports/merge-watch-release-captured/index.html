@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Release, Captured Once</title>
+<meta name="description" content="The whole release goal walked once with Claude, kept as a script with slots, then five pull requests released by that script with their own inputs and no model.">
+<style>
+  :root { --bg: #f6f5f1; --fg: #1d211f; --soft: #5b625e; --line: #dcdcd4; --card: #ffffff; --code: #f0efe9;
+    --pass: #e6f4ea; --pass-edge: #2f6b4f; --cost: #fff4e0; --cost-edge: #a56a12; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+      --code: #1f2522; --pass: #16321f; --pass-edge: #7cc4a0; --cost: #33270f; --cost-edge: #e0b060; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+    --code: #1f2522; --pass: #16321f; --pass-edge: #7cc4a0; --cost: #33270f; --cost-edge: #e0b060; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1000px; margin: 0 auto; padding: 1rem max(16px, env(safe-area-inset-left, 0px)) 3rem; }
+  h1 { font-size: 1.5rem; margin: .2rem 0 .3rem; text-wrap: balance; }
+  h2 { font-size: 1.1rem; margin: 1.6rem 0 .5rem; }
+  p, li { color: var(--soft); max-width: 78ch; }
+  a { color: inherit; }
+  code { font: .88em ui-monospace, Menlo, monospace; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .6rem; margin: 1rem 0; }
+  .tile { border-radius: 8px; padding: .7rem .8rem; border: 1px solid; }
+  .tile.cost { background: var(--cost); border-color: var(--cost-edge); }
+  .tile.pass { background: var(--pass); border-color: var(--pass-edge); }
+  .tile b { display: block; font-size: 1.15rem; }
+  .tile span { color: var(--soft); font-size: .9rem; }
+  .wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; border: 1px solid var(--line); padding: .4rem .55rem; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; margin: .5rem 0; }
+  summary { cursor: pointer; padding: .55rem .8rem; font-weight: 600; }
+  pre { margin: 0; padding: .7rem .8rem; background: var(--code); overflow-x: auto; font: 12.5px/1.45 ui-monospace, Menlo, monospace; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<main>
+  <h1>The Release, Captured Once with Claude</h1>
+  <p>The whole release goal walked once with a model, kept as a script with slots, then run for five pull requests
+    with their own inputs and no model. Follows <a href="../merge-watch-release/">The Merge Watch Release</a>, where
+    only the smoke test was captured.</p>
+
+  <div class="tiles">
+    <div class="tile cost"><b>1 run with Claude: 24 calls</b>
+      <span>claude-sonnet-5-5 · 38,102 input tokens · 3,352 output · 35,246 read from cache · 63 steps in 53 s ·
+        <a href="runs/capture.html">the capture</a></span></div>
+    <div class="tile pass"><b>5 replays: 0 calls</b>
+      <span>release.heart.yaml, generated from the capture · 58 to 63 steps, about 20 s each</span></div>
+    <div class="tile pass"><b>5 of 5 as expected</b>
+      <span>501, 502, 503 and 505 promoted to Dev · 504 stopped by smoke scenario S3, and said so on its pull request</span></div>
+  </div>
+
+  <h2>How it goes</h2>
+  <ul>
+    <li><b>The goal is plain text</b> (<code>release.goal.md</code>): open the pull request, ask the watcher to be told
+      when it can be merged, merge it, ask Jenkins to build, run the smoke script the build links, promote or comment.</li>
+    <li><b>One walk with Claude.</b> The model chose each act from what each answer offered. The steps the grammar
+      covers ran with no model: At a party, Once a reply, Run the script, If.</li>
+    <li><b>The walk kept as a script.</b> <code>artie generate</code> wrote every value as the input or the name it
+      came from: the pull request to watch is <code>${pr.@self}</code>, the build's commit
+      <code>${merged.merge_commit_sha}</code>, Dev's environment <code>${environment}</code>.</li>
+    <li><b>Five releases, five sets of inputs.</b> A different pull request and policy change each, and a different
+      book, problem and comment for the smoke test. Same script every time; the real Jenkins builds each.</li>
+  </ul>
+
+  <h2>The five releases, replayed</h2>
+  <div class="wrap"><table>
+    <tr><th>Pull request</th><th>Its change</th><th>Smoke test given</th><th>Model calls</th><th>Outcome</th></tr>
+    <tr><td><a href="runs/pr-501.html">501</a></td><td>renewals: 2 weeks</td><td>Charlotte's Web · E. B. White · damaged · "Spine cracked."</td><td>0</td><td>promoted to Dev</td></tr>
+    <tr><td><a href="runs/pr-502.html">502</a></td><td>renewals: 4 weeks</td><td>The Hobbit · J. R. R. Tolkien · wrong-book · "This is the sequel."</td><td>0</td><td>promoted to Dev</td></tr>
+    <tr><td><a href="runs/pr-503.html">503</a></td><td>renewals: 1 week</td><td>Matilda · Roald Dahl · lost · "Not on the shelf at home."</td><td>0</td><td>promoted to Dev</td></tr>
+    <tr><td><a href="runs/pr-504.html">504</a></td><td>renewals: none (0 weeks)</td><td>Charlotte's Web · E. B. White · missing-pages · "Pages 40 to 44."</td><td>0</td><td>stopped, as it should: S3 failed; not promoted; commented "Not promoted to Dev: smoke scenarios S3 failed."</td></tr>
+    <tr><td><a href="runs/pr-505.html">505</a></td><td>a README line only</td><td>The Hobbit · J. R. R. Tolkien · damaged · "Water damage on the cover."</td><td>0</td><td>promoted to Dev</td></tr>
+  </table></div>
+
+  <h2>What is not yet right</h2>
+  <ul>
+    <li>The promote step cites the smoke score as written in the capture (<code>passed: 5, of: 5</code>), not read from
+      <code>${smoke.passing}</code> and <code>${smoke.of}</code>. It holds while promotion follows only a full pass of
+      five scenarios.</li>
+  </ul>
+
+  <h2>The goal, and the script kept from it</h2>
+  <details><summary>release.goal.md, the plain-text goal</summary><pre>---
+start: "{github}"
+inputs:
+  pull:      { question: "Which pull request?" }
+  owner:     { default: acme }
+  repo:      { default: web }
+  github:    { default: "http://192.168.1.18:8098/" }
+  watcher:   { default: "http://192.168.1.18:8099/" }
+  jenkins:   { default: "http://192.168.1.18:8170/" }
+  dev:       { default: "http://192.168.1.18:8190/" }
+  environment: { default: "1" }
+  book:      { default: "The Hobbit" }
+  author:    { default: "J. R. R. Tolkien" }
+  renewable: { default: "Matilda" }
+  problem:   { default: "missing-pages" }
+  comment:   { default: "Pages 12 to 14." }
+---
+
+Release a pull request to Dev once it can be merged and its build passes its smoke test.
+
+- Open pull request {pull} of {owner}/{repo} `as pr`
+- At {watcher}, ask to be told when {pr} offers github:merge `as watch`
+- Once {watch} is answered, follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing `as merged`
+- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`
+- Once {build} is answered, follow its in-reply-to link to the build `as built`
+  - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`
+- If {smoke.passed}, at {dev}, open environment {environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed `as promotion`
+  Otherwise, at {pr}, act github:comment with body = "Not promoted to Dev: smoke scenarios {smoke.failed} failed."</pre></details>
+  <details><summary>release.heart.yaml, generated from the capture</summary><pre># Generated by artie generate from /Users/josh/repos/artie/exhibits/merge-watch-release/release.capture.yaml, the run of /Users/josh/repos/artie/exhibits/merge-watch-release/release.goal.md.
+# Every selection as that run made it, nested as it nested, with no model.
+# What it was offered is pinned in /Users/josh/repos/artie/exhibits/merge-watch-release/release.pins.yaml, held to before every act.
+# After an act, what it changed is checked: the run stops where that no longer holds.
+# A value marked "review:" holds a value the reasoner chose: check it before keeping the script.
+#   artie run /Users/josh/repos/artie/exhibits/merge-watch-release/release.heart.yaml pull=501
+heart: 1
+kind: kept
+start: ${github}
+
+inputs:
+  github:
+    default: http://192.168.1.18:8098/
+  pull:
+    question: Which pull request?
+    type: integer
+  owner:
+    default: acme
+  repo:
+    default: web
+  watcher:
+    default: http://192.168.1.18:8099/
+  jenkins:
+    default: http://192.168.1.18:8170/
+  dev:
+    default: http://192.168.1.18:8190/
+  environment:
+    default: "1"
+    type: integer
+  book:
+    default: The Hobbit
+  author:
+    default: J. R. R. Tolkien
+  renewable:
+    default: Matilda
+  problem:
+    default: missing-pages
+  comment:
+    default: Pages 12 to 14.
+
+steps:
+  - act: github:pulls-get
+    fields:
+      owner: ${owner}
+      repo: ${repo}
+      pull_number: ${pull}
+    intent: Open pull request ${pull} of ${owner}/${repo}
+    then:
+      - keep-as: pr
+  - enter: ${watcher}
+    steps:
+      - ask: watcher:watch
+        fields:
+          resource: ${pr.@self}
+          offers: github:merge
+        reply: watch
+  - once-answered:
+      reply: watch
+      steps:
+        - follow: hr:in-reply-to
+          inferred: follow the hr:in-reply-to link
+          from-intent: follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing
+          then:
+            - follow: about
+              inferred: follow the about link
+              from-intent: follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing
+              then:
+                - act: github:merge
+                  fields:
+                    merge_method: squash
+                  intent: follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing
+                  then:
+                    - check:
+                        - field: mergeable_state
+                          is: unknown
+                        - field: merged
+                          is: true
+                        - field: state
+                          is: closed
+                    - keep-as: merged
+  - enter: ${jenkins}
+    steps:
+      - ask: ci:build
+        fields:
+          commit: ${merged.merge_commit_sha}
+        reply: build
+  - once-answered:
+      reply: build
+      steps:
+        - follow: hr:in-reply-to
+          intent: follow its in-reply-to link to the build
+          then:
+            - run-script: ci:smoke-test
+              on-link: ci:deployment
+              inputs:
+                book: ${book}
+                author: ${author}
+                renewable: ${renewable}
+                problem: ${problem}
+                comment: ${comment}
+              as: smoke
+  - given:
+      - at: smoke
+        field: passed
+        is: true
+    then:
+      - enter: ${dev}
+        steps:
+          - act: env:get-environment
+            fields:
+              id: ${environment}
+            inferred: get environment ${environment}
+            from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
+            then:
+              - act: env:promote
+                fields:
+                  commit: ${merged.merge_commit_sha}
+                  smoke:
+                    passed: 5
+                    of: 5
+                intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
+                then:
+                  - check:
+                      - field: commit
+                        is: ${merged.merge_commit_sha}
+    otherwise:
+      - at: ${pr.@self}
+        steps:
+          - act: github:comment
+            fields:
+              body: "Not promoted to Dev: smoke scenarios ${smoke.failed} failed."</pre></details>
+
+  <h2>Run it again</h2>
+  <ul>
+    <li><code>sh exhibits/merge-watch-release/capture-release.sh 501</code>: one walk with Claude, the script generated.</li>
+    <li><code>sh exhibits/merge-watch-release/variants.sh docs/reports/merge-watch-release-captured/runs</code>: the five
+      releases, no model.</li>
+    <li><code>sh docs/reports/merge-watch-release-captured/build.sh</code>: this report.</li>
+  </ul>
+</main>
+</body>
+</html>
