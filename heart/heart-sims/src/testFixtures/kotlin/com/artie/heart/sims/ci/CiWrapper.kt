@@ -153,6 +153,7 @@ class CiWrapper(
     /** A notification from Jenkins: the build it names moves, and the caller's reply is told, signed. */
     private fun notified(request: Request): Response {
         if (request.query("secret") != hookSecret) return Response(Status.FORBIDDEN)
+        System.err.println("ci: notified ${request.bodyString().take(LOGGED)}")
         val said = mapper.readTree(request.bodyString())["build"] ?: return Response(Status.BAD_REQUEST)
         val parameters = said["parameters"]
         val id = parameters?.get("RELEASE_BUILD")?.asText()?.toLongOrNull() ?: return Response(Status.OK)
@@ -252,6 +253,7 @@ class CiWrapper(
         const val LOG = "ci:log"
         const val SMOKE_GOAL = "smoke.goal.md"
         private const val DEFAULT_PREVIEW_PORT = 8180
+        private const val LOGGED = 600
         private const val STARTED_PERCENT = 10
         private const val IMMUTABLE = "public, max-age=31536000, immutable"
         private val STANDINGS = listOf(Build.QUEUED, Build.RUNNING, Build.SUCCEEDED, Build.FAILED)

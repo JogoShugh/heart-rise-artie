@@ -3,6 +3,7 @@
 # init.groovy.d and jobs/.
 FROM jenkins/jenkins:lts-jdk21
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true"
-RUN jenkins-plugin-cli --plugins notification
+# Notification reads test results through the JUnit plugin's classes, so it needs that plugin beside it.
+RUN jenkins-plugin-cli --plugins notification junit
 COPY --chown=jenkins:jenkins init.groovy.d/ /usr/share/jenkins/ref/init.groovy.d/
 COPY --chown=jenkins:jenkins jobs/ /usr/share/jenkins/ref/jobs/

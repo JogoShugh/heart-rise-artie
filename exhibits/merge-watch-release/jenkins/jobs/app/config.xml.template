@@ -13,6 +13,7 @@
             <urlType>PUBLIC</urlType>
           </urlInfo>
           <event>all</event>
+          <branch>.*</branch>
           <timeout>30000</timeout>
           <loglines>0</loglines>
           <retries>2</retries>
@@ -24,6 +25,11 @@
         <hudson.model.StringParameterDefinition>
           <name>SHA</name>
           <description>The commit to build: the merged one.</description>
+          <trim>true</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>RELEASE_BUILD</name>
+          <description>The wrapper's number for this build, echoed in each notification.</description>
           <trim>true</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>

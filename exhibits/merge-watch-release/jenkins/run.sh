@@ -10,6 +10,7 @@ env_file="$here/jenkins.env"
 [ -f "$env_file" ] || env_file="$here/jenkins.env.example"
 # shellcheck disable=SC1090
 . "$env_file"
+export JENKINS_ADMIN_USER JENKINS_ADMIN_PASSWORD JENKINS_HOOK_SECRET
 work="$here/../work"
 [ -d "$work/library-app/.git" ] || { echo "no $work/library-app: run ../make-app-repo.sh first"; exit 1; }
 [ -d "$root/heart/heart-sims/build/sims/lib" ] || { echo "build the simulator first: ./gradlew -p heart :heart-sims:installSims"; exit 1; }

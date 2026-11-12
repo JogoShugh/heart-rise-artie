@@ -2,6 +2,7 @@ package com.artie.heart.sims
 
 import com.artie.heart.sims.library.LibraryPolicy
 import com.artie.heart.sims.library.LibraryService
+import com.artie.heart.sims.release.Release
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import java.nio.file.Path
@@ -20,6 +21,15 @@ import java.nio.file.Path
  * (LibraryPolicy): how a build deploys the library at a commit, as a preview.
  */
 fun main(args: Array<String>) {
+    if (args.firstOrNull() == "release") {
+        Release(
+            host = System.getenv("RELEASE_HOST") ?: "localhost",
+            jenkinsUser = System.getenv("JENKINS_ADMIN_USER") ?: "artie",
+            jenkinsPassword = checkNotNull(System.getenv("JENKINS_ADMIN_PASSWORD")) { "JENKINS_ADMIN_PASSWORD" },
+            hookSecret = checkNotNull(System.getenv("JENKINS_HOOK_SECRET")) { "JENKINS_HOOK_SECRET" },
+        ).serve()
+        return
+    }
     if (args.firstOrNull() == "library") {
         val policy = LibraryPolicy.read(Path.of(args[2]))
         val server = LibraryService(policy = policy).handler.asServer(Jetty(args[1].toInt())).start()
