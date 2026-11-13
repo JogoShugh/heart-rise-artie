@@ -54,6 +54,7 @@ object PartyCredentials : CredentialSource {
     private val byPort = mapOf(
         Release.GITHUB_PORT to Credential.Bearer(GitHubService.TOKEN),
         Release.GITLAB_PORT to Credential.Bearer(Release.GITLAB_TOKEN),
+        Release.GITHUB_LIVE_PORT to Credential.Bearer(GitHubService.TOKEN),
         Release.WATCHER_PORT to Credential.Bearer(OfferWatcher.TOKEN),
         Release.REPLIES_PORT to Credential.Bearer(Release.REPLY_TOKEN),
         Release.CI_PORT to Credential.Bearer(CiWrapper.TOKEN),

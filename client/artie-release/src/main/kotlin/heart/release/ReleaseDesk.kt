@@ -158,6 +158,8 @@ class ReleaseDesk(
       "type": "string", "format": "uri", "title": "Source control",
       "description": "Where the pull request is: the gateway in front of GitHub or GitLab"
     },
+    "owner": {"type": "string", "title": "Owner", "description": "Who owns the repository"},
+    "repo": {"type": "string", "title": "Repository", "description": "The repository the pull request is in"},
     "book": {"type": "string", "title": "Book", "description": "The book the smoke test finds and reads"},
     "author": {"type": "string", "title": "Author", "description": "Who wrote it, as the smoke test checks"},
     "problem": {

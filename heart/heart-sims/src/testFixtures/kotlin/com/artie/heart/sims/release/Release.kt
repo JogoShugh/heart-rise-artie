@@ -65,6 +65,7 @@ class Release(
     private val credentials = mapOf(
         GITHUB_PORT to "Bearer ${GitHubService.TOKEN}",
         GITLAB_PORT to "Bearer $GITLAB_TOKEN",
+        GITHUB_LIVE_PORT to "Bearer ${GitHubService.TOKEN}",
         WATCHER_PORT to "Bearer ${OfferWatcher.TOKEN}",
         CI_PORT to "Bearer ${CiWrapper.TOKEN}",
         DEV_PORT to "Bearer ${DevEnvironment.TOKEN}",
@@ -168,6 +169,12 @@ class Release(
         /** The gateway in front of the release's GitLab (exhibits/merge-watch-release/gitlab), and what it takes. */
         const val GITLAB_PORT = 8094
         const val GITLAB_TOKEN = "gitlab-token"
+
+        /**
+         * The gateway in front of real GitHub (exhibits/merge-watch-release/github): it calls GitHub with its own
+         * token, and takes GitHub's test token from the release's parties.
+         */
+        const val GITHUB_LIVE_PORT = 8093
         const val WATCHER_PORT = 8099
         const val REPLIES_PORT = 8160
         const val CI_PORT = 8170

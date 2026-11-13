@@ -39,6 +39,7 @@ Feature: The release desk: services that call others through ARTIE, and answer t
       | origin                   | credential                |
       | http://192.168.1.18:8098 | Bearer github-token       |
       | http://192.168.1.18:8094 | Bearer gitlab-token       |
+      | http://192.168.1.18:8093 | Bearer github-token       |
       | http://192.168.1.18:8099 | Bearer watcher-token      |
       | http://192.168.1.18:8160 | Bearer artie-reply-token  |
       | http://192.168.1.18:8170 | Bearer ci-token           |
@@ -56,13 +57,15 @@ Feature: The release desk: services that call others through ARTIE, and answer t
       """yaml
       heart: 1
       kind: kept
-      inputs: {pull: {}, scm: {default: "http://localhost:8098/"}, book: {default: Matilda}, problem: {default: damaged}}
+      inputs: {pull: {}, scm: {default: "http://localhost:8098/"}, owner: {default: acme}, repo: {default: web}, book: {default: Matilda}, problem: {default: damaged}}
       start: http://localhost:8160/
       steps:
-        - note: "releasing pull request ${pull} at ${scm}, smoke testing ${book} with ${problem}"
+        - note: "releasing pull request ${pull} of ${owner}/${repo} at ${scm}, smoke testing ${book} with ${problem}"
       """
     When a person asks the desk to release pull request 482, with:
       | scm     | http://localhost:8094/ |
+      | owner   | JogoShugh              |
+      | repo    | heart-github-test      |
       | book    | The Hobbit             |
       | problem | wrong-book             |
     Then the desk answered 201, at "/releases/1"
@@ -70,7 +73,9 @@ Feature: The release desk: services that call others through ARTIE, and answer t
       | member          | value                                                         |
       | /pull           | 482                                                           |
       | /inputs/scm     | http://localhost:8094/                                        |
+      | /inputs/owner   | JogoShugh                                                     |
+      | /inputs/repo    | heart-github-test                                             |
       | /inputs/book    | The Hobbit                                                    |
       | /inputs/problem | wrong-book                                                    |
       | /state          | ended                                                         |
-      | /notes/0        | releasing pull request 482 at http://localhost:8094/, smoke testing The Hobbit with wrong-book |
+      | /notes/0        | releasing pull request 482 of JogoShugh/heart-github-test at http://localhost:8094/, smoke testing The Hobbit with wrong-book |
