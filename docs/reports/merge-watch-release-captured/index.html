@@ -44,11 +44,11 @@
     only the smoke test was captured.</p>
 
   <div class="tiles">
-    <div class="tile cost"><b>1 run with Claude: 24 calls</b>
-      <span>claude-sonnet-5-5 · 38,107 input tokens · 3,297 output · 35,246 read from cache · 63 steps in 56 s ·
+    <div class="tile cost"><b>1 run with Claude: 20 calls</b>
+      <span>claude-sonnet-5-5 · 33,811 input tokens · 2,945 output · 29,424 read from cache · 61 steps in 47 s ·
         <a href="runs/capture.html">the capture</a></span></div>
     <div class="tile pass"><b>5 replays: 0 calls</b>
-      <span>release.heart.yaml, generated from the capture · 58 to 63 steps, about 25 s each</span></div>
+      <span>release.heart.yaml, generated from the capture · 56 to 61 steps, about 21 s each</span></div>
     <div class="tile pass"><b>5 of 5 as expected</b>
       <span>501, 502, 503 and 505 promoted to Dev · 504 stopped by smoke scenario S3, and said so on its pull request</span></div>
   </div>
@@ -106,7 +106,7 @@ Release a pull request to Dev once it can be merged and its build passes its smo
 
 - Open pull request {pull} of {owner}/{repo} `as pr`
 - At {watcher}, ask to be told when {pr} offers github:merge `as watch`
-- Once {watch} is answered, follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing `as merged`
+- Once {watch} is answered, at {pr}, merge it by squashing `as merged`
 - At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`
 - Once {build} is answered, follow its in-reply-to link to the build `as built`
   - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`
@@ -171,27 +171,21 @@ steps:
   - once-answered:
       reply: watch
       steps:
-        - follow: hr:in-reply-to
-          inferred: follow the in-reply-to link to the watch
-          from-intent: follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing
-          then:
-            - follow: about
-              inferred: follow the about link to the pull request
-              from-intent: follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing
+        - enter: ${pr.@self}
+          steps:
+            - act: github:merge
+              fields:
+                merge_method: squash
+              intent: merge it by squashing
               then:
-                - act: github:merge
-                  fields:
-                    merge_method: squash
-                  intent: follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing
-                  then:
-                    - check:
-                        - field: mergeable_state
-                          is: unknown
-                        - field: merged
-                          is: true
-                        - field: state
-                          is: closed
-                    - keep-as: merged
+                - check:
+                    - field: mergeable_state
+                      is: unknown
+                    - field: merged
+                      is: true
+                    - field: state
+                      is: closed
+                - keep-as: merged
   - enter: ${jenkins}
     steps:
       - ask: ci:build
@@ -223,7 +217,7 @@ steps:
           - act: env:get-environment
             fields:
               id: ${environment}
-            inferred: open environment ${environment}
+            inferred: get environment ${environment}
             from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
             then:
               - act: env:promote

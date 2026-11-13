@@ -243,16 +243,16 @@ run:
       given: default
       default: '1'
 ---
-at: '2026-11-12T23:18:10.679176Z'
-ms: 41
+at: '2026-11-13T01:11:08.534527Z'
+ms: 35
 mode: script
 say: enter {entry}
 params:
   entry: http://192.168.1.18:8098/
 opens: true
 exchanges:
-  - at: '2026-11-12T23:18:10.680565Z'
-    ms: 23
+  - at: '2026-11-13T01:11:08.535963Z'
+    ms: 21
     request:
       method: GET
       url: http://192.168.1.18:8098/
@@ -262,14 +262,14 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-dbbc006c384ceb82-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-d314d27eebf39790-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:10 GMT
+        date: Fri, 13 Nov 2026 01:11:08 GMT
         etag: '"index-hsf-2b57f9146741dddf"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -873,8 +873,8 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:10.726782Z'
-ms: 197
+at: '2026-11-13T01:11:08.578486Z'
+ms: 188
 mode: script
 say: act {relation}, owner {owner}, repo {repo}, pull_number {pull_number}
 intent: Open pull request 501 of acme/web
@@ -913,8 +913,8 @@ guard:
   form: sha256-h02WjR7vd61a3clH1/805IIXM3O8OwspKt3KHwUP7/s=
   act: sha256-1F83f16yZ7bvcK7pTCwTR7vWpQdX/5YrkMr2Vjh4hAE=
 exchanges:
-  - at: '2026-11-12T23:18:10.767944Z'
-    ms: 151
+  - at: '2026-11-13T01:11:08.617698Z'
+    ms: 145
     request:
       method: GET
       url: http://192.168.1.18:8098/repos/acme/web/pulls/501
@@ -924,15 +924,15 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-e33d14a4a1a2b254-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-b4a49a05568dd682-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:10 GMT
-        etag: '"seq-0.hsf.L0.07dba7185fb03007"'
+        date: Fri, 13 Nov 2026 01:11:08 GMT
+        etag: '"seq-0.hsf.L0.fd6b49418ffdca0a"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="text/html", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
@@ -957,7 +957,7 @@ exchanges:
         head:
           label: acme:new-topic
           ref: new-topic
-          sha: 9cbfb8b3e45540179b07e2ccdd7a4071f04b96cf
+          sha: 79b6fa4952ef24e0963cf30e601341b827b88235
         id: 1000501
         labels: []
         locked: true
@@ -2089,7 +2089,7 @@ now:
     head:
       label: acme:new-topic
       ref: new-topic
-      sha: 9cbfb8b3e45540179b07e2ccdd7a4071f04b96cf
+      sha: 79b6fa4952ef24e0963cf30e601341b827b88235
     id: 1000501
     labels: []
     locked: true
@@ -2253,34 +2253,34 @@ keeps:
   /_embedded/github:base-repo/0/full_name:
     - 5
   /requested_teams/0/id:
-    - 58
+    - 56
   /_embedded/author/0/id:
-    - 58
+    - 56
   /_embedded/github:assignee/0/id:
-    - 58
+    - 56
   /_embedded/github:assignees/0/id:
-    - 58
+    - 56
   /_embedded/github:assignees/1/id:
-    - 58
+    - 56
   /_embedded/github:merged-by/0/id:
-    - 58
+    - 56
   /_embedded/github:milestone/0/number:
-    - 58
+    - 56
   /_embedded/github:head-user/0/id:
-    - 58
+    - 56
   /_embedded/github:base-user/0/id:
-    - 58
+    - 56
   /changed_files:
-    - 59
+    - 57
 ---
-at: '2026-11-12T23:18:10.927206Z'
+at: '2026-11-13T01:11:08.770623Z'
 ms: 4
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8098/
 exchanges:
-  - at: '2026-11-12T23:18:10.927440Z'
+  - at: '2026-11-13T01:11:08.770847Z'
     ms: 3
     request:
       method: GET
@@ -2292,14 +2292,14 @@ exchanges:
         If-None-Match: '"index-hsf-2b57f9146741dddf"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-e2c9d55c35f180b2-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-dc2b6d077553a2a6-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:10 GMT
+        date: Fri, 13 Nov 2026 01:11:08 GMT
         etag: '"index-hsf-2b57f9146741dddf"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -2407,19 +2407,19 @@ now:
       - null
 keeps:
   /title:
-    - 28
-    - 29
-    - 47
-    - 48
+    - 26
+    - 27
+    - 45
+    - 46
 ---
-at: '2026-11-12T23:18:10.932091Z'
-ms: 3
+at: '2026-11-13T01:11:08.775494Z'
+ms: 2
 mode: script
 say: enter {entry}
 params:
   entry: http://192.168.1.18:8099/
 exchanges:
-  - at: '2026-11-12T23:18:10.932200Z'
+  - at: '2026-11-13T01:11:08.775579Z'
     ms: 2
     request:
       method: GET
@@ -2430,14 +2430,14 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-5798990a70a6d136-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-3c3fff9e127d0460-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:10 GMT
+        date: Fri, 13 Nov 2026 01:11:08 GMT
         etag: '"index-hsf-c8ab1f3c28e950d1"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -2614,8 +2614,8 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:10.937778Z'
-ms: 17
+at: '2026-11-13T01:11:08.780664Z'
+ms: 16
 mode: script
 say: act {relation}, resource {resource}, offers {offers}, _links {_links}
 params:
@@ -2624,7 +2624,7 @@ params:
   offers: github:merge
   _links:
     hr:reply-to:
-      href: http://192.168.1.18:8160/replies/r1-1794525490937
+      href: http://192.168.1.18:8160/replies/r1-1794532268779
     hr:keys:
       href: http://192.168.1.18:8160/keys
 values:
@@ -2650,7 +2650,7 @@ values:
   _links:
     value:
       hr:reply-to:
-        href: http://192.168.1.18:8160/replies/r1-1794525490937
+        href: http://192.168.1.18:8160/replies/r1-1794532268779
       hr:keys:
         href: http://192.168.1.18:8160/keys
     type: object
@@ -2672,7 +2672,7 @@ guard:
   act: sha256-d2xDQiCk6HRrceJvk19XIlJ86QD6BDbuCJ34eoNKMhg=
   if-match: '"index-hsf-c8ab1f3c28e950d1"'
 exchanges:
-  - at: '2026-11-12T23:18:10.943961Z'
+  - at: '2026-11-13T01:11:08.786802Z'
     ms: 10
     request:
       method: POST
@@ -2684,16 +2684,16 @@ exchanges:
         If-Match: '"index-hsf-c8ab1f3c28e950d1"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-a06a5275fd6da1ee-01
-        Content-Digest: 'sha-256=:j4u0EcfAWeTALNfzYULhgcOPLw5vj+9ORhPHftHdTEQ=:'
-        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794525490;keyid="artie-2026-11";alg="ed25519"
-        Signature: 'sig1=:EtwsJLBzu8SwCmdYtofzUV+xAO2NtG2ZcZyS84yyXhozn4vdBRsyKDz6f0DJuAFloyXmETtLT6lcQ+boLeFnCw==:'
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-6de25538cc3f28b5-01
+        Content-Digest: 'sha-256=:LA/wOjabwlBsZkEl3K3353Ua6CxtmYKp6N5iQW1lWKw=:'
+        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794532268;keyid="artie-2026-11";alg="ed25519"
+        Signature: 'sig1=:J8eqf6zGWl7GmgO1NHiaRKRlRN6NbcQPHzct3vMhvvwXNlGNbhRKOs7S7JebpbIVeqn04yHOo78Q/cCi9YD1AQ==:'
       body:
         resource: http://192.168.1.18:8098/repos/acme/web/pulls/501
         offers: github:merge
         _links:
           hr:reply-to:
-            href: http://192.168.1.18:8160/replies/r1-1794525490937
+            href: http://192.168.1.18:8160/replies/r1-1794532268779
           hr:keys:
             href: http://192.168.1.18:8160/keys
     response:
@@ -2703,8 +2703,8 @@ exchanges:
         content-location: /watches/1
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:10 GMT
-        etag: '"seq-0.hsf.L0.0179a446f1184b16"'
+        date: Fri, 13 Nov 2026 01:11:08 GMT
+        etag: '"seq-0.hsf.L0.e16aa4f65588876d"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/watches/1&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/watches/1&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/watches/1&gt;; rel="alternate"; type="text/html", &lt;/watches/1&gt;; rel="alternate"; type="application/json"
         location: /watches/1
         server: Jetty(12.0.16)
@@ -2732,7 +2732,7 @@ exchanges:
           about:
             href: http://192.168.1.18:8098/repos/acme/web/pulls/501
           hr:reply-to:
-            href: http://192.168.1.18:8160/replies/r1-1794525490937
+            href: http://192.168.1.18:8160/replies/r1-1794532268779
           hr:keys:
             href: /keys
             type: application/jwk-set+json
@@ -2770,16 +2770,16 @@ now:
       - null
 keeps:
   /id:
-    - 58
+    - 56
 ---
-at: '2026-11-12T23:18:10.958375Z'
-ms: 2
+at: '2026-11-13T01:11:08.800737Z'
+ms: 1
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8098/
 exchanges:
-  - at: '2026-11-12T23:18:10.958514Z'
+  - at: '2026-11-13T01:11:08.800846Z'
     ms: 1
     request:
       method: GET
@@ -2791,14 +2791,14 @@ exchanges:
         If-None-Match: '"index-hsf-2b57f9146741dddf"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-fc5f22fb95f70fe5-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-b3e156f8aecca9f6-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:10 GMT
+        date: Fri, 13 Nov 2026 01:11:08 GMT
         etag: '"index-hsf-2b57f9146741dddf"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -2905,25 +2905,25 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:10.962500Z'
-ms: 11
+at: '2026-11-13T01:11:08.803833Z'
+ms: 14
 mode: script
 say: return to {address}
 params:
-  address: http://192.168.1.18:8160/replies/r1-1794525490937
+  address: http://192.168.1.18:8160/replies/r1-1794532268779
 exchanges:
-  - at: '2026-11-12T23:18:10.962630Z'
-    ms: 10
+  - at: '2026-11-13T01:11:08.803943Z'
+    ms: 14
     request:
       method: GET
-      url: http://192.168.1.18:8160/replies/r1-1794525490937
+      url: http://192.168.1.18:8160/replies/r1-1794532268779
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-4aca2977c4567b51-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-5d6f6f650f89e89e-01
     response:
       status: 200
       headers:
@@ -2931,18 +2931,18 @@ exchanges:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:10 GMT
-        etag: '"seq-1.hsf.L0.fc6ab68f5fa9ce42"'
-        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/replies/r1-1794525490937&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/replies/r1-1794525490937&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/replies/r1-1794525490937&gt;; rel="alternate"; type="text/html", &lt;/replies/r1-1794525490937&gt;; rel="alternate"; type="application/json"
+        date: Fri, 13 Nov 2026 01:11:08 GMT
+        etag: '"seq-1.hsf.L0.690cc610007ba050"'
+        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/replies/r1-1794532268779&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/replies/r1-1794532268779&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/replies/r1-1794532268779&gt;; rel="alternate"; type="text/html", &lt;/replies/r1-1794532268779&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        reply: r1-1794525490937
+        reply: r1-1794532268779
         state: awaiting
         _links:
           self:
-            href: /replies/r1-1794525490937
+            href: /replies/r1-1794532268779
           curies:
             - name: hr
               href: https://w3id.org/heart-rise/rels/{rel}
@@ -2957,7 +2957,7 @@ exchanges:
             description: Tells the caller how far the work has got.
             _links:
               target:
-                href: /replies/r1-1794525490937
+                href: /replies/r1-1794532268779
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -2998,7 +2998,7 @@ exchanges:
             description: 'Sends the result: the work is done.'
             _links:
               target:
-                href: /replies/r1-1794525490937
+                href: /replies/r1-1794532268779
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -3037,7 +3037,7 @@ exchanges:
             description: Says the work failed, with a problem document.
             _links:
               target:
-                href: /replies/r1-1794525490937
+                href: /replies/r1-1794532268779
             method: PATCH
             contentType: application/problem+json
             schema:
@@ -3073,10 +3073,10 @@ exchanges:
               '$id': /schemas/3ee822291d3d75a3
             hr:integrity: sha256-lU0r2LFtHRt/6h/aAZHWVXGl2ByYhCzFfvdPbrhxRDI=
 outcome: done
-address: http://192.168.1.18:8160/replies/r1-1794525490937
+address: http://192.168.1.18:8160/replies/r1-1794532268779
 now:
   state:
-    reply: r1-1794525490937
+    reply: r1-1794532268779
     state: awaiting
   forms:
     - hr:progress
@@ -3089,29 +3089,29 @@ now:
       - null
 keeps:
   /title:
-    - 47
-    - 48
+    - 45
+    - 46
 ---
-at: '2026-11-12T23:18:19.349237Z'
+at: '2026-11-13T01:11:17.141476Z'
 ms: 5
 mode: script
 say: return to {address}
 params:
-  address: http://192.168.1.18:8160/replies/r1-1794525490937
+  address: http://192.168.1.18:8160/replies/r1-1794532268779
 exchanges:
-  - at: '2026-11-12T23:18:19.349348Z'
+  - at: '2026-11-13T01:11:17.141562Z'
     ms: 4
     request:
       method: GET
-      url: http://192.168.1.18:8160/replies/r1-1794525490937
+      url: http://192.168.1.18:8160/replies/r1-1794532268779
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-1.hsf.L0.fc6ab68f5fa9ce42"'
+        If-None-Match: '"seq-1.hsf.L0.690cc610007ba050"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-e59541efb6212c53-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-7eb99ed4700605bb-01
     response:
       status: 200
       headers:
@@ -3119,26 +3119,26 @@ exchanges:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:19 GMT
-        etag: '"seq-2.hsf.L0.895954ff3d5bf5a0"'
-        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/replies/r1-1794525490937&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/replies/r1-1794525490937&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/replies/r1-1794525490937&gt;; rel="alternate"; type="text/html", &lt;/replies/r1-1794525490937&gt;; rel="alternate"; type="application/json"
+        date: Fri, 13 Nov 2026 01:11:17 GMT
+        etag: '"seq-2.hsf.L0.b195e8a665c0f6e6"'
+        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/replies/r1-1794532268779&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/replies/r1-1794532268779&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/replies/r1-1794532268779&gt;; rel="alternate"; type="text/html", &lt;/replies/r1-1794532268779&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        reply: r1-1794525490937
+        reply: r1-1794532268779
         state: completed
         percent: 100
         result:
           resource: http://192.168.1.18:8098/repos/acme/web/pulls/501
           offers: github:merge
-          etag: '"seq-0.hsf.L0.34232b174a8b8abe"'
+          etag: '"seq-0.hsf.L0.a3c0497625a690c4"'
           _links:
             about:
               href: http://192.168.1.18:8098/repos/acme/web/pulls/501
         _links:
           self:
-            href: /replies/r1-1794525490937
+            href: /replies/r1-1794532268779
           curies:
             - name: hr
               href: https://w3id.org/heart-rise/rels/{rel}
@@ -3151,16 +3151,16 @@ exchanges:
             href: http://192.168.1.18:8099/watches/1
         _forms: {}
 outcome: done
-address: http://192.168.1.18:8160/replies/r1-1794525490937
+address: http://192.168.1.18:8160/replies/r1-1794532268779
 now:
   state:
-    reply: r1-1794525490937
+    reply: r1-1794532268779
     state: completed
     percent: 100
     result:
       resource: http://192.168.1.18:8098/repos/acme/web/pulls/501
       offers: github:merge
-      etag: '"seq-0.hsf.L0.34232b174a8b8abe"'
+      etag: '"seq-0.hsf.L0.a3c0497625a690c4"'
       _links:
         about:
           href: http://192.168.1.18:8098/repos/acme/web/pulls/501
@@ -3173,123 +3173,15 @@ now:
     hr:in-reply-to:
       - null
 ---
-at: '2026-11-12T23:18:19.354884Z'
-ms: 2
-mode: script
-say: follow {relation}
-inferred: follow the in-reply-to link to the watch
-fromIntent: follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing
-params:
-  relation: hr:in-reply-to
-opens: true
-chose:
-  kind: link
-  relation: hr:in-reply-to
-  method: GET
-  target: http://192.168.1.18:8099/watches/1
-  address: http://192.168.1.18:8099/watches/1
-  picked: relation
-exchanges:
-  - at: '2026-11-12T23:18:19.355035Z'
-    ms: 2
-    request:
-      method: GET
-      url: http://192.168.1.18:8099/watches/1
-      headers:
-        Accept: application/hal+json
-        Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        Cache-Control: no-cache
-        Authorization: &lt;token&gt;
-        User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-a00821efbe33e1e7-01
-    response:
-      status: 200
-      headers:
-        cache-control: no-cache
-        content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:19 GMT
-        etag: '"seq-3.hsf.L0.ebf45561382fac88"'
-        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/watches/1&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/watches/1&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/watches/1&gt;; rel="alternate"; type="text/html", &lt;/watches/1&gt;; rel="alternate"; type="application/json"
-        server: Jetty(12.0.16)
-        transfer-encoding: chunked
-        vary: Accept, Prefer, Accept-Profile
-      body:
-        id: 1
-        offers: github:merge
-        standing: answered
-        looks: 3
-        _links:
-          self:
-            href: /watches/1
-          curies:
-            - name: watcher
-              href: /profiles/watcher#{rel}
-              templated: true
-            - name: hr
-              href: https://w3id.org/heart-rise/rels/{rel}
-              templated: true
-          hr:unavailable:
-            href: /unavailable/fc81f545088ea825
-            type: application/json
-            integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
-          about:
-            href: http://192.168.1.18:8098/repos/acme/web/pulls/501
-          hr:reply-to:
-            href: http://192.168.1.18:8160/replies/r1-1794525490937
-          hr:keys:
-            href: /keys
-            type: application/jwk-set+json
-        _forms: {}
-offered:
-  forms: []
-  links:
-    - hr:in-reply-to
-    - hr:unavailable
-    - self
-outcome: done
-address: http://192.168.1.18:8099/watches/1
-now:
-  state:
-    id: 1
-    offers: github:merge
-    standing: answered
-    looks: 3
-  forms: []
-  links:
-    self:
-      - null
-    hr:unavailable:
-      - null
-    about:
-      - null
-    hr:reply-to:
-      - null
-    hr:keys:
-      - null
-keeps:
-  /id:
-    - 58
----
-at: '2026-11-12T23:18:19.357640Z'
+at: '2026-11-13T01:11:17.146970Z'
 ms: 31
 mode: script
-say: follow {relation}
-inferred: follow the about link to the pull request
-fromIntent: follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing
+say: enter {entry}
 params:
-  relation: about
-opens: true
-chose:
-  kind: link
-  relation: about
-  method: GET
-  target: http://192.168.1.18:8098/repos/acme/web/pulls/501
-  address: http://192.168.1.18:8098/repos/acme/web/pulls/501
-  picked: relation
+  entry: http://192.168.1.18:8098/repos/acme/web/pulls/501
 exchanges:
-  - at: '2026-11-12T23:18:19.357717Z'
-    ms: 28
+  - at: '2026-11-13T01:11:17.147059Z'
+    ms: 29
     request:
       method: GET
       url: http://192.168.1.18:8098/repos/acme/web/pulls/501
@@ -3297,18 +3189,18 @@ exchanges:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-0.hsf.L0.07dba7185fb03007"'
+        If-None-Match: '"seq-0.hsf.L0.fd6b49418ffdca0a"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-0cfb2943aa213f47-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-673d5a011ce18b5b-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:19 GMT
-        etag: '"seq-0.hsf.L0.34232b174a8b8abe"'
+        date: Fri, 13 Nov 2026 01:11:17 GMT
+        etag: '"seq-0.hsf.L0.a3c0497625a690c4"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="text/html", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
@@ -3333,7 +3225,7 @@ exchanges:
         head:
           label: acme:new-topic
           ref: new-topic
-          sha: 9cbfb8b3e45540179b07e2ccdd7a4071f04b96cf
+          sha: 79b6fa4952ef24e0963cf30e601341b827b88235
         id: 1000501
         labels: []
         locked: true
@@ -4458,14 +4350,6 @@ exchanges:
               type: object
               '$id': /schemas/62f60422b20449be
             hr:integrity: sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
-offered:
-  forms: []
-  links:
-    - about
-    - hr:keys
-    - hr:reply-to
-    - hr:unavailable
-    - self
 outcome: done
 address: http://192.168.1.18:8098/repos/acme/web/pulls/501
 now:
@@ -4489,7 +4373,7 @@ now:
     head:
       label: acme:new-topic
       ref: new-topic
-      sha: 9cbfb8b3e45540179b07e2ccdd7a4071f04b96cf
+      sha: 79b6fa4952ef24e0963cf30e601341b827b88235
     id: 1000501
     labels: []
     locked: true
@@ -4652,29 +4536,29 @@ now:
           private: false
 keeps:
   /requested_teams/0/id:
-    - 58
+    - 56
   /_embedded/author/0/id:
-    - 58
+    - 56
   /_embedded/github:assignee/0/id:
-    - 58
+    - 56
   /_embedded/github:assignees/0/id:
-    - 58
+    - 56
   /_embedded/github:assignees/1/id:
-    - 58
+    - 56
   /_embedded/github:merged-by/0/id:
-    - 58
+    - 56
   /_embedded/github:milestone/0/number:
-    - 58
+    - 56
   /_embedded/github:head-user/0/id:
-    - 58
+    - 56
   /_embedded/github:base-user/0/id:
-    - 58
+    - 56
 ---
-at: '2026-11-12T23:18:19.389703Z'
-ms: 116
+at: '2026-11-13T01:11:17.178643Z'
+ms: 111
 mode: script
 say: act {relation}, merge_method {merge_method}
-intent: follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing
+intent: merge it by squashing
 params:
   relation: github:merge
   merge_method: squash
@@ -4700,10 +4584,10 @@ guard:
   rung: L0
   form: sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
   act: sha256-rIPDcwcEW99MvpphQzxbgRrzOPoH90Q4lEQrZ+emAMo=
-  if-match: '"seq-0.hsf.L0.34232b174a8b8abe"'
+  if-match: '"seq-0.hsf.L0.a3c0497625a690c4"'
 exchanges:
-  - at: '2026-11-12T23:18:19.391614Z'
-    ms: 112
+  - at: '2026-11-13T01:11:17.180634Z'
+    ms: 108
     request:
       method: PUT
       url: http://192.168.1.18:8098/repos/acme/web/pulls/501/actions/merge
@@ -4711,13 +4595,13 @@ exchanges:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Content-Type: application/json
-        If-Match: '"seq-0.hsf.L0.34232b174a8b8abe"'
+        If-Match: '"seq-0.hsf.L0.a3c0497625a690c4"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-0c0074511f7ee2db-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-1086aee0c6a088da-01
         Content-Digest: 'sha-256=:olGuAiHLflscH7EMBaB8TBe293bRF8tzunjSAK/TrA8=:'
-        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794525499;keyid="artie-2026-11";alg="ed25519"
-        Signature: 'sig1=:q4JvmfZPpkmZ4H3Ihk5kCpF/DmltAb5iwtoosvQdNF1ih2fne/3qwAAVrMqHOIIKFUBoomWmNS/dLG3GFKNNDg==:'
+        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794532277;keyid="artie-2026-11";alg="ed25519"
+        Signature: 'sig1=:4E+l3ZrY4XcqrNa54wuSeDEsmRkgd7EfxmBhWSpf00NZ/PByuqBbBUH5eeJQmnsCMuQFJTDVTuFVYMWuqRyvDg==:'
       body:
         merge_method: squash
     response:
@@ -4727,8 +4611,8 @@ exchanges:
         content-location: /repos/acme/web/pulls/501
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:19 GMT
-        etag: '"seq-0.hsf.L0.1f49eb6f865a6de5"'
+        date: Fri, 13 Nov 2026 01:11:17 GMT
+        etag: '"seq-0.hsf.L0.83a988e06b2c904d"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="text/html", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
@@ -4753,12 +4637,12 @@ exchanges:
         head:
           label: acme:new-topic
           ref: new-topic
-          sha: 9cbfb8b3e45540179b07e2ccdd7a4071f04b96cf
+          sha: 79b6fa4952ef24e0963cf30e601341b827b88235
         id: 1000501
         labels: []
         locked: true
         maintainer_can_modify: true
-        merge_commit_sha: 6066ef274b2932b5738af780eb59e093569eddfb
+        merge_commit_sha: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
         mergeable: null
         mergeable_state: unknown
         merged: true
@@ -5825,12 +5709,12 @@ now:
     head:
       label: acme:new-topic
       ref: new-topic
-      sha: 9cbfb8b3e45540179b07e2ccdd7a4071f04b96cf
+      sha: 79b6fa4952ef24e0963cf30e601341b827b88235
     id: 1000501
     labels: []
     locked: true
     maintainer_can_modify: true
-    merge_commit_sha: 6066ef274b2932b5738af780eb59e093569eddfb
+    merge_commit_sha: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
     mergeable: null
     mergeable_state: unknown
     merged: true
@@ -5984,28 +5868,28 @@ now:
           private: false
 keeps:
   /merge_commit_sha:
-    - 18
-    - 59
+    - 16
+    - 57
   /requested_teams/0/id:
-    - 58
+    - 56
   /_embedded/author/0/id:
-    - 58
+    - 56
   /_embedded/github:assignee/0/id:
-    - 58
+    - 56
   /_embedded/github:assignees/0/id:
-    - 58
+    - 56
   /_embedded/github:assignees/1/id:
-    - 58
+    - 56
   /_embedded/github:merged-by/0/id:
-    - 58
+    - 56
   /_embedded/github:milestone/0/number:
-    - 58
+    - 56
   /_embedded/github:head-user/0/id:
-    - 58
+    - 56
   /_embedded/github:base-user/0/id:
-    - 58
+    - 56
 ---
-at: '2026-11-12T23:18:19.508126Z'
+at: '2026-11-13T01:11:17.293175Z'
 ms: 0
 mode: script
 say: check
@@ -6046,12 +5930,12 @@ now:
     head:
       label: acme:new-topic
       ref: new-topic
-      sha: 9cbfb8b3e45540179b07e2ccdd7a4071f04b96cf
+      sha: 79b6fa4952ef24e0963cf30e601341b827b88235
     id: 1000501
     labels: []
     locked: true
     maintainer_can_modify: true
-    merge_commit_sha: 6066ef274b2932b5738af780eb59e093569eddfb
+    merge_commit_sha: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
     mergeable: null
     mergeable_state: unknown
     merged: true
@@ -6203,19 +6087,15 @@ now:
           name: web
           node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
           private: false
-keeps:
-  /title:
-    - 40
-    - 41
 ---
-at: '2026-11-12T23:18:19.508274Z'
+at: '2026-11-13T01:11:17.293397Z'
 ms: 26
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8098/repos/acme/web/pulls/501
 exchanges:
-  - at: '2026-11-12T23:18:19.508400Z'
+  - at: '2026-11-13T01:11:17.293506Z'
     ms: 25
     request:
       method: GET
@@ -6224,18 +6104,18 @@ exchanges:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-0.hsf.L0.34232b174a8b8abe"'
+        If-None-Match: '"seq-0.hsf.L0.a3c0497625a690c4"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-836bf3fa10d96e10-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-8690b354aa6ca766-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:19 GMT
-        etag: '"seq-0.hsf.L0.1f49eb6f865a6de5"'
+        date: Fri, 13 Nov 2026 01:11:17 GMT
+        etag: '"seq-0.hsf.L0.83a988e06b2c904d"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="text/html", &lt;/repos/acme/web/pulls/501&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
@@ -6260,12 +6140,12 @@ exchanges:
         head:
           label: acme:new-topic
           ref: new-topic
-          sha: 9cbfb8b3e45540179b07e2ccdd7a4071f04b96cf
+          sha: 79b6fa4952ef24e0963cf30e601341b827b88235
         id: 1000501
         labels: []
         locked: true
         maintainer_can_modify: true
-        merge_commit_sha: 6066ef274b2932b5738af780eb59e093569eddfb
+        merge_commit_sha: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
         mergeable: null
         mergeable_state: unknown
         merged: true
@@ -7307,12 +7187,12 @@ now:
     head:
       label: acme:new-topic
       ref: new-topic
-      sha: 9cbfb8b3e45540179b07e2ccdd7a4071f04b96cf
+      sha: 79b6fa4952ef24e0963cf30e601341b827b88235
     id: 1000501
     labels: []
     locked: true
     maintainer_can_modify: true
-    merge_commit_sha: 6066ef274b2932b5738af780eb59e093569eddfb
+    merge_commit_sha: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
     mergeable: null
     mergeable_state: unknown
     merged: true
@@ -7466,81 +7346,29 @@ now:
           private: false
 keeps:
   /title:
-    - 40
-    - 41
+    - 38
+    - 39
 ---
-at: '2026-11-12T23:18:19.535313Z'
-ms: 3
+at: '2026-11-13T01:11:17.320256Z'
+ms: 5
 mode: script
 say: return to {address}
 params:
-  address: http://192.168.1.18:8099/watches/1
+  address: http://192.168.1.18:8160/replies/r1-1794532268779
 exchanges:
-  - at: '2026-11-12T23:18:19.535407Z'
-    ms: 2
-    request:
-      method: GET
-      url: http://192.168.1.18:8099/watches/1
-      headers:
-        Accept: application/hal+json
-        Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        Cache-Control: no-cache
-        If-None-Match: '"seq-3.hsf.L0.ebf45561382fac88"'
-        Authorization: &lt;token&gt;
-        User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-d672f34ea59a567f-01
-    response:
-      status: 304
-      headers:
-        cache-control: no-cache
-        content-length: '0'
-        content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:19 GMT
-        etag: '"seq-3.hsf.L0.ebf45561382fac88"'
-        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/watches/1&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/watches/1&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/watches/1&gt;; rel="alternate"; type="text/html", &lt;/watches/1&gt;; rel="alternate"; type="application/json"
-        server: Jetty(12.0.16)
-        vary: Accept, Prefer, Accept-Profile
-outcome: done
-address: http://192.168.1.18:8099/watches/1
-now:
-  state:
-    id: 1
-    offers: github:merge
-    standing: answered
-    looks: 3
-  forms: []
-  links:
-    self:
-      - null
-    hr:unavailable:
-      - null
-    about:
-      - null
-    hr:reply-to:
-      - null
-    hr:keys:
-      - null
----
-at: '2026-11-12T23:18:19.538580Z'
-ms: 4
-mode: script
-say: return to {address}
-params:
-  address: http://192.168.1.18:8160/replies/r1-1794525490937
-exchanges:
-  - at: '2026-11-12T23:18:19.538661Z'
+  - at: '2026-11-13T01:11:17.320356Z'
     ms: 4
     request:
       method: GET
-      url: http://192.168.1.18:8160/replies/r1-1794525490937
+      url: http://192.168.1.18:8160/replies/r1-1794532268779
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-2.hsf.L0.895954ff3d5bf5a0"'
+        If-None-Match: '"seq-2.hsf.L0.b195e8a665c0f6e6"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-924c960cace744cc-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-a9b6a9ee07b7f37a-01
     response:
       status: 304
       headers:
@@ -7548,22 +7376,22 @@ exchanges:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:19 GMT
-        etag: '"seq-2.hsf.L0.895954ff3d5bf5a0"'
-        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/replies/r1-1794525490937&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/replies/r1-1794525490937&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/replies/r1-1794525490937&gt;; rel="alternate"; type="text/html", &lt;/replies/r1-1794525490937&gt;; rel="alternate"; type="application/json"
+        date: Fri, 13 Nov 2026 01:11:17 GMT
+        etag: '"seq-2.hsf.L0.b195e8a665c0f6e6"'
+        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/replies/r1-1794532268779&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/replies/r1-1794532268779&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/replies/r1-1794532268779&gt;; rel="alternate"; type="text/html", &lt;/replies/r1-1794532268779&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         vary: Accept, Prefer, Accept-Profile
 outcome: done
-address: http://192.168.1.18:8160/replies/r1-1794525490937
+address: http://192.168.1.18:8160/replies/r1-1794532268779
 now:
   state:
-    reply: r1-1794525490937
+    reply: r1-1794532268779
     state: completed
     percent: 100
     result:
       resource: http://192.168.1.18:8098/repos/acme/web/pulls/501
       offers: github:merge
-      etag: '"seq-0.hsf.L0.34232b174a8b8abe"'
+      etag: '"seq-0.hsf.L0.a3c0497625a690c4"'
       _links:
         about:
           href: http://192.168.1.18:8098/repos/acme/web/pulls/501
@@ -7575,15 +7403,19 @@ now:
       - null
     hr:in-reply-to:
       - null
+keeps:
+  /title:
+    - 38
+    - 39
 ---
-at: '2026-11-12T23:18:19.543137Z'
+at: '2026-11-13T01:11:17.325391Z'
 ms: 1
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8098/
 exchanges:
-  - at: '2026-11-12T23:18:19.543184Z'
+  - at: '2026-11-13T01:11:17.325446Z'
     ms: 1
     request:
       method: GET
@@ -7595,14 +7427,14 @@ exchanges:
         If-None-Match: '"index-hsf-2b57f9146741dddf"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-391b33fc59dbd789-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-6a0770b4a11807c0-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:19 GMT
+        date: Fri, 13 Nov 2026 01:11:17 GMT
         etag: '"index-hsf-2b57f9146741dddf"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -7709,14 +7541,14 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:19.545245Z'
-ms: 2
+at: '2026-11-13T01:11:17.326873Z'
+ms: 1
 mode: script
 say: enter {entry}
 params:
   entry: http://192.168.1.18:8170/
 exchanges:
-  - at: '2026-11-12T23:18:19.545439Z'
+  - at: '2026-11-13T01:11:17.326928Z'
     ms: 1
     request:
       method: GET
@@ -7727,14 +7559,14 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-bfb4c4ac7d6f8362-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-0700397d5762018a-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:19 GMT
+        date: Fri, 13 Nov 2026 01:11:17 GMT
         etag: '"index-hsf-c38dd2ad2b54aa08"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -7901,29 +7733,29 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:19.547966Z'
-ms: 180
+at: '2026-11-13T01:11:17.329184Z'
+ms: 87
 mode: script
 say: act {relation}, commit {commit}, _links {_links}
 params:
   relation: ci:build
-  commit: 6066ef274b2932b5738af780eb59e093569eddfb
+  commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
   _links:
     hr:reply-to:
-      href: http://192.168.1.18:8160/replies/r2-1794525499547
+      href: http://192.168.1.18:8160/replies/r2-1794532277329
     hr:keys:
       href: http://192.168.1.18:8160/keys
 values:
   commit:
-    value: 6066ef274b2932b5738af780eb59e093569eddfb
+    value: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
     type: string
     from:
-      - step: 11
+      - step: 10
         pointer: /merge_commit_sha
   _links:
     value:
       hr:reply-to:
-        href: http://192.168.1.18:8160/replies/r2-1794525499547
+        href: http://192.168.1.18:8160/replies/r2-1794532277329
       hr:keys:
         href: http://192.168.1.18:8160/keys
     type: object
@@ -7943,8 +7775,8 @@ guard:
   act: sha256-pRWeCc+H8BU1XAzb0JioyVqPV99Usx2L2VKKmnlHhOo=
   if-match: '"index-hsf-c38dd2ad2b54aa08"'
 exchanges:
-  - at: '2026-11-12T23:18:19.549912Z'
-    ms: 177
+  - at: '2026-11-13T01:11:17.331189Z'
+    ms: 85
     request:
       method: POST
       url: http://192.168.1.18:8170/actions/build
@@ -7955,15 +7787,15 @@ exchanges:
         If-Match: '"index-hsf-c38dd2ad2b54aa08"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-57322a3c843ec222-01
-        Content-Digest: 'sha-256=:fOcIIJfwoY+1vN90A5dOtWSm+ceKW2Q1uvhDGpqMlQA=:'
-        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794525499;keyid="artie-2026-11";alg="ed25519"
-        Signature: 'sig1=:eIZUF/fFBdTUPxVll4PnRKIQk1tdslGqtx6cb1ACBR9+W2kg7dnaNN6xmQUi/qaILQNU9jtV+/B2z8goH+E0Ag==:'
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-76d36603e5b7f7e3-01
+        Content-Digest: 'sha-256=:bUqphLog8h48CRmr7xR4dFl59QSZ4bRrhkXLa3DJMK4=:'
+        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794532277;keyid="artie-2026-11";alg="ed25519"
+        Signature: 'sig1=:XKiMs+n2nLbfe/wug2hFjnCoxolGA1a6lXYZ/AVoGkrmvOi2tCUw5wFIk+J1lHECwP6KyPpZmtzGARaDfwd9DA==:'
       body:
-        commit: 6066ef274b2932b5738af780eb59e093569eddfb
+        commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
         _links:
           hr:reply-to:
-            href: http://192.168.1.18:8160/replies/r2-1794525499547
+            href: http://192.168.1.18:8160/replies/r2-1794532277329
           hr:keys:
             href: http://192.168.1.18:8160/keys
     response:
@@ -7973,8 +7805,8 @@ exchanges:
         content-location: /builds/1
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:19 GMT
-        etag: '"seq-0.hsf.L0.986b237a57561b3a"'
+        date: Fri, 13 Nov 2026 01:11:17 GMT
+        etag: '"seq-0.hsf.L0.e023650bf8286010"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/builds/1&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/builds/1&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/builds/1&gt;; rel="alternate"; type="text/html", &lt;/builds/1&gt;; rel="alternate"; type="application/json"
         location: /builds/1
         server: Jetty(12.0.16)
@@ -7982,7 +7814,7 @@ exchanges:
         vary: Accept, Prefer, Accept-Profile
       body:
         id: 1
-        commit: 6066ef274b2932b5738af780eb59e093569eddfb
+        commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
         standing: queued
         jenkinsBuild: null
         _links:
@@ -8000,7 +7832,7 @@ exchanges:
             type: application/json
             integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
           hr:reply-to:
-            href: http://192.168.1.18:8160/replies/r2-1794525499547
+            href: http://192.168.1.18:8160/replies/r2-1794532277329
           hr:keys:
             href: /keys
             type: application/jwk-set+json
@@ -8023,7 +7855,7 @@ address: http://192.168.1.18:8170/builds/1
 now:
   state:
     id: 1
-    commit: 6066ef274b2932b5738af780eb59e093569eddfb
+    commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
     standing: queued
     jenkinsBuild: null
   forms: []
@@ -8040,18 +7872,18 @@ now:
       - null
 keeps:
   /id:
-    - 58
+    - 56
   /commit:
-    - 59
+    - 57
 ---
-at: '2026-11-12T23:18:19.731554Z'
+at: '2026-11-13T01:11:17.419671Z'
 ms: 1
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8098/
 exchanges:
-  - at: '2026-11-12T23:18:19.731644Z'
+  - at: '2026-11-13T01:11:17.419806Z'
     ms: 1
     request:
       method: GET
@@ -8063,14 +7895,14 @@ exchanges:
         If-None-Match: '"index-hsf-2b57f9146741dddf"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-b2130ec62b9363bd-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-230bba1c150773b2-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:19 GMT
+        date: Fri, 13 Nov 2026 01:11:17 GMT
         etag: '"index-hsf-2b57f9146741dddf"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -8177,25 +8009,25 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:19.733434Z'
-ms: 9
+at: '2026-11-13T01:11:17.421509Z'
+ms: 8
 mode: script
 say: return to {address}
 params:
-  address: http://192.168.1.18:8160/replies/r2-1794525499547
+  address: http://192.168.1.18:8160/replies/r2-1794532277329
 exchanges:
-  - at: '2026-11-12T23:18:19.733516Z'
-    ms: 9
+  - at: '2026-11-13T01:11:17.421585Z'
+    ms: 7
     request:
       method: GET
-      url: http://192.168.1.18:8160/replies/r2-1794525499547
+      url: http://192.168.1.18:8160/replies/r2-1794532277329
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-fbd94443443d878a-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-effb1aaefa7d2247-01
     response:
       status: 200
       headers:
@@ -8203,18 +8035,18 @@ exchanges:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:19 GMT
-        etag: '"seq-1.hsf.L0.0cbc385f3e4d619e"'
-        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/replies/r2-1794525499547&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/replies/r2-1794525499547&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/replies/r2-1794525499547&gt;; rel="alternate"; type="text/html", &lt;/replies/r2-1794525499547&gt;; rel="alternate"; type="application/json"
+        date: Fri, 13 Nov 2026 01:11:17 GMT
+        etag: '"seq-1.hsf.L0.d511c24d59135392"'
+        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/replies/r2-1794532277329&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/replies/r2-1794532277329&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/replies/r2-1794532277329&gt;; rel="alternate"; type="text/html", &lt;/replies/r2-1794532277329&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        reply: r2-1794525499547
+        reply: r2-1794532277329
         state: awaiting
         _links:
           self:
-            href: /replies/r2-1794525499547
+            href: /replies/r2-1794532277329
           curies:
             - name: hr
               href: https://w3id.org/heart-rise/rels/{rel}
@@ -8229,7 +8061,7 @@ exchanges:
             description: Tells the caller how far the work has got.
             _links:
               target:
-                href: /replies/r2-1794525499547
+                href: /replies/r2-1794532277329
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -8270,7 +8102,7 @@ exchanges:
             description: 'Sends the result: the work is done.'
             _links:
               target:
-                href: /replies/r2-1794525499547
+                href: /replies/r2-1794532277329
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -8309,7 +8141,7 @@ exchanges:
             description: Says the work failed, with a problem document.
             _links:
               target:
-                href: /replies/r2-1794525499547
+                href: /replies/r2-1794532277329
             method: PATCH
             contentType: application/problem+json
             schema:
@@ -8345,10 +8177,10 @@ exchanges:
               '$id': /schemas/3ee822291d3d75a3
             hr:integrity: sha256-lU0r2LFtHRt/6h/aAZHWVXGl2ByYhCzFfvdPbrhxRDI=
 outcome: done
-address: http://192.168.1.18:8160/replies/r2-1794525499547
+address: http://192.168.1.18:8160/replies/r2-1794532277329
 now:
   state:
-    reply: r2-1794525499547
+    reply: r2-1794532277329
     state: awaiting
   forms:
     - hr:progress
@@ -8360,26 +8192,26 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:35.010219Z'
-ms: 5
+at: '2026-11-13T01:11:29.408432Z'
+ms: 4
 mode: script
 say: return to {address}
 params:
-  address: http://192.168.1.18:8160/replies/r2-1794525499547
+  address: http://192.168.1.18:8160/replies/r2-1794532277329
 exchanges:
-  - at: '2026-11-12T23:18:35.010328Z'
+  - at: '2026-11-13T01:11:29.408562Z'
     ms: 4
     request:
       method: GET
-      url: http://192.168.1.18:8160/replies/r2-1794525499547
+      url: http://192.168.1.18:8160/replies/r2-1794532277329
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-1.hsf.L0.0cbc385f3e4d619e"'
+        If-None-Match: '"seq-1.hsf.L0.d511c24d59135392"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-4f0031bb4a4141a4-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-a06f0c49aa2ebb4b-01
     response:
       status: 200
       headers:
@@ -8387,19 +8219,19 @@ exchanges:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:35 GMT
-        etag: '"seq-2.hsf.L0.29c032188af056ae"'
-        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/replies/r2-1794525499547&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/replies/r2-1794525499547&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/replies/r2-1794525499547&gt;; rel="alternate"; type="text/html", &lt;/replies/r2-1794525499547&gt;; rel="alternate"; type="application/json"
+        date: Fri, 13 Nov 2026 01:11:29 GMT
+        etag: '"seq-2.hsf.L0.75d3ec53c0220e1a"'
+        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/replies/r2-1794532277329&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/replies/r2-1794532277329&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/replies/r2-1794532277329&gt;; rel="alternate"; type="text/html", &lt;/replies/r2-1794532277329&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        reply: r2-1794525499547
+        reply: r2-1794532277329
         state: completed
         percent: 100
         result:
           build: http://192.168.1.18:8170/builds/1
-          commit: 6066ef274b2932b5738af780eb59e093569eddfb
+          commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
           _links:
             ci:deployment:
               href: http://192.168.1.18:8180/
@@ -8409,7 +8241,7 @@ exchanges:
               href: http://192.168.1.18:8170/builds/1/log
         _links:
           self:
-            href: /replies/r2-1794525499547
+            href: /replies/r2-1794532277329
           curies:
             - name: hr
               href: https://w3id.org/heart-rise/rels/{rel}
@@ -8422,15 +8254,15 @@ exchanges:
             href: http://192.168.1.18:8170/builds/1
         _forms: {}
 outcome: done
-address: http://192.168.1.18:8160/replies/r2-1794525499547
+address: http://192.168.1.18:8160/replies/r2-1794532277329
 now:
   state:
-    reply: r2-1794525499547
+    reply: r2-1794532277329
     state: completed
     percent: 100
     result:
       build: http://192.168.1.18:8170/builds/1
-      commit: 6066ef274b2932b5738af780eb59e093569eddfb
+      commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
       _links:
         ci:deployment:
           href: http://192.168.1.18:8180/
@@ -8447,7 +8279,7 @@ now:
     hr:in-reply-to:
       - null
 ---
-at: '2026-11-12T23:18:35.015438Z'
+at: '2026-11-13T01:11:29.413795Z'
 ms: 2
 mode: script
 say: follow {relation}
@@ -8463,7 +8295,7 @@ chose:
   address: http://192.168.1.18:8170/builds/1
   picked: relation
 exchanges:
-  - at: '2026-11-12T23:18:35.015571Z'
+  - at: '2026-11-13T01:11:29.413988Z'
     ms: 2
     request:
       method: GET
@@ -8474,24 +8306,24 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-7e5d498df8e2224e-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-94e187f9d1b736af-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:35 GMT
-        etag: '"seq-2.hsf.L0.d8c8bad3a0f5c996"'
+        date: Fri, 13 Nov 2026 01:11:29 GMT
+        etag: '"seq-2.hsf.L0.5cb86a6354836dc6"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/builds/1&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/builds/1&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/builds/1&gt;; rel="alternate"; type="text/html", &lt;/builds/1&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
         id: 1
-        commit: 6066ef274b2932b5738af780eb59e093569eddfb
+        commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
         standing: succeeded
-        jenkinsBuild: 38
+        jenkinsBuild: 45
         _links:
           self:
             href: /builds/1
@@ -8507,7 +8339,7 @@ exchanges:
             type: application/json
             integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
           hr:reply-to:
-            href: http://192.168.1.18:8160/replies/r2-1794525499547
+            href: http://192.168.1.18:8160/replies/r2-1794532277329
           hr:keys:
             href: /keys
             type: application/jwk-set+json
@@ -8529,9 +8361,9 @@ address: http://192.168.1.18:8170/builds/1
 now:
   state:
     id: 1
-    commit: 6066ef274b2932b5738af780eb59e093569eddfb
+    commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
     standing: succeeded
-    jenkinsBuild: 38
+    jenkinsBuild: 45
   forms: []
   links:
     self:
@@ -8550,20 +8382,20 @@ now:
       - null
 keeps:
   /id:
-    - 58
+    - 56
   /commit:
-    - 59
+    - 57
 ---
-at: '2026-11-12T23:18:35.188052Z'
-ms: 207
+at: '2026-11-13T01:11:29.491129Z'
+ms: 74
 mode: script
 say: enter {entry}
 params:
   entry: http://192.168.1.18:8180/
 opens: true
 exchanges:
-  - at: '2026-11-12T23:18:35.188255Z'
-    ms: 206
+  - at: '2026-11-13T01:11:29.491300Z'
+    ms: 73
     request:
       method: GET
       url: http://192.168.1.18:8180/
@@ -8573,14 +8405,14 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-2d41cbfd1ca4d251-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-9f720b8d4561af28-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:35 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"index-hsf-79cc72e04de15146"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -8926,8 +8758,8 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:35.395911Z'
-ms: 945
+at: '2026-11-13T01:11:29.565930Z'
+ms: 266
 mode: script
 say: act {relation}, name {name}
 inferred: search the loans for "Charlotte's Web"
@@ -8955,8 +8787,8 @@ guard:
   form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
   act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
 exchanges:
-  - at: '2026-11-12T23:18:35.396774Z'
-    ms: 943
+  - at: '2026-11-13T01:11:29.566831Z'
+    ms: 265
     request:
       method: GET
       url: http://192.168.1.18:8180/loans?name=Charlotte%27s%20Web
@@ -8966,14 +8798,14 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-93e59979a08c8efa-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-f786b729ad41fd65-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:35 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"page.hsf.cf37ece03c6401a0"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -9017,10 +8849,10 @@ now:
       - Charlotte's Web
 keeps:
   /count:
-    - 58
+    - 56
 ---
-at: '2026-11-12T23:18:36.341470Z'
-ms: 118
+at: '2026-11-13T01:11:29.833446Z'
+ms: 11
 mode: script
 say: follow {relation}, titled {title}
 intent: Search the loans for "Charlotte's Web", and open Charlotte's Web
@@ -9042,8 +8874,8 @@ chose:
   address: http://192.168.1.18:8180/loans/3312
   picked: title
 exchanges:
-  - at: '2026-11-12T23:18:36.341650Z'
-    ms: 118
+  - at: '2026-11-13T01:11:29.833642Z'
+    ms: 11
     request:
       method: GET
       url: http://192.168.1.18:8180/loans/3312
@@ -9053,14 +8885,14 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-b0e45cc27ecae9f2-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-c6f62aceac2f8f76-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"seq-1.hsf.L0.678473ad13256252"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/loans/3312&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/loans/3312&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/loans/3312&gt;; rel="alternate"; type="text/html", &lt;/loans/3312&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -9157,15 +8989,15 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:36.460580Z'
-ms: 15
+at: '2026-11-13T01:11:29.845507Z'
+ms: 4
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/loans?name=Charlotte%27s+Web
 exchanges:
-  - at: '2026-11-12T23:18:36.460709Z'
-    ms: 15
+  - at: '2026-11-13T01:11:29.845645Z'
+    ms: 4
     request:
       method: GET
       url: http://192.168.1.18:8180/loans?name=Charlotte%27s+Web
@@ -9175,14 +9007,14 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-db9d3238830e90f1-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-51a0d53f8fca633a-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"page.hsf.cf37ece03c6401a0"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -9208,15 +9040,15 @@ now:
     item:
       - Charlotte's Web
 ---
-at: '2026-11-12T23:18:36.476611Z'
-ms: 15
+at: '2026-11-13T01:11:29.850459Z'
+ms: 4
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/
 exchanges:
-  - at: '2026-11-12T23:18:36.476725Z'
-    ms: 15
+  - at: '2026-11-13T01:11:29.850576Z'
+    ms: 3
     request:
       method: GET
       url: http://192.168.1.18:8180/
@@ -9227,14 +9059,14 @@ exchanges:
         If-None-Match: '"index-hsf-79cc72e04de15146"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-01fd0191edf622e5-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-59bdef028b6182e4-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"index-hsf-79cc72e04de15146"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -9298,8 +9130,8 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:36.492879Z'
-ms: 14
+at: '2026-11-13T01:11:29.854822Z'
+ms: 3
 mode: script
 say: act {relation}, name {name}
 inferred: search the loans for "Charlotte's Web"
@@ -9329,8 +9161,8 @@ guard:
   form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
   act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
 exchanges:
-  - at: '2026-11-12T23:18:36.493288Z'
-    ms: 14
+  - at: '2026-11-13T01:11:29.855281Z'
+    ms: 3
     request:
       method: GET
       url: http://192.168.1.18:8180/loans?name=Charlotte%27s%20Web
@@ -9341,14 +9173,14 @@ exchanges:
         If-None-Match: '"page.hsf.cf37ece03c6401a0"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-e62fa661188ccf13-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-8534b37a0971ca8b-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"page.hsf.cf37ece03c6401a0"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -9383,10 +9215,10 @@ now:
       - Charlotte's Web
 keeps:
   /count:
-    - 58
+    - 56
 ---
-at: '2026-11-12T23:18:36.507998Z'
-ms: 34
+at: '2026-11-13T01:11:29.858762Z'
+ms: 5
 mode: script
 say: follow {relation}, titled {title}
 intent: Search the loans for "Charlotte's Web", and open Charlotte's Web
@@ -9410,8 +9242,8 @@ chose:
   address: http://192.168.1.18:8180/loans/3312
   picked: title
 exchanges:
-  - at: '2026-11-12T23:18:36.508130Z'
-    ms: 34
+  - at: '2026-11-13T01:11:29.858886Z'
+    ms: 4
     request:
       method: GET
       url: http://192.168.1.18:8180/loans/3312
@@ -9422,14 +9254,14 @@ exchanges:
         If-None-Match: '"seq-1.hsf.L0.678473ad13256252"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-f358eb68fb3747c8-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-d85a08f9330e6027-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"seq-1.hsf.L0.678473ad13256252"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/loans/3312&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/loans/3312&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/loans/3312&gt;; rel="alternate"; type="text/html", &lt;/loans/3312&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -9458,7 +9290,7 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:36.543364Z'
+at: '2026-11-13T01:11:29.864347Z'
 ms: 0
 mode: script
 say: check
@@ -9487,15 +9319,15 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:36.543471Z'
-ms: 12
+at: '2026-11-13T01:11:29.864442Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/loans?name=Charlotte%27s+Web
 exchanges:
-  - at: '2026-11-12T23:18:36.543613Z'
-    ms: 12
+  - at: '2026-11-13T01:11:29.864585Z'
+    ms: 3
     request:
       method: GET
       url: http://192.168.1.18:8180/loans?name=Charlotte%27s+Web
@@ -9506,14 +9338,14 @@ exchanges:
         If-None-Match: '"page.hsf.cf37ece03c6401a0"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-6cf570dcd746d60f-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-9f2bfe219d7f9256-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"page.hsf.cf37ece03c6401a0"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -9530,15 +9362,15 @@ now:
     item:
       - Charlotte's Web
 ---
-at: '2026-11-12T23:18:36.556323Z'
-ms: 8
+at: '2026-11-13T01:11:29.868253Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/
 exchanges:
-  - at: '2026-11-12T23:18:36.556456Z'
-    ms: 8
+  - at: '2026-11-13T01:11:29.868345Z'
+    ms: 1
     request:
       method: GET
       url: http://192.168.1.18:8180/
@@ -9549,14 +9381,14 @@ exchanges:
         If-None-Match: '"index-hsf-79cc72e04de15146"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-5a958001a75350f2-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-540f23d73531138a-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"index-hsf-79cc72e04de15146"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -9620,8 +9452,8 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:36.565094Z'
-ms: 15
+at: '2026-11-13T01:11:29.870760Z'
+ms: 3
 mode: script
 say: act {relation}, name {name}
 inferred: search the loans for "Matilda"
@@ -9649,8 +9481,8 @@ guard:
   form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
   act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
 exchanges:
-  - at: '2026-11-12T23:18:36.565472Z'
-    ms: 14
+  - at: '2026-11-13T01:11:29.871092Z'
+    ms: 2
     request:
       method: GET
       url: http://192.168.1.18:8180/loans?name=Matilda
@@ -9660,14 +9492,14 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-3bfdd5555be328bc-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-99881a2e669cdf09-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"page.hsf.cf9be93cfa7211ff"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -9711,10 +9543,10 @@ now:
       - Matilda
 keeps:
   /count:
-    - 58
+    - 56
 ---
-at: '2026-11-12T23:18:36.580535Z'
-ms: 44
+at: '2026-11-13T01:11:29.874234Z'
+ms: 5
 mode: script
 say: follow {relation}, titled {title}
 intent: Search the loans for "Matilda", and open Matilda
@@ -9736,8 +9568,8 @@ chose:
   address: http://192.168.1.18:8180/loans/3311
   picked: title
 exchanges:
-  - at: '2026-11-12T23:18:36.580657Z'
-    ms: 44
+  - at: '2026-11-13T01:11:29.874318Z'
+    ms: 5
     request:
       method: GET
       url: http://192.168.1.18:8180/loans/3311
@@ -9747,14 +9579,14 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-ede15bcf5a7cc1b4-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-46d81b11ef5aa2ab-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"seq-1.hsf.L0.0fa0131d7cc560a0"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/loans/3311&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/loans/3311&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/loans/3311&gt;; rel="alternate"; type="text/html", &lt;/loans/3311&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -9865,8 +9697,8 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:36.625682Z'
-ms: 71
+at: '2026-11-13T01:11:29.880020Z'
+ms: 20
 mode: script
 say: act {relation}
 intent: Renew it
@@ -9887,8 +9719,8 @@ guard:
   act: sha256-mKB6rkhzosKiuPOCcy+AO/8TOYuWyeVQhs5BrzlmKho=
   if-match: '"seq-1.hsf.L0.0fa0131d7cc560a0"'
 exchanges:
-  - at: '2026-11-12T23:18:36.626790Z'
-    ms: 69
+  - at: '2026-11-13T01:11:29.881695Z'
+    ms: 17
     request:
       method: POST
       url: http://192.168.1.18:8180/loans/3311/actions/renew
@@ -9899,10 +9731,10 @@ exchanges:
         If-Match: '"seq-1.hsf.L0.0fa0131d7cc560a0"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-b9b4154e0ec22cdb-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-3d927761761240fb-01
         Content-Digest: 'sha-256=:RBNvo1WzZ4oRRq0W9+hknpT7T8If536DEMBg9hyq/4o=:'
-        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794525516;keyid="artie-2026-11";alg="ed25519"
-        Signature: 'sig1=:KAqWT8HXTzhDGzaUpThWkUObJYJ1My2j4cYphC9xS+xo63iDioIUh4JL3et1T50DegQ8lyhv0oPzq3NAtoxvAg==:'
+        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794532289;keyid="artie-2026-11";alg="ed25519"
+        Signature: 'sig1=:6LYtMxYK1Ij3h08hPYLQdQaqWP+z3ZJrKPTTUGhKcx3oUCJJ93+I6FJdxxMxnwzGObE2+ZTkMLzV1iqXxiLvAA==:'
       body: {}
     response:
       status: 200
@@ -9911,7 +9743,7 @@ exchanges:
         content-location: /loans/3311
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"seq-2.hsf.L0.6fee3447dda50d60"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/loans/3311&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/loans/3311&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/loans/3311&gt;; rel="alternate"; type="text/html", &lt;/loans/3311&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -10026,17 +9858,17 @@ now:
       - null
 keeps:
   /renewals:
-    - 58
+    - 56
 ---
-at: '2026-11-12T23:18:36.696925Z'
-ms: 25
+at: '2026-11-13T01:11:29.900471Z'
+ms: 6
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/loans/3311
 exchanges:
-  - at: '2026-11-12T23:18:36.697065Z'
-    ms: 24
+  - at: '2026-11-13T01:11:29.900739Z'
+    ms: 5
     request:
       method: GET
       url: http://192.168.1.18:8180/loans/3311
@@ -10047,14 +9879,14 @@ exchanges:
         If-None-Match: '"seq-1.hsf.L0.0fa0131d7cc560a0"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-466fd323fc37e3cd-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-a036f5c6bcc5dece-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"seq-2.hsf.L0.6fee3447dda50d60"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/loans/3311&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/loans/3311&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/loans/3311&gt;; rel="alternate"; type="text/html", &lt;/loans/3311&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -10160,7 +9992,7 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:36.722627Z'
+at: '2026-11-13T01:11:29.907345Z'
 ms: 0
 mode: script
 say: check
@@ -10190,15 +10022,15 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:36.722717Z'
-ms: 12
+at: '2026-11-13T01:11:29.907431Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/loans?name=Matilda
 exchanges:
-  - at: '2026-11-12T23:18:36.722811Z'
-    ms: 12
+  - at: '2026-11-13T01:11:29.907516Z'
+    ms: 2
     request:
       method: GET
       url: http://192.168.1.18:8180/loans?name=Matilda
@@ -10209,14 +10041,14 @@ exchanges:
         If-None-Match: '"page.hsf.cf9be93cfa7211ff"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-7848c602dfb23228-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-7180dd87a6f49c5c-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"page.hsf.cf9be93cfa7211ff"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -10233,15 +10065,15 @@ now:
     item:
       - Matilda
 ---
-at: '2026-11-12T23:18:36.735611Z'
-ms: 9
+at: '2026-11-13T01:11:29.910757Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/
 exchanges:
-  - at: '2026-11-12T23:18:36.735712Z'
-    ms: 9
+  - at: '2026-11-13T01:11:29.910860Z'
+    ms: 2
     request:
       method: GET
       url: http://192.168.1.18:8180/
@@ -10252,14 +10084,14 @@ exchanges:
         If-None-Match: '"index-hsf-79cc72e04de15146"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-ac57dbc6cc10df16-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-4e18dc2eb9efe03d-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"index-hsf-79cc72e04de15146"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -10323,8 +10155,8 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:36.745478Z'
-ms: 11
+at: '2026-11-13T01:11:29.914294Z'
+ms: 4
 mode: script
 say: act {relation}, name {name}
 inferred: search the loans for "Matilda"
@@ -10356,8 +10188,8 @@ guard:
   form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
   act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
 exchanges:
-  - at: '2026-11-12T23:18:36.745879Z'
-    ms: 11
+  - at: '2026-11-13T01:11:29.914616Z'
+    ms: 3
     request:
       method: GET
       url: http://192.168.1.18:8180/loans?name=Matilda
@@ -10368,14 +10200,14 @@ exchanges:
         If-None-Match: '"page.hsf.cf9be93cfa7211ff"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-02a8589257b4c7b9-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-e524fe0c59e2c07d-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"page.hsf.cf9be93cfa7211ff"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -10410,10 +10242,10 @@ now:
       - Matilda
 keeps:
   /count:
-    - 58
+    - 56
 ---
-at: '2026-11-12T23:18:36.757813Z'
-ms: 20
+at: '2026-11-13T01:11:29.919277Z'
+ms: 8
 mode: script
 say: follow {relation}, titled {title}
 intent: Search the loans for "Matilda", and open Matilda
@@ -10439,8 +10271,8 @@ chose:
   address: http://192.168.1.18:8180/loans/3311
   picked: title
 exchanges:
-  - at: '2026-11-12T23:18:36.757905Z'
-    ms: 19
+  - at: '2026-11-13T01:11:29.919383Z'
+    ms: 8
     request:
       method: GET
       url: http://192.168.1.18:8180/loans/3311
@@ -10451,14 +10283,14 @@ exchanges:
         If-None-Match: '"seq-2.hsf.L0.6fee3447dda50d60"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-57a55cf69b918096-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-7177d25fefe0de8e-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"seq-2.hsf.L0.6fee3447dda50d60"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/loans/3311&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/loans/3311&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/loans/3311&gt;; rel="alternate"; type="text/html", &lt;/loans/3311&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -10489,10 +10321,10 @@ now:
       - null
 keeps:
   /renewals:
-    - 58
+    - 56
 ---
-at: '2026-11-12T23:18:36.778349Z'
-ms: 67
+at: '2026-11-13T01:11:29.928610Z'
+ms: 12
 mode: script
 say: act {relation}
 intent: Renew it
@@ -10513,8 +10345,8 @@ guard:
   act: sha256-mKB6rkhzosKiuPOCcy+AO/8TOYuWyeVQhs5BrzlmKho=
   if-match: '"seq-2.hsf.L0.6fee3447dda50d60"'
 exchanges:
-  - at: '2026-11-12T23:18:36.779351Z'
-    ms: 66
+  - at: '2026-11-13T01:11:29.929695Z'
+    ms: 10
     request:
       method: POST
       url: http://192.168.1.18:8180/loans/3311/actions/renew
@@ -10525,10 +10357,10 @@ exchanges:
         If-Match: '"seq-2.hsf.L0.6fee3447dda50d60"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-5748fa05422c0d2b-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-8c8c761b5f1bf92b-01
         Content-Digest: 'sha-256=:RBNvo1WzZ4oRRq0W9+hknpT7T8If536DEMBg9hyq/4o=:'
-        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794525516;keyid="artie-2026-11";alg="ed25519"
-        Signature: 'sig1=:gJeu9asdhwrF1yvwazfLwpNwAkZ+0qufZz5tBP8UHyTv6jhq23dr9RLSY/vxqBRvv1UEXilSeCwnloPJ9dfYDw==:'
+        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794532289;keyid="artie-2026-11";alg="ed25519"
+        Signature: 'sig1=:1FT6m5JZI4RuVg1U6zqk/1zOjozbGWq/b6zUiwo7SmF7arCAdT1+uquqj5kI+ihRNHaaKeJsjjIz0C8qmC02CA==:'
       body: {}
     response:
       status: 200
@@ -10537,7 +10369,7 @@ exchanges:
         content-location: /loans/3311
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"seq-3.hsf.L0.91f6aa6f24fb51c7"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/loans/3311&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/loans/3311&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/loans/3311&gt;; rel="alternate"; type="text/html", &lt;/loans/3311&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -10651,15 +10483,15 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:36.846430Z'
-ms: 15
+at: '2026-11-13T01:11:29.941021Z'
+ms: 5
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/loans/3311
 exchanges:
-  - at: '2026-11-12T23:18:36.846528Z'
-    ms: 15
+  - at: '2026-11-13T01:11:29.941127Z'
+    ms: 5
     request:
       method: GET
       url: http://192.168.1.18:8180/loans/3311
@@ -10670,14 +10502,14 @@ exchanges:
         If-None-Match: '"seq-2.hsf.L0.6fee3447dda50d60"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-7721bb85f908d42c-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-75ce7d097687d27e-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"seq-3.hsf.L0.91f6aa6f24fb51c7"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/loans/3311&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/loans/3311&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/loans/3311&gt;; rel="alternate"; type="text/html", &lt;/loans/3311&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -10783,8 +10615,8 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:36.862587Z'
-ms: 74
+at: '2026-11-13T01:11:29.947120Z'
+ms: 13
 mode: script
 say: act {relation}
 inferred: renew the loan
@@ -10804,8 +10636,8 @@ guard:
   act: sha256-mKB6rkhzosKiuPOCcy+AO/8TOYuWyeVQhs5BrzlmKho=
   if-match: '"seq-3.hsf.L0.91f6aa6f24fb51c7"'
 exchanges:
-  - at: '2026-11-12T23:18:36.863499Z'
-    ms: 28
+  - at: '2026-11-13T01:11:29.948290Z'
+    ms: 6
     request:
       method: POST
       url: http://192.168.1.18:8180/loans/3311/actions/renew
@@ -10816,16 +10648,16 @@ exchanges:
         If-Match: '"seq-2.hsf.L0.6fee3447dda50d60"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-8b95f8669a4d5d18-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-00390ce65a508e58-01
         Content-Digest: 'sha-256=:RBNvo1WzZ4oRRq0W9+hknpT7T8If536DEMBg9hyq/4o=:'
-        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794525516;keyid="artie-2026-11";alg="ed25519"
-        Signature: 'sig1=:gJeu9asdhwrF1yvwazfLwpNwAkZ+0qufZz5tBP8UHyTv6jhq23dr9RLSY/vxqBRvv1UEXilSeCwnloPJ9dfYDw==:'
+        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794532289;keyid="artie-2026-11";alg="ed25519"
+        Signature: 'sig1=:1FT6m5JZI4RuVg1U6zqk/1zOjozbGWq/b6zUiwo7SmF7arCAdT1+uquqj5kI+ihRNHaaKeJsjjIz0C8qmC02CA==:'
       body: {}
     response:
       status: 412
       headers:
         content-type: application/problem+json
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         server: Jetty(12.0.16)
         transfer-encoding: chunked
       body:
@@ -10836,8 +10668,8 @@ exchanges:
         _links:
           about:
             href: /loans/3311
-  - at: '2026-11-12T23:18:36.893057Z'
-    ms: 42
+  - at: '2026-11-13T01:11:29.955628Z'
+    ms: 4
     request:
       method: GET
       url: http://192.168.1.18:8180/loans/3311
@@ -10848,14 +10680,14 @@ exchanges:
         If-None-Match: '"seq-3.hsf.L0.91f6aa6f24fb51c7"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-7060d23db0692d03-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-3ea7a826ca446432-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"seq-3.hsf.L0.91f6aa6f24fb51c7"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/loans/3311&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/loans/3311&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/loans/3311&gt;; rel="alternate"; type="text/html", &lt;/loans/3311&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -10876,15 +10708,15 @@ refused:
   by: the server
   detail: the resource changed since it was read
 ---
-at: '2026-11-12T23:18:36.937316Z'
-ms: 19
+at: '2026-11-13T01:11:29.961119Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/loans?name=Matilda
 exchanges:
-  - at: '2026-11-12T23:18:36.937408Z'
-    ms: 19
+  - at: '2026-11-13T01:11:29.961216Z'
+    ms: 2
     request:
       method: GET
       url: http://192.168.1.18:8180/loans?name=Matilda
@@ -10895,14 +10727,14 @@ exchanges:
         If-None-Match: '"page.hsf.cf9be93cfa7211ff"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-559377ff0f6bf6de-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-57d1c81b241ee620-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"page.hsf.cf9be93cfa7211ff"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -10919,15 +10751,15 @@ now:
     item:
       - Matilda
 ---
-at: '2026-11-12T23:18:36.957121Z'
-ms: 19
+at: '2026-11-13T01:11:29.964250Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/
 exchanges:
-  - at: '2026-11-12T23:18:36.957253Z'
-    ms: 18
+  - at: '2026-11-13T01:11:29.964371Z'
+    ms: 3
     request:
       method: GET
       url: http://192.168.1.18:8180/
@@ -10938,14 +10770,14 @@ exchanges:
         If-None-Match: '"index-hsf-79cc72e04de15146"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-8aa9793bce85f9dc-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-ce840dc623a7ea86-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"index-hsf-79cc72e04de15146"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -11009,8 +10841,8 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:36.976333Z'
-ms: 8
+at: '2026-11-13T01:11:29.967911Z'
+ms: 3
 mode: script
 say: act {relation}, name {name}
 inferred: search the loans for "Charlotte's Web"
@@ -11042,8 +10874,8 @@ guard:
   form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
   act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
 exchanges:
-  - at: '2026-11-12T23:18:36.976672Z'
-    ms: 7
+  - at: '2026-11-13T01:11:29.968334Z'
+    ms: 2
     request:
       method: GET
       url: http://192.168.1.18:8180/loans?name=Charlotte%27s%20Web
@@ -11054,14 +10886,14 @@ exchanges:
         If-None-Match: '"page.hsf.cf37ece03c6401a0"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-b1c8e1174218e9a2-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-d7d6ad94d64024f7-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"page.hsf.cf37ece03c6401a0"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -11096,10 +10928,10 @@ now:
       - Charlotte's Web
 keeps:
   /count:
-    - 58
+    - 56
 ---
-at: '2026-11-12T23:18:36.985119Z'
-ms: 17
+at: '2026-11-13T01:11:29.971857Z'
+ms: 4
 mode: script
 say: follow {relation}, titled {title}
 intent: Search the loans for "Charlotte's Web", and open Charlotte's Web
@@ -11125,8 +10957,8 @@ chose:
   address: http://192.168.1.18:8180/loans/3312
   picked: title
 exchanges:
-  - at: '2026-11-12T23:18:36.985211Z'
-    ms: 17
+  - at: '2026-11-13T01:11:29.971988Z'
+    ms: 4
     request:
       method: GET
       url: http://192.168.1.18:8180/loans/3312
@@ -11137,14 +10969,14 @@ exchanges:
         If-None-Match: '"seq-1.hsf.L0.678473ad13256252"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-b014e70db157572a-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-b84d6436f8f7e25e-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:36 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"seq-1.hsf.L0.678473ad13256252"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/loans/3312&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/loans/3312&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/loans/3312&gt;; rel="alternate"; type="text/html", &lt;/loans/3312&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -11173,8 +11005,8 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:37.003117Z'
-ms: 134
+at: '2026-11-13T01:11:29.976990Z'
+ms: 20
 mode: script
 say: act {relation}, problem {problem}, comment {comment}
 intent: Report damaged on it, saying "Spine cracked."
@@ -11208,8 +11040,8 @@ guard:
   act: sha256-M7uvJU9wvS8gI9X3f9Fh2oELWtan92UFPWZES08rYYo=
   if-match: '"seq-1.hsf.L0.678473ad13256252"'
 exchanges:
-  - at: '2026-11-12T23:18:37.003476Z'
-    ms: 16
+  - at: '2026-11-13T01:11:29.977348Z'
+    ms: 3
     request:
       method: GET
       url: http://192.168.1.18:8180/problem-kinds
@@ -11218,13 +11050,13 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-ffec1c8ac6ef9cd6-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-4b9affc71c3bd1bd-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-type: application/json
-        date: Thu, 12 Nov 2026 23:18:37 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"list-d75ef1860bf9bb86"'
         server: Jetty(12.0.16)
         transfer-encoding: chunked
@@ -11238,8 +11070,8 @@ exchanges:
             prompt: It's the wrong book
           - value: lost
             prompt: I can't find it
-  - at: '2026-11-12T23:18:37.021571Z'
-    ms: 116
+  - at: '2026-11-13T01:11:29.983651Z'
+    ms: 13
     request:
       method: POST
       url: http://192.168.1.18:8180/loans/3312/actions/report-problem
@@ -11250,10 +11082,10 @@ exchanges:
         If-Match: '"seq-1.hsf.L0.678473ad13256252"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-5fb1b43be6a15797-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-e8106ca8717cdb96-01
         Content-Digest: 'sha-256=:UIdHSkjQUvWTCxaFUvSOyHeYOVO7RGr+CBoiwlEC5JI=:'
-        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794525517;keyid="artie-2026-11";alg="ed25519"
-        Signature: 'sig1=:pN0m5ZqwKGGbOMCi/JhJQ48eoA1kTcRVtt1v4MAmZVXwaptupgrokV3XQM9KvQo9GHzX4E7Xk98eG6M8eMHHCQ==:'
+        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794532289;keyid="artie-2026-11";alg="ed25519"
+        Signature: 'sig1=:ooTeNfopsUtuM2Ae/D5qjpqD90OMIlzP2jPSMTuAn9QAPaRBAUkr66B5HKTQtNQ7qbSM7DIFnvgubpMdn6tQDw==:'
       body:
         problem: damaged
         comment: Spine cracked.
@@ -11264,7 +11096,7 @@ exchanges:
         content-location: /loans/3312
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:37 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"seq-2.hsf.L0.051afe4ee9e0ed39"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/loans/3312&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/loans/3312&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/loans/3312&gt;; rel="alternate"; type="text/html", &lt;/loans/3312&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -11369,15 +11201,15 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:37.138644Z'
-ms: 13
+at: '2026-11-13T01:11:29.998208Z'
+ms: 5
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/loans/3312
 exchanges:
-  - at: '2026-11-12T23:18:37.138780Z'
-    ms: 13
+  - at: '2026-11-13T01:11:29.998452Z'
+    ms: 5
     request:
       method: GET
       url: http://192.168.1.18:8180/loans/3312
@@ -11388,14 +11220,14 @@ exchanges:
         If-None-Match: '"seq-1.hsf.L0.678473ad13256252"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-7f8aaf95242e3bdc-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-ba56035f89095645-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:37 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         etag: '"seq-2.hsf.L0.051afe4ee9e0ed39"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/loans/3312&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/loans/3312&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/loans/3312&gt;; rel="alternate"; type="text/html", &lt;/loans/3312&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -11493,7 +11325,7 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:37.152923Z'
+at: '2026-11-13T01:11:30.004273Z'
 ms: 0
 mode: script
 say: check
@@ -11525,15 +11357,15 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:37.153Z'
-ms: 6
+at: '2026-11-13T01:11:30.004367Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/loans?name=Charlotte%27s+Web
 exchanges:
-  - at: '2026-11-12T23:18:37.153111Z'
-    ms: 6
+  - at: '2026-11-13T01:11:30.004478Z'
+    ms: 2
     request:
       method: GET
       url: http://192.168.1.18:8180/loans?name=Charlotte%27s+Web
@@ -11544,14 +11376,14 @@ exchanges:
         If-None-Match: '"page.hsf.cf37ece03c6401a0"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-ef7de532c5aaa6e0-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-09880b31aa2487b7-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:37 GMT
+        date: Fri, 13 Nov 2026 01:11:30 GMT
         etag: '"page.hsf.cf37ece03c6401a0"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
@@ -11568,15 +11400,15 @@ now:
     item:
       - Charlotte's Web
 ---
-at: '2026-11-12T23:18:37.159458Z'
-ms: 3
+at: '2026-11-13T01:11:30.007109Z'
+ms: 1
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8180/
 exchanges:
-  - at: '2026-11-12T23:18:37.159545Z'
-    ms: 3
+  - at: '2026-11-13T01:11:30.007193Z'
+    ms: 1
     request:
       method: GET
       url: http://192.168.1.18:8180/
@@ -11587,14 +11419,14 @@ exchanges:
         If-None-Match: '"index-hsf-79cc72e04de15146"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-30d63506011027cb3d98597584a724be-9493bc6cbb8f4730-01
+        traceparent: 00-095d55941c91111a0c470a02b660e348-f5094dd453393dc4-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:37 GMT
+        date: Fri, 13 Nov 2026 01:11:30 GMT
         etag: '"index-hsf-79cc72e04de15146"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -11658,15 +11490,15 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:37.163697Z'
+at: '2026-11-13T01:11:30.009302Z'
 ms: 2
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8170/builds/1
 exchanges:
-  - at: '2026-11-12T23:18:35.018861Z'
-    ms: 167
+  - at: '2026-11-13T01:11:29.417462Z'
+    ms: 72
     request:
       method: GET
       url: http://192.168.1.18:8170/builds/1/artifacts/smoke.heart.yaml
@@ -11674,13 +11506,13 @@ exchanges:
         Accept: application/yaml, text/plain;q=0.9, */*;q=0.1
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-1d214d732351b231-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-00b10619f82c3923-01
     response:
       status: 200
       headers:
         cache-control: public, max-age=31536000, immutable
         content-type: text/plain; charset=utf-8
-        date: Thu, 12 Nov 2026 23:18:35 GMT
+        date: Fri, 13 Nov 2026 01:11:29 GMT
         server: Jetty(12.0.16)
         transfer-encoding: chunked
       body: |
@@ -11794,7 +11626,7 @@ exchanges:
                       - check:
                           - field: /reported/problem
                             is: ${problem}
-  - at: '2026-11-12T23:18:37.163793Z'
+  - at: '2026-11-13T01:11:30.009366Z'
     ms: 2
     request:
       method: GET
@@ -11803,18 +11635,18 @@ exchanges:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-2.hsf.L0.d8c8bad3a0f5c996"'
+        If-None-Match: '"seq-2.hsf.L0.5cb86a6354836dc6"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-6eca8f6275999640-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-2af29e5a57f28175-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:37 GMT
-        etag: '"seq-2.hsf.L0.d8c8bad3a0f5c996"'
+        date: Fri, 13 Nov 2026 01:11:30 GMT
+        etag: '"seq-2.hsf.L0.5cb86a6354836dc6"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/builds/1&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/builds/1&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/builds/1&gt;; rel="alternate"; type="text/html", &lt;/builds/1&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         vary: Accept, Prefer, Accept-Profile
@@ -11823,9 +11655,9 @@ address: http://192.168.1.18:8170/builds/1
 now:
   state:
     id: 1
-    commit: 6066ef274b2932b5738af780eb59e093569eddfb
+    commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
     standing: succeeded
-    jenkinsBuild: 38
+    jenkinsBuild: 45
   forms: []
   links:
     self:
@@ -11843,26 +11675,26 @@ now:
     ci:log:
       - null
 ---
-at: '2026-11-12T23:18:37.166116Z'
-ms: 4
+at: '2026-11-13T01:11:30.012019Z'
+ms: 5
 mode: script
 say: return to {address}
 params:
-  address: http://192.168.1.18:8160/replies/r2-1794525499547
+  address: http://192.168.1.18:8160/replies/r2-1794532277329
 exchanges:
-  - at: '2026-11-12T23:18:37.166162Z'
+  - at: '2026-11-13T01:11:30.012083Z'
     ms: 4
     request:
       method: GET
-      url: http://192.168.1.18:8160/replies/r2-1794525499547
+      url: http://192.168.1.18:8160/replies/r2-1794532277329
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-2.hsf.L0.29c032188af056ae"'
+        If-None-Match: '"seq-2.hsf.L0.75d3ec53c0220e1a"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-dcb84a400447a3f0-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-0cbbd37b9525950a-01
     response:
       status: 304
       headers:
@@ -11870,21 +11702,21 @@ exchanges:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:37 GMT
-        etag: '"seq-2.hsf.L0.29c032188af056ae"'
-        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/replies/r2-1794525499547&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/replies/r2-1794525499547&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/replies/r2-1794525499547&gt;; rel="alternate"; type="text/html", &lt;/replies/r2-1794525499547&gt;; rel="alternate"; type="application/json"
+        date: Fri, 13 Nov 2026 01:11:30 GMT
+        etag: '"seq-2.hsf.L0.75d3ec53c0220e1a"'
+        link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/replies/r2-1794532277329&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/replies/r2-1794532277329&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/replies/r2-1794532277329&gt;; rel="alternate"; type="text/html", &lt;/replies/r2-1794532277329&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         vary: Accept, Prefer, Accept-Profile
 outcome: done
-address: http://192.168.1.18:8160/replies/r2-1794525499547
+address: http://192.168.1.18:8160/replies/r2-1794532277329
 now:
   state:
-    reply: r2-1794525499547
+    reply: r2-1794532277329
     state: completed
     percent: 100
     result:
       build: http://192.168.1.18:8170/builds/1
-      commit: 6066ef274b2932b5738af780eb59e093569eddfb
+      commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
       _links:
         ci:deployment:
           href: http://192.168.1.18:8180/
@@ -11901,15 +11733,15 @@ now:
     hr:in-reply-to:
       - null
 ---
-at: '2026-11-12T23:18:37.171050Z'
+at: '2026-11-13T01:11:30.017313Z'
 ms: 1
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8098/
 exchanges:
-  - at: '2026-11-12T23:18:37.171131Z'
-    ms: 1
+  - at: '2026-11-13T01:11:30.017397Z'
+    ms: 0
     request:
       method: GET
       url: http://192.168.1.18:8098/
@@ -11920,14 +11752,14 @@ exchanges:
         If-None-Match: '"index-hsf-2b57f9146741dddf"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-110979d0b56a2a24-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-33a23cb534decbc0-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:37 GMT
+        date: Fri, 13 Nov 2026 01:11:30 GMT
         etag: '"index-hsf-2b57f9146741dddf"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -12034,14 +11866,14 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:37.174553Z'
-ms: 2
+at: '2026-11-13T01:11:30.019859Z'
+ms: 1
 mode: script
 say: enter {entry}
 params:
   entry: http://192.168.1.18:8190/
 exchanges:
-  - at: '2026-11-12T23:18:37.174647Z'
+  - at: '2026-11-13T01:11:30.019907Z'
     ms: 1
     request:
       method: GET
@@ -12052,14 +11884,14 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-388a69cb712177f1-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-868a7eebaa6409e0-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:37 GMT
+        date: Fri, 13 Nov 2026 01:11:30 GMT
         etag: '"index-hsf-5be8c58f051d3e97"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -12176,11 +12008,11 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:37.176875Z'
-ms: 4
+at: '2026-11-13T01:11:30.021890Z'
+ms: 3
 mode: script
 say: act {relation}, id {id}
-inferred: open environment 1
+inferred: get environment 1
 fromIntent: open environment 1 and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
 params:
   relation: env:get-environment
@@ -12212,60 +12044,58 @@ values:
       - step: 5
         pointer: /id
       - step: 9
+        pointer: /requested_teams/0/id
+      - step: 9
+        pointer: /_embedded/author/0/id
+      - step: 9
+        pointer: /_embedded/github:assignee/0/id
+      - step: 9
+        pointer: /_embedded/github:assignees/0/id
+      - step: 9
+        pointer: /_embedded/github:assignees/1/id
+      - step: 9
+        pointer: /_embedded/github:merged-by/0/id
+      - step: 9
+        pointer: /_embedded/github:milestone/0/number
+      - step: 9
+        pointer: /_embedded/github:head-user/0/id
+      - step: 9
+        pointer: /_embedded/github:base-user/0/id
+      - step: 10
+        pointer: /requested_teams/0/id
+      - step: 10
+        pointer: /_embedded/author/0/id
+      - step: 10
+        pointer: /_embedded/github:assignee/0/id
+      - step: 10
+        pointer: /_embedded/github:assignees/0/id
+      - step: 10
+        pointer: /_embedded/github:assignees/1/id
+      - step: 10
+        pointer: /_embedded/github:merged-by/0/id
+      - step: 10
+        pointer: /_embedded/github:milestone/0/number
+      - step: 10
+        pointer: /_embedded/github:head-user/0/id
+      - step: 10
+        pointer: /_embedded/github:base-user/0/id
+      - step: 16
         pointer: /id
-      - step: 10
-        pointer: /requested_teams/0/id
-      - step: 10
-        pointer: /_embedded/author/0/id
-      - step: 10
-        pointer: /_embedded/github:assignee/0/id
-      - step: 10
-        pointer: /_embedded/github:assignees/0/id
-      - step: 10
-        pointer: /_embedded/github:assignees/1/id
-      - step: 10
-        pointer: /_embedded/github:merged-by/0/id
-      - step: 10
-        pointer: /_embedded/github:milestone/0/number
-      - step: 10
-        pointer: /_embedded/github:head-user/0/id
-      - step: 10
-        pointer: /_embedded/github:base-user/0/id
-      - step: 11
-        pointer: /requested_teams/0/id
-      - step: 11
-        pointer: /_embedded/author/0/id
-      - step: 11
-        pointer: /_embedded/github:assignee/0/id
-      - step: 11
-        pointer: /_embedded/github:assignees/0/id
-      - step: 11
-        pointer: /_embedded/github:assignees/1/id
-      - step: 11
-        pointer: /_embedded/github:merged-by/0/id
-      - step: 11
-        pointer: /_embedded/github:milestone/0/number
-      - step: 11
-        pointer: /_embedded/github:head-user/0/id
-      - step: 11
-        pointer: /_embedded/github:base-user/0/id
-      - step: 18
+      - step: 20
         pointer: /id
       - step: 22
-        pointer: /id
-      - step: 24
         pointer: /count
-      - step: 28
+      - step: 26
+        pointer: /count
+      - step: 31
         pointer: /count
       - step: 33
-        pointer: /count
-      - step: 35
         pointer: /renewals
-      - step: 40
+      - step: 38
         pointer: /count
-      - step: 41
+      - step: 39
         pointer: /renewals
-      - step: 47
+      - step: 45
         pointer: /count
 opens: true
 chose:
@@ -12281,7 +12111,7 @@ guard:
   form: sha256-UWb+xXKngRFe8ibTwO9SrpSUYNPBbji/5JjlwpAEKfQ=
   act: sha256-Q2LRr+EzqClkiSbE8iPy6vdBIWMwspZ23FdKAdM6AAw=
 exchanges:
-  - at: '2026-11-12T23:18:37.177559Z'
+  - at: '2026-11-13T01:11:30.022545Z'
     ms: 3
     request:
       method: GET
@@ -12292,15 +12122,15 @@ exchanges:
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-140055ef2990b623-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-52e706ec6c4ea819-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:37 GMT
-        etag: '"seq-0.hsf.L0.3f1edf5aa304596e"'
+        date: Fri, 13 Nov 2026 01:11:30 GMT
+        etag: '"seq-0.hsf.L0.647d10f1f0720f6a"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/environments/1&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/environments/1&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/environments/1&gt;; rel="alternate"; type="text/html", &lt;/environments/1&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
@@ -12308,7 +12138,7 @@ exchanges:
       body:
         id: 1
         name: dev
-        commit: d464d0b33f79f07c6302366ad8aefd0dad51280d
+        commit: 6c288879c914fbb197c5346df124679cb4963d25
         promotedAt: null
         standing: serving
         _links:
@@ -12387,7 +12217,7 @@ now:
   state:
     id: 1
     name: dev
-    commit: d464d0b33f79f07c6302366ad8aefd0dad51280d
+    commit: 6c288879c914fbb197c5346df124679cb4963d25
     promotedAt: null
     standing: serving
   forms:
@@ -12398,27 +12228,27 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:37.182885Z'
-ms: 7
+at: '2026-11-13T01:11:30.026633Z'
+ms: 6
 mode: script
 say: act {relation}, commit {commit}, smoke {smoke}
 intent: open environment 1 and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
 params:
   relation: env:promote
-  commit: 6066ef274b2932b5738af780eb59e093569eddfb
+  commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
   smoke:
     passed: 5
     of: 5
 values:
   commit:
-    value: 6066ef274b2932b5738af780eb59e093569eddfb
+    value: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
     type: string
     from:
-      - step: 11
+      - step: 10
         pointer: /merge_commit_sha
-      - step: 18
+      - step: 16
         pointer: /commit
-      - step: 22
+      - step: 20
         pointer: /commit
   smoke:
     value:
@@ -12445,10 +12275,10 @@ guard:
   rung: L0
   form: sha256-TwXThZ20UPUIctrpRXRoHqarKKsEilvB0sVwvK1PY4s=
   act: sha256-jMwh2mKzzspqL/XzQB6lCVqO3Kj+6/d12RidWAxXr1w=
-  if-match: '"seq-0.hsf.L0.3f1edf5aa304596e"'
+  if-match: '"seq-0.hsf.L0.647d10f1f0720f6a"'
 exchanges:
-  - at: '2026-11-12T23:18:37.184385Z'
-    ms: 5
+  - at: '2026-11-13T01:11:30.027999Z'
+    ms: 4
     request:
       method: POST
       url: http://192.168.1.18:8190/environments/1/actions/promote
@@ -12456,15 +12286,15 @@ exchanges:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Content-Type: application/json
-        If-Match: '"seq-0.hsf.L0.3f1edf5aa304596e"'
+        If-Match: '"seq-0.hsf.L0.647d10f1f0720f6a"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-58c36ca73ae8a489-01
-        Content-Digest: 'sha-256=:650Bt5wNL/zIbsb/uK3tBetIfK9+yHs9xJ4C1Mcjm3I=:'
-        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794525517;keyid="artie-2026-11";alg="ed25519"
-        Signature: 'sig1=:D2WrtiTXN6Ql2AQGWplH+PMNEjnmeuAINOO+SYa1LwWfmUpiOd6fXcDkGNrYFeSu9+W/cNwHYBYEJOOO3zurDA==:'
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-c860079b7d114deb-01
+        Content-Digest: 'sha-256=:9cfHMayFVV0vN04W4sitlWkkqhYD33gTz2xZSWL5xKQ=:'
+        Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794532290;keyid="artie-2026-11";alg="ed25519"
+        Signature: 'sig1=:8oT6AZ3hKVoX5+5dk1mqlz1zaE5gJ49sAjQ8yJXJzQACGqJVWq++278bZJVQlr/HjVzBMOss0t3ej5mK0jl1BA==:'
       body:
-        commit: 6066ef274b2932b5738af780eb59e093569eddfb
+        commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
         smoke:
           passed: 5
           of: 5
@@ -12475,8 +12305,8 @@ exchanges:
         content-location: /environments/1
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:37 GMT
-        etag: '"seq-1.hsf.L0.b0c3dfcab6705a7d"'
+        date: Fri, 13 Nov 2026 01:11:30 GMT
+        etag: '"seq-1.hsf.L0.db9ee584717054f8"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/environments/1&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/environments/1&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/environments/1&gt;; rel="alternate"; type="text/html", &lt;/environments/1&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
@@ -12484,8 +12314,8 @@ exchanges:
       body:
         id: 1
         name: dev
-        commit: 6066ef274b2932b5738af780eb59e093569eddfb
-        promotedAt: '2026-11-12T23:18:37.187281Z'
+        commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
+        promotedAt: '2026-11-13T01:11:30.030356Z'
         standing: serving
         _links:
           self:
@@ -12560,8 +12390,8 @@ now:
   state:
     id: 1
     name: dev
-    commit: 6066ef274b2932b5738af780eb59e093569eddfb
-    promotedAt: '2026-11-12T23:18:37.187281Z'
+    commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
+    promotedAt: '2026-11-13T01:11:30.030356Z'
     standing: serving
   forms:
     - env:promote
@@ -12571,15 +12401,15 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:37.192346Z'
+at: '2026-11-13T01:11:30.034799Z'
 ms: 0
 mode: script
 say: check
 params:
   facts:
     - member: commit
-      test: eq 6066ef274b2932b5738af780eb59e093569eddfb
-      held: 6066ef274b2932b5738af780eb59e093569eddfb
+      test: eq 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
+      held: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
       holds: true
 outcome: held
 address: http://192.168.1.18:8190/environments/1
@@ -12587,8 +12417,8 @@ now:
   state:
     id: 1
     name: dev
-    commit: 6066ef274b2932b5738af780eb59e093569eddfb
-    promotedAt: '2026-11-12T23:18:37.187281Z'
+    commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
+    promotedAt: '2026-11-13T01:11:30.030356Z'
     standing: serving
   forms:
     - env:promote
@@ -12598,15 +12428,15 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:37.192464Z'
-ms: 4
+at: '2026-11-13T01:11:30.034916Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8190/environments/1
 exchanges:
-  - at: '2026-11-12T23:18:37.192549Z'
-    ms: 4
+  - at: '2026-11-13T01:11:30.034989Z'
+    ms: 2
     request:
       method: GET
       url: http://192.168.1.18:8190/environments/1
@@ -12614,18 +12444,18 @@ exchanges:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-0.hsf.L0.3f1edf5aa304596e"'
+        If-None-Match: '"seq-0.hsf.L0.647d10f1f0720f6a"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-d24d126ae8a8712f-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-c9bb81a2d38f89e5-01
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         content-type: application/hal+json
-        date: Thu, 12 Nov 2026 23:18:37 GMT
-        etag: '"seq-1.hsf.L0.b0c3dfcab6705a7d"'
+        date: Fri, 13 Nov 2026 01:11:30 GMT
+        etag: '"seq-1.hsf.L0.db9ee584717054f8"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/environments/1&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/environments/1&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/environments/1&gt;; rel="alternate"; type="text/html", &lt;/environments/1&gt;; rel="alternate"; type="application/json"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
@@ -12633,8 +12463,8 @@ exchanges:
       body:
         id: 1
         name: dev
-        commit: 6066ef274b2932b5738af780eb59e093569eddfb
-        promotedAt: '2026-11-12T23:18:37.187281Z'
+        commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
+        promotedAt: '2026-11-13T01:11:30.030356Z'
         standing: serving
         _links:
           self:
@@ -12703,8 +12533,8 @@ now:
   state:
     id: 1
     name: dev
-    commit: 6066ef274b2932b5738af780eb59e093569eddfb
-    promotedAt: '2026-11-12T23:18:37.187281Z'
+    commit: 75b376c29e273e568ba4c57a8cc5765d5f8dfae9
+    promotedAt: '2026-11-13T01:11:30.030356Z'
     standing: serving
   forms:
     - env:promote
@@ -12714,15 +12544,15 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-12T23:18:37.197074Z'
+at: '2026-11-13T01:11:30.038101Z'
 ms: 1
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8190/
 exchanges:
-  - at: '2026-11-12T23:18:37.197154Z'
-    ms: 0
+  - at: '2026-11-13T01:11:30.038179Z'
+    ms: 1
     request:
       method: GET
       url: http://192.168.1.18:8190/
@@ -12733,14 +12563,14 @@ exchanges:
         If-None-Match: '"index-hsf-5be8c58f051d3e97"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-303bff943373eb6e-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-37f82ed5dc1b6bd3-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:37 GMT
+        date: Fri, 13 Nov 2026 01:11:30 GMT
         etag: '"index-hsf-5be8c58f051d3e97"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -12775,14 +12605,14 @@ now:
     hr:affordances:
       - null
 ---
-at: '2026-11-12T23:18:37.198374Z'
+at: '2026-11-13T01:11:30.039496Z'
 ms: 1
 mode: script
 say: return to {address}
 params:
   address: http://192.168.1.18:8098/
 exchanges:
-  - at: '2026-11-12T23:18:37.198445Z'
+  - at: '2026-11-13T01:11:30.039553Z'
     ms: 0
     request:
       method: GET
@@ -12794,14 +12624,14 @@ exchanges:
         If-None-Match: '"index-hsf-2b57f9146741dddf"'
         Authorization: &lt;token&gt;
         User-Agent: ARTIE/0.5 (desk)
-        traceparent: 00-2471ca043968ba2dbf66cb2a3f984338-f48c8ce1cc79e4f6-01
+        traceparent: 00-c23ccf3f8d42b43cfb0df1e4022d5335-781e57c641a69b62-01
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
         content-profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
-        date: Thu, 12 Nov 2026 23:18:37 GMT
+        date: Fri, 13 Nov 2026 01:11:30 GMT
         etag: '"index-hsf-2b57f9146741dddf"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/&gt;; rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", &lt;/&gt;; rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", &lt;/&gt;; rel="alternate"; type="text/html", &lt;/&gt;; rel="alternate"; type="application/json", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
