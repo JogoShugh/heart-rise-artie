@@ -33,7 +33,22 @@
   .grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: .8rem; align-items: start; }
   @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
   .panel { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .7rem .8rem; min-width: 0; }
-  .seq { padding: 0; overflow: hidden; }
+  .seq { padding: 0; overflow: hidden; position: relative; }
+  svg text.href { font: 11px ui-monospace, Menlo, monospace; transition: opacity .3s; }
+  svg text.href.pending { opacity: 0; }
+  #float { position: absolute; z-index: 3; max-width: min(92%, 480px); background: var(--card); border: 1px solid var(--line);
+    border-radius: 8px; box-shadow: 0 6px 24px rgb(0 0 0 / .25); padding: .4rem .55rem; opacity: 0;
+    transform: translateY(6px); transition: opacity .3s, transform .3s; pointer-events: none; }
+  #float.shown { opacity: 1; transform: none; }
+  #float .from { font-size: .75rem; color: var(--soft); margin-bottom: .2rem; }
+  #float pre { margin: 0; font: 11.5px/1.45 ui-monospace, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+  #float mark.relkey { background: transparent; color: var(--now); font-weight: 700; border-radius: 3px;
+    animation: flash .45s ease-in-out 3 alternate; }
+  @keyframes flash { from { background: transparent; } to { background: color-mix(in srgb, var(--now) 28%, transparent); } }
+  #float .hrefsrc { color: var(--rise); font-weight: 600; }
+  .fly { position: absolute; z-index: 4; font: 600 11.5px ui-monospace, Menlo, monospace; color: var(--now);
+    background: var(--card); border: 1px solid var(--now); border-radius: 4px; padding: 0 .25rem; pointer-events: none;
+    transition: transform .8s cubic-bezier(.3, .7, .2, 1); white-space: nowrap; }
   .heads { overflow: hidden; border-bottom: 1px solid var(--line); }
   .scroll { max-height: min(68vh, 640px); overflow: auto; }
   .heads svg, .scroll svg { display: block; width: 880px; max-width: none; }
@@ -97,6 +112,7 @@
 
   <div class="grid">
     <div class="panel seq">
+      <div id="float" hidden aria-hidden="true"></div>
       <div class="heads"><svg id="heads" role="presentation"></svg></div>
       <div class="scroll" id="scroll"><svg id="seq" role="img" aria-label="The release's messages between ARTIE and the parties, up to the one playing."></svg></div>
       <div class="legend">
@@ -140,7 +156,7 @@ const QUOTES = {
 // The constraint a message is the clearest example of: the rarest it shows first.
 const SPECIFIC = ["cache", "layered", "hypermedia", "stateless", "representations", "selfDescriptive", "identification"];
 const COLOR = { heart: "var(--heart)", rise: "var(--rise)", own: "var(--own)" };
-const COL = 110, X0 = 55, ROW = 44, TOP = 26, W = COL * PARTIES.length;
+const COL = 110, X0 = 55, ROW = 52, TOP = 26, W = COL * PARTIES.length;
 const x = (p) => X0 + COL * PARTIES.findIndex(([k]) => k === p);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const NS = "http://www.w3.org/2000/svg";
@@ -164,13 +180,16 @@ function draw() {
   const defs = `<defs>${Object.entries(COLOR).map(([k, c]) =>
     `<marker id="h-${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:${c}"/></marker>`).join("")}</defs>`;
   const rows = ms.map((m, i) => {
-    const y = TOP + ROW * i + 16, x1 = x(m.from), x2 = x(m.to), dir = x2 > x1 ? -2 : 2;
+    const y = TOP + ROW * i + 22, x1 = x(m.from), x2 = x(m.to), dir = x2 > x1 ? -2 : 2;
     // Each label starts just past the arrow's left end, so a short arrow's label is never cut at the edge.
     const mid = Math.min(x1, x2) + 8, c = COLOR[m.kind];
-    const label = m.n ? `${m.n}  ${m.label}${m.status ? ` · ${m.status}` : ""}` : m.label;
+    // Above the arrow, the relation ARTIE chose; below it, the href that relation handed over, as requested.
+    const named = m.rel ? `${m.n}  ${m.rel}` : m.n ? `${m.n}  ${m.method || ""}` : m.label;
+    const label = `${named}${m.status ? ` · ${m.status}` : ""}`;
+    const href = m.path ? `<text class="href" x="${mid}" y="${y + 15}" style="fill:${c}">${esc(`${m.method} ${m.path}`)}</text>` : "";
     return `<g class="m" data-i="${i}"><line x1="${x1}" y1="${y}" x2="${x2 + dir}" y2="${y}" style="stroke:${c}" stroke-width="1.6"` +
       `${m.kind === "own" || m.inside ? ' stroke-dasharray="3 3"' : ""} marker-end="url(#h-${m.kind})"/>` +
-      `<text x="${mid}" y="${y - 6}" style="fill:${c}">${esc(label)}</text></g>`;
+      `<text class="rel" x="${mid}" y="${y - 7}" style="fill:${c}">${esc(label)}</text>${href}</g>`;
   }).join("");
   svg.innerHTML = defs + lines + rows;
   svg.querySelectorAll(".m").forEach((g) => g.addEventListener("click", () => { stop(); show(+g.dataset.i); }));
@@ -208,17 +227,71 @@ function show(i, instant = false) {
   $("detail").innerHTML = `<h2>${head}</h2>${m.note ? `<p class="note">${esc(m.note)}</p>` : ""}${exchange}${chips(m)}`;
   $("detail").querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => { picked = b.dataset.k; show(at); }));
   const scroll = $("scroll"), row = (TOP + ROW * at) * (scroll.querySelector("svg").getBoundingClientRect().width / W);
-  if (row < scroll.scrollTop + 40 || row > scroll.scrollTop + scroll.clientHeight - 80) {
-    scroll.scrollTo({ top: row - scroll.clientHeight / 2, behavior: instant || matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  const still = instant || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (row < scroll.scrollTop + 60 || row > scroll.scrollTop + scroll.clientHeight - 120) {
+    scroll.scrollTo({ top: row - scroll.clientHeight / 2, behavior: still ? "auto" : "smooth" });
   }
+  offer(m, still);
 }
 
-function stop() { clearInterval(timer); timer = null; $("play").textContent = "▶ Play"; }
+// The offer a message followed: the bit of JSON in the representation ARTIE held where its relation appears, the
+// relation flashed, then the href it handed over lifted out and put onto the arrow. Its steps, by the speed chosen.
+let steps = [];
+const scale = () => +$("speed").value / 800;
+const OFFER_MS = 2600;
+function offer(m, still) {
+  steps.forEach(clearTimeout); steps = [];
+  const box = $("float"), seq = document.querySelector(".seq");
+  document.querySelectorAll(".fly").forEach((f) => f.remove());
+  box.hidden = true; box.classList.remove("shown");
+  const g = $("seq").querySelector(`.m[data-i="${at}"]`);
+  const target = g?.querySelector(".href");
+  if (!m.offer || !target || still) return;
+  const json = esc(m.offer.json)
+    .replace(`&quot;${esc(m.rel)}&quot;`, `<mark class="relkey">&quot;${esc(m.rel)}&quot;</mark>`)
+    .replace(`&quot;${esc(m.offer.href)}&quot;`, `<span class="hrefsrc">&quot;${esc(m.offer.href)}&quot;</span>`);
+  box.innerHTML = `<div class="from">held: ${m.offer.kind === "form" ? "a form" : "a link"} at <code>${esc(m.offer.where)}</code></div><pre>${json}</pre>`;
+  target.classList.add("pending");
+  const s = scale();
+  steps.push(setTimeout(() => {
+    const p = seq.getBoundingClientRect(), r = g.querySelector(".rel").getBoundingClientRect();
+    box.hidden = false;
+    const top = Math.max(48, r.top - p.top - box.offsetHeight - 10);
+    box.style.left = `${Math.max(8, Math.min(p.width - box.offsetWidth - 8, r.left - p.left))}px`;
+    box.style.top = `${top}px`;
+    requestAnimationFrame(() => box.classList.add("shown"));
+  }, 0));
+  steps.push(setTimeout(() => {
+    const src = box.querySelector(".hrefsrc");
+    if (!src) return;
+    const p = seq.getBoundingClientRect(), a = src.getBoundingClientRect(), b = target.getBoundingClientRect();
+    const fly = document.createElement("span");
+    fly.className = "fly"; fly.textContent = m.offer.href;
+    fly.style.left = `${a.left - p.left}px`; fly.style.top = `${a.top - p.top}px`;
+    seq.appendChild(fly);
+    requestAnimationFrame(() => {
+      fly.style.transform = `translate(${b.left - a.left}px, ${b.top - a.top}px)`;
+    });
+  }, 1000 * s));
+  steps.push(setTimeout(() => {
+    target.classList.remove("pending");
+    document.querySelectorAll(".fly").forEach((f) => f.remove());
+    box.classList.remove("shown");
+  }, 1900 * s));
+  steps.push(setTimeout(() => { box.hidden = true; }, 2300 * s));
+}
+
+function stop() { clearTimeout(timer); timer = null; $("play").textContent = "▶ Play"; }
+function tick() {
+  if (at >= RUNS[run].length - 1) return stop();
+  show(at + 1);
+  timer = setTimeout(tick, +$("speed").value + (RUNS[run][at].offer ? OFFER_MS * scale() : 0));
+}
 function play() {
   if (timer) return stop();
   if (at >= RUNS[run].length - 1) show(0);
   $("play").textContent = "⏸ Pause";
-  timer = setInterval(() => { if (at >= RUNS[run].length - 1) stop(); else show(at + 1); }, +$("speed").value);
+  timer = setTimeout(tick, +$("speed").value + (RUNS[run][at].offer ? OFFER_MS * scale() : 0));
 }
 
 $("play").addEventListener("click", play);
@@ -235,10 +308,11 @@ document.addEventListener("keydown", (e) => {
   if (e.key === " ") { e.preventDefault(); play(); }
 });
 $("scroll").addEventListener("scroll", () => { $("heads").parentElement.scrollLeft = $("scroll").scrollLeft; });
-// A link may name a run and a message: #504/40.
-const [wantRun, wantAt] = location.hash.slice(1).split("/");
+// A link may name a run and a message, and play its offer: #504/40, #501/14/offer.
+const [wantRun, wantAt, wantOffer] = location.hash.slice(1).split("/");
 if (RUNS[wantRun]) { run = wantRun; $("run").value = wantRun; }
 heads(); draw(); show((+wantAt || 1) - 1, true);
+if (wantOffer === "offer") offer(RUNS[run][at], false);
 </script>
 </body>
 </html>

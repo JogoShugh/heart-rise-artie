@@ -81,9 +81,37 @@ function constraints(step, ex) {
   return why;
 }
 
+/**
+ * Where [rel] appears in [held], the representation ARTIE held when it chose it: the bit of JSON around it (a link,
+ * or a form with only its method and target), the pointer to it, and the href it hands over; null when it isn't there.
+ */
+function offered(held, rel, url, base) {
+  if (!held || !rel) return null;
+  const goes = (href) => { try { return new URL(href, base).href.split("?")[0] === url.split("?")[0]; } catch { return false; } };
+  const links = [held._links?.[rel]].flat().filter((l) => l && l.href);
+  const at = links.findIndex((l) => goes(l.href));
+  const link = links[at] || (links.length === 1 ? links[0] : null);
+  const form = held._forms?.[rel];
+  if (link) {
+    const many = Array.isArray(held._links[rel]);
+    const shown = { href: link.href, ...(link.title ? { title: link.title } : {}) };
+    return { kind: "link", where: `/_links/${rel}${many ? `/${Math.max(at, 0)}` : ""}`, href: link.href,
+      json: JSON.stringify({ _links: { [rel]: many ? [shown] : shown } }, null, 2) };
+  }
+  if (form) {
+    const href = form._links?.target?.href || form.target;
+    const kept = { title: form.title, method: form.method || "POST", _links: { target: { href } } };
+    return { kind: "form", where: `/_forms/${rel}`, href, json: JSON.stringify({ _forms: { [rel]: kept } }, null, 2) };
+  }
+  return null;
+}
+
 function messages(trace) {
   const steps = sandbox.jsyaml.loadAll(fs.readFileSync(trace, "utf8")).slice(1);
   const all = [], replyState = new Map();
+  // The last representation of each address, as ARTIE holds it: a 304 keeps the one held before.
+  const bodies = new Map();
+  let here = null;
   let watchShown = false, jenkinsShown = false;
   const pull = steps.find((s) => s.params?.relation === "github:pulls-get")?.address;
   const own = (from, to, label, note) => all.push({ kind: "own", from, to, label, note });
@@ -142,12 +170,24 @@ function messages(trace) {
       const { asked, answer } = lines(req, res);
       if (replyTo) asked.push(`_links: hr:reply-to ${short(replyTo)}, hr:keys`);
       const state = body.state ? ` ${body.state}` : "";
+      const rel = step.params?.relation;
       all.push({
         kind: party(req.url) === "replies" ? "rise" : "heart", n: i + 1, from: "artie", to: party(req.url),
-        label: `${req.method} ${step.params?.relation || cut(short(req.url), 22)}`, status: `${res.status}${state}`,
+        method: req.method, rel: rel || null, path: short(req.url),
+        label: `${req.method} ${rel || cut(short(req.url), 22)}`, status: `${res.status}${state}`,
         say: said(step), entered: String(step.say || "").startsWith("enter"), asked, answer,
+        // Where ARTIE stood, else the latest representation that offered the relation to this URL.
+        offer: offered(bodies.get(here), rel, req.url, here || req.url)
+          || [...bodies.entries()].reverse().map(([at, held]) => offered(held, rel, req.url, at))
+            .find((o) => o && (() => { try { return new URL(o.href, req.url).pathname === new URL(req.url).pathname; } catch { return false; } })())
+          || null,
         why: constraints(step, ex),
       });
+      if (res.status !== 304 && Object.keys(body).length) bodies.set(req.url, body);
+      const located = header(res.headers, "Content-Location");
+      if (located && Object.keys(body).length) bodies.set(new URL(located, req.url).href, body);
+      if (req.method === "GET") here = req.url;
+      else if (located) here = new URL(located, req.url).href;
     });
   });
   return all;
