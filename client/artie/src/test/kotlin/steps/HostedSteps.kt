@@ -124,6 +124,18 @@ class HostedSteps(private val ctx: ClientContext) {
     }
 
     private val reasoners = mutableMapOf<String, heart.Reasoner>()
+    private val rungs = mutableMapOf<String, heart.Rung>()
+
+    @Given("the host {string} has ARTIE read at rung {string}")
+    fun readsAt(host: String, rung: String) {
+        rungs[host] = heart.Rung.valueOf(rung)
+    }
+
+    @Then("the GET to {string} carried header {string} set to {string}")
+    fun getHeader(url: String, name: String, value: String) {
+        val sent = ctx.transport.requests.filter { it.method == "GET" && it.url == url }.map { it.header(name) }
+        assertTrue(sent.isNotEmpty() && sent.all { it == value }, "$name on the GETs to $url: $sent")
+    }
 
     @Given("the host {string} lets ARTIE send credentials over plain HTTP to {string}")
     fun plainHttp(host: String, mask: String) {
@@ -241,6 +253,7 @@ class HostedSteps(private val ctx: ClientContext) {
         val wire = waitingOn[host]?.let { other -> heldUntil(other) } ?: shared
         return Hosted(credentials, keys[host], wire, host, masks[host].orEmpty(), replies[host])
             .also { it.reasoner = reasoners[host] }
+            .also { it.rung = rungs[host] ?: heart.Rung.L0 }
     }
 
     /** The scripted service, which answers only once [other] has its run back. */

@@ -56,6 +56,17 @@ Feature: ARTIE hosted in a service
       | enter         | done    |
       | act waterCell | done    |
 
+  Scenario: A host may have ARTIE read at a rung of the ladder, its forms and schemas each fetched by link
+    Given the host "desk" has ARTIE read at rung "L2"
+    When the host "desk" runs this kept script with ARTIE:
+      """yaml
+      start: http://localhost:8301/beds/2
+      steps:
+        - act: waterCell
+          fields: {milliliters: 100}
+      """
+    Then the GET to "http://localhost:8301/beds/2" carried header "Prefer" set to "forms=link, schema=link"
+
   Scenario: ARTIE calls with the credentials the host gives
     Given the host "desk" gives ARTIE the token "desk-token" for "http://localhost:8301"
     When the host "desk" runs this kept script with ARTIE:
