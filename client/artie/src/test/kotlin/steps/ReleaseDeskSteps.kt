@@ -53,6 +53,29 @@ class ReleaseDeskSteps {
     private var woke: Pair<Boolean, Long>? = null
     private var askedAt = 0L
 
+    private var readAtRung: Response? = null
+    private val oneOrigin by lazy { ReleaseDesk({ emptyMap<String, Any>() }, replies, { Hosted() }) }
+
+    @When("the reply is read at the desk's origin at rung {string}")
+    fun readAtRung(rung: String) {
+        readAtRung = oneOrigin.handler(
+            Request(Method.GET, reply.address).header(AUTH, "Bearer $REPLY_TOKEN")
+                .header("Accept", "application/hal+json").header("Prefer", heart.Rung.valueOf(rung).prefer.orEmpty()),
+        )
+    }
+
+    @Then("the form set it links as {string} is served at the desk's origin")
+    fun setServed(relation: String) {
+        val read = checkNotNull(readAtRung)
+        val href = json.readTree(read.bodyString()).path("_links").path(relation).path("href").asText()
+        assertTrue(href.isNotEmpty(), "no $relation link: ${read.bodyString()}")
+        val set = oneOrigin.handler(
+            Request(Method.GET, java.net.URI(DESK).resolve(href).toString()).header(AUTH, "Bearer $REPLY_TOKEN")
+                .header("Accept", "application/hal+json"),
+        )
+        assertEquals(200, set.status.code, "the set at $href: ${set.status}")
+    }
+
     @Given("the desk keeps a reply, asked for at the watch {string}")
     fun keepsReply(watch: String) {
         reply = replies.open()

@@ -116,6 +116,9 @@ class ReleaseDesk(
         when {
             path.startsWith("/replies/") || path == "/keys" -> replies.handler(request)
             path.matches(TRACE) -> trace(path.removePrefix("/releases/").removeSuffix("/trace").toLong())
+            // A form set or a schema a reply links at L1 or L2 is the replies' own; any other, the desk's.
+            path.startsWith(SETS) || path.startsWith(SCHEMAS) ->
+                replies.handler(request).takeIf { it.status != Status.NOT_FOUND } ?: heart(request)
             else -> heart(request)
         }
     }
@@ -148,6 +151,8 @@ class ReleaseDesk(
         const val STOPPED = "stopped"
         private val STATES = listOf(RUNNING, ENDED, STOPPED)
         private val TRACE = Regex("^/releases/\\d+/trace$")
+        private const val SETS = "/affordance-sets/"
+        private const val SCHEMAS = "/schemas/"
 
         private const val RELEASE_INPUT = """{
   "type": "object",

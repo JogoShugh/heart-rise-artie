@@ -20,6 +20,13 @@ Feature: The release desk: services that call others through ARTIE, and answer t
       | /_links/hr:in-reply-to/href | http://localhost:8099/watches/1            |
     And the answer was signed by the key "watcher-2026-11"
 
+  Scenario: A reply read at L2 at the desk's origin has its form set served there too
+    The desk and its replies share one origin: a reply read at L2 links its form set by address,
+    and the desk serves that set, as it serves its own.
+    Given the desk keeps a reply, asked for at the watch "http://localhost:8099/watches/1"
+    When the reply is read at the desk's origin at rung "L2"
+    Then the form set it links as "hr:forms" is served at the desk's origin
+
   Scenario: A run waiting on its reply wakes when the reply is answered
     Given the desk keeps a reply, asked for at the watch "http://localhost:8099/watches/1"
     And a run waits on the reply for up to 10 seconds
