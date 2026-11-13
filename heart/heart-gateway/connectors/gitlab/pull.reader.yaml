@@ -1,7 +1,7 @@
 # A merge request says nothing about what is allowed, so the rules are written here:
 # first by its state, then by the rules below, in order, each with its reason.
 matches:
-  path: /projects/{id}/merge_requests/{merge_request_iid}
+  path: /projects/{owner}%2F{repo}/merge_requests/{pull_number}
 allowed:
   table: /state
   rows:

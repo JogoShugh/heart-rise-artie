@@ -8,22 +8,24 @@ info:
 servers:
   - url: http://localhost:8929/api/v4
 paths:
-  /projects/{id}:
+  /projects/{owner}%2F{repo}:
     get:
       operationId: projects/get
       summary: Get a single project
-      description: Get a specific project, by its ID or its URL-encoded path.
+      description: Get a specific project, by its URL-encoded path.
       parameters:
-        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/owner"
+        - $ref: "#/components/parameters/repo"
       responses:
         "200": { description: The project, content: { application/json: { schema: { type: object } } } }
-  /projects/{id}/merge_requests:
+  /projects/{owner}%2F{repo}/merge_requests:
     get:
-      operationId: merge-requests/list
+      operationId: pulls/list
       summary: List project merge requests
       description: Get all merge requests for this project.
       parameters:
-        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/owner"
+        - $ref: "#/components/parameters/repo"
         - name: state
           in: query
           description: Return all merge requests or just those that are opened, closed, locked, or merged.
@@ -40,22 +42,24 @@ paths:
         "200":
           description: The project's merge requests
           content: { application/json: { schema: { type: array, items: { type: object } } } }
-  /projects/{id}/merge_requests/{merge_request_iid}:
+  /projects/{owner}%2F{repo}/merge_requests/{pull_number}:
     get:
-      operationId: merge-requests/get
+      operationId: pulls/get
       summary: Get single merge request
       description: Shows information about a single merge request.
       parameters:
-        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/owner"
+        - $ref: "#/components/parameters/repo"
         - $ref: "#/components/parameters/mergeRequest"
       responses:
         "200": { description: The merge request, content: { application/json: { schema: { type: object } } } }
     put:
-      operationId: merge-requests/update
+      operationId: pulls/update
       summary: Update a merge request
       description: Updates an existing merge request; its state_event closes or reopens it.
       parameters:
-        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/owner"
+        - $ref: "#/components/parameters/repo"
         - $ref: "#/components/parameters/mergeRequest"
       requestBody:
         content:
@@ -68,13 +72,14 @@ paths:
                 state_event: { type: string, enum: [close, reopen], description: New state (close or reopen). }
       responses:
         "200": { description: The merge request, content: { application/json: { schema: { type: object } } } }
-  /projects/{id}/merge_requests/{merge_request_iid}/merge:
+  /projects/{owner}%2F{repo}/merge_requests/{pull_number}/merge:
     put:
-      operationId: merge-requests/merge
+      operationId: pulls/merge
       summary: Merge a merge request
       description: Accept and merge changes submitted with the merge request.
       parameters:
-        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/owner"
+        - $ref: "#/components/parameters/repo"
         - $ref: "#/components/parameters/mergeRequest"
       requestBody:
         content:
@@ -92,13 +97,14 @@ paths:
         "200": { description: The merged request, content: { application/json: { schema: { type: object } } } }
         "405": { description: The merge request can't be merged now. }
         "409": { description: The SHA doesn't match the HEAD of the source branch. }
-  /projects/{id}/merge_requests/{merge_request_iid}/notes:
+  /projects/{owner}%2F{repo}/merge_requests/{pull_number}/notes:
     get:
       operationId: notes/list
       summary: List all merge request notes
       description: Gets a list of all notes for a single merge request.
       parameters:
-        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/owner"
+        - $ref: "#/components/parameters/repo"
         - $ref: "#/components/parameters/mergeRequest"
       responses:
         "200":
@@ -109,7 +115,8 @@ paths:
       summary: Create new merge request note
       description: Creates a new note for a single merge request.
       parameters:
-        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/owner"
+        - $ref: "#/components/parameters/repo"
         - $ref: "#/components/parameters/mergeRequest"
       requestBody:
         content:
@@ -121,14 +128,22 @@ paths:
                 body: { type: string, description: The content of a note. }
       responses:
         "201": { description: The new note, content: { application/json: { schema: { type: object } } } }
-  /projects/{id}/merge_requests/{merge_request_iid}/notes/{note_id}:
+  /projects/{project_id}/merge_requests/{noteable_iid}/notes/{note_id}:
     get:
       operationId: notes/get
       summary: Get single merge request note
-      description: Returns a single note for a given merge request.
+      description: Returns a single note for a given merge request, by its project's ID.
       parameters:
-        - $ref: "#/components/parameters/project"
-        - $ref: "#/components/parameters/mergeRequest"
+        - name: project_id
+          in: path
+          required: true
+          description: The ID of the project.
+          schema: { type: integer }
+        - name: noteable_iid
+          in: path
+          required: true
+          description: The internal ID of the merge request.
+          schema: { type: integer }
         - name: note_id
           in: path
           required: true
@@ -138,14 +153,20 @@ paths:
         "200": { description: The note, content: { application/json: { schema: { type: object } } } }
 components:
   parameters:
-    project:
-      name: id
+    owner:
+      name: owner
       in: path
       required: true
-      description: The ID or URL-encoded path of the project.
+      description: The group or user the project belongs to, the first part of its path.
+      schema: { type: string }
+    repo:
+      name: repo
+      in: path
+      required: true
+      description: The project's own name, the last part of its path.
       schema: { type: string }
     mergeRequest:
-      name: merge_request_iid
+      name: pull_number
       in: path
       required: true
       description: The internal ID of the merge request.

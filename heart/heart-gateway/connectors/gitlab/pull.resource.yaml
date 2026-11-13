@@ -1,22 +1,42 @@
-# A merge request, served as a pull request: read by merge-requests/get, a project's listed by merge-requests/list.
+# A merge request, served as a pull request in scm's words: read by pulls/get, a project's listed by pulls/list.
 noun: pull
 collection: pulls
-read: merge-requests/get
-search: merge-requests/list
-# GitLab's merge request names its project and number in its state: the read's path is made from them.
-pointers:
-  id: /project_id
-  merge_request_iid: /iid
+read: pulls/get
+search: pulls/list
+# GitLab's merge request names its project and number only in its page's address: the read's path variables are
+# matched from it, and kept in the state as hr:address.
+address: /web_url
+address-path: "/{owner}/{repo}/-/merge_requests/{pull_number}"
 filters: [state, order_by, sort]
 title: /title
 # GitLab works mergeability out by itself, after a push: left out when the state is compared before an act.
 volatile: [/detailed_merge_status, /merge_status, /has_conflicts, /updated_at]
+# scm's members, as GitHub says them: state is open or closed, and merged says whether it was merged. GitLab's own
+# state is kept under upstream.
+normal:
+  state:
+    from: /state
+    values: { opened: open, closed: closed, locked: closed, merged: closed }
+  merged:
+    from: /state
+    values: { opened: false, closed: false, locked: false, merged: true }
 acts:
   merge:
-    operation: merge-requests/merge
+    operation: pulls/merge
     title: Merge
     description: Merge the pull request into its target branch.
-    fields: [squash, squash_commit_message, merge_commit_message]
+    fields: [merge_commit_message]
+    # scm's method, as GitHub's merge takes it; GitLab squashes or not, and merges with a merge commit either way.
+    inputs:
+      method:
+        type: string
+        enum: [merge, squash]
+        title: Merge method
+        description: The merge method to use.
+    values:
+      method:
+        merge: { squash: false }
+        squash: { squash: true }
     # GitLab merges only if the source branch's head is still at this sha: the head the client's view had.
     bind: { sha: /sha }
     # GitLab's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.
@@ -30,12 +50,12 @@ acts:
     # GitLab answers with the new note; the gateway answers 201, with the note's address in Location.
     creates: note
   close:
-    operation: merge-requests/update
+    operation: pulls/update
     title: Close
     description: Close it, unmerged.
     body: { state_event: close }
   reopen:
-    operation: merge-requests/update
+    operation: pulls/update
     title: Reopen
     description: Open it again.
     body: { state_event: reopen }
