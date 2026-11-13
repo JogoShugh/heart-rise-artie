@@ -49,7 +49,9 @@ for (const [forge, { port }] of Object.entries(forges)) {
       pull: desk.pull,
       steps: steps.length,
       seconds: Math.round((time(steps[steps.length - 1].at) - time(steps[0].at)) / 1000),
-      promoted: Boolean(dev.promotedAt),
+      // Promoted by this run: its own env:promote act, not whatever Dev last held (one desk serves every release).
+      promoted: steps.some((step) => (step.params || {}).relation === 'env:promote' && step.outcome === 'done'),
+      dev: dev.commit,
       calls,
     };
   }

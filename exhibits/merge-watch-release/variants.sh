@@ -5,7 +5,8 @@
 # Writes each run's trace, and what the desk said of it, to OUT (default: docs/reports/merge-watch-release/runs).
 # With RELEASE_SCM=gitlab, each release is at GitLab (gitlab/run.sh, gateway.sh) instead, seeded afresh; GitLab works
 # out mergeability itself. With RELEASE_SCM=github-live, at real GitHub (github/gateway.sh), each variant a pull request
-# of its own number, opened afresh by github/seed.sh.
+# of its own number, opened afresh by github/seed.sh. With RELEASE_ONE_DESK=1, one desk runs every release, so what
+# its ARTIE cached in one release, the next reads with no request.
 #   variants.sh [OUT]
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
@@ -35,8 +36,10 @@ release() { # pull fields-json
     at="\"scm\": \"$H:8093/\", \"owner\": \"${slug%%/*}\", \"repo\": \"${slug#*/}\", "
     echo "variant $pull is pull request $number of $slug"
   fi
-  "$root/client/artie-release/build/install/artie-release/bin/artie-release" > "$out/pr-$pull.parties.log" 2>&1 &
-  parties=$!
+  if [ -z "${parties:-}" ]; then
+    "$root/client/artie-release/build/install/artie-release/bin/artie-release" > "$out/pr-$pull.parties.log" 2>&1 &
+    parties=$!
+  fi
   until curl -sf -o /dev/null -H "$DESK" "$H:8160/"; do sleep 1; done
   [ "$scm" = github ] && curl -sf -X PUT -d null "$H:8098/_release/github/pulls/$pull/mergeable"
   etag=$(curl -sfi -H "$DESK" -H 'Accept: application/hal+json' "$H:8160/" | tr -d '\r' \
@@ -54,7 +57,8 @@ release() { # pull fields-json
   curl -sf -H "$DESK" "$H:8160$loc/trace" > "$out/pr-$pull.yaml"
   curl -sf -H 'Authorization: Bearer env-token' -H 'Accept: application/json' "$H:8190/environments/1" \
     > "$out/pr-$pull.dev.json"
-  kill "$parties"; wait "$parties" 2>/dev/null || true
+  # One desk for every release, when RELEASE_ONE_DESK says so: its HTTP cache outlives each release.
+  if [ -z "${RELEASE_ONE_DESK:-}" ]; then kill "$parties"; wait "$parties" 2>/dev/null || true; parties=; fi
   # A look at the forge as each release left it, when RELEASE_SHOT names a script: given the variant and its number.
   [ -n "${RELEASE_SHOT:-}" ] && sh "$RELEASE_SHOT" "$pull" "$number"
   echo "pr-$pull: $said"
@@ -65,3 +69,4 @@ release 502 '"book": "The Hobbit", "author": "J. R. R. Tolkien", "problem": "wro
 release 503 '"book": "Matilda", "author": "Roald Dahl", "problem": "lost", "comment": "Not on the shelf at home."'
 release 504 '"book": "Charlotte'"'"'s Web", "author": "E. B. White", "problem": "missing-pages", "comment": "Pages 40 to 44."'
 release 505 '"book": "The Hobbit", "author": "J. R. R. Tolkien", "problem": "damaged", "comment": "Water damage on the cover."'
+[ -z "${parties:-}" ] || { kill "$parties"; wait "$parties" 2>/dev/null || true; }

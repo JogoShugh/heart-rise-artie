@@ -31,6 +31,7 @@ escape < "$exhibit/release.goal.md" > "$tmp/GOAL"
 escape < "$exhibit/release.heart.yaml" > "$tmp/SCRIPT"
 node "$here/data.mjs" "$assets/js-yaml.min.js" "$here/runs" | sed 's#</#<\\/#g' > "$tmp/DATA"
 cp "$assets/js-yaml.min.js" "$tmp/JS_YAML"
+node "$here/cache.mjs" "$assets/js-yaml.min.js" "$here/../merge-watch-real-github-l0/runs" "$here/runs-fresh-desk" "$here/runs" > "$tmp/CACHE"
 usage() { sed -n '/^ *usage:/,/^ *[a-z_]*:$/p' "$here/runs/capture.yaml" | awk -v k="$1" '$1==k":"{print $2; exit}'; }
 printf '%s' "$(usage calls)" > "$tmp/CALLS"
 printf "%'d" "$(usage input)" > "$tmp/TOKENS_IN"
