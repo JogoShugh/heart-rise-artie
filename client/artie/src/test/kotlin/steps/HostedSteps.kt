@@ -45,9 +45,13 @@ class HostedSteps(private val ctx: ClientContext) {
     /** What the wire answered each GET, so a second reader of the same resource reads it too. */
     private val served = ConcurrentHashMap<String, HeartResponse>()
 
+    /** Every request that reached the wire, from any host. */
+    private val onTheWire = java.util.concurrent.CopyOnWriteArrayList<HeartRequest>()
+
     /** The scripted service, safe for hosts on several threads: a resource read once is read again alike. */
     private val shared = object : Transport {
         override fun send(request: HeartRequest): HeartResponse = synchronized(this) {
+            onTheWire += request
             if (request.method == "GET") served[request.url]?.let { return it }
             ctx.transport.send(request).also { if (request.method == "GET") served[request.url] = it }
         }
@@ -125,6 +129,23 @@ class HostedSteps(private val ctx: ClientContext) {
 
     private val reasoners = mutableMapOf<String, heart.Reasoner>()
     private val rungs = mutableMapOf<String, heart.Rung>()
+    private val caches = mutableMapOf<String, heart.HttpCache>()
+
+    @Given("the host {string} gives each run its own cache")
+    fun ownCaches(host: String) {
+        caches.remove(host)
+    }
+
+    @Given("the host {string} keeps one cache across its runs")
+    fun oneCache(host: String) {
+        caches[host] = heart.HttpCache()
+    }
+
+    @Then("the wire carried {int} GET to {string}")
+    fun getsTo(count: Int, url: String) {
+        val at = ctx.expand(url)
+        assertEquals(count, onTheWire.count { it.method == "GET" && it.url == at }, "GETs to $at")
+    }
 
     @Given("the host {string} has ARTIE read at rung {string}")
     fun readsAt(host: String, rung: String) {
@@ -254,6 +275,7 @@ class HostedSteps(private val ctx: ClientContext) {
         return Hosted(credentials, keys[host], wire, host, masks[host].orEmpty(), replies[host])
             .also { it.reasoner = reasoners[host] }
             .also { it.rung = rungs[host] ?: heart.Rung.L0 }
+            .also { it.cache = caches[host] }
     }
 
     /** The scripted service, which answers only once [other] has its run back. */

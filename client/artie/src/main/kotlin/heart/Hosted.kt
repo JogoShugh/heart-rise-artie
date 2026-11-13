@@ -33,6 +33,12 @@ class Hosted(
     /** The rung ARTIE asks every party to answer at (SPEC §6.10): L0, all in one answer, unless the host says. */
     var rung: Rung = Rung.L0
 
+    /**
+     * The HTTP cache every run of this host keeps its responses in; null gives each run its own. What one run read
+     * that is still fresh (an L2 form set or schema, a year), the next reads from here: no request leaves for it.
+     */
+    var cache: HttpCache? = null
+
     /** A client of its own, for one run: its own cache and trace, on the host's wire. */
     fun navigator(): Navigator {
         // Every exchange on the wire is kept for the run's capture, credentials written `<token>`, as sent: signed.
@@ -40,7 +46,7 @@ class Hosted(
         val signed = signing?.let { SigningTransport(it, log) } ?: log
         val named = UserAgentTransport("${UserAgentTransport.DEFAULT} ($name)", TraceContextTransport(Trace(), signed))
         val bare = AuthTransport(credentials, named, masks)
-        val transport = CachingTransport(IntegrityCheck(bare))
+        val transport = CachingTransport(IntegrityCheck(bare), cache = cache ?: HttpCache())
         // A script a link hands over is read as it is, below the cache, as a bare call is.
         return WiredNavigator(ArtieNavigator(ArtieClient(transport, rung), reasoner, exchangeLog = log), bare)
     }

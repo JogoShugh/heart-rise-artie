@@ -67,6 +67,45 @@ Feature: ARTIE hosted in a service
       """
     Then the GET to "http://localhost:8301/beds/2" carried header "Prefer" set to "forms=link, schema=link"
 
+  Scenario Outline: A host's runs may share one HTTP cache: what one run cached, the next reads with no request
+    At L2 a bed links its form set, and the set links its schema: each content-addressed and fresh for
+    a year. A run answers them from its cache while fresh, with no request. The bed itself is always
+    asked again, if only to hear 304. Each run has its own cache, unless the host keeps one across its runs.
+    Given the service serves schema "water" at its content address:
+      """yaml
+      type: object
+      properties:
+        milliliters: {type: integer, minimum: 1}
+      """
+    And the service serves affordance set "planted" at its content address:
+      """yaml
+      _forms:
+        waterCell:
+          _links: {target: {href: "/beds/{id}/actions/water-cell", templated: true}}
+          method: POST
+          schema: {$ref: "{schema:water}", "hr:integrity": "{integrity:schema:water}"}
+      """
+    And bed 2 and bed 3 both link to affordance set "planted"
+    And the host "desk" has ARTIE read at rung "L2"
+    And the host "desk" <keeps>
+    When the host "desk" runs this kept script with ARTIE:
+      """yaml
+      start: http://garden.test/beds/2
+      steps: []
+      """
+    And the host "desk" runs this kept script with ARTIE:
+      """yaml
+      start: http://garden.test/beds/3
+      steps: []
+      """
+    Then the wire carried <sets> GET to "http://garden.test{set:planted}"
+    And the wire carried <sets> GET to "http://garden.test{schema:water}"
+
+    Examples:
+      | keeps                           | sets |
+      | gives each run its own cache    | 2    |
+      | keeps one cache across its runs | 1    |
+
   Scenario: ARTIE calls with the credentials the host gives
     Given the host "desk" gives ARTIE the token "desk-token" for "http://localhost:8301"
     When the host "desk" runs this kept script with ARTIE:

@@ -9,6 +9,7 @@ import com.artie.heart.sims.rise.OfferWatcher
 import heart.Credential
 import heart.CredentialSource
 import heart.Hosted
+import heart.HttpCache
 import heart.Origin
 import heart.Rung
 import heart.SigningKey
@@ -31,6 +32,9 @@ fun hosting(
 ): Release.Hosting = Release.Hosting(
     answers = { key -> ArtieAnswers(key.keyId, SigningKey(key.keyId, key.pair.private), Release.REPLY_TOKEN, masks) },
     front = { service ->
+        // One HTTP cache for every release the desk runs: a form set or schema one release read, the next reads
+        // from here, with no request (hosted.feature).
+        val cache = HttpCache()
         ReleaseDesk(
             script = { org.yaml.snakeyaml.Yaml().load<Map<*, *>>(Files.readString(script)) },
             replies = DeskReplies(service, "http://$host:${Release.REPLIES_PORT}").also(kept),
@@ -38,7 +42,10 @@ fun hosting(
                 Hosted(
                     PartyCredentials, SigningKey(ArtieKey.KEY_ID, ArtieKey.pair.private), name = "desk",
                     plainHttp = masks, replies = kept,
-                ).also { it.rung = rung }
+                ).also {
+                    it.rung = rung
+                    it.cache = cache
+                }
             },
             tokens = listOf(ReleaseDesk.TOKEN, Release.REPLY_TOKEN),
             keys = mapOf(ArtieKey.KEY_ID to ArtieKey.pair.public),

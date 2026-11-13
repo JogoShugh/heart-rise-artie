@@ -22,16 +22,11 @@ import java.util.concurrent.ConcurrentHashMap
 class CachingTransport(
     private val inner: Transport,
     private val now: () -> Instant = Instant::now,
+    /** Where the responses are kept: the transport's own, unless one outlives it (a host's runs share one). */
+    cache: HttpCache = HttpCache(),
 ) : Transport {
 
-    private class Entry(
-        val response: HeartResponse,
-        val varied: Map<String, String?>,
-        val freshUntil: Instant?,
-        val etag: String?,
-    )
-
-    private val entries = ConcurrentHashMap<String, Entry>()
+    private val entries = cache.entries
 
     /**
      * Where a response is kept: its URL, and, for a request that names the integrity it
@@ -54,11 +49,11 @@ class CachingTransport(
     private fun requiresValidation(request: HeartRequest): Boolean =
         request.header("Cache-Control").orEmpty().split(',').any { it.trim().lowercase() == "no-cache" }
 
-    private fun lookup(request: HeartRequest): Entry? =
+    private fun lookup(request: HeartRequest): HttpCache.Entry? =
         entries[key(request)]?.takeIf { e -> e.varied.all { (name, value) -> request.header(name) == value } }
 
     /** A miss, or a stored entry that must be revalidated with its ETag. */
-    private fun fetch(request: HeartRequest, entry: Entry?): HeartResponse {
+    private fun fetch(request: HeartRequest, entry: HttpCache.Entry?): HeartResponse {
         val etag = entry?.etag
         val sent = if (etag != null) request.copy(headers = request.headers + ("If-None-Match" to etag)) else request
         val response = inner.send(sent)
@@ -76,7 +71,7 @@ class CachingTransport(
         val storable = response.status == OK && "no-store" !in directives && "*" !in vary &&
             ((maxAge != null && !revalidate) || (revalidate && etag != null))
         if (!storable) return
-        entries[key(request)] = Entry(
+        entries[key(request)] = HttpCache.Entry(
             response = response,
             varied = vary.associateWith { request.header(it) },
             freshUntil = if (revalidate) null else now().plusSeconds(maxAge ?: 0),
@@ -88,4 +83,16 @@ class CachingTransport(
         const val OK = 200
         const val NOT_MODIFIED = 304
     }
+}
+
+/** The responses a [CachingTransport] keeps, which may outlive it: one store, shared by every run of a host. */
+class HttpCache {
+    internal class Entry(
+        val response: HeartResponse,
+        val varied: Map<String, String?>,
+        val freshUntil: Instant?,
+        val etag: String?,
+    )
+
+    internal val entries = ConcurrentHashMap<String, Entry>()
 }
