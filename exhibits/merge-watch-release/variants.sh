@@ -3,6 +3,8 @@
 # given. The same kept scripts every time, the captured smoke test among them, with no model: only the inputs vary.
 # Each release starts from main as made, the parties started fresh; Jenkins (jenkins/run.sh) runs throughout.
 # Writes each run's trace, and what the desk said of it, to OUT (default: docs/reports/merge-watch-release/runs).
+# With RELEASE_SCM=gitlab, each release is at GitLab (gitlab/run.sh, gateway.sh) instead, seeded afresh; GitLab works
+# out mergeability itself.
 #   variants.sh [OUT]
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
@@ -12,6 +14,9 @@ host=${RELEASE_HOST:-192.168.1.18}
 H="http://$host"
 DESK="Authorization: Bearer desk-token"
 mkdir -p "$out"
+scm=${RELEASE_SCM:-github}
+at=""
+[ "$scm" = gitlab ] && at="\"scm\": \"$H:8094/\", "
 . "$here/jenkins/jenkins.env.example"
 export JENKINS_ADMIN_USER JENKINS_ADMIN_PASSWORD JENKINS_HOOK_SECRET RELEASE_HOST="$host"
 export RELEASE_GITHUB_CONNECTOR=${RELEASE_GITHUB_CONNECTOR:-github-scm}
@@ -21,17 +26,18 @@ export JAVA_HOME=${JAVA_HOME:-$HOME/.sdkman/candidates/java/25.3.4+1.r25-graal}
 release() { # pull fields-json
   pull=$1 fields=$2
   sh "$here/make-app-repo.sh" >/dev/null
+  [ "$scm" = gitlab ] && sh "$here/gitlab/seed.sh" >/dev/null
   "$root/client/artie-release/build/install/artie-release/bin/artie-release" > "$out/pr-$pull.parties.log" 2>&1 &
   parties=$!
   until curl -sf -o /dev/null -H "$DESK" "$H:8160/"; do sleep 1; done
-  curl -sf -X PUT -d null "$H:8098/_release/github/pulls/$pull/mergeable"
+  [ "$scm" = gitlab ] || curl -sf -X PUT -d null "$H:8098/_release/github/pulls/$pull/mergeable"
   etag=$(curl -sfi -H "$DESK" -H 'Accept: application/hal+json' "$H:8160/" | tr -d '\r' \
     | awk -F': ' 'tolower($1)=="etag"{print $2}')
   loc=$(curl -sfi -X POST -H "$DESK" -H "If-Match: $etag" -H 'Accept: application/hal+json' \
-    -H 'Content-Type: application/json' -d "{\"pull\": $pull, $fields}" "$H:8160/actions/release" \
+    -H 'Content-Type: application/json' -d "{\"pull\": $pull, $at$fields}" "$H:8160/actions/release" \
     | tr -d '\r' | awk -F': ' 'tolower($1)=="location"{print $2; exit}')
   sleep 6
-  curl -sf -X PUT -d true "$H:8098/_release/github/pulls/$pull/mergeable"
+  [ "$scm" = gitlab ] || curl -sf -X PUT -d true "$H:8098/_release/github/pulls/$pull/mergeable"
   while :; do
     said=$(curl -sf -H "$DESK" -H 'Accept: application/json' "$H:8160$loc")
     case "$said" in *'"state":"running"'*) sleep 3 ;; *) break ;; esac

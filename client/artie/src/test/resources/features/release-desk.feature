@@ -56,19 +56,21 @@ Feature: The release desk: services that call others through ARTIE, and answer t
       """yaml
       heart: 1
       kind: kept
-      inputs: {pull: {}, book: {default: Matilda}, problem: {default: damaged}}
+      inputs: {pull: {}, scm: {default: "http://localhost:8098/"}, book: {default: Matilda}, problem: {default: damaged}}
       start: http://localhost:8160/
       steps:
-        - note: "releasing pull request ${pull}, smoke testing ${book} with ${problem}"
+        - note: "releasing pull request ${pull} at ${scm}, smoke testing ${book} with ${problem}"
       """
     When a person asks the desk to release pull request 482, with:
-      | book    | The Hobbit |
-      | problem | wrong-book |
+      | scm     | http://localhost:8094/ |
+      | book    | The Hobbit             |
+      | problem | wrong-book             |
     Then the desk answered 201, at "/releases/1"
     And "/releases/1" reads, once the run is over:
       | member          | value                                                         |
       | /pull           | 482                                                           |
+      | /inputs/scm     | http://localhost:8094/                                        |
       | /inputs/book    | The Hobbit                                                    |
       | /inputs/problem | wrong-book                                                    |
       | /state          | ended                                                         |
-      | /notes/0        | releasing pull request 482, smoke testing The Hobbit with wrong-book |
+      | /notes/0        | releasing pull request 482 at http://localhost:8094/, smoke testing The Hobbit with wrong-book |

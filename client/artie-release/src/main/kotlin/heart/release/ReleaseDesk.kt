@@ -154,6 +154,10 @@ class ReleaseDesk(
   "required": ["pull"],
   "properties": {
     "pull": {"type": "integer", "minimum": 1, "title": "Pull request", "description": "The pull request to release"},
+    "scm": {
+      "type": "string", "format": "uri", "title": "Source control",
+      "description": "Where the pull request is: the gateway in front of GitHub or GitLab"
+    },
     "book": {"type": "string", "title": "Book", "description": "The book the smoke test finds and reads"},
     "author": {"type": "string", "title": "Author", "description": "Who wrote it, as the smoke test checks"},
     "problem": {

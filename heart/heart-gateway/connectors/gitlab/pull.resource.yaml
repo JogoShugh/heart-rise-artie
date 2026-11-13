@@ -20,6 +20,27 @@ normal:
   merged:
     from: /state
     values: { opened: false, closed: false, locked: false, merged: true }
+  # Whether it can be merged now, in the words GitHub's pull requests use: unknown while GitLab works it out, and
+  # once it isn't open.
+  mergeable_state:
+    from: /detailed_merge_status
+    values:
+      mergeable: clean
+      not_open: unknown
+      checking: unknown
+      unchecked: unknown
+      preparing: unknown
+      conflict: dirty
+      need_rebase: behind
+      draft_status: draft
+      ci_must_pass: blocked
+      ci_still_running: blocked
+      not_approved: blocked
+      discussions_not_resolved: blocked
+      blocked_status: blocked
+      jira_association_missing: blocked
+      external_status_checks: blocked
+      merge_request_blocked: blocked
 acts:
   merge:
     operation: pulls/merge
