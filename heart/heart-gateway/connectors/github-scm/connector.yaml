@@ -47,11 +47,11 @@ resources:
   - ../github/comment.resource.yaml
   - ../github/branch.resource.yaml
 readers:
-  - ../github/pull.reader.yaml
-  - ../github/issue.reader.yaml
-  - ../github/repository.reader.yaml
-  - ../github/comment.reader.yaml
-  - ../github/branch.reader.yaml
+  - pull.reader.yaml
+  - issue.reader.yaml
+  - repository.reader.yaml
+  - comment.reader.yaml
+  - branch.reader.yaml
 # GitHub puts its links in the state, as members named *_url, and on a pull request also in its own _links.
 # Each becomes a HEART link and leaves the state (spec/PLAN-GATEWAY-URL-LINKS.md). Only these members are
 # read: no other data is scanned for addresses. A link into GitHub's API that the gateway serves is rewritten

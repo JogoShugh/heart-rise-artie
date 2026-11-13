@@ -51,6 +51,11 @@ set -eu
 echo "== checkout $SHA"
 rm -rf src
 git clone -q /repos/library-app src
+# A commit merged on GitLab is only there: fetch its branches when the local repository hasn't the commit.
+if ! git -C src cat-file -e "$SHA^{commit}" 2>/dev/null; then
+  echo "== $SHA is not in the local repository: fetching from GitLab"
+  git -C src fetch -q "http://host.docker.internal:8929/acme/web.git" '+refs/heads/*:refs/remotes/gitlab/*'
+fi
 git -C src -c advice.detachedHead=false checkout -q "$SHA"
 git -C src log -1 --format='%H %s'
 

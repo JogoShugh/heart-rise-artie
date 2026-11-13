@@ -3,9 +3,9 @@
 # target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
 # one offered in a set not recorded for it.
 rung: L0
-digest: sha256-9z/yNKYISVPJET5QcWtBBmjhu+uk34DJbVlyDzGulgc=
+digest: sha256-qKM7TXJvTtzvI3H416WCa/y5oYK6wvYch4GhbwCLhKc=
 forms:
-  github:pulls-get:
+  scm:pulls-get:
     integrity: sha256-h02WjR7vd61a3clH1/805IIXM3O8OwspKt3KHwUP7/s=
     act: sha256-1F83f16yZ7bvcK7pTCwTR7vWpQdX/5YrkMr2Vjh4hAE=
     method: GET
@@ -15,9 +15,9 @@ forms:
     act: sha256-d2xDQiCk6HRrceJvk19XIlJ86QD6BDbuCJ34eoNKMhg=
     method: POST
     sets: []
-  github:merge:
-    integrity: sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
-    act: sha256-rIPDcwcEW99MvpphQzxbgRrzOPoH90Q4lEQrZ+emAMo=
+  scm:merge:
+    integrity: sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pweUa6ioBBwF8=
+    act: sha256-wxu/RB5Xng/l2mMU0xKUBGBldhK/ij10ZMKqGYXJ1lI=
     method: PUT
     sets: []
   ci:build:

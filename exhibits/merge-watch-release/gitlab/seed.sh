@@ -29,11 +29,11 @@ api() { curl -sf -H "PRIVATE-TOKEN: $GITLAB_TOKEN" "$@"; }
 
 # The group and project, once.
 api "$G/api/v4/groups/acme" >/dev/null 2>&1 \
-  || api -X POST "$G/api/v4/groups" -d name=acme -d path=acme -d visibility=internal >/dev/null
+  || api -X POST "$G/api/v4/groups" -d name=acme -d path=acme -d visibility=public >/dev/null
 group=$(api "$G/api/v4/groups/acme" | sed -E 's/^\{"id":([0-9]+).*/\1/')
 if ! api "$G/api/v4/projects/acme%2Fweb" >/dev/null 2>&1; then
   api -X POST "$G/api/v4/projects" -d name=web -d path=web -d "namespace_id=$group" -d default_branch=main \
-    -d visibility=internal >/dev/null
+    -d visibility=public >/dev/null
   # Merge requests are numbered as the pull requests they stand for: the next is 501.
   printf "p = Project.find_by_full_path('acme/web')
 InternalId.create!(project: p, usage: :merge_requests, last_value: 500) unless InternalId.exists?(project: p, usage: :merge_requests)
@@ -46,12 +46,17 @@ auth=$(printf 'oauth2:%s' "$GITLAB_TOKEN" | base64)
 git -C "$repo" -c "http.extraHeader=Authorization: Basic $auth" push -q -f "$G/acme/web.git" \
   main pr-501 pr-502 pr-503 pr-504 pr-505
 
-# A merge request for each variant, titled as its last commit.
+# A merge request for each variant, titled as its last commit, made afresh: a release merges one, and a merged merge
+# request can't be opened again. The ones before are deleted, and the numbering starts again at 501.
+printf "p = Project.find_by_full_path('acme/web')
+MergeRequest.where(target_project: p).find_each { |mr| mr.destroy! }
+InternalId.where(project: p, usage: :merge_requests).delete_all
+InternalId.create!(project: p, usage: :merge_requests, last_value: 500)
+" | rails >/dev/null
 for n in 501 502 503 504 505; do
-  if ! api "$G/api/v4/projects/acme%2Fweb/merge_requests/$n" >/dev/null 2>&1; then
-    title=$(git -C "$repo" log -1 --format=%s "pr-$n")
-    api -X POST "$G/api/v4/projects/acme%2Fweb/merge_requests" --data-urlencode "title=$title" \
-      -d "source_branch=pr-$n" -d target_branch=main >/dev/null
-  fi
-  echo "!$n $(api "$G/api/v4/projects/acme%2Fweb/merge_requests/$n" | sed -E 's/.*"title":"([^"]*)".*"state":"([a-z]*)".*/\1 · \2/')"
+  title=$(git -C "$repo" log -1 --format=%s "pr-$n")
+  made=$(api -X POST "$G/api/v4/projects/acme%2Fweb/merge_requests" --data-urlencode "title=$title" \
+    -d "source_branch=pr-$n" -d target_branch=main | sed -E 's/^\{"id":[0-9]+,"iid":([0-9]+).*/\1/')
+  [ "$made" = "$n" ] || { echo "merge request for pr-$n is !$made, not !$n"; exit 1; }
+  echo "!$n $title"
 done

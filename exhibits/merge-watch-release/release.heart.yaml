@@ -6,10 +6,10 @@
 #   artie run /Users/josh/repos/artie/exhibits/merge-watch-release/release.heart.yaml pull=501
 heart: 1
 kind: kept
-start: ${github}
+start: ${scm}
 
 inputs:
-  github:
+  scm:
     default: http://192.168.1.18:8098/
   pull:
     question: Which pull request?
@@ -39,7 +39,7 @@ inputs:
     default: Pages 12 to 14.
 
 steps:
-  - act: github:pulls-get
+  - act: scm:pulls-get
     fields:
       owner: ${owner}
       repo: ${repo}
@@ -52,16 +52,16 @@ steps:
       - ask: watcher:watch
         fields:
           resource: ${pr.@self}
-          offers: github:merge
+          offers: scm:merge
         reply: watch
   - once-answered:
       reply: watch
       steps:
         - enter: ${pr.@self}
           steps:
-            - act: github:merge
+            - act: scm:merge
               fields:
-                merge_method: squash
+                method: squash
               intent: merge it by squashing
               then:
                 - check:
@@ -120,6 +120,6 @@ steps:
     otherwise:
       - at: ${pr.@self}
         steps:
-          - act: github:comment
+          - act: scm:comment
             fields:
               body: "Not promoted to Dev: smoke scenarios ${smoke.failed} failed."
