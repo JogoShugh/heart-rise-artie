@@ -6,7 +6,7 @@
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 root=$(cd "$here/../../.." && pwd)
-host=${RELEASE_HOST:-192.168.1.18}
+host=${RELEASE_HOST:-localhost}
 # shellcheck disable=SC1090
 . "$here/gitlab.env"
 connector="$root/heart/heart-gateway/connectors/gitlab"

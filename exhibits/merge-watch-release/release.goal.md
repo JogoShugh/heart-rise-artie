@@ -4,10 +4,10 @@ inputs:
   pull:      { question: "Which pull request?" }
   owner:     { default: acme }
   repo:      { default: web }
-  scm:       { default: "http://192.168.1.18:8098/" }
-  watcher:   { default: "http://192.168.1.18:8099/" }
-  jenkins:   { default: "http://192.168.1.18:8170/" }
-  dev:       { default: "http://192.168.1.18:8190/" }
+  scm:       { default: "http://localhost:8098/" }
+  watcher:   { default: "http://localhost:8099/" }
+  jenkins:   { default: "http://localhost:8170/" }
+  dev:       { default: "http://localhost:8190/" }
   environment: { default: "1" }
   book:      { default: "The Hobbit" }
   author:    { default: "J. R. R. Tolkien" }

@@ -54,7 +54,12 @@ git clone -q /repos/library-app src
 # A commit merged on GitLab is only there: fetch its branches when the local repository hasn't the commit.
 if ! git -C src cat-file -e "$SHA^{commit}" 2>/dev/null; then
   echo "== $SHA is not in the local repository: fetching from GitLab"
-  git -C src fetch -q "http://host.docker.internal:8929/acme/web.git" '+refs/heads/*:refs/remotes/gitlab/*'
+  git -C src fetch -q "http://host.docker.internal:8929/acme/web.git" '+refs/heads/*:refs/remotes/gitlab/*' || true
+fi
+# One merged on real GitHub is on its library/ branches there.
+if ! git -C src cat-file -e "$SHA^{commit}" 2>/dev/null; then
+  echo "== $SHA is not on GitLab either: fetching from GitHub"
+  git -C src fetch -q "https://github.com/JogoShugh/heart-github-test.git" '+refs/heads/library/*:refs/remotes/github/*'
 fi
 git -C src -c advice.detachedHead=false checkout -q "$SHA"
 git -C src log -1 --format='%H %s'

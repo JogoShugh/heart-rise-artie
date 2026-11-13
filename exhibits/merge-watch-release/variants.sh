@@ -4,19 +4,21 @@
 # Each release starts from main as made, the parties started fresh; Jenkins (jenkins/run.sh) runs throughout.
 # Writes each run's trace, and what the desk said of it, to OUT (default: docs/reports/merge-watch-release/runs).
 # With RELEASE_SCM=gitlab, each release is at GitLab (gitlab/run.sh, gateway.sh) instead, seeded afresh; GitLab works
-# out mergeability itself.
+# out mergeability itself. With RELEASE_SCM=github-live, at real GitHub (github/gateway.sh), each variant a pull request
+# of its own number, opened afresh by github/seed.sh.
 #   variants.sh [OUT]
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 root=$(cd "$here/../.." && pwd)
 out=${1:-$root/docs/reports/merge-watch-release/runs}
-host=${RELEASE_HOST:-192.168.1.18}
+host=${RELEASE_HOST:-localhost}
 H="http://$host"
 DESK="Authorization: Bearer desk-token"
 mkdir -p "$out"
 scm=${RELEASE_SCM:-github}
 at=""
 [ "$scm" = gitlab ] && at="\"scm\": \"$H:8094/\", "
+slug=${RELEASE_GITHUB_REPO:-JogoShugh/heart-github-test}
 . "$here/jenkins/jenkins.env.example"
 export JENKINS_ADMIN_USER JENKINS_ADMIN_PASSWORD JENKINS_HOOK_SECRET RELEASE_HOST="$host"
 export RELEASE_GITHUB_CONNECTOR=${RELEASE_GITHUB_CONNECTOR:-github-scm}
@@ -27,17 +29,23 @@ release() { # pull fields-json
   pull=$1 fields=$2
   sh "$here/make-app-repo.sh" >/dev/null
   [ "$scm" = gitlab ] && sh "$here/gitlab/seed.sh" >/dev/null
+  number=$pull
+  if [ "$scm" = github-live ]; then
+    number=$(sh "$here/github/seed.sh" "$pull")
+    at="\"scm\": \"$H:8093/\", \"owner\": \"${slug%%/*}\", \"repo\": \"${slug#*/}\", "
+    echo "variant $pull is pull request $number of $slug"
+  fi
   "$root/client/artie-release/build/install/artie-release/bin/artie-release" > "$out/pr-$pull.parties.log" 2>&1 &
   parties=$!
   until curl -sf -o /dev/null -H "$DESK" "$H:8160/"; do sleep 1; done
-  [ "$scm" = gitlab ] || curl -sf -X PUT -d null "$H:8098/_release/github/pulls/$pull/mergeable"
+  [ "$scm" = github ] && curl -sf -X PUT -d null "$H:8098/_release/github/pulls/$pull/mergeable"
   etag=$(curl -sfi -H "$DESK" -H 'Accept: application/hal+json' "$H:8160/" | tr -d '\r' \
     | awk -F': ' 'tolower($1)=="etag"{print $2}')
   loc=$(curl -sfi -X POST -H "$DESK" -H "If-Match: $etag" -H 'Accept: application/hal+json' \
-    -H 'Content-Type: application/json' -d "{\"pull\": $pull, $at$fields}" "$H:8160/actions/release" \
+    -H 'Content-Type: application/json' -d "{\"pull\": $number, $at$fields}" "$H:8160/actions/release" \
     | tr -d '\r' | awk -F': ' 'tolower($1)=="location"{print $2; exit}')
   sleep 6
-  [ "$scm" = gitlab ] || curl -sf -X PUT -d true "$H:8098/_release/github/pulls/$pull/mergeable"
+  [ "$scm" = github ] && curl -sf -X PUT -d true "$H:8098/_release/github/pulls/$pull/mergeable"
   while :; do
     said=$(curl -sf -H "$DESK" -H 'Accept: application/json' "$H:8160$loc")
     case "$said" in *'"state":"running"'*) sleep 3 ;; *) break ;; esac
@@ -47,6 +55,8 @@ release() { # pull fields-json
   curl -sf -H 'Authorization: Bearer env-token' -H 'Accept: application/json' "$H:8190/environments/1" \
     > "$out/pr-$pull.dev.json"
   kill "$parties"; wait "$parties" 2>/dev/null || true
+  # A look at the forge as each release left it, when RELEASE_SHOT names a script: given the variant and its number.
+  [ -n "${RELEASE_SHOT:-}" ] && sh "$RELEASE_SHOT" "$pull" "$number"
   echo "pr-$pull: $said"
 }
 

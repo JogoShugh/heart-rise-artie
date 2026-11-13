@@ -5,7 +5,7 @@
 #   gitlab/seed.sh
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
-host=${RELEASE_HOST:-192.168.1.18}
+host=${RELEASE_HOST:-localhost}
 G="http://$host:8929"
 repo="$here/../work/library-app"
 env_file="$here/gitlab.env"
