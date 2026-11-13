@@ -84,6 +84,16 @@
     <div class="tile pass"><b>Local GitLab: 5 releases, 0 model calls</b><span id="tile-gitlab"></span></div>
   </div>
 
+  <h2>Rung L2, and the L0 run before it</h2>
+  <p class="soft">The same goal and the same releases were first run at rung L0: <a href="../merge-watch-real-github-l0/">the L0 report</a>.</p>
+  <ul>
+    <li><b>L0:</b> every answer carries the state, its forms, and each form's full schema, inline. One request per read.</li>
+    <li><b>L2:</b> the answer carries the state and a link to its form set. The set links each schema. Sets and schemas are their own resources: content-addressed, immutable, cached.</li>
+    <li><b>Measured over 5 releases each:</b> real GitHub 292 requests and 725 KB of answers at L0, 553 requests and 689 KB at L2. Local GitLab 292 and 318 KB at L0, 497 and 294 KB at L2.</li>
+    <li><b>Why the saving is small here:</b> each release starts a fresh process with an empty cache, so it fetches every set and schema once. L2 pays when the cache outlives a run: a state seen before costs one 304, and sets and schemas are shared across resources, states and runs.</li>
+    <li><b>Unchanged:</b> the script's steps and outcomes, and the native calls to GitHub and GitLab. The rung is only between ARTIE and the gateways.</li>
+  </ul>
+
   <h2>The goal</h2>
   <pre>@@GOAL@@</pre>
   <h2>The script captured from it</h2>
