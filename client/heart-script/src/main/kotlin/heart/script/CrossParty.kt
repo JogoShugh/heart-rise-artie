@@ -23,7 +23,17 @@ internal class CrossParty(
         val reply = step.once?.condition?.let { ONCE.find(it) }?.groupValues?.get(1)
             ?.takeIf { run.replied.containsKey(it) }
         val running = RUN.matchEntire(step.words.trim())
+        // A reply is waited on first: `Once {watch} is answered, at {pr}, …` goes to that party once it is answered.
         when {
+            reply != null -> {
+                val line = script.written("onceAnswered(\"$reply\") {", opener)
+                marks.put(line, "once-answered", reply)
+                val traced = run.trace.size
+                here.onceAnswered(reply) {
+                    run.trace.getOrNull(traced)?.opens = true
+                    done(step.answered(), this, line, intent)
+                }
+            }
             running != null -> ranScript(step, here, opener, running)
             at != null -> {
                 val (party, rest) = at.destructured
@@ -33,15 +43,6 @@ internal class CrossParty(
                 here.enter(fill("{$party}")) {
                     run.trace.getOrNull(traced)?.opens = true
                     done(step.saying(rest), this, line, intent)
-                }
-            }
-            reply != null -> {
-                val line = script.written("onceAnswered(\"$reply\") {", opener)
-                marks.put(line, "once-answered", reply)
-                val traced = run.trace.size
-                here.onceAnswered(reply) {
-                    run.trace.getOrNull(traced)?.opens = true
-                    intent(step, this, line)
                 }
             }
             else -> intent(step, here, opener)
@@ -109,3 +110,7 @@ internal class CrossParty(
 /** This step, its words [words]: the rest of an `At {party}, …` step, done at that party. */
 private fun Step.Intent.saying(words: String) =
     Step.Intent(words, line, name, moves, reasoned, children, once, otherwise, condition, scenario)
+
+/** This step, its reply waited on: the rest of a `Once {NAME} is answered, …` step. */
+private fun Step.Intent.answered() =
+    Step.Intent(words, line, name, moves, reasoned, children, null, otherwise, condition, scenario)

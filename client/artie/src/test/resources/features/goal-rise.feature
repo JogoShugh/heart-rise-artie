@@ -129,6 +129,43 @@ Feature: A goal that crosses parties and waits on their answers: At, asking to b
     When artie generated "cited.heart.yaml" as data from "cited.trace.yaml" and "cited.goal.md"
     Then the script "cited.heart.yaml" has a line with "pull: ${smoke.of}"
 
+  Scenario: Once a reply is answered, the step goes on at another party
+    `Once {NAME} is answered, at {party}, …` waits on the reply, then does the rest at that party's
+    entry, with no link to spell out from the reply to it.
+    Given the file "once-at.goal.md" is
+      """
+      ---
+      start: "{desk}"
+      inputs:
+        desk:
+        watcher:
+      ---
+
+      Wait until the desk offers to release, then release there.
+
+      - At {watcher}, ask to be told when {desk} offers desk:release `as watch`
+      - Once {watch} is answered, at {desk}, release pull request 7
+      """
+    And the planner will move
+      | move | words                                                          | opens |
+      | act  | ask to be told when http://localhost:8160/ offers desk:release | yes   |
+      | done |                                                                |       |
+      | act  | release pull request 7                                         | yes   |
+      | done |                                                                |       |
+    And ARTIE's reasoner will choose, in order
+      | form          | follow | fields                                                           |
+      | watcher:watch |        | {"resource": "http://localhost:8160/", "offers": "desk:release"} |
+      | desk:release  |        | {"pull": 7}                                                      |
+    When the goal "once-at.goal.md" runs with ARTIE in the desk, captured in "once-at.trace.yaml", given
+      | name    | value                  |
+      | desk    | http://localhost:8160/ |
+      | watcher | http://localhost:8099/ |
+    Then the run finished
+    When artie generated "once-at.heart.yaml" as data from "once-at.trace.yaml" and "once-at.goal.md"
+    Then the script "once-at.heart.yaml" has a line with "- once-answered:"
+    And the script "once-at.heart.yaml" has a line with "- enter: ${desk}"
+    And the script "once-at.heart.yaml" has a line with "act: desk:release"
+
   Scenario: The goal runs once with the planner, and the script made from it runs with none
     Given the planner will move
       | move | words                                                          | opens |
