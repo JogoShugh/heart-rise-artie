@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Script, Two Forges</title>
+<meta name="description" content="The release goal captured once with Claude on GitHub, then the same script replayed for five pull requests on GitHub and on GitLab, with no model.">
+<style>
+  :root { --bg: #f6f5f1; --fg: #1d211f; --soft: #5b625e; --line: #dcdcd4; --card: #ffffff; --code: #f0efe9;
+    --pass: #e6f4ea; --pass-edge: #2f6b4f; --cost: #fff4e0; --cost-edge: #a56a12; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+      --code: #1f2522; --pass: #16321f; --pass-edge: #7cc4a0; --cost: #33270f; --cost-edge: #e0b060; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+    --code: #1f2522; --pass: #16321f; --pass-edge: #7cc4a0; --cost: #33270f; --cost-edge: #e0b060; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1000px; margin: 0 auto; padding: 1rem max(16px, env(safe-area-inset-left, 0px)) 3rem; }
+  h1 { font-size: 1.5rem; margin: .2rem 0 .3rem; text-wrap: balance; }
+  h2 { font-size: 1.1rem; margin: 1.6rem 0 .5rem; }
+  h3 { font-size: .95rem; margin: .2rem 0 .4rem; }
+  p, li { color: var(--soft); max-width: 78ch; }
+  a { color: inherit; }
+  code { font: .88em ui-monospace, Menlo, monospace; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .6rem; margin: 1rem 0; }
+  .tile { border-radius: 8px; padding: .7rem .8rem; border: 1px solid; }
+  .tile.cost { background: var(--cost); border-color: var(--cost-edge); }
+  .tile.pass { background: var(--pass); border-color: var(--pass-edge); }
+  .tile b { display: block; font-size: 1.15rem; }
+  .tile span { color: var(--soft); font-size: .9rem; }
+  .wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; border: 1px solid var(--line); padding: .4rem .55rem; }
+  .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: .6rem; }
+  .pair > div { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .6rem; min-width: 0; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; margin: .5rem 0; }
+  summary { cursor: pointer; padding: .55rem .8rem; font-weight: 600; }
+  pre { margin: 0; padding: .7rem .8rem; background: var(--code); overflow-x: auto; font: 12.5px/1.45 ui-monospace, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>One Script, Two Forges</h1>
+  <p>The release goal walked once with Claude on GitHub and kept as a script. The same script then released five pull
+    requests on GitHub and five merge requests on GitLab, with no model. Follows
+    <a href="../merge-watch-release-captured/">The Release, Captured Once with Claude</a>.</p>
+
+  <div class="tiles">
+    <div class="tile cost"><b>1 capture, on GitHub: 20 calls</b>
+      <span>claude-sonnet-5-5 · 33,876 input tokens · 3,040 output · 29,424 read from cache · 61 steps in 58 s ·
+        <a href="runs/capture.html">the capture</a></span></div>
+    <div class="tile pass"><b>GitHub: 5 replays, 0 calls</b>
+      <span>56 to 61 steps, 18 to 22 s each · 4 promoted, 504 stopped by S3 as it should</span></div>
+    <div class="tile pass"><b>GitLab: 5 replays, 0 calls</b>
+      <span>same script, unchanged · 56 to 61 steps, 16 to 18 s each · 4 promoted, 504 stopped by S3 as it should</span></div>
+  </div>
+
+  <h2>How it works</h2>
+  <ul>
+    <li><b>One set of words for both forges.</b> The goal and the script name relations from a shared
+      <code>scm:</code> profile: <code>scm:pulls-get</code>, <code>scm:merge</code>, <code>scm:comment</code>. Neither
+      says GitHub or GitLab. The only difference between the runs is one input: <code>scm</code>, the gateway's
+      address.</li>
+    <li><b>One gateway program, two connectors.</b> Each forge sits behind the HEART gateway with its own
+      connector: <code>github-scm</code> on 8098, <code>gitlab</code> on 8094. A connector is declarations only, no
+      code.</li>
+    <li><b>Normalized on the way out.</b> Each connector answers in scm's words. GitLab's <code>opened</code> reads as
+      <code>open</code>, its <code>merged</code> as <code>closed</code> with <code>merged: true</code>, and its
+      <code>detailed_merge_status</code> as <code>mergeable_state</code>. Where a value had to change, GitLab's own
+      is kept under <code>upstream</code>. Going in, scm's <code>method: squash</code> becomes GitHub's
+      <code>merge_method: squash</code> or GitLab's <code>squash: true</code>.</li>
+    <li><b>Everything else is the same parties.</b> The watcher, the CI wrapper in front of the real Jenkins, the
+      library preview and Dev. On GitLab, Jenkins fetches the merged commit from GitLab.</li>
+  </ul>
+
+  <h2>The five releases on each forge</h2>
+  <div class="wrap"><table>
+    <tr><th>#</th><th>Its change</th><th>Smoke test given</th><th>GitHub</th><th>GitLab</th></tr>
+    <tr><td>501</td><td>renewals: 2 weeks</td><td>Charlotte's Web · damaged</td>
+      <td><a href="runs/github/pr-501.html">merged, promoted to Dev</a></td><td><a href="runs/gitlab/pr-501.html">merged, promoted to Dev</a></td></tr>
+    <tr><td>502</td><td>renewals: 4 weeks</td><td>The Hobbit · wrong-book</td>
+      <td><a href="runs/github/pr-502.html">merged, promoted to Dev</a></td><td><a href="runs/gitlab/pr-502.html">merged, promoted to Dev</a></td></tr>
+    <tr><td>503</td><td>renewals: 1 week</td><td>Matilda · lost</td>
+      <td><a href="runs/github/pr-503.html">merged, promoted to Dev</a></td><td><a href="runs/gitlab/pr-503.html">merged, promoted to Dev</a></td></tr>
+    <tr><td>504</td><td>renewals: none (0 weeks)</td><td>Charlotte's Web · missing-pages</td>
+      <td><a href="runs/github/pr-504.html">merged; S3 failed, not promoted; commented</a></td><td><a href="runs/gitlab/pr-504.html">merged; S3 failed, not promoted; commented</a></td></tr>
+    <tr><td>505</td><td>a README line only</td><td>The Hobbit · damaged</td>
+      <td><a href="runs/github/pr-505.html">merged, promoted to Dev</a></td><td><a href="runs/gitlab/pr-505.html">merged, promoted to Dev</a></td></tr>
+  </table></div>
+
+  <h2>The same step on each forge: merge 501</h2>
+  <p>The script asks for the same thing in the same words. Each gateway answers in the same words, and the check after
+    the merge holds on both.</p>
+  <div class="pair">
+    <div><h3>GitHub (8098)</h3><pre>intent: merge it by squashing
+sent:
+  method: PUT
+  url: http://192.168.1.18:8098/repos/acme/web/pulls/501/actions/merge
+  body:
+    method: squash
+answered: 200
+the pull request after:
+  state: closed
+  merged: true
+  mergeable_state: unknown
+  merge_commit_sha: 338c8cfc1db1664b8434106ea964ac918064fe79</pre></div>
+    <div><h3>GitLab (8094)</h3><pre>intent: merge it by squashing
+sent:
+  method: PUT
+  url: http://192.168.1.18:8094/projects/acme%2Fweb/merge_requests/501/actions/merge
+  body:
+    method: squash
+answered: 200
+the pull request after:
+  state: closed
+  merged: true
+  mergeable_state: unknown
+  merge_commit_sha: 3e4a380176b50fced830a549227dc5fa9678e2b2
+  upstream:
+    state: merged</pre></div>
+  </div>
+
+  <h2>What each connector says</h2>
+  <div class="pair">
+    <div><h3>github-scm: the merge act</h3><pre>  merge:
+    operation: pulls/merge
+    title: Merge
+    description: Merge the pull request into its base branch.
+    fields: [commit_title, commit_message]
+    # scm's method, as GitHub's merge_method takes it.
+    inputs:
+      method:
+        type: string
+        enum: [merge, squash, rebase]
+        title: Merge method
+        description: The merge method to use.
+    values:
+      method:
+        merge: { merge_method: merge }
+        squash: { merge_method: squash }
+        rebase: { merge_method: rebase }
+    # GitHub merges only if the head is still at this sha: the head the client's view had.
+    bind: { sha: /head/sha }
+    # GitHub's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.
+    stale: 409
+    refused: 405</pre></div>
+    <div><h3>gitlab: the merge act</h3><pre>  merge:
+    operation: pulls/merge
+    title: Merge
+    description: Merge the pull request into its target branch.
+    fields: [merge_commit_message]
+    # scm's method, as GitHub's merge takes it; GitLab squashes or not, and merges with a merge commit either way.
+    inputs:
+      method:
+        type: string
+        enum: [merge, squash]
+        title: Merge method
+        description: The merge method to use.
+    values:
+      method:
+        merge: { squash: false }
+        squash: { squash: true }
+    # GitLab merges only if the source branch's head is still at this sha: the head the client's view had.
+    bind: { sha: /sha }
+    # GitLab's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.
+    stale: 409
+    refused: 405</pre></div>
+  </div>
+  <details><summary>gitlab: normal, GitLab's state in scm's words</summary><pre>normal:
+  state:
+    from: /state
+    values: { opened: open, closed: closed, locked: closed, merged: closed }
+  merged:
+    from: /state
+    values: { opened: false, closed: false, locked: false, merged: true }
+  # Whether it can be merged now, in the words GitHub's pull requests use: unknown while GitLab works it out, and
+  # once it isn't open.
+  mergeable_state:
+    from: /detailed_merge_status
+    values:
+      mergeable: clean
+      not_open: unknown
+      checking: unknown
+      unchecked: unknown
+      preparing: unknown
+      conflict: dirty
+      need_rebase: behind
+      draft_status: draft
+      ci_must_pass: blocked
+      ci_still_running: blocked
+      not_approved: blocked
+      discussions_not_resolved: blocked
+      blocked_status: blocked
+      jira_association_missing: blocked
+      external_status_checks: blocked
+      merge_request_blocked: blocked</pre></details>
+
+  <h2>The goal, and the script kept from it</h2>
+  <details><summary>release.goal.md, the plain-text goal</summary><pre>---
+start: "{scm}"
+inputs:
+  pull:      { question: "Which pull request?" }
+  owner:     { default: acme }
+  repo:      { default: web }
+  scm:       { default: "http://192.168.1.18:8098/" }
+  watcher:   { default: "http://192.168.1.18:8099/" }
+  jenkins:   { default: "http://192.168.1.18:8170/" }
+  dev:       { default: "http://192.168.1.18:8190/" }
+  environment: { default: "1" }
+  book:      { default: "The Hobbit" }
+  author:    { default: "J. R. R. Tolkien" }
+  renewable: { default: "Matilda" }
+  problem:   { default: "missing-pages" }
+  comment:   { default: "Pages 12 to 14." }
+---
+
+Release a pull request to Dev once it can be merged and its build passes its smoke test.
+
+- Open pull request {pull} of {owner}/{repo} `as pr`
+- At {watcher}, ask to be told when {pr} offers scm:merge `as watch`
+- Once {watch} is answered, at {pr}, merge it by squashing `as merged`
+- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`
+- Once {build} is answered, follow its in-reply-to link to the build `as built`
+  - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`
+- If {smoke.passed}, at {dev}, open environment {environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed `as promotion`
+  Otherwise, at {pr}, act scm:comment with body = "Not promoted to Dev: smoke scenarios {smoke.failed} failed."</pre></details>
+  <details><summary>release.heart.yaml, generated from the capture, run on both forges</summary><pre># Generated by artie generate from /Users/josh/repos/artie/exhibits/merge-watch-release/release.capture.yaml, the run of /Users/josh/repos/artie/exhibits/merge-watch-release/release.goal.md.
+# Every selection as that run made it, nested as it nested, with no model.
+# What it was offered is pinned in /Users/josh/repos/artie/exhibits/merge-watch-release/release.pins.yaml, held to before every act.
+# After an act, what it changed is checked: the run stops where that no longer holds.
+# A value marked "review:" holds a value the reasoner chose: check it before keeping the script.
+#   artie run /Users/josh/repos/artie/exhibits/merge-watch-release/release.heart.yaml pull=501
+heart: 1
+kind: kept
+start: ${scm}
+
+inputs:
+  scm:
+    default: http://192.168.1.18:8098/
+  pull:
+    question: Which pull request?
+    type: integer
+  owner:
+    default: acme
+  repo:
+    default: web
+  watcher:
+    default: http://192.168.1.18:8099/
+  jenkins:
+    default: http://192.168.1.18:8170/
+  dev:
+    default: http://192.168.1.18:8190/
+  environment:
+    default: "1"
+    type: integer
+  book:
+    default: The Hobbit
+  author:
+    default: J. R. R. Tolkien
+  renewable:
+    default: Matilda
+  problem:
+    default: missing-pages
+  comment:
+    default: Pages 12 to 14.
+
+steps:
+  - act: scm:pulls-get
+    fields:
+      owner: ${owner}
+      repo: ${repo}
+      pull_number: ${pull}
+    intent: Open pull request ${pull} of ${owner}/${repo}
+    then:
+      - keep-as: pr
+  - enter: ${watcher}
+    steps:
+      - ask: watcher:watch
+        fields:
+          resource: ${pr.@self}
+          offers: scm:merge
+        reply: watch
+  - once-answered:
+      reply: watch
+      steps:
+        - enter: ${pr.@self}
+          steps:
+            - act: scm:merge
+              fields:
+                method: squash
+              intent: merge it by squashing
+              then:
+                - check:
+                    - field: mergeable_state
+                      is: unknown
+                    - field: merged
+                      is: true
+                    - field: state
+                      is: closed
+                - keep-as: merged
+  - enter: ${jenkins}
+    steps:
+      - ask: ci:build
+        fields:
+          commit: ${merged.merge_commit_sha}
+        reply: build
+  - once-answered:
+      reply: build
+      steps:
+        - follow: hr:in-reply-to
+          intent: follow its in-reply-to link to the build
+          then:
+            - run-script: ci:smoke-test
+              on-link: ci:deployment
+              inputs:
+                book: ${book}
+                author: ${author}
+                renewable: ${renewable}
+                problem: ${problem}
+                comment: ${comment}
+              as: smoke
+  - given:
+      - at: smoke
+        field: passed
+        is: true
+    then:
+      - enter: ${dev}
+        steps:
+          - act: env:get-environment
+            fields:
+              id: ${environment}
+            inferred: get environment ${environment}
+            from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
+            then:
+              - act: env:promote
+                fields:
+                  commit: ${merged.merge_commit_sha}
+                  smoke:
+                    passed: ${smoke.passing}
+                    of: ${smoke.of}
+                intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
+                then:
+                  - check:
+                      - field: commit
+                        is: ${merged.merge_commit_sha}
+    otherwise:
+      - at: ${pr.@self}
+        steps:
+          - act: scm:comment
+            fields:
+              body: "Not promoted to Dev: smoke scenarios ${smoke.failed} failed."</pre></details>
+
+  <h2>Run it again</h2>
+  <ul>
+    <li><code>sh exhibits/merge-watch-release/capture-release.sh 501</code>: one walk with Claude on GitHub, the script generated.</li>
+    <li><code>sh exhibits/merge-watch-release/variants.sh docs/reports/merge-watch-two-forges/runs/github</code>: the five releases on GitHub.</li>
+    <li><code>sh exhibits/merge-watch-release/gitlab/run.sh</code>, <code>gitlab/gateway.sh</code>, then
+      <code>RELEASE_SCM=gitlab sh exhibits/merge-watch-release/variants.sh docs/reports/merge-watch-two-forges/runs/gitlab</code>: the five on GitLab.</li>
+    <li><code>sh docs/reports/merge-watch-two-forges/build.sh</code>: this report.</li>
+  </ul>
+</main>
+</body>
+</html>
