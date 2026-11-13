@@ -123,7 +123,24 @@ function messages(trace) {
         }
         replyState.set(body.reply, key);
       }
+      // An ask carries the reply the desk made for it, before it asked: made in the desk, with no request on the wire.
+      const envelope = typeof req.body === "object" && req.body ? req.body._links || {} : {};
+      const replyTo = envelope["hr:reply-to"]?.href;
+      if (replyTo) {
+        all.push({
+          kind: "rise", inside: true, from: "artie", to: "replies", label: `makes reply ${cut(short(replyTo), 24)}`,
+          note: "Before it asks, the desk makes the reply the answer will come to, and the key list to check its signature by. "
+            + "This happens inside the desk, with no request on the wire: the next message carries both in its envelope.",
+          asked: [`reply  ${short(replyTo)}`, `keys   ${short(envelope["hr:keys"]?.href || "")}`, "", "state: awaiting"],
+          answer: [],
+          why: {
+            identification: `The reply is a resource of its own, with its own URI: ${short(replyTo)}.`,
+            hypermedia: "Its URI is handed to the party in hr:reply-to; the party builds none, it follows the link.",
+          },
+        });
+      }
       const { asked, answer } = lines(req, res);
+      if (replyTo) asked.push(`_links: hr:reply-to ${short(replyTo)}, hr:keys`);
       const state = body.state ? ` ${body.state}` : "";
       all.push({
         kind: party(req.url) === "replies" ? "rise" : "heart", n: i + 1, from: "artie", to: party(req.url),

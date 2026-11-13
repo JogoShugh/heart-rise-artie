@@ -101,7 +101,7 @@
       <div class="scroll" id="scroll"><svg id="seq" role="img" aria-label="The release's messages between ARTIE and the parties, up to the one playing."></svg></div>
       <div class="legend">
         <span><i style="background:var(--heart)"></i>HEART: ARTIE's requests</span>
-        <span><i style="background:var(--rise)"></i>RISE: the desk's replies and their signed answers</span>
+        <span><i style="background:var(--rise)"></i>RISE: the desk's replies and their signed answers (dashed: made inside the desk)</span>
         <span><i style="background:var(--own)"></i>The parties' own messages, which ARTIE never sees</span>
       </div>
     </div>
@@ -169,7 +169,7 @@ function draw() {
     const mid = Math.min(x1, x2) + 8, c = COLOR[m.kind];
     const label = m.n ? `${m.n}  ${m.label}${m.status ? ` · ${m.status}` : ""}` : m.label;
     return `<g class="m" data-i="${i}"><line x1="${x1}" y1="${y}" x2="${x2 + dir}" y2="${y}" style="stroke:${c}" stroke-width="1.6"` +
-      `${m.kind === "own" ? ' stroke-dasharray="3 3"' : ""} marker-end="url(#h-${m.kind})"/>` +
+      `${m.kind === "own" || m.inside ? ' stroke-dasharray="3 3"' : ""} marker-end="url(#h-${m.kind})"/>` +
       `<text x="${mid}" y="${y - 6}" style="fill:${c}">${esc(label)}</text></g>`;
   }).join("");
   svg.innerHTML = defs + lines + rows;
@@ -203,7 +203,8 @@ function show(i, instant = false) {
   $("slider").value = at + 1;
   $("where").textContent = `${at + 1} / ${ms.length}`;
   const head = m.n ? `Step ${m.n} · ${esc(m.say)}` : esc(m.label);
-  const exchange = m.asked ? `<pre class="msg">${esc(m.asked.join("\n"))}\n\n${esc(m.answer.join("\n"))}</pre>` : "";
+  const answered = m.answer?.length ? `\n\n${esc(m.answer.join("\n"))}` : "";
+  const exchange = m.asked ? `<pre class="msg">${esc(m.asked.join("\n"))}${answered}</pre>` : "";
   $("detail").innerHTML = `<h2>${head}</h2>${m.note ? `<p class="note">${esc(m.note)}</p>` : ""}${exchange}${chips(m)}`;
   $("detail").querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => { picked = b.dataset.k; show(at); }));
   const scroll = $("scroll"), row = (TOP + ROW * at) * (scroll.querySelector("svg").getBoundingClientRect().width / W);
