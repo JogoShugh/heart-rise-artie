@@ -36,7 +36,6 @@ printf '%s' "$(usage calls)" > "$tmp/CALLS"
 printf "%'d" "$(usage input)" > "$tmp/TOKENS_IN"
 printf "%'d" "$(usage output)" > "$tmp/TOKENS_OUT"
 grep -m1 "value: '[0-9]*'" "$here/runs/capture.yaml" | sed -E "s/.*'([0-9]+)'.*/\1/" | tr -d '\n' > "$tmp/CAPTURE_PULL"
-sed -E 's/.*"pull":([0-9]+).*/\1/' "$here/runs/github/pr-505.desk.json" | tr -d '\n' > "$tmp/EXPLORER_PULL"
 awk -v dir="$tmp" '{
   while (match($0, /@@[A-Z_]+@@/)) {
     key = substr($0, RSTART + 2, RLENGTH - 4); file = dir "/" key; text = ""; first = 1

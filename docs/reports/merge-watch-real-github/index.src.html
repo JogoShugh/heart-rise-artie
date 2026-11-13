@@ -69,7 +69,7 @@
   <h1>One Script: Real GitHub, Then Local GitLab</h1>
   <p>Claude walked a release goal once against <b>real GitHub</b> (<code>JogoShugh/heart-github-test</code>), choosing each
     move from what the API offered. ARTIE kept that walk as a script. The same script then released five pull requests on
-    real GitHub and five merge requests on a <b>GitLab running on this Mac</b>, with <b>no model calls</b>. The GitLab
+    real GitHub and five merge requests on a <b>GitLab running on this Mac</b>, with <b>no model calls</b>, every party read at <b>rung L2</b>: forms and schemas each fetched by link and cached. The GitLab
     runs touch nothing remote: no cloud service and no enterprise system.</p>
   <p>Both forges look the same on the wire. The script asks for typed relations, <code>scm:pulls-get</code>,
     <code>scm:merge</code> and <code>scm:comment</code>, in HAL Schema Forms. Each forge sits behind the same HEART gateway
@@ -99,7 +99,7 @@
     <button role="tab" data-tab="side" aria-selected="true">Side by side</button>
     <button role="tab" data-tab="scm" aria-selected="false">scm calls</button>
     <button role="tab" data-tab="native" aria-selected="false">Native API calls</button>
-    <button role="tab" data-tab="explorer" aria-selected="false">HAL-FORMS Explorer</button>
+    <button role="tab" data-tab="html" aria-selected="false">Gateway text/html</button>
   </nav>
   <div class="variants" id="variants"><span class="soft">Variant:</span></div>
 
@@ -127,17 +127,14 @@
     <div class="pair"><section id="native-github"></section><section id="native-gitlab"></section></div>
   </section>
 
-  <section data-panel="explorer" hidden>
-    <p class="soft">The same gateways read in the stock HAL Explorer, through HAL-FORMS, as a demonstration: a generic
-      client finds the state, the links and the forms with no code for either forge. The releases themselves use HAL
-      Schema Forms.</p>
+  <section data-panel="html" hidden>
+    <p class="soft">The same resource each gateway served to ARTIE, asked for as <code>text/html</code>: one declaration,
+      every reader. A browser sees the state and the forms this state offers, in scm's words, on either forge.</p>
     <div class="pair">
-      <section><h3><span class="forge github">Real GitHub</span> · pull request #@@EXPLORER_PULL@@</h3>
-        <figure><div class="shot"><img src="shots/explorer-github.png" alt="HAL Explorer showing the real GitHub pull request through the gateway"></div>
-          <figcaption>State, links, and the HAL-FORMS templates the gateway offers.</figcaption></figure></section>
-      <section><h3><span class="forge gitlab">Local GitLab</span> · merge request !501</h3>
-        <figure><div class="shot"><img src="shots/explorer-gitlab.png" alt="HAL Explorer showing the GitLab merge request through the gateway"></div>
-          <figcaption>The same shape: <code>state: open</code>, GitLab's own <code>opened</code> kept under <code>upstream</code>.</figcaption></figure></section>
+      <section><h3><span class="forge github">Real GitHub</span> · through the gateway</h3>
+        <figure><div class="shot"><img id="html-github-img" alt=""></div><figcaption>The gateway on 8093, in front of api.github.com.</figcaption></figure></section>
+      <section><h3><span class="forge gitlab">Local GitLab</span> · through the gateway</h3>
+        <figure><div class="shot"><img id="html-gitlab-img" alt=""></div><figcaption>The gateway on 8094, in front of GitLab's /api/v4.</figcaption></figure></section>
     </div>
   </section>
 
@@ -239,13 +236,18 @@
         ? 'github.com, as anyone sees it: merged by the script, and on 504 its comment.'
         : 'GitLab on this Mac, as anyone sees it: merged by the same script, and on 504 the same comment.';
     }
-    for (const forge of ['github', 'gitlab']) { calls(forge, false); calls(forge, true); }
+    for (const forge of ['github', 'gitlab']) {
+      calls(forge, false); calls(forge, true);
+      const html = document.getElementById(`html-${forge}-img`);
+      html.src = `shots/html-${forge}-${variant}.png`;
+      html.alt = `The gateway's text/html rendering of variant ${variant}`;
+    }
   }
 
   document.querySelectorAll('.tabs button').forEach((tab) => tab.addEventListener('click', () => {
     document.querySelectorAll('.tabs button').forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
     document.querySelectorAll('[data-panel]').forEach((p) => (p.hidden = p.dataset.panel !== tab.dataset.tab));
-    bar.hidden = tab.dataset.tab === 'explorer';
+    
   }));
   show();
 })();
