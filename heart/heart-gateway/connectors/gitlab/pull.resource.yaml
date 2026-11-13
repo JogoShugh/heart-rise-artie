@@ -1,0 +1,41 @@
+# A merge request, served as a pull request: read by merge-requests/get, a project's listed by merge-requests/list.
+noun: pull
+collection: pulls
+read: merge-requests/get
+search: merge-requests/list
+# GitLab's merge request names its project and number in its state: the read's path is made from them.
+pointers:
+  id: /project_id
+  merge_request_iid: /iid
+filters: [state, order_by, sort]
+title: /title
+# GitLab works mergeability out by itself, after a push: left out when the state is compared before an act.
+volatile: [/detailed_merge_status, /merge_status, /has_conflicts, /updated_at]
+acts:
+  merge:
+    operation: merge-requests/merge
+    title: Merge
+    description: Merge the pull request into its target branch.
+    fields: [squash, squash_commit_message, merge_commit_message]
+    # GitLab merges only if the source branch's head is still at this sha: the head the client's view had.
+    bind: { sha: /sha }
+    # GitLab's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.
+    stale: 409
+    refused: 405
+  comment:
+    operation: notes/create
+    title: Comment
+    description: Add a comment to the pull request's conversation.
+    fields: [body]
+    # GitLab answers with the new note; the gateway answers 201, with the note's address in Location.
+    creates: note
+  close:
+    operation: merge-requests/update
+    title: Close
+    description: Close it, unmerged.
+    body: { state_event: close }
+  reopen:
+    operation: merge-requests/update
+    title: Reopen
+    description: Open it again.
+    body: { state_event: reopen }

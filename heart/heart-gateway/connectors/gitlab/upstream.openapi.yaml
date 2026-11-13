@@ -1,0 +1,152 @@
+openapi: 3.0.3
+# The part of GitLab's REST API v4 the gitlab connector reads (connector.yaml), described here from GitLab's API
+# documentation: merge requests, their notes, and projects. Only these operations are described; the members each
+# answer has are GitLab's, passed through as they come.
+info:
+  title: GitLab REST API v4, merge requests
+  version: "4"
+servers:
+  - url: http://localhost:8929/api/v4
+paths:
+  /projects/{id}:
+    get:
+      operationId: projects/get
+      summary: Get a single project
+      description: Get a specific project, by its ID or its URL-encoded path.
+      parameters:
+        - $ref: "#/components/parameters/project"
+      responses:
+        "200": { description: The project, content: { application/json: { schema: { type: object } } } }
+  /projects/{id}/merge_requests:
+    get:
+      operationId: merge-requests/list
+      summary: List project merge requests
+      description: Get all merge requests for this project.
+      parameters:
+        - $ref: "#/components/parameters/project"
+        - name: state
+          in: query
+          description: Return all merge requests or just those that are opened, closed, locked, or merged.
+          schema: { type: string, enum: [opened, closed, locked, merged] }
+        - name: order_by
+          in: query
+          description: Return requests ordered by created_at, title, or updated_at fields.
+          schema: { type: string, enum: [created_at, title, updated_at] }
+        - name: sort
+          in: query
+          description: Return requests sorted in asc or desc order.
+          schema: { type: string, enum: [asc, desc] }
+      responses:
+        "200":
+          description: The project's merge requests
+          content: { application/json: { schema: { type: array, items: { type: object } } } }
+  /projects/{id}/merge_requests/{merge_request_iid}:
+    get:
+      operationId: merge-requests/get
+      summary: Get single merge request
+      description: Shows information about a single merge request.
+      parameters:
+        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/mergeRequest"
+      responses:
+        "200": { description: The merge request, content: { application/json: { schema: { type: object } } } }
+    put:
+      operationId: merge-requests/update
+      summary: Update a merge request
+      description: Updates an existing merge request; its state_event closes or reopens it.
+      parameters:
+        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/mergeRequest"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string, description: Title of the merge request. }
+                description: { type: string, description: Description of the merge request. }
+                state_event: { type: string, enum: [close, reopen], description: New state (close or reopen). }
+      responses:
+        "200": { description: The merge request, content: { application/json: { schema: { type: object } } } }
+  /projects/{id}/merge_requests/{merge_request_iid}/merge:
+    put:
+      operationId: merge-requests/merge
+      summary: Merge a merge request
+      description: Accept and merge changes submitted with the merge request.
+      parameters:
+        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/mergeRequest"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                squash:
+                  type: boolean
+                  description: If true, the commits are squashed into a single commit on merge.
+                squash_commit_message: { type: string, description: Custom squash commit message. }
+                merge_commit_message: { type: string, description: Custom merge commit message. }
+                sha: { type: string, description: If present, this SHA must match the HEAD of the source branch. }
+      responses:
+        "200": { description: The merged request, content: { application/json: { schema: { type: object } } } }
+        "405": { description: The merge request can't be merged now. }
+        "409": { description: The SHA doesn't match the HEAD of the source branch. }
+  /projects/{id}/merge_requests/{merge_request_iid}/notes:
+    get:
+      operationId: notes/list
+      summary: List all merge request notes
+      description: Gets a list of all notes for a single merge request.
+      parameters:
+        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/mergeRequest"
+      responses:
+        "200":
+          description: The notes
+          content: { application/json: { schema: { type: array, items: { type: object } } } }
+    post:
+      operationId: notes/create
+      summary: Create new merge request note
+      description: Creates a new note for a single merge request.
+      parameters:
+        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/mergeRequest"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body: { type: string, description: The content of a note. }
+      responses:
+        "201": { description: The new note, content: { application/json: { schema: { type: object } } } }
+  /projects/{id}/merge_requests/{merge_request_iid}/notes/{note_id}:
+    get:
+      operationId: notes/get
+      summary: Get single merge request note
+      description: Returns a single note for a given merge request.
+      parameters:
+        - $ref: "#/components/parameters/project"
+        - $ref: "#/components/parameters/mergeRequest"
+        - name: note_id
+          in: path
+          required: true
+          description: The ID of a merge request note.
+          schema: { type: integer }
+      responses:
+        "200": { description: The note, content: { application/json: { schema: { type: object } } } }
+components:
+  parameters:
+    project:
+      name: id
+      in: path
+      required: true
+      description: The ID or URL-encoded path of the project.
+      schema: { type: string }
+    mergeRequest:
+      name: merge_request_iid
+      in: path
+      required: true
+      description: The internal ID of the merge request.
+      schema: { type: integer }
