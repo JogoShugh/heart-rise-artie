@@ -70,12 +70,12 @@ function callouts(s, img, { x, y, w, pxW, pxH }, items, lx) {
 // 12. In production
 {
   const s = slide("Not new, not niche", "Hypermedia is already in production", false,
-    "Okta's Authentication API answers with HAL: _embedded for the user and policy, _links for what can be done next, here changePassword or cancel, because the password expired. Amazon API Gateway, the slide before. Spring HATEOAS is being pitched for agents now: Adib Saikali, Spring I/O 2026. What HEART adds: forms with JSON Schema, guards, and typed relations.");
+    "Okta's Authentication API answers with HAL: _embedded for the user and policy, _links for what can be done next, here changePassword or cancel, because the password expired. Amazon API Gateway, the preview earlier. Spring HATEOAS is being pitched for agents now: Adib Saikali, Spring I/O 2026. What HEART adds: forms with JSON Schema, guards, and typed relations.");
   shot(s, "okta-crop.png", 0.6, 1.65, 3.55, 3.55 * 2200 / 1640, "Okta Authentication API: expired password.");
   T(s, "Okta", { x: 4.6, y: 1.65, w: 3.6, h: 0.4, fontSize: 20, bold: true, fontFace: "Cambria", color: GREEN });
   T(s, "The password expired, so the answer’s _links offer next: changePassword, and cancel. Nothing else. State, then controls, in one answer.", { x: 4.6, y: 2.1, w: 3.6, h: 1.8, fontSize: 15 });
   T(s, "Amazon API Gateway", { x: 4.6, y: 4.0, w: 3.6, h: 0.4, fontSize: 20, bold: true, fontFace: "Cambria", color: GREEN });
-  T(s, "HAL with typed relations, in its current API reference (the slide before).", { x: 4.6, y: 4.45, w: 3.6, h: 1.2, fontSize: 15 });
+  T(s, "HAL with typed relations, in its current API reference: the preview earlier.", { x: 4.6, y: 4.45, w: 3.6, h: 1.2, fontSize: 15 });
   card(s, 8.6, 1.65, 4.1, 4.3, C.text1);
   T(s, "Spring HATEOAS, for agents", { x: 8.85, y: 1.9, w: 3.6, h: 0.5, fontSize: 20, bold: true, fontFace: "Cambria", color: GOLD });
   T(s, "Adib Saikali (Broadcom), “REST is for Agents: Rediscovering Spring HATEOAS”, Spring I/O 2026.", { x: 8.85, y: 2.5, w: 3.6, h: 1.3, fontSize: 15, color: C.background1 });
