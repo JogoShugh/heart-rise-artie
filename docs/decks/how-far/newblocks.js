@@ -70,12 +70,12 @@ function callouts(s, img, { x, y, w, pxW, pxH }, items, lx) {
 // 12. In production
 {
   const s = slide("Not new, not niche", "Hypermedia is already in production", false,
-    "Okta's Authentication API answers with HAL: _embedded for the user and policy, _links for what can be done next, here changePassword or cancel, because the password expired. Amazon API Gateway, the preview earlier. Spring HATEOAS is being pitched for agents now: Adib Saikali, Spring I/O 2026. What HEART adds: forms with JSON Schema, guards, and typed relations.");
+    "Okta's Authentication API answers with HAL: _embedded for the user and policy, _links for what can be done next, here changePassword or cancel, because the password expired. Amazon API Gateway documents HAL with typed relations today; it gets previewed as HEART a few slides on. Spring HATEOAS is being pitched for agents now: Adib Saikali, Spring I/O 2026. What HEART adds: forms with JSON Schema, guards, and typed relations.");
   shot(s, "okta-crop.png", 0.6, 1.65, 3.55, 3.55 * 2200 / 1640, "Okta Authentication API: expired password.");
   T(s, "Okta", { x: 4.6, y: 1.65, w: 3.6, h: 0.4, fontSize: 20, bold: true, fontFace: "Cambria", color: GREEN });
   T(s, "The password expired, so the answer’s _links offer next: changePassword, and cancel. Nothing else. State, then controls, in one answer.", { x: 4.6, y: 2.1, w: 3.6, h: 1.8, fontSize: 15 });
   T(s, "Amazon API Gateway", { x: 4.6, y: 4.0, w: 3.6, h: 0.4, fontSize: 20, bold: true, fontFace: "Cambria", color: GREEN });
-  T(s, "HAL with typed relations, in its current API reference: the preview earlier.", { x: 4.6, y: 4.45, w: 3.6, h: 1.2, fontSize: 15 });
+  T(s, "HAL with typed relations, in its current API reference. We\u2019ll preview it as HEART shortly.", { x: 4.6, y: 4.45, w: 3.6, h: 1.2, fontSize: 15 });
   card(s, 8.6, 1.65, 4.1, 4.3, C.text1);
   T(s, "Spring HATEOAS, for agents", { x: 8.85, y: 1.9, w: 3.6, h: 0.5, fontSize: 20, bold: true, fontFace: "Cambria", color: GOLD });
   T(s, "Adib Saikali (Broadcom), “REST is for Agents: Rediscovering Spring HATEOAS”, Spring I/O 2026.", { x: 8.85, y: 2.5, w: 3.6, h: 1.3, fontSize: 15, color: C.background1 });
@@ -397,5 +397,31 @@ function callouts(s, img, { x, y, w, pxW, pxH }, items, lx) {
   const list = (items, x) => s.addText(items.map((r, i) => r.map((run, j) => ({ text: run.text, options: { ...run.options, breakLine: j === r.length - 1 && i < items.length - 1, paraSpaceAfter: 12 } }))).flat(), { x, y: 1.85, w: 5.45, h: 4.4, fontSize: 15, margin: 0, valign: "top", isTextBox: true });
   card(s, 0.6, 1.65, 6.0, 4.75); card(s, 6.8, 1.65, 5.9, 4.75);
   list(left, 0.85); list(right, 7.05);
+}
+//@END
+
+//@COUPLE
+// The generic client
+{
+  const s = slide("Putting them back together  \u00B7  The generic client", "ARTIE is to APIs what a browser is to web pages", false,
+    "The browser is coupled to HTML and HTTP, and to nothing about any site: not account numbers, not URL layouts, not which buttons exist today. That's why a bank can change its forms tonight and nobody updates their browser. ARTIE is coupled the same way, to one media type, HAL with HEART's schema forms, and HTTP. Zero domain code: no client certificates, no pull requests, no merge rules. Each answer carries its controls. The next slides preview what that looks like on an API you know, AWS API Gateway.");
+  const row = (y, client, sub, speaks, mt, targets, dark) => {
+    card(s, 0.6, y, 2.6, 1.6, dark ? C.text1 : C.accent1);
+    T(s, client, { x: 0.8, y: y + 0.25, w: 2.3, h: 0.5, fontSize: 22, bold: true, fontFace: "Cambria", color: dark ? GOLD : C.background1 });
+    T(s, sub, { x: 0.8, y: y + 0.85, w: 2.3, h: 0.6, fontSize: 13, color: C.background1 });
+    arrow(s, 3.35, y + 0.64);
+    card(s, 3.9, y, 3.6, 1.6, PALE);
+    T(s, speaks, { x: 4.1, y: y + 0.15, w: 3.2, h: 0.3, fontSize: 11, color: SAGE, bold: true });
+    T(s, mt, { x: 4.1, y: y + 0.5, w: 3.2, h: 1.0, fontSize: 14, bold: true, fontFace: "Courier New", color: INK });
+    arrow(s, 7.65, y + 0.64);
+    targets.forEach((t, i) => {
+      card(s, 8.2 + (i % 2) * 2.3, y + Math.floor(i / 2) * 0.82, 2.2, 0.72, i === targets.length - 1 ? "FFFFFF" : PALE);
+      T(s, t, { x: 8.3 + (i % 2) * 2.3, y: y + Math.floor(i / 2) * 0.82, w: 2.0, h: 0.72, fontSize: 13, valign: "middle", italic: i === targets.length - 1, color: i === targets.length - 1 ? SAGE : INK });
+    });
+  };
+  row(1.65, "Web browser", "one generic client, for every site", "SPEAKS, AND IS COUPLED TO", "text/html\n+ HTTP", ["An online bank", "A wiki", "A shop", "Any site not yet built"], true);
+  row(3.65, "ARTIE", "one generic client, for every API", "SPEAKS, AND IS COUPLED TO", "application/hal+json\n+ HEART profile + HTTP", ["AWS API Gateway (preview next)", "GitHub", "GitLab", "Any API not yet built"], false);
+  T(s, [{ text: "Coupled to: ", options: { bold: true, color: GREEN } }, { text: "the media type and the protocol.   " }, { text: "Not coupled to: ", options: { bold: true, color: RUST } }, { text: "certificates, pull requests, merge rules, URL layouts, or which acts exist today. Zero domain code." }], { x: 0.6, y: 5.55, w: 12.1, h: 0.8, fontSize: 15 });
+  src(s, [["Fielding, dissertation, ch. 5", "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"], ["HAL Schema Forms", "https://github.com/jbadeau/hal-schema-forms"], ["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]]);
 }
 //@END
