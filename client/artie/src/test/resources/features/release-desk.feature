@@ -47,6 +47,16 @@ Feature: The release desk: services that call others through ARTIE, and answer t
       | http://192.168.1.18:8190 | Bearer env-token          |
       | http://192.168.1.18:9999 | none                      |
 
+  Scenario Outline: The desk's ARTIE reads every party at the rung the release is run at
+    When the release is run with RELEASE_RUNG "<given>"
+    Then the desk's ARTIE reads at rung "<rung>"
+
+    Examples:
+      | given | rung |
+      |       | L0   |
+      | L0    | L0   |
+      | L2    | L2   |
+
   Scenario: A capture in the desk's process waits until the parties serve before its first request
     Given nothing serves yet at "http://localhost:8399/", and something will in 1 second
     When the capture waits for "http://localhost:8399/" for up to 10 seconds

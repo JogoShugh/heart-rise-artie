@@ -42,6 +42,8 @@ private const val POLL_MILLIS = 200L
  */
 fun capture(goal: Path, out: Path, inputs: Map<String, String>, replies: DeskReplies, masks: List<String>): String? {
     val home = Path.of(System.getProperty("user.home"))
+    // The rung the release reads every party at, as its parties are run (RELEASE_RUNG).
+    val rung = releaseRung(System.getenv())
     val key = checkNotNull(ModelKey.standard(System.getenv(), home)) {
         "no model key: set ANTHROPIC_API_KEY, or add one for https://api.anthropic.com to ~/.artie/credentials"
     }
@@ -49,7 +51,10 @@ fun capture(goal: Path, out: Path, inputs: Map<String, String>, replies: DeskRep
     val hosted = Hosted(
         PartyCredentials, SigningKey(ArtieKey.KEY_ID, ArtieKey.pair.private), name = "desk",
         plainHttp = masks, replies = replies,
-    ).also { it.reasoner = reasoner }
+    ).also {
+        it.reasoner = reasoner
+        it.rung = rung
+    }
     val navigator = hosted.navigator()
     val planner = checkNotNull(navigator.planner()) { "the desk's ARTIE has no planner" }
     val run = Run(inputs = inputs, navigator = { navigator })

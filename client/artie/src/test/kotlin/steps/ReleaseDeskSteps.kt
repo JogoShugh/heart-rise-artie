@@ -104,6 +104,18 @@ class ReleaseDeskSteps {
         }
     }
 
+    private var rung: heart.Rung? = null
+
+    @When("the release is run with RELEASE_RUNG {string}")
+    fun runAt(given: String) {
+        rung = heart.release.releaseRung(if (given.isEmpty()) emptyMap() else mapOf("RELEASE_RUNG" to given))
+    }
+
+    @Then("the desk's ARTIE reads at rung {string}")
+    fun readsAt(expected: String) {
+        assertEquals(heart.Rung.valueOf(expected), rung)
+    }
+
     @When("the capture waits for {string} for up to {int} seconds")
     fun captureWaits(url: String, seconds: Int) {
         waitedOk = heart.release.awaitServing(url, seconds.toLong())

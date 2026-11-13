@@ -27,7 +27,7 @@ fun main(args: Array<String>) {
         env["JENKINS_ADMIN_USER"] ?: "artie",
         env.getValue("JENKINS_ADMIN_PASSWORD"),
         env.getValue("JENKINS_HOOK_SECRET"),
-        hosting(host, Path.of(env.getValue("RELEASE_SCRIPT")), masks) { replies.complete(it) },
+        hosting(host, Path.of(env.getValue("RELEASE_SCRIPT")), masks, { replies.complete(it) }, releaseRung(env)),
     )
     if (args.firstOrNull() != "capture") return release.serve()
     // capture GOAL OUT name=value…: the parties served, the release goal walked once with Claude, then done.

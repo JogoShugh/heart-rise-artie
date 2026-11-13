@@ -10,6 +10,7 @@ import heart.Credential
 import heart.CredentialSource
 import heart.Hosted
 import heart.Origin
+import heart.Rung
 import heart.SigningKey
 import java.nio.file.Files
 import java.nio.file.Path
@@ -25,6 +26,8 @@ fun hosting(
     masks: List<String>,
     /** Told of the desk's replies once it keeps them: a capture run in this process asks with them. */
     kept: (DeskReplies) -> Unit = {},
+    /** The rung the desk's ARTIE reads every party at (SPEC §6.10). */
+    rung: Rung = Rung.L0,
 ): Release.Hosting = Release.Hosting(
     answers = { key -> ArtieAnswers(key.keyId, SigningKey(key.keyId, key.pair.private), Release.REPLY_TOKEN, masks) },
     front = { service ->
@@ -35,13 +38,17 @@ fun hosting(
                 Hosted(
                     PartyCredentials, SigningKey(ArtieKey.KEY_ID, ArtieKey.pair.private), name = "desk",
                     plainHttp = masks, replies = kept,
-                )
+                ).also { it.rung = rung }
             },
             tokens = listOf(ReleaseDesk.TOKEN, Release.REPLY_TOKEN),
             keys = mapOf(ArtieKey.KEY_ID to ArtieKey.pair.public),
         ).handler
     },
 )
+
+/** The rung the release's [env] says its desk reads at, RELEASE_RUNG: L0, all in one answer, when it says none. */
+fun releaseRung(env: Map<String, String>): Rung =
+    env["RELEASE_RUNG"]?.takeIf { it.isNotBlank() }?.let(Rung::valueOf) ?: Rung.L0
 
 /** The credential the desk's ARTIE presents at each party, by port: each party's own test credential, and no other. */
 object PartyCredentials : CredentialSource {
