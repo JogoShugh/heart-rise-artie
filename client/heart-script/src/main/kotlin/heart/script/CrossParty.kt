@@ -13,6 +13,8 @@ internal class CrossParty(
     private val fill: (String) -> String,
     /** Keeps what a step named, by its name, as the goal's later steps read it. */
     private val keep: (String, Representation) -> Unit,
+    /** Whether a step named this name: what it led to is a resource the run holds, not an input. */
+    private val named: (String) -> Boolean = { false },
 ) {
     /** The steps whose ask was made: one reply each. */
     private val asked = mutableSetOf<Step>()
@@ -38,7 +40,8 @@ internal class CrossParty(
             at != null -> {
                 val (party, rest) = at.destructured
                 val line = script.written("enter(\"{$party}\") {", opener)
-                marks.put(line, "enter", "\${$party}")
+                // A resource a step named is entered at the address it was kept at, never by its state.
+                marks.put(line, "enter", if (named(party)) "\${$party.@self}" else "\${$party}")
                 val traced = run.trace.size
                 here.enter(fill("{$party}")) {
                     run.trace.getOrNull(traced)?.opens = true

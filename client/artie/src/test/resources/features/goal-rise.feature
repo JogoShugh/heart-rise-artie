@@ -166,6 +166,47 @@ Feature: A goal that crosses parties and waits on their answers: At, asking to b
     And the script "once-at.heart.yaml" has a line with "- enter: ${desk}"
     And the script "once-at.heart.yaml" has a line with "act: desk:release"
 
+  Scenario: At a resource a step named, the script made from the run enters its address
+    `At {NAME}, …` where a step named NAME enters what that step led to: the script reads the
+    address it was kept at, `${NAME.@self}`, not its state.
+    Given the file "at-named.goal.md" is
+      """
+      ---
+      start: "{desk}"
+      inputs:
+        desk:
+        watcher:
+      ---
+
+      Wait until the desk offers to release, then release where the watch was about.
+
+      - At {watcher}, ask to be told when {desk} offers desk:release `as watch`
+      - Once {watch} is answered, follow it to the resource it watched `as watched`
+      - At {watched}, release pull request 7
+      """
+    And the planner will move
+      | move | words                                                          | opens |
+      | act  | ask to be told when http://localhost:8160/ offers desk:release | yes   |
+      | done |                                                                |       |
+      | act  | follow it to the watch                                         | yes   |
+      | act  | follow it to the resource it watched                           | yes   |
+      | done |                                                                |       |
+      | act  | release pull request 7                                         | yes   |
+      | done |                                                                |       |
+    And ARTIE's reasoner will choose, in order
+      | form          | follow         | fields                                                           |
+      | watcher:watch |                | {"resource": "http://localhost:8160/", "offers": "desk:release"} |
+      |               | hr:in-reply-to |                                                                  |
+      |               | about          |                                                                  |
+      | desk:release  |                | {"pull": 7}                                                      |
+    When the goal "at-named.goal.md" runs with ARTIE in the desk, captured in "at-named.trace.yaml", given
+      | name    | value                  |
+      | desk    | http://localhost:8160/ |
+      | watcher | http://localhost:8099/ |
+    Then the run finished
+    When artie generated "at-named.heart.yaml" as data from "at-named.trace.yaml" and "at-named.goal.md"
+    Then the script "at-named.heart.yaml" has a line with "- enter: ${watched.@self}"
+
   Scenario: The goal runs once with the planner, and the script made from it runs with none
     Given the planner will move
       | move | words                                                          | opens |

@@ -116,7 +116,9 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
     private val namedFacts = NamedFacts(script, marks, ::fill, moves)
 
     /** Steps at another party, asking to be told, or waiting on a reply (goal-rise.feature). */
-    private val crossParty = CrossParty(run, script, marks, ::fill) { name, kept -> named[name] = kept }
+    private val crossParty = CrossParty(run, script, marks, ::fill, { name, kept -> named[name] = kept }) {
+        named.containsKey(it) || run.kept.containsKey(it)
+    }
 
     /** If on a name's member, its Otherwise as written (goal-rise.feature). */
     private val branch = Branch(run, script, marks, ::fill) { name -> names[name] }

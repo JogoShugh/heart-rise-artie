@@ -20,7 +20,7 @@ Release a pull request to Dev once it can be merged and its build passes its smo
 
 - Open pull request {pull} of {owner}/{repo} `as pr`
 - At {watcher}, ask to be told when {pr} offers github:merge `as watch`
-- Once {watch} is answered, follow its in-reply-to link to the watch, then the watch's about link to the pull request, and merge it by squashing `as merged`
+- Once {watch} is answered, at {pr}, merge it by squashing `as merged`
 - At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`
 - Once {build} is answered, follow its in-reply-to link to the build `as built`
   - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`
