@@ -272,7 +272,7 @@ const arrow = (s, x, y) => s.addShape(pres.shapes.RIGHT_ARROW, { x, y, w: 0.4, h
 // 13. Tokenomics
 {
   const s = slide("The tokenomics slide", "Capture once with a model, replay with none", false,
-    "One Claude capture on real GitHub at rung L2: 20 model calls, 33,140 input and 2,980 output tokens. Then the kept script ran ten releases on two forges, and five more three ways for the cache numbers: zero model calls. Pins stop a replay that no longer fits, so the model is called only to repair.");
+    "One Claude capture on real GitHub at rung L2: 20 model calls, 33,140 input and 2,980 output tokens. Then the kept script ran ten releases on two forges, and five more three ways for the cache numbers: zero model calls. Pins stop a replay that no longer fits, so the model is called only to repair. This is Kelsey Hightower's Zero Token Architecture in practice: infer once, run everywhere, as deterministic code; here the kept script is YAML, and the hypermedia keeps the replay honest.");
   code(s, 0.6, 1.7, 6.3, 3.6, [
     ["c", "# release.goal.md: the goal, in words"],
     ["p", "- Open pull request {pull} of {owner}/{repo} `as pr`"],
@@ -290,7 +290,8 @@ const arrow = (s, x, y) => s.addShape(pres.shapes.RIGHT_ARROW, { x, y, w: 0.4, h
   stat(s, 10.2, 1.7, 2.6, "33,140", "input tokens, plus 2,980 output, once");
   stat(s, 7.4, 3.5, 2.6, "0", "model calls in every replay since", GREEN);
   stat(s, 10.2, 3.5, 2.6, "2", "forges replayed: real GitHub, and GitLab on this machine", GREEN);
-  T(s, "Pins hold the replay to what was offered. If a form changes, the replay stops, and only then is the model called again, to repair.", { x: 7.4, y: 5.3, w: 5.3, h: 1.0, fontSize: 14, bold: true, color: RUST });
+  T(s, "Pins hold the replay to what was offered. If a form changes, the replay stops, and only then is the model called again, to repair.", { x: 7.4, y: 5.25, w: 5.3, h: 0.8, fontSize: 14, bold: true, color: RUST });
+  T(s, [{ text: "Inspiration: ", options: { bold: true, color: GREEN } }, { text: "Kelsey Hightower", options: { bold: true, color: GREEN, hyperlink: { url: "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture" } } }, { text: "’s ZTA, Zero Token Architecture: infer once, run everywhere. Here, the hypermedia keeps the replay honest." }], { x: 0.6, y: 5.45, w: 6.3, h: 0.8, fontSize: 13 });
 }
 
 // 14. Two forges

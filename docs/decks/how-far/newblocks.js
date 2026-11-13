@@ -376,7 +376,7 @@ function callouts(s, img, { x, y, w, pxW, pxH }, items, lx) {
 // 19. Foundations
 {
   const s = slide("Foundations", "Standing on these shoulders", false,
-    "Links only. Fielding; Mike Kelly's HAL; Mike Amundsen's HAL-FORMS; J. Badeau's HAL Schema Forms, the base of HEART's media type, and HyperBench; Kin Lane; Adib Saikali; Rohit Bhardwaj and Michael Carducci on hypermedia and agents; the W3C Autonomous Agents on the Web Community Group; and one of numerous research papers, Ciortea et al. at AAMAS 2019.");
+    "Links only. Fielding; Mike Kelly's HAL; Mike Amundsen's HAL-FORMS; J. Badeau's HAL Schema Forms, the base of HEART's media type, and HyperBench; Kin Lane; Adib Saikali; Rohit Bhardwaj and Michael Carducci on hypermedia and agents; Kelsey Hightower's Zero Token Architecture, an inspiration for this talk; the W3C Autonomous Agents on the Web Community Group; and one of numerous research papers, Ciortea et al. at AAMAS 2019.");
   const L = (who, what, url) => [{ text: who, options: { bold: true, hyperlink: { url }, color: GREEN } }, { text: "  " + what, options: { color: INK } }];
   const left = [
     L("Roy T. Fielding", "the dissertation (2000)", "https://ics.uci.edu/~fielding/pubs/dissertation/top.htm"),
@@ -391,10 +391,11 @@ function callouts(s, img, { x, y, w, pxW, pxH }, items, lx) {
     L("Adib Saikali", "“REST is for Agents”, Spring I/O 2026", "https://2026.springio.net/sessions/rest-is-for-agents-rediscovering-spring-hateoas/"),
     L("Rohit Bhardwaj", "(Salesforce) “From REST to Reasoning Agents”", "https://nofluffjuststuff.com/topics/from_rest_to_reasoning_agents_designing_apis_for_the_ai_era"),
     L("Michael Carducci", "“Hypermedia APIs and the Future of AI Agentic Systems”", "https://nofluffjuststuff.com/topics/hypermedia_apis_and_the_future_of_ai_agentic_systems"),
+    L("Kelsey Hightower", "“ZTA: Zero Token Architecture”, WeAreDevelopers 2026: infer once, run everywhere", "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"),
     L("W3C", "Autonomous Agents on the Web Community Group", "https://www.w3.org/community/webagents/"),
     L("Ciortea et al.", "“A Decade in Hindsight”, AAMAS 2019: one of numerous papers", "https://dblp.org/rec/conf/atal/CiorteaMGBRZ19"),
   ];
-  const list = (items, x) => s.addText(items.map((r, i) => r.map((run, j) => ({ text: run.text, options: { ...run.options, breakLine: j === r.length - 1 && i < items.length - 1, paraSpaceAfter: 12 } }))).flat(), { x, y: 1.85, w: 5.45, h: 4.4, fontSize: 15, margin: 0, valign: "top", isTextBox: true });
+  const list = (items, x) => s.addText(items.map((r, i) => r.map((run, j) => ({ text: run.text, options: { ...run.options, breakLine: j === r.length - 1 && i < items.length - 1, paraSpaceAfter: 12 } }))).flat(), { x, y: 1.85, w: 5.45, h: 4.4, fontSize: 14, margin: 0, valign: "top", isTextBox: true });
   card(s, 0.6, 1.65, 6.0, 4.75); card(s, 6.8, 1.65, 5.9, 4.75);
   list(left, 0.85); list(right, 7.05);
 }
