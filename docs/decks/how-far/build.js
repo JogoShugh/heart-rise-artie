@@ -157,14 +157,14 @@ const arrow = (s, x, y) => s.addShape(pres.shapes.RIGHT_ARROW, { x, y, w: 0.4, h
 // 6. Information and controls
 {
   const s = slide("Fielding, in the comments on his 2008 post", "Information and controls, presented together", true,
-    "This is the marriage. On the human web, the page and its forms arrive together; the information itself is how you find out what you can do.");
+    "This is the marriage. On the human web, the page and its forms arrive together; the information itself is how you find out what you can do. And this is what lets Hightower's infer-once replay survive change: the controls come with every answer, so the replay can check them for free.");
   quote(s, 1.3, 1.95, 10.8, 2.0, "When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.", "Roy T. Fielding, comment, 20 October 2008", true, 26);
   pill(s, 1.3, 4.9, 2.2, "information");
   T(s, "+", { x: 3.6, y: 4.85, w: 0.4, h: 0.45, fontSize: 24, bold: true, color: GOLD, align: "center" });
   pill(s, 4.1, 4.9, 2.2, "controls");
   T(s, "=", { x: 6.4, y: 4.85, w: 0.4, h: 0.45, fontSize: 24, bold: true, color: GOLD, align: "center" });
   pill(s, 6.9, 4.9, 2.2, "affordance");
-  T(s, "On the human web they were married: the page and its forms arrive together.", { x: 1.3, y: 5.6, w: 10, h: 0.4, fontSize: 15, italic: true, color: C.accent6 });
+  T(s, "On the human web they were married: the page and its forms arrive together. This is what lets an infer-once replay survive change.", { x: 1.3, y: 5.6, w: 11, h: 0.4, fontSize: 15, italic: true, color: C.accent6 });
 }
 
 // 7. Divorce
@@ -184,7 +184,7 @@ const arrow = (s, x, y) => s.addShape(pres.shapes.RIGHT_ARROW, { x, y, w: 0.4, h
 // 8. One loop, two readers
 {
   const s = slide("One loop, two readers", "Look, Think, Act  =  Sync, Reason, Act", false,
-    "A person in a browser and ARTIE run the same loop. Sync and Act are plain code. Reason is the only place a model sits, and a kept script can stand in for it on every later run.");
+    "A person in a browser and ARTIE run the same loop. Sync and Act are plain code. Reason is the only place a model sits, and a kept script can stand in for it on every later run. Think is the only step that costs tokens: Hightower's budget, spent once. Look and Act are Fielding's controls, read for free.");
   const rows = [["Look", "Sync", "Read the representation: the state and the controls offered now."], ["Think", "Reason", "Choose among what\u2019s offered. The only place a model sits, and a kept script can stand in for it."], ["Act", "Act", "Send the form: method, target, fields, If-Match, signed."]];
   T(s, "A person", { x: 0.6, y: 1.65, w: 2, h: 0.3, fontSize: 13, bold: true, color: SAGE });
   T(s, "ARTIE", { x: 3.2, y: 1.65, w: 2, h: 0.3, fontSize: 13, bold: true, color: SAGE });
@@ -195,7 +195,8 @@ const arrow = (s, x, y) => s.addShape(pres.shapes.RIGHT_ARROW, { x, y, w: 0.4, h
     pill(s, 3.2, y, 2.0, b, i === 1 ? GOLD : GREEN, i === 1 ? INK : C.background1, 0.5);
     T(s, d, { x: 5.5, y: y - 0.02, w: 7.2, h: 0.6, fontSize: 15, valign: "middle" });
   });
-  quote(s, 1.3, 5.3, 11.2, 0.6, "Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.", "Roy T. Fielding, comment, 2008", false, 18);
+  T(s, [{ text: "Think is the only step that costs tokens.", options: { bold: true, color: RUST } }, { text: " Look and Act read and send controls the server handed over: free on every replay." }], { x: 0.6, y: 4.95, w: 12.1, h: 0.4, fontSize: 15 });
+  quote(s, 1.3, 5.55, 11.2, 0.6, "Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.", "Roy T. Fielding, comment, 2008", false, 18);
 }
 
 // 9. HEART RISE ARTIE
@@ -291,7 +292,7 @@ const arrow = (s, x, y) => s.addShape(pres.shapes.RIGHT_ARROW, { x, y, w: 0.4, h
   stat(s, 7.4, 3.5, 2.6, "0", "model calls in every replay since", GREEN);
   stat(s, 10.2, 3.5, 2.6, "2", "forges replayed: real GitHub, and GitLab on this machine", GREEN);
   T(s, "Pins hold the replay to what was offered. If a form changes, the replay stops, and only then is the model called again, to repair.", { x: 7.4, y: 5.25, w: 5.3, h: 0.8, fontSize: 14, bold: true, color: RUST });
-  T(s, [{ text: "Inspiration: ", options: { bold: true, color: GREEN } }, { text: "Kelsey Hightower", options: { bold: true, color: GREEN, hyperlink: { url: "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture" } } }, { text: "’s ZTA, Zero Token Architecture: infer once, run everywhere. Here, the hypermedia keeps the replay honest." }], { x: 0.6, y: 5.45, w: 6.3, h: 0.8, fontSize: 13 });
+  T(s, [{ text: "Inspiration: ", options: { bold: true, color: GREEN } }, { text: "Kelsey Hightower", options: { bold: true, color: GREEN, hyperlink: { url: "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture" } } }, { text: "’s ZTA: infer once. Fielding’s controls: check every step. The pins are where the two meet." }], { x: 0.6, y: 5.45, w: 6.3, h: 0.8, fontSize: 13 });
 }
 
 // 14. Two forges
@@ -426,6 +427,7 @@ const arrow = (s, x, y) => s.addShape(pres.shapes.RIGHT_ARROW, { x, y, w: 0.4, h
   col(0.6, "Running", "Driven by hypertext: only what\u2019s offered now. Found once with a model, replayed with none.");
   col(4.7, "Building", "Gated by hooks: Gherkin, red, code, green, commit. No model call to enforce.");
   col(8.8, "Both", "Move work from tokens to processes, where it costs nothing to repeat.");
+  T(s, "Zero tokens to replay. Zero domain code to read. One media type.", { x: 0.6, y: 5.95, w: 12, h: 0.5, fontSize: 20, bold: true, fontFace: "Cambria", color: GOLD });
 }
 
 (async () => {
