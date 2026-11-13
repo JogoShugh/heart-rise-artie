@@ -46,7 +46,17 @@ class ActDeclaration(
     val rename: Map<String, String> = emptyMap(),
     /** A field's own title and description, each written by the resource file, over the operation's words. */
     val describe: Map<String, Map<String, String>> = emptyMap(),
+    /**
+     * Fields in a profile's own words, each value sent upstream as the members the upstream takes: a merge's
+     * `method: squash` is GitHub's `merge_method: squash`, GitLab's `squash: true` (normalized.feature).
+     */
+    val values: Map<String, Map<String, Map<String, Any?>>> = emptyMap(),
 ) {
+    /** The members the upstream takes for the values [sent] gives the fields [values] maps. */
+    fun valued(sent: Map<String, Any?>): Map<String, Any?> =
+        values.entries.mapNotNull { (field, byValue) -> sent[field]?.let { byValue[it.toString()] } }
+            .fold(emptyMap()) { body, members -> body + members }
+
     /** The operation's own name for the form's [field]: as written, or as [rename] maps it. */
     fun upstream(field: String): String = rename[field] ?: field
 
@@ -94,6 +104,15 @@ class ActDeclaration(
                         "$label: act $name renames $field, which is not one of its fields"
                     }
                     field to upstream.asText()
+                },
+                values = node.path("values").properties().associate { (field, byValue) ->
+                    check(node.path("inputs").has(field) || field in node.path("fields").map { it.asText() }) {
+                        "$label: act $name maps the values of $field, which is not one of its fields"
+                    }
+                    @Suppress("UNCHECKED_CAST")
+                    field to byValue.properties().associate { (value, members) ->
+                        value to (MAPPER.convertValue(members, Map::class.java) as Map<String, Any?>)
+                    }
                 },
                 describe = node.path("describe").properties().associate { (field, words) ->
                     check(field in node.path("fields").map { it.asText() } || node.path("inputs").has(field)) {

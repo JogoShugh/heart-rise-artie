@@ -3,6 +3,7 @@ package com.artie.heart.gateway
 import com.artie.heart.StatePointer
 import com.fasterxml.jackson.core.JsonPointer
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 
 /**
@@ -56,10 +57,30 @@ class ResourceDeclaration(
      * upstream's description doesn't say. GitHub's issue list has pull requests in it; the gateway's leaves them out.
      */
     val searchNote: String? = null,
+    /**
+     * A profile's members the state says, each made from the upstream's member [Normal.from], its values mapped:
+     * GitLab's `state: opened` is scm's `state: open` (normalized.feature). A member the state already has otherwise
+     * keeps the upstream's own value under `upstream`.
+     */
+    val normal: Map<String, Normal> = emptyMap(),
 ) {
     /** The operations the file names, checked against the description at start. */
     val named: Set<OperationId> = setOfNotNull(read, search) + acts.map { it.operation } +
         facts.values.map { it.operation } + lists + links + searchedBy.map { it.operation }
+
+    /**
+     * [body], the state served, with the profile's members [normal] says, each made from [upstream]'s; a member it
+     * had otherwise keeps the upstream's own value under `upstream`.
+     */
+    fun normalized(upstream: JsonNode, body: Map<String, Any?>, mapper: ObjectMapper): Map<String, Any?> {
+        if (normal.isEmpty()) return body
+        val said = normal.mapNotNull { (member, normal) ->
+            normal.of(upstream)?.let { member to mapper.convertValue(it, Any::class.java) }
+        }.toMap()
+        val kept = said.filter { (member, value) -> member in body && body[member] != value }
+            .mapValues { (member, _) -> body[member] }
+        return body + said + (if (kept.isEmpty()) emptyMap() else mapOf(UPSTREAM to kept))
+    }
 
     /** [state] without its [volatile] members, the members the upstream changes by itself. */
     fun steady(state: JsonNode): JsonNode = state.deepCopy<JsonNode>().also { copy ->
@@ -69,6 +90,9 @@ class ResourceDeclaration(
     }
 
     companion object {
+        /** Where the state keeps the upstream's own value of each member a profile says otherwise. */
+        const val UPSTREAM = "upstream"
+
         /** The declaration in [node], from the file [label], or a refusal naming it. */
         fun of(label: String, node: JsonNode): ResourceDeclaration {
             fun text(name: String): String = checkNotNull(node.path(name).asText(null)) { "$label: no $name" }
@@ -113,11 +137,27 @@ class ResourceDeclaration(
                     val keep = Condition.all(by.path("keep"))
                     SearchedBy(filter, needs("operation"), keep, pointer(label, needs("address")))
                 },
+                normal = node.path("normal").properties().associate { (member, said) ->
+                    val from = checkNotNull(said.path("from").asText(null)) { "$label: normal $member has no from" }
+                    member to Normal(
+                        pointer(label, from),
+                        said.path("values").takeIf { it.isObject }?.properties()?.associate { (k, v) -> k to v },
+                    )
+                },
             )
         }
 
         private fun pointer(label: String, text: String): JsonPointer =
             runCatching { JsonPointer.compile(text) }.getOrElse { error("$label: $text is not a JSON Pointer") }
+    }
+}
+
+/** A profile's member, made from the upstream's member at [from], each of its [values] said as the profile says it. */
+class Normal(val from: JsonPointer, val values: Map<String, JsonNode>?) {
+    /** The member, from [state], the upstream's: its value as the profile says it; null when the upstream has none. */
+    fun of(state: JsonNode): JsonNode? {
+        val upstream = state.at(from).takeUnless { it.isMissingNode } ?: return null
+        return values?.get(upstream.asText()) ?: upstream
     }
 }
 

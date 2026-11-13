@@ -90,7 +90,9 @@ internal class DeclaredResource(
             // The ETag also names the representation's digest, so the body itself tells states apart.
             versionOf = { 0 },
             // The state without its link members, which become links and embedded resources (Links.kt).
-            bodyOf = { mapper.convertValue(lifter?.lift(it.json)?.state ?: it.json, BODY) },
+            bodyOf = {
+                declared.normalized(it.json, mapper.convertValue(lifter?.lift(it.json)?.state ?: it.json, BODY), mapper)
+            },
             itemPath = itemPath,
             hypermediaOf = { lifter?.lift(it.json)?.hypermedia ?: Hypermedia.NONE },
         ),
@@ -141,8 +143,8 @@ internal class DeclaredResource(
         val variables = pointers.mapValues { (_, pointer) -> checked.json.at(pointer).asText() } +
             fields.filterKeys { it in inPath }.entries.associate { (field, value) -> act.upstream(field) to "$value" } +
             boundInPath.associate { (name, pointer) -> name to checked.json.at(pointer).asText() }
-        val body = act.filled(inputs) +
-            fields.filterKeys { it !in inPath }.mapKeys { (field, _) -> act.upstream(field) } +
+        val body = act.filled(inputs) + act.valued(sent) +
+            fields.filterKeys { it !in inPath && it !in act.values }.mapKeys { (field, _) -> act.upstream(field) } +
             boundInBody.associate { (name, pointer) ->
                 name to mapper.convertValue(checked.json.at(pointer), Any::class.java)
             }
