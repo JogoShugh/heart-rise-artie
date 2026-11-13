@@ -427,3 +427,25 @@ function callouts(s, img, { x, y, w, pxW, pxH }, items, lx) {
   src(s, [["Fielding, dissertation, ch. 5", "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"], ["HAL Schema Forms", "https://github.com/jbadeau/hal-schema-forms"], ["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]]);
 }
 //@END
+
+//@ZTA
+// Why this talk: from token maxing to tokenomics
+{
+  const ZTA = "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture";
+  const s = slide("Why this talk", "From token maxing to tokenomics", false,
+    "Start with Kelsey Hightower. He opened his talk ZTA, Zero Token Architecture, at the WeAreDevelopers World Congress North America in September 2026 by telling the room they were having way too much fun burning way too many tokens. His point: agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. That lands at a moment when the industry is turning. Companies ranked engineers by tokens burned; Meta's internal leaderboard covered more than 85,000 employees. Per-token prices for GPT-4-class models fell about 98% since late 2022, yet enterprise AI bills went up, because volume went up. J.R. Storment of the FinOps Foundation says the conversation moved from tokenmaxxing and go fast to guardrails and control. Ashish Bhatia puts it in two phases: the first was enablement, the next is governance. This talk is one answer: infer once, run everywhere, and let the hypermedia say what's still allowed.");
+  card(s, 0.6, 1.65, 6.3, 4.75, C.text1);
+  T(s, "“You are all having way too much fun burning way too many tokens”", { x: 0.95, y: 1.95, w: 5.6, h: 1.9, fontSize: 26, fontFace: "Cambria", italic: true, color: C.background1 });
+  T(s, [{ text: "Kelsey Hightower", options: { bold: true, color: GOLD, hyperlink: { url: ZTA } } }, { text: ", opening ", options: { color: C.background1 } }, { text: "ZTA: Zero Token Architecture", options: { bold: true, color: GOLD, hyperlink: { url: ZTA } } }, { text: ", WeAreDevelopers World Congress North America, 26 Sep 2026", options: { color: C.background1 } }], { x: 0.95, y: 3.35, w: 5.6, h: 0.8, fontSize: 14 });
+  T(s, "Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code.", { x: 0.95, y: 4.5, w: 5.6, h: 1.2, fontSize: 16, color: C.accent6 });
+  const row = (y, head, body) => {
+    T(s, head, { x: 7.3, y, w: 5.4, h: 0.35, fontSize: 13, bold: true, color: RUST, charSpacing: 1 });
+    T(s, body, { x: 7.3, y: y + 0.38, w: 5.4, h: 0.95, fontSize: 15 });
+  };
+  row(1.7, "TOKEN MAXING", "Companies ranked engineers by tokens burned. Meta’s internal leaderboard covered 85,000+ employees.");
+  row(2.95, "THE BILL", "Per-token prices for GPT-4-class models fell about 98% since late 2022. Enterprise AI bills rose anyway: volume.");
+  row(4.2, "THE TURN", "The FinOps Foundation’s J.R. Storment: from tokenmaxxing and “go fast” to guardrails and control. Ashish Bhatia: enablement first, governance next.");
+  T(s, "Infer once, run everywhere, and let the hypermedia say what’s still allowed.", { x: 7.3, y: 5.55, w: 5.4, h: 0.8, fontSize: 17, bold: true, fontFace: "Cambria", color: GREEN });
+  src(s, [["Hightower: ZTA, Zero Token Architecture (talk)", ZTA], ["Cranney: Infer Once, Run Everywhere", "https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture"], ["Bhatia: From Tokenmaxing to Tokenomics", "https://ashbhatia.substack.com/p/from-tokenmaxing-to-tokenomics"], ["The Next Web: Token prices fell 98%", "https://thenextweb.com/news/token-prices-fell-98-enterprise-ai-bills-tripled-now-the-industry-wants-a-standards-body-to-explain-why"]]);
+}
+//@END
