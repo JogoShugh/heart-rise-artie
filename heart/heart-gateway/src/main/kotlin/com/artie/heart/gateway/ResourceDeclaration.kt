@@ -63,6 +63,11 @@ class ResourceDeclaration(
      * keeps the upstream's own value under `upstream`.
      */
     val normal: Map<String, Normal> = emptyMap(),
+    /**
+     * The path template of the URL at [address], when it isn't the read's: GitLab's merge request names itself
+     * only in its page's address, `/{owner}/{repo}/-/merge_requests/{pull_number}` (normalized.feature).
+     */
+    val addressPath: String? = null,
 ) {
     /** The operations the file names, checked against the description at start. */
     val named: Set<OperationId> = setOfNotNull(read, search) + acts.map { it.operation } +
@@ -137,6 +142,7 @@ class ResourceDeclaration(
                     val keep = Condition.all(by.path("keep"))
                     SearchedBy(filter, needs("operation"), keep, pointer(label, needs("address")))
                 },
+                addressPath = node.path("address-path").asText(null),
                 normal = node.path("normal").properties().associate { (member, said) ->
                     val from = checkNotNull(said.path("from").asText(null)) { "$label: normal $member has no from" }
                     member to Normal(

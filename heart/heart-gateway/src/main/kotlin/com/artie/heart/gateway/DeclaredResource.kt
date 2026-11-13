@@ -46,7 +46,7 @@ internal class DeclaredResource(
 ) {
     private val reading = spec.route(declared.read)
     private val listing = declared.search?.let { spec.route(it) }
-    private val address = declared.address?.let { ItemAddress(it, reading.path, declared.file) }
+    private val address = declared.address?.let { ItemAddress(it, declared.addressPath ?: reading.path, declared.file) }
 
     /** Each variable of the read's path, where in the state it is: by the file's pointers, or in `hr:address`. */
     private val pointers: Map<String, String> = address?.pointers ?: declared.pointers

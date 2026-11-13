@@ -53,6 +53,17 @@ class NormalSteps(private val github: GitHubSteps) {
         github.readsFrom(copy)
     }
 
+    /** The shipped GitHub connector, copied, with its pull requests addressed by [member], whose path is [template]. */
+    @Given(ADDRESSED)
+    fun addressed(member: String, template: String) {
+        val copy = copied()
+        val file = copy.resolve("pull.resource.yaml")
+        val lines = Files.readAllLines(file).map { if (it.startsWith("address:")) "address: $member" else it } +
+            "address-path: \"$template\""
+        Files.write(file, lines)
+        github.readsFrom(copy)
+    }
+
     /** The form [key] offers [field] as exactly these values, comma separated. */
     @Then("the {string} form offers {string} as one of {string}")
     fun offersOneOf(key: String, field: String, values: String) {
@@ -80,6 +91,8 @@ class NormalSteps(private val github: GitHubSteps) {
     private companion object {
         const val TAKING = "the GitHub gateway reads GitHub's description with the shipped connector, " +
             "its act {string} taking {string} as"
-        const val SAYING = "the GitHub gateway reads GitHub's description with the shipped connector, its pulls saying"
+        const val ADDRESSED = "the GitHub gateway reads GitHub's description with the shipped connector, " +
+            "its pulls addressed by {string} as {string}"
+        const val SAYING ="the GitHub gateway reads GitHub's description with the shipped connector, its pulls saying"
     }
 }
