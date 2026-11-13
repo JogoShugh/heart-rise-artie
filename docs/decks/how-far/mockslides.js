@@ -314,17 +314,3 @@ properties:
   src(s, [["RFC 9111 HTTP Caching", "https://www.rfc-editor.org/rfc/rfc9111"], ["JSON Schema 2020-12", "https://json-schema.org/draft/2020-12"], AWSPATCH]);
 }
 
-// Pivot
-{
-  const s = slide("From preview to proof", "Now for real: GitHub and GitLab", true,
-    "AWS stays a mockup: nobody serves it as HEART today. Everything from here on ran for real. A HEART gateway in front of real GitHub and a local GitLab, one YAML connector per forge, the same scm: relations on both, ARTIE as the only client, and Claude called once, to find the path.");
-  const steps = [["Gateway", "HEART in front of each forge\u2019s own API"], ["Connector", "one YAML file per forge"], ["scm: relations", "the same on GitHub and GitLab"], ["ARTIE", "one generic client; Claude once, then none"]];
-  steps.forEach(([h, d], i) => {
-    const x = 0.6 + i * 3.1;
-    card(s, x, 2.3, 2.75, 2.2, i === 2 ? C.accent1 : C.text2);
-    T(s, h, { x: x + 0.25, y: 2.5, w: 2.3, h: 0.5, fontSize: 20, bold: true, fontFace: "Cambria", color: i === 2 ? C.background1 : GOLD });
-    T(s, d, { x: x + 0.25, y: 3.1, w: 2.3, h: 1.2, fontSize: 15, color: C.background1 });
-    if (i < 3) T(s, "\u2192", { x: x + 2.78, y: 3.05, w: 0.3, h: 0.5, fontSize: 22, color: GOLD });
-  });
-  T(s, "The mockup showed the shape. The next slides show it running, with every request on the record.", { x: 0.6, y: 5.0, w: 12, h: 0.8, fontSize: 18, color: C.accent6 });
-}

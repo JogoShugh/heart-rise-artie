@@ -133,7 +133,7 @@ function callouts(s, img, { x, y, w, pxW, pxH }, items, lx) {
 //@GH
 // GitHub annotated
 {
-  const s = slide("Proof, closer  ·  Real GitHub", "What each scm: relation did, on GitHub’s own page", false,
+  const s = slide("Typed relations  ·  On GitHub", "What each scm: relation did, on GitHub’s own page", false,
     "Pull request #2337 on real GitHub, variant 504: merged, then the smoke test failed scenario S3, so it wasn't promoted and the script commented. Each box is something one scm: relation read or did. The page is GitHub's; ARTIE never saw it, only the gateway's HAL Schema Forms.");
   callouts(s, "gh504.png", { x: 0.6, y: 1.65, w: 7.2, pxW: 920, pxH: 550 }, [
     [1, [28, 22, 578, 64], "scm:pulls-get", "Read pull request 2337, kept as pr."],
@@ -149,7 +149,7 @@ function callouts(s, img, { x, y, w, pxW, pxH }, items, lx) {
 //@GL
 // GitLab annotated
 {
-  const s = slide("Proof, closer  ·  Local GitLab", "The same relations, on GitLab’s page", false,
+  const s = slide("Typed relations  ·  On GitLab", "The same relations, on GitLab’s page", false,
     "Merge request !504 on the GitLab running on this machine, the same variant, the same script. Same five things, different words on the page: GitLab says merge request, Merged, pr-504 into main, commits were squashed. ARTIE read and sent the same scm: relations on both.");
   callouts(s, "gl504.png", { x: 0.6, y: 1.65, w: 4.75, pxW: 680, pxH: 660 }, [
     [1, [6, 8, 442, 54], "scm:pulls-get", "Read merge request 504, kept as pr."],
@@ -165,7 +165,7 @@ function callouts(s, img, { x, y, w, pxW, pxH }, items, lx) {
 //@MAP
 // The mapping
 {
-  const s = slide("Proof, closer  ·  One relation, two native calls", "How each scm: relation maps to each forge", false,
+  const s = slide("Typed relations  ·  One relation, two native calls", "How each scm: relation maps to each forge", false,
     "Every row is from the recorded runs: ARTIE's request to the gateway, and the gateway's call upstream, joined by traceparent. ARTIE sends the same thing to both gateways. Only the connector's YAML knows the forge.");
   const hd = (t) => ({ text: t, options: { bold: true, color: C.background1, fill: { color: C.text1 } } });
   const m = (t) => ({ text: t, options: { fontFace: "Courier New", fontSize: 10.5 } });
@@ -405,22 +405,23 @@ function callouts(s, img, { x, y, w, pxW, pxH }, items, lx) {
 {
   const s = slide("Putting them back together  \u00B7  The generic client", "ARTIE is to APIs what a browser is to web pages", false,
     "The browser is coupled to HTML and HTTP, and to nothing about any site: not account numbers, not URL layouts, not which buttons exist today. That's why a bank can change its forms tonight and nobody updates their browser. ARTIE is coupled the same way, to one media type, HAL with HEART's schema forms, and HTTP. Zero domain code: no client certificates, no pull requests, no merge rules. Each answer carries its controls. The next slides preview what that looks like on an API you know, AWS API Gateway.");
-  const row = (y, client, sub, speaks, mt, targets, dark) => {
+  const row = (y, client, sub, speaks, mt, targets, dark, ghosts) => {
     card(s, 0.6, y, 2.6, 1.6, dark ? C.text1 : C.accent1);
     T(s, client, { x: 0.8, y: y + 0.25, w: 2.3, h: 0.5, fontSize: 22, bold: true, fontFace: "Cambria", color: dark ? GOLD : C.background1 });
     T(s, sub, { x: 0.8, y: y + 0.85, w: 2.3, h: 0.6, fontSize: 13, color: C.background1 });
     arrow(s, 3.35, y + 0.64);
     card(s, 3.9, y, 3.6, 1.6, PALE);
     T(s, speaks, { x: 4.1, y: y + 0.15, w: 3.2, h: 0.3, fontSize: 11, color: SAGE, bold: true });
-    T(s, mt, { x: 4.1, y: y + 0.5, w: 3.2, h: 1.0, fontSize: 14, bold: true, fontFace: "Courier New", color: INK });
+    T(s, mt, { x: 4.1, y: y + 0.42, w: 3.2, h: 0.6, fontSize: 14, bold: true, fontFace: "Courier New", color: INK });
+    T(s, ghosts, { x: 4.1, y: y + 1.0, w: 3.3, h: 0.55, fontSize: 10, fontFace: "Courier New", color: "AEBFB5" });
     arrow(s, 7.65, y + 0.64);
     targets.forEach((t, i) => {
       card(s, 8.2 + (i % 2) * 2.3, y + Math.floor(i / 2) * 0.82, 2.2, 0.72, i === targets.length - 1 ? "FFFFFF" : PALE);
       T(s, t, { x: 8.3 + (i % 2) * 2.3, y: y + Math.floor(i / 2) * 0.82, w: 2.0, h: 0.72, fontSize: 13, valign: "middle", italic: i === targets.length - 1, color: i === targets.length - 1 ? SAGE : INK });
     });
   };
-  row(1.65, "Web browser", "one generic client, for every site", "SPEAKS, AND IS COUPLED TO", "text/html\n+ HTTP", ["An online bank", "A wiki", "A shop", "Any site not yet built"], true);
-  row(3.65, "ARTIE", "one generic client, for every API", "SPEAKS, AND IS COUPLED TO", "application/hal+json\n+ HEART profile + HTTP", ["AWS API Gateway (preview next)", "GitHub", "GitLab", "Any API not yet built"], false);
+  row(1.65, "Web browser", "one generic client, for every site", "SPEAKS, AND IS COUPLED TO", "text/html\n+ HTTP", ["An online bank", "A wiki", "A shop", "Any site not yet built"], true, "image/jpeg  image/png  text/css\ntext/javascript  image/svg+xml  font/woff2");
+  row(3.65, "ARTIE", "one generic client, for every API", "SPEAKS, AND IS COUPLED TO", "application/hal+json\n+ HEART profile + HTTP", ["AWS API Gateway (preview next)", "GitHub", "GitLab", "Any API not yet built"], false, "application/schema+json\napplication/problem+json  application/yaml");
   T(s, [{ text: "Coupled to: ", options: { bold: true, color: GREEN } }, { text: "the media type and the protocol.   " }, { text: "Not coupled to: ", options: { bold: true, color: RUST } }, { text: "certificates, pull requests, merge rules, URL layouts, or which acts exist today. Zero domain code." }], { x: 0.6, y: 5.55, w: 12.1, h: 0.8, fontSize: 15 });
   src(s, [["Fielding, dissertation, ch. 5", "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"], ["HAL Schema Forms", "https://github.com/jbadeau/hal-schema-forms"], ["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]]);
 }
