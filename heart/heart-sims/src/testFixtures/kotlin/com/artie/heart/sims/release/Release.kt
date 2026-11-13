@@ -64,6 +64,7 @@ class Release(
     /** The credential ARTIE's services and the watcher present at each party, by port. */
     private val credentials = mapOf(
         GITHUB_PORT to "Bearer ${GitHubService.TOKEN}",
+        GITLAB_PORT to "Bearer $GITLAB_TOKEN",
         WATCHER_PORT to "Bearer ${OfferWatcher.TOKEN}",
         CI_PORT to "Bearer ${CiWrapper.TOKEN}",
         DEV_PORT to "Bearer ${DevEnvironment.TOKEN}",
@@ -76,7 +77,11 @@ class Release(
         client(presented?.let { request.header("Authorization", it) } ?: request)
     }
 
-    val github = GitHubService(repository = GitRepository(repository)).apply { reset() }
+    // The GitHub gateway's connector, by name beside the shipped one: github-scm serves pull requests in scm's words.
+    val github = GitHubService(
+        connector = GitHubService.findConnector().resolveSibling(System.getenv("RELEASE_GITHUB_CONNECTOR") ?: "github"),
+        repository = GitRepository(repository),
+    ).apply { reset() }
 
     val replies = ReplyService(
         origin = origin(REPLIES_PORT),
@@ -159,6 +164,10 @@ class Release(
 
     companion object {
         const val GITHUB_PORT = 8098
+
+        /** The gateway in front of the release's GitLab (exhibits/merge-watch-release/gitlab), and what it takes. */
+        const val GITLAB_PORT = 8094
+        const val GITLAB_TOKEN = "gitlab-token"
         const val WATCHER_PORT = 8099
         const val REPLIES_PORT = 8160
         const val CI_PORT = 8170

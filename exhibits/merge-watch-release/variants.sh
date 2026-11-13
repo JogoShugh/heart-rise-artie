@@ -14,6 +14,7 @@ DESK="Authorization: Bearer desk-token"
 mkdir -p "$out"
 . "$here/jenkins/jenkins.env.example"
 export JENKINS_ADMIN_USER JENKINS_ADMIN_PASSWORD JENKINS_HOOK_SECRET RELEASE_HOST="$host"
+export RELEASE_GITHUB_CONNECTOR=${RELEASE_GITHUB_CONNECTOR:-github-scm}
 export RELEASE_REPOSITORY="$here/work/library-app" RELEASE_SCRIPT="$here/release.heart.yaml"
 export JAVA_HOME=${JAVA_HOME:-$HOME/.sdkman/candidates/java/25.3.4+1.r25-graal}
 

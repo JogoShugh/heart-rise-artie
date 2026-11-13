@@ -12,6 +12,7 @@ host=${RELEASE_HOST:-192.168.1.18}
 H="http://$host"
 . "$here/jenkins/jenkins.env.example"
 export JENKINS_ADMIN_USER JENKINS_ADMIN_PASSWORD JENKINS_HOOK_SECRET RELEASE_HOST="$host"
+export RELEASE_GITHUB_CONNECTOR=${RELEASE_GITHUB_CONNECTOR:-github-scm}
 export RELEASE_REPOSITORY="$here/work/library-app" RELEASE_SCRIPT="$here/release.heart.yaml"
 export JAVA_HOME=${JAVA_HOME:-$HOME/.sdkman/candidates/java/25.3.4+1.r25-graal}
 sh "$here/make-app-repo.sh" >/dev/null

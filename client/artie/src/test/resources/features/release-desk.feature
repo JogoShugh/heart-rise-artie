@@ -38,6 +38,7 @@ Feature: The release desk: services that call others through ARTIE, and answer t
     Examples:
       | origin                   | credential                |
       | http://192.168.1.18:8098 | Bearer github-token       |
+      | http://192.168.1.18:8094 | Bearer gitlab-token       |
       | http://192.168.1.18:8099 | Bearer watcher-token      |
       | http://192.168.1.18:8160 | Bearer artie-reply-token  |
       | http://192.168.1.18:8170 | Bearer ci-token           |
