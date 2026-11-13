@@ -11,7 +11,7 @@ internal object Detours {
     private const val ITEM = "item"
 
     fun trimmed(root: Node, capture: Capture): Node {
-        val used = used(capture)
+        val used = used(capture) + named(capture)
         val scope = { step: Step -> SCOPES.any { it in capture.marks(step) } }
         prune(root, used, { capture.marks(it)["scenario"] != null }, scope, inScope = false)
         return root
@@ -55,6 +55,19 @@ internal object Detours {
     /** Whether [step] did something a script must do again: an act that changes, a wait, a check. */
     private fun acts(step: Step): Boolean = step.say == "until" || step.say == "check" ||
         (!step.follows && step.relation != null && step.chose["method"]?.toString()?.uppercase() != "GET")
+
+    /**
+     * The steps a goal's step named `as NAME` where another of its steps names NAME (`{pr}`, `${pr.@self}`): what
+     * they led to is read by that name, though no value of it is sent.
+     */
+    private fun named(capture: Capture): Set<Int> {
+        val marks = capture.steps.associateWith { capture.marks(it) }
+        return marks.filter { (step, own) ->
+            val name = own["as"]?.toString() ?: return@filter false
+            val mention = Regex("""\{$name[.}]""")
+            marks.any { (other, its) -> other.line != step.line && its.values.any { mention.containsMatchIn("$it") } }
+        }.keys.map { it.number }.toSet()
+    }
 
     /** The steps a later value is read from, as the generator binds it: an input wins; else the earliest answer. */
     private fun used(capture: Capture): Set<Int> {

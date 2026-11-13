@@ -207,6 +207,44 @@ Feature: A goal that crosses parties and waits on their answers: At, asking to b
     When artie generated "at-named.heart.yaml" as data from "at-named.trace.yaml" and "at-named.goal.md"
     Then the script "at-named.heart.yaml" has a line with "- enter: ${watched.@self}"
 
+  Scenario: A step that only reads is kept in the script when a later step names what it read
+    `as NAME` on a read is no detour when a later step names it: the watch is asked about
+    `${front.@self}`, so the script reads front first, though no value of front is sent.
+    Given the file "named-read.goal.md" is
+      """
+      ---
+      start: "{desk}"
+      inputs:
+        desk:
+        watcher:
+        state:
+      ---
+
+      Watch the desk's releases in a state.
+
+      - Search the desk's releases that are {state} `as front`
+      - At {watcher}, ask to be told when {front} offers desk:release `as watch`
+      """
+    And the planner will move
+      | move | words                                                          | opens |
+      | act  | search the desk's releases that are running                    | yes   |
+      | done |                                                                |       |
+      | act  | ask to be told when the releases found offer desk:release      | yes   |
+      | done |                                                                |       |
+    And ARTIE's reasoner will choose, in order
+      | form                 | follow | fields                                                                          |
+      | desk:search-releases |        | {"name": "running"}                                                             |
+      | watcher:watch        |        | {"resource": "http://localhost:8160/releases?name=running", "offers": "desk:release"} |
+    When the goal "named-read.goal.md" runs with ARTIE in the desk, captured in "named-read.trace.yaml", given
+      | name    | value                  |
+      | desk    | http://localhost:8160/ |
+      | watcher | http://localhost:8099/ |
+      | state   | running                |
+    Then the run finished
+    When artie generated "named-read.heart.yaml" as data from "named-read.trace.yaml" and "named-read.goal.md"
+    Then the script "named-read.heart.yaml" has a line with "- act: desk:search-releases"
+    And the script "named-read.heart.yaml" has a line with "- keep-as: front"
+
   Scenario: The goal runs once with the planner, and the script made from it runs with none
     Given the planner will move
       | move | words                                                          | opens |

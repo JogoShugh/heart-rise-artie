@@ -22,6 +22,9 @@ internal object YamlText {
         }
 
     private fun item(head: String, value: Any?, indent: Int): List<String> = when {
+        // A map or a list noted is written as itself, the note on its head's line.
+        value is Noted && (value.value is Map<*, *> || value.value is List<*>) ->
+            item(head, value.value, indent).let { listOf(it.first() + " # ${value.note}") + it.drop(1) }
         value is Noted -> listOf("$head: ${scalar(value.value)} # ${value.note}")
         value == null -> listOf("$head:")
         value is Map<*, *> && value.isEmpty() -> listOf("$head: {}")

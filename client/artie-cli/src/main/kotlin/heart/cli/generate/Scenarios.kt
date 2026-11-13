@@ -55,8 +55,12 @@ internal fun namesRead(capture: Capture): Set<String> = capture.steps.flatMap { 
         NAME.findAll(marks[key]?.toString().orEmpty()).map { it.groupValues[1] }
     }
     val given = (marks["given"] as? List<*>).orEmpty().mapNotNull { (it as? Map<*, *>)?.get("at")?.toString() }
-    listOfNotNull(marks["as-of"]?.toString()) + read + given
+    // A name a step's words name whole, `{pr}`: what that step led to, at its address.
+    val named = WHOLE.findAll(marks["intent"]?.toString().orEmpty()).map { it.groupValues[1] }
+    listOfNotNull(marks["as-of"]?.toString()) + read + given + named
 }.toSet()
+
+private val WHOLE = Regex("""\{([A-Za-z_][A-Za-z0-9_]*)}""")
 
 private val NAME = Regex("""\$\{([A-Za-z_][A-Za-z0-9_]*)\.""")
 
