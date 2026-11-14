@@ -4,8 +4,8 @@
   "part": "For real: two forges, one vocabulary",
   "kicker": "The whole release · 2 of 2",
   "tone": "light",
-  "number": 39,
-  "of": 54,
+  "number": 40,
+  "of": 55,
   "html": "<h2>The build’s console, and Dev, promoted or not</h2>\n<div class=\"split\">\n  <figure><img src=\"media/jenkins-console.png\" alt=\"Jenkins console output for build #35, ending in SUCCESS\"><figcaption>Build #35: the merged commit of #2341, tested, deployed, SUCCESS.</figcaption></figure>\n  <figure><img src=\"media/dev.png\" alt=\"The Dev environment's text/html representation showing commit 6c030f1 promoted\"><figcaption>Dev, as text/html: commit 6c030f1 of #2341, promoted.</figcaption></figure>\n</div>\n<p class=\"lead\">Smoke passed: promote. Smoke failed: comment on the pull request, “Not promoted to Dev”. One kept script, no model.</p>\n",
   "say": "Jenkins' console for one build of the merged commit. Then the Dev environment, another HEART service: promoted when the smoke scenarios pass. For 504, scenario S3 failed, so Dev wasn't promoted and the script commented on the pull request instead, as the earlier slides showed on both forges.",
   "sources": [

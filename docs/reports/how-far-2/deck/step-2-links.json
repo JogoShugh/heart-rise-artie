@@ -4,8 +4,8 @@
   "part": "For real: two forges, one vocabulary",
   "kicker": "Building it back up · Step 2 of 5 · HEART L0, simplified",
   "tone": "light",
-  "number": 34,
-  "of": 54,
+  "number": 35,
+  "of": 55,
   "html": "<h2>Links: it names itself and its vocabulary</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr)\">\n  <pre># GET http://gateway/repos/JogoShugh/heart-github-test/pulls/2325\n# Accept: application/hal+json\nnumber: 2325\ntitle: \"Renewals: none during the audit\"\nstate: open\nmergeable_state: clean\n<span class=\"add\">_links:\n  self:\n    href: /repos/JogoShugh/heart-github-test/pulls/2325\n  curies:\n    - name: scm\n      href: /profiles/scm#{rel}\n      templated: true\n  alternate:\n    href: https://github.com/JogoShugh/heart-github-test/pull/2325\n    type: text/html\n  scm:commits:\n    href: /repos/JogoShugh/heart-github-test/pulls/2325/commits\n  scm:diff:\n    href: https://github.com/JogoShugh/heart-github-test/pull/2325.diff\n    type: text/x-diff</span></pre>\n  <div class=\"rows\">\n    <h3 style=\"font: 650 1.5rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--leaf)\">Where it is, and what its words mean</h3>\n    <ul>\n      <li><b>self:</b> its own address, handed over, never built.</li>\n      <li><b>curies:</b> scm: names resolve to one shared vocabulary, for both forges.</li>\n      <li><b>alternate:</b> the forge’s own page, for people.</li>\n      <li><b>Typed links:</b> GitHub’s *_url members became links and left the data.</li>\n    </ul>\n    <p class=\"refs\"><deck-ref name=\"rule-4\"></deck-ref></p>\n  </div>\n</div>\n",
   "say": "The gateway's answer adds HAL links: self, the scm: curie that says where the relation names are defined, the forge's own page as an alternate, and typed links to related resources. GitHub's own *_url members became these links and left the data.",
   "sources": [

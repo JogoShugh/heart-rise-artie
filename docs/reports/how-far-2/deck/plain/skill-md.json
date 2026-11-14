@@ -4,8 +4,8 @@
   "part": "What it costs, and how it was built",
   "kicker": "For the engineers · The prompt",
   "tone": "light",
-  "number": 45,
-  "of": 54,
+  "number": 46,
+  "of": 55,
   "html": "<h2>The skill tells the model the loop, and that the gates win</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);\">\n  <div class=\"rows\">\n    <pre><code># SKILL.md, the opening\nInstructions are advisory. A model can drift\npast them. These gates are real processes with\nreal exit codes, so they hold even when\nattention slips. This skill installs them and\nexplains the loop they enforce. **The skill\nnever replaces the hooks**: if a gate blocks\nyou, satisfy it; never edit it away.</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"opening\">SKILL.md, the opening</deck-fragment></p>\n  </div>\n  <div class=\"rows\">\n    <pre><code># SKILL.md, the work loop\n1. Write or change the .feature scenario.\n   Use Scenario Outlines and data tables,\n   not repeated Given/When/Then blocks.\n2. Run the BDD suite (native command, or\n   .claude/bdd-gates/bdd-run.sh on wrapper\n   stacks). See it fail for the right\n   reason: BDD_RUN FAIL.\n3. Write step definitions, then production\n   code. The gate now allows it.\n4. Run the suite until BDD_RUN PASS. Fix\n   lint findings as they appear.\n5. End the turn. The Stop gate runs the\n   full check.</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"loop\">SKILL.md, the work loop</deck-fragment></p>\n  </div>\n</div>\n",
   "say": "The bdd-gates skill's own words, from SKILL.md. The skill is instructions, and instructions are advisory; that's why it installs hooks and says, in its first paragraph, that the hooks win.",
   "sources": [

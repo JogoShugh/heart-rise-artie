@@ -4,8 +4,8 @@
   "part": "Putting them back together",
   "kicker": "Not new, not niche",
   "tone": "light",
-  "number": 15,
-  "of": 54,
+  "number": 16,
+  "of": 55,
   "html": "<h2>Hypermedia is already in production</h2>\n<div class=\"split\" style=\"grid-template-columns: 1fr 1fr 1fr\">\n  <figure><img src=\"media/okta-crop.png\" alt=\"Okta Authentication API response for an expired password, with _links for changePassword and cancel\"><figcaption>Okta Authentication API: expired password.</figcaption></figure>\n  <div class=\"rows\">\n    <div><h3 style=\"font: 650 1.6rem/1.15 var(--display); color: var(--leaf); margin: 0 0 0.4rem; text-transform: none; letter-spacing: 0\">Okta</h3><p>The password expired, so the answer’s _links offer next: changePassword, and cancel. Nothing else. State, then controls, in one answer.</p></div>\n    <div><h3 style=\"font: 650 1.6rem/1.15 var(--display); color: var(--leaf); margin: 0 0 0.4rem; text-transform: none; letter-spacing: 0\">Amazon API Gateway</h3><p>HAL with typed relations, in its current API reference. We’ll preview it as HEART shortly.</p></div>\n  </div>\n  <div class=\"box\" style=\"padding: 1.5rem 1.6rem; gap: 1rem; align-content: start\">\n    <h3>Spring HATEOAS, for agents</h3>\n    <p>Adib Saikali (Broadcom), “REST is for Agents: Rediscovering Spring HATEOAS”, Spring I/O 2026.</p>\n    <p>What HEART adds: forms with JSON Schema, If-Match guards, typed relations, and only the forms that apply now.</p>\n  </div>\n</div>\n",
   "say": "Okta's Authentication API answers with HAL: _embedded for the user and policy, _links for what can be done next, here changePassword or cancel, because the password expired. Amazon API Gateway documents HAL with typed relations today; it gets previewed as HEART a few slides on. Spring HATEOAS is being pitched for agents now: Adib Saikali, Spring I/O 2026. What HEART adds: forms with JSON Schema, guards, and typed relations.",
   "sources": [
