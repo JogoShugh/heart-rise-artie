@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L0: the certificate, with its forms inline · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">A preview of HEART · 2 of 5 · HEART L0</span></header>
+<h2>L0: the certificate, with its forms inline</h2>
+<div class="split">
+<pre><code># GET /clientcertificates/xmbiqp
+# Accept: application/hal+json
+# Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
+# 200 OK
+# ETag: "seq-1.hsf.L0"
+# Cache-Control: no-cache
+# Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;;
+#   rel="profile"
+clientCertificateId: xmbiqp
+createdDate: 2015-12-08T18:02:16Z
+description: test-client-cert-2
+expirationDate: 2016-12-07T18:02:16Z
+pemEncodedCertificate: |
+  -----BEGIN CERTIFICATE-----
+  MIIC6DC...XuHVdZ5r27XRRXEjg==
+  -----END CERTIFICATE-----
+_links:
+  self:
+    href: /clientcertificates/xmbiqp
+  curies:
+    - name: clientcertificate
+      href: /profiles/clientcertificate#{rel}
+      templated: true</code></pre>
+<pre><code><span class="add">_forms:</span>
+<span class="add">  clientcertificate:update:</span>
+    title: Update
+    _links:
+      target:
+        href: /clientcertificates/xmbiqp
+    method: PATCH
+    contentType: application/json
+    schema:
+      type: object
+      required: [patchOperations]
+      properties:
+        patchOperations:
+          type: array
+          items:
+            type: object
+            properties:
+              op:
+                enum: [add, remove, replace, move, copy, test]
+              path: {type: string, examples: [/description]}
+              value: {type: string}
+              from: {type: string}
+<span class="add">  clientcertificate:delete:</span>
+    title: Delete
+    _links:
+      target:
+        href: /clientcertificates/xmbiqp
+    method: DELETE</code></pre>
+</div>
+<p class="cite"><b style="color:var(--bad)">MOCKUP</b> · Today · <b>L0</b> · L1 · L2 · <i>Everything in one answer: correct, and repeated on every read.</i></p>
+</article>
+<nav class="foot"><a href="deck/aws-today.html" rel="prev"><small>Back</small><b>AWS already names the acts. Only the forms are missing</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#aws-l0-certificate">with heart-ts</a></span>
+<a href="deck/aws-l0-list.html" rel="next"><small>Next</small><b>L0: the list offers generate, with what it needs</b></a></nav>
+</main></div></body></html>

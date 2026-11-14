@@ -1,0 +1,99 @@
+{
+  "name": "connectors",
+  "title": "scm:merge, written once per forge",
+  "part": "Two forges, one vocabulary",
+  "kicker": "For the engineers · The connectors",
+  "tone": "light",
+  "number": 27,
+  "of": 50,
+  "html": "<h2>scm:merge, written once per forge</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)\">\n  <div>\n<pre><code># github-scm/pull.resource.yaml\nmerge:\n  operation: pulls/merge\n  fields: [commit_title, commit_message]\n  inputs:\n    method:\n      enum: [merge, squash, rebase]\n<span class=\"add\">  values:\n    method:\n      merge:  {merge_method: merge}\n      squash: {merge_method: squash}\n      rebase: {merge_method: rebase}</span>\n  bind: {sha: /head/sha}\n  stale: 409\n  refused: 405</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"github-merge\">the whole merge act</deck-fragment></p>\n  </div>\n  <div>\n<pre><code># gitlab/pull.resource.yaml\nmerge:\n  operation: pulls/merge\n  fields: [merge_commit_message]\n  inputs:\n    method:\n      enum: [merge, squash]\n<span class=\"add\">  values:\n    method:\n      merge:  {squash: false}\n      squash: {squash: true}</span>\n  bind: {sha: /sha}\n  stale: 409\n  refused: 405\n# + normal: state, merged, mergeable_state</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"gitlab-merge\">the whole merge act</deck-fragment></p>\n  </div>\n</div>\n",
+  "say": "The merge act in each connector. Same relation, same input (method), same guard (the head sha the view had), same stale and refused codes. The upstream operation, the field names and the values differ, and only here.",
+  "sources": [
+    {
+      "label": "artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    },
+    {
+      "label": "GitHub OpenAPI description",
+      "href": "https://github.com/github/rest-api-description"
+    },
+    {
+      "label": "GitLab merge requests API",
+      "href": "https://docs.gitlab.com/api/merge_requests/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "connectors.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "mapping.json",
+      "title": "How each scm: relation maps to each forge"
+    },
+    "next": {
+      "href": "one-plain-ui.json",
+      "title": "One plain UI, rendered from the shared relations"
+    },
+    "alternate": {
+      "href": "connectors.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:fragment": [
+      {
+        "name": "github-merge",
+        "label": "GitHub's merge act (github-scm/pull.resource.yaml)",
+        "lang": "yaml",
+        "path": "heart/heart-gateway/connectors/github-scm/pull.resource.yaml",
+        "lines": "31–52",
+        "of": 109,
+        "text": "merge:\n  operation: pulls/merge\n  title: Merge\n  description: Merge the pull request into its base branch.\n  fields: [commit_title, commit_message]\n  # scm's method, as GitHub's merge_method takes it.\n  inputs:\n    method:\n      type: string\n      enum: [merge, squash, rebase]\n      title: Merge method\n      description: The merge method to use.\n  values:\n    method:\n      merge: { merge_method: merge }\n      squash: { merge_method: squash }\n      rebase: { merge_method: rebase }\n  # GitHub merges only if the head is still at this sha: the head the client's view had.\n  bind: { sha: /head/sha }\n  # GitHub's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.\n  stale: 409\n  refused: 405",
+        "_links": {
+          "self": {
+            "href": "fragments/connectors--github-merge.json",
+            "title": "GitHub's merge act (github-scm/pull.resource.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-gateway/connectors/github-scm/pull.resource.yaml#L31-L52",
+            "title": "heart/heart-gateway/connectors/github-scm/pull.resource.yaml, lines 31–52"
+          }
+        }
+      },
+      {
+        "name": "gitlab-merge",
+        "label": "GitLab's merge act (gitlab/pull.resource.yaml)",
+        "lang": "yaml",
+        "path": "heart/heart-gateway/connectors/gitlab/pull.resource.yaml",
+        "lines": "45–65",
+        "of": 82,
+        "text": "merge:\n  operation: pulls/merge\n  title: Merge\n  description: Merge the pull request into its target branch.\n  fields: [merge_commit_message]\n  # scm's method, as GitHub's merge takes it; GitLab squashes or not, and merges with a merge commit either way.\n  inputs:\n    method:\n      type: string\n      enum: [merge, squash]\n      title: Merge method\n      description: The merge method to use.\n  values:\n    method:\n      merge: { squash: false }\n      squash: { squash: true }\n  # GitLab merges only if the source branch's head is still at this sha: the head the client's view had.\n  bind: { sha: /sha }\n  # GitLab's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.\n  stale: 409\n  refused: 405",
+        "_links": {
+          "self": {
+            "href": "fragments/connectors--gitlab-merge.json",
+            "title": "GitLab's merge act (gitlab/pull.resource.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-gateway/connectors/gitlab/pull.resource.yaml#L45-L65",
+            "title": "heart/heart-gateway/connectors/gitlab/pull.resource.yaml, lines 45–65"
+          }
+        }
+      }
+    ]
+  }
+}

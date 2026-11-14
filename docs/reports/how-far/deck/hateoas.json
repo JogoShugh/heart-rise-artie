@@ -1,0 +1,73 @@
+{
+  "name": "hateoas",
+  "title": "HATEOAS: Fielding’s explanation, not his invention",
+  "part": "Why it matters",
+  "kicker": "Why the Web scaled",
+  "tone": "light",
+  "number": 7,
+  "of": 50,
+  "html": "<h2>HATEOAS: Fielding’s explanation, not his invention</h2>\n<div class=\"split\">\n  <div class=\"card\">\n    <h3>A description, not a proposal</h3>\n    <ul>\n      <li>Hypermedia as the engine of application state: the name his dissertation (2000) gave to why the Web scaled so fast.</li>\n      <li>Every page carries its own next steps, its links and forms.</li>\n      <li>So a browser needs no prior knowledge of any site, and never ships an update when a site changes.</li>\n    </ul>\n    <p class=\"refs\"><deck-ref name=\"uniform-interface\"></deck-ref></p>\n  </div>\n  <div class=\"card dark\">\n    <p class=\"lead\"><b>At the application layer, perhaps the most depended-upon and consequential network constraint of all time</b></p>\n    <p class=\"lead\"><b style=\"color: var(--gold, #E3B341)\">for the human web.</b></p>\n    <p>Every link followed and every form sent, by billions of people, every day.</p>\n  </div>\n</div>\n",
+  "say": "Hypermedia as the engine of application state is the name the 2000 dissertation gave to what the Web already did. It explains why one generic program, the browser, could use every site. At the application layer, it is arguably the most depended-upon and consequential network constraint of all time, for the human web.",
+  "sources": [
+    {
+      "label": "Fielding, dissertation, ch. 5: REST",
+      "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "hateoas.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "frustration.json",
+      "title": "Our question: how far can we take his vision today?"
+    },
+    "next": {
+      "href": "web-made-llms.json",
+      "title": "The Web made LLMs possible, and only half of it"
+    },
+    "alternate": {
+      "href": "hateoas.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "uniform-interface",
+        "kind": "constraint",
+        "label": "Uniform interface · HATEOAS",
+        "title": "Uniform interface (§5.1.5)",
+        "summary": "One generic interface for every component; its fourth part is hypermedia as the engine of application state.",
+        "quote": "<p>“The central feature that distinguishes the REST architectural style from other network-based styles is its emphasis on a uniform interface between components (Figure 5-6). By applying the software engineering principle of generality to the component interface, the overall system architecture is simplified and the visibility of interactions is improved. Implementations are decoupled from the services they provide, which encourages independent evolvability. The trade-off, though, is that a uniform interface degrades efficiency, since information is transferred in a standardized form rather than one which is specific to an application's needs. The REST interface is designed to be efficient for large-grain hypermedia data transfer, optimizing for the common case of the Web, but resulting in an interface that is not optimal for other forms of architectural interaction.</p><p>In order to obtain a uniform interface, multiple architectural constraints are needed to guide the behavior of components. REST is defined by four interface constraints: identification of resources; manipulation of resources through representations; self-descriptive messages; and, hypermedia as the engine of application state. These constraints will be discussed in Section 5.2.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.5",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/uniform-interface.json",
+            "title": "Uniform interface · HATEOAS"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_5",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.5"
+          }
+        }
+      }
+    ]
+  }
+}

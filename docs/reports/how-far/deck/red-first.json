@@ -1,0 +1,76 @@
+{
+  "name": "red-first",
+  "title": "The scenario, then the failing run",
+  "part": "How it was built",
+  "kicker": "How it was built · Red first, live",
+  "tone": "light",
+  "number": 45,
+  "of": 50,
+  "html": "<h2>The scenario, then the failing run</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);\">\n  <div class=\"rows\">\n    <pre><code>Scenario: A step that only reads is kept in the\n  script when a later step names what it read\n  `as NAME` on a read is no detour when a later step\n  names it: the watch is asked about ${front.@self}\n  Given the file \"named-read.goal.md\" is\n    - Search the desk's releases that are {state}\n      `as front`\n    - At {watcher}, ask to be told when {front}\n      offers desk:release `as watch`\n  …\n  Then the script has a line with\n    \"- act: desk:search-releases\"</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"scenario\">the whole scenario</deck-fragment></p>\n  </div>\n  <div class=\"rows\">\n    <pre><code># the red run, logged by the gate\n496 tests completed, 1 failed,\n41 skipped\ntestcase: A step that only reads\nis kept in the script when …</code></pre>\n    <p>Red on behaviour, not on a compile error. The gate logs the run; only then may src/main change.</p>\n  </div>\n</div>\n",
+  "say": "A real one from this work. The real-GitHub capture dropped the step that opens the pull request, because nothing read a value from it; a later step only named it. The scenario says so first, and the run fails on behaviour before any code is written.",
+  "sources": [
+    {
+      "label": "Gherkin reference",
+      "href": "https://cucumber.io/docs/gherkin/reference/"
+    },
+    {
+      "label": "artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "red-first.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "pre-commit.json",
+      "title": "git pre-commit reads the log in order"
+    },
+    "next": {
+      "href": "code-green-commit.json",
+      "title": "The fix, the green run, the gated commit"
+    },
+    "alternate": {
+      "href": "red-first.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:fragment": [
+      {
+        "name": "scenario",
+        "label": "The scenario, whole (goal-rise.feature)",
+        "lang": "gherkin",
+        "path": "client/artie/src/test/resources/features/goal-rise.feature",
+        "lines": "210–245",
+        "of": 277,
+        "text": "Scenario: A step that only reads is kept in the script when a later step names what it read\n  `as NAME` on a read is no detour when a later step names it: the watch is asked about\n  `${front.@self}`, so the script reads front first, though no value of front is sent.\n  Given the file \"named-read.goal.md\" is\n    \"\"\"\n    ---\n    start: \"{desk}\"\n    inputs:\n      desk:\n      watcher:\n      state:\n    ---\n\n    Watch the desk's releases in a state.\n\n    - Search the desk's releases that are {state} `as front`\n    - At {watcher}, ask to be told when {front} offers desk:release `as watch`\n    \"\"\"\n  And the planner will move\n    | move | words                                                          | opens |\n    | act  | search the desk's releases that are running                    | yes   |\n    | done |                                                                |       |\n    | act  | ask to be told when the releases found offer desk:release      | yes   |\n    | done |                                                                |       |\n  And ARTIE's reasoner will choose, in order\n    | form                 | follow | fields                                                                          |\n    | desk:search-releases |        | {\"name\": \"running\"}                                                             |\n    | watcher:watch        |        | {\"resource\": \"http://localhost:8160/releases?name=running\", \"offers\": \"desk:release\"} |\n  When the goal \"named-read.goal.md\" runs with ARTIE in the desk, captured in \"named-read.trace.yaml\", given\n    | name    | value                  |\n    | desk    | http://localhost:8160/ |\n    | watcher | http://localhost:8099/ |\n    | state   | running                |\n  Then the run finished\n  When artie generated \"named-read.heart.yaml\" as data from \"named-read.trace.yaml\" and \"named-read.goal.md\"\n  Then the script \"named-read.heart.yaml\" has a line with \"- act: desk:search-releases\"",
+        "_links": {
+          "self": {
+            "href": "fragments/red-first--scenario.json",
+            "title": "The scenario, whole (goal-rise.feature)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/client/artie/src/test/resources/features/goal-rise.feature#L210-L245",
+            "title": "client/artie/src/test/resources/features/goal-rise.feature, lines 210–245"
+          }
+        }
+      }
+    ]
+  }
+}

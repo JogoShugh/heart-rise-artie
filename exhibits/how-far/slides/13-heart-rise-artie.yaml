@@ -1,0 +1,18 @@
+name: heart-rise-artie
+part: Putting them back together
+title: HEART, RISE and ARTIE
+kicker: Putting them back together
+say: "Three names, briefly. HEART is the media type and its rules; RISE is how asynchronous work answers back; ARTIE is the one generic client. All built test-first under the bdd-gates skill."
+sources:
+  - ["artie: HEART, RISE, ARTIE", "https://github.com/JogoShugh/heart-rise-artie"]
+  - ["HAL Schema Forms", "https://github.com/jbadeau/hal-schema-forms"]
+  - ["JSON Schema 2020-12", "https://json-schema.org/draft/2020-12"]
+  - ["RFC 9421 HTTP Message Signatures", "https://www.rfc-editor.org/rfc/rfc9421"]
+html: |
+  <h2>HEART, RISE and ARTIE</h2>
+  <div class="split" style="grid-template-columns: 1fr 1fr 1fr">
+    <div class="card"><h3>HEART</h3><p><i>Hypermedia Enforced Agentic Reliable Transactions</i></p><p>Each answer carries the state plus the forms valid now (HAL Schema Forms), with typed relations, If-Match guards and signed acts.</p></div>
+    <div class="card"><h3>RISE</h3><p><i>Reciprocal Interface for State Exchange</i></p><p>Replies for asynchronous work: a watcher or a build answers back when it’s ready.</p></div>
+    <div class="card dark"><h3>ARTIE</h3><p><i>Autonomous Restful Traversal and Interactive Engine</i></p><p>One generic client for all of it, coupled to the media type, never to a domain.</p></div>
+  </div>
+  <p class="punch">Built test-first under the bdd-gates skill: Claude Code hooks plus git hooks.</p>

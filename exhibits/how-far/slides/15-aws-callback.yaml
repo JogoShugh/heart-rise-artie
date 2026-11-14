@@ -1,0 +1,17 @@
+name: aws-callback
+part: "A preview: AWS as HEART"
+tone: dark
+title: What if AWS’s HAL became HEART?
+kicker: A callback · Amazon API Gateway
+say: "A few slides back: Amazon API Gateway already answers in HAL, with typed relations that name its acts. What if we took exactly that, and turned it into the HEART media type, which is built on HAL Schema Forms? Same resources, same relation names. Add the forms, then make them cheap. The next five slides are a mockup, rung by rung."
+sources:
+  - ["AWS: GetClientCertificates", "https://docs.aws.amazon.com/apigateway/latest/api/API_GetClientCertificates.html"]
+  - ["HAL Schema Forms", "https://github.com/jbadeau/hal-schema-forms"]
+html: |
+  <h2>What if AWS’s HAL became HEART?</h2>
+  <div class="split" style="grid-template-columns: 1fr 1fr 1fr">
+    <div class="card"><h3>HAL</h3><p>AWS today: links and typed relations that name the acts</p></div>
+    <div class="card"><h3>+ HAL Schema Forms</h3><p>each act as a form: method, fields, JSON Schema</p></div>
+    <div class="card dark"><h3>= HEART</h3><p>only the forms valid now, guarded, cached by rung</p></div>
+  </div>
+  <p class="lead">Same resources. Same relation names. Nothing for AWS to give up.</p>

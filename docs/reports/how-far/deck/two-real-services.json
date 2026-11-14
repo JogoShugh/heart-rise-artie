@@ -1,0 +1,46 @@
+{
+  "name": "two-real-services",
+  "title": "Now two real services, built to agree on nothing",
+  "part": "Two forges, one vocabulary",
+  "kicker": "From preview to proof",
+  "tone": "dark",
+  "number": 21,
+  "of": 50,
+  "html": "<h2>Now two real services, built to agree on nothing</h2>\n<p class=\"lead\">AWS stays a mockup. From here on, everything ran for real, and every request is on the record.</p>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)\">\n  <div class=\"card dark\"><h3>GitHub</h3><p>the real one, in the cloud: <a href=\"https://github.com/JogoShugh/heart-github-test\" target=\"_blank\" rel=\"noopener\">JogoShugh/heart-github-test</a></p></div>\n  <div class=\"card dark\"><h3>GitLab</h3><p>Community Edition, in a container on this machine</p></div>\n</div>\n",
+  "say": "AWS stays a mockup: nobody serves it as HEART today. From here on everything ran for real, with every request recorded. Two real services, from two companies, that do mostly the same job and agree on almost nothing: GitHub, in the cloud, and GitLab, running on this machine.",
+  "sources": [
+    {
+      "label": "github.com/JogoShugh/heart-github-test",
+      "href": "https://github.com/JogoShugh/heart-github-test"
+    },
+    {
+      "label": "GitLab CE",
+      "href": "https://docs.gitlab.com/install/docker/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "two-real-services.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "aws-l2.json",
+      "title": "L2: schemas linked too, and shared everywhere"
+    },
+    "next": {
+      "href": "two-implementations.json",
+      "title": "Two implementations of mostly the same thing"
+    },
+    "alternate": {
+      "href": "two-real-services.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

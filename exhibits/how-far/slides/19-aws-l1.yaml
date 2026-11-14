@@ -1,0 +1,64 @@
+name: aws-l1
+part: "A preview: AWS as HEART"
+title: "L1: the forms become one shared, cached set"
+kicker: A preview of HEART · 4 of 5 · HEART L1
+say: "Mockup. With Prefer: forms=link, the certificate links its form set instead of inlining it. Every certificate links the same set, at a content address with an integrity hash, cached for a year and immutable. The target becomes a template the client fills from the certificate's own state, by the pointer. The certificate itself is still revalidated by its ETag; a state seen before costs one 304."
+sources:
+  - ["RFC 9111 HTTP Caching", "https://www.rfc-editor.org/rfc/rfc9111"]
+  - ["RFC 7240 Prefer", "https://www.rfc-editor.org/rfc/rfc7240"]
+  - ["UpdateClientCertificate", "https://docs.aws.amazon.com/apigateway/latest/api/API_UpdateClientCertificate.html"]
+html: |
+  <h2>L1: the forms become one shared, cached set</h2>
+  <div class="split">
+  <pre><code># GET /clientcertificates/xmbiqp
+  # Prefer: forms=link
+  # 200 OK
+  # ETag: "seq-1.hsf.L1"
+  # Cache-Control: no-cache
+  # Preference-Applied: forms=link
+  clientCertificateId: xmbiqp
+  createdDate: 2015-12-08T18:02:16Z
+  description: test-client-cert-2
+  expirationDate: 2016-12-07T18:02:16Z
+  pemEncodedCertificate: |
+    -----BEGIN CERTIFICATE----- …
+  _links:
+    self:
+      href: /clientcertificates/xmbiqp
+  <span class="add">  hr:forms:</span>
+  <span class="add">    href: /affordance-sets/{hash}</span>
+  <span class="add">    type: application/hal+json</span>
+  <span class="add">    profile: https://w3id.org/heart-rise/</span>
+  <span class="add">      hal-schema-forms</span>
+  <span class="add">    integrity: sha256-…</span></code></pre>
+  <pre><code># GET /affordance-sets/{hash}
+  # Cache-Control: public, max-age=31536000, immutable
+  _forms:
+    clientcertificate:update:
+      title: Update
+      _links:
+        target:
+          href: /clientcertificates/{id}
+          templated: true
+  <span class="add">    hr:templatePointers:</span>
+  <span class="add">      id: /clientCertificateId</span>
+      method: PATCH
+      contentType: application/json
+      hr:integrity: sha256-…
+      schema:
+        type: object
+        required: [patchOperations]
+        properties:
+          patchOperations: {…as at L0…}
+    clientcertificate:delete:
+      title: Delete
+      _links:
+        target:
+          href: /clientcertificates/{id}
+          templated: true
+      hr:templatePointers:
+        id: /clientCertificateId
+      method: DELETE</code></pre>
+  </div>
+  <p class="cite"><b style="color:var(--bad)">MOCKUP</b> · Today · L0 · <b>L1</b> · L2 · <i>One set for every certificate: fetched once, then read from cache.</i></p>
+  <p class="refs"><deck-ref name="cache"></deck-ref></p>

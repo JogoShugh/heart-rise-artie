@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The skill tells the model the loop, and that the gates win · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">For the engineers · The prompt</span></header>
+<h2>The skill tells the model the loop, and that the gates win</h2>
+<div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);">
+  <div class="rows">
+    <pre><code># SKILL.md, the opening
+Instructions are advisory. A model can drift
+past them. These gates are real processes with
+real exit codes, so they hold even when
+attention slips. This skill installs them and
+explains the loop they enforce. **The skill
+never replaces the hooks**: if a gate blocks
+you, satisfy it; never edit it away.</code></pre>
+    <p class="refs"><details class="fragment-plain"><summary>SKILL.md, the opening</summary><pre><code>Instructions are advisory. A model can drift past them. These gates are real
+processes with real exit codes, so they hold even when attention slips. This
+skill installs them and explains the loop they enforce. **The skill never
+replaces the hooks**: if a gate blocks you, satisfy it; never edit it away.</code></pre></details></p>
+  </div>
+  <div class="rows">
+    <pre><code># SKILL.md, the work loop
+1. Write or change the .feature scenario.
+   Use Scenario Outlines and data tables,
+   not repeated Given/When/Then blocks.
+2. Run the BDD suite (native command, or
+   .claude/bdd-gates/bdd-run.sh on wrapper
+   stacks). See it fail for the right
+   reason: BDD_RUN FAIL.
+3. Write step definitions, then production
+   code. The gate now allows it.
+4. Run the suite until BDD_RUN PASS. Fix
+   lint findings as they appear.
+5. End the turn. The Stop gate runs the
+   full check.</code></pre>
+    <p class="refs"><details class="fragment-plain"><summary>SKILL.md, the work loop</summary><pre><code>1. Write or change the `.feature` scenario. Use Scenario Outlines and data
+   tables, not repeated Given/When/Then blocks.
+2. Run the BDD suite (native command, or `.claude/bdd-gates/bdd-run.sh` on
+   wrapper stacks). See it **fail** for the right reason: `BDD_RUN FAIL`.
+3. Write step definitions, then production code. The gate now allows it.
+4. Run the suite until `BDD_RUN PASS`. Fix lint findings as they appear.
+5. End the turn. The Stop gate runs the full check.</code></pre></details></p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/hooks.html" rel="prev"><small>Back</small><b>Instructions are advisory. Hooks are not.</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#skill-md">with heart-ts</a></span>
+<a href="deck/hooks-wiring.html" rel="next"><small>Next</small><b>Five hook events, each a shell script</b></a></nav>
+</main></div></body></html>

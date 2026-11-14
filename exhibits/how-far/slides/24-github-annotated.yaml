@@ -1,0 +1,21 @@
+name: github-annotated
+part: Two forges, one vocabulary
+title: "What each scm: relation did, on GitHub’s own page"
+kicker: Typed relations · On GitHub
+say: "Pull request #2337 on real GitHub, variant 504: merged, then the smoke test failed scenario S3, so it wasn't promoted and the script commented. Each box is something one scm: relation read or did. The page is GitHub's; ARTIE never saw it, only the gateway's HAL Schema Forms."
+sources:
+  - ["Pull request #2337", "https://github.com/JogoShugh/heart-github-test/pull/2337"]
+  - ["GitHub: merge a pull request", "https://docs.github.com/en/rest/pulls/pulls#merge-a-pull-request"]
+  - ["GitHub: create an issue comment", "https://docs.github.com/en/rest/issues/comments#create-an-issue-comment"]
+html: |
+  <h2>What each scm: relation did, on GitHub’s own page</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr)">
+    <figure><img src="media/gh504.png" alt="GitHub's page for pull request #2337, with five numbered boxes: the title, the merged state, the head sha, the squash merge and the comment"></figure>
+    <ol>
+      <li><code><b>scm:pulls-get</b></code><br>Read pull request 2337, kept as pr.</li>
+      <li><code><b>state, merged</b></code><br>state: closed, merged: true, read after the act.</li>
+      <li><code><b>head.sha</b></code><br>The head the view had: GitHub merges only if it’s still there.</li>
+      <li><code><b>scm:merge {method: squash}</b></code><br>Squashed into library/main as 1361304.</li>
+      <li><code><b>scm:comment {body}</b></code><br>“Not promoted to Dev: smoke scenarios S3 failed.”</li>
+    </ol>
+  </div>

@@ -1,0 +1,29 @@
+{
+  "name": "aws-l0-certificate",
+  "title": "L0: the certificate, with its forms inline",
+  "part": "A preview: AWS as HEART",
+  "kicker": "A preview of HEART · 2 of 5 · HEART L0",
+  "tone": "light",
+  "number": 17,
+  "of": 50,
+  "html": "<h2>L0: the certificate, with its forms inline</h2>\n<div class=\"split\">\n<pre><code># GET /clientcertificates/xmbiqp\n# Accept: application/hal+json\n# Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;\n# 200 OK\n# ETag: \"seq-1.hsf.L0\"\n# Cache-Control: no-cache\n# Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;;\n#   rel=\"profile\"\nclientCertificateId: xmbiqp\ncreatedDate: 2015-12-08T18:02:16Z\ndescription: test-client-cert-2\nexpirationDate: 2016-12-07T18:02:16Z\npemEncodedCertificate: |\n  -----BEGIN CERTIFICATE-----\n  MIIC6DC...XuHVdZ5r27XRRXEjg==\n  -----END CERTIFICATE-----\n_links:\n  self:\n    href: /clientcertificates/xmbiqp\n  curies:\n    - name: clientcertificate\n      href: /profiles/clientcertificate#{rel}\n      templated: true</code></pre>\n<pre><code><span class=\"add\">_forms:</span>\n<span class=\"add\">  clientcertificate:update:</span>\n    title: Update\n    _links:\n      target:\n        href: /clientcertificates/xmbiqp\n    method: PATCH\n    contentType: application/json\n    schema:\n      type: object\n      required: [patchOperations]\n      properties:\n        patchOperations:\n          type: array\n          items:\n            type: object\n            properties:\n              op:\n                enum: [add, remove, replace, move, copy, test]\n              path: {type: string, examples: [/description]}\n              value: {type: string}\n              from: {type: string}\n<span class=\"add\">  clientcertificate:delete:</span>\n    title: Delete\n    _links:\n      target:\n        href: /clientcertificates/xmbiqp\n    method: DELETE</code></pre>\n</div>\n<p class=\"cite\"><b style=\"color:var(--bad)\">MOCKUP</b> · Today · <b>L0</b> · L1 · L2 · <i>Everything in one answer: correct, and repeated on every read.</i></p>\n",
+  "say": "Mockup. The certificate as a HEART resource at L0: AWS's state as is, plus each act as a form: target, method, content type and its JSON Schema, all in one answer. The relation names stay AWS's. The ETag lets an act carry If-Match, so a stale view gets 412 rather than a lost update. The update schema follows AWS's PatchOperation: op, path, value, from.",
+  "sources": [
+    {
+      "label": "UpdateClientCertificate",
+      "href": "https://docs.aws.amazon.com/apigateway/latest/api/API_UpdateClientCertificate.html"
+    },
+    {
+      "label": "PatchOperation",
+      "href": "https://docs.aws.amazon.com/apigateway/latest/api/API_PatchOperation.html"
+    },
+    {
+      "label": "DeleteClientCertificate",
+      "href": "https://docs.aws.amazon.com/apigateway/latest/api/API_DeleteClientCertificate.html"
+    },
+    {
+      "label": "HAL Schema Forms",
+      "href": "https://github.com/jbadeau/hal-schema-forms"
+    }
+  ]
+}

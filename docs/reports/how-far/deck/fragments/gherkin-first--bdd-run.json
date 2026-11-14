@@ -1,0 +1,21 @@
+{
+  "name": "bdd-run",
+  "label": "core/bdd-run.sh, every run, pass or fail",
+  "lang": "bash",
+  "path": "bdd-gates: core/bdd-run.sh",
+  "lines": "1–26",
+  "of": 26,
+  "text": "#!/usr/bin/env bash\n# Runs the BDD suite and records \"BDD_RUN PASS|FAIL\" in the event log, pass or\n# fail. For stacks with bddLogging \"wrapper\" (no native build hook that runs\n# after a failed test task). Extra args are appended to bddCommand.\n# Exits with the suite's own exit code.\nset -o pipefail\n. \"$(dirname \"$0\")/lib.sh\"\n\nbdd_has_config || { echo \"bdd-run: no $(bdd_config)\" >&2; exit 1; }\ncmd=$(bdd_value bddCommand)\n[ -n \"$cmd\" ] || { echo \"bdd-run: bddCommand not set in $(bdd_config)\" >&2; exit 1; }\n\ncd \"$(bdd_root)\" || exit 1\nif [ $# -gt 0 ]; then\n  bash -c \"$cmd $*\"\nelse\n  bash -c \"$cmd\"\nfi\nec=$?\n\nif [ $ec -eq 0 ]; then\n  bdd_append \"BDD_RUN PASS exit=0\"\nelse\n  bdd_append \"BDD_RUN FAIL exit=$ec\"\nfi\nexit $ec",
+  "_links": {
+    "self": {
+      "href": "gherkin-first--bdd-run.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/bdd-run.sh",
+      "title": "core/bdd-run.sh, lines 1–26"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

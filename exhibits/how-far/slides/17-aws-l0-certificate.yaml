@@ -1,0 +1,66 @@
+name: aws-l0-certificate
+part: "A preview: AWS as HEART"
+title: "L0: the certificate, with its forms inline"
+kicker: A preview of HEART · 2 of 5 · HEART L0
+say: "Mockup. The certificate as a HEART resource at L0: AWS's state as is, plus each act as a form: target, method, content type and its JSON Schema, all in one answer. The relation names stay AWS's. The ETag lets an act carry If-Match, so a stale view gets 412 rather than a lost update. The update schema follows AWS's PatchOperation: op, path, value, from."
+sources:
+  - ["UpdateClientCertificate", "https://docs.aws.amazon.com/apigateway/latest/api/API_UpdateClientCertificate.html"]
+  - ["PatchOperation", "https://docs.aws.amazon.com/apigateway/latest/api/API_PatchOperation.html"]
+  - ["DeleteClientCertificate", "https://docs.aws.amazon.com/apigateway/latest/api/API_DeleteClientCertificate.html"]
+  - ["HAL Schema Forms", "https://github.com/jbadeau/hal-schema-forms"]
+html: |
+  <h2>L0: the certificate, with its forms inline</h2>
+  <div class="split">
+  <pre><code># GET /clientcertificates/xmbiqp
+  # Accept: application/hal+json
+  # Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
+  # 200 OK
+  # ETag: "seq-1.hsf.L0"
+  # Cache-Control: no-cache
+  # Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;;
+  #   rel="profile"
+  clientCertificateId: xmbiqp
+  createdDate: 2015-12-08T18:02:16Z
+  description: test-client-cert-2
+  expirationDate: 2016-12-07T18:02:16Z
+  pemEncodedCertificate: |
+    -----BEGIN CERTIFICATE-----
+    MIIC6DC...XuHVdZ5r27XRRXEjg==
+    -----END CERTIFICATE-----
+  _links:
+    self:
+      href: /clientcertificates/xmbiqp
+    curies:
+      - name: clientcertificate
+        href: /profiles/clientcertificate#{rel}
+        templated: true</code></pre>
+  <pre><code><span class="add">_forms:</span>
+  <span class="add">  clientcertificate:update:</span>
+      title: Update
+      _links:
+        target:
+          href: /clientcertificates/xmbiqp
+      method: PATCH
+      contentType: application/json
+      schema:
+        type: object
+        required: [patchOperations]
+        properties:
+          patchOperations:
+            type: array
+            items:
+              type: object
+              properties:
+                op:
+                  enum: [add, remove, replace, move, copy, test]
+                path: {type: string, examples: [/description]}
+                value: {type: string}
+                from: {type: string}
+  <span class="add">  clientcertificate:delete:</span>
+      title: Delete
+      _links:
+        target:
+          href: /clientcertificates/xmbiqp
+      method: DELETE</code></pre>
+  </div>
+  <p class="cite"><b style="color:var(--bad)">MOCKUP</b> · Today · <b>L0</b> · L1 · L2 · <i>Everything in one answer: correct, and repeated on every read.</i></p>

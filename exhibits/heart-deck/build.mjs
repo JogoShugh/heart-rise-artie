@@ -83,6 +83,8 @@ const named = (html, tag) => [...new Set([...html.matchAll(new RegExp(`<${tag} n
 const slides = readdirSync(join(deckDir, "slides")).filter((f) => f.endsWith(".yaml")).sort()
   .map((f) => parse(readFileSync(join(deckDir, "slides", f), "utf8")));
 if (new Set(slides.map((s) => s.name)).size !== slides.length) throw new Error("two slides share a name");
+// heart-ts picks an embedded item by its title, so titles are unique too.
+if (new Set(slides.map((s) => s.title)).size !== slides.length) throw new Error("two slides share a title");
 
 rmSync(join(out, "deck"), { recursive: true, force: true });
 rmSync(join(out, "refs"), { recursive: true, force: true });

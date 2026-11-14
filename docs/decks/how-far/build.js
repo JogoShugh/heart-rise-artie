@@ -251,8 +251,8 @@ const arrow = (s, x, y) => s.addShape(pres.shapes.RIGHT_ARROW, { x, y, w: 0.4, h
   ];
   s.addTable(rows, { x: 6.6, y: 1.65, w: 6.1, colW: [2.6, 0.7, 0.7, 0.7, 0.7, 0.7], fontSize: 12, color: INK, border: { type: "solid", pt: 0.5, color: "C9D8CE" }, fill: { color: "FFFFFF" }, rowH: 0.36, align: "center", valign: "middle" });
   T(s, "Real GitHub, five releases, no model calls. A warm release sends about 53 fewer requests: the form sets and schemas never leave ARTIE\u2019s memory.", { x: 6.6, y: 3.25, w: 6.1, h: 0.7, fontSize: 12, color: SAGE, italic: true });
-  stat(s, 6.6, 4.05, 3.0, "51.2M", "requests never sent, over 1,000,000 releases (GitHub)");
-  stat(s, 9.7, 4.05, 3.0, "34.6 GB", "bytes not received at that scale: 23% on GitHub, 60% on GitLab");
+  stat(s, 6.6, 4.05, 3.0, "5,069", "requests never sent over 100 releases on GitHub (3,985 on GitLab)");
+  stat(s, 9.7, 4.05, 3.0, "3.4 MB", "not received over those 100 on GitHub, 23% (GitLab: 3.8 MB, 59%)");
   T(s, "Bytes: JSON bodies before compression, headers excluded. Extrapolated from the measured warm release.", { x: 6.6, y: 5.75, w: 6.1, h: 0.5, fontSize: 11, color: SAGE });
 }
 

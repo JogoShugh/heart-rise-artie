@@ -1,0 +1,20 @@
+name: gitlab-annotated
+part: Two forges, one vocabulary
+title: The same relations, on GitLab’s page
+kicker: Typed relations · On GitLab
+say: "Merge request !504 on the GitLab running on this machine, the same variant, the same script. Same five things, different words on the page: GitLab says merge request, Merged, pr-504 into main, commits were squashed. ARTIE read and sent the same scm: relations on both."
+sources:
+  - ["GitLab: merge requests API", "https://docs.gitlab.com/api/merge_requests/"]
+  - ["GitLab: notes API", "https://docs.gitlab.com/api/notes/"]
+html: |
+  <h2>The same relations, on GitLab’s page</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 5fr) minmax(0, 7fr)">
+    <figure><img src="media/gl504.png" alt="GitLab's page for merge request !504, with five numbered boxes: the title, the merged state, the head sha, the squash merge and the note"></figure>
+    <ol>
+      <li><code><b>scm:pulls-get</b></code><br>Read merge request 504, kept as pr.</li>
+      <li><code><b>state, merged</b></code><br>GitLab’s merged becomes state: closed, merged: true.</li>
+      <li><code><b>head.sha</b></code><br>GitLab’s sha: it merges only if the source head is still there.</li>
+      <li><code><b>scm:merge {method: squash}</b></code><br>“Changes merged into main with 8ef9444b (commits were squashed).”</li>
+      <li><code><b>scm:comment {body}</b></code><br>The same comment, as a GitLab note.</li>
+    </ol>
+  </div>

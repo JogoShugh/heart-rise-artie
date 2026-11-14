@@ -1,0 +1,15 @@
+name: one-plain-ui
+part: Two forges, one vocabulary
+title: One plain UI, rendered from the shared relations
+kicker: What typed relations buy · text/html
+say: "The gateway serves each resource as text/html too. It's a plain, functional UI, rendered only from the data, the typed relations and the forms offered now. Nothing in the renderer knows GitHub or GitLab. Here, both merged: green buttons are the forms offered now, grey ones are not offered in this state. scm:comment is lit on both."
+sources:
+  - ["Report: Real GitHub, Local GitLab", "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-real-github/"]
+html: |
+  <h2>One plain UI, rendered from the shared relations</h2>
+  <div class="split">
+    <figure><img src="media/hgh504.png" alt="GitHub pull request #2337 through the gateway, rendered as text/html"><figcaption>GitHub #2337 through the gateway, as text/html.</figcaption></figure>
+    <figure><img src="media/hgl504.png" alt="GitLab merge request !504 through the gateway, rendered as text/html"><figcaption>GitLab !504 through the gateway, as text/html.</figcaption></figure>
+  </div>
+  <p class="lead"><b style="color: var(--leaf)">Green:</b> offered now. <b>Grey:</b> not in this state (merged). One renderer, no forge-specific code: it reads the media type, as a browser reads HTML.</p>
+  <p class="refs"><deck-ref name="think-of-the-web"></deck-ref></p>

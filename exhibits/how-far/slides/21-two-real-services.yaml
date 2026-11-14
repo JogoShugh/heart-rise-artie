@@ -1,0 +1,16 @@
+name: two-real-services
+part: Two forges, one vocabulary
+tone: dark
+title: Now two real services, built to agree on nothing
+kicker: From preview to proof
+say: "AWS stays a mockup: nobody serves it as HEART today. From here on everything ran for real, with every request recorded. Two real services, from two companies, that do mostly the same job and agree on almost nothing: GitHub, in the cloud, and GitLab, running on this machine."
+sources:
+  - ["github.com/JogoShugh/heart-github-test", "https://github.com/JogoShugh/heart-github-test"]
+  - ["GitLab CE", "https://docs.gitlab.com/install/docker/"]
+html: |
+  <h2>Now two real services, built to agree on nothing</h2>
+  <p class="lead">AWS stays a mockup. From here on, everything ran for real, and every request is on the record.</p>
+  <div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)">
+    <div class="card dark"><h3>GitHub</h3><p>the real one, in the cloud: <a href="https://github.com/JogoShugh/heart-github-test" target="_blank" rel="noopener">JogoShugh/heart-github-test</a></p></div>
+    <div class="card dark"><h3>GitLab</h3><p>Community Edition, in a container on this machine</p></div>
+  </div>

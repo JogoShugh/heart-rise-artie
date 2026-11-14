@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARTIE is to APIs what a browser is to web pages · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Putting them back together · The generic client</span></header>
+<h2>ARTIE is to APIs what a browser is to web pages</h2>
+<table>
+  <thead><tr><th>The client</th><th>Speaks, and is coupled to</th><th>Works with</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><b>Web browser</b><br>one generic client, for every site</td>
+      <td><code>text/html</code> + HTTP<br><small><code>image/jpeg</code> <code>image/png</code> <code>text/css</code> <code>text/javascript</code> <code>image/svg+xml</code> <code>font/woff2</code></small></td>
+      <td>An online bank · A wiki · A shop · <i>Any site not yet built</i></td>
+    </tr>
+    <tr>
+      <td><b>ARTIE</b><br>one generic client, for every API</td>
+      <td><code>application/hal+json</code> + HEART profile + HTTP<br><small><code>application/schema+json</code> <code>application/problem+json</code> <code>application/yaml</code></small></td>
+      <td>AWS API Gateway (preview next) · GitHub · GitLab · <i>Any API not yet built</i></td>
+    </tr>
+  </tbody>
+</table>
+<p class="lead"><b>Coupled to:</b> the media type and the protocol. <b>Not coupled to:</b> certificates, pull requests, merge rules, URL layouts, or which acts exist today. Zero domain code.</p>
+<p class="refs"><a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-720">“Think of it in terms of the Web”</a> <a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_5">Uniform interface · HATEOAS</a></p>
+</article>
+<nav class="foot"><a href="deck/heart-rise-artie.html" rel="prev"><small>Back</small><b>HEART, RISE and ARTIE</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#generic-client">with heart-ts</a></span>
+<a href="deck/aws-callback.html" rel="next"><small>Next</small><b>What if AWS’s HAL became HEART?</b></a></nav>
+</main></div></body></html>

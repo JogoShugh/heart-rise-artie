@@ -1,0 +1,20 @@
+name: divorce
+part: Why it matters
+title: "The divorce: data in the response, controls elsewhere"
+kicker: The machine web
+say: "APIs kept the information and moved the controls out of band: docs, SDKs, OpenAPI, and now MCP tool lists. Agents inherit the divorce: every tool and endpoint is loaded into the context window up front, whatever the current state allows."
+sources:
+  - ["Fielding (2008)", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]
+  - ["GitHub OpenAPI description", "https://github.com/github/rest-api-description"]
+html: |
+  <h2>The divorce: data in the response, controls elsewhere</h2>
+  <div class="split" style="grid-template-columns: 1fr 1fr 1fr">
+    <div class="card"><h3>The response</h3><p>Data only. Status, ids, timestamps. Nothing says what you may do next.</p></div>
+    <div class="card dark"><h3>The controls, out of band</h3>
+      <ul><li>Docs and SDKs</li><li>OpenAPI descriptions</li><li>MCP tool lists</li></ul>
+    </div>
+    <div class="rows"><h3 style="font-size: 2.4rem">13.5 MB</h3><p>GitHub’s OpenAPI description, as one file. An agent given it reads every operation, whatever state the pull request is in.</p></div>
+  </div>
+  <blockquote class="big">“Failure here implies that out-of-band information is driving interaction instead of hypertext.”</blockquote>
+  <p class="cite"><a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven" target="_blank" rel="noopener"><b>Roy T. Fielding</b></a>, “REST APIs must be hypertext-driven”, 2008</p>
+  <p class="refs"><deck-ref name="rule-3"></deck-ref></p>

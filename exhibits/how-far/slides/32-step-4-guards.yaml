@@ -1,0 +1,52 @@
+name: step-4-guards
+part: Two forges, one vocabulary
+title: Guards, and why the other acts are absent
+kicker: Building it back up · Step 4 of 5 · HEART L0, simplified
+say: "The whole answer's headers: the profile, the ETag, no-cache, and the alternates the gateway also serves (HAL-FORMS, text/html, plain JSON). An act sends the ETag back as If-Match: if the pull request changed since it was read, the answer is 412, not a lost update. And the absent acts have reasons: reopen isn't offered because the pull request is already open, in the connector's own words."
+sources:
+  - ["RFC 9110: If-Match, 412", "https://www.rfc-editor.org/rfc/rfc9110#name-if-match"]
+  - ["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]
+fragments:
+  - name: reader
+    label: The connector's own words (github-scm/pull.reader.yaml)
+    source: heart/heart-gateway/connectors/github-scm/pull.reader.yaml
+    lang: yaml
+html: |
+  <h2>Guards, and why the other acts are absent</h2>
+  <div class="split">
+    <div class="rows">
+      <pre># 200 OK
+  Content-Type: application/hal+json
+  Content-Profile: &lt;https://w3id.org/heart-rise/
+                    hal-schema-forms&gt;
+  ETag: "seq-0.hsf.L0.6042001a61e14760"
+  Cache-Control: no-cache
+  Vary: Accept, Prefer, Accept-Profile
+  Link: &lt;…/pulls/2325&gt;; rel="alternate";
+          type="application/prs.hal-forms+json",
+        &lt;…/pulls/2325&gt;; rel="alternate"; type="text/html"</pre>
+      <pre># the act carries what it read
+  PUT /repos/…/pulls/2325/actions/merge
+  <span class="add">If-Match: "seq-0.hsf.L0.6042001a61e14760"</span>
+  {method: squash}
+  # changed since? 412, not a lost update</pre>
+    </div>
+    <div class="rows">
+      <pre><b>_links:</b>
+    hr:unavailable:
+      href: /unavailable/bf257b5ee24d7901
+      integrity: sha256-vyV7XuJNeQF8…
+  # GET /unavailable/bf257b5ee24d7901  (as served)
+  unavailable:
+    - rel: /profiles/scm#reopen
+      title: Reopen
+      <span class="add">reason: The pull request is already open.</span>
+  # the reason is the connector's own words:
+  # github-scm/pull.reader.yaml
+  #   open:
+  #     absent:
+  #       reopen: The pull request is
+  #               already open.</pre>
+      <p class="refs"><deck-ref name="in-band"></deck-ref> <deck-fragment name="reader">pull.reader.yaml</deck-fragment></p>
+    </div>
+  </div>

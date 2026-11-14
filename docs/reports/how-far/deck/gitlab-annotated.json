@@ -1,0 +1,46 @@
+{
+  "name": "gitlab-annotated",
+  "title": "The same relations, on GitLab’s page",
+  "part": "Two forges, one vocabulary",
+  "kicker": "Typed relations · On GitLab",
+  "tone": "light",
+  "number": 25,
+  "of": 50,
+  "html": "<h2>The same relations, on GitLab’s page</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 5fr) minmax(0, 7fr)\">\n  <figure><img src=\"media/gl504.png\" alt=\"GitLab's page for merge request !504, with five numbered boxes: the title, the merged state, the head sha, the squash merge and the note\"></figure>\n  <ol>\n    <li><code><b>scm:pulls-get</b></code><br>Read merge request 504, kept as pr.</li>\n    <li><code><b>state, merged</b></code><br>GitLab’s merged becomes state: closed, merged: true.</li>\n    <li><code><b>head.sha</b></code><br>GitLab’s sha: it merges only if the source head is still there.</li>\n    <li><code><b>scm:merge {method: squash}</b></code><br>“Changes merged into main with 8ef9444b (commits were squashed).”</li>\n    <li><code><b>scm:comment {body}</b></code><br>The same comment, as a GitLab note.</li>\n  </ol>\n</div>\n",
+  "say": "Merge request !504 on the GitLab running on this machine, the same variant, the same script. Same five things, different words on the page: GitLab says merge request, Merged, pr-504 into main, commits were squashed. ARTIE read and sent the same scm: relations on both.",
+  "sources": [
+    {
+      "label": "GitLab: merge requests API",
+      "href": "https://docs.gitlab.com/api/merge_requests/"
+    },
+    {
+      "label": "GitLab: notes API",
+      "href": "https://docs.gitlab.com/api/notes/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "gitlab-annotated.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "github-annotated.json",
+      "title": "What each scm: relation did, on GitHub’s own page"
+    },
+    "next": {
+      "href": "mapping.json",
+      "title": "How each scm: relation maps to each forge"
+    },
+    "alternate": {
+      "href": "gitlab-annotated.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

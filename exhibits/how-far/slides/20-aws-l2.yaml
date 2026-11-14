@@ -1,0 +1,64 @@
+name: aws-l2
+part: "A preview: AWS as HEART"
+title: "L2: schemas linked too, and shared everywhere"
+kicker: A preview of HEART · 5 of 5 · HEART L2
+say: "Mockup. With Prefer: forms=link, schema=link, each form in the set references its schema by $ref, at a content address with an integrity hash. One schema, say for a patch of the description, is shared across forms, states and resources. This is the rung the release desk ran on GitHub and GitLab: from the second release on, about 50 set and schema reads per release never reached the network."
+sources:
+  - ["RFC 9111 HTTP Caching", "https://www.rfc-editor.org/rfc/rfc9111"]
+  - ["JSON Schema 2020-12", "https://json-schema.org/draft/2020-12"]
+  - ["PatchOperation", "https://docs.aws.amazon.com/apigateway/latest/api/API_PatchOperation.html"]
+html: |
+  <h2>L2: schemas linked too, and shared everywhere</h2>
+  <div class="split">
+  <pre><code># GET /affordance-sets/{hash}
+  # Prefer: forms=link, schema=link
+  # Cache-Control: public, max-age=31536000, immutable
+  _forms:
+    clientcertificate:update:
+      title: Update
+      _links:
+        target:
+          href: /clientcertificates/{id}
+          templated: true
+      hr:templatePointers:
+        id: /clientCertificateId
+      method: PATCH
+      contentType: application/json
+      hr:integrity: sha256-…
+  <span class="add">    schema:</span>
+  <span class="add">      $ref: /schemas/{hash}</span>
+  <span class="add">      hr:integrity: sha256-…</span>
+    clientcertificate:delete:
+      title: Delete
+      _links:
+        target:
+          href: /clientcertificates/{id}
+          templated: true
+      hr:templatePointers:
+        id: /clientCertificateId
+      method: DELETE</code></pre>
+  <pre><code># GET /schemas/{hash}
+  # Content-Type: application/schema+json
+  # Cache-Control: public, max-age=31536000, immutable
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  required: [patchOperations]
+  properties:
+    patchOperations:
+      type: array
+      items:
+        type: object
+        properties:
+          op:
+            enum: [add, remove, replace,
+                   move, copy, test]
+          path:
+            type: string
+            examples: [/description]
+          value:
+            type: string
+          from:
+            type: string</code></pre>
+  </div>
+  <p class="cite"><b style="color:var(--bad)">MOCKUP</b> · Today · L0 · L1 · <b>L2</b> · <i>A second read: 304 for the certificate; set and schema from cache, no request.</i></p>
+  <p class="refs"><deck-ref name="cache"></deck-ref></p>

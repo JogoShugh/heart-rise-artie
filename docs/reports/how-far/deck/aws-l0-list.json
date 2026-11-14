@@ -1,0 +1,50 @@
+{
+  "name": "aws-l0-list",
+  "title": "L0: the list offers generate, with what it needs",
+  "part": "A preview: AWS as HEART",
+  "kicker": "A preview of HEART · 3 of 5 · HEART L0",
+  "tone": "light",
+  "number": 18,
+  "of": 50,
+  "html": "<h2>L0: the list offers generate, with what it needs</h2>\n<div class=\"split\">\n<pre><code># GET /clientcertificates\n# 200 OK, ETag: \"seq-7.hsf.L0\", Cache-Control: no-cache\n_links:\n  self:\n    href: /clientcertificates\n  curies:\n    - name: clientcertificate\n      href: /profiles/clientcertificate#{rel}\n      templated: true\n_embedded:\n  item:\n    - clientCertificateId: xmbiqp\n      description: test-client-cert-2\n      expirationDate: 2016-12-07T18:02:16Z\n      _links:\n        self:\n          href: /clientcertificates/xmbiqp\n      _forms:\n        clientcertificate:update: {…}\n        clientcertificate:delete: {…}</code></pre>\n<pre><code><span class=\"add\">_forms:</span>\n<span class=\"add\">  clientcertificate:generate:</span>\n    title: Generate a client certificate\n    _links:\n      target:\n        href: /clientcertificates\n    method: POST\n    contentType: application/json\n    schema:\n      type: object\n      properties:\n        description:\n          type: string\n        tags:\n          type: object\n          additionalProperties: {type: string}\n<span class=\"add\">  clientcertificate:by-id:</span>\n    title: Find a certificate by its id\n    _links:\n      target:\n        href: /clientcertificates/{clientcertificate_id}\n        templated: true\n    method: GET\n    schema:\n      type: object\n      required: [clientcertificate_id]\n      properties:\n        clientcertificate_id: {type: string}</code></pre>\n</div>\n<p class=\"cite\"><b style=\"color:var(--bad)\">MOCKUP</b> · Today · <b>L0</b> · L1 · L2 · <i>The list carries its own acts, and each item carries its own.</i></p>\n",
+  "say": "Mockup. The list of certificates at L0. generate becomes a form: POST, JSON, and the two fields AWS's GenerateClientCertificate takes, description and tags. by-id becomes a search-like form whose one field fills the template. Each certificate is embedded with its own forms, as on the previous slide.",
+  "sources": [
+    {
+      "label": "GenerateClientCertificate",
+      "href": "https://docs.aws.amazon.com/apigateway/latest/api/API_GenerateClientCertificate.html"
+    },
+    {
+      "label": "AWS: GetClientCertificates",
+      "href": "https://docs.aws.amazon.com/apigateway/latest/api/API_GetClientCertificates.html"
+    },
+    {
+      "label": "HAL Schema Forms",
+      "href": "https://github.com/jbadeau/hal-schema-forms"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "aws-l0-list.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "aws-l0-certificate.json",
+      "title": "L0: the certificate, with its forms inline"
+    },
+    "next": {
+      "href": "aws-l1.json",
+      "title": "L1: the forms become one shared, cached set"
+    },
+    "alternate": {
+      "href": "aws-l0-list.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

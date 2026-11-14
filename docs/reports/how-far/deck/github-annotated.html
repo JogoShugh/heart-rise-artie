@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What each scm: relation did, on GitHub’s own page · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Typed relations · On GitHub</span></header>
+<h2>What each scm: relation did, on GitHub’s own page</h2>
+<div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr)">
+  <figure><img src="media/gh504.png" alt="GitHub's page for pull request #2337, with five numbered boxes: the title, the merged state, the head sha, the squash merge and the comment"></figure>
+  <ol>
+    <li><code><b>scm:pulls-get</b></code><br>Read pull request 2337, kept as pr.</li>
+    <li><code><b>state, merged</b></code><br>state: closed, merged: true, read after the act.</li>
+    <li><code><b>head.sha</b></code><br>The head the view had: GitHub merges only if it’s still there.</li>
+    <li><code><b>scm:merge {method: squash}</b></code><br>Squashed into library/main as 1361304.</li>
+    <li><code><b>scm:comment {body}</b></code><br>“Not promoted to Dev: smoke scenarios S3 failed.”</li>
+  </ol>
+</div>
+</article>
+<nav class="foot"><a href="deck/interchangeable.html" rel="prev"><small>Back</small><b>Can we make them interchangeable?</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#github-annotated">with heart-ts</a></span>
+<a href="deck/gitlab-annotated.html" rel="next"><small>Next</small><b>The same relations, on GitLab’s page</b></a></nav>
+</main></div></body></html>

@@ -1,0 +1,46 @@
+{
+  "name": "web-made-llms",
+  "title": "The Web made LLMs possible, and only half of it",
+  "part": "Why it matters",
+  "kicker": "Why this team cares",
+  "tone": "light",
+  "number": 8,
+  "of": 50,
+  "html": "<h2>The Web made LLMs possible, and only half of it</h2>\n<div class=\"split\" style=\"grid-template-columns: 1fr 1fr 1fr\">\n  <div class=\"card\"><h3>Links everywhere</h3><p>The Web’s architecture made every page reachable from another. A crawler needs no map.</p></div>\n  <div class=\"card\"><h3>A corpus</h3><p>Filtered Common Crawl was the largest share of GPT-3’s training mix.</p></div>\n  <div class=\"card dark\"><h3>The missing half</h3><p>Crawlers read. They never send a form, so the Web’s transactions were never learned from.</p></div>\n</div>\n<p class=\"punch\">The transactional half of the Web is where agents now have to work.</p>\n",
+  "say": "Brief. The same architecture made a crawlable corpus. Filtered Common Crawl was the largest share of GPT-3's training mix. But crawlers only read: they follow links, they never submit forms. The transactional half of the Web was never in the corpus.",
+  "sources": [
+    {
+      "label": "Brown et al., Language Models are Few-Shot Learners (GPT-3), Table 2.2",
+      "href": "https://arxiv.org/abs/2005.14165"
+    },
+    {
+      "label": "Common Crawl",
+      "href": "https://commoncrawl.org/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "web-made-llms.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "hateoas.json",
+      "title": "HATEOAS: Fielding’s explanation, not his invention"
+    },
+    "next": {
+      "href": "information-and-controls.json",
+      "title": "Information and controls, presented together"
+    },
+    "alternate": {
+      "href": "web-made-llms.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

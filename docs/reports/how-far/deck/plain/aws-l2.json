@@ -1,0 +1,25 @@
+{
+  "name": "aws-l2",
+  "title": "L2: schemas linked too, and shared everywhere",
+  "part": "A preview: AWS as HEART",
+  "kicker": "A preview of HEART · 5 of 5 · HEART L2",
+  "tone": "light",
+  "number": 20,
+  "of": 50,
+  "html": "<h2>L2: schemas linked too, and shared everywhere</h2>\n<div class=\"split\">\n<pre><code># GET /affordance-sets/{hash}\n# Prefer: forms=link, schema=link\n# Cache-Control: public, max-age=31536000, immutable\n_forms:\n  clientcertificate:update:\n    title: Update\n    _links:\n      target:\n        href: /clientcertificates/{id}\n        templated: true\n    hr:templatePointers:\n      id: /clientCertificateId\n    method: PATCH\n    contentType: application/json\n    hr:integrity: sha256-…\n<span class=\"add\">    schema:</span>\n<span class=\"add\">      $ref: /schemas/{hash}</span>\n<span class=\"add\">      hr:integrity: sha256-…</span>\n  clientcertificate:delete:\n    title: Delete\n    _links:\n      target:\n        href: /clientcertificates/{id}\n        templated: true\n    hr:templatePointers:\n      id: /clientCertificateId\n    method: DELETE</code></pre>\n<pre><code># GET /schemas/{hash}\n# Content-Type: application/schema+json\n# Cache-Control: public, max-age=31536000, immutable\n$schema: https://json-schema.org/draft/2020-12/schema\ntype: object\nrequired: [patchOperations]\nproperties:\n  patchOperations:\n    type: array\n    items:\n      type: object\n      properties:\n        op:\n          enum: [add, remove, replace,\n                 move, copy, test]\n        path:\n          type: string\n          examples: [/description]\n        value:\n          type: string\n        from:\n          type: string</code></pre>\n</div>\n<p class=\"cite\"><b style=\"color:var(--bad)\">MOCKUP</b> · Today · L0 · L1 · <b>L2</b> · <i>A second read: 304 for the certificate; set and schema from cache, no request.</i></p>\n<p class=\"refs\"><deck-ref name=\"cache\"></deck-ref></p>\n",
+  "say": "Mockup. With Prefer: forms=link, schema=link, each form in the set references its schema by $ref, at a content address with an integrity hash. One schema, say for a patch of the description, is shared across forms, states and resources. This is the rung the release desk ran on GitHub and GitLab: from the second release on, about 50 set and schema reads per release never reached the network.",
+  "sources": [
+    {
+      "label": "RFC 9111 HTTP Caching",
+      "href": "https://www.rfc-editor.org/rfc/rfc9111"
+    },
+    {
+      "label": "JSON Schema 2020-12",
+      "href": "https://json-schema.org/draft/2020-12"
+    },
+    {
+      "label": "PatchOperation",
+      "href": "https://docs.aws.amazon.com/apigateway/latest/api/API_PatchOperation.html"
+    }
+  ]
+}

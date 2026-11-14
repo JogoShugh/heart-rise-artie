@@ -1,0 +1,15 @@
+name: gate-says-no
+part: How it was built
+title: The gates hold, even against the model
+kicker: How it was built · When the gate says no
+say: "Three moments from this work. The protect-gate hook blocked the model from reading its own event log; it didn't retry. Refactor mode is the human's switch, never the model's. And an edit made outside Claude Code's edit tool was redone through it, so the log saw it."
+sources:
+  - ["bdd-gates: protect-gate.sh, refactor mode", "https://github.com/JogoShugh/bdd-gates-skill"]
+html: |
+  <h2>The gates hold, even against the model</h2>
+  <div class="rows">
+    <div class="step gap"><h3>Blocked</h3><p>The protect-gate hook stopped the model reading the gate’s own event log. It didn’t try another way.</p></div>
+    <div class="step"><h3>Human’s switch</h3><p>Refactor mode, the only time src/main may change with no new red, is switched on by the person, never the model.</p></div>
+    <div class="step"><h3>Redone</h3><p>An edit made outside Claude Code’s edit tool was redone through it, so the log records every change.</p></div>
+    <p class="punch">The model doesn’t have to be trustworthy for the process to be.</p>
+  </div>

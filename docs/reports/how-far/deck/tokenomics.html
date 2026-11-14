@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capture once with a model, replay with none · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">The tokenomics slide</span></header>
+<h2>Capture once with a model, replay with none</h2>
+<div class="split">
+  <div class="rows">
+    <pre># release.goal.md: the goal, in words
+- Open pull request {pull} of {owner}/{repo} `as pr`
+- At {watcher}, ask to be told when {pr}
+  offers scm:merge `as watch`
+- Once {watch} is answered, at {pr},
+  merge it by squashing `as merged`
+- At {jenkins}, build commit
+  {merged.merge_commit_sha} `as build`
+- … run the smoke script it links … `as smoke`
+- If {smoke.passed}, at {dev}, promote …
+  Otherwise, at {pr}, act scm:comment …</pre>
+    <p><b>Inspiration: <a href="https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture" target="_blank" rel="noopener">Kelsey Hightower</a></b>’s ZTA: infer once. Fielding’s controls: check every step. The pins are where the two meet.</p>
+    <p class="refs"><a class="ref-plain" href="https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture">Hightower · ZTA</a> <details class="fragment-plain"><summary>The goal, in words (release.goal.md)</summary><pre><code>Release a pull request to Dev once it can be merged and its build passes its smoke test.
+
+- Open pull request {pull} of {owner}/{repo} `as pr`
+- At {watcher}, ask to be told when {pr} offers scm:merge `as watch`
+- Once {watch} is answered, at {pr}, merge it by squashing `as merged`
+- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`
+- Once {build} is answered, follow its in-reply-to link to the build `as built`
+  - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`
+- If {smoke.passed}, at {dev}, open environment {environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed `as promotion`
+  Otherwise, at {pr}, act scm:comment with body = &quot;Not promoted to Dev: smoke scenarios {smoke.failed} failed.&quot;</code></pre></details></p>
+  </div>
+  <div class="rows">
+    <div class="split">
+      <div><h3>20</h3><p>model calls, once: the capture on real GitHub</p></div>
+      <div><h3>33,140</h3><p>input tokens, plus 2,980 output, once</p></div>
+      <div><h3 style="color: var(--leaf)">0</h3><p>model calls in every replay since</p></div>
+      <div><h3 style="color: var(--leaf)">2</h3><p>forges replayed: real GitHub, and GitLab on this machine</p></div>
+    </div>
+    <p class="punch">Pins hold the replay to what was offered. If a form changes, the replay stops, and only then is the model called again, to repair.</p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/rungs.html" rel="prev"><small>Back</small><b>L0, L1, L2: one page, three ways to deliver it</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#tokenomics">with heart-ts</a></span>
+<a href="deck/kept-vs-code-mode.html" rel="next"><small>Next</small><b>A kept script is data, not a program</b></a></nav>
+</main></div></body></html>

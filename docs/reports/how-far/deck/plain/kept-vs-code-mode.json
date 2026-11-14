@@ -1,0 +1,25 @@
+{
+  "name": "kept-vs-code-mode",
+  "title": "A kept script is data, not a program",
+  "part": "What it costs",
+  "kicker": "What gets kept",
+  "tone": "light",
+  "number": 38,
+  "of": 50,
+  "html": "<h2>A kept script is data, not a program</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <pre># release.heart.yaml (excerpt), kept by artie generate\n<b>heart: 1</b>\n<b>kind: kept</b>\nsteps:\n  - act: scm:pulls-get\n    fields: {owner: ${owner}, repo: ${repo},\n             pull_number: ${pull}}\n    then: [keep-as: pr]\n  - enter: ${watcher}\n    steps:\n      - ask: watcher:watch\n        fields: {resource: ${pr.@self},\n                 offers: scm:merge}\n  - once-answered: {reply: watch, steps: […\n<span class=\"add\">      - act: scm:merge\n        fields: {method: squash}</span>\n# release.pins.yaml: what each form was, by hash\n  scm:merge: {method: PUT,\n    integrity: sha256-sGUdrPfH…}</pre>\n    <p class=\"refs\"><deck-fragment name=\"kept\">release.heart.yaml</deck-fragment> <deck-fragment name=\"pins\">release.pins.yaml</deck-fragment></p>\n  </div>\n  <div class=\"split\">\n    <div class=\"card\">\n      <h3>Kept YAML (ARTIE)</h3>\n      <ul>\n        <li>Data. No loops, imports or eval to review.</li>\n        <li>Every act names a relation the server must still offer.</li>\n        <li>Pinned by hash: a changed form stops the replay.</li>\n        <li>Runs with no model, in any HEART client.</li>\n      </ul>\n    </div>\n    <div class=\"card\">\n      <h3>Code Mode</h3>\n      <ul>\n        <li>The model writes TypeScript or Python against tool APIs.</li>\n        <li>What you keep is a program: code review, sandbox, dependencies.</li>\n        <li>It can call anything its bindings expose, in any order.</li>\n        <li>A real step up from tool lists in context.</li>\n      </ul>\n    </div>\n  </div>\n</div>\n",
+  "say": "Code Mode (Cloudflare, September 2025; Anthropic's code execution with MCP, November 2025) has the model write TypeScript against tool APIs and runs it in a sandbox. That's a real improvement on stuffing tool lists into context. But what you keep is a program: it needs code review, a sandbox, dependency hygiene, and it can call anything its bindings expose. ARTIE keeps YAML: no loops you didn't capture, no imports, no eval. Every act names a relation, and before it's sent ARTIE checks the form is still offered and still matches its pin. A review is reading data.",
+  "sources": [
+    {
+      "label": "Cloudflare: Code Mode (2025)",
+      "href": "https://blog.cloudflare.com/code-mode/"
+    },
+    {
+      "label": "Anthropic: Code execution with MCP",
+      "href": "https://www.anthropic.com/engineering/code-execution-with-mcp"
+    },
+    {
+      "label": "artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    }
+  ]
+}

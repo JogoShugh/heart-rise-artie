@@ -1,0 +1,25 @@
+{
+  "name": "github-annotated",
+  "title": "What each scm: relation did, on GitHub’s own page",
+  "part": "Two forges, one vocabulary",
+  "kicker": "Typed relations · On GitHub",
+  "tone": "light",
+  "number": 24,
+  "of": 50,
+  "html": "<h2>What each scm: relation did, on GitHub’s own page</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 7fr) minmax(0, 5fr)\">\n  <figure><img src=\"media/gh504.png\" alt=\"GitHub's page for pull request #2337, with five numbered boxes: the title, the merged state, the head sha, the squash merge and the comment\"></figure>\n  <ol>\n    <li><code><b>scm:pulls-get</b></code><br>Read pull request 2337, kept as pr.</li>\n    <li><code><b>state, merged</b></code><br>state: closed, merged: true, read after the act.</li>\n    <li><code><b>head.sha</b></code><br>The head the view had: GitHub merges only if it’s still there.</li>\n    <li><code><b>scm:merge {method: squash}</b></code><br>Squashed into library/main as 1361304.</li>\n    <li><code><b>scm:comment {body}</b></code><br>“Not promoted to Dev: smoke scenarios S3 failed.”</li>\n  </ol>\n</div>\n",
+  "say": "Pull request #2337 on real GitHub, variant 504: merged, then the smoke test failed scenario S3, so it wasn't promoted and the script commented. Each box is something one scm: relation read or did. The page is GitHub's; ARTIE never saw it, only the gateway's HAL Schema Forms.",
+  "sources": [
+    {
+      "label": "Pull request #2337",
+      "href": "https://github.com/JogoShugh/heart-github-test/pull/2337"
+    },
+    {
+      "label": "GitHub: merge a pull request",
+      "href": "https://docs.github.com/en/rest/pulls/pulls#merge-a-pull-request"
+    },
+    {
+      "label": "GitHub: create an issue comment",
+      "href": "https://docs.github.com/en/rest/issues/comments#create-an-issue-comment"
+    }
+  ]
+}

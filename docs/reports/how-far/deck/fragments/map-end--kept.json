@@ -1,0 +1,21 @@
+{
+  "name": "kept",
+  "label": "The kept script (release.heart.yaml)",
+  "lang": "yaml",
+  "path": "exhibits/merge-watch-release/release.heart.yaml",
+  "lines": "41–125",
+  "of": 125,
+  "text": "steps:\n  - act: scm:pulls-get\n    fields:\n      owner: ${owner}\n      repo: ${repo}\n      pull_number: ${pull}\n    intent: Open pull request ${pull} of ${owner}/${repo}\n    then:\n      - keep-as: pr\n  - enter: ${watcher}\n    steps:\n      - ask: watcher:watch\n        fields:\n          resource: ${pr.@self}\n          offers: scm:merge\n        reply: watch\n  - once-answered:\n      reply: watch\n      steps:\n        - enter: ${pr.@self}\n          steps:\n            - act: scm:merge\n              fields:\n                method: squash\n              intent: merge it by squashing\n              then:\n                - check:\n                    - field: state\n                      is: closed\n                    - field: merged\n                      is: true\n                    - field: mergeable_state\n                      is: unknown\n                - keep-as: merged\n  - enter: ${jenkins}\n    steps:\n      - ask: ci:build\n        fields:\n          commit: ${merged.merge_commit_sha}\n        reply: build\n  - once-answered:\n      reply: build\n      steps:\n        - follow: hr:in-reply-to\n          intent: follow its in-reply-to link to the build\n          then:\n            - run-script: ci:smoke-test\n              on-link: ci:deployment\n              inputs:\n                book: ${book}\n                author: ${author}\n                renewable: ${renewable}\n                problem: ${problem}\n                comment: ${comment}\n              as: smoke\n  - given:\n      - at: smoke\n        field: passed\n        is: true\n    then:\n      - enter: ${dev}\n        steps:\n          - act: env:get-environment\n            fields:\n              id: ${environment}\n            inferred: get environment ${environment}\n            from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n            then:\n              - act: env:promote\n                fields:\n                  commit: ${merged.merge_commit_sha}\n                  smoke: # review: the reasoner chose it, asked \"promote commit 30a0fa96e3eed2ae20b2b5fa7613a115d56312a3, citing 5 of 5 scenarios passed\"\n                    passed: ${smoke.passing}\n                    of: ${smoke.of}\n                intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n                then:\n                  - check:\n                      - field: commit\n                        is: ${merged.merge_commit_sha}\n    otherwise:\n      - at: ${pr.@self}\n        steps:\n          - act: scm:comment\n            fields:\n              body: \"Not promoted to Dev: smoke scenarios ${smoke.failed} failed.\"",
+  "_links": {
+    "self": {
+      "href": "map-end--kept.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.heart.yaml#L41-L125",
+      "title": "exhibits/merge-watch-release/release.heart.yaml, lines 41–125"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

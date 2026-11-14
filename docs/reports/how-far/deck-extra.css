@@ -5,7 +5,7 @@
 .map h4 small { font: italic 400 0.72rem var(--body); letter-spacing: 0; text-transform: none; color: var(--sage); }
 .map img { width: 1.05rem; height: 1.05rem; flex: none; }
 .map .map-lit { position: absolute; opacity: 0; pointer-events: none; }
-.map .map-switch { position: absolute; right: 0; top: -2.6rem; cursor: pointer; display: inline-flex; border: 1px solid #2d3a31; border-radius: 999px; overflow: hidden; font: 600 0.72rem var(--body); }
+.map .map-switch { grid-column: 1 / -1; justify-self: end; cursor: pointer; display: inline-flex; border: 1px solid #2d3a31; border-radius: 999px; overflow: hidden; font: 600 0.72rem var(--body); }
 .map .map-switch span { padding: 0.3rem 0.75rem; color: var(--sage); }
 .map .map-lit:not(:checked) + .map-switch .off, .map .map-lit:checked + .map-switch .on { background: var(--gold); color: #17201b; }
 .map .map-lit:focus-visible + .map-switch { outline: 2px solid var(--gold); outline-offset: 2px; }

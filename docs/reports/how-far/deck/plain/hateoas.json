@@ -1,0 +1,17 @@
+{
+  "name": "hateoas",
+  "title": "HATEOAS: Fielding’s explanation, not his invention",
+  "part": "Why it matters",
+  "kicker": "Why the Web scaled",
+  "tone": "light",
+  "number": 7,
+  "of": 50,
+  "html": "<h2>HATEOAS: Fielding’s explanation, not his invention</h2>\n<div class=\"split\">\n  <div class=\"card\">\n    <h3>A description, not a proposal</h3>\n    <ul>\n      <li>Hypermedia as the engine of application state: the name his dissertation (2000) gave to why the Web scaled so fast.</li>\n      <li>Every page carries its own next steps, its links and forms.</li>\n      <li>So a browser needs no prior knowledge of any site, and never ships an update when a site changes.</li>\n    </ul>\n    <p class=\"refs\"><deck-ref name=\"uniform-interface\"></deck-ref></p>\n  </div>\n  <div class=\"card dark\">\n    <p class=\"lead\"><b>At the application layer, perhaps the most depended-upon and consequential network constraint of all time</b></p>\n    <p class=\"lead\"><b style=\"color: var(--gold, #E3B341)\">for the human web.</b></p>\n    <p>Every link followed and every form sent, by billions of people, every day.</p>\n  </div>\n</div>\n",
+  "say": "Hypermedia as the engine of application state is the name the 2000 dissertation gave to what the Web already did. It explains why one generic program, the browser, could use every site. At the application layer, it is arguably the most depended-upon and consequential network constraint of all time, for the human web.",
+  "sources": [
+    {
+      "label": "Fielding, dissertation, ch. 5: REST",
+      "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"
+    }
+  ]
+}

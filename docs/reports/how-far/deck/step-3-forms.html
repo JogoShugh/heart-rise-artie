@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forms: what you can do now, and how · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Building it back up · Step 3 of 5 · HEART L0, simplified</span></header>
+<h2>Forms: what you can do now, and how</h2>
+<div class="split">
+  <pre><b>_forms:</b>
+  scm:close: {…}
+  <span class="add">scm:merge:</span>
+    title: Merge
+    description: Merge the pull request into its base branch.
+    _links:
+      target:
+        href: /repos/JogoShugh/heart-github-test/
+              pulls/2325/actions/merge
+    method: PUT
+    contentType: application/json
+    schema:
+      type: object
+      additionalProperties: false
+      required: [method]
+      properties:
+        method:
+          title: Merge method
+          enum: [merge, squash, rebase]
+        commit_title:
+          type: string
+        commit_message:
+          type: string</pre>
+  <pre>  <span class="add">scm:comment:</span>
+    title: Comment
+    _links:
+      target:
+        href: /repos/JogoShugh/heart-github-test/
+              pulls/2325/actions/comment
+    method: POST
+    contentType: application/json
+    schema:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
+          description: The contents of the comment.
+  scm:label: {…}
+  scm:edit: {…}
+  scm:request-review: {…}
+  scm:update-branch: {…}
+# 7 forms, while open</pre>
+</div>
+</article>
+<nav class="foot"><a href="deck/step-2-links.html" rel="prev"><small>Back</small><b>Links: it names itself and its vocabulary</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#step-3-forms">with heart-ts</a></span>
+<a href="deck/step-4-guards.html" rel="next"><small>Next</small><b>Guards, and why the other acts are absent</b></a></nav>
+</main></div></body></html>

@@ -1,0 +1,54 @@
+{
+  "name": "heart-rise-artie",
+  "title": "HEART, RISE and ARTIE",
+  "part": "Putting them back together",
+  "kicker": "Putting them back together",
+  "tone": "light",
+  "number": 13,
+  "of": 50,
+  "html": "<h2>HEART, RISE and ARTIE</h2>\n<div class=\"split\" style=\"grid-template-columns: 1fr 1fr 1fr\">\n  <div class=\"card\"><h3>HEART</h3><p><i>Hypermedia Enforced Agentic Reliable Transactions</i></p><p>Each answer carries the state plus the forms valid now (HAL Schema Forms), with typed relations, If-Match guards and signed acts.</p></div>\n  <div class=\"card\"><h3>RISE</h3><p><i>Reciprocal Interface for State Exchange</i></p><p>Replies for asynchronous work: a watcher or a build answers back when it’s ready.</p></div>\n  <div class=\"card dark\"><h3>ARTIE</h3><p><i>Autonomous Restful Traversal and Interactive Engine</i></p><p>One generic client for all of it, coupled to the media type, never to a domain.</p></div>\n</div>\n<p class=\"punch\">Built test-first under the bdd-gates skill: Claude Code hooks plus git hooks.</p>\n",
+  "say": "Three names, briefly. HEART is the media type and its rules; RISE is how asynchronous work answers back; ARTIE is the one generic client. All built test-first under the bdd-gates skill.",
+  "sources": [
+    {
+      "label": "artie: HEART, RISE, ARTIE",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    },
+    {
+      "label": "HAL Schema Forms",
+      "href": "https://github.com/jbadeau/hal-schema-forms"
+    },
+    {
+      "label": "JSON Schema 2020-12",
+      "href": "https://json-schema.org/draft/2020-12"
+    },
+    {
+      "label": "RFC 9421 HTTP Message Signatures",
+      "href": "https://www.rfc-editor.org/rfc/rfc9421"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "heart-rise-artie.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "in-production.json",
+      "title": "Hypermedia is already in production"
+    },
+    "next": {
+      "href": "generic-client.json",
+      "title": "ARTIE is to APIs what a browser is to web pages"
+    },
+    "alternate": {
+      "href": "heart-rise-artie.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

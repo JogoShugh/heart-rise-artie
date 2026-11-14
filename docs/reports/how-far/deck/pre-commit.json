@@ -1,0 +1,76 @@
+{
+  "name": "pre-commit",
+  "title": "git pre-commit reads the log in order",
+  "part": "How it was built",
+  "kicker": "For the engineers · The commit",
+  "tone": "light",
+  "number": 44,
+  "of": 50,
+  "html": "<h2>git pre-commit reads the log in order</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);\">\n  <div class=\"rows\">\n    <pre><code># .githooks/pre-commit (abridged)\nfeature=$(first_line ' FEATURE_WRITE ')\nfail=$(first_line \"${run_re}FAIL\")\nmain=$(first_line ' MAIN_WRITE ')\n[ -n \"$feature\" ] || reasons+=(\"no FEATURE_WRITE\n  since the last commit\")\n[ -n \"$fail\" ] || reasons+=(\"no failing BDD run\n  since the last commit (the scenario was never\n  seen red)\")\n[ \"$fail\" -gt \"$main\" ] &amp;&amp; reasons+=(\"production\n  code was written before the BDD suite was\n  seen failing\")\ncase \"$last_run\" in *\" PASS\"*) ;; *) reasons+=(\n  \"the latest BDD run … is not PASS\") ;; esac\necho \"pre-commit: TDD ordering check passed.\"</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"pre-commit\">pre-commit</deck-fragment></p>\n  </div>\n  <div class=\"rows\">\n    <h3>Three facts, in order</h3>\n    <p class=\"refs\" style=\"flex-direction: column; align-items: flex-start;\">\n      <span class=\"ref\" aria-hidden=\"true\">FEATURE_WRITE</span> ↓\n      <span class=\"ref kind-rule\" aria-hidden=\"true\">BDD_RUN FAIL</span> ↓\n      <span class=\"ref\" aria-hidden=\"true\">MAIN_WRITE …</span> ↓\n      <span class=\"ref kind-comment\" aria-hidden=\"true\">BDD_RUN PASS</span>\n    </p>\n    <p>Works for a plain terminal git commit too. --no-verify and git commit -n are blocked for the model by protect-gate.sh.</p>\n  </div>\n</div>\n",
+  "say": "The git pre-commit hook works for any committer, not just Claude Code. Since the last commit, the event log must show a feature write before the first production write, a failing BDD run before the first production write, and a passing final run. Order comes from line order in the append-only log, so events in the same second compare correctly.",
+  "sources": [
+    {
+      "label": "bdd-gates: core/pre-commit",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    },
+    {
+      "label": "Git hooks",
+      "href": "https://git-scm.com/docs/githooks"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "pre-commit.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "gherkin-first.json",
+      "title": "No production write until a feature file changes"
+    },
+    "next": {
+      "href": "red-first.json",
+      "title": "The scenario, then the failing run"
+    },
+    "alternate": {
+      "href": "pre-commit.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:fragment": [
+      {
+        "name": "pre-commit",
+        "label": "core/pre-commit, the ordering check",
+        "lang": "bash",
+        "path": "bdd-gates: core/pre-commit",
+        "lines": "98–126",
+        "of": 127,
+        "text": "feature=$(first_line ' FEATURE_WRITE ')\nfail=$(first_line \"${run_re}FAIL\")\nmain=$(first_line ' MAIN_WRITE ')\nlast_run=$(printf '%s\\n' \"$recent\" | grep -E -- \"$run_re\" | tail -1)\n\nreasons=()\n[ -n \"$feature\" ] || reasons+=(\"no FEATURE_WRITE since the last commit\")\n[ -n \"$fail\" ] || reasons+=(\"no failing BDD run since the last commit (the scenario was never seen red)\")\nif [ -n \"$feature\" ] && [ -n \"$main\" ] && [ \"$feature\" -gt \"$main\" ]; then\n  reasons+=(\"production code was written before any feature file\")\nfi\nif [ -n \"$fail\" ] && [ -n \"$main\" ] && [ \"$fail\" -gt \"$main\" ]; then\n  reasons+=(\"production code was written before the BDD suite was seen failing\")\nfi\ncase \"$last_run\" in\n  *\" PASS\"*) ;;\n  *) reasons+=(\"the latest BDD run since the last commit is not PASS\") ;;\nesac\n\nif [ ${#reasons[@]} -gt 0 ]; then\n  echo \"pre-commit: TDD ordering check FAILED:\" >&2\n  printf '  - %s\\n' \"${reasons[@]}\" >&2\n  echo \"\" >&2\n  echo \"Events since the last commit:\" >&2\n  printf '%s\\n' \"$recent\" | sed 's/^/  /' >&2\n  exit 1\nfi\n\necho \"pre-commit: TDD ordering check passed.\"",
+        "_links": {
+          "self": {
+            "href": "fragments/pre-commit--pre-commit.json",
+            "title": "core/pre-commit, the ordering check"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/pre-commit#L98-L126",
+            "title": "core/pre-commit, lines 98–126"
+          }
+        }
+      }
+    ]
+  }
+}
