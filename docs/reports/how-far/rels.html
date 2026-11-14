@@ -5,6 +5,8 @@
 <h1>The deck's relations</h1>
 <h2 id="ref">deck:ref</h2>
 <p>A reference note the slide shows as a pill: a source's own words, quoted whole, with where they come from (<code>describedby</code>). Each note is one resource, under <code>refs/</code>, embedded whole in every slide that names it, so a client shows it with no further request.</p>
+<h2 id="code">deck:code</h2>
+<p>A script the client may run to extend what it can show for this slide: code on demand, REST's one optional constraint (Fielding, dissertation, §5.1.7). <code>integrity</code> is the script's SHA-256; a browser runs it only if the bytes match.</p>
 <h2 id="fragment">deck:fragment</h2>
 <p>A fragment of source code the slide shows on demand, read from its file when the deck was built. <code>via</code> links the file and lines on GitHub.</p>
 </article></main></div></body></html>

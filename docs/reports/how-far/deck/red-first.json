@@ -4,8 +4,8 @@
   "part": "How it was built",
   "kicker": "How it was built · Red first, live",
   "tone": "light",
-  "number": 45,
-  "of": 50,
+  "number": 46,
+  "of": 51,
   "html": "<h2>The scenario, then the failing run</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);\">\n  <div class=\"rows\">\n    <pre><code>Scenario: A step that only reads is kept in the\n  script when a later step names what it read\n  `as NAME` on a read is no detour when a later step\n  names it: the watch is asked about ${front.@self}\n  Given the file \"named-read.goal.md\" is\n    - Search the desk's releases that are {state}\n      `as front`\n    - At {watcher}, ask to be told when {front}\n      offers desk:release `as watch`\n  …\n  Then the script has a line with\n    \"- act: desk:search-releases\"</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"scenario\">the whole scenario</deck-fragment></p>\n  </div>\n  <div class=\"rows\">\n    <pre><code># the red run, logged by the gate\n496 tests completed, 1 failed,\n41 skipped\ntestcase: A step that only reads\nis kept in the script when …</code></pre>\n    <p>Red on behaviour, not on a compile error. The gate logs the run; only then may src/main change.</p>\n  </div>\n</div>\n",
   "say": "A real one from this work. The real-GitHub capture dropped the step that opens the pull request, because nothing read a value from it; a later step only named it. The scenario says so first, and the run fails on behaviour before any code is written.",
   "sources": [

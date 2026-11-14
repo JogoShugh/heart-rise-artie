@@ -4,8 +4,8 @@
   "part": "A preview: AWS as HEART",
   "kicker": "A preview of HEART · 1 of 5 · Today",
   "tone": "light",
-  "number": 16,
-  "of": 50,
+  "number": 17,
+  "of": 51,
   "html": "<h2>AWS already names the acts. Only the forms are missing</h2>\n<p class=\"refs\"><small style=\"background: #B5562B; color: #fff; padding: 0.15rem 0.6rem; border-radius: 1rem; font-weight: 700\">MOCKUP</small> <small><b>Today</b> · L0 · L1 · L2</small> <small><i>Green: the relations AWS already offers.</i></small></p>\n<div class=\"split\" style=\"grid-template-columns: 1fr 1fr 1fr\">\n<pre><code># GET /clientcertificates  (AWS's sample)\n<b>_links:</b>\n  curies:\n    name: clientcertificate\n    href: https://docs.aws.amazon.com/\n      apigateway/latest/developerguide/\n      restapi-clientcertificate-{rel}.html\n    templated: true\n  self:\n    href: /clientcertificates\n  clientcertificate:by-id:\n    href: /clientcertificates/\n      {clientcertificate_id}\n    templated: true\n<span class=\"add\">  clientcertificate:generate:\n    href: /clientcertificates</span>\n  item:\n    href: /clientcertificates/xmbiqp</code></pre>\n<pre><code><b>_embedded:</b>\n  item:\n    _links:\n      self:\n        href: /clientcertificates/xmbiqp\n<span class=\"add\">      clientcertificate:delete:\n        href: /clientcertificates/xmbiqp\n      clientcertificate:update:\n        href: /clientcertificates/xmbiqp</span>\n    clientCertificateId: xmbiqp\n    createdDate: 2015-12-08T18:02:16Z\n    description: test-client-cert-2\n    expirationDate: 2016-12-07T18:02:16Z\n    pemEncodedCertificate: |\n      -----BEGIN CERTIFICATE-----\n      MIIC6DC...XuHVdZ5r27XRRXEjg==\n      -----END CERTIFICATE-----</code></pre>\n  <div class=\"rows\">\n    <h3>Still looked up elsewhere</h3>\n    <table>\n      <thead><tr><th>Relation</th><th>Method</th><th>Body</th></tr></thead>\n      <tbody>\n        <tr><td>generate</td><td>POST</td><td>description, tags</td></tr>\n        <tr><td>update</td><td>PATCH</td><td>patchOperations</td></tr>\n        <tr><td>delete</td><td>DELETE</td><td>none</td></tr>\n      </tbody>\n    </table>\n    <p>Three more docs pages, read by a developer and coded into a client. That is the gap HEART closes, one rung at a time.</p>\n  </div>\n</div>\n",
   "say": "AWS's real sample response, written as YAML, all of it but the certificate's PEM body. The relations are typed and per item: delete and update sit on the certificate, generate on the list. What a client can't learn from it: the method, the fields, the limits. Those are on three other docs pages, linked by the curie. The next four slides are a mockup: the same resources as HEART would answer, at each rung.",
   "sources": [
@@ -38,8 +38,8 @@
       "title": "Contents"
     },
     "prev": {
-      "href": "aws-callback.json",
-      "title": "What if AWS’s HAL became HEART?"
+      "href": "aws-docs-into-forms.json",
+      "title": "Out of band, then in band: AWS's docs move into the answer"
     },
     "next": {
       "href": "aws-l0-certificate.json",

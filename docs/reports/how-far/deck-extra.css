@@ -85,3 +85,33 @@
 }
 .slide .map .cell b, .slide .map .cell small { text-transform: none; letter-spacing: 0; font-family: var(--body); }
 .slide .map .cell small { font-size: 0.72rem; font-weight: 400; }
+
+/* The AWS docs moving into the answer (slide aws-docs-into-forms), animated by morph.js */
+.slide .aw-apart { display: grid; grid-template-columns: minmax(0, 1fr) 2.2rem minmax(0, 1.15fr); gap: 0.6rem; align-items: stretch; }
+.slide .hl { display: grid; align-content: start; gap: 0.08rem; background: #0f1512; color: #dce7df; border: 1px solid #2d3a31; border-radius: 10px;
+  padding: 0.8rem 1rem; font: 0.8rem/1.55 var(--mono); }
+.slide .hl > span, .slide .hl-cols span[class^="i"], .slide .hl-cols > div > span { display: block; white-space: pre-wrap; }
+.slide .hl .hl-label { font: 600 0.66rem var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: #a9b8ae; margin-bottom: 0.4rem; }
+.slide .hl .hl-note { margin-top: 0.6rem; font: italic 0.82rem var(--body); color: #e3b341; }
+.slide .hl .k { color: #a9b8ae; }
+.slide .hl .k.add { color: #8fd694; font-weight: 700; }
+.slide .hl .rel { color: #8fd694; }
+.slide .hl .i1 { padding-left: 1.2em; } .slide .hl .i2 { padding-left: 2.4em; } .slide .hl .i3 { padding-left: 3.6em; }
+.slide .hl .i4 { padding-left: 4.8em; } .slide .hl .i5 { padding-left: 6em; } .slide .hl .i6 { padding-left: 7.2em; } .slide .hl .i7 { padding-left: 8.4em; }
+.slide .hl-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 0 1.2rem; }
+.slide .aw-gap { margin: 0; display: grid; place-items: center; max-width: none; }
+.slide .aw-gap span { writing-mode: vertical-rl; transform: rotate(180deg); font: italic 0.72rem var(--body); color: #e8735f; text-align: center; }
+/* The docs replica: a plain docs page in a browser frame */
+.slide .aw { background: #ffffff; color: #16191f; border-radius: 10px; overflow: hidden; border: 1px solid #d5dbdb; display: grid; align-content: start; }
+.slide .aw-bar { background: #232f3e; color: #ffffff; font: 600 0.7rem var(--body); padding: 0.45rem 0.8rem; display: flex; gap: 0.6rem; }
+.slide .aw-bar em { margin-left: auto; font-weight: 400; color: #ff9900; }
+.slide .aw-page { padding: 0.6rem 0.9rem 0.8rem; display: grid; gap: 0.3rem; font: 0.78rem/1.45 "Amazon Ember", "Helvetica Neue", Arial, sans-serif; }
+.slide .aw-page h4 { margin: 0; font: 700 1.05rem "Helvetica Neue", Arial, sans-serif; color: #16191f; }
+.slide .aw-page h4.aw-next { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #eaeded; }
+.slide .aw-page h5 { margin: 0.2rem 0 0; font: 700 0.8rem "Helvetica Neue", Arial, sans-serif; color: #16191f; }
+.slide .aw-d { margin: 0; max-width: none; color: #16191f; font-size: 0.76rem; }
+.slide .aw-code { margin: 0; background: #f2f3f3; color: #16191f; border-radius: 4px; padding: 0.45rem 0.6rem; font: 0.74rem/1.45 var(--mono); white-space: pre-wrap; }
+.slide .aw .tk { background: #fff3d6; border-radius: 3px; }
+.slide .tk.aw-m { font-weight: 700; color: #c7511f; }
+.slide .hl .tk.aw-m { color: #ffb37a; }
+@media (max-width: 56rem) { .slide .aw-apart { grid-template-columns: minmax(0, 1fr); } .slide .aw-gap span { writing-mode: horizontal-tb; transform: none; } .slide .hl-cols { grid-template-columns: minmax(0, 1fr); } }

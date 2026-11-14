@@ -4,8 +4,8 @@
   "part": "Two forges, one vocabulary",
   "kicker": "For the engineers · The connectors",
   "tone": "light",
-  "number": 27,
-  "of": 50,
+  "number": 28,
+  "of": 51,
   "html": "<h2>scm:merge, written once per forge</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)\">\n  <div>\n<pre><code># github-scm/pull.resource.yaml\nmerge:\n  operation: pulls/merge\n  fields: [commit_title, commit_message]\n  inputs:\n    method:\n      enum: [merge, squash, rebase]\n<span class=\"add\">  values:\n    method:\n      merge:  {merge_method: merge}\n      squash: {merge_method: squash}\n      rebase: {merge_method: rebase}</span>\n  bind: {sha: /head/sha}\n  stale: 409\n  refused: 405</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"github-merge\">the whole merge act</deck-fragment></p>\n  </div>\n  <div>\n<pre><code># gitlab/pull.resource.yaml\nmerge:\n  operation: pulls/merge\n  fields: [merge_commit_message]\n  inputs:\n    method:\n      enum: [merge, squash]\n<span class=\"add\">  values:\n    method:\n      merge:  {squash: false}\n      squash: {squash: true}</span>\n  bind: {sha: /sha}\n  stale: 409\n  refused: 405\n# + normal: state, merged, mergeable_state</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"gitlab-merge\">the whole merge act</deck-fragment></p>\n  </div>\n</div>\n",
   "say": "The merge act in each connector. Same relation, same input (method), same guard (the head sha the view had), same stale and refused codes. The upstream operation, the field names and the values differ, and only here.",
   "sources": [

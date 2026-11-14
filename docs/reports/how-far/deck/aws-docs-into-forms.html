@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Out of band, then in band: AWS's docs move into the answer · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">A preview of HEART · the docs become forms</span></header>
+<h2>Out of band, then in band: AWS's docs move into the answer</h2>
+<div class="morph" data-start="apart" data-cycles='[{"to": "married", "label": "Into the answer", "head": "Out of band, then in band: AWS&apos;s docs move into the answer"}]'>
+  <div class="mo-stage">
+    <section class="mo-scene" data-scene="apart">
+      <div class="aw-apart">
+        <div class="hl">
+          <span class="hl-label">The answer · GET /clientcertificates/xmbiqp · application/hal+json</span>
+          <span class="tk" data-token="state-id">clientCertificateId: xmbiqp</span>
+          <span class="tk" data-token="state-created">createdDate: 2015-12-08T18:02:16Z</span>
+          <span class="tk" data-token="state-desc">description: test-client-cert-2</span>
+          <span class="tk" data-token="state-exp">expirationDate: 2016-12-07T18:02:16Z</span>
+          <span class="k">_links:</span>
+          <span class="i1 tk" data-token="self">self: {href: /clientcertificates/xmbiqp}</span>
+          <span class="i1 tk rel" data-token="rel-update">clientcertificate:update:</span>
+          <span class="i2">href: /clientcertificates/xmbiqp</span>
+          <span class="i1 tk rel" data-token="rel-delete">clientcertificate:delete:</span>
+          <span class="i2">href: /clientcertificates/xmbiqp</span>
+          <span class="hl-note">The acts are named. How to do them is not here.</span>
+        </div>
+        <p class="aw-gap"><span>A developer reads these, then codes them into a client</span></p>
+        <div class="aw">
+          <div class="aw-bar">docs.aws.amazon.com · Amazon API Gateway · API Reference <em>replica in HTML</em></div>
+          <div class="aw-page">
+            <h4>UpdateClientCertificate</h4>
+            <p class="aw-d">Changes information about an ClientCertificate resource.</p>
+            <h5>Request Syntax</h5>
+            <pre class="aw-code"><span class="tk aw-m" data-token="u-method">PATCH</span> <span class="tk" data-token="u-target">/clientcertificates/clientcertificate_id</span> HTTP/1.1
+<span class="tk" data-token="u-ct">Content-type: application/json</span>
+{
+   "<span class="tk" data-token="u-po">patchOperations</span>": [ {
+      "<span class="tk" data-token="u-from">from</span>": "string",
+      "op": "string",
+      "<span class="tk" data-token="u-path">path</span>": "string",
+      "<span class="tk" data-token="u-value">value</span>": "string"
+   } ]
+}</pre>
+            <p class="aw-d"><b>clientcertificate_id</b> The identifier of the ClientCertificate resource to be updated. Required: Yes</p>
+            <p class="aw-d"><b>PatchOperation · op</b> <span class="tk" data-token="u-op">Valid Values: add | remove | replace | move | copy | test</span></p>
+            <h4 class="aw-next">DeleteClientCertificate</h4>
+            <p class="aw-d">Deletes the ClientCertificate resource.</p>
+            <h5>Request Syntax</h5>
+            <pre class="aw-code"><span class="tk aw-m" data-token="d-method">DELETE</span> <span class="tk" data-token="d-target">/clientcertificates/clientcertificate_id</span> HTTP/1.1</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="mo-scene" data-scene="married">
+      <div class="hl hl-one">
+        <span class="hl-label">The answer, HEART L0 · GET /clientcertificates/xmbiqp · application/hal+json; profile: hal-schema-forms</span>
+        <div class="hl-cols">
+          <div>
+            <span class="tk" data-token="state-id">clientCertificateId: xmbiqp</span>
+            <span class="tk" data-token="state-created">createdDate: 2015-12-08T18:02:16Z</span>
+            <span class="tk" data-token="state-desc">description: test-client-cert-2</span>
+            <span class="tk" data-token="state-exp">expirationDate: 2016-12-07T18:02:16Z</span>
+            <span class="k">_links:</span>
+            <span class="i1 tk" data-token="self">self: {href: /clientcertificates/xmbiqp}</span>
+            <span class="k add">_forms:</span>
+            <span class="i1 tk rel" data-token="rel-delete">clientcertificate:delete:</span>
+            <span class="i2">title: Delete</span>
+            <span class="i2">_links: {target: {href: <span class="tk" data-token="d-target">/clientcertificates/xmbiqp</span>}}</span>
+            <span class="i2">method: <span class="tk aw-m" data-token="d-method">DELETE</span></span>
+          </div>
+          <div>
+            <span class="i1 tk rel" data-token="rel-update">clientcertificate:update:</span>
+            <span class="i2">title: Update</span>
+            <span class="i2">_links: {target: {href: <span class="tk" data-token="u-target">/clientcertificates/xmbiqp</span>}}</span>
+            <span class="i2">method: <span class="tk aw-m" data-token="u-method">PATCH</span></span>
+            <span class="i2 tk" data-token="u-ct">contentType: application/json</span>
+            <span class="i2">schema:</span>
+            <span class="i3">type: object</span>
+            <span class="i3">properties:</span>
+            <span class="i4"><span class="tk" data-token="u-po">patchOperations</span>:</span>
+            <span class="i5">type: array</span>
+            <span class="i5">items:</span>
+            <span class="i6">properties:</span>
+            <span class="i7 tk" data-token="u-op">op: {enum: [add, remove, replace, move, copy, test]}</span>
+            <span class="i7"><span class="tk" data-token="u-path">path</span>: {type: string}</span>
+            <span class="i7"><span class="tk" data-token="u-value">value</span>: {type: string}</span>
+            <span class="i7"><span class="tk" data-token="u-from">from</span>: {type: string}</span>
+          </div>
+        </div>
+        <span class="hl-note">Same relation names, same values AWS publishes: now in the answer, at this certificate’s own address.</span>
+      </div>
+    </section>
+  </div>
+</div>
+<p class="refs"><a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">Rule 3 · Describe the media type</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754">“Provided in-band”</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-718">“When I say hypertext…”</a></p>
+</article>
+<nav class="foot"><a href="deck/aws-callback.html" rel="prev"><small>Back</small><b>What if AWS’s HAL became HEART?</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#aws-docs-into-forms">with heart-ts</a></span>
+<a href="deck/aws-today.html" rel="next"><small>Next</small><b>AWS already names the acts. Only the forms are missing</b></a></nav>
+</main></div></body></html>

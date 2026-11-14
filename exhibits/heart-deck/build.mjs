@@ -132,6 +132,21 @@ ${next ? `<a href="deck/${next.name}.html" rel="next"><small>Next</small><b>${es
 `;
 
 const CURIES = [{ name: "deck", href: "../rels.html#{rel}", templated: true }];
+
+// Code on demand (Fielding, dissertation §5.1.7): a slide may link a script that extends the client, an animation.
+// The link carries the script's digest; the browser runs it only if the bytes match. The script is the deck's own
+// (code/ in the deck directory) or heart-deck's shared one (code/ here). A client that skips the link shows the slide
+// as written.
+rmSync(join(out, "code"), { recursive: true, force: true });
+mkdirSync(join(out, "code"), { recursive: true });
+const codeLink = (s) => {
+  if (!s.code) return {};
+  const from = [join(deckDir, "code", s.code.file), join(here, "code", s.code.file)].find((f) => existsSync(f));
+  if (!from) throw new Error(`${s.name}: no code file ${s.code.file}`);
+  const bytes = readFileSync(from);
+  copyFileSync(from, join(out, "code", s.code.file));
+  return { "deck:code": { href: `../code/${s.code.file}`, type: "text/javascript", title: s.code.title, integrity: integrity(bytes) } };
+};
 slides.forEach((s, i) => {
   const prev = slides[i - 1], next = slides[i + 1];
   for (const n of named(s.html, "deck-ref")) if (!refs.has(n)) throw new Error(`${s.name}: no ref named ${n}`);
@@ -155,7 +170,8 @@ slides.forEach((s, i) => {
       ...(prev ? { prev: link(prev) } : {}),
       ...(next ? { next: link(next) } : {}),
       alternate: { href: `${s.name}.html`, type: "text/html", title: "This slide as a plain page" },
-      ...(Object.keys(embedded).length ? { curies: CURIES } : {}),
+      ...(Object.keys(embedded).length || s.code ? { curies: CURIES } : {}),
+      ...codeLink(s),
     },
     ...(Object.keys(embedded).length ? { _embedded: embedded } : {}),
   };
@@ -192,6 +208,8 @@ writeFileSync(join(out, "rels.html"), `<!doctype html>
 <h1>The deck's relations</h1>
 <h2 id="ref">deck:ref</h2>
 <p>A reference note the slide shows as a pill: a source's own words, quoted whole, with where they come from (<code>describedby</code>). Each note is one resource, under <code>refs/</code>, embedded whole in every slide that names it, so a client shows it with no further request.</p>
+<h2 id="code">deck:code</h2>
+<p>A script the client may run to extend what it can show for this slide: code on demand, REST's one optional constraint (Fielding, dissertation, §5.1.7). <code>integrity</code> is the script's SHA-256; a browser runs it only if the bytes match.</p>
 <h2 id="fragment">deck:fragment</h2>
 <p>A fragment of source code the slide shows on demand, read from its file when the deck was built. <code>via</code> links the file and lines on GitHub.</p>
 </article></main></div></body></html>

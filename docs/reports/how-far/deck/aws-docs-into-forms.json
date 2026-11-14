@@ -1,0 +1,135 @@
+{
+  "name": "aws-docs-into-forms",
+  "title": "Out of band, then in band: AWS's docs move into the answer",
+  "part": "A preview: AWS as HEART",
+  "kicker": "A preview of HEART · the docs become forms",
+  "tone": "light",
+  "number": 16,
+  "of": 51,
+  "html": "<h2>Out of band, then in band: AWS's docs move into the answer</h2>\n<div class=\"morph\" data-start=\"apart\" data-cycles='[{\"to\": \"married\", \"label\": \"Into the answer\", \"head\": \"Out of band, then in band: AWS&apos;s docs move into the answer\"}]'>\n  <div class=\"mo-stage\">\n    <section class=\"mo-scene\" data-scene=\"apart\">\n      <div class=\"aw-apart\">\n        <div class=\"hl\">\n          <span class=\"hl-label\">The answer · GET /clientcertificates/xmbiqp · application/hal+json</span>\n          <span class=\"tk\" data-token=\"state-id\">clientCertificateId: xmbiqp</span>\n          <span class=\"tk\" data-token=\"state-created\">createdDate: 2015-12-08T18:02:16Z</span>\n          <span class=\"tk\" data-token=\"state-desc\">description: test-client-cert-2</span>\n          <span class=\"tk\" data-token=\"state-exp\">expirationDate: 2016-12-07T18:02:16Z</span>\n          <span class=\"k\">_links:</span>\n          <span class=\"i1 tk\" data-token=\"self\">self: {href: /clientcertificates/xmbiqp}</span>\n          <span class=\"i1 tk rel\" data-token=\"rel-update\">clientcertificate:update:</span>\n          <span class=\"i2\">href: /clientcertificates/xmbiqp</span>\n          <span class=\"i1 tk rel\" data-token=\"rel-delete\">clientcertificate:delete:</span>\n          <span class=\"i2\">href: /clientcertificates/xmbiqp</span>\n          <span class=\"hl-note\">The acts are named. How to do them is not here.</span>\n        </div>\n        <p class=\"aw-gap\"><span>A developer reads these, then codes them into a client</span></p>\n        <div class=\"aw\">\n          <div class=\"aw-bar\">docs.aws.amazon.com · Amazon API Gateway · API Reference <em>replica in HTML</em></div>\n          <div class=\"aw-page\">\n            <h4>UpdateClientCertificate</h4>\n            <p class=\"aw-d\">Changes information about an ClientCertificate resource.</p>\n            <h5>Request Syntax</h5>\n            <pre class=\"aw-code\"><span class=\"tk aw-m\" data-token=\"u-method\">PATCH</span> <span class=\"tk\" data-token=\"u-target\">/clientcertificates/clientcertificate_id</span> HTTP/1.1\n<span class=\"tk\" data-token=\"u-ct\">Content-type: application/json</span>\n{\n   \"<span class=\"tk\" data-token=\"u-po\">patchOperations</span>\": [ {\n      \"<span class=\"tk\" data-token=\"u-from\">from</span>\": \"string\",\n      \"op\": \"string\",\n      \"<span class=\"tk\" data-token=\"u-path\">path</span>\": \"string\",\n      \"<span class=\"tk\" data-token=\"u-value\">value</span>\": \"string\"\n   } ]\n}</pre>\n            <p class=\"aw-d\"><b>clientcertificate_id</b> The identifier of the ClientCertificate resource to be updated. Required: Yes</p>\n            <p class=\"aw-d\"><b>PatchOperation · op</b> <span class=\"tk\" data-token=\"u-op\">Valid Values: add | remove | replace | move | copy | test</span></p>\n            <h4 class=\"aw-next\">DeleteClientCertificate</h4>\n            <p class=\"aw-d\">Deletes the ClientCertificate resource.</p>\n            <h5>Request Syntax</h5>\n            <pre class=\"aw-code\"><span class=\"tk aw-m\" data-token=\"d-method\">DELETE</span> <span class=\"tk\" data-token=\"d-target\">/clientcertificates/clientcertificate_id</span> HTTP/1.1</pre>\n          </div>\n        </div>\n      </div>\n    </section>\n    <section class=\"mo-scene\" data-scene=\"married\">\n      <div class=\"hl hl-one\">\n        <span class=\"hl-label\">The answer, HEART L0 · GET /clientcertificates/xmbiqp · application/hal+json; profile: hal-schema-forms</span>\n        <div class=\"hl-cols\">\n          <div>\n            <span class=\"tk\" data-token=\"state-id\">clientCertificateId: xmbiqp</span>\n            <span class=\"tk\" data-token=\"state-created\">createdDate: 2015-12-08T18:02:16Z</span>\n            <span class=\"tk\" data-token=\"state-desc\">description: test-client-cert-2</span>\n            <span class=\"tk\" data-token=\"state-exp\">expirationDate: 2016-12-07T18:02:16Z</span>\n            <span class=\"k\">_links:</span>\n            <span class=\"i1 tk\" data-token=\"self\">self: {href: /clientcertificates/xmbiqp}</span>\n            <span class=\"k add\">_forms:</span>\n            <span class=\"i1 tk rel\" data-token=\"rel-delete\">clientcertificate:delete:</span>\n            <span class=\"i2\">title: Delete</span>\n            <span class=\"i2\">_links: {target: {href: <span class=\"tk\" data-token=\"d-target\">/clientcertificates/xmbiqp</span>}}</span>\n            <span class=\"i2\">method: <span class=\"tk aw-m\" data-token=\"d-method\">DELETE</span></span>\n          </div>\n          <div>\n            <span class=\"i1 tk rel\" data-token=\"rel-update\">clientcertificate:update:</span>\n            <span class=\"i2\">title: Update</span>\n            <span class=\"i2\">_links: {target: {href: <span class=\"tk\" data-token=\"u-target\">/clientcertificates/xmbiqp</span>}}</span>\n            <span class=\"i2\">method: <span class=\"tk aw-m\" data-token=\"u-method\">PATCH</span></span>\n            <span class=\"i2 tk\" data-token=\"u-ct\">contentType: application/json</span>\n            <span class=\"i2\">schema:</span>\n            <span class=\"i3\">type: object</span>\n            <span class=\"i3\">properties:</span>\n            <span class=\"i4\"><span class=\"tk\" data-token=\"u-po\">patchOperations</span>:</span>\n            <span class=\"i5\">type: array</span>\n            <span class=\"i5\">items:</span>\n            <span class=\"i6\">properties:</span>\n            <span class=\"i7 tk\" data-token=\"u-op\">op: {enum: [add, remove, replace, move, copy, test]}</span>\n            <span class=\"i7\"><span class=\"tk\" data-token=\"u-path\">path</span>: {type: string}</span>\n            <span class=\"i7\"><span class=\"tk\" data-token=\"u-value\">value</span>: {type: string}</span>\n            <span class=\"i7\"><span class=\"tk\" data-token=\"u-from\">from</span>: {type: string}</span>\n          </div>\n        </div>\n        <span class=\"hl-note\">Same relation names, same values AWS publishes: now in the answer, at this certificate’s own address.</span>\n      </div>\n    </section>\n  </div>\n</div>\n<p class=\"refs\"><deck-ref name=\"rule-3\"></deck-ref> <deck-ref name=\"in-band\"></deck-ref> <deck-ref name=\"hypertext\"></deck-ref></p>\n",
+  "say": "On the left, AWS's own answer for one client certificate, as its sample shows it: the state, and links with typed relations, update and delete. AWS already names the acts. On the right, what you still have to read to use them: two docs resources, UpdateClientCertificate and DeleteClientCertificate, rebuilt here in HTML from AWS's API reference. A developer reads them and codes the method, the address, the content type and the body into a client. Now watch: each of those values leaves the docs and lands in the answer, as HAL Schema Forms. The relation names stay AWS's. The address is no longer a template you fill in; it's this certificate's own. The op values come with the schema. That's HEART at L0: everything in one answer. Nothing moved that AWS doesn't already publish; it just moved to where the client already is.",
+  "sources": [
+    {
+      "label": "AWS: GetClientCertificate",
+      "href": "https://docs.aws.amazon.com/apigateway/latest/api/API_GetClientCertificate.html"
+    },
+    {
+      "label": "AWS: UpdateClientCertificate",
+      "href": "https://docs.aws.amazon.com/apigateway/latest/api/API_UpdateClientCertificate.html"
+    },
+    {
+      "label": "AWS: DeleteClientCertificate",
+      "href": "https://docs.aws.amazon.com/apigateway/latest/api/API_DeleteClientCertificate.html"
+    },
+    {
+      "label": "AWS: PatchOperation",
+      "href": "https://docs.aws.amazon.com/apigateway/latest/api/API_PatchOperation.html"
+    },
+    {
+      "label": "HAL Schema Forms",
+      "href": "https://github.com/jbadeau/hal-schema-forms"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "aws-docs-into-forms.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "aws-callback.json",
+      "title": "What if AWS’s HAL became HEART?"
+    },
+    "next": {
+      "href": "aws-today.json",
+      "title": "AWS already names the acts. Only the forms are missing"
+    },
+    "alternate": {
+      "href": "aws-docs-into-forms.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ],
+    "deck:code": {
+      "href": "../code/morph.js",
+      "type": "text/javascript",
+      "title": "Animates the slide's stills, as its HTML says",
+      "integrity": "sha256-IKDnb60U0dRSd/LE4XomTkDVz+p/C6HP0DWA2rfLBmo="
+    }
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "rule-3",
+        "kind": "rule",
+        "label": "Rule 3 · Describe the media type",
+        "title": "Spend the effort on media types",
+        "summary": "In brief: describe media types and relations, not which methods go to which URIs. This is what HEART's spec is.",
+        "quote": "<p>“A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types. Any effort spent describing what methods to use on what URIs of interest should be entirely defined within the scope of the processing rules for a media type (and, in most cases, already defined by existing media types). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>",
+        "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/rule-3.json",
+            "title": "Rule 3 · Describe the media type"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+            "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "in-band",
+        "kind": "comment",
+        "label": "“Provided in-band”",
+        "title": "Instructions in every representation",
+        "summary": "The media type is learned once; each representation carries the transitions available at that point.",
+        "quote": "<p>“The media type identifies a specification that defines how a representation is to be processed. That is out-of-band information (all communication is dependent on some prior knowledge). What you are missing is that each representation contains the specific instructions for interfacing with a given service, provided in-band. The media type is a generic processing model that every agent can learn if there aren’t too many of them (hence the need for standards). The representation is specific to the application being performed by the agent. Each representation therefore provides the transitions that are available at that point in the application.</p><p>When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "23 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/in-band.json",
+            "title": "“Provided in-band”"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "hypertext",
+        "kind": "comment",
+        "label": "“When I say hypertext…”",
+        "title": "What hypertext means",
+        "summary": "His definition: information and controls, presented together. Machines can follow links too.",
+        "quote": "<p>“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions. Hypermedia is just an expansion on what text means to include temporal anchors within a media stream; most researchers have dropped the distinction.</p><p>Hypertext does not need to be HTML on a browser. Machines can follow links when they understand the data format and relationship types.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/hypertext.json",
+            "title": "“When I say hypertext…”"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-718",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      }
+    ]
+  }
+}
