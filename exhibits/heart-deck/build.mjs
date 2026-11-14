@@ -3,6 +3,7 @@
 //   node exhibits/heart-deck/build.mjs <deck directory> [--artifact <file>]
 //
 // The deck directory holds:
+//   deck.css        optional: the deck's own styles, after heart-deck's
 //   deck.yaml       brand, tagline, description, out (repo-relative), media (dirs), roots (named source roots)
 //   slides/*.yaml   one slide each, in file order: name, part, title, kicker, html, say, sources, fragments
 //   refs/*.yaml     shared reference notes a slide shows as pills: name, kind, label, title, summary, quote, cite, href
@@ -117,7 +118,7 @@ const plainPage = (s, html, prev, next) => `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(s.title)} · ${esc(BRAND)}</title>
 <base href="../">
-<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck.css">${existsSync(join(deckDir, "deck.css")) ? '\n<link rel="stylesheet" href="deck-extra.css">' : ""}
 </head><body>
 <div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
 <article class="slide">${s.kicker ? `<header><span class="part">${esc(s.kicker)}</span></header>` : ""}
@@ -204,7 +205,9 @@ await build({
 
 const page = readFileSync(join(here, "page/index.html"), "utf8")
   .replaceAll("{{brand}}", esc(BRAND)).replaceAll("{{tagline}}", esc(deck.tagline)).replaceAll("{{description}}", esc(deck.description))
-  .replaceAll("{{key}}", esc(deck.name));
+  .replaceAll("{{key}}", esc(deck.name))
+  .replaceAll("{{extraCss}}", existsSync(join(deckDir, "deck.css")) ? '<link rel="stylesheet" href="deck-extra.css">' : "");
+if (existsSync(join(deckDir, "deck.css"))) copyFileSync(join(deckDir, "deck.css"), join(out, "deck-extra.css"));
 writeFileSync(join(out, "index.html"), page);
 for (const f of ["deck.css", "deck.js"]) copyFileSync(join(here, "page", f), join(out, f));
 for (const f of ["json-view.js", "json-view.css", "theme-switch.js"]) copyFileSync(join(repo, "docs/reports/assets", f), join(out, f));

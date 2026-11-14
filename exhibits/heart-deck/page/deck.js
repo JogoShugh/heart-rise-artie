@@ -300,7 +300,7 @@
   });
   document.addEventListener("keydown", function (event) {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
-    if (event.target.closest && event.target.closest("input, textarea, select")) return;
+    if (event.target.closest && event.target.closest("input:not([type=checkbox]), textarea, select")) return;
     if (overlay.open) return;
     if (event.key === "ArrowRight" || event.key === "PageDown" || (event.key === " " && root.dataset.present === "on")) { event.preventDefault(); follow("next"); }
     if (event.key === "ArrowLeft" || event.key === "PageUp") follow("prev");
