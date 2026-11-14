@@ -8,12 +8,12 @@ sources:
 html: |
   <h2>More Than Tokens: The Three R’s</h2>
   <div class="rel-frame">
-    <div class="rel-head"><deck-ref name="reliability"></deck-ref><span>All three together, or it isn’t reliable</span></div>
+    <div class="rel-band"><deck-ref name="reliability">Reliability</deck-ref><small>All three together, or it isn’t reliable</small></div>
     <div class="rel-cards">
       <div class="step"><h3><deck-ref name="right-behavior"></deck-ref></h3><p>Only what the state allows. When an act is absent, a reason.</p></div>
       <div class="step"><h3><deck-ref name="repeatability"></deck-ref></h3><p>That right behavior, the same way, every time.</p><p class="note">Given the same inputs, the same outputs, call after call.</p></div>
       <div class="step"><h3><deck-ref name="resilience"></deck-ref></h3><p>The server changes, or misbehaves. The client takes the right failure path and carries on.</p></div>
     </div>
+    <div class="rel-band bottom"><deck-ref name="risk">Risk Mitigation</deck-ref><small>Lose any one R, and its risk comes back</small></div>
   </div>
-  <div class="risk-bar"><deck-ref name="risk"></deck-ref><span>Risk, mitigated: lose any one R, and its risk comes back.</span></div>
   <div class="reason-strip"><deck-ref name="reason"></deck-ref><span>is the hype. A reasoning model can stand in for a person in two places: <b>finding the way the first time</b>, and <b>repairing when the controls change</b>. In the middle, it’s the token maxing Hightower warned us about.</span></div>

@@ -306,6 +306,19 @@
     fit();
   }
   presentButton.addEventListener("click", function () { present(root.dataset.present !== "on"); });
+  // Present on a phone or tablet: no keyboard, so edge buttons and a swipe advance.
+  document.querySelectorAll(".present-nav").forEach(function (b) {
+    b.addEventListener("click", function () { follow(b.dataset.go); });
+  });
+  document.querySelector(".present-exit").addEventListener("click", function () { present(false); });
+  var touchX = null, touchY = null;
+  frame.addEventListener("touchstart", function (e) { if (e.touches.length === 1) { touchX = e.touches[0].clientX; touchY = e.touches[0].clientY; } }, { passive: true });
+  frame.addEventListener("touchend", function (e) {
+    if (root.dataset.present !== "on" || touchX === null) return;
+    var dx = e.changedTouches[0].clientX - touchX, dy = e.changedTouches[0].clientY - touchY;
+    touchX = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy)) follow(dx < 0 ? "next" : "prev");
+  }, { passive: true });
   document.addEventListener("fullscreenchange", function () { if (!document.fullscreenElement && root.dataset.present === "on") present(false); });
 
   var CANVAS_W = 1280, CANVAS_H = 720;
