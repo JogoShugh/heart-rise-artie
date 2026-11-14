@@ -37,7 +37,7 @@
 .map .cell { position: relative; display: flex; align-items: center; gap: 0.4rem; background: var(--chip); border: 1px solid var(--chipline); border-radius: 8px; padding: 0.4rem 0.6rem; line-height: 1.25; }
 .map .cell small { color: var(--sage); }
 .map .cell.mono { font-family: var(--mono); font-size: 0.76rem; }
-.map .cell.key { border: 2px solid var(--gold); }
+.map .cell.hub { border: 2px solid var(--gold); }
 .map .cell.dim { color: var(--sage); }
 .map .cell .n, .map .legend .n { flex: none; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: var(--gold); color: #17201b; font: 700 0.75rem/1.35rem var(--body); text-align: center; }
 .map .legend .n.red { background: var(--rust); color: #fff; }
@@ -69,7 +69,7 @@
 /* The path: only the numbered steps lit, until Everything */
 .map .map-lit:not(:checked) ~ .rail, .map .map-lit:not(:checked) ~ .rest,
 .map .map-lit:not(:checked) ~ .legend.repair,
-.map .map-lit:not(:checked) ~ .layers .cell:not(.path):not(.key),
+.map .map-lit:not(:checked) ~ .layers .cell:not(.path):not(.hub),
 .map .map-lit:not(:checked) ~ .layers .caption,
 .map .map-lit:not(:checked) ~ .layers .tags,
 .map .map-lit:not(:checked) ~ .layers .smoke { opacity: 0.28; transition: opacity 0.3s; }
