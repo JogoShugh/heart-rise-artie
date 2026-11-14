@@ -4,10 +4,10 @@
   "part": "Close",
   "kicker": "The measuring stick, applied · marks for discussion",
   "tone": "light",
-  "number": 61,
-  "of": 63,
+  "number": 62,
+  "of": 64,
   "html": "<h2>How Far Did We Get?</h2>\n<div class=\"split\" style=\"grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch\">\n  <div class=\"panel\">\n    <span class=\"label\">2000 · constraints</span>\n    <p><b>Met:</b> <deck-ref name=\"client-server\"></deck-ref> <deck-ref name=\"stateless\"></deck-ref> <deck-ref name=\"cache\"></deck-ref> <deck-ref name=\"uniform-interface\"></deck-ref> <deck-ref name=\"layered-system\"></deck-ref></p>\n    <p><b>Not used:</b> <deck-ref name=\"code-on-demand\"></deck-ref> optional, and he says so.</p>\n  </div>\n  <div class=\"panel\">\n    <span class=\"label\">2008 · rules</span>\n    <p><b>Met:</b> <deck-ref name=\"rule-2\"></deck-ref> <deck-ref name=\"rule-3\"></deck-ref> <deck-ref name=\"rule-4\"></deck-ref> <deck-ref name=\"rule-5\"></deck-ref> <deck-ref name=\"rule-6\"></deck-ref></p>\n    <p><b>Partly:</b> <deck-ref name=\"rule-1\"></deck-ref> only HTTP so far.</p>\n  </div>\n  <div class=\"panel\">\n    <span class=\"label\">The three R’s</span>\n    <p><b>Met:</b> <deck-ref name=\"right-behavior\"></deck-ref> refused before sending, with a reason. <deck-ref name=\"repeatability\"></deck-ref> replay with no model.</p>\n    <p><b>Partly:</b> <deck-ref name=\"resilience\"></deck-ref> Buster’s pack written; not yet run against every client.</p>\n  </div>\n</div>\n<p class=\"punch\">Further than most people expect, and not all the way yet.</p>\n",
-  "say": "So, how far did we get? Here's the measuring stick from the start, applied honestly. Fielding's 2000 constraints: client-server, stateless, cache, the uniform interface with hypermedia driving the state, and layering, with our gateway in front of GitHub, all met. Code on demand we didn't use; it's optional, and he says so. His 2008 rules: we enter by a bookmark, we don't fix URIs, the media type and the relation types carry the meaning, and HTTP is used as HTTP defines it, validators and all. Any protocol? Partly. We've only run over HTTP. Then the three R's. Right behavior: met; the second merge was refused before it left the machine, with the service's reason. Repeatability: met; the kept script replays with no model. Resilience: partly. Buster's pack is written and judging ARTIE, but I haven't run the whole pack against every client yet. That's the honest answer: further than most people expect, and not all the way yet.",
+  "say": "So, how far did we get? Here's the measuring stick from the start, applied honestly. Fielding's 2000 constraints: client-server, stateless, cache, the uniform interface with hypermedia driving the state, and layering, with our gateway in front of GitHub, all met. Code on demand we didn't use; it's optional, and he says so. His 2008 rules: we enter by a bookmark, we don't fix URIs, the media type and the relation types carry the meaning, and HTTP is used as HTTP defines it, validators and all. Any protocol? Partly. We've only run over HTTP. Then the three R's. Right behavior: met; the second merge was refused before it left the machine, with the service's reason. Repeatability: met; the kept script replays with no model. Resilience: partly. Buster's pack is written and judging ARTIE, but I haven't run the whole pack against every client yet. And since reliability takes all three, the risk they hold down is only partly held for now. That's the honest answer: further than most people expect, and not all the way yet.",
   "sources": [
     {
       "label": "Fielding: dissertation, chapter 5 (2000)",
@@ -319,7 +319,7 @@
         "kind": "measure",
         "label": "REPEATABILITY",
         "title": "Repeatability: the same goal, the same result, every time",
-        "summary": "Reliability and repeatability are the same thing here. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
+        "summary": "Given the same inputs, the same outputs, call after call. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
         "cite": "The second of the three R's",
         "_links": {
           "self": {

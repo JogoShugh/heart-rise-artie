@@ -10,7 +10,7 @@
   kind: measure
   label: "REPEATABILITY"
   title: "Repeatability: the same goal, the same result, every time"
-  summary: "Reliability and repeatability are the same thing here. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time."
+  summary: "Given the same inputs, the same outputs, call after call. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time."
   cite: "The second of the three R's"
   href: "#three-rs"
 - name: resilience
@@ -27,3 +27,17 @@
   summary: "Reasoning models can stand in for a person in two places: finding the way the first time, and repairing when the controls change. Everywhere else, paying a model to reason through the same path again is the token maxing Hightower warned about. Useful at the edges; wasted in the middle."
   cite: "The hype, kept at the edges"
   href: "#three-rs"
+- name: reliability
+  kind: umbrella
+  label: "RELIABILITY"
+  title: "Reliability: what the three R's add up to"
+  summary: "Not a fourth R beside the others: the one over them. A system is reliable only when it behaves right, repeats that behavior given the same inputs, and stays right when things change or break. Miss any one and it isn't."
+  cite: "Over the three R's"
+  href: "#three-rs"
+- name: risk
+  kind: umbrella
+  label: "RISK"
+  title: "Risk, mitigated: what reliability buys"
+  summary: "Wrong acts on the wrong state, drift between runs, surprises when a service changes, unbounded spend, decisions nobody can reconstruct. Each is a risk; each is held down by one of the R's, or by the record they leave. Lose an R and the risk comes back."
+  cite: "What the R's are for"
+  href: "#risk"

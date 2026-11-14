@@ -1,0 +1,17 @@
+{
+  "name": "risk",
+  "title": "Risk, Mitigated",
+  "part": "The question",
+  "kicker": "What the three R's are for · ask anyone in insurance",
+  "tone": "light",
+  "number": 4,
+  "of": 64,
+  "html": "<h2>Risk, Mitigated</h2>\n<div class=\"table-scroll\"><table>\n  <thead><tr><th>The risk</th><th>What holds it down</th><th></th></tr></thead>\n  <tbody>\n    <tr><td>The wrong act on the wrong state</td><td>Only the acts the state allows, sent with its validator; a reason when absent</td><td><deck-ref name=\"right-behavior\"></deck-ref></td></tr>\n    <tr><td>A different result tomorrow, given the same request</td><td>A kept script, checked against its pins on every run</td><td><deck-ref name=\"repeatability\"></deck-ref></td></tr>\n    <tr><td>A service changes, or misbehaves</td><td>The failure path the spec names, taken on purpose, and tested</td><td><deck-ref name=\"resilience\"></deck-ref></td></tr>\n    <tr><td>A bill nobody budgeted</td><td>Found once with a model, replayed with none</td><td><deck-ref name=\"zta\"></deck-ref></td></tr>\n    <tr><td>Nobody can say why it did that</td><td>A record of every request, answer and decision, readable by a person</td><td><deck-ref name=\"ai-in-the-loop\"></deck-ref></td></tr>\n  </tbody>\n</table></div>\n<p class=\"note\">Each word is a short form for more than one talk can cover: validators and lost updates, audit records, change control, cost control.</p>\n<p class=\"punch\">Lose any one R, and its risk comes back. <deck-ref name=\"reliability\"></deck-ref> <deck-ref name=\"risk\"></deck-ref></p>\n",
+  "say": "Ask anyone who works at an insurance company what they think about all day. Risk. Not tokens, not reasoning: risk. So let's say plainly what an agent puts at risk. It can do the wrong thing to the wrong state: merge what shouldn't be merged, pay what shouldn't be paid. It can do something different tomorrow than it did today, given the same request. It can fall over, or worse, carry on wrongly, when a service it depends on changes. It can run up a bill nobody budgeted. And when someone asks why it did what it did, there may be nothing to read. Each of those is held down by one of the R's, or by the record they leave behind. Right behavior: only the acts the current state allows, sent with the validator from the state that was read, and a reason when an act is absent. Repeatability: a kept script, checked against its pins, that does the same thing on every run and costs no tokens to repeat. Resilience: the failure paths the spec names, taken on purpose, and tested by a terrier. Lose any one of them and the risk comes back. The words are only short forms. Each stands for more than one talk can cover: validators and lost updates, audit records, change control, cost control. We'll touch a few of them today. First, though, why this matters to me, personally.",
+  "sources": [
+    {
+      "label": "Buster (repository)",
+      "href": "https://github.com/JogoShugh/buster"
+    }
+  ]
+}
