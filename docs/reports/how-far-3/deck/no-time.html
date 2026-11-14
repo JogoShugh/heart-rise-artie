@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>No Time to Type · Claude Wrote It. Git Hooks Kept It Honest. · 3.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Why this talk · the second ground has four legs</span></header>
+<h2>No Time to Type</h2>
+<div class="split">
+  <div class="rows">
+    <p class="lead">Have you ever tried to write code with a leash in one hand? I don’t recommend it.</p>
+    <div><h3>Half the Answer: <code>/remote-control</code></h3><p>The session runs on my machine. I steer it mostly by dictating into my phone.</p></div>
+    <div><h3>The Other Half: Rigor Without Watching</h3><p>BDD for real, the same way every time: Gherkin, red, code, green, commit. <a class="ref-plain" href="deck/three-rs-one-behavior.html">RIGHT-BEHAVIOR</a> <a class="ref-plain" href="deck/three-rs-one-behavior.html">REPEATABILITY</a></p></div>
+    <div><h3>Asking Nicely? Probably Not.</h3><p>Instructions are advisory, so hooks enforce the order. I read the record afterward.</p></div>
+    <p class="punch">Notice that an agent calling an API needs the same thing: controls that still hold when nobody is watching. <a class="ref-plain" href="https://code.claude.com/docs/en/remote-control">NO-TIME</a> <details class="fragment-plain"><summary>The hooks that gate every change (core/hooks.json)</summary><pre><code>{
+  &quot;UserPromptSubmit&quot;: [
+    {
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/refactor-prompt.sh&quot;,
+          &quot;timeout&quot;: 15
+        }
+      ]
+    }
+  ],
+  &quot;PreToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/protect-gate.sh&quot;,
+          &quot;timeout&quot;: 10
+        }
+      ]
+    },
+    {
+      &quot;matcher&quot;: &quot;Edit|Write|MultiEdit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/gherkin-first.sh&quot;,
+          &quot;timeout&quot;: 15,
+          &quot;statusMessage&quot;: &quot;Checking Gherkin-first ordering...&quot;
+        }
+      ]
+    },
+    {
+      &quot;matcher&quot;: &quot;Bash&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/gate-bash.sh&quot;,
+          &quot;timeout&quot;: 10
+        }
+      ]
+    }
+  ],
+  &quot;PostToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;Edit|Write|MultiEdit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/log-event.sh&quot;,
+          &quot;timeout&quot;: 15,
+          &quot;statusMessage&quot;: &quot;Logging TDD event...&quot;
+        },
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/lint.sh&quot;,
+          &quot;timeout&quot;: 180,
+          &quot;statusMessage&quot;: &quot;Running lint gate...&quot;
+        }
+      ]
+    }
+  ],
+  &quot;Stop&quot;: [
+    {
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/check.sh&quot;,
+          &quot;timeout&quot;: 600,
+          &quot;statusMessage&quot;: &quot;Running full check gate...&quot;
+        }
+      ]
+    }
+  ]
+}</code></pre></details></p>
+  </div>
+  <div class="phone">
+    <p class="phone-head">/remote-control</p>
+    <p class="me">Please give me an update</p>
+    <p class="it">Red run logged. Writing the fix.</p>
+    <p class="me">How’s it going?</p>
+    <p class="it">Green. Commit gate: TDD order checked.</p>
+    <p class="me">🐕 pulling. back in 20</p>
+    <p class="note">Illustrative, not a transcript. The two questions are the real ones, every evening. So is the dog.</p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/three-rs-one-behavior.html" rel="prev"><small>Back</small><b>The Three R’s, One Behavior at a Time</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#no-time">with heart-ts</a></span>
+<a href="deck/hooks.html" rel="next"><small>Next</small><b>Instructions are advisory. Hooks are not.</b></a></nav>
+</main></div></body></html>

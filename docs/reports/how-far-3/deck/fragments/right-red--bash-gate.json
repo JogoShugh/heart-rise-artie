@@ -1,0 +1,21 @@
+{
+  "name": "bash-gate",
+  "label": "Raw test commands are blocked (core/gate-bash.sh)",
+  "lang": "bash",
+  "path": "bdd-gates: core/gate-bash.sh",
+  "lines": "1–20",
+  "of": 20,
+  "text": "#!/usr/bin/env bash\n# PreToolUse (Bash). For wrapper-logged stacks: blocks running the raw test\n# command, because a raw run leaves no BDD_RUN fact and the pre-commit check\n# then cannot see the red/green sequence. No-op unless bddRawCommandRegex is set.\nset -o pipefail\n. \"$(dirname \"$0\")/lib.sh\"\n\nbdd_has_config || exit 0\nregex=$(bdd_value bddRawCommandRegex)\n[ -n \"$regex\" ] || exit 0\n\ncommand=$(jq -r '.tool_input.command // empty')\n[ -n \"$command\" ] || exit 0\ncase \"$command\" in *bdd-gates/bdd-run.sh*) exit 0 ;; esac\n\nif printf '%s\\n' \"$command\" | grep -Eq -- \"$regex\"; then\n  echo \"Blocked: run tests through .claude/bdd-gates/bdd-run.sh [extra args] so the BDD_RUN result is logged.\" >&2\n  exit 2\nfi\nexit 0",
+  "_links": {
+    "self": {
+      "href": "right-red--bash-gate.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/gate-bash.sh",
+      "title": "core/gate-bash.sh, lines 1–20"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

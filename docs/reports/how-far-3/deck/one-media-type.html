@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Media Type, Five Services · Claude Wrote It. Git Hooks Kept It Honest. · 3.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">The system · why one generic client is enough</span></header>
+<h2>One Media Type, Five Services</h2>
+<div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr)">
+  <figure>
+    <svg viewBox="0 0 520 380" role="img" aria-label="ARTIE in the middle, one generic client. Around it five services, each answering in application/hal+json with the HEART profile: the forge gateway (scm), the offer watcher (watcher), the release desk (desk), CI in front of Jenkins (ci), and Dev (env).">
+      <g stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6">
+        <line x1="260" y1="190" x2="110" y2="70"/><line x1="260" y1="190" x2="410" y2="70"/>
+        <line x1="260" y1="190" x2="70" y2="230"/><line x1="260" y1="190" x2="450" y2="230"/>
+        <line x1="260" y1="190" x2="260" y2="330"/>
+      </g>
+      <circle cx="260" cy="190" r="58" style="fill: var(--surface)"/>
+      <circle cx="260" cy="190" r="58" fill="#2f9e5b" fill-opacity="0.25" stroke="#2f9e5b" stroke-width="2.5"/>
+      <text fill="currentColor" x="260" y="186" text-anchor="middle" fill="currentColor" font-size="18" font-weight="700">ARTIE</text>
+      <text fill="currentColor" x="260" y="206" text-anchor="middle" fill="currentColor" font-size="11">one generic client</text>
+      <g font-size="13" text-anchor="middle">
+        <rect x="35" y="40" width="150" height="56" rx="10" style="fill: var(--surface)" stroke="currentColor" stroke-width="1.5"/>
+        <text fill="currentColor" x="110" y="64" font-weight="700">Gateway</text><text fill="currentColor" x="110" y="83" font-size="11">scm: · GitHub or GitLab</text>
+        <rect x="335" y="40" width="150" height="56" rx="10" style="fill: var(--surface)" stroke="currentColor" stroke-width="1.5"/>
+        <text fill="currentColor" x="410" y="64" font-weight="700">Offer watch</text><text fill="currentColor" x="410" y="83" font-size="11">watcher:watch</text>
+        <rect x="0" y="202" width="140" height="56" rx="10" style="fill: var(--surface)" stroke="currentColor" stroke-width="1.5"/>
+        <text fill="currentColor" x="70" y="226" font-weight="700">Release desk</text><text fill="currentColor" x="70" y="245" font-size="11">desk:release</text>
+        <rect x="380" y="202" width="140" height="56" rx="10" style="fill: var(--surface)" stroke="currentColor" stroke-width="1.5"/>
+        <text fill="currentColor" x="450" y="226" font-weight="700">CI · Jenkins</text><text fill="currentColor" x="450" y="245" font-size="11">ci:build · ci:smoke-test</text>
+        <rect x="190" y="306" width="140" height="56" rx="10" style="fill: var(--surface)" stroke="currentColor" stroke-width="1.5"/>
+        <text fill="currentColor" x="260" y="330" font-weight="700">Dev</text><text fill="currentColor" x="260" y="349" font-size="11">env:promote</text>
+      </g>
+    </svg>
+    <figcaption>Every answer: <code>application/hal+json</code>, profile HAL Schema Forms.</figcaption>
+  </figure>
+  <div class="rows">
+    <div><h3>Five Jobs, Five Vocabularies</h3><p>scm, watcher, desk, ci, env.</p></div>
+    <div><h3>One Media Type</h3><p>HAL with HAL Schema Forms: the data and the forms for the acts its state allows now.</p></div>
+    <div><h3>No Code per Service</h3><p>ARTIE knows the media type, the way a browser knows HTML.</p></div>
+    <p class="punch">A sixth service is a bookmark and a vocabulary, not a client.</p>
+    <p class="refs"><a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/spec/HAL-SCHEMA-FORMS-HR.md">HEART</a> <a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/client">ARTIE</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">MEDIA-TYPES</a> <a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_5">UNIFORM-INTERFACE</a></p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/walk-the-dog.html" rel="prev"><small>Back</small><b>Back to the Dog: Buster</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#one-media-type">with heart-ts</a></span>
+<a href="deck/two-real-services.html" rel="next"><small>Next</small><b>Now Two Real Services, Built to Agree on Nothing</b></a></nav>
+</main></div></body></html>

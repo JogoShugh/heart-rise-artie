@@ -1,0 +1,21 @@
+{
+  "name": "what-i-say",
+  "title": "What I Actually Say",
+  "part": "The bdd-gates skill, in depth",
+  "kicker": "Dictation, through /remote-control · AI in the loop, in practice",
+  "tone": "light",
+  "number": 14,
+  "of": 31,
+  "html": "<h2>What I Actually Say</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <p class=\"lead\">Mostly, I talk. Speech-to-text, into a phone, through <code>/remote-control</code>.</p>\n    <div><h3>I Own the Goal</h3><p>One sentence, said out loud.</p></div>\n    <div><h3>I Don’t Approve Every Step</h3><p>The hooks hold the order while nobody watches.</p></div>\n    <div><h3>I Read the Record Afterward</h3><p>Which scenario, which red run, which green run, which commit.</p></div>\n    <p class=\"refs\"><deck-ref name=\"no-time\"></deck-ref> <deck-ref name=\"ai-in-the-loop\"></deck-ref></p>\n  </div>\n  <div class=\"phone\">\n    <p class=\"phone-head\">/remote-control</p>\n    <p class=\"me\">Please give me an update</p>\n    <p class=\"it\">Red run logged: 3 failures, on behavior. Writing the fix.</p>\n    <p class=\"me\">How’s it going?</p>\n    <p class=\"it\">Green. Commit gate: TDD order checked.</p>\n    <p class=\"me\">go deep on bed gates skill</p>\n    <p class=\"it\">The bdd-gates skill, understood.</p>\n    <p class=\"note\">Illustrative, not a transcript. The two questions are the real ones. So is “bed gates”.</p>\n  </div>\n</div>\n",
+  "say": "So what does my side of this look like? Mostly, I talk. Speech-to-text, into my phone, through Claude Code's /remote-control, while the session runs on my machine. Most evenings it's the same two questions: 'Please give me an update', and 'How's it going?' Dictation has opinions of its own. It hears 'BDD gates' as 'bed gates' about half the time. Claude knows what I mean; the gates don't care either way. What I don't do is approve every step. I own the goal, I say it in a sentence, and afterward I read the record: which scenario, which red run, which green run, which commit. That's what people mean by AI in the loop: the person is in control of the system, and the AI is there to support the person. The hooks make it possible to work that way without watching.",
+  "sources": [
+    {
+      "label": "Claude Code docs: /remote-control",
+      "href": "https://code.claude.com/docs/en/remote-control"
+    },
+    {
+      "label": "Natarajan et al.: Human-in-the-loop or AI-in-the-loop? (arXiv, 2024)",
+      "href": "https://arxiv.org/abs/2412.14232"
+    }
+  ]
+}

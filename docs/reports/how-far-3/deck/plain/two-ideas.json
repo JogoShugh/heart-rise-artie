@@ -1,0 +1,21 @@
+{
+  "name": "two-ideas",
+  "title": "Two Ideas I Borrowed",
+  "part": "Why, in two slides",
+  "kicker": "Fielding, 2008 · Hightower, 2026",
+  "tone": "light",
+  "number": 2,
+  "of": 31,
+  "html": "<h2>Two Ideas I Borrowed</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch\">\n  <div class=\"panel\">\n    <span class=\"label\">Roy Fielding · 2008</span>\n    <p class=\"lead\" style=\"margin: .3rem 0\">Enter with a bookmark. Follow what’s offered.</p>\n    <p>No manual and no list of URLs: every next step comes from the server’s own answer.</p>\n    <p class=\"refs\"><deck-ref name=\"rule-6\"></deck-ref> <deck-ref name=\"hypertext\"></deck-ref> <deck-ref name=\"frustrated\"></deck-ref></p>\n  </div>\n  <div class=\"panel\">\n    <span class=\"label\">Kelsey Hightower · 2026</span>\n    <p class=\"lead\" style=\"margin: .3rem 0\">Infer once. Then run it without a model.</p>\n    <p>Stop paying a model to work out the same thing on every call.</p>\n    <p class=\"refs\"><deck-ref name=\"zta\"></deck-ref></p>\n  </div>\n</div>\n<p class=\"punch\">Together: find the way once from the answers, then replay it for free, checking each step is still offered.</p>\n",
+  "say": "Two ideas, briefly, because everything else hangs on them. Roy Fielding, in 2008, got frustrated enough to write down rules for what a REST API is. The one I lean on most: a client should enter with nothing but a bookmark and the media types it understands, and from then on take every next step from what the server offers in its answers. No manual, no list of URLs. Kelsey Hightower, this year, gave a talk called Zero Token Architecture. His point: stop paying a model to work out the same thing on every call. Infer once, then run the result as plain, deterministic code. Put the two together and you get the agent I wanted: it finds its way from the answers, once, with a model, and after that it replays the way it found, for free, checking at each step that the server still offers it. The pills have the depth for anyone who wants it. Now, the shape of the thing I built.",
+  "sources": [
+    {
+      "label": "Fielding: REST APIs must be hypertext-driven (2008)",
+      "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"
+    },
+    {
+      "label": "Hightower: ZTA, Zero Token Architecture (talk)",
+      "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"
+    }
+  ]
+}

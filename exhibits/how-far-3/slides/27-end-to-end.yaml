@@ -1,0 +1,24 @@
+name: end-to-end
+part: "The system: everything speaks HEART"
+title: "One Script, End to End"
+kicker: Five services · one media type · every step offered by the last answer
+say: "Here's the whole release on one slide. A person asks the release desk to release a pull request: desk:release. The desk starts ARTIE on the kept script. ARTIE opens the pull request through the gateway, scm:pulls-get. It asks the watcher to say when merge is offered, and waits. Answered: it merges, scm:merge, by squashing, and checks the pull request really is merged. It asks CI to build the merge commit, ci:build, and waits. Answered: it follows the link to the build, and runs the smoke scenarios the build links, against the deployment the build links. If they all pass, it opens Dev and promotes the commit, env:promote, citing how many passed. If one fails, it doesn't promote; it says why on the pull request, scm:comment. Five services. One script, written as data. One generic client. And every step is a control the last answer offered."
+sources:
+  - ["The kept release script (release.heart.yaml)", "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/merge-watch-release/release.heart.yaml"]
+  - ["Report: Merge Watch release", "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-release/"]
+html: |
+  <h2>One Script, End to End</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Service</th><th>Relation</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Release desk</td><td><code>desk:release</code></td><td>A person asks; the desk starts ARTIE on the kept script</td></tr>
+      <tr><td>2</td><td>Gateway</td><td><code>scm:pulls-get</code></td><td>Open the pull request</td></tr>
+      <tr><td>3</td><td>Offer watch</td><td><code>watcher:watch</code></td><td>Tell me when it offers <code>scm:merge</code>; wait for the reply</td></tr>
+      <tr><td>4</td><td>Gateway</td><td><code>scm:merge</code></td><td>Merge by squashing; check it’s merged</td></tr>
+      <tr><td>5</td><td>CI · Jenkins</td><td><code>ci:build</code></td><td>Build the merge commit; wait for the reply</td></tr>
+      <tr><td>6</td><td>CI · Jenkins</td><td><code>ci:smoke-test</code></td><td>Run the build’s own smoke scenarios against its deployment</td></tr>
+      <tr><td>7</td><td>Dev, or the gateway</td><td><code>env:promote</code> or <code>scm:comment</code></td><td>All passed: promote. One failed: say why on the pull request</td></tr>
+    </tbody>
+  </table></div>
+  <p class="punch">Five services, one script written as data, one generic client.</p>
+  <p class="refs"><deck-ref name="right-behavior"></deck-ref> <deck-ref name="repeatability"></deck-ref> <deck-ref name="resilience"></deck-ref> <deck-ref name="rise"></deck-ref></p>

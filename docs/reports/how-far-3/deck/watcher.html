@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Watcher: Tell Me When It Offers Merge · Claude Wrote It. Git Hooks Kept It Honest. · 3.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">RISE · ask now, be told later</span></header>
+<h2>The Watcher: Tell Me When It Offers Merge</h2>
+<div class="split">
+  <div class="rows">
+    <div><h3>Ask Once</h3><p><code>watcher:watch</code>: this resource, the relation <code>scm:merge</code>, and a reply form to answer on.</p></div>
+    <div><h3>It Looks, as HEART</h3><p>Every 3 seconds: does the pull request’s answer offer <code>scm:merge</code> now?</p></div>
+    <div><h3>Be Told Later</h3><p><code>completed</code>, signed, when it does. <code>failed</code>, not offered in time, when it never does.</p></div>
+    <p class="punch">It doesn’t know what a pull request is. It knows what an offer is.</p>
+    <p class="refs"><a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc">RISE</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-718">HYPERTEXT</a></p>
+  </div>
+  <div class="card dark" style="align-self: center">
+    <span class="label">From the kept script</span>
+    <pre style="margin: .4rem 0 0; white-space: pre-wrap; font-size: .9rem">- enter: ${watcher}
+  steps:
+    - ask: watcher:watch
+      fields:
+        resource: ${pr.@self}
+        offers: scm:merge
+      reply: watch
+- once-answered:
+    reply: watch
+    steps:
+      - enter: ${pr.@self}
+        steps:
+          - act: scm:merge
+            fields:
+              method: squash</pre>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/mapping.html" rel="prev"><small>Back</small><b>How each scm: relation maps to each forge</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#watcher">with heart-ts</a></span>
+<a href="deck/release-desk-jenkins.html" rel="next"><small>Next</small><b>The release desk, and Jenkins, for real</b></a></nav>
+</main></div></body></html>

@@ -1,0 +1,21 @@
+{
+  "name": "scenario",
+  "label": "The scenario, whole (goal-rise.feature)",
+  "lang": "gherkin",
+  "path": "client/artie/src/test/resources/features/goal-rise.feature",
+  "lines": "210–245",
+  "of": 277,
+  "text": "Scenario: A step that only reads is kept in the script when a later step names what it read\n  `as NAME` on a read is no detour when a later step names it: the watch is asked about\n  `${front.@self}`, so the script reads front first, though no value of front is sent.\n  Given the file \"named-read.goal.md\" is\n    \"\"\"\n    ---\n    start: \"{desk}\"\n    inputs:\n      desk:\n      watcher:\n      state:\n    ---\n\n    Watch the desk's releases in a state.\n\n    - Search the desk's releases that are {state} `as front`\n    - At {watcher}, ask to be told when {front} offers desk:release `as watch`\n    \"\"\"\n  And the planner will move\n    | move | words                                                          | opens |\n    | act  | search the desk's releases that are running                    | yes   |\n    | done |                                                                |       |\n    | act  | ask to be told when the releases found offer desk:release      | yes   |\n    | done |                                                                |       |\n  And ARTIE's reasoner will choose, in order\n    | form                 | follow | fields                                                                          |\n    | desk:search-releases |        | {\"name\": \"running\"}                                                             |\n    | watcher:watch        |        | {\"resource\": \"http://localhost:8160/releases?name=running\", \"offers\": \"desk:release\"} |\n  When the goal \"named-read.goal.md\" runs with ARTIE in the desk, captured in \"named-read.trace.yaml\", given\n    | name    | value                  |\n    | desk    | http://localhost:8160/ |\n    | watcher | http://localhost:8099/ |\n    | state   | running                |\n  Then the run finished\n  When artie generated \"named-read.heart.yaml\" as data from \"named-read.trace.yaml\" and \"named-read.goal.md\"\n  Then the script \"named-read.heart.yaml\" has a line with \"- act: desk:search-releases\"",
+  "_links": {
+    "self": {
+      "href": "red-first--scenario.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/client/artie/src/test/resources/features/goal-rise.feature#L210-L245",
+      "title": "client/artie/src/test/resources/features/goal-rise.feature, lines 210–245"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

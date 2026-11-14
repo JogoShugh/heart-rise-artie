@@ -1,0 +1,129 @@
+{
+  "name": "end-to-end",
+  "title": "One Script, End to End",
+  "part": "The system: everything speaks HEART",
+  "kicker": "Five services · one media type · every step offered by the last answer",
+  "tone": "light",
+  "number": 27,
+  "of": 31,
+  "html": "<h2>One Script, End to End</h2>\n<div class=\"table-scroll\"><table>\n  <thead><tr><th></th><th>Service</th><th>Relation</th><th>What happens</th></tr></thead>\n  <tbody>\n    <tr><td>1</td><td>Release desk</td><td><code>desk:release</code></td><td>A person asks; the desk starts ARTIE on the kept script</td></tr>\n    <tr><td>2</td><td>Gateway</td><td><code>scm:pulls-get</code></td><td>Open the pull request</td></tr>\n    <tr><td>3</td><td>Offer watch</td><td><code>watcher:watch</code></td><td>Tell me when it offers <code>scm:merge</code>; wait for the reply</td></tr>\n    <tr><td>4</td><td>Gateway</td><td><code>scm:merge</code></td><td>Merge by squashing; check it’s merged</td></tr>\n    <tr><td>5</td><td>CI · Jenkins</td><td><code>ci:build</code></td><td>Build the merge commit; wait for the reply</td></tr>\n    <tr><td>6</td><td>CI · Jenkins</td><td><code>ci:smoke-test</code></td><td>Run the build’s own smoke scenarios against its deployment</td></tr>\n    <tr><td>7</td><td>Dev, or the gateway</td><td><code>env:promote</code> or <code>scm:comment</code></td><td>All passed: promote. One failed: say why on the pull request</td></tr>\n  </tbody>\n</table></div>\n<p class=\"punch\">Five services, one script written as data, one generic client.</p>\n<p class=\"refs\"><deck-ref name=\"right-behavior\"></deck-ref> <deck-ref name=\"repeatability\"></deck-ref> <deck-ref name=\"resilience\"></deck-ref> <deck-ref name=\"rise\"></deck-ref></p>\n",
+  "say": "Here's the whole release on one slide. A person asks the release desk to release a pull request: desk:release. The desk starts ARTIE on the kept script. ARTIE opens the pull request through the gateway, scm:pulls-get. It asks the watcher to say when merge is offered, and waits. Answered: it merges, scm:merge, by squashing, and checks the pull request really is merged. It asks CI to build the merge commit, ci:build, and waits. Answered: it follows the link to the build, and runs the smoke scenarios the build links, against the deployment the build links. If they all pass, it opens Dev and promotes the commit, env:promote, citing how many passed. If one fails, it doesn't promote; it says why on the pull request, scm:comment. Five services. One script, written as data. One generic client. And every step is a control the last answer offered.",
+  "sources": [
+    {
+      "label": "The kept release script (release.heart.yaml)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/merge-watch-release/release.heart.yaml"
+    },
+    {
+      "label": "Report: Merge Watch release",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-release/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "end-to-end.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "console-and-dev.json",
+      "title": "The build’s console, and Dev, promoted or not"
+    },
+    "next": {
+      "href": "heart-mcp-github.json",
+      "title": "The same model, given state instead of a catalogue"
+    },
+    "alternate": {
+      "href": "end-to-end.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "right-behavior",
+        "kind": "measure",
+        "label": "RIGHT-BEHAVIOR",
+        "title": "Right behavior: only what the state allows, and a reason when not",
+        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
+        "cite": "The first of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/right-behavior.json",
+            "title": "RIGHT-BEHAVIOR"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The first of the three R's"
+          }
+        }
+      },
+      {
+        "name": "repeatability",
+        "kind": "measure",
+        "label": "REPEATABILITY",
+        "title": "Repeatability: the same goal, the same result, every time",
+        "summary": "Given the same inputs, the same outputs, call after call. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
+        "cite": "The second of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/repeatability.json",
+            "title": "REPEATABILITY"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The second of the three R's"
+          }
+        }
+      },
+      {
+        "name": "resilience",
+        "kind": "measure",
+        "label": "RESILIENCE",
+        "title": "Resilience: the server changes, the client doesn't break",
+        "summary": "When the server changes, or misbehaves on purpose, the client takes the failure path the spec names, re-syncs, and goes on; a model comes back only when the controls really changed, to repair. At the small scale it is the regression suite and the gates that hold, even against the model.",
+        "cite": "The third of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/resilience.json",
+            "title": "RESILIENCE"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The third of the three R's"
+          }
+        }
+      },
+      {
+        "name": "rise",
+        "kind": "part",
+        "label": "RISE",
+        "title": "RISE: tell me when it's done",
+        "summary": "Reciprocal Interface for State Exchange. Replies for asynchronous work: ask now, be told later. A watcher or a build answers back when it is ready, as Jenkins does in the release.",
+        "cite": "heart-rise-artie (repository)",
+        "_links": {
+          "self": {
+            "href": "../refs/rise.json",
+            "title": "RISE"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc",
+            "title": "heart-rise-artie (repository)"
+          }
+        }
+      }
+    ]
+  }
+}

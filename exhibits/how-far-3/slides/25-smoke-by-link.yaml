@@ -1,0 +1,34 @@
+name: smoke-by-link
+part: "The system: everything speaks HEART"
+title: "The Smoke Script, Found by Link"
+kicker: Jenkins answers back · ARTIE follows what the build offers
+say: "When Jenkins finishes, it doesn't call ARTIE directly. Its notification plugin tells the CI service, and the CI service answers ARTIE's reply, signed, with a link to the build. ARTIE follows that link. A build that succeeded links two things: where it was deployed, ci:deployment, and the smoke scenarios it shipped with, ci:smoke-test, archived as an artifact of that very build. ARTIE runs the smoke script against the deployment. Neither address was in the kept script; both came in the answer. So a new build, on a new port, with new smoke scenarios, needs no change to the release script at all."
+sources:
+  - ["The kept release script (release.heart.yaml)", "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/merge-watch-release/release.heart.yaml"]
+html: |
+  <h2>The Smoke Script, Found by Link</h2>
+  <div class="split">
+    <div class="rows">
+      <div><h3>Jenkins Tells the CI Service</h3><p>Its notification plugin posts each build event; the CI service answers ARTIE’s reply, signed, linking the build.</p></div>
+      <div><h3>The Build Links What It Made</h3><p><code>ci:deployment</code>: where it runs. <code>ci:smoke-test</code>: the scenarios it shipped with.</p></div>
+      <div><h3>ARTIE Follows, Then Runs</h3><p>Neither address is in the script. Both came in the answer.</p></div>
+      <p class="refs"><deck-ref name="rise"></deck-ref> <deck-ref name="rule-4"></deck-ref> <deck-ref name="follow-your-nose"></deck-ref></p>
+    </div>
+    <div class="card dark" style="align-self: center">
+      <span class="label">From the kept script</span>
+      <pre style="margin: .4rem 0 0; white-space: pre-wrap; font-size: .9rem">- enter: ${jenkins}
+    steps:
+      - ask: ci:build
+        fields:
+          commit: ${merged.merge_commit_sha}
+        reply: build
+  - once-answered:
+      reply: build
+      steps:
+        - follow: hr:in-reply-to
+          then:
+            - run-script: ci:smoke-test
+              on-link: ci:deployment
+              as: smoke</pre>
+    </div>
+  </div>

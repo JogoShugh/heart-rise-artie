@@ -1,0 +1,111 @@
+{
+  "name": "right-red",
+  "title": "Red Has to Be the Right Red",
+  "part": "The bdd-gates skill, in depth",
+  "kicker": "A failing run only counts if it fails for the right reason",
+  "tone": "light",
+  "number": 10,
+  "of": 31,
+  "html": "<h2>Red Has to Be the Right Red</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <div><h3>Red, but Not Evidence</h3><p>It didn’t compile, or the step didn’t exist yet. Something is missing, but not necessarily the behavior.</p></div>\n    <div><h3>Every Run Through the Runner</h3><p>A raw test command is blocked: it would leave nothing in the log.</p></div>\n    <div><h3>One Line per Run</h3><p>Pass or fail, total, failures, errors. No results at all is logged as a failure, <code>reason=no-results</code>.</p></div>\n    <div><h3>Then Check It</h3><p>The right module, failing on behavior, with a plausible total, before any production write.</p></div>\n    <p class=\"refs\"><deck-ref name=\"right-behavior\"></deck-ref> <deck-fragment name=\"bash-gate\">gate-bash.sh</deck-fragment> <deck-fragment name=\"run-logging\">bdd-run-logging.gradle.kts</deck-fragment></p>\n  </div>\n  <div class=\"card dark\" style=\"align-self: center\">\n    <span class=\"label\">The log, in order</span>\n    <pre style=\"margin: .4rem 0 0; white-space: pre-wrap; font-size: .85rem\">1795… FEATURE_WRITE heart/…/options.feature\n1795… BDD_RUN FAIL total=412 failures=3 errors=0\n1795… MAIN_WRITE heart/…/ActPipeline.kt\n1795… BDD_RUN PASS total=412 failures=0 errors=0</pre>\n    <p class=\"note\">The log’s own line kinds; the paths and counts are illustrative.</p>\n  </div>\n</div>\n",
+  "say": "Here's a trap I fell into more than once. A model is told to write the scenario first and watch it fail. It writes the scenario, runs the suite, and the suite fails. Red. Done? Probably not. It failed because the code didn't compile, or because the step it needed didn't exist yet. That's red, but it isn't evidence that the behavior is missing. It's evidence that something is missing. So the skill is strict about what a run is. Tests run only through the skill's own runner; a raw test command is blocked, because a raw run leaves nothing in the log. Every run appends one line: pass or fail, the total, the failures, the errors. A run that produced no results at all is logged as a failure with the reason no-results, so it can't pass for a real red. And I hold one rule on top of the skill: after every red run, before any production write, check that the failure is the right module, on behavior, with a total that makes sense. Notice that it's the same idea as the whole talk: don't trust that the agent did the right thing; make it leave a record you can check.",
+  "sources": [
+    {
+      "label": "bdd-gates skill",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "right-red.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "red-first.json",
+      "title": "The scenario, then the failing run"
+    },
+    "next": {
+      "href": "code-green-commit.json",
+      "title": "The fix, the green run, the gated commit"
+    },
+    "alternate": {
+      "href": "right-red.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "right-behavior",
+        "kind": "measure",
+        "label": "RIGHT-BEHAVIOR",
+        "title": "Right behavior: only what the state allows, and a reason when not",
+        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
+        "cite": "The first of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/right-behavior.json",
+            "title": "RIGHT-BEHAVIOR"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The first of the three R's"
+          }
+        }
+      }
+    ],
+    "deck:fragment": [
+      {
+        "name": "bash-gate",
+        "label": "Raw test commands are blocked (core/gate-bash.sh)",
+        "lang": "bash",
+        "path": "bdd-gates: core/gate-bash.sh",
+        "lines": "1–20",
+        "of": 20,
+        "text": "#!/usr/bin/env bash\n# PreToolUse (Bash). For wrapper-logged stacks: blocks running the raw test\n# command, because a raw run leaves no BDD_RUN fact and the pre-commit check\n# then cannot see the red/green sequence. No-op unless bddRawCommandRegex is set.\nset -o pipefail\n. \"$(dirname \"$0\")/lib.sh\"\n\nbdd_has_config || exit 0\nregex=$(bdd_value bddRawCommandRegex)\n[ -n \"$regex\" ] || exit 0\n\ncommand=$(jq -r '.tool_input.command // empty')\n[ -n \"$command\" ] || exit 0\ncase \"$command\" in *bdd-gates/bdd-run.sh*) exit 0 ;; esac\n\nif printf '%s\\n' \"$command\" | grep -Eq -- \"$regex\"; then\n  echo \"Blocked: run tests through .claude/bdd-gates/bdd-run.sh [extra args] so the BDD_RUN result is logged.\" >&2\n  exit 2\nfi\nexit 0",
+        "_links": {
+          "self": {
+            "href": "fragments/right-red--bash-gate.json",
+            "title": "Raw test commands are blocked (core/gate-bash.sh)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/gate-bash.sh",
+            "title": "core/gate-bash.sh, lines 1–20"
+          }
+        }
+      },
+      {
+        "name": "run-logging",
+        "label": "Every run leaves one line, even a failed compile (stacks/gradle-kotlin/templates/bdd-run-logging.gradle.kts)",
+        "lang": "kotlin",
+        "path": "bdd-gates: stacks/gradle-kotlin/templates/bdd-run-logging.gradle.kts",
+        "lines": "1–29",
+        "of": 29,
+        "text": "// bdd-gates: records \"BDD_RUN PASS|FAIL\" after every test run, including failed ones.\n// Needs: import java.time.Instant and java.time.temporal.ChronoUnit at the top of the build script.\n\nval logBddRun by tasks.registering {\n    group = \"verification\"\n    description = \"Appends a BDD_RUN fact to .claude/tdd-events.log for the pre-commit TDD-ordering check.\"\n    doLast {\n        // RESULT_XML: the JUnit XML written for the Cucumber suite runner class.\n        val resultFile = file(\"build/test-results/test/TEST-<your.package>.RunCucumberTest.xml\")\n        val logFile = file(\".claude/tdd-events.log\")\n        val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)\n        logFile.parentFile.mkdirs()\n        if (!resultFile.exists()) {\n            // No result file means compilation or discovery failed: still red.\n            logFile.appendText(\"$timestamp BDD_RUN FAIL reason=no-results\\n\")\n            return@doLast\n        }\n        val xml = resultFile.readText()\n        fun attr(name: String) = Regex(\"\"\"$name=\"(\\d+)\"\"\"\").find(xml)?.groupValues?.get(1) ?: \"0\"\n        val status = if (attr(\"failures\") == \"0\" && attr(\"errors\") == \"0\") \"PASS\" else \"FAIL\"\n        logFile.appendText(\n            \"$timestamp BDD_RUN $status total=${attr(\"tests\")} failures=${attr(\"failures\")} errors=${attr(\"errors\")}\\n\",\n        )\n    }\n}\n\ntasks.test {\n    finalizedBy(logBddRun)\n}",
+        "_links": {
+          "self": {
+            "href": "fragments/right-red--run-logging.json",
+            "title": "Every run leaves one line, even a failed compile (stacks/gradle-kotlin/templates/bdd-run-logging.gradle.kts)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/stacks/gradle-kotlin/templates/bdd-run-logging.gradle.kts",
+            "title": "stacks/gradle-kotlin/templates/bdd-run-logging.gradle.kts, lines 1–29"
+          }
+        }
+      }
+    ]
+  }
+}

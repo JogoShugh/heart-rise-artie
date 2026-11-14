@@ -1,0 +1,107 @@
+{
+  "name": "what-it-produced",
+  "title": "What It Produced",
+  "part": "The bdd-gates skill, in depth",
+  "kicker": "The artie repository, counted on 14 November 2026",
+  "tone": "light",
+  "number": 15,
+  "of": 31,
+  "html": "<h2>What It Produced</h2>\n<div class=\"split\" style=\"grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch\">\n  <div class=\"stat\"><b style=\"font: 700 3.2rem var(--display); color: var(--leaf)\">201</b><p>feature files</p></div>\n  <div class=\"stat\"><b style=\"font: 700 3.2rem var(--display); color: var(--leaf)\">1,273</b><p>scenarios</p></div>\n  <div class=\"stat\"><b style=\"font: 700 3.2rem var(--display); color: var(--leaf)\">1,117</b><p>commits since 19 April 2026</p></div>\n  <div class=\"stat\"><b style=\"font: 700 3.2rem var(--display); color: var(--leaf)\">365</b><p>Kotlin production files</p></div>\n</div>\n<p class=\"lead\">Across the HEART library, the client, the domains, the MCP server and the Spring server.</p>\n<p class=\"punch\">Under the gates, no production change lands without a scenario first.</p>\n<p class=\"refs\"><deck-ref name=\"right-behavior\"></deck-ref> <deck-ref name=\"repeatability\"></deck-ref> <deck-ref name=\"resilience\"></deck-ref></p>\n",
+  "say": "So what did seven months of that produce? I counted, today, in the repository. 201 feature files. 1,273 scenarios, each one a behavior written down before its code. 1,117 commits since the 19th of April. 365 Kotlin production files, across the HEART library, the client, the domains, the MCP server and the Spring server. I didn't type most of it. Under the gates, no production change lands without a scenario first. As we'll see next, that's what makes the components trustworthy enough to build a release on.",
+  "sources": [
+    {
+      "label": "heart-rise-artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "what-it-produced.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "what-i-say.json",
+      "title": "What I Actually Say"
+    },
+    "next": {
+      "href": "generic-client.json",
+      "title": "ARTIE is to APIs what a browser is to web pages"
+    },
+    "alternate": {
+      "href": "what-it-produced.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "right-behavior",
+        "kind": "measure",
+        "label": "RIGHT-BEHAVIOR",
+        "title": "Right behavior: only what the state allows, and a reason when not",
+        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
+        "cite": "The first of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/right-behavior.json",
+            "title": "RIGHT-BEHAVIOR"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The first of the three R's"
+          }
+        }
+      },
+      {
+        "name": "repeatability",
+        "kind": "measure",
+        "label": "REPEATABILITY",
+        "title": "Repeatability: the same goal, the same result, every time",
+        "summary": "Given the same inputs, the same outputs, call after call. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
+        "cite": "The second of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/repeatability.json",
+            "title": "REPEATABILITY"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The second of the three R's"
+          }
+        }
+      },
+      {
+        "name": "resilience",
+        "kind": "measure",
+        "label": "RESILIENCE",
+        "title": "Resilience: the server changes, the client doesn't break",
+        "summary": "When the server changes, or misbehaves on purpose, the client takes the failure path the spec names, re-syncs, and goes on; a model comes back only when the controls really changed, to repair. At the small scale it is the regression suite and the gates that hold, even against the model.",
+        "cite": "The third of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/resilience.json",
+            "title": "RESILIENCE"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The third of the three R's"
+          }
+        }
+      }
+    ]
+  }
+}

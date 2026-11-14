@@ -1,0 +1,30 @@
+name: walk-the-dog
+part: "Generic components, built that way"
+title: "Back to the Dog: Buster"
+kicker: Resilience, tested · back to the dog
+say: "Recall the dog. His name is Buster. He's a Russell terrier; he chews remotes, bites ankles, and jumps on everything. Fitting, given how much of this was built through /remote-control. So I named a program after him. Buster is a chaos filter that sits in front of a server and tampers with its answers on purpose: the Basically Unstoppable Saboteur Terrierizing Every Representation. Each plugin breaks one rule of the HEART spec, and says what a well-behaved client must do about it. Forge the ETag, and ARTIE has to revalidate or take the 412 and re-sync. Flip one letter in a form, and ARTIE has to refuse the bytes and fetch them again. Drop an affordance, and ARTIE must never act on it. Every mutation ends as a pass or a FAIL, and every one is seeded, so any failure replays exactly. Nothing corrupted is ever cached. Notice that this is the same idea as the hooks: I can't watch ARTIE every minute either, so something else does. Buster tests ARTIE's resilience, just as he tests mine. Those are the components. Now let's put them to work, together."
+sources:
+  - ["Buster (repository)", "https://github.com/JogoShugh/buster"]
+  - ["Claude Code docs: /remote-control", "https://code.claude.com/docs/en/remote-control"]
+html: |
+  <h2>Back to the Dog: Buster</h2>
+  <div class="split">
+    <div class="rows">
+      <p class="lead">A Russell terrier who chews remotes, bites ankles and jumps on everything. So I named a program after him.</p>
+      <div><h3>Buster: a Chaos Filter for HEART</h3><p>It sits in front of a server and tampers with its answers on purpose. Each plugin breaks one rule of the spec and says what ARTIE must do about it.</p></div>
+      <div><h3>Every Mutation Judged</h3><p>Pass or FAIL, from ARTIE’s next requests. Seeded, so any failure replays exactly. Nothing corrupted is ever cached.</p></div>
+      <p class="punch">He tests ARTIE’s resilience, just as he tests mine. <deck-ref name="no-time"></deck-ref> <deck-ref name="artie"></deck-ref></p>
+    </div>
+    <div class="card dark" style="align-self: center">
+      <span class="label">Basically Unstoppable Saboteur Terrierizing Every Representation</span>
+      <table>
+        <tr><th>Buster does</th><th>ARTIE must</th></tr>
+        <tr><td>Forges the ETag</td><td>revalidate, or take the 412 and re-sync</td></tr>
+        <tr><td>Flips one letter in a form</td><td>refuse the bytes, fetch them again</td></tr>
+        <tr><td>Drops an affordance</td><td>never act on it</td></tr>
+        <tr><td>Strips the forms integrity</td><td>never follow that link</td></tr>
+        <tr><td>Lies about the rung</td><td>treat it as L0, no forms</td></tr>
+      </table>
+      <p class="note">Five of the eight plugins in the HEART pack.</p>
+    </div>
+  </div>

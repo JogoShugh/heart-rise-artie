@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Red Has to Be the Right Red · Claude Wrote It. Git Hooks Kept It Honest. · 3.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">A failing run only counts if it fails for the right reason</span></header>
+<h2>Red Has to Be the Right Red</h2>
+<div class="split">
+  <div class="rows">
+    <div><h3>Red, but Not Evidence</h3><p>It didn’t compile, or the step didn’t exist yet. Something is missing, but not necessarily the behavior.</p></div>
+    <div><h3>Every Run Through the Runner</h3><p>A raw test command is blocked: it would leave nothing in the log.</p></div>
+    <div><h3>One Line per Run</h3><p>Pass or fail, total, failures, errors. No results at all is logged as a failure, <code>reason=no-results</code>.</p></div>
+    <div><h3>Then Check It</h3><p>The right module, failing on behavior, with a plausible total, before any production write.</p></div>
+    <p class="refs"><a class="ref-plain" href="deck/three-rs-one-behavior.html">RIGHT-BEHAVIOR</a> <details class="fragment-plain"><summary>Raw test commands are blocked (core/gate-bash.sh)</summary><pre><code>#!/usr/bin/env bash
+# PreToolUse (Bash). For wrapper-logged stacks: blocks running the raw test
+# command, because a raw run leaves no BDD_RUN fact and the pre-commit check
+# then cannot see the red/green sequence. No-op unless bddRawCommandRegex is set.
+set -o pipefail
+. &quot;$(dirname &quot;$0&quot;)/lib.sh&quot;
+
+bdd_has_config || exit 0
+regex=$(bdd_value bddRawCommandRegex)
+[ -n &quot;$regex&quot; ] || exit 0
+
+command=$(jq -r '.tool_input.command // empty')
+[ -n &quot;$command&quot; ] || exit 0
+case &quot;$command&quot; in *bdd-gates/bdd-run.sh*) exit 0 ;; esac
+
+if printf '%s\n' &quot;$command&quot; | grep -Eq -- &quot;$regex&quot;; then
+  echo &quot;Blocked: run tests through .claude/bdd-gates/bdd-run.sh [extra args] so the BDD_RUN result is logged.&quot; &gt;&amp;2
+  exit 2
+fi
+exit 0</code></pre></details> <details class="fragment-plain"><summary>Every run leaves one line, even a failed compile (stacks/gradle-kotlin/templates/bdd-run-logging.gradle.kts)</summary><pre><code>// bdd-gates: records &quot;BDD_RUN PASS|FAIL&quot; after every test run, including failed ones.
+// Needs: import java.time.Instant and java.time.temporal.ChronoUnit at the top of the build script.
+
+val logBddRun by tasks.registering {
+    group = &quot;verification&quot;
+    description = &quot;Appends a BDD_RUN fact to .claude/tdd-events.log for the pre-commit TDD-ordering check.&quot;
+    doLast {
+        // RESULT_XML: the JUnit XML written for the Cucumber suite runner class.
+        val resultFile = file(&quot;build/test-results/test/TEST-&lt;your.package&gt;.RunCucumberTest.xml&quot;)
+        val logFile = file(&quot;.claude/tdd-events.log&quot;)
+        val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+        logFile.parentFile.mkdirs()
+        if (!resultFile.exists()) {
+            // No result file means compilation or discovery failed: still red.
+            logFile.appendText(&quot;$timestamp BDD_RUN FAIL reason=no-results\n&quot;)
+            return@doLast
+        }
+        val xml = resultFile.readText()
+        fun attr(name: String) = Regex(&quot;&quot;&quot;$name=&quot;(\d+)&quot;&quot;&quot;&quot;).find(xml)?.groupValues?.get(1) ?: &quot;0&quot;
+        val status = if (attr(&quot;failures&quot;) == &quot;0&quot; &amp;&amp; attr(&quot;errors&quot;) == &quot;0&quot;) &quot;PASS&quot; else &quot;FAIL&quot;
+        logFile.appendText(
+            &quot;$timestamp BDD_RUN $status total=${attr(&quot;tests&quot;)} failures=${attr(&quot;failures&quot;)} errors=${attr(&quot;errors&quot;)}\n&quot;,
+        )
+    }
+}
+
+tasks.test {
+    finalizedBy(logBddRun)
+}</code></pre></details></p>
+  </div>
+  <div class="card dark" style="align-self: center">
+    <span class="label">The log, in order</span>
+    <pre style="margin: .4rem 0 0; white-space: pre-wrap; font-size: .85rem">1795… FEATURE_WRITE heart/…/options.feature
+1795… BDD_RUN FAIL total=412 failures=3 errors=0
+1795… MAIN_WRITE heart/…/ActPipeline.kt
+1795… BDD_RUN PASS total=412 failures=0 errors=0</pre>
+    <p class="note">The log’s own line kinds; the paths and counts are illustrative.</p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/red-first.html" rel="prev"><small>Back</small><b>The scenario, then the failing run</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#right-red">with heart-ts</a></span>
+<a href="deck/code-green-commit.html" rel="next"><small>Next</small><b>The fix, the green run, the gated commit</b></a></nav>
+</main></div></body></html>
