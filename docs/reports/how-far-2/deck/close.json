@@ -6,7 +6,7 @@
   "tone": "dark",
   "number": 62,
   "of": 63,
-  "html": "<h2>Where to Go From Here</h2>\n<div class=\"split\" style=\"grid-template-columns: repeat(3, minmax(0, 1fr));\">\n  <div class=\"step\"><h3>Running</h3><p>Controls in the answer. Found once with a model, replayed with none. The model comes back only to repair.</p></div>\n  <div class=\"step\"><h3>Building</h3><p>One behavior at a time: Gherkin, red, code, green, commit, held by hooks while nobody’s watching.</p></div>\n  <div class=\"step\"><h3>Owning the Loop</h3><p>You own the goal and read the record. The AI supports; the controls hold the line.</p></div>\n</div>\n<p class=\"lead\">Everything you saw is in the repositories and the reports. Run it yourself, and tell me where it falls short of Fielding’s words.</p>\n<p class=\"refs\"><deck-ref name=\"repeatability\"></deck-ref> <deck-ref name=\"right-behavior\"></deck-ref> <deck-ref name=\"resilience\"></deck-ref> <deck-ref name=\"ai-in-the-loop\"></deck-ref> <deck-ref name=\"zta\"></deck-ref></p>\n",
+  "html": "<h2>Where to Go From Here</h2>\n<div class=\"split\" style=\"grid-template-columns: repeat(3, minmax(0, 1fr));\">\n  <div class=\"step\"><h3>Running</h3><p>Controls in the answer. Found once with a model, replayed with none. The model comes back only to repair.</p></div>\n  <div class=\"step\"><h3>Building</h3><p>One behavior at a time: Gherkin, red, code, green, commit, held by hooks while nobody’s watching.</p></div>\n  <div class=\"step\"><h3>Owning the Loop</h3><p>You own the goal and read the record. The AI supports; the controls hold the line.</p></div>\n</div>\n<p class=\"lead\">Everything you saw is in the repositories and the reports. Run it yourself, and tell me where it falls short of Fielding’s words.</p>\n<p class=\"refs\"><deck-ref name=\"right-behavior\"></deck-ref> <deck-ref name=\"repeatability\"></deck-ref> <deck-ref name=\"resilience\"></deck-ref> <deck-ref name=\"ai-in-the-loop\"></deck-ref> <deck-ref name=\"zta\"></deck-ref></p>\n",
   "say": "Recall where we started: have you ever paid a model to find the same path twice? You don't have to. The Web already had the answer for people: put the controls in the answer, next to the information. Do that for agents, and a model finds the way once, a script replays it for free, and a reasoning model only comes back when the controls really change. Build it the same way, one behavior at a time, with gates that hold while you're out walking the dog, and the three R's go all the way up. Everything you saw is in the repositories and the reports, linked on the next slide, including the real merge on GitHub. Run it yourself. And if you find a place where it falls short of Fielding's words, tell me. That's the next measurement.",
   "sources": [],
   "_links": {
@@ -44,16 +44,16 @@
   "_embedded": {
     "deck:ref": [
       {
-        "name": "repeatability",
+        "name": "right-behavior",
         "kind": "measure",
-        "label": "REPEATABILITY",
-        "title": "Repeatability: the same goal, the same result, every time",
-        "summary": "Reliability and repeatability are the same thing here. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
+        "label": "RIGHT-BEHAVIOR",
+        "title": "Right behavior: only what the state allows, and a reason when not",
+        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
         "cite": "The first of the three R's",
         "_links": {
           "self": {
-            "href": "../refs/repeatability.json",
-            "title": "REPEATABILITY"
+            "href": "../refs/right-behavior.json",
+            "title": "RIGHT-BEHAVIOR"
           },
           "describedby": {
             "href": "#three-rs",
@@ -62,16 +62,16 @@
         }
       },
       {
-        "name": "right-behavior",
+        "name": "repeatability",
         "kind": "measure",
-        "label": "RIGHT-BEHAVIOR",
-        "title": "Right behavior: only what the state allows, and a reason when not",
-        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
+        "label": "REPEATABILITY",
+        "title": "Repeatability: the same goal, the same result, every time",
+        "summary": "Reliability and repeatability are the same thing here. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
         "cite": "The second of the three R's",
         "_links": {
           "self": {
-            "href": "../refs/right-behavior.json",
-            "title": "RIGHT-BEHAVIOR"
+            "href": "../refs/repeatability.json",
+            "title": "REPEATABILITY"
           },
           "describedby": {
             "href": "#three-rs",

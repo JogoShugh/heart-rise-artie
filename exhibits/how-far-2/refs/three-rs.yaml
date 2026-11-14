@@ -1,16 +1,16 @@
 # What the business needs from an agent, besides fewer tokens. Reason is the hype; these three are the work.
-- name: repeatability
-  kind: measure
-  label: "REPEATABILITY"
-  title: "Repeatability: the same goal, the same result, every time"
-  summary: "Reliability and repeatability are the same thing here. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time."
-  cite: "The first of the three R's"
-  href: "#three-rs"
 - name: right-behavior
   kind: measure
   label: "RIGHT-BEHAVIOR"
   title: "Right behavior: only what the state allows, and a reason when not"
   summary: "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written."
+  cite: "The first of the three R's"
+  href: "#three-rs"
+- name: repeatability
+  kind: measure
+  label: "REPEATABILITY"
+  title: "Repeatability: the same goal, the same result, every time"
+  summary: "Reliability and repeatability are the same thing here. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time."
   cite: "The second of the three R's"
   href: "#three-rs"
 - name: resilience

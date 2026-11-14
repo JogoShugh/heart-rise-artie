@@ -2,14 +2,14 @@ name: three-rs
 part: "The question"
 title: "More Than Tokens: The Three R’s"
 kicker: What the business needs · and what everyone’s excited about
-say: "Ask anyone who runs a business process what they need from an agent, and I doubt they'll say 'more reasoning'. They need three R's. Repeatability: the same goal gives the same result, every time. Reliability is the same thing, so we'll just say repeatability. Right behavior: the agent only does what the current state allows, and when it can't, it gets told why. Resilience: when the server changes, or misbehaves, the agent takes the failure path it's supposed to and carries on. And reason? Reason is the hype. It's what everyone's excited about when they talk about agents. Reasoning models really can stand in for a person, in two places: finding the way the first time, and repairing when the controls change. In the middle, paying a model to reason through the same path again is the token maxing Hightower warned us about. Keep these four pills in mind. Every part of this talk gets measured against the first three."
+say: "Ask anyone who runs a business process what they need from an agent, and I doubt they'll say 'more reasoning'. They need three R's, in this order. Right behavior first: the agent only does what the current state allows, and when it can't, it gets told why. Then repeatability: that right behavior, the same way, every time. Reliability is the same thing, so we'll just say repeatability. Then resilience: when the server changes, or misbehaves, the agent takes the failure path it's supposed to and carries on. And reason? Reason is the hype. It's what everyone's excited about when they talk about agents. Reasoning models really can stand in for a person, in two places: finding the way the first time, and repairing when the controls change. In the middle, paying a model to reason through the same path again is the token maxing Hightower warned us about. Keep these four pills in mind. Every part of this talk gets measured against the first three."
 sources:
   - ["Hightower: ZTA, Zero Token Architecture (talk)", "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"]
 html: |
   <h2>More Than Tokens: The Three R’s</h2>
   <div class="split" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
-    <div class="step"><h3><deck-ref name="repeatability"></deck-ref></h3><p>The same goal, the same result, every time. Reliability is the same thing.</p></div>
     <div class="step"><h3><deck-ref name="right-behavior"></deck-ref></h3><p>Only what the state allows. When an act is absent, a reason.</p></div>
+    <div class="step"><h3><deck-ref name="repeatability"></deck-ref></h3><p>That right behavior, the same way, every time. Reliability is the same thing.</p></div>
     <div class="step"><h3><deck-ref name="resilience"></deck-ref></h3><p>The server changes, or misbehaves. The client takes the right failure path and carries on.</p></div>
   </div>
   <div class="card dark" style="margin-top: 1.2rem">

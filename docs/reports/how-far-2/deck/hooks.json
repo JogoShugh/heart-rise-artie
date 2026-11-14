@@ -6,7 +6,7 @@
   "tone": "light",
   "number": 52,
   "of": 63,
-  "html": "<h2>Instructions are advisory. Hooks are not.</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);\">\n  <div class=\"rows\">\n    <div class=\"table-scroll\"><table>\n      <thead><tr><th>Gate</th><th>Where</th><th>What it holds</th></tr></thead>\n      <tbody>\n        <tr><td>Gherkin first</td><td>PreToolUse</td><td>No production code until a scenario says what it must do</td></tr>\n        <tr><td>Red, logged</td><td>PostToolUse</td><td>A failing test run is recorded before the first src/main write</td></tr>\n        <tr><td>Green to stop</td><td>Stop</td><td>The session can’t end with the suite red</td></tr>\n        <tr><td>Ordering at commit</td><td>git pre-commit</td><td>The log must show feature, red, code, green, in that order</td></tr>\n        <tr><td>Gate protection</td><td>PreToolUse</td><td>The gates and their log can’t be edited by the model</td></tr>\n      </tbody>\n    </table></div>\n    <p class=\"punch\">Claude Code hooks guard the edits; git hooks guard the history.</p>\n    <p class=\"refs\"><deck-ref name=\"repeatability\"></deck-ref> <deck-ref name=\"right-behavior\"></deck-ref> <deck-ref name=\"resilience\"></deck-ref> <deck-fragment name=\"hooks\">hooks.json</deck-fragment></p>\n  </div>\n  <div class=\"card dark\" style=\"box-shadow: inset 0 0 0 1.5px rgba(227, 179, 65, 0.45); align-content: center; padding: 1.6rem;\">\n    <p style=\"font: 700 3.6rem/1 var(--display); color: #e3b341; margin: 0;\">0</p>\n    <p>model calls to enforce them. The gates are scripts the harness runs, not instructions the model may forget.</p>\n  </div>\n</div>\n",
+  "html": "<h2>Instructions are advisory. Hooks are not.</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);\">\n  <div class=\"rows\">\n    <div class=\"table-scroll\"><table>\n      <thead><tr><th>Gate</th><th>Where</th><th>What it holds</th></tr></thead>\n      <tbody>\n        <tr><td>Gherkin first</td><td>PreToolUse</td><td>No production code until a scenario says what it must do</td></tr>\n        <tr><td>Red, logged</td><td>PostToolUse</td><td>A failing test run is recorded before the first src/main write</td></tr>\n        <tr><td>Green to stop</td><td>Stop</td><td>The session can’t end with the suite red</td></tr>\n        <tr><td>Ordering at commit</td><td>git pre-commit</td><td>The log must show feature, red, code, green, in that order</td></tr>\n        <tr><td>Gate protection</td><td>PreToolUse</td><td>The gates and their log can’t be edited by the model</td></tr>\n      </tbody>\n    </table></div>\n    <p class=\"punch\">Claude Code hooks guard the edits; git hooks guard the history.</p>\n    <p class=\"refs\"><deck-ref name=\"right-behavior\"></deck-ref> <deck-ref name=\"repeatability\"></deck-ref> <deck-ref name=\"resilience\"></deck-ref> <deck-fragment name=\"hooks\">hooks.json</deck-fragment></p>\n  </div>\n  <div class=\"card dark\" style=\"box-shadow: inset 0 0 0 1.5px rgba(227, 179, 65, 0.45); align-content: center; padding: 1.6rem;\">\n    <p style=\"font: 700 3.6rem/1 var(--display); color: #e3b341; margin: 0;\">0</p>\n    <p>model calls to enforce them. The gates are scripts the harness runs, not instructions the model may forget.</p>\n  </div>\n</div>\n",
   "say": "So how do you make sure the model actually works that way, one behavior at a time, when you're not watching? You can tell it to write the test first. It will, most of the time. Most of the time isn't repeatable. So the bdd-gates skill makes it a property of the environment instead: Claude Code hooks guard the edits, and git hooks guard the history. Gherkin first, red logged, green to stop, the order checked at commit, and the gates themselves out of the model's reach. None of it costs a token.",
   "sources": [
     {
@@ -57,16 +57,16 @@
   "_embedded": {
     "deck:ref": [
       {
-        "name": "repeatability",
+        "name": "right-behavior",
         "kind": "measure",
-        "label": "REPEATABILITY",
-        "title": "Repeatability: the same goal, the same result, every time",
-        "summary": "Reliability and repeatability are the same thing here. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
+        "label": "RIGHT-BEHAVIOR",
+        "title": "Right behavior: only what the state allows, and a reason when not",
+        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
         "cite": "The first of the three R's",
         "_links": {
           "self": {
-            "href": "../refs/repeatability.json",
-            "title": "REPEATABILITY"
+            "href": "../refs/right-behavior.json",
+            "title": "RIGHT-BEHAVIOR"
           },
           "describedby": {
             "href": "#three-rs",
@@ -75,16 +75,16 @@
         }
       },
       {
-        "name": "right-behavior",
+        "name": "repeatability",
         "kind": "measure",
-        "label": "RIGHT-BEHAVIOR",
-        "title": "Right behavior: only what the state allows, and a reason when not",
-        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
+        "label": "REPEATABILITY",
+        "title": "Repeatability: the same goal, the same result, every time",
+        "summary": "Reliability and repeatability are the same thing here. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
         "cite": "The second of the three R's",
         "_links": {
           "self": {
-            "href": "../refs/right-behavior.json",
-            "title": "RIGHT-BEHAVIOR"
+            "href": "../refs/repeatability.json",
+            "title": "REPEATABILITY"
           },
           "describedby": {
             "href": "#three-rs",
