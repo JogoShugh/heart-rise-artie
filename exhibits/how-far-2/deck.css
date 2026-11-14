@@ -119,3 +119,18 @@
 /* The divorce: the size of the controls' bag */
 .slide .dv-bag { display: flex; align-items: baseline; gap: 0.6rem; margin: 0.2rem 0 0.4rem; font: italic 0.85rem var(--body); color: var(--muted); }
 .slide .dv-bag b { font: 650 clamp(2.2rem, 5vw, 3.4rem)/1 var(--display); font-style: normal; color: var(--bad); }
+
+/* Two forges, side by side, with their own marks */
+.slide .forge-vs { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 1.2rem; align-items: stretch; margin: .6rem 0; }
+.slide .forge { border-radius: 18px; padding: 1.4rem 1.6rem; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1.2rem; align-items: center; }
+.slide .forge .mark { width: 80px; height: 80px; }
+.slide .forge.gh { background: #0d1117; border: 1px solid #30363d; color: #f0f6fc; }
+.slide .forge.gl { background: #171321; border: 1px solid #3b2f55; color: #faf9fc; }
+.slide .forge a { overflow-wrap: anywhere; }
+.slide .forge-vs .neq { align-self: center; font: 700 2.6rem var(--display); color: var(--hold); }
+@media (max-width: 760px) {
+  .slide .forge-vs { grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+  .slide .forge-vs .neq { justify-self: center; font-size: 1.8rem; }
+  .slide .forge { padding: 1rem; }
+  .slide .forge .mark { width: 56px; height: 56px; }
+}
