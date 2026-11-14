@@ -1,104 +1,31 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Walk the dog, ship the feature · How far can one vision go · 2.0</title>
+<title>Back to the Dog: Buster · How far can one vision go · 2.0</title>
 <base href="../">
 <link rel="stylesheet" href="deck.css">
 <link rel="stylesheet" href="deck-extra.css">
 </head><body>
 <div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
-<article class="slide"><header><span class="part">How this was built · back to the dog</span></header>
-<h2>Walk the dog, ship the feature</h2>
+<article class="slide"><header><span class="part">How this was built · the dog gets a job</span></header>
+<h2>Back to the Dog: Buster</h2>
 <div class="split">
   <div class="rows">
-    <p class="lead">Back to the dog. Built a few sentences at a time, one thumb free.</p>
-    <ul>
-      <li><b>Claude Code’s <code>/remote-control</code></b> on the phone, a personal Max account at home.</li>
-      <li><b>Test first, every change:</b> Gherkin, a red run, the code, a green run, a gated commit.</li>
-      <li><b>Evidence, not trust:</b> the gates log every step, so what passed is on record when I get home.</li>
-      <li><b>The result:</b> repeatable, reliable RISE behaviour, built on walks.</li>
-    </ul>
-    <p class="refs"><a class="ref-plain" href="https://code.claude.com/docs/en/remote-control">NO-TIME</a> <details class="fragment-plain"><summary>The hooks that gate every change (core/hooks.json)</summary><pre><code>{
-  &quot;UserPromptSubmit&quot;: [
-    {
-      &quot;hooks&quot;: [
-        {
-          &quot;type&quot;: &quot;command&quot;,
-          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/refactor-prompt.sh&quot;,
-          &quot;timeout&quot;: 15
-        }
-      ]
-    }
-  ],
-  &quot;PreToolUse&quot;: [
-    {
-      &quot;matcher&quot;: &quot;*&quot;,
-      &quot;hooks&quot;: [
-        {
-          &quot;type&quot;: &quot;command&quot;,
-          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/protect-gate.sh&quot;,
-          &quot;timeout&quot;: 10
-        }
-      ]
-    },
-    {
-      &quot;matcher&quot;: &quot;Edit|Write|MultiEdit&quot;,
-      &quot;hooks&quot;: [
-        {
-          &quot;type&quot;: &quot;command&quot;,
-          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/gherkin-first.sh&quot;,
-          &quot;timeout&quot;: 15,
-          &quot;statusMessage&quot;: &quot;Checking Gherkin-first ordering...&quot;
-        }
-      ]
-    },
-    {
-      &quot;matcher&quot;: &quot;Bash&quot;,
-      &quot;hooks&quot;: [
-        {
-          &quot;type&quot;: &quot;command&quot;,
-          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/gate-bash.sh&quot;,
-          &quot;timeout&quot;: 10
-        }
-      ]
-    }
-  ],
-  &quot;PostToolUse&quot;: [
-    {
-      &quot;matcher&quot;: &quot;Edit|Write|MultiEdit&quot;,
-      &quot;hooks&quot;: [
-        {
-          &quot;type&quot;: &quot;command&quot;,
-          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/log-event.sh&quot;,
-          &quot;timeout&quot;: 15,
-          &quot;statusMessage&quot;: &quot;Logging TDD event...&quot;
-        },
-        {
-          &quot;type&quot;: &quot;command&quot;,
-          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/lint.sh&quot;,
-          &quot;timeout&quot;: 180,
-          &quot;statusMessage&quot;: &quot;Running lint gate...&quot;
-        }
-      ]
-    }
-  ],
-  &quot;Stop&quot;: [
-    {
-      &quot;hooks&quot;: [
-        {
-          &quot;type&quot;: &quot;command&quot;,
-          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/check.sh&quot;,
-          &quot;timeout&quot;: 600,
-          &quot;statusMessage&quot;: &quot;Running full check gate...&quot;
-        }
-      ]
-    }
-  ]
-}</code></pre></details></p>
+    <p class="lead">A Russell terrier who chews remotes, bites ankles and jumps on everything. So I named a program after him.</p>
+    <div><h3>Buster: a Chaos Filter for HEART</h3><p>It sits in front of a server and tampers with its answers on purpose. Each plugin breaks one rule of the spec and says what ARTIE must do about it.</p></div>
+    <div><h3>Every Mutation Judged</h3><p>Pass or FAIL, from ARTIE’s next requests. Seeded, so any failure replays exactly. Nothing corrupted is ever cached.</p></div>
+    <p class="punch">He tests ARTIE’s resilience, just as he tests mine. <a class="ref-plain" href="https://code.claude.com/docs/en/remote-control">NO-TIME</a> <a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/client">ARTIE</a></p>
   </div>
   <div class="card dark" style="align-self: center">
-    <p class="lead" style="font-size: 2rem; margin: 0">Code reviews by the dog: 0</p>
-    <p>Prompts shortened by the dog: all of them.</p>
-    <p class="note">What I couldn’t watch, the gates did: red, green, gated commit, logged.</p>
+    <span class="label">Basically Unstoppable Saboteur Terrierizing Every Representation</span>
+    <table>
+      <tr><th>Buster does</th><th>ARTIE must</th></tr>
+      <tr><td>Forges the ETag</td><td>revalidate, or take the 412 and re-sync</td></tr>
+      <tr><td>Flips one letter in a form</td><td>refuse the bytes, fetch them again</td></tr>
+      <tr><td>Drops an affordance</td><td>never act on it</td></tr>
+      <tr><td>Strips the forms integrity</td><td>never follow that link</td></tr>
+      <tr><td>Lies about the rung</td><td>treat it as L0, no forms</td></tr>
+    </table>
+    <p class="note">Five of the eight plugins in the HEART pack.</p>
   </div>
 </div>
 </article>

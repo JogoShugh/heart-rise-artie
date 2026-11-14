@@ -1,17 +1,17 @@
 {
   "name": "walk-the-dog",
-  "title": "Walk the dog, ship the feature",
+  "title": "Back to the Dog: Buster",
   "part": "What it costs, and how it was built",
-  "kicker": "How this was built · back to the dog",
+  "kicker": "How this was built · the dog gets a job",
   "tone": "light",
   "number": 48,
   "of": 59,
-  "html": "<h2>Walk the dog, ship the feature</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <p class=\"lead\">Back to the dog. Built a few sentences at a time, one thumb free.</p>\n    <ul>\n      <li><b>Claude Code’s <code>/remote-control</code></b> on the phone, a personal Max account at home.</li>\n      <li><b>Test first, every change:</b> Gherkin, a red run, the code, a green run, a gated commit.</li>\n      <li><b>Evidence, not trust:</b> the gates log every step, so what passed is on record when I get home.</li>\n      <li><b>The result:</b> repeatable, reliable RISE behaviour, built on walks.</li>\n    </ul>\n    <p class=\"refs\"><deck-ref name=\"no-time\"></deck-ref> <deck-fragment name=\"hooks\">hooks.json</deck-fragment></p>\n  </div>\n  <div class=\"card dark\" style=\"align-self: center\">\n    <p class=\"lead\" style=\"font-size: 2rem; margin: 0\">Code reviews by the dog: 0</p>\n    <p>Prompts shortened by the dog: all of them.</p>\n    <p class=\"note\">What I couldn’t watch, the gates did: red, green, gated commit, logged.</p>\n  </div>\n</div>\n",
-  "say": "Back to the dog, as promised at the start. Everything you've seen was built a few sentences at a time, by thumb, through Claude Code's /remote-control, on a personal Max account at home. What made that safe wasn't my attention; I was holding a leash. It was a test-first discipline: Gherkin, a red run, the code, a green run, a gated commit, every change. The gates log every step, so what passed is on record when I get home. The humor is real: the messages really were that short. The dog has not reviewed a single pull request, and is still the reason they were short.",
+  "html": "<h2>Back to the Dog: Buster</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <p class=\"lead\">A Russell terrier who chews remotes, bites ankles and jumps on everything. So I named a program after him.</p>\n    <div><h3>Buster: a Chaos Filter for HEART</h3><p>It sits in front of a server and tampers with its answers on purpose. Each plugin breaks one rule of the spec and says what ARTIE must do about it.</p></div>\n    <div><h3>Every Mutation Judged</h3><p>Pass or FAIL, from ARTIE’s next requests. Seeded, so any failure replays exactly. Nothing corrupted is ever cached.</p></div>\n    <p class=\"punch\">He tests ARTIE’s resilience, just as he tests mine. <deck-ref name=\"no-time\"></deck-ref> <deck-ref name=\"artie\"></deck-ref></p>\n  </div>\n  <div class=\"card dark\" style=\"align-self: center\">\n    <span class=\"label\">Basically Unstoppable Saboteur Terrierizing Every Representation</span>\n    <table>\n      <tr><th>Buster does</th><th>ARTIE must</th></tr>\n      <tr><td>Forges the ETag</td><td>revalidate, or take the 412 and re-sync</td></tr>\n      <tr><td>Flips one letter in a form</td><td>refuse the bytes, fetch them again</td></tr>\n      <tr><td>Drops an affordance</td><td>never act on it</td></tr>\n      <tr><td>Strips the forms integrity</td><td>never follow that link</td></tr>\n      <tr><td>Lies about the rung</td><td>treat it as L0, no forms</td></tr>\n    </table>\n    <p class=\"note\">Five of the eight plugins in the HEART pack.</p>\n  </div>\n</div>\n",
+  "say": "Recall the dog. His name is Buster. He's a Russell terrier; he chews remotes, bites ankles, and jumps on everything. Fitting, given how much of this was built through /remote-control. So I named a program after him. Buster is a chaos filter that sits in front of a server and tampers with its answers on purpose: the Basically Unstoppable Saboteur Terrierizing Every Representation. Each plugin breaks one rule of the HEART spec, and says what a well-behaved client must do about it. Forge the ETag, and ARTIE has to revalidate or take the 412 and re-sync. Flip one letter in a form, and ARTIE has to refuse the bytes and fetch them again. Drop an affordance, and ARTIE must never act on it. Every mutation ends as a pass or a FAIL, and every one is seeded, so any failure replays exactly. Nothing corrupted is ever cached. Notice that this is the same idea as the hooks: I can't watch ARTIE every minute either, so something else does. Buster tests ARTIE's resilience, just as he tests mine.",
   "sources": [
     {
-      "label": "bdd-gates skill",
-      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+      "label": "Buster (repository)",
+      "href": "https://github.com/JogoShugh/buster"
     },
     {
       "label": "Claude Code docs: /remote-control",
@@ -69,25 +69,22 @@
             "title": "Claude Code docs: /remote-control, continue a local session from a phone or a browser"
           }
         }
-      }
-    ],
-    "deck:fragment": [
+      },
       {
-        "name": "hooks",
-        "label": "The hooks that gate every change (core/hooks.json)",
-        "lang": "json",
-        "path": "bdd-gates: core/hooks.json",
-        "lines": "1–77",
-        "of": 77,
-        "text": "{\n  \"UserPromptSubmit\": [\n    {\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/refactor-prompt.sh\",\n          \"timeout\": 15\n        }\n      ]\n    }\n  ],\n  \"PreToolUse\": [\n    {\n      \"matcher\": \"*\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/protect-gate.sh\",\n          \"timeout\": 10\n        }\n      ]\n    },\n    {\n      \"matcher\": \"Edit|Write|MultiEdit\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/gherkin-first.sh\",\n          \"timeout\": 15,\n          \"statusMessage\": \"Checking Gherkin-first ordering...\"\n        }\n      ]\n    },\n    {\n      \"matcher\": \"Bash\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/gate-bash.sh\",\n          \"timeout\": 10\n        }\n      ]\n    }\n  ],\n  \"PostToolUse\": [\n    {\n      \"matcher\": \"Edit|Write|MultiEdit\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/log-event.sh\",\n          \"timeout\": 15,\n          \"statusMessage\": \"Logging TDD event...\"\n        },\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/lint.sh\",\n          \"timeout\": 180,\n          \"statusMessage\": \"Running lint gate...\"\n        }\n      ]\n    }\n  ],\n  \"Stop\": [\n    {\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/check.sh\",\n          \"timeout\": 600,\n          \"statusMessage\": \"Running full check gate...\"\n        }\n      ]\n    }\n  ]\n}",
+        "name": "artie",
+        "kind": "part",
+        "label": "ARTIE",
+        "title": "ARTIE: the generic client",
+        "summary": "Autonomous Restful Traversal and Interactive Engine. Coupled to HEART and HTTP, and to nothing about any one API, as a browser is to HTML. It enters by a bookmark, checks a kept script's pins against what is offered, sends each act with its If-Match validator, and caches forms and schemas (L2).",
+        "cite": "heart-rise-artie (repository)",
         "_links": {
           "self": {
-            "href": "fragments/walk-the-dog--hooks.json",
-            "title": "The hooks that gate every change (core/hooks.json)"
+            "href": "../refs/artie.json",
+            "title": "ARTIE"
           },
-          "via": {
-            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/hooks.json",
-            "title": "core/hooks.json, lines 1–77"
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/client",
+            "title": "heart-rise-artie (repository)"
           }
         }
       }
