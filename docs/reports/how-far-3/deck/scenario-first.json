@@ -1,0 +1,96 @@
+{
+  "name": "scenario-first",
+  "title": "Claude Writes the Scenario First",
+  "part": "One behavior, start to finish",
+  "kicker": "A hook blocks production code until a feature file changes",
+  "tone": "light",
+  "number": 8,
+  "of": 30,
+  "html": "<h2>Claude Writes the Scenario First</h2>\n<div class=\"card dark\">\n  <pre style=\"margin: 0; white-space: pre-wrap; font-size: 1rem\">Scenario Outline: A library whose policy file renews &lt;weeks&gt; weeks at a time\n                  moves the due date that far\n  Given the library's policy file reads \"&lt;policy&gt;\"\n  When Ana renews loan 3311\n  Then the answer is 200\n  And loan 3311 is due \"&lt;due&gt;\", renewed 1 time\n\n  Examples:\n    | policy           | weeks | due        |\n    | renewal.weeks=3  | 3     | 2026-12-03 |\n    | <b style=\"color: #e3b341\">renewal.weeks=0  | 0     | 2026-11-12</b> |\n    | renewal.weeks=6  | 6     | 2026-12-24 |\n    | # no rules       | 3     | 2026-12-03 |</pre>\n</div>\n<p class=\"punch\">Four rows anyone can read. Remember the zero-weeks row.</p>\n<p class=\"refs\"><deck-ref name=\"right-behavior\"></deck-ref> <deck-fragment name=\"gherkin-first\">gherkin-first.sh</deck-fragment></p>\n",
+  "say": "Here's what came back first: not code, a scenario. And it's a table, which is the point. Four rows. A policy of three weeks moves the due date three weeks. Zero weeks doesn't move it at all. Six weeks moves it six. And a policy file with no rule keeps three. Anyone in this room can read that, and so can a librarian. Could Claude have skipped this and gone straight to the code? It could have tried. A hook runs before every edit: if the file is production code and no feature file has changed, the edit is refused, and the model reads why. Remember that zero-weeks row. It comes back at the end.",
+  "sources": [
+    {
+      "label": "library.feature",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/heart/heart-sims/src/test/resources/features/library.feature"
+    },
+    {
+      "label": "bdd-gates skill",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "scenario-first.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "one-sentence.json",
+      "title": "It Starts With One Sentence"
+    },
+    "next": {
+      "href": "right-red.json",
+      "title": "Then It Has to Fail, for the Right Reason"
+    },
+    "alternate": {
+      "href": "scenario-first.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "right-behavior",
+        "kind": "measure",
+        "label": "RIGHT-BEHAVIOR",
+        "title": "Right behavior: only what the state allows, and a reason when not",
+        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
+        "cite": "The first of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/right-behavior.json",
+            "title": "RIGHT-BEHAVIOR"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The first of the three R's"
+          }
+        }
+      }
+    ],
+    "deck:fragment": [
+      {
+        "name": "gherkin-first",
+        "label": "No production write until a feature file changes (core/gherkin-first.sh)",
+        "lang": "bash",
+        "path": "bdd-gates: core/gherkin-first.sh",
+        "lines": "1–25",
+        "of": 25,
+        "text": "#!/usr/bin/env bash\n# PreToolUse (Edit|Write|MultiEdit). Blocks a write to production code unless\n# a feature file already has an in-flight change, or the author switched\n# refactor mode on (scripts/refactor-mode). Exit 2 blocks the tool call\n# and sends stderr back to Claude.\nset -o pipefail\n. \"$(dirname \"$0\")/lib.sh\"\n\nfile_path=$(bdd_hook_file_path)\n[ -n \"$file_path\" ] || exit 0\nbdd_has_config || exit 0\nbdd_load\n\nrel=$(bdd_rel \"$file_path\")\nbdd_is_prod \"$rel\" || exit 0\nbdd_features_dirty && exit 0\n# The author switched refactor mode on: pre-commit checks its own terms.\nbdd_refactor_on && exit 0\n\ncat >&2 <<EOF\nBlocked: about to modify production code ($rel) with no feature file change in this changeset yet.\nWrite or update the Gherkin scenario first, run the BDD suite to see it fail, then implement.\nFeature patterns: $(bdd_list featurePatterns | tr '\\n' ' ')\nEOF\nexit 2",
+        "_links": {
+          "self": {
+            "href": "fragments/scenario-first--gherkin-first.json",
+            "title": "No production write until a feature file changes (core/gherkin-first.sh)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/gherkin-first.sh",
+            "title": "core/gherkin-first.sh, lines 1–25"
+          }
+        }
+      }
+    ]
+  }
+}

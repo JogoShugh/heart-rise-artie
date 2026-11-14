@@ -1,0 +1,17 @@
+name: gate-says-no
+part: "One behavior, start to finish"
+title: "The Gates Say No, Even to the Model"
+kicker: How it was built · When the gate says no
+say: "Do the gates ever actually say no? Yes, and to the model too. Three moments from this work. The hook that protects the gates blocked the model from reading its own event log; it didn't argue, it didn't retry. Refactor mode, the one time production code may change without a new scenario, is a switch only I can turn on, never the model. And when an edit was made outside Claude Code's own edit tool, it was redone through the tool, so the log saw it. So what does my side of this look like, day to day?"
+sources:
+  - ["bdd-gates: protect-gate.sh, refactor mode", "https://github.com/JogoShugh/bdd-gates-skill"]
+html: |
+  <h2>The Gates Say No, Even to the Model</h2>
+  <div style="display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); gap: 2.2rem 2rem; align-items: center; margin-top: 1rem;">
+    <h3 style="font: 700 1.05rem/1.2 var(--body); text-transform: none; letter-spacing: 0; margin: 0; padding: 0.7rem 1rem; border-radius: 999px; text-align: center; color: #fff; background: #b4562c;">Blocked</h3><p style="margin: 0; font-size: 1.3rem;">The protect-gate hook stopped the model reading the gate’s own event log. It didn’t try another way.</p>
+    <h3 style="font: 700 1.05rem/1.2 var(--body); text-transform: none; letter-spacing: 0; margin: 0; padding: 0.7rem 1rem; border-radius: 999px; text-align: center; color: #fff; background: #2f7d55;">Human’s switch</h3><p style="margin: 0; font-size: 1.3rem;">Refactor mode, the only time src/main may change with no new red, is switched on by the person, never the model.</p>
+    <h3 style="font: 700 1.05rem/1.2 var(--body); text-transform: none; letter-spacing: 0; margin: 0; padding: 0.7rem 1rem; border-radius: 999px; text-align: center; color: #fff; background: #2f7d55;">Redone</h3><p style="margin: 0; font-size: 1.3rem;">An edit made outside Claude Code’s edit tool was redone through it, so the log records every change.</p>
+  </div>
+  <div class="rows">
+    <p class="punch">The model doesn’t have to be trustworthy for the process to be.</p>
+  </div>

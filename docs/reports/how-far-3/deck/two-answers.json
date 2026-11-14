@@ -1,0 +1,102 @@
+{
+  "name": "two-answers",
+  "title": "Same Question, Two Answers",
+  "part": "The problem",
+  "kicker": "The problem, in one sentence",
+  "tone": "light",
+  "number": 2,
+  "of": 30,
+  "html": "<h2>Same Question, Two Answers</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch\">\n  <div class=\"panel\">\n    <span class=\"label\">Fine to vary</span>\n    <p class=\"lead\" style=\"margin: .3rem 0\">Suggest a name for this variable.</p>\n    <p>Two different answers? No harm done.</p>\n  </div>\n  <div class=\"panel\" style=\"border-color: var(--bad)\">\n    <span class=\"label\" style=\"color: var(--bad)\">Not fine to vary</span>\n    <p class=\"lead\" style=\"margin: .3rem 0\">Renew a library book. Merge a pull request. Promote a build.</p>\n    <p>Two different answers is a defect, or worse.</p>\n  </div>\n</div>\n<p class=\"punch\">The right thing, the same way, every time, and the right thing when something goes wrong.</p>\n<p class=\"refs\"><deck-ref name=\"right-behavior\"></deck-ref> <deck-ref name=\"repeatability\"></deck-ref> <deck-ref name=\"resilience\"></deck-ref></p>\n",
+  "say": "Here's the problem in one sentence. Ask an AI agent to do the same job twice, and you can get two different answers. Sometimes that's fine. If the job is to suggest a name for a variable, I don't care. But if the job is to renew a library book, merge a pull request, or promote a build to an environment other people use, I care a great deal. I need it to do the right thing, the same way, every time, and to do the right thing when something goes wrong. And I needed that twice over, because of how I work. Let me explain.",
+  "sources": [],
+  "_links": {
+    "self": {
+      "href": "two-answers.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "title.json",
+      "title": "How I Used Claude and Git Hooks Together to Build a Generic AI Agent for HATEOAS APIs"
+    },
+    "next": {
+      "href": "no-time.json",
+      "title": "No Time to Type"
+    },
+    "alternate": {
+      "href": "two-answers.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "right-behavior",
+        "kind": "measure",
+        "label": "RIGHT-BEHAVIOR",
+        "title": "Right behavior: only what the state allows, and a reason when not",
+        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
+        "cite": "The first of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/right-behavior.json",
+            "title": "RIGHT-BEHAVIOR"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The first of the three R's"
+          }
+        }
+      },
+      {
+        "name": "repeatability",
+        "kind": "measure",
+        "label": "REPEATABILITY",
+        "title": "Repeatability: the same goal, the same result, every time",
+        "summary": "Given the same inputs, the same outputs, call after call. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
+        "cite": "The second of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/repeatability.json",
+            "title": "REPEATABILITY"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The second of the three R's"
+          }
+        }
+      },
+      {
+        "name": "resilience",
+        "kind": "measure",
+        "label": "RESILIENCE",
+        "title": "Resilience: the server changes, the client doesn't break",
+        "summary": "When the server changes, or misbehaves on purpose, the client takes the failure path the spec names, re-syncs, and goes on; a model comes back only when the controls really changed, to repair. At the small scale it is the regression suite and the gates that hold, even against the model.",
+        "cite": "The third of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/resilience.json",
+            "title": "RESILIENCE"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The third of the three R's"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,13 +1,13 @@
 {
   "name": "no-time",
   "title": "No Time to Type",
-  "part": "The shape of the thing",
-  "kicker": "Why this talk · the second ground has four legs",
+  "part": "The problem",
+  "kicker": "Why I needed it twice over",
   "tone": "light",
-  "number": 4,
-  "of": 31,
+  "number": 3,
+  "of": 30,
   "html": "<h2>No Time to Type</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <p class=\"lead\">Have you ever tried to write code with a leash in one hand? I don’t recommend it.</p>\n    <div><h3>Half the Answer: <code>/remote-control</code></h3><p>The session runs on my machine. I steer it mostly by dictating into my phone.</p></div>\n    <div><h3>The Other Half: Rigor Without Watching</h3><p>BDD for real, the same way every time: Gherkin, red, code, green, commit. <deck-ref name=\"right-behavior\"></deck-ref> <deck-ref name=\"repeatability\"></deck-ref></p></div>\n    <div><h3>Asking Nicely? Probably Not.</h3><p>Instructions are advisory, so hooks enforce the order. I read the record afterward.</p></div>\n    <p class=\"punch\">Notice that an agent calling an API needs the same thing: controls that still hold when nobody is watching. <deck-ref name=\"no-time\"></deck-ref> <deck-fragment name=\"hooks\">hooks.json</deck-fragment></p>\n  </div>\n  <div class=\"phone\">\n    <p class=\"phone-head\">/remote-control</p>\n    <p class=\"me\">Please give me an update</p>\n    <p class=\"it\">Red run logged. Writing the fix.</p>\n    <p class=\"me\">How’s it going?</p>\n    <p class=\"it\">Green. Commit gate: TDD order checked.</p>\n    <p class=\"me\">🐕 pulling. back in 20</p>\n    <p class=\"note\">Illustrative, not a transcript. The two questions are the real ones, every evening. So is the dog.</p>\n  </div>\n</div>\n",
-  "say": "Have you ever tried to write code with a leash in one hand? I don't recommend it. Between family and a new dog, the time I used to spend at a keyboard is gone. Half of the answer was Claude Code's /remote-control. The session runs on my machine, and I steer it mostly by speech-to-text dictation into my phone, from wherever I am. Most evenings I send two messages: 'Please give me an update' and 'How's it going?' Fair enough, but that's only half. An agent I can't watch needs the three R's before anyone else's does: it has to follow BDD for real, and it has to do that the same way every time: Gherkin first, a red run, the code, a green run, and only then a commit. Can you get that by asking nicely? Probably not. Instructions to a model are advisory. So hooks enforce the order: a write out of turn is refused, every run is logged, and the commit gate checks the order before anything lands. I don't watch the agent; I read the record afterward. Notice that this is exactly what an agent calling an API needs, too: controls that still hold when nobody is watching. So how do you trust code you didn't watch being written? That's the bdd-gates skill.",
+  "say": "Here's the 'twice over'. Have you ever tried to write code with a leash in one hand? I don't recommend it. Between family and a new dog, the time I used to spend at a keyboard is gone. Most of my work now is speech-to-text, dictated into my phone, through Claude Code's /remote-control, while the session runs on my machine. So I needed two things I could trust without watching. An agent that does the right thing, the same way, every time. And a way of building it where Claude does the right thing, in the right order, every time, while I'm not looking. Let's take the agent first: what did I want it to be?",
   "sources": [
     {
       "label": "Claude Code docs: /remote-control",

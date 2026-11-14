@@ -1,13 +1,13 @@
 {
   "name": "what-it-produced",
   "title": "What It Produced",
-  "part": "The bdd-gates skill, in depth",
+  "part": "One behavior, start to finish",
   "kicker": "The artie repository, counted on 14 November 2026",
   "tone": "light",
   "number": 15,
-  "of": 31,
+  "of": 30,
   "html": "<h2>What It Produced</h2>\n<div class=\"split\" style=\"grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch\">\n  <div class=\"stat\"><b style=\"font: 700 3.2rem var(--display); color: var(--leaf)\">201</b><p>feature files</p></div>\n  <div class=\"stat\"><b style=\"font: 700 3.2rem var(--display); color: var(--leaf)\">1,273</b><p>scenarios</p></div>\n  <div class=\"stat\"><b style=\"font: 700 3.2rem var(--display); color: var(--leaf)\">1,117</b><p>commits since 19 April 2026</p></div>\n  <div class=\"stat\"><b style=\"font: 700 3.2rem var(--display); color: var(--leaf)\">365</b><p>Kotlin production files</p></div>\n</div>\n<p class=\"lead\">Across the HEART library, the client, the domains, the MCP server and the Spring server.</p>\n<p class=\"punch\">Under the gates, no production change lands without a scenario first.</p>\n<p class=\"refs\"><deck-ref name=\"right-behavior\"></deck-ref> <deck-ref name=\"repeatability\"></deck-ref> <deck-ref name=\"resilience\"></deck-ref></p>\n",
-  "say": "So what did seven months of that produce? I counted, today, in the repository. 201 feature files. 1,273 scenarios, each one a behavior written down before its code. 1,117 commits since the 19th of April. 365 Kotlin production files, across the HEART library, the client, the domains, the MCP server and the Spring server. I didn't type most of it. Under the gates, no production change lands without a scenario first. As we'll see next, that's what makes the components trustworthy enough to build a release on.",
+  "say": "I counted, today, in the repository. 201 feature files. 1,273 scenarios, each one a behavior written down before its code, like the library's four rows. 1,117 commits since the 19th of April. 365 Kotlin production files, across the HEART library, the client, the domains, the MCP server and the Spring server. Under the gates, no production change lands without a scenario first. So what did all of that build?",
   "sources": [
     {
       "label": "heart-rise-artie (repository)",

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Five Pull Requests Change the Policy · Claude and Git Hooks, Together · 3.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">The library, released for real</span></header>
+<h2>Five Pull Requests Change the Policy</h2>
+<div class="table-scroll"><table>
+  <thead><tr><th>Pull request</th><th>Changes</th><th>Smoke scenarios</th><th>Ends</th></tr></thead>
+  <tbody>
+    <tr><td>501</td><td>renewals: 2 weeks</td><td>5 of 5</td><td>promoted to Dev</td></tr>
+    <tr><td>502</td><td>renewals: 4 weeks</td><td>5 of 5</td><td>promoted to Dev</td></tr>
+    <tr><td>503</td><td>renewals: 1 week</td><td>5 of 5</td><td>promoted to Dev</td></tr>
+    <tr><td><b style="color: var(--hold)">504</b></td><td><b style="color: var(--hold)">renewals: none (0 weeks)</b></td><td>?</td><td>?</td></tr>
+    <tr><td>505</td><td>a README line only</td><td>5 of 5</td><td>promoted to Dev</td></tr>
+  </tbody>
+</table></div>
+<p class="punch">Merged, built, smoke-tested, promoted only if every scenario passes. Guess which one is in trouble.</p>
+</article>
+<nav class="foot"><a href="deck/three-rs-one-behavior.html" rel="prev"><small>Back</small><b>From One Test to a Whole System</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#renewal-prs">with heart-ts</a></span>
+<a href="deck/the-desk.html" rel="next"><small>Next</small><b>A Person Asks the Release Desk</b></a></nav>
+</main></div></body></html>

@@ -1,13 +1,13 @@
 {
   "name": "watcher",
   "title": "The Watcher: Tell Me When It Offers Merge",
-  "part": "The system: everything speaks HEART",
-  "kicker": "RISE · ask now, be told later",
+  "part": "The release, in the order it runs",
+  "kicker": "Steps 3 and 4 · watcher:watch, then scm:merge",
   "tone": "light",
-  "number": 23,
-  "of": 31,
+  "number": 22,
+  "of": 30,
   "html": "<h2>The Watcher: Tell Me When It Offers Merge</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <div><h3>Ask Once</h3><p><code>watcher:watch</code>: this resource, the relation <code>scm:merge</code>, and a reply form to answer on.</p></div>\n    <div><h3>It Looks, as HEART</h3><p>Every 3 seconds: does the pull request’s answer offer <code>scm:merge</code> now?</p></div>\n    <div><h3>Be Told Later</h3><p><code>completed</code>, signed, when it does. <code>failed</code>, not offered in time, when it never does.</p></div>\n    <p class=\"punch\">It doesn’t know what a pull request is. It knows what an offer is.</p>\n    <p class=\"refs\"><deck-ref name=\"rise\"></deck-ref> <deck-ref name=\"hypertext\"></deck-ref></p>\n  </div>\n  <div class=\"card dark\" style=\"align-self: center\">\n    <span class=\"label\">From the kept script</span>\n    <pre style=\"margin: .4rem 0 0; white-space: pre-wrap; font-size: .9rem\">- enter: ${watcher}\n  steps:\n    - ask: watcher:watch\n      fields:\n        resource: ${pr.@self}\n        offers: scm:merge\n      reply: watch\n- once-answered:\n    reply: watch\n    steps:\n      - enter: ${pr.@self}\n        steps:\n          - act: scm:merge\n            fields:\n              method: squash</pre>\n  </div>\n</div>\n",
-  "say": "Here's a question every release script asks: is this pull request ready to merge yet? The usual answer is a polling loop, written for one service, checking one field. We asked a different question: tell me when this resource offers the merge act. The offer watcher is a small RISE service, and it speaks HEART like everything else. ARTIE asks it, watcher:watch, with the pull request's own address and the relation scm:merge, and a reply form of its own to be answered on. Then ARTIE stops waiting. The watcher looks at the pull request every three seconds, as plain HEART: does its answer offer scm:merge now? The moment it does, the watcher answers ARTIE's reply, completed, signed with its own key, and the release wakes up and merges. If it never comes, the reply says so: failed, not offered in time. Notice that the watcher doesn't know what a pull request is. It knows what an offer is. That's the media type doing the work.",
+  "say": "Is it ready to merge yet? The usual answer is a polling loop, written for one service, checking one field. We asked a different question: tell me when this pull request offers the merge act. The offer watcher is a small RISE service, and it speaks HEART like everything else. ARTIE asks it, with the pull request's address, the relation scm:merge, and a reply form of its own to be answered on. Then ARTIE stops waiting. Every three seconds the watcher reads the pull request: does its answer offer merge now? The moment it does, the watcher answers ARTIE's reply, signed, and ARTIE merges, by squashing, and checks it really is merged. Notice that the watcher doesn't know what a pull request is. It knows what an offer is. Next: build it.",
   "sources": [
     {
       "label": "The kept release script (release.heart.yaml)",

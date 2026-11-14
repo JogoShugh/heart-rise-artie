@@ -1,8 +1,8 @@
 name: what-i-say
-part: "The bdd-gates skill, in depth"
+part: "One behavior, start to finish"
 title: "What I Actually Say"
 kicker: Dictation, through /remote-control · AI in the loop, in practice
-say: "So what does my side of this look like? Mostly, I talk. Speech-to-text, into my phone, through Claude Code's /remote-control, while the session runs on my machine. Most evenings it's the same two questions: 'Please give me an update', and 'How's it going?' Dictation has opinions of its own. It hears 'BDD gates' as 'bed gates' about half the time. Claude knows what I mean; the gates don't care either way. What I don't do is approve every step. I own the goal, I say it in a sentence, and afterward I read the record: which scenario, which red run, which green run, which commit. That's what people mean by AI in the loop: the person is in control of the system, and the AI is there to support the person. The hooks make it possible to work that way without watching."
+say: "Mostly, I talk. Most evenings it's the same two questions into my phone: 'Please give me an update', and 'How's it going?' Dictation has opinions of its own; it hears 'BDD gates' as 'bed gates' about half the time. Claude knows what I mean, and the gates don't care either way. What I don't do is approve every step. I own the goal, I say it in a sentence, and afterward I read the record: which scenario, which red run, which green run, which commit. People call that AI in the loop: the person in control, the AI in support. So what did months of that produce?"
 sources:
   - ["Claude Code docs: /remote-control", "https://code.claude.com/docs/en/remote-control"]
   - ["Natarajan et al.: Human-in-the-loop or AI-in-the-loop? (arXiv, 2024)", "https://arxiv.org/abs/2412.14232"]

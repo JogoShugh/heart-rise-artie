@@ -1,20 +1,27 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Red Has to Be the Right Red · Claude and Git Hooks, Together · 3.0</title>
+<title>Then It Has to Fail, for the Right Reason · Claude and Git Hooks, Together · 3.0</title>
 <base href="../">
 <link rel="stylesheet" href="deck.css">
 <link rel="stylesheet" href="deck-extra.css">
 </head><body>
 <div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
-<article class="slide"><header><span class="part">A failing run only counts if it fails for the right reason</span></header>
-<h2>Red Has to Be the Right Red</h2>
-<div class="split">
-  <div class="rows">
-    <div><h3>Red, but Not Evidence</h3><p>It didn’t compile, or the step didn’t exist yet. Something is missing, but not necessarily the behavior.</p></div>
-    <div><h3>Every Run Through the Runner</h3><p>A raw test command is blocked: it would leave nothing in the log.</p></div>
-    <div><h3>One Line per Run</h3><p>Pass or fail, total, failures, errors. No results at all is logged as a failure, <code>reason=no-results</code>.</p></div>
-    <div><h3>Then Check It</h3><p>The right module, failing on behavior, with a plausible total, before any production write.</p></div>
-    <p class="refs"><a class="ref-plain" href="deck/three-rs-one-behavior.html">RIGHT-BEHAVIOR</a> <details class="fragment-plain"><summary>Raw test commands are blocked (core/gate-bash.sh)</summary><pre><code>#!/usr/bin/env bash
+<article class="slide"><header><span class="part">Red first · and the right red</span></header>
+<h2>Then It Has to Fail, for the Right Reason</h2>
+<div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch">
+  <div class="panel" style="border-color: var(--bad)">
+    <span class="label" style="color: var(--bad)">Red, but not evidence</span>
+    <p>The step that reads the policy file doesn’t exist yet. The run fails, and says nothing about renewals.</p>
+  </div>
+  <div class="panel" style="border-color: var(--leaf)">
+    <span class="label" style="color: var(--leaf)">The right red</span>
+    <p>The old code always moves three weeks. Zero weeks expects <b>2026-11-12</b>, gets 2026-12-03. Six weeks expects <b>2026-12-24</b>, gets 2026-12-03.</p>
+  </div>
+</div>
+<div class="rows" style="margin-top: 1rem">
+  <div><h3>Every Run Through the Runner</h3><p>A raw test command is blocked; it would leave nothing in the log. Each run leaves one line: pass or fail, total, failures. No results at all is logged as a failure, with the reason.</p></div>
+</div>
+<p class="refs"><a class="ref-plain" href="deck/three-rs-one-behavior.html">RIGHT-BEHAVIOR</a> <details class="fragment-plain"><summary>Raw test commands are blocked (core/gate-bash.sh)</summary><pre><code>#!/usr/bin/env bash
 # PreToolUse (Bash). For wrapper-logged stacks: blocks running the raw test
 # command, because a raw run leaves no BDD_RUN fact and the pre-commit check
 # then cannot see the red/green sequence. No-op unless bddRawCommandRegex is set.
@@ -62,18 +69,8 @@ val logBddRun by tasks.registering {
 tasks.test {
     finalizedBy(logBddRun)
 }</code></pre></details></p>
-  </div>
-  <div class="card dark" style="align-self: center">
-    <span class="label">The log, in order</span>
-    <pre style="margin: .4rem 0 0; white-space: pre-wrap; font-size: .85rem">1795… FEATURE_WRITE heart/…/options.feature
-1795… BDD_RUN FAIL total=412 failures=3 errors=0
-1795… MAIN_WRITE heart/…/ActPipeline.kt
-1795… BDD_RUN PASS total=412 failures=0 errors=0</pre>
-    <p class="note">The log’s own line kinds; the paths and counts are illustrative.</p>
-  </div>
-</div>
 </article>
-<nav class="foot"><a href="deck/red-first.html" rel="prev"><small>Back</small><b>The scenario, then the failing run</b></a>
+<nav class="foot"><a href="deck/scenario-first.html" rel="prev"><small>Back</small><b>Claude Writes the Scenario First</b></a>
 <span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#right-red">with heart-ts</a></span>
-<a href="deck/code-green-commit.html" rel="next"><small>Next</small><b>The fix, the green run, the gated commit</b></a></nav>
+<a href="deck/then-the-code.html" rel="next"><small>Next</small><b>Then the Code, Then Green</b></a></nav>
 </main></div></body></html>

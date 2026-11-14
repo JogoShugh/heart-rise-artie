@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Then the Code, Then Green · Claude and Git Hooks, Together · 3.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">The smallest change that makes the table pass</span></header>
+<h2>Then the Code, Then Green</h2>
+<div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr)">
+  <div class="card dark">
+    <pre style="margin: 0; white-space: pre-wrap; font-size: .9rem">data class LibraryPolicy(
+    val renewalWeeks: Long = DEFAULT_RENEWAL_WEEKS,
+) {
+    companion object {
+        const val DEFAULT_RENEWAL_WEEKS = 3L
+
+        fun of(text: String): LibraryPolicy {
+            val read = Properties().apply { load(text.reader()) }
+            return LibraryPolicy(
+                renewalWeeks = read.getProperty("renewal.weeks")
+                    ?.trim()?.toLong() ?: DEFAULT_RENEWAL_WEEKS,
+            )
+        }
+    }
+}</pre>
+  </div>
+  <div class="rows">
+    <div><h3>One Rule</h3><p><code>renewal.weeks</code>, read from the library’s policy file. Left out: three weeks.</p></div>
+    <div><h3>A Renewal Uses It</h3><p>The due date moves by the policy’s weeks.</p></div>
+    <div><h3>Green, Logged</h3><p>All four rows pass, through the runner.</p></div>
+    <p class="refs"><a class="ref-plain" href="deck/three-rs-one-behavior.html">REPEATABILITY</a> <details class="fragment-plain"><summary>The library's policy (LibraryPolicy.kt)</summary><pre><code>package com.artie.heart.sims.library
+
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.Properties
+
+/**
+ * The library's rules, as its policy file says them: a Java properties file kept with the library's code, so a
+ * commit can change them and what a build deploys is what that commit says. A rule the file leaves out keeps its
+ * default.
+ */
+data class LibraryPolicy(
+    /** How far a renewal moves a loan's due date: `renewal.weeks`. */
+    val renewalWeeks: Long = DEFAULT_RENEWAL_WEEKS,
+) {
+    companion object {
+        const val DEFAULT_RENEWAL_WEEKS = 3L
+
+        /** The policy [text] says, a properties file's lines. */
+        fun of(text: String): LibraryPolicy {
+            val read = Properties().apply { load(text.reader()) }
+            return LibraryPolicy(
+                renewalWeeks = read.getProperty(&quot;renewal.weeks&quot;)?.trim()?.toLong() ?: DEFAULT_RENEWAL_WEEKS,
+            )
+        }
+
+        /** The policy in the file at [path]. */
+        fun read(path: Path): LibraryPolicy = of(Files.readString(path))
+    }
+}</code></pre></details></p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/right-red.html" rel="prev"><small>Back</small><b>Then It Has to Fail, for the Right Reason</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#then-the-code">with heart-ts</a></span>
+<a href="deck/commit-proves-order.html" rel="next"><small>Next</small><b>The Commit Has to Prove the Order</b></a></nav>
+</main></div></body></html>

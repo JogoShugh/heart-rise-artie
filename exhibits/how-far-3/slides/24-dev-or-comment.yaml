@@ -1,0 +1,19 @@
+name: dev-or-comment
+part: "The release, in the order it runs"
+title: "Promoted to Dev, or Told Why"
+kicker: Step 7 · env:promote or scm:comment
+say: "Last step. If every smoke scenario passed, ARTIE opens the Dev environment, another HEART service, and promotes the merged commit, citing how many passed. Dev has its own rule, too: it refuses a promotion whose smoke run didn't pass. Four of the five pull requests ended right there, promoted. And 504, the zero-week policy? Smoke scenario S3 checks that renewing a book moves its due date. With zero weeks, it doesn't move. Four of five passed, S3 failed. So ARTIE didn't promote. It went back to the pull request and said why, in a comment: not promoted to Dev, smoke scenarios S3 failed. Recall the zero-weeks row, back at the start? The library's code does exactly what that row says. It was the policy that was wrong for the people using it, and the release caught it before it reached Dev. Right behavior, at both scales, and nobody had to be watching."
+sources:
+  - ["Report: Merge Watch release", "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-release/"]
+html: |
+  <h2>Promoted to Dev, or Told Why</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 6fr) minmax(0, 6fr)">
+    <figure><img src="media/dev.png" alt="The Dev environment's text/html representation showing a commit promoted"><figcaption>Dev, as HTML for a person: a commit promoted, citing its smoke run.</figcaption></figure>
+    <div class="rows">
+      <div><h3>All Passed: Promote</h3><p><code>env:promote</code>, citing how many passed. 501, 502, 503 and 505.</p></div>
+      <div><h3>504: Zero Weeks</h3><p>S3 checks that renewing moves the due date. It didn’t. 4 of 5.</p></div>
+      <div><h3>Not Promoted, and Told Why</h3><p><code>scm:comment</code> on the pull request: “Not promoted to Dev: smoke scenarios S3 failed.”</p></div>
+      <p class="punch">Recall the zero-weeks row. The release caught it.</p>
+      <p class="refs"><deck-ref name="right-behavior"></deck-ref> <deck-ref name="resilience"></deck-ref></p>
+    </div>
+  </div>

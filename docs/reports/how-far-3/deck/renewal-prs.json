@@ -1,0 +1,42 @@
+{
+  "name": "renewal-prs",
+  "title": "Five Pull Requests Change the Policy",
+  "part": "The release, in the order it runs",
+  "kicker": "The library, released for real",
+  "tone": "light",
+  "number": 19,
+  "of": 30,
+  "html": "<h2>Five Pull Requests Change the Policy</h2>\n<div class=\"table-scroll\"><table>\n  <thead><tr><th>Pull request</th><th>Changes</th><th>Smoke scenarios</th><th>Ends</th></tr></thead>\n  <tbody>\n    <tr><td>501</td><td>renewals: 2 weeks</td><td>5 of 5</td><td>promoted to Dev</td></tr>\n    <tr><td>502</td><td>renewals: 4 weeks</td><td>5 of 5</td><td>promoted to Dev</td></tr>\n    <tr><td>503</td><td>renewals: 1 week</td><td>5 of 5</td><td>promoted to Dev</td></tr>\n    <tr><td><b style=\"color: var(--hold)\">504</b></td><td><b style=\"color: var(--hold)\">renewals: none (0 weeks)</b></td><td>?</td><td>?</td></tr>\n    <tr><td>505</td><td>a README line only</td><td>5 of 5</td><td>promoted to Dev</td></tr>\n  </tbody>\n</table></div>\n<p class=\"punch\">Merged, built, smoke-tested, promoted only if every scenario passes. Guess which one is in trouble.</p>\n",
+  "say": "Remember the policy file? Now it's in the library's repository, and people send pull requests that change it. Here are five, run for real. One makes renewals two weeks. One makes them four. One makes them one week. One makes them none at all: zero weeks. And one only changes a line in the README. Each pull request gets released the same way: merged, built by Jenkins, smoke-tested against what Jenkins deployed, and promoted to Dev, but only if every smoke scenario passes. One of the smoke scenarios checks that renewing a book moves its due date. You can probably guess which pull request is in trouble. Let's follow a release through, in the order it runs.",
+  "sources": [
+    {
+      "label": "Report: Merge Watch release",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-release/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "renewal-prs.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "three-rs-one-behavior.json",
+      "title": "From One Test to a Whole System"
+    },
+    "next": {
+      "href": "the-desk.json",
+      "title": "A Person Asks the Release Desk"
+    },
+    "alternate": {
+      "href": "renewal-prs.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

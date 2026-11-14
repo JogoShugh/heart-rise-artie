@@ -1,0 +1,45 @@
+name: one-media-type
+part: "The release, in the order it runs"
+title: "One Media Type, Five Services"
+kicker: Why one generic client is enough
+say: "Here's the answer, and it's the point of the whole release. Five services: the forge gateway, the offer watcher, the release desk, CI in front of Jenkins, and Dev. Five jobs, five vocabularies: scm, watcher, desk, ci, env. But every one of them answers in the same media type, HEART: HAL with HAL Schema Forms, application/hal+json. So ARTIE has no code for any of them. It knows the media type, the way a browser knows HTML. Add a sixth service and you add a bookmark and a vocabulary, not a client. And if ARTIE can do that, can an AI agent you already use?"
+sources:
+  - ["HAL Schema Forms, the HEART profile", "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/spec/HAL-SCHEMA-FORMS-HR.md"]
+  - ["The kept release script (release.heart.yaml)", "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/merge-watch-release/release.heart.yaml"]
+html: |
+  <h2>One Media Type, Five Services</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr)">
+    <figure>
+      <svg viewBox="0 0 520 380" role="img" aria-label="ARTIE in the middle, one generic client. Around it five services, each answering in application/hal+json with the HEART profile: the forge gateway (scm), the offer watcher (watcher), the release desk (desk), CI in front of Jenkins (ci), and Dev (env).">
+        <g stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6">
+          <line x1="260" y1="190" x2="110" y2="70"/><line x1="260" y1="190" x2="410" y2="70"/>
+          <line x1="260" y1="190" x2="70" y2="230"/><line x1="260" y1="190" x2="450" y2="230"/>
+          <line x1="260" y1="190" x2="260" y2="330"/>
+        </g>
+        <circle cx="260" cy="190" r="58" style="fill: var(--surface)"/>
+        <circle cx="260" cy="190" r="58" fill="#2f9e5b" fill-opacity="0.25" stroke="#2f9e5b" stroke-width="2.5"/>
+        <text fill="currentColor" x="260" y="186" text-anchor="middle" fill="currentColor" font-size="18" font-weight="700">ARTIE</text>
+        <text fill="currentColor" x="260" y="206" text-anchor="middle" fill="currentColor" font-size="11">one generic client</text>
+        <g font-size="13" text-anchor="middle">
+          <rect x="35" y="40" width="150" height="56" rx="10" style="fill: var(--surface)" stroke="currentColor" stroke-width="1.5"/>
+          <text fill="currentColor" x="110" y="64" font-weight="700">Gateway</text><text fill="currentColor" x="110" y="83" font-size="11">scm: · GitHub or GitLab</text>
+          <rect x="335" y="40" width="150" height="56" rx="10" style="fill: var(--surface)" stroke="currentColor" stroke-width="1.5"/>
+          <text fill="currentColor" x="410" y="64" font-weight="700">Offer watch</text><text fill="currentColor" x="410" y="83" font-size="11">watcher:watch</text>
+          <rect x="0" y="202" width="140" height="56" rx="10" style="fill: var(--surface)" stroke="currentColor" stroke-width="1.5"/>
+          <text fill="currentColor" x="70" y="226" font-weight="700">Release desk</text><text fill="currentColor" x="70" y="245" font-size="11">desk:release</text>
+          <rect x="380" y="202" width="140" height="56" rx="10" style="fill: var(--surface)" stroke="currentColor" stroke-width="1.5"/>
+          <text fill="currentColor" x="450" y="226" font-weight="700">CI · Jenkins</text><text fill="currentColor" x="450" y="245" font-size="11">ci:build · ci:smoke-test</text>
+          <rect x="190" y="306" width="140" height="56" rx="10" style="fill: var(--surface)" stroke="currentColor" stroke-width="1.5"/>
+          <text fill="currentColor" x="260" y="330" font-weight="700">Dev</text><text fill="currentColor" x="260" y="349" font-size="11">env:promote</text>
+        </g>
+      </svg>
+      <figcaption>Every answer: <code>application/hal+json</code>, profile HAL Schema Forms.</figcaption>
+    </figure>
+    <div class="rows">
+      <div><h3>Five Jobs, Five Vocabularies</h3><p>scm, watcher, desk, ci, env.</p></div>
+      <div><h3>One Media Type</h3><p>HAL with HAL Schema Forms: the data and the forms for the acts its state allows now.</p></div>
+      <div><h3>No Code per Service</h3><p>ARTIE knows the media type, the way a browser knows HTML.</p></div>
+      <p class="punch">A sixth service is a bookmark and a vocabulary, not a client.</p>
+      <p class="refs"><deck-ref name="heart"></deck-ref> <deck-ref name="artie"></deck-ref> <deck-ref name="rule-3"></deck-ref> <deck-ref name="uniform-interface"></deck-ref></p>
+    </div>
+  </div>

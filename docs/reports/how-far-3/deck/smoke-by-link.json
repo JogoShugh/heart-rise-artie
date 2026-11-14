@@ -1,13 +1,13 @@
 {
   "name": "smoke-by-link",
   "title": "The Smoke Script, Found by Link",
-  "part": "The system: everything speaks HEART",
-  "kicker": "Jenkins answers back · ARTIE follows what the build offers",
+  "part": "The release, in the order it runs",
+  "kicker": "Steps 5 and 6 · ci:build, then ci:smoke-test",
   "tone": "light",
-  "number": 25,
-  "of": 31,
+  "number": 23,
+  "of": 30,
   "html": "<h2>The Smoke Script, Found by Link</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <div><h3>Jenkins Tells the CI Service</h3><p>Its notification plugin posts each build event; the CI service answers ARTIE’s reply, signed, linking the build.</p></div>\n    <div><h3>The Build Links What It Made</h3><p><code>ci:deployment</code>: where it runs. <code>ci:smoke-test</code>: the scenarios it shipped with.</p></div>\n    <div><h3>ARTIE Follows, Then Runs</h3><p>Neither address is in the script. Both came in the answer.</p></div>\n    <p class=\"refs\"><deck-ref name=\"rise\"></deck-ref> <deck-ref name=\"rule-4\"></deck-ref> <deck-ref name=\"follow-your-nose\"></deck-ref></p>\n  </div>\n  <div class=\"card dark\" style=\"align-self: center\">\n    <span class=\"label\">From the kept script</span>\n    <pre style=\"margin: .4rem 0 0; white-space: pre-wrap; font-size: .9rem\">- enter: ${jenkins}\n  steps:\n    - ask: ci:build\n      fields:\n        commit: ${merged.merge_commit_sha}\n      reply: build\n- once-answered:\n    reply: build\n    steps:\n      - follow: hr:in-reply-to\n        then:\n          - run-script: ci:smoke-test\n            on-link: ci:deployment\n            as: smoke</pre>\n  </div>\n</div>\n",
-  "say": "When Jenkins finishes, it doesn't call ARTIE directly. Its notification plugin tells the CI service, and the CI service answers ARTIE's reply, signed, with a link to the build. ARTIE follows that link. A build that succeeded links two things: where it was deployed, ci:deployment, and the smoke scenarios it shipped with, ci:smoke-test, archived as an artifact of that very build. ARTIE runs the smoke script against the deployment. Neither address was in the kept script; both came in the answer. So a new build, on a new port, with new smoke scenarios, needs no change to the release script at all.",
+  "say": "Build it. ARTIE asks the CI service to build the merge commit, and waits again. The CI service is a thin HEART service in front of a real Jenkins, the official image, in a container. When Jenkins finishes, its notification plugin tells the CI service, and the CI service answers ARTIE's reply, with a link to the build. ARTIE follows it. A build that succeeded links two things: where it was deployed, and the smoke scenarios it shipped with. ARTIE runs those scenarios against that deployment. Neither address was in the release script; both came in the answer. One of those scenarios, S3, renews a book and checks the due date moves. Now, the moment of truth.",
   "sources": [
     {
       "label": "The kept release script (release.heart.yaml)",
@@ -26,12 +26,12 @@
       "title": "Contents"
     },
     "prev": {
-      "href": "release-desk-jenkins.json",
-      "title": "The release desk, and Jenkins, for real"
+      "href": "watcher.json",
+      "title": "The Watcher: Tell Me When It Offers Merge"
     },
     "next": {
-      "href": "console-and-dev.json",
-      "title": "The build’s console, and Dev, promoted or not"
+      "href": "dev-or-comment.json",
+      "title": "Promoted to Dev, or Told Why"
     },
     "alternate": {
       "href": "smoke-by-link.html",
