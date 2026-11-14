@@ -461,3 +461,39 @@ pre.source { font-size: 0.72rem; }
 .slide[data-tone="dark"] .lead { color: #c9d8ce; }
 .overlay pre.fragment { white-space: pre-wrap; overflow-wrap: anywhere; }
 .slide .phone { border: 6px solid #2d3a31; }
+
+/* ---------- Slide components, matching the PowerPoint decks ---------- */
+/* A flow: rows of  box → panel → tiles,  arrows between */
+.slide .flow { display: grid; grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1.3fr) auto minmax(0, 1.5fr); gap: 1rem 0.8rem; align-items: stretch; }
+.slide .flow > .arrow { align-self: center; font-size: 2rem; line-height: 1; color: var(--muted); }
+.slide .flow > .arrow::before { content: "➜"; }
+/* A solid box naming a thing: ink or green */
+.slide .box { border-radius: 10px; padding: 1.1rem 1.3rem; display: grid; gap: 0.5rem; align-content: center; background: #17201b; color: #e6ede7; }
+.slide .box.green { background: #2f7d55; }
+.slide .box h3 { font: 650 1.7rem/1.15 var(--display); color: #e3b341; margin: 0; text-transform: none; letter-spacing: 0; }
+.slide .box.green h3 { color: #fff; }
+.slide .box p { margin: 0; font-size: 1rem; }
+/* A pale panel with a small label */
+.slide .panel { border-radius: 10px; padding: 0.9rem 1.1rem; background: var(--paper); border: 1px solid var(--rule); display: grid; gap: 0.35rem; align-content: start; }
+.slide .panel > .label, .slide .tiles > .label { font: 600 0.72rem var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.slide .panel .big { font: 600 1.25rem/1.35 var(--mono); }
+.slide .panel .faint { font: 0.82rem/1.5 var(--mono); color: var(--muted); opacity: 0.75; }
+/* Tiles: a 2-column grid of plain cells; .ghost is the one not built yet */
+.slide .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; align-content: stretch; }
+.slide .tiles > div { background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 0.7rem 0.9rem; display: flex; align-items: center; }
+.slide .tiles > .ghost { font-style: italic; color: var(--muted); background: transparent; border-style: dashed; }
+/* Big numbers */
+.slide .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1rem; }
+.slide .stat b { display: block; font: 650 clamp(2rem, 4.5vw, 3.2rem)/1 var(--display); color: var(--leaf); }
+.slide .stat.bad b { color: var(--bad); }
+.slide .stat span { font-size: 0.9rem; color: var(--muted); }
+/* Said plainly: green "yes", rust "no" */
+.slide .verdict { font-size: 1.15rem; max-width: none; }
+.slide .verdict .yes { color: var(--leaf); font-weight: 700; }
+.slide .verdict .no { color: var(--bad); font-weight: 700; margin-left: 0.6rem; }
+@media (max-width: 56rem) {
+  .slide .flow { grid-template-columns: minmax(0, 1fr); }
+  .slide .flow > .arrow { transform: rotate(90deg); justify-self: center; }
+}
+.slide .box { box-shadow: inset 0 0 0 1.5px rgba(227, 179, 65, 0.45); }
+.slide .box.green { box-shadow: none; }

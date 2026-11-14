@@ -19,7 +19,7 @@ fragments:
     lang: yaml
 html: |
   <h2>A kept script is data, not a program</h2>
-  <div class="split">
+  <div class="split" style="grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr)">
     <div class="rows">
       <pre># release.heart.yaml (excerpt), kept by artie generate
   <b>heart: 1</b>
@@ -42,9 +42,9 @@ html: |
       integrity: sha256-sGUdrPfH…}</pre>
       <p class="refs"><deck-fragment name="kept">release.heart.yaml</deck-fragment> <deck-fragment name="pins">release.pins.yaml</deck-fragment></p>
     </div>
-    <div class="split">
-      <div class="card">
-        <h3>Kept YAML (ARTIE)</h3>
+    <div class="split" style="grid-template-columns: 1fr 1fr">
+      <div class="rows" style="gap: 0.4rem">
+        <h3 style="font: 650 1.5rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--leaf)">Kept YAML (ARTIE)</h3>
         <ul>
           <li>Data. No loops, imports or eval to review.</li>
           <li>Every act names a relation the server must still offer.</li>
@@ -52,8 +52,8 @@ html: |
           <li>Runs with no model, in any HEART client.</li>
         </ul>
       </div>
-      <div class="card">
-        <h3>Code Mode</h3>
+      <div class="rows" style="gap: 0.4rem">
+        <h3 style="font: 650 1.5rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--bad)">Code Mode</h3>
         <ul>
           <li>The model writes TypeScript or Python against tool APIs.</li>
           <li>What you keep is a program: code review, sandbox, dependencies.</li>

@@ -11,7 +11,7 @@ sources:
 html: |
   <h2>L0: the certificate, with its forms inline</h2>
   <div class="split">
-  <pre><code># GET /clientcertificates/xmbiqp
+  <pre style="white-space: pre-wrap"><code># GET /clientcertificates/xmbiqp
   # Accept: application/hal+json
   # Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
   # 200 OK
@@ -63,4 +63,4 @@ html: |
           href: /clientcertificates/xmbiqp
       method: DELETE</code></pre>
   </div>
-  <p class="cite"><b style="color:var(--bad)">MOCKUP</b> · Today · <b>L0</b> · L1 · L2 · <i>Everything in one answer: correct, and repeated on every read.</i></p>
+  <p class="cite" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center"><span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#b85c2c;color:#fff;letter-spacing:0.04em">MOCKUP</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">Today</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#2f7d55;color:#fff">L0</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">L1</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">L2</span> <i style="margin-left:0.6rem">Everything in one answer: correct, and repeated on every read.</i></p>

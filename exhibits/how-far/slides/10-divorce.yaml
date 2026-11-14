@@ -8,12 +8,12 @@ sources:
   - ["GitHub OpenAPI description", "https://github.com/github/rest-api-description"]
 html: |
   <h2>The divorce: data in the response, controls elsewhere</h2>
-  <div class="split" style="grid-template-columns: 1fr 1fr 1fr">
-    <div class="card"><h3>The response</h3><p>Data only. Status, ids, timestamps. Nothing says what you may do next.</p></div>
-    <div class="card dark"><h3>The controls, out of band</h3>
-      <ul><li>Docs and SDKs</li><li>OpenAPI descriptions</li><li>MCP tool lists</li></ul>
+  <div class="split" style="grid-template-columns: 1fr 1.1fr 1fr; align-items: stretch">
+    <div class="panel" style="padding: 1.4rem 1.5rem; gap: 0.8rem"><h3 style="font: 650 1.6rem/1.15 var(--display); color: var(--leaf); margin: 0; text-transform: none; letter-spacing: 0">The response</h3><p style="font-size: 1.1rem">Data only. Status, ids, timestamps. Nothing says what you may do next.</p></div>
+    <div class="box" style="padding: 1.4rem 1.5rem; gap: 0.8rem; align-content: start"><h3>The controls, out of band</h3>
+      <ul style="margin: 0; font-size: 1.1rem"><li>Docs and SDKs</li><li>OpenAPI descriptions</li><li>MCP tool lists</li></ul>
     </div>
-    <div class="rows"><h3 style="font-size: 2.4rem">13.5 MB</h3><p>GitHub’s OpenAPI description, as one file. An agent given it reads every operation, whatever state the pull request is in.</p></div>
+    <div class="stats" style="grid-template-columns: 1fr; align-content: start"><div class="stat bad"><b>13.5 MB</b><span style="display: block; margin-top: 0.6rem; font-size: 1rem; line-height: 1.5">GitHub’s OpenAPI description, as one file. An agent given it reads every operation, whatever state the pull request is in.</span></div></div>
   </div>
   <blockquote class="big">“Failure here implies that out-of-band information is driving interaction instead of hypertext.”</blockquote>
   <p class="cite"><a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven" target="_blank" rel="noopener"><b>Roy T. Fielding</b></a>, “REST APIs must be hypertext-driven”, 2008</p>

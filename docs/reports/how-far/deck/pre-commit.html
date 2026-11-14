@@ -57,13 +57,13 @@ echo &quot;pre-commit: TDD ordering check passed.&quot;</code></pre></details></
   </div>
   <div class="rows">
     <h3>Three facts, in order</h3>
-    <p class="refs" style="flex-direction: column; align-items: flex-start;">
-      <span class="ref" aria-hidden="true">FEATURE_WRITE</span> ↓
-      <span class="ref kind-rule" aria-hidden="true">BDD_RUN FAIL</span> ↓
-      <span class="ref" aria-hidden="true">MAIN_WRITE …</span> ↓
-      <span class="ref kind-comment" aria-hidden="true">BDD_RUN PASS</span>
-    </p>
-    <p>Works for a plain terminal git commit too. --no-verify and git commit -n are blocked for the model by protect-gate.sh.</p>
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) 1.5rem; gap: 0.7rem 0.6rem; align-items: center;">
+      <span style="display: block; text-align: center; font: 700 1rem/1.2 var(--body); padding: 0.7rem 1rem; border-radius: 999px; background: #c9d8ce; color: #17201b;">FEATURE_WRITE</span> <span aria-hidden="true">↓</span>
+      <span style="display: block; text-align: center; font: 700 1rem/1.2 var(--body); padding: 0.7rem 1rem; border-radius: 999px; background: #b4562c; color: #fff;">BDD_RUN FAIL</span> <span aria-hidden="true">↓</span>
+      <span style="display: block; text-align: center; font: 700 1rem/1.2 var(--body); padding: 0.7rem 1rem; border-radius: 999px; background: #c9d8ce; color: #17201b;">MAIN_WRITE …</span> <span aria-hidden="true">↓</span>
+      <span style="display: block; text-align: center; font: 700 1rem/1.2 var(--body); padding: 0.7rem 1rem; border-radius: 999px; background: #2f7d55; color: #fff;">BDD_RUN PASS</span>
+    </div>
+    <p>Works for a plain terminal git commit too. <span style="white-space: nowrap;">--no-verify</span> and git commit -n are blocked for the model by protect-gate.sh.</p>
   </div>
 </div>
 </article>

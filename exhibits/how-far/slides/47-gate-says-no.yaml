@@ -7,9 +7,11 @@ sources:
   - ["bdd-gates: protect-gate.sh, refactor mode", "https://github.com/JogoShugh/bdd-gates-skill"]
 html: |
   <h2>The gates hold, even against the model</h2>
+  <div style="display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); gap: 2.2rem 2rem; align-items: center; margin-top: 1rem;">
+    <h3 style="font: 700 1.05rem/1.2 var(--body); text-transform: none; letter-spacing: 0; margin: 0; padding: 0.7rem 1rem; border-radius: 999px; text-align: center; color: #fff; background: #b4562c;">Blocked</h3><p style="margin: 0; font-size: 1.3rem;">The protect-gate hook stopped the model reading the gate’s own event log. It didn’t try another way.</p>
+    <h3 style="font: 700 1.05rem/1.2 var(--body); text-transform: none; letter-spacing: 0; margin: 0; padding: 0.7rem 1rem; border-radius: 999px; text-align: center; color: #fff; background: #2f7d55;">Human’s switch</h3><p style="margin: 0; font-size: 1.3rem;">Refactor mode, the only time src/main may change with no new red, is switched on by the person, never the model.</p>
+    <h3 style="font: 700 1.05rem/1.2 var(--body); text-transform: none; letter-spacing: 0; margin: 0; padding: 0.7rem 1rem; border-radius: 999px; text-align: center; color: #fff; background: #2f7d55;">Redone</h3><p style="margin: 0; font-size: 1.3rem;">An edit made outside Claude Code’s edit tool was redone through it, so the log records every change.</p>
+  </div>
   <div class="rows">
-    <div class="step gap"><h3>Blocked</h3><p>The protect-gate hook stopped the model reading the gate’s own event log. It didn’t try another way.</p></div>
-    <div class="step"><h3>Human’s switch</h3><p>Refactor mode, the only time src/main may change with no new red, is switched on by the person, never the model.</p></div>
-    <div class="step"><h3>Redone</h3><p>An edit made outside Claude Code’s edit tool was redone through it, so the log records every change.</p></div>
     <p class="punch">The model doesn’t have to be trustworthy for the process to be.</p>
   </div>
