@@ -4,8 +4,8 @@
   "part": "How it was built",
   "kicker": "How it was built · Code, green, commit",
   "tone": "light",
-  "number": 47,
-  "of": 51,
+  "number": 50,
+  "of": 54,
   "html": "<h2>The fix, the green run, the gated commit</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);\">\n  <div class=\"rows\">\n    <pre><code>// Detours.kt: keep a read another step names\nprivate fun named(capture: Capture): Set&lt;Int&gt; {\n  val marks = capture.steps.associateWith {\n    capture.marks(it) }\n  return marks.filter { (step, own) -&gt;\n    val name = own[\"as\"]?.toString()\n      ?: return@filter false\n    val mention = Regex(\"\"\"\\{$name[.}]\"\"\")\n    marks.any { (other, its) -&gt; other.line !=\n      step.line &amp;&amp; its.values.any {\n        mention.containsMatchIn(\"$it\") } }\n  }.keys.map { it.number }.toSet()</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"detours\">Detours.kt</deck-fragment></p>\n    <pre><code>pre-commit: TDD ordering check passed.\n# then the capture again, and the open-PR step stays</code></pre>\n  </div>\n  <div class=\"rows\">\n    <figure><img src=\"media/testreport-crop.png\" alt=\"The artie-cli test report: 198 tests, 0 failures\"><figcaption>artie-cli test report: 198 tests, 0 failures.</figcaption></figure>\n    <p class=\"punch\">Then the replay, on real GitHub and local GitLab, with the regenerated script.</p>\n  </div>\n</div>\n",
   "say": "The fix in Detours.kt: keep a step whose `as` name another step mentions. Then green, then the commit, which the git pre-commit hook checks for ordering. The report beside it is the module's real test report.",
   "sources": [

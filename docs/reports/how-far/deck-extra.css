@@ -115,3 +115,7 @@
 .slide .tk.aw-m { font-weight: 700; color: #c7511f; }
 .slide .hl .tk.aw-m { color: #ffb37a; }
 @media (max-width: 56rem) { .slide .aw-apart { grid-template-columns: minmax(0, 1fr); } .slide .aw-gap span { writing-mode: horizontal-tb; transform: none; } .slide .hl-cols { grid-template-columns: minmax(0, 1fr); } }
+
+/* The divorce: the size of the controls' bag */
+.slide .dv-bag { display: flex; align-items: baseline; gap: 0.6rem; margin: 0.2rem 0 0.4rem; font: italic 0.85rem var(--body); color: var(--muted); }
+.slide .dv-bag b { font: 650 clamp(2.2rem, 5vw, 3.4rem)/1 var(--display); font-style: normal; color: var(--bad); }

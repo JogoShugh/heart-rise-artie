@@ -4,8 +4,8 @@
   "part": "How it was built",
   "kicker": "For the engineers · Gherkin first",
   "tone": "light",
-  "number": 44,
-  "of": 51,
+  "number": 47,
+  "of": 54,
   "html": "<h2>No production write until a feature file changes</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);\">\n  <div class=\"rows\">\n    <pre><code># core/gherkin-first.sh (PreToolUse)\nrel=$(bdd_rel \"$file_path\")\nbdd_is_prod \"$rel\" || exit 0\nbdd_features_dirty &amp;&amp; exit 0\n# The author switched refactor mode on\nbdd_refactor_on &amp;&amp; exit 0\n\ncat &gt;&amp;2 &lt;&lt;EOF\nBlocked: about to modify production code\n($rel) with no feature file change in this\nchangeset yet. Write or update the Gherkin\nscenario first, run the BDD suite to see it\nfail, then implement.\nEOF\nexit 2</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"gherkin-first\">gherkin-first.sh</deck-fragment></p>\n  </div>\n  <div class=\"rows\">\n    <pre><code># core/log-event.sh (PostToolUse)\nif bdd_is_prod \"$rel\"; then\n  bdd_append \"MAIN_WRITE $rel\"\nelif bdd_is_feature \"$rel\"; then\n  bdd_append \"FEATURE_WRITE $rel\"\nfi</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"log-event\">log-event.sh</deck-fragment></p>\n    <pre><code># core/bdd-run.sh: every run, pass or fail\nif [ $ec -eq 0 ]; then\n  bdd_append \"BDD_RUN PASS exit=0\"\nelse\n  bdd_append \"BDD_RUN FAIL exit=$ec\"\nfi</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"bdd-run\">bdd-run.sh</deck-fragment></p>\n  </div>\n</div>\n",
   "say": "gherkin-first.sh runs before every Edit or Write. If the file is production code and no feature file has an in-flight change, it exits 2 with a message the model reads. log-event.sh, after every edit, appends a fact to the event log, which the pre-commit check reads in order.",
   "sources": [
