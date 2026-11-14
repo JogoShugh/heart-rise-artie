@@ -6,16 +6,16 @@
   "tone": "light",
   "number": 3,
   "of": 59,
-  "html": "<h2>No time to type</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <p class=\"lead\">Family, a new dog, a phone in one hand and a leash in the other. The dog sets the pace.</p>\n    <div><h3>Safe while nobody watches</h3><p>Offered only what the state allows. A refusal says why.</p></div>\n    <div><h3>Cheap when repeated</h3><p>Think once, then replay with no model. <deck-ref name=\"zta\"></deck-ref></p></div>\n    <div><h3>Short to say</h3><p>A goal in words, not a manual. One thumb’s worth.</p></div>\n    <p class=\"punch\">So the agent finds its way from the answers, not from me. <deck-ref name=\"no-time\"></deck-ref></p>\n  </div>\n  <div class=\"phone\">\n    <p class=\"phone-head\">/remote-control</p>\n    <p class=\"me\">Please give me an update</p>\n    <p class=\"it\">Red run logged. Writing the fix.</p>\n    <p class=\"me\">How’s it going?</p>\n    <p class=\"it\">Green. Committed through the gate.</p>\n    <p class=\"me\">🐕 pulling. back in 20</p>\n    <p class=\"note\">Illustrative, not a transcript. The two questions are the real ones, every evening. So is the dog.</p>\n  </div>\n</div>\n",
-  "say": "The second ground is personal, and it has four legs. Family, and a new dog. Typing time is gone: one hand holds a leash, the other a phone. So most of my work is steered by thumb, through Claude Code's /remote-control: the session runs on my machine at home, and I answer it from the sidewalk. My prompts got very short. Most evenings it's two: 'Please give me an update', and 'How's it going?' The dog sets the pace. That changes what an agent has to be. Safe while nobody watches every step: offered only what the state allows, and a refusal that says why. Cheap when it does the same thing again: think once, replay with no model, which is Hightower's point. And short to say: a goal in words, not a manual. So the agent finds its way from the answers, not from me. Hold on to that; it's why the controls have to be in the answers.",
+  "html": "<h2>No time to type</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <p class=\"lead\">Family, a new dog, a phone in one hand and a leash in the other.</p>\n    <div><h3>Half the fix: <code>/remote-control</code></h3><p>The session runs at home; I steer it by thumb from the sidewalk.</p></div>\n    <div><h3>The other half: rigour without watching</h3><p>Same behaviour every time, BDD followed strictly: Gherkin, red, code, green, commit.</p></div>\n    <div><h3>Hooks, not hopes</h3><p>A write out of order is refused. Every run is logged. The commit gate checks the order. I read the record, not the agent.</p></div>\n    <p class=\"punch\">Controls that hold while nobody watches. That’s this talk. <deck-ref name=\"no-time\"></deck-ref> <deck-fragment name=\"hooks\">hooks.json</deck-fragment></p>\n  </div>\n  <div class=\"phone\">\n    <p class=\"phone-head\">/remote-control</p>\n    <p class=\"me\">Please give me an update</p>\n    <p class=\"it\">Red run logged. Writing the fix.</p>\n    <p class=\"me\">How’s it going?</p>\n    <p class=\"it\">Green. Commit gate: TDD order checked.</p>\n    <p class=\"me\">🐕 pulling. back in 20</p>\n    <p class=\"note\">Illustrative, not a transcript. The two questions are the real ones, every evening. So is the dog.</p>\n  </div>\n</div>\n",
+  "say": "The second ground is personal, and it has four legs. Family, and a new dog. Typing time is gone: one hand holds a leash, the other a phone. Half the fix was Claude Code's /remote-control: the session runs on my machine at home, and I steer it by thumb from the sidewalk. Most evenings that's two prompts: 'Please give me an update', and 'How's it going?' But that's only half. An agent I can't watch has to behave the same way every time, and it has to follow BDD rigorously: Gherkin first, a red run, the code, a green run, then a commit. Asking it nicely isn't enough; instructions are advisory. So hooks enforce it: a write out of order is refused, every run is logged, and the commit gate checks the order. I don't monitor the agent; I read the record when I get home. Hold on to that: controls that hold while nobody watches. It's exactly what this talk asks of agents calling APIs.",
   "sources": [
     {
       "label": "Claude Code docs: /remote-control",
       "href": "https://code.claude.com/docs/en/remote-control"
     },
     {
-      "label": "Hightower: ZTA, Zero Token Architecture (talk)",
-      "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"
+      "label": "bdd-gates skill",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
     }
   ],
   "_links": {
@@ -53,31 +53,11 @@
   "_embedded": {
     "deck:ref": [
       {
-        "name": "zta",
-        "kind": "talk",
-        "label": "ZTA",
-        "title": "ZTA: Zero Token Architecture",
-        "summary": "Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. (In my words, from the talk's page and Daniel Cranney's write-up.)",
-        "quote": "<p>“You are all having way too much fun burning way too many tokens”</p><p class=\"note\">His opening line, as quoted in Daniel Cranney, <a href=\"https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture\">“Infer Once, Run Everywhere: Zero-Token Architecture”</a>, WeAreDevelopers, 13 October 2026.</p>",
-        "cite": "Kelsey Hightower, WeAreDevelopers World Congress North America",
-        "date": "26 September 2026",
-        "_links": {
-          "self": {
-            "href": "../refs/zta.json",
-            "title": "ZTA"
-          },
-          "describedby": {
-            "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture",
-            "title": "Kelsey Hightower, WeAreDevelopers World Congress North America"
-          }
-        }
-      },
-      {
         "name": "no-time",
         "kind": "ground",
         "label": "NO-TIME",
         "title": "No time to type",
-        "summary": "Family and a new dog took the typing time: one hand on a leash, one thumb on a phone. Most of my work is steered that way, through Claude Code's /remote-control, away from the keyboard. So the agents have to act safely while nobody watches every step, and cheaply when they do the same thing again. Hypermedia gives the first (only what the state allows is offered); kept scripts give the second (zero tokens to replay).",
+        "summary": "Family and a new dog took the typing time: one hand on a leash, one thumb on a phone. Half the fix is Claude Code's /remote-control: the session runs at home, steered by thumb. The other half is rigour without watching: the agent must behave the same way every time and follow BDD strictly (Gherkin, red, code, green, commit), so hooks enforce the order and log every run, and the record is read later instead of the agent being monitored. Controls that hold while nobody watches: what this talk asks of agents calling APIs too.",
         "cite": "Claude Code docs: /remote-control, continue a local session from a phone or a browser",
         "_links": {
           "self": {
@@ -87,6 +67,27 @@
           "describedby": {
             "href": "https://code.claude.com/docs/en/remote-control",
             "title": "Claude Code docs: /remote-control, continue a local session from a phone or a browser"
+          }
+        }
+      }
+    ],
+    "deck:fragment": [
+      {
+        "name": "hooks",
+        "label": "The hooks that gate every change (core/hooks.json)",
+        "lang": "json",
+        "path": "bdd-gates: core/hooks.json",
+        "lines": "1–77",
+        "of": 77,
+        "text": "{\n  \"UserPromptSubmit\": [\n    {\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/refactor-prompt.sh\",\n          \"timeout\": 15\n        }\n      ]\n    }\n  ],\n  \"PreToolUse\": [\n    {\n      \"matcher\": \"*\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/protect-gate.sh\",\n          \"timeout\": 10\n        }\n      ]\n    },\n    {\n      \"matcher\": \"Edit|Write|MultiEdit\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/gherkin-first.sh\",\n          \"timeout\": 15,\n          \"statusMessage\": \"Checking Gherkin-first ordering...\"\n        }\n      ]\n    },\n    {\n      \"matcher\": \"Bash\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/gate-bash.sh\",\n          \"timeout\": 10\n        }\n      ]\n    }\n  ],\n  \"PostToolUse\": [\n    {\n      \"matcher\": \"Edit|Write|MultiEdit\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/log-event.sh\",\n          \"timeout\": 15,\n          \"statusMessage\": \"Logging TDD event...\"\n        },\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/lint.sh\",\n          \"timeout\": 180,\n          \"statusMessage\": \"Running lint gate...\"\n        }\n      ]\n    }\n  ],\n  \"Stop\": [\n    {\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/check.sh\",\n          \"timeout\": 600,\n          \"statusMessage\": \"Running full check gate...\"\n        }\n      ]\n    }\n  ]\n}",
+        "_links": {
+          "self": {
+            "href": "fragments/no-time--hooks.json",
+            "title": "The hooks that gate every change (core/hooks.json)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/hooks.json",
+            "title": "core/hooks.json, lines 1–77"
           }
         }
       }

@@ -10,18 +10,94 @@
 <h2>No time to type</h2>
 <div class="split">
   <div class="rows">
-    <p class="lead">Family, a new dog, a phone in one hand and a leash in the other. The dog sets the pace.</p>
-    <div><h3>Safe while nobody watches</h3><p>Offered only what the state allows. A refusal says why.</p></div>
-    <div><h3>Cheap when repeated</h3><p>Think once, then replay with no model. <a class="ref-plain" href="https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture">ZTA</a></p></div>
-    <div><h3>Short to say</h3><p>A goal in words, not a manual. One thumb’s worth.</p></div>
-    <p class="punch">So the agent finds its way from the answers, not from me. <a class="ref-plain" href="https://code.claude.com/docs/en/remote-control">NO-TIME</a></p>
+    <p class="lead">Family, a new dog, a phone in one hand and a leash in the other.</p>
+    <div><h3>Half the fix: <code>/remote-control</code></h3><p>The session runs at home; I steer it by thumb from the sidewalk.</p></div>
+    <div><h3>The other half: rigour without watching</h3><p>Same behaviour every time, BDD followed strictly: Gherkin, red, code, green, commit.</p></div>
+    <div><h3>Hooks, not hopes</h3><p>A write out of order is refused. Every run is logged. The commit gate checks the order. I read the record, not the agent.</p></div>
+    <p class="punch">Controls that hold while nobody watches. That’s this talk. <a class="ref-plain" href="https://code.claude.com/docs/en/remote-control">NO-TIME</a> <details class="fragment-plain"><summary>The hooks that gate every change (core/hooks.json)</summary><pre><code>{
+  &quot;UserPromptSubmit&quot;: [
+    {
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/refactor-prompt.sh&quot;,
+          &quot;timeout&quot;: 15
+        }
+      ]
+    }
+  ],
+  &quot;PreToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/protect-gate.sh&quot;,
+          &quot;timeout&quot;: 10
+        }
+      ]
+    },
+    {
+      &quot;matcher&quot;: &quot;Edit|Write|MultiEdit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/gherkin-first.sh&quot;,
+          &quot;timeout&quot;: 15,
+          &quot;statusMessage&quot;: &quot;Checking Gherkin-first ordering...&quot;
+        }
+      ]
+    },
+    {
+      &quot;matcher&quot;: &quot;Bash&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/gate-bash.sh&quot;,
+          &quot;timeout&quot;: 10
+        }
+      ]
+    }
+  ],
+  &quot;PostToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;Edit|Write|MultiEdit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/log-event.sh&quot;,
+          &quot;timeout&quot;: 15,
+          &quot;statusMessage&quot;: &quot;Logging TDD event...&quot;
+        },
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/lint.sh&quot;,
+          &quot;timeout&quot;: 180,
+          &quot;statusMessage&quot;: &quot;Running lint gate...&quot;
+        }
+      ]
+    }
+  ],
+  &quot;Stop&quot;: [
+    {
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/check.sh&quot;,
+          &quot;timeout&quot;: 600,
+          &quot;statusMessage&quot;: &quot;Running full check gate...&quot;
+        }
+      ]
+    }
+  ]
+}</code></pre></details></p>
   </div>
   <div class="phone">
     <p class="phone-head">/remote-control</p>
     <p class="me">Please give me an update</p>
     <p class="it">Red run logged. Writing the fix.</p>
     <p class="me">How’s it going?</p>
-    <p class="it">Green. Committed through the gate.</p>
+    <p class="it">Green. Commit gate: TDD order checked.</p>
     <p class="me">🐕 pulling. back in 20</p>
     <p class="note">Illustrative, not a transcript. The two questions are the real ones, every evening. So is the dog.</p>
   </div>
