@@ -1,20 +1,20 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>No time to type · How far can one vision go · 2.0</title>
+<title>No Time to Type · How far can one vision go · 2.0</title>
 <base href="../">
 <link rel="stylesheet" href="deck.css">
 <link rel="stylesheet" href="deck-extra.css">
 </head><body>
 <div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
 <article class="slide"><header><span class="part">Why this talk · the second ground has four legs</span></header>
-<h2>No time to type</h2>
+<h2>No Time to Type</h2>
 <div class="split">
   <div class="rows">
-    <p class="lead">Family, a new dog, a phone in one hand and a leash in the other.</p>
-    <div><h3>Half the fix: <code>/remote-control</code></h3><p>The session runs at home; I steer it by thumb from the sidewalk.</p></div>
-    <div><h3>The other half: rigour without watching</h3><p>Same behaviour every time, BDD followed strictly: Gherkin, red, code, green, commit.</p></div>
-    <div><h3>Hooks, not hopes</h3><p>A write out of order is refused. Every run is logged. The commit gate checks the order. I read the record, not the agent.</p></div>
-    <p class="punch">Controls that hold while nobody watches. That’s this talk. <a class="ref-plain" href="https://code.claude.com/docs/en/remote-control">NO-TIME</a> <details class="fragment-plain"><summary>The hooks that gate every change (core/hooks.json)</summary><pre><code>{
+    <p class="lead">Have you ever tried to write code with a leash in one hand? I don’t recommend it.</p>
+    <div><h3>Half the Answer: <code>/remote-control</code></h3><p>The session runs at home. I steer it with one thumb from the sidewalk.</p></div>
+    <div><h3>The Other Half: Rigor Without Watching</h3><p>Same behavior every time, and BDD for real: Gherkin, red, code, green, commit.</p></div>
+    <div><h3>Asking Nicely? Probably Not.</h3><p>Instructions are advisory, so hooks enforce the order. I read the record when I get home.</p></div>
+    <p class="punch">Notice that an agent calling an API needs the same thing: controls that still hold when nobody is watching. <a class="ref-plain" href="https://code.claude.com/docs/en/remote-control">NO-TIME</a> <details class="fragment-plain"><summary>The hooks that gate every change (core/hooks.json)</summary><pre><code>{
   &quot;UserPromptSubmit&quot;: [
     {
       &quot;hooks&quot;: [
