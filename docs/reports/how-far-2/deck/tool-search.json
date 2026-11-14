@@ -5,7 +5,7 @@
   "kicker": "The machine web · what agents got next",
   "tone": "light",
   "number": 12,
-  "of": 53,
+  "of": 54,
   "html": "<h2>Tool search: a smaller bag, still a bag</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)\">\n  <div class=\"panel\">\n    <span class=\"label\">What it gives, and it’s real</span>\n    <p>Tool definitions marked <code>defer_loading: true</code> stay out of the model’s context until a search over their names and descriptions (regex or BM25) finds them.</p>\n    <div class=\"stats\" style=\"margin-top: 0.4rem\">\n      <div class=\"stat\"><b>49 → 74%</b><span>Opus 4 on MCP evaluations with large tool libraries (Anthropic’s figures)</span></div>\n      <div class=\"stat\"><b>79.5 → 88.1%</b><span>Opus 4.5, same evaluations</span></div>\n    </div>\n    <p class=\"cite\">Claude Code uses it too. It solves context size; HEART’s L1 and L2 solve the same with caching.</p>\n  </div>\n  <div class=\"box\">\n    <h3>What it finds is still RPC</h3>\n    <pre style=\"background: #0f1512; color: #dce7df; font-size: 0.74rem\"># a tool definition, illustrative\nname: merge_pull_request\ndescription: Merge a pull request.\ninput_schema:\n  owner, repo, pull_number,\n  merge_method: [merge, squash, rebase],\n  sha\ndefer_loading: true</pre>\n    <p>A function and its parameters: the same for every pull request, in every state. Chosen by the words of the task, not the state of anything.</p>\n  </div>\n</div>\n<p class=\"verdict\"><span class=\"yes\">Finds:</span> the right functions to call. <span class=\"no\">Never says:</span> which acts are open now, on which address, or why not. That still arrives as an error after the call.</p>\n<p class=\"cite\">In fairness: MCP lets a server change its tool list during a session (<code>notifications/tools/list_changed</code>). That list belongs to the session, not to one resource’s representation.</p>\n<p class=\"refs\"><deck-ref name=\"in-band\"></deck-ref> <deck-ref name=\"rule-6\"></deck-ref></p>\n",
   "say": "To be fair to the newest answer. Tool search, which Anthropic ships on its API and which Claude Code itself uses, keeps tool definitions out of the model's context until a search over their names and descriptions finds them. That's a real gain: Anthropic reports, on MCP evaluations with large tool libraries, Opus 4 going from 49 to 74 percent, and Opus 4.5 from 79.5 to 88.1 percent, with it on. But look at what it finds. A definition is a function name, a description, and a JSON Schema for its arguments. The same for every pull request, in every state. It's chosen by relevance to the words of the task, not by the state of anything. Whether merging is allowed right now, on which address, and why not, still arrives only as an error after the call. Tool search makes the bag smaller. It's still the bag. And it's complementary: it solves context size, which HEART's L1 and L2 solve with caching; HEART solves what's valid now, and where. In fairness, MCP does let a server change its tool list during a session; but that list belongs to the session, not to one resource's representation.",
   "sources": [
@@ -38,8 +38,8 @@
       "title": "The divorce: data in the response, controls elsewhere"
     },
     "next": {
-      "href": "frustration.json",
-      "title": "Our question: how far can we take his vision today?"
+      "href": "heart-mcp-github.json",
+      "title": "The same model, given state instead of a catalogue"
     },
     "alternate": {
       "href": "tool-search.html",
