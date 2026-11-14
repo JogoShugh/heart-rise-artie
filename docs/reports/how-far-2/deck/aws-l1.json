@@ -1,0 +1,81 @@
+{
+  "name": "aws-l1",
+  "title": "L1: the forms become one shared, cached set",
+  "part": "Preview: AWS as HEART",
+  "kicker": "A preview of HEART · HEART L1",
+  "tone": "light",
+  "number": 21,
+  "of": 53,
+  "html": "<h2>L1: the forms become one shared, cached set</h2>\n<div class=\"split\">\n<pre><code># GET /clientcertificates/xmbiqp\n# Prefer: forms=link\n# 200 OK\n# ETag: \"seq-1.hsf.L1\"\n# Cache-Control: no-cache\n# Preference-Applied: forms=link\nclientCertificateId: xmbiqp\ncreatedDate: 2015-12-08T18:02:16Z\ndescription: test-client-cert-2\nexpirationDate: 2016-12-07T18:02:16Z\npemEncodedCertificate: |\n  -----BEGIN CERTIFICATE----- …\n_links:\n  self:\n    href: /clientcertificates/xmbiqp\n<span class=\"add\">  hr:forms:</span>\n<span class=\"add\">    href: /affordance-sets/{hash}</span>\n<span class=\"add\">    type: application/hal+json</span>\n<span class=\"add\">    profile: https://w3id.org/heart-rise/</span>\n<span class=\"add\">      hal-schema-forms</span>\n<span class=\"add\">    integrity: sha256-…</span></code></pre>\n<pre><code># GET /affordance-sets/{hash}\n# Cache-Control: public, max-age=31536000, immutable\n_forms:\n  clientcertificate:update:\n    title: Update\n    _links:\n      target:\n        href: /clientcertificates/{id}\n        templated: true\n<span class=\"add\">    hr:templatePointers:</span>\n<span class=\"add\">      id: /clientCertificateId</span>\n    method: PATCH\n    contentType: application/json\n    hr:integrity: sha256-…\n    schema:\n      type: object\n      required: [patchOperations]\n      properties:\n        patchOperations: {…as at L0…}\n  clientcertificate:delete:\n    title: Delete\n    _links:\n      target:\n        href: /clientcertificates/{id}\n        templated: true\n    hr:templatePointers:\n      id: /clientCertificateId\n    method: DELETE</code></pre>\n</div>\n<p class=\"cite\" style=\"display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center\"><span style=\"display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#b85c2c;color:#fff;letter-spacing:0.04em\">MOCKUP</span> <span style=\"display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)\">Today</span> <span style=\"display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)\">L0</span> <span style=\"display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#2f7d55;color:#fff\">L1</span> <span style=\"display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)\">L2</span> <i style=\"margin-left:0.6rem\">One set for every certificate: fetched once, then read from cache.</i></p>\n<p class=\"refs\"><deck-ref name=\"cache\"></deck-ref></p>\n",
+  "say": "Mockup. With Prefer: forms=link, the certificate links its form set instead of inlining it. Every certificate links the same set, at a content address with an integrity hash, cached for a year and immutable. The target becomes a template the client fills from the certificate's own state, by the pointer. The certificate itself is still revalidated by its ETag; a state seen before costs one 304.",
+  "sources": [
+    {
+      "label": "RFC 9111 HTTP Caching",
+      "href": "https://www.rfc-editor.org/rfc/rfc9111"
+    },
+    {
+      "label": "RFC 7240 Prefer",
+      "href": "https://www.rfc-editor.org/rfc/rfc7240"
+    },
+    {
+      "label": "UpdateClientCertificate",
+      "href": "https://docs.aws.amazon.com/apigateway/latest/api/API_UpdateClientCertificate.html"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "aws-l1.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "aws-l0-list.json",
+      "title": "L0: the list offers generate, with what it needs"
+    },
+    "next": {
+      "href": "aws-l2.json",
+      "title": "L2: schemas linked too, and shared everywhere"
+    },
+    "alternate": {
+      "href": "aws-l1.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "cache",
+        "kind": "constraint",
+        "label": "Cache",
+        "title": "Cache (§5.1.4)",
+        "summary": "Label every response cacheable or not, so interactions can be skipped. HEART's L2 form sets are this.",
+        "quote": "<p>“In order to improve network efficiency, we add cache constraints to form the client-cache-stateless-server style of Section 3.4.4 (Figure 5-4). Cache constraints require that the data within a response to a request be implicitly or explicitly labeled as cacheable or non-cacheable. If a response is cacheable, then a client cache is given the right to reuse that response data for later, equivalent requests.</p><p>The advantage of adding cache constraints is that they have the potential to partially or completely eliminate some interactions, improving efficiency, scalability, and user-perceived performance by reducing the average latency of a series of interactions. The trade-off, however, is that a cache can decrease reliability if stale data within the cache differs significantly from the data that would have been obtained had the request been sent directly to the server.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.4",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/cache.json",
+            "title": "Cache"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_4",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.4"
+          }
+        }
+      }
+    ]
+  }
+}

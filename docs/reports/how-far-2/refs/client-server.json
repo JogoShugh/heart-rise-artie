@@ -1,0 +1,22 @@
+{
+  "name": "client-server",
+  "kind": "constraint",
+  "label": "Client–server",
+  "title": "Client–server (§5.1.2)",
+  "summary": "Separate the user interface from the data; let each side evolve on its own.",
+  "quote": "<p>“The first constraints added to our hybrid style are those of the client-server architectural style (Figure 5-2), described in Section 3.4.1. Separation of concerns is the principle behind the client-server constraints. By separating the user interface concerns from the data storage concerns, we improve the portability of the user interface across multiple platforms and improve scalability by simplifying the server components. Perhaps most significant to the Web, however, is that the separation allows the components to evolve independently, thus supporting the Internet-scale requirement of multiple organizational domains.”</p>",
+  "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.2",
+  "date": "2000",
+  "_links": {
+    "describedby": {
+      "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_2",
+      "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.2"
+    },
+    "self": {
+      "href": "client-server.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

@@ -1,0 +1,62 @@
+name: aws-l0-list
+part: "Preview: AWS as HEART"
+title: "L0: the list offers generate, with what it needs"
+kicker: A preview of HEART · HEART L0
+say: "Mockup. The list of certificates at L0. generate becomes a form: POST, JSON, and the two fields AWS's GenerateClientCertificate takes, description and tags. by-id becomes a search-like form whose one field fills the template. Each certificate is embedded with its own forms, as on the previous slide."
+sources:
+  - ["GenerateClientCertificate", "https://docs.aws.amazon.com/apigateway/latest/api/API_GenerateClientCertificate.html"]
+  - ["AWS: GetClientCertificates", "https://docs.aws.amazon.com/apigateway/latest/api/API_GetClientCertificates.html"]
+  - ["HAL Schema Forms", "https://github.com/jbadeau/hal-schema-forms"]
+html: |
+  <h2>L0: the list offers generate, with what it needs</h2>
+  <div class="split">
+  <pre><code># GET /clientcertificates
+  # 200 OK, ETag: "seq-7.hsf.L0", Cache-Control: no-cache
+  _links:
+    self:
+      href: /clientcertificates
+    curies:
+      - name: clientcertificate
+        href: /profiles/clientcertificate#{rel}
+        templated: true
+  _embedded:
+    item:
+      - clientCertificateId: xmbiqp
+        description: test-client-cert-2
+        expirationDate: 2016-12-07T18:02:16Z
+        _links:
+          self:
+            href: /clientcertificates/xmbiqp
+        _forms:
+          clientcertificate:update: {…}
+          clientcertificate:delete: {…}</code></pre>
+  <pre><code><span class="add">_forms:</span>
+  <span class="add">  clientcertificate:generate:</span>
+      title: Generate a client certificate
+      _links:
+        target:
+          href: /clientcertificates
+      method: POST
+      contentType: application/json
+      schema:
+        type: object
+        properties:
+          description:
+            type: string
+          tags:
+            type: object
+            additionalProperties: {type: string}
+  <span class="add">  clientcertificate:by-id:</span>
+      title: Find a certificate by its id
+      _links:
+        target:
+          href: /clientcertificates/{clientcertificate_id}
+          templated: true
+      method: GET
+      schema:
+        type: object
+        required: [clientcertificate_id]
+        properties:
+          clientcertificate_id: {type: string}</code></pre>
+  </div>
+  <p class="cite" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center"><span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#b85c2c;color:#fff;letter-spacing:0.04em">MOCKUP</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">Today</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#2f7d55;color:#fff">L0</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">L1</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">L2</span> <i style="margin-left:0.6rem">The list carries its own acts, and each item carries its own.</i></p>

@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What you saw, on one page · How far can one vision go · 2.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">The whole story · what you saw</span></header>
+<h2>Think once. Look and act for free. Own the controls.</h2>
+<div class="map">
+  <input type="checkbox" id="map-lit-end" class="map-lit" checked><label for="map-lit-end" class="map-switch"><span class="off">Path only</span><span class="on">Everything</span></label>
+  <aside class="rail build">
+    <h4>Building <small>bdd-gates hooks</small></h4>
+    <ol>
+      <li><img src="media/icon-cucumber.png" alt=""><b>Gherkin</b><i>the behaviour, first</i></li>
+      <li class="red"><img src="media/icon-x.png" alt=""><b>red run</b><i>fails on behaviour</i></li>
+      <li><img src="media/icon-code.png" alt=""><b>code</b><i class="g">complexity lint, every edit</i></li>
+      <li class="green"><img src="media/icon-check.png" alt=""><b>green run</b><i class="g">+ architecture rules</i></li>
+      <li><img src="media/icon-commit.png" alt=""><b>gated commit</b><i>order checked: test, then code</i></li>
+    </ol>
+    <p class="quiet">Instructions are advice. Hooks aren’t. <details class="fragment-plain"><summary>The hooks that gate every change (core/hooks.json)</summary><pre><code>{
+  &quot;UserPromptSubmit&quot;: [
+    {
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/refactor-prompt.sh&quot;,
+          &quot;timeout&quot;: 15
+        }
+      ]
+    }
+  ],
+  &quot;PreToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/protect-gate.sh&quot;,
+          &quot;timeout&quot;: 10
+        }
+      ]
+    },
+    {
+      &quot;matcher&quot;: &quot;Edit|Write|MultiEdit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/gherkin-first.sh&quot;,
+          &quot;timeout&quot;: 15,
+          &quot;statusMessage&quot;: &quot;Checking Gherkin-first ordering...&quot;
+        }
+      ]
+    },
+    {
+      &quot;matcher&quot;: &quot;Bash&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/gate-bash.sh&quot;,
+          &quot;timeout&quot;: 10
+        }
+      ]
+    }
+  ],
+  &quot;PostToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;Edit|Write|MultiEdit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/log-event.sh&quot;,
+          &quot;timeout&quot;: 15,
+          &quot;statusMessage&quot;: &quot;Logging TDD event...&quot;
+        },
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/lint.sh&quot;,
+          &quot;timeout&quot;: 180,
+          &quot;statusMessage&quot;: &quot;Running lint gate...&quot;
+        }
+      ]
+    }
+  ],
+  &quot;Stop&quot;: [
+    {
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/check.sh&quot;,
+          &quot;timeout&quot;: 600,
+          &quot;statusMessage&quot;: &quot;Running full check gate...&quot;
+        }
+      ]
+    }
+  ]
+}</code></pre></details></p>
+  </aside>
+  <div class="layers">
+    <section class="band think"><h4>Think <small>once</small></h4><div class="cells">
+      <div class="cell path"><span class="n">1</span><img src="media/icon-md.png" alt=""><span>release.goal.md<br><small>the goal, in words</small></span> <details class="fragment-plain"><summary>The goal, in words (release.goal.md)</summary><pre><code>Release a pull request to Dev once it can be merged and its build passes its smoke test.
+
+- Open pull request {pull} of {owner}/{repo} `as pr`
+- At {watcher}, ask to be told when {pr} offers scm:merge `as watch`
+- Once {watch} is answered, at {pr}, merge it by squashing `as merged`
+- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`
+- Once {build} is answered, follow its in-reply-to link to the build `as built`
+  - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`
+- If {smoke.passed}, at {dev}, open environment {environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed `as promotion`
+  Otherwise, at {pr}, act scm:comment with body = &quot;Not promoted to Dev: smoke scenarios {smoke.failed} failed.&quot;</code></pre></details></div>
+      <div class="cell path"><span class="n">2</span><img src="media/icon-claude.png" alt=""><span>Claude captures<br><small>20 calls, once</small></span></div>
+      <div class="cell path"><span class="n">3</span><img src="media/icon-yaml.png" alt=""><span><b>kept YAML + pins</b></span> <details class="fragment-plain"><summary>The kept script (release.heart.yaml)</summary><pre><code>steps:
+  - act: scm:pulls-get
+    fields:
+      owner: ${owner}
+      repo: ${repo}
+      pull_number: ${pull}
+    intent: Open pull request ${pull} of ${owner}/${repo}
+    then:
+      - keep-as: pr
+  - enter: ${watcher}
+    steps:
+      - ask: watcher:watch
+        fields:
+          resource: ${pr.@self}
+          offers: scm:merge
+        reply: watch
+  - once-answered:
+      reply: watch
+      steps:
+        - enter: ${pr.@self}
+          steps:
+            - act: scm:merge
+              fields:
+                method: squash
+              intent: merge it by squashing
+              then:
+                - check:
+                    - field: state
+                      is: closed
+                    - field: merged
+                      is: true
+                    - field: mergeable_state
+                      is: unknown
+                - keep-as: merged
+  - enter: ${jenkins}
+    steps:
+      - ask: ci:build
+        fields:
+          commit: ${merged.merge_commit_sha}
+        reply: build
+  - once-answered:
+      reply: build
+      steps:
+        - follow: hr:in-reply-to
+          intent: follow its in-reply-to link to the build
+          then:
+            - run-script: ci:smoke-test
+              on-link: ci:deployment
+              inputs:
+                book: ${book}
+                author: ${author}
+                renewable: ${renewable}
+                problem: ${problem}
+                comment: ${comment}
+              as: smoke
+  - given:
+      - at: smoke
+        field: passed
+        is: true
+    then:
+      - enter: ${dev}
+        steps:
+          - act: env:get-environment
+            fields:
+              id: ${environment}
+            inferred: get environment ${environment}
+            from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
+            then:
+              - act: env:promote
+                fields:
+                  commit: ${merged.merge_commit_sha}
+                  smoke: # review: the reasoner chose it, asked &quot;promote commit 30a0fa96e3eed2ae20b2b5fa7613a115d56312a3, citing 5 of 5 scenarios passed&quot;
+                    passed: ${smoke.passing}
+                    of: ${smoke.of}
+                intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
+                then:
+                  - check:
+                      - field: commit
+                        is: ${merged.merge_commit_sha}
+    otherwise:
+      - at: ${pr.@self}
+        steps:
+          - act: scm:comment
+            fields:
+              body: &quot;Not promoted to Dev: smoke scenarios ${smoke.failed} failed.&quot;</code></pre></details> <details class="fragment-plain"><summary>The pins (release.pins.yaml)</summary><pre><code># What /Users/josh/repos/artie/exhibits/merge-watch-release/release.heart.yaml was recorded against, from /Users/josh/repos/artie/exhibits/merge-watch-release/release.capture.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its
+# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
+# one offered in a set not recorded for it.
+rung: L2
+digest: sha256-qKM7TXJvTtzvI3H416WCa/y5oYK6wvYch4GhbwCLhKc=
+forms:
+  scm:pulls-get:
+    integrity: sha256-h02WjR7vd61a3clH1/805IIXM3O8OwspKt3KHwUP7/s=
+    act: sha256-0vjYAyfZzEdAjZBvXTUMge5qmujg/1tlkot9bnCWtaI=
+    method: GET
+    sets:
+      - sha256-gImH34GdmXPjwBtQ7RNGKro/Tbf26SFredj/E+jK13c=
+  watcher:watch:
+    integrity: sha256-vfjsEUQ7/+mWV478GxTnnHzzo8rZLb+s3eHW4KJhRFw=
+    act: sha256-BQiZ8TwYquT9Wgp2yiw4eEIqY3c9/0IwgvhuCvV1KHg=
+    method: POST
+    sets:
+      - sha256-T8prIv6TSqXSB9HdposRpsV8AYFUzfYEqiUvr32dX10=
+  scm:merge:
+    integrity: sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pweUa6ioBBwF8=
+    act: sha256-s8/h0c399Nx7AL340i09iHi9+s/nSZ9R+q5MfjgiYUY=
+    method: PUT
+    sets:
+      - sha256-ARE/YVgALeTnzANV8TegQJiue3vljZt3onMex+jMsvs=
+  ci:build:
+    integrity: sha256-xo3vNZ/YJwDkXNstjxyOUmQHZdWN8PojyD9Ub3KzHGQ=
+    act: sha256-9MVTORRjzrcFoMzlwiQWRmnUPVD+jk4sNjjyGG2m4fI=
+    method: POST
+    sets:
+      - sha256-Uv4wXjFFrnajvow8ez6LM8naU0uFYIKuRdyKs4IQA3A=
+  library:search-loans:
+    integrity: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+    act: sha256-Z7N30vs6QUGs1xK2hP+w1F0UgY7gyXs1+HawMkOt274=
+    method: GET
+    sets:
+      - sha256-OO1MlqifBoCG+V9lYByf83cmOoCUf75taO/frDYwjWE=
+  library:renew:
+    integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+    act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    method: POST
+    sets:
+      - sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU=
+  library:report-problem:
+    integrity: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+    act: sha256-Z+8E81vIjCh35uyOKsoSwVMDm2eCmJBVEcbO6oI3uD8=
+    method: POST
+    sets:
+      - sha256-04lPGu1h4kV3Ra9udmDg1UCTzHfqn47zOSXw6TDIKOQ=
+  env:get-environment:
+    integrity: sha256-UWb+xXKngRFe8ibTwO9SrpSUYNPBbji/5JjlwpAEKfQ=
+    act: sha256-myRjFFxsNF8ai44N4fdXgWOPGB3uRptbwrCqaA8yp6s=
+    method: GET
+    sets:
+      - sha256-sy8+OSs554Ilw4WUAs9A0ywntG59u2PLanv0jt/pId4=
+  env:promote:
+    integrity: sha256-TwXThZ20UPUIctrpRXRoHqarKKsEilvB0sVwvK1PY4s=
+    act: sha256-uhGb8WNCB9bBSTcSnGDncK5OOgbvor2iNrT+IZvrEFA=
+    method: POST
+    sets:
+      - sha256-Uk7KIVDEyuxx08fE2x1gvp0hjkFhpH/7gyFyP7k3Vb8=
+links:
+  hr:in-reply-to: ''
+  item: ''</code></pre></details></div>
+    </div><p class="tags"><a class="ref-plain" href="https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture">Hightower · ZTA</a></p></section>
+    <section class="band look"><h4>Look · Act <small>0 tokens a replay</small></h4><div class="cells">
+      <div class="cell"><img src="media/icon-globe.png" alt="">browser</div>
+      <div class="cell mono"><img src="media/icon-ts.png" alt="">heart-ts</div>
+      <div class="cell mono"><img src="media/icon-mcp.png" alt="">heart-mcp</div>
+      <div class="cell path hub"><span class="n">4</span><img src="media/icon-compass.png" alt=""><b>ARTIE</b></div>
+    </div><p class="caption">generic clients: pin check · If-Match · signed · L2 cache</p></section>
+    <section class="band wire"><h4>The wire <small>one media type</small></h4><div class="cells">
+      <div class="cell"><img src="media/icon-heart.png" alt=""><b>HEART = HAL + HAL Schema Forms</b></div>
+      <div class="cell"><img src="media/icon-layers.png" alt="">L0 · L1 · L2</div>
+      <div class="cell mono"><img src="media/icon-git.png" alt="">scm: relations</div>
+      <div class="cell mono"><img src="media/icon-info.png" alt="">hr:unavailable</div>
+    </div><p class="caption"><span class="rise">RISE, dotted blue:</span> watch now, be told later · <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">Fielding · enter by bookmark</a></p></section>
+    <section class="band ours"><h4>Our controls <small>in front of theirs</small></h4><div class="cells">
+      <div class="cell"><img src="media/icon-toggle.png" alt="">state-scoped acts</div>
+      <div class="cell mono"><img src="media/icon-slash.png" alt="">412·409·405</div>
+      <div class="cell rise-from"><img src="media/icon-bell.png" alt=""><b>watcher</b></div>
+      <div class="cell path hub"><span class="n">5</span><img src="media/icon-shield.png" alt=""><span><b>gateway</b><br><small>YAML connectors</small></span></div>
+    </div><p class="caption">acts offered only when the state allows; refusals explained · runs on your laptop, in front of GitHub</p></section>
+    <section class="band theirs"><h4>Theirs <small>native APIs</small></h4><div class="cells">
+      <div class="cell dim"><img src="media/icon-aws.png" alt="">preview</div>
+      <div class="cell path"><img src="media/icon-server.png" alt="">Dev</div>
+      <div class="cell path rise-from"><img src="media/icon-jenkins.png" alt="">Jenkins</div><span class="smoke">smoke script, linked</span>
+      <div class="scm path"><p><code>scm:</code> one set of typed relations, two forges</p>
+        <div class="cell path"><img src="media/icon-gitlab.png" alt="">GitLab <details class="fragment-plain"><summary>scm:merge on GitLab: the gateway's connector</summary><pre><code>merge:
+  operation: pulls/merge
+  title: Merge
+  description: Merge the pull request into its target branch.
+  fields: [merge_commit_message]
+  # scm's method, as GitHub's merge takes it; GitLab squashes or not, and merges with a merge commit either way.
+  inputs:
+    method:
+      type: string
+      enum: [merge, squash]
+      title: Merge method
+      description: The merge method to use.
+  values:
+    method:
+      merge: { squash: false }
+      squash: { squash: true }
+  # GitLab merges only if the source branch's head is still at this sha: the head the client's view had.
+  bind: { sha: /sha }
+  # GitLab's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.
+  stale: 409
+  refused: 405</code></pre></details></div>
+        <div class="cell hub"><span class="n">6</span><img src="media/icon-github.png" alt=""><b>GitHub</b> <details class="fragment-plain"><summary>scm:merge on GitHub: the gateway's connector</summary><pre><code>merge:
+  operation: pulls/merge
+  title: Merge
+  description: Merge the pull request into its base branch.
+  fields: [commit_title, commit_message]
+  # scm's method, as GitHub's merge_method takes it.
+  inputs:
+    method:
+      type: string
+      enum: [merge, squash, rebase]
+      title: Merge method
+      description: The merge method to use.
+  values:
+    method:
+      merge: { merge_method: merge }
+      squash: { merge_method: squash }
+      rebase: { merge_method: rebase }
+  # GitHub merges only if the head is still at this sha: the head the client's view had.
+  bind: { sha: /head/sha }
+  # GitHub's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.
+  stale: 409
+  refused: 405</code></pre></details></div>
+      </div>
+    </div></section>
+  </div>
+  <aside class="rail nums">
+    <h4>Capture <small>once · Claude · real GitHub</small></h4>
+    <dl><dt>20</dt><dd>model calls</dd><dt>36k</dt><dd>tokens: 33,140 in, 2,980 out</dd></dl>
+    <h4>Replay <small>each release after · no model</small></h4>
+    <dl><dt>0</dt><dd>model calls, tokens</dd></dl>
+    <table><caption>per 100 releases, L2 cache</caption><tr><th></th><th>GitHub</th><th>local GitLab</th></tr>
+      <tr><td>requests never sent</td><td>5,069</td><td>3,985</td></tr><tr><td>bytes never received</td><td>3.4 MB</td><td>3.8 MB</td></tr></table>
+    <h4>Instead of <small>an agent with no hypermedia</small></h4>
+    <dl class="rust"><dt>13.5 MB</dt><dd>GitHub’s OpenAPI, read up front</dd></dl>
+  </aside>
+  <p class="legend"><span class="gold-line"></span><b>The gold path is hypermedia as the engine of application state:</b> every step is a control the last answer offered. Nothing is built from a manual.</p>
+  <p class="legend repair"><span class="n red">7</span>A form changed? The replay stops, the model repairs at ② (the capture), then it’s zero tokens again.</p>
+  <div class="rest">
+    <h4>REST <small>Fielding’s dissertation, 2000</small></h4>
+    <a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_2">client–server</a>
+    <a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_3">stateless</a>
+    <a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_4">cache ▲ L2</a>
+    <div class="uniform"><p><a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_5">uniform interface</a> its four constraints</p>
+      <span>identification of resources</span><span>manipulation of resources through representations</span><span>self-descriptive messages</span><a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_5">HATEOAS ▲ the gold path</a></div>
+    <a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_6">layered system ▲ gateway</a>
+    <span class="optional"><a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_7">code on demand ▲ smoke link</a><small>optional</small></span>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/gate-says-no.html" rel="prev"><small>Back</small><b>The gates hold, even against the model</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#map-end">with heart-ts</a></span>
+<a href="deck/close.html" rel="next"><small>Next</small><b>The Web gave us the model. Hypertext and hooks let us stop paying it for the same path twice.</b></a></nav>
+</main></div></body></html>

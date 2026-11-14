@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>After the merge: the server changed, the client didn’t · How far can one vision go · 2.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Building it back up · Step 5 of 5 · HEART L0, simplified</span></header>
+<h2>After the merge: the server changed, the client didn’t</h2>
+<div class="split" style="grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr)">
+  <pre># GET …/pulls/2325, after scm:merge
+<span class="add">ETag: "seq-0.hsf.L0.ed4a2f1e1ab3f687"</span>
+number: 2325
+state: closed
+merged: true
+mergeable_state: unknown
+<b>_forms:</b>
+  scm:comment: {…}
+  scm:label: {…}
+  scm:edit: {…}
+# gone: scm:merge, scm:close, scm:reopen,
+#       scm:request-review, scm:update-branch</pre>
+  <div class="rows">
+    <pre># GET /unavailable/d0a0136ee8d4d2bb  (as served)
+unavailable:
+  - title: Close
+    reason: The pull request is already closed.
+  - title: Reopen
+    reason: A merged pull request can't be reopened.
+  - title: Merge
+    reason: A closed pull request can't be merged;
+            reopen it first.
+  - title: Request a review
+    reason: A closed pull request can't have reviews requested;
+            reopen it first.
+  - title: Update the branch
+    reason: A closed pull request's branch isn't updated;
+            reopen it first.
+# each also has rel: /profiles/scm#close, #reopen, …</pre>
+    <p class="punch">7 forms open, 3 merged. ARTIE needed no new code: it reads what’s offered, as a browser does.</p>
+    <p class="refs"><a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-720">“Think of it in terms of the Web”</a> <details class="fragment-plain"><summary>Where the reasons come from (github-scm/pull.reader.yaml)</summary><pre><code># A pull request says nothing about what is allowed, so the rules are written here:
+# first by its state, then by the rules below, in order, each with its reason.
+matches:
+  path: /repos/{owner}/{repo}/pulls/{pull_number}
+allowed:
+  table: /state
+  rows:
+    open:
+      allow: [close, merge, edit, request-review, update-branch, comment, label]
+      absent: { reopen: The pull request is already open. }
+    closed:
+      allow: [reopen, edit, comment, label]
+      absent:
+        close: The pull request is already closed.
+        merge: &quot;A closed pull request can't be merged; reopen it first.&quot;
+        request-review: &quot;A closed pull request can't have reviews requested; reopen it first.&quot;
+        update-branch: &quot;A closed pull request's branch isn't updated; reopen it first.&quot;
+  rules:
+    # The repository's own answer says whether the caller may push (the fact named in pull.resource.yaml).
+    - when: { &quot;repository:/permissions/push&quot;: false }
+      absent:
+        close: You can't push to this repository.
+        reopen: You can't push to this repository.
+        merge: You can't push to this repository.
+        edit: You can't push to this repository.
+        request-review: You can't push to this repository.
+        update-branch: You can't push to this repository.
+    # Labels are triage's, as on an issue.
+    - when: { &quot;repository:/permissions/triage&quot;: false }
+      absent: { label: You need triage access to this repository. }
+    # A locked conversation takes comments only from collaborators with push access, as an issue's does.
+    - when: { /locked: true, &quot;repository:/permissions/push&quot;: false }
+      absent: { comment: The conversation is locked; only collaborators can comment. }
+    - when: { /merged: true }
+      absent: { reopen: A merged pull request can't be reopened. }
+    - when: { /draft: true }
+      absent: { merge: &quot;A draft can't be merged; mark it ready for review first.&quot; }
+    # GitHub works mergeability out in the background; until it has, mergeable is null.
+    - when: { /mergeable: null }
+      absent: { merge: &quot;GitHub is still checking whether it can be merged; read it again shortly.&quot; }
+    # GitHub says behind only when the base's protection asks for up-to-date branches and names a required
+    # check; with none required, a branch behind its base is clean (seen live, 2026-10-16).
+    - when: { /mergeable_state: behind }
+      absent: { merge: &quot;The branch is behind its base; update it first.&quot; }
+    # Without that protection, the gateway's own rule: GitHub's compare says the base has commits the branch lacks.
+    - when: { /state: open, &quot;compare:/behind_by&quot;: { not: 0 } }
+      absent: { merge: &quot;The branch is behind its base; update it first.&quot; }
+    - when: { /mergeable_state: dirty }
+      absent:
+        merge: &quot;The branch has conflicts with its base; resolve them first.&quot;
+        update-branch: &quot;The branch has conflicts with its base; resolve them first.&quot;
+    - when: { /mergeable_state: blocked }
+      absent: { merge: &quot;Branch protection blocks the merge: a required check or review is missing.&quot; }</code></pre></details></p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/step-4-guards.html" rel="prev"><small>Back</small><b>Guards, and why the other acts are absent</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#step-5-after-merge">with heart-ts</a></span>
+<a href="deck/release-desk-jenkins.html" rel="next"><small>Next</small><b>The release desk, and Jenkins, for real</b></a></nav>
+</main></div></body></html>

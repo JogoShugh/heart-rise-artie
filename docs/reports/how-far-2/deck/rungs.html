@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L0, L1, L2: one page, three ways to deliver it · How far can one vision go · 2.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">“But isn’t hypermedia bloated?”</span></header>
+<h2>L0, L1, L2: one page, three ways to deliver it</h2>
+<div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr)">
+  <div class="rows">
+    <p class="lead"><i>Like a page with its CSS and JavaScript inlined, or linked and cached.</i></p>
+    <div style="display: flex; gap: 1rem; align-items: flex-start"><span style="flex: none; background: var(--leaf); color: var(--bg, #fff); border-radius: 999px; padding: 0.45rem 1.2rem; font: 700 1rem var(--body); align-self: start">L0</span><div><h3 style="margin: 0; font: 650 1.15rem/1.3 var(--body); text-transform: none; letter-spacing: 0; color: var(--fg)">State, forms and schemas in one answer</h3><p style="margin: 0.3rem 0 0; color: var(--muted)">Simple and correct: like a page with everything inlined.</p></div></div>
+    <div style="display: flex; gap: 1rem; align-items: flex-start"><span style="flex: none; background: var(--leaf); color: var(--bg, #fff); border-radius: 999px; padding: 0.45rem 1.2rem; font: 700 1rem var(--body); align-self: start">L1</span><div><h3 style="margin: 0; font: 650 1.15rem/1.3 var(--body); text-transform: none; letter-spacing: 0; color: var(--fg)">Prefer: forms=link</h3><p style="margin: 0.3rem 0 0; color: var(--muted)">The form set is its own content-addressed link, cached.</p></div></div>
+    <div style="display: flex; gap: 1rem; align-items: flex-start"><span style="flex: none; background: var(--leaf); color: var(--bg, #fff); border-radius: 999px; padding: 0.45rem 1.2rem; font: 700 1rem var(--body); align-self: start">L2</span><div><h3 style="margin: 0; font: 650 1.15rem/1.3 var(--body); text-transform: none; letter-spacing: 0; color: var(--fg)">Prefer: forms=link, schema=link</h3><p style="margin: 0.3rem 0 0; color: var(--muted)">Schemas linked too: immutable, shared across forms, states and resources.</p></div></div>
+    <p class="punch">“L0 buys correctness, L2 buys economy.” HTTP caching does the scaling, as it always has on the Web.</p>
+    <p class="refs"><a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_4">Cache</a></p>
+  </div>
+  <div class="rows">
+    <table>
+      <thead><tr><th>Requests on the network, per release</th><th>1st</th><th>2nd</th><th>3rd</th><th>4th</th><th>5th</th></tr></thead>
+      <tbody>
+        <tr><td>L0</td><td>59</td><td>59</td><td>59</td><td>56</td><td>59</td></tr>
+        <tr><td>L2, a fresh cache each release</td><td>112</td><td>112</td><td>111</td><td>106</td><td>112</td></tr>
+        <tr><td style="color: var(--leaf); font-weight: bold">L2, one cache kept</td><td>112</td><td style="color: var(--leaf); font-weight: bold">61</td><td style="color: var(--leaf); font-weight: bold">59</td><td style="color: var(--leaf); font-weight: bold">58</td><td style="color: var(--leaf); font-weight: bold">59</td></tr>
+      </tbody>
+    </table>
+    <p class="cite"><i>Real GitHub, five releases, no model calls. A warm release sends about 53 fewer requests: the form sets and schemas never leave ARTIE’s memory.</i></p>
+    <div class="stats" style="grid-template-columns: 1fr 1fr">
+      <div class="stat"><b>5,069</b><span>requests never sent over 100 releases on GitHub (3,985 on GitLab)</span></div>
+      <div class="stat"><b>3.4 MB</b><span>not received over those 100 on GitHub, 23% (GitLab: 3.8 MB, 59%)</span></div>
+    </div>
+    <p class="cite">Bytes: JSON bodies before compression, headers excluded. Extrapolated from the measured warm release.</p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/aws-l2.html" rel="prev"><small>Back</small><b>L2: schemas linked too, and shared everywhere</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#rungs">with heart-ts</a></span>
+<a href="deck/two-real-services.html" rel="next"><small>Next</small><b>Now two real services, built to agree on nothing</b></a></nav>
+</main></div></body></html>

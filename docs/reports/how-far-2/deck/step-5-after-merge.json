@@ -1,0 +1,98 @@
+{
+  "name": "step-5-after-merge",
+  "title": "After the merge: the server changed, the client didn’t",
+  "part": "For real: two forges, one vocabulary",
+  "kicker": "Building it back up · Step 5 of 5 · HEART L0, simplified",
+  "tone": "light",
+  "number": 36,
+  "of": 53,
+  "html": "<h2>After the merge: the server changed, the client didn’t</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr)\">\n  <pre># GET …/pulls/2325, after scm:merge\n<span class=\"add\">ETag: \"seq-0.hsf.L0.ed4a2f1e1ab3f687\"</span>\nnumber: 2325\nstate: closed\nmerged: true\nmergeable_state: unknown\n<b>_forms:</b>\n  scm:comment: {…}\n  scm:label: {…}\n  scm:edit: {…}\n# gone: scm:merge, scm:close, scm:reopen,\n#       scm:request-review, scm:update-branch</pre>\n  <div class=\"rows\">\n    <pre># GET /unavailable/d0a0136ee8d4d2bb  (as served)\nunavailable:\n  - title: Close\n    reason: The pull request is already closed.\n  - title: Reopen\n    reason: A merged pull request can't be reopened.\n  - title: Merge\n    reason: A closed pull request can't be merged;\n            reopen it first.\n  - title: Request a review\n    reason: A closed pull request can't have reviews requested;\n            reopen it first.\n  - title: Update the branch\n    reason: A closed pull request's branch isn't updated;\n            reopen it first.\n# each also has rel: /profiles/scm#close, #reopen, …</pre>\n    <p class=\"punch\">7 forms open, 3 merged. ARTIE needed no new code: it reads what’s offered, as a browser does.</p>\n    <p class=\"refs\"><deck-ref name=\"think-of-the-web\"></deck-ref> <deck-fragment name=\"reader\">pull.reader.yaml</deck-fragment></p>\n  </div>\n</div>\n",
+  "say": "The same pull request, read after scm:merge. The state changed, so the forms changed: three left, comment, label and edit. merge, close and reopen are gone, each with its reason. ARTIE needed no new code to know; it read what's offered. The ETag changed too, so any act still holding the old one gets 412.",
+  "sources": [
+    {
+      "label": "artie: github-scm/pull.reader.yaml",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    },
+    {
+      "label": "Fielding (2008)",
+      "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "step-5-after-merge.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "step-4-guards.json",
+      "title": "Guards, and why the other acts are absent"
+    },
+    "next": {
+      "href": "release-desk-jenkins.json",
+      "title": "The release desk, and Jenkins, for real"
+    },
+    "alternate": {
+      "href": "step-5-after-merge.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "think-of-the-web",
+        "kind": "comment",
+        "label": "“Think of it in terms of the Web”",
+        "title": "Browsers don't know resource types",
+        "summary": "A browser knows the links and forms, not whether it's a bank or a wiki. Typed relations guide automated agents.",
+        "quote": "<p>“A truly RESTful API looks like hypertext. Every addressable unit of information carries an address, either explicitly (e.g., link and id attributes) or implicitly (e.g., derived from the media type definition and representation structure). Query results are represented by a list of links with summary information, not by arrays of object representations (query is not a substitute for identification of resources). Resource representations are self-descriptive: the client does not need to know if a resource is OpenSocialist because it is just acting on the representations received.</p><p>Think of it in terms of the Web. How many Web browsers are aware of the distinction between an online-banking resource and a Wiki resource? None of them. They don’t need to be aware of the resource types. What they need to be aware of is the potential state transitions — the links and forms — and what semantics/actions are implied by traversing those links. A browser represents them as distinct UI controls so that a user can see potential transitions and anticipate the effect of chosen actions. A spider can follow them to the extent that the relationships are known to be safe. Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/think-of-the-web.json",
+            "title": "“Think of it in terms of the Web”"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-720",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      }
+    ],
+    "deck:fragment": [
+      {
+        "name": "reader",
+        "label": "Where the reasons come from (github-scm/pull.reader.yaml)",
+        "lang": "yaml",
+        "path": "heart/heart-gateway/connectors/github-scm/pull.reader.yaml",
+        "lines": "1–53",
+        "of": 53,
+        "text": "# A pull request says nothing about what is allowed, so the rules are written here:\n# first by its state, then by the rules below, in order, each with its reason.\nmatches:\n  path: /repos/{owner}/{repo}/pulls/{pull_number}\nallowed:\n  table: /state\n  rows:\n    open:\n      allow: [close, merge, edit, request-review, update-branch, comment, label]\n      absent: { reopen: The pull request is already open. }\n    closed:\n      allow: [reopen, edit, comment, label]\n      absent:\n        close: The pull request is already closed.\n        merge: \"A closed pull request can't be merged; reopen it first.\"\n        request-review: \"A closed pull request can't have reviews requested; reopen it first.\"\n        update-branch: \"A closed pull request's branch isn't updated; reopen it first.\"\n  rules:\n    # The repository's own answer says whether the caller may push (the fact named in pull.resource.yaml).\n    - when: { \"repository:/permissions/push\": false }\n      absent:\n        close: You can't push to this repository.\n        reopen: You can't push to this repository.\n        merge: You can't push to this repository.\n        edit: You can't push to this repository.\n        request-review: You can't push to this repository.\n        update-branch: You can't push to this repository.\n    # Labels are triage's, as on an issue.\n    - when: { \"repository:/permissions/triage\": false }\n      absent: { label: You need triage access to this repository. }\n    # A locked conversation takes comments only from collaborators with push access, as an issue's does.\n    - when: { /locked: true, \"repository:/permissions/push\": false }\n      absent: { comment: The conversation is locked; only collaborators can comment. }\n    - when: { /merged: true }\n      absent: { reopen: A merged pull request can't be reopened. }\n    - when: { /draft: true }\n      absent: { merge: \"A draft can't be merged; mark it ready for review first.\" }\n    # GitHub works mergeability out in the background; until it has, mergeable is null.\n    - when: { /mergeable: null }\n      absent: { merge: \"GitHub is still checking whether it can be merged; read it again shortly.\" }\n    # GitHub says behind only when the base's protection asks for up-to-date branches and names a required\n    # check; with none required, a branch behind its base is clean (seen live, 2026-10-16).\n    - when: { /mergeable_state: behind }\n      absent: { merge: \"The branch is behind its base; update it first.\" }\n    # Without that protection, the gateway's own rule: GitHub's compare says the base has commits the branch lacks.\n    - when: { /state: open, \"compare:/behind_by\": { not: 0 } }\n      absent: { merge: \"The branch is behind its base; update it first.\" }\n    - when: { /mergeable_state: dirty }\n      absent:\n        merge: \"The branch has conflicts with its base; resolve them first.\"\n        update-branch: \"The branch has conflicts with its base; resolve them first.\"\n    - when: { /mergeable_state: blocked }\n      absent: { merge: \"Branch protection blocks the merge: a required check or review is missing.\" }",
+        "_links": {
+          "self": {
+            "href": "fragments/step-5-after-merge--reader.json",
+            "title": "Where the reasons come from (github-scm/pull.reader.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-gateway/connectors/github-scm/pull.reader.yaml",
+            "title": "heart/heart-gateway/connectors/github-scm/pull.reader.yaml, lines 1–53"
+          }
+        }
+      }
+    ]
+  }
+}

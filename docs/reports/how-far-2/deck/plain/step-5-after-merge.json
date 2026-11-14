@@ -1,0 +1,21 @@
+{
+  "name": "step-5-after-merge",
+  "title": "After the merge: the server changed, the client didn’t",
+  "part": "For real: two forges, one vocabulary",
+  "kicker": "Building it back up · Step 5 of 5 · HEART L0, simplified",
+  "tone": "light",
+  "number": 36,
+  "of": 53,
+  "html": "<h2>After the merge: the server changed, the client didn’t</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr)\">\n  <pre># GET …/pulls/2325, after scm:merge\n<span class=\"add\">ETag: \"seq-0.hsf.L0.ed4a2f1e1ab3f687\"</span>\nnumber: 2325\nstate: closed\nmerged: true\nmergeable_state: unknown\n<b>_forms:</b>\n  scm:comment: {…}\n  scm:label: {…}\n  scm:edit: {…}\n# gone: scm:merge, scm:close, scm:reopen,\n#       scm:request-review, scm:update-branch</pre>\n  <div class=\"rows\">\n    <pre># GET /unavailable/d0a0136ee8d4d2bb  (as served)\nunavailable:\n  - title: Close\n    reason: The pull request is already closed.\n  - title: Reopen\n    reason: A merged pull request can't be reopened.\n  - title: Merge\n    reason: A closed pull request can't be merged;\n            reopen it first.\n  - title: Request a review\n    reason: A closed pull request can't have reviews requested;\n            reopen it first.\n  - title: Update the branch\n    reason: A closed pull request's branch isn't updated;\n            reopen it first.\n# each also has rel: /profiles/scm#close, #reopen, …</pre>\n    <p class=\"punch\">7 forms open, 3 merged. ARTIE needed no new code: it reads what’s offered, as a browser does.</p>\n    <p class=\"refs\"><deck-ref name=\"think-of-the-web\"></deck-ref> <deck-fragment name=\"reader\">pull.reader.yaml</deck-fragment></p>\n  </div>\n</div>\n",
+  "say": "The same pull request, read after scm:merge. The state changed, so the forms changed: three left, comment, label and edit. merge, close and reopen are gone, each with its reason. ARTIE needed no new code to know; it read what's offered. The ETag changed too, so any act still holding the old one gets 412.",
+  "sources": [
+    {
+      "label": "artie: github-scm/pull.reader.yaml",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    },
+    {
+      "label": "Fielding (2008)",
+      "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"
+    }
+  ]
+}

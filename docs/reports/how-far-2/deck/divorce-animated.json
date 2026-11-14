@@ -1,0 +1,131 @@
+{
+  "name": "divorce-animated",
+  "title": "The divorce of information from controls",
+  "part": "What the machine web did",
+  "kicker": "The machine web",
+  "tone": "light",
+  "number": 10,
+  "of": 53,
+  "html": "<h2>The divorce of information from controls</h2>\n<div class=\"morph\" data-start=\"page\" data-cycles='[{\"to\": \"apart\", \"label\": \"The divorce\", \"head\": \"The divorce of information from controls\"}]'>\n  <div class=\"mo-stage\">\n    <section class=\"mo-scene\" data-scene=\"page\">\n      <div class=\"dv-browser\">\n        <div class=\"dv-url\">github.com/JogoShugh/heart-github-test/pull/2325</div>\n        <div class=\"dv-screen\">\n          <b class=\"dv-book\">Renewals: none during the audit</b>\n          <div class=\"dv-fields\">\n            <div class=\"tk tk-card\" data-token=\"number\"><small>Pull request</small><span>#2325</span></div>\n            <div class=\"tk tk-card\" data-token=\"state\"><small>State</small><span>Open</span></div>\n            <div class=\"tk tk-card\" data-token=\"branch\"><small>Wants to merge</small><span>library/pr-504 → library/main</span></div>\n            <div class=\"tk tk-card\" data-token=\"sha\"><small>Head</small><span>e266e3b</span></div>\n          </div>\n          <div class=\"dv-acts\">\n            <div class=\"tk tk-note\" data-token=\"why\">This branch has no conflicts with the base branch.</div>\n            <div class=\"tk tk-button\" data-token=\"merge\">Squash and merge</div>\n            <div class=\"dv-dialog\">\n              <span class=\"dv-field\">Merge method</span>\n              <div class=\"tk tk-select\" data-token=\"method\">Create a merge commit · Squash and merge · Rebase and merge</div>\n              <span class=\"dv-field\">Comment</span>\n              <div class=\"tk tk-text\" data-token=\"comment\">Leave a comment</div>\n            </div>\n            <div class=\"tk tk-button\" data-token=\"close\">Close pull request</div>\n          </div>\n        </div>\n      </div>\n      <p class=\"mo-cap\">GitHub’s own page for one pull request: what it is, on the left; what you can do with it now, on the right, with the reason merging is allowed.</p>\n    </section>\n    <section class=\"mo-scene\" data-scene=\"apart\">\n      <div class=\"dv-apart\">\n        <div class=\"dv-doc\">\n          <span class=\"dv-label\">Information · GET /repos/…/pulls/2325 · application/json</span>\n          <div class=\"dv-code\">\n            <span>{</span>\n            <span class=\"tk tk-line tk-info i1\" data-token=\"number\">\"number\": 2325,</span>\n            <span class=\"i1\">\"title\": \"Renewals: none during the audit\",</span>\n            <span class=\"tk tk-line tk-info i1\" data-token=\"state\">\"state\": \"open\",</span>\n            <span class=\"tk tk-line tk-info i1\" data-token=\"branch\">\"head\": {\"ref\": \"library/pr-504\"}, \"base\": {\"ref\": \"library/main\"},</span>\n            <span class=\"tk tk-line tk-info i1\" data-token=\"sha\">\"sha\": \"e266e3b53e0e04204c4f8eff6b14208ba53aafea\",</span>\n            <span class=\"i1\">\"mergeable_state\": \"clean\"</span>\n            <span>}</span>\n          </div>\n        </div>\n        <p class=\"dv-gap\"><span>The client joins them, and learns the rules from a 405 and a 409</span></p>\n        <div class=\"dv-doc\">\n          <span class=\"dv-label\">Controls · api.github.com.json · 13.5 MB · every pull request alike</span>\n          <span class=\"dv-bag\"><b>13.5 MB</b> one file, every operation, every state</span>\n          <div class=\"dv-code\">\n            <span>paths:</span>\n            <span class=\"tk tk-line tk-ctl i1\" data-token=\"merge\">/repos/{owner}/{repo}/pulls/{pull_number}/merge:</span>\n            <span class=\"i2\">put:</span>\n            <span class=\"tk tk-line tk-ctl i3\" data-token=\"method\">merge_method: { enum: [merge, squash, rebase] }</span>\n            <span class=\"i3\">sha: { type: string }</span>\n            <span class=\"tk tk-line tk-said i3\" data-token=\"why\">405: not mergeable · 409: the head moved</span>\n            <span class=\"tk tk-line tk-ctl i1\" data-token=\"comment\">/repos/{owner}/{repo}/issues/{issue_number}/comments: post: body</span>\n            <span class=\"tk tk-line tk-ctl i1\" data-token=\"close\">/repos/{owner}/{repo}/pulls/{pull_number}: patch: state: { enum: [open, closed] }</span>\n            <span class=\"i1\">… and every other operation GitHub has, for every state</span>\n          </div>\n        </div>\n      </div>\n      <p class=\"mo-cap\">The machine web’s version of that page: the data in one answer, the controls in a 13.5 MB description beside it, the same whatever state the pull request is in. Whoever calls it joins the two.</p>\n    </section>\n  </div>\n</div>\n<p class=\"refs\"><deck-ref name=\"rule-3\"></deck-ref> <deck-ref name=\"rule-4\"></deck-ref> <deck-ref name=\"in-band\"></deck-ref></p>\n",
+  "say": "Here's a real pull request on GitHub's own page: what it is, and what you can do with it now, together. Squash and merge, because there are no conflicts. Comment. Close. Now watch what the machine web does with that same page. The information goes one way: JSON, the pull request's fields, and nothing about what you may do. The controls go the other: GitHub's OpenAPI description, 13.5 megabytes, the same for every pull request in every state. The merge button becomes a path and a method. The squash menu becomes an enum. 'No conflicts' becomes a 405 you find out about after you try. The client, or the agent, has to join them back together, every time. That's the divorce.",
+  "sources": [
+    {
+      "label": "GitHub REST: merge a pull request",
+      "href": "https://docs.github.com/en/rest/pulls/pulls#merge-a-pull-request"
+    },
+    {
+      "label": "GitHub REST: create an issue comment",
+      "href": "https://docs.github.com/en/rest/issues/comments#create-an-issue-comment"
+    },
+    {
+      "label": "GitHub OpenAPI description",
+      "href": "https://github.com/github/rest-api-description"
+    },
+    {
+      "label": "Overheard at Riverside: the divorce",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/overheard-at-riverside/#divorce"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "divorce-animated.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "web-made-llms.json",
+      "title": "The Web made LLMs possible, and only half of it"
+    },
+    "next": {
+      "href": "divorce.json",
+      "title": "The divorce: data in the response, controls elsewhere"
+    },
+    "alternate": {
+      "href": "divorce-animated.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ],
+    "deck:code": {
+      "href": "../code/morph.js",
+      "type": "text/javascript",
+      "title": "Animates the slide's stills, as its HTML says",
+      "integrity": "sha256-IKDnb60U0dRSd/LE4XomTkDVz+p/C6HP0DWA2rfLBmo="
+    }
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "rule-3",
+        "kind": "rule",
+        "label": "Rule 3 · Describe the media type",
+        "title": "Spend the effort on media types",
+        "summary": "In brief: describe media types and relations, not which methods go to which URIs. This is what HEART's spec is.",
+        "quote": "<p>“A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types. Any effort spent describing what methods to use on what URIs of interest should be entirely defined within the scope of the processing rules for a media type (and, in most cases, already defined by existing media types). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>",
+        "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/rule-3.json",
+            "title": "Rule 3 · Describe the media type"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+            "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "rule-4",
+        "kind": "rule",
+        "label": "Rule 4 · No fixed URIs",
+        "title": "No fixed resource names or hierarchies",
+        "summary": "In brief: the server owns its namespace and tells the client how to build addresses: forms, URI templates.",
+        "quote": "<p>“A REST API must not define fixed resource names or hierarchies (an obvious coupling of client and server). Servers must have the freedom to control their own namespace. Instead, allow servers to instruct clients on how to construct appropriate URIs, such as is done in HTML forms and URI templates, by defining those instructions within media types and link relations. [Failure here implies that clients are assuming a resource structure due to out-of band information, such as a domain-specific standard, which is the data-oriented equivalent to RPC’s functional coupling].”</p>",
+        "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/rule-4.json",
+            "title": "Rule 4 · No fixed URIs"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+            "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "in-band",
+        "kind": "comment",
+        "label": "“Provided in-band”",
+        "title": "Instructions in every representation",
+        "summary": "The media type is learned once; each representation carries the transitions available at that point.",
+        "quote": "<p>“The media type identifies a specification that defines how a representation is to be processed. That is out-of-band information (all communication is dependent on some prior knowledge). What you are missing is that each representation contains the specific instructions for interfacing with a given service, provided in-band. The media type is a generic processing model that every agent can learn if there aren’t too many of them (hence the need for standards). The representation is specific to the application being performed by the agent. Each representation therefore provides the transitions that are available at that point in the application.</p><p>When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "23 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/in-band.json",
+            "title": "“Provided in-band”"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      }
+    ]
+  }
+}

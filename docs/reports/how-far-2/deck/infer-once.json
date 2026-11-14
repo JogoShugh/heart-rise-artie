@@ -1,0 +1,216 @@
+{
+  "name": "infer-once",
+  "title": "When to think, and how “once” stays true",
+  "part": "Why now",
+  "kicker": "Infer once. Then what?",
+  "tone": "light",
+  "number": 3,
+  "of": 53,
+  "html": "<h2>When to think, and how “once” stays true</h2>\n<div class=\"split\">\n  <div class=\"card\">\n    <div class=\"step\"><h3>Hightower: when to think</h3><p>Once. Infer the task, then run it as plain, deterministic code. Zero tokens per run. <deck-ref name=\"zta\">ZTA</deck-ref></p></div>\n    <div class=\"step gap\"><h3>The gap</h3><p>“Everywhere” includes tomorrow. A script frozen against out-of-band URLs breaks, or pays tokens to re-learn.</p></div>\n    <div class=\"step\"><h3>Fielding: why it stays true</h3><p>Every answer carries its controls. The replay checks its act is still offered. That check is free.</p></div>\n    <p class=\"refs\"><deck-fragment name=\"goal\">goal</deck-fragment> <deck-fragment name=\"kept\">kept script</deck-fragment> <deck-fragment name=\"pins\">pins</deck-fragment></p>\n  </div>\n  <div class=\"card dark\" style=\"box-shadow: inset 0 0 0 1.5px rgba(227, 179, 65, 0.45);\">\n    <blockquote class=\"whole\">“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</blockquote>\n    <p class=\"cite\"><a href=\"https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven\" target=\"_blank\" rel=\"noopener\"><b>Roy T. Fielding</b></a>, “REST APIs must be hypertext-driven”, 20 Oct 2008</p>\n    <p class=\"refs\"><deck-ref name=\"rule-6\"></deck-ref> <deck-ref name=\"ai-driven\"></deck-ref> <deck-ref name=\"in-band\"></deck-ref> <deck-ref name=\"code-on-demand\"></deck-ref></p>\n  </div>\n</div>\n",
+  "say": "Infer once, run everywhere. But everywhere includes tomorrow, after the API changed. A script frozen against URLs and docs it learned out of band either breaks, or pays tokens to re-learn. Fielding wrote the answer down in 2008: enter with nothing but a bookmark and media types the client already understands, and from then on take every next step from the choices the server puts in the answer. Then a kept replay only has to check that the act it wants is still offered. That check costs no tokens. The model comes back only when the controls really changed, to repair. Hightower tells you to infer once; Fielding tells you how once stays true. The chips show the real thing: the goal in words, the script kept from one model run, and the pins it checks before every act.",
+  "sources": [
+    {
+      "label": "Fielding: REST APIs must be hypertext-driven (2008)",
+      "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"
+    },
+    {
+      "label": "Hightower: ZTA, Zero Token Architecture (talk)",
+      "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "infer-once.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "token-maxing.json",
+      "title": "From token maxing to tokenomics"
+    },
+    "next": {
+      "href": "map.json",
+      "title": "Think once. Look and act for free. Own the controls."
+    },
+    "alternate": {
+      "href": "infer-once.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "zta",
+        "kind": "talk",
+        "label": "Hightower · ZTA",
+        "title": "ZTA: Zero Token Architecture",
+        "summary": "Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. (In my words, from the talk's page and Daniel Cranney's write-up.)",
+        "quote": "<p>“You are all having way too much fun burning way too many tokens”</p><p class=\"note\">His opening line, as quoted in Daniel Cranney, <a href=\"https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture\">“Infer Once, Run Everywhere: Zero-Token Architecture”</a>, WeAreDevelopers, 13 October 2026.</p>",
+        "cite": "Kelsey Hightower, WeAreDevelopers World Congress North America",
+        "date": "26 September 2026",
+        "_links": {
+          "self": {
+            "href": "../refs/zta.json",
+            "title": "Hightower · ZTA"
+          },
+          "describedby": {
+            "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture",
+            "title": "Kelsey Hightower, WeAreDevelopers World Congress North America"
+          }
+        }
+      },
+      {
+        "name": "rule-6",
+        "kind": "rule",
+        "label": "Rule 6 · The bookmark",
+        "title": "Enter with a bookmark; follow what's offered",
+        "summary": "In brief: one URI and known media types to start; every next step chosen from what the server put in the answer.",
+        "quote": "<p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>",
+        "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/rule-6.json",
+            "title": "Rule 6 · The bookmark"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+            "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "ai-driven",
+        "kind": "comment",
+        "label": "“…or some sort of AI-driven”",
+        "title": "Instructions just before acting",
+        "summary": "A client that acts only on the instructions it just received doesn't need to know how the resource is built. 2008, and he named AI.",
+        "quote": "<p>“A distributed queue is an implementation choice. You can certainly implement some applications by having them interact with a queue-like resource in a RESTful manner. However, if your client relies on the resource being a queue, then it certainly isn’t a RESTful API. Do you see the difference? Encoding knowledge within clients and servers of the other side’s implementation mechanism is what we are trying to avoid.</p><p>If a client is receiving instructions on how to interact with a resource just before acting only on those instructions, then the client doesn’t care if the resource is a distributed queue. It simply doesn’t need to know how the resource is implemented. All it needs to know is the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of AI-driven.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "8 November 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/ai-driven.json",
+            "title": "“…or some sort of AI-driven”"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-842",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "in-band",
+        "kind": "comment",
+        "label": "“Provided in-band”",
+        "title": "Instructions in every representation",
+        "summary": "The media type is learned once; each representation carries the transitions available at that point.",
+        "quote": "<p>“The media type identifies a specification that defines how a representation is to be processed. That is out-of-band information (all communication is dependent on some prior knowledge). What you are missing is that each representation contains the specific instructions for interfacing with a given service, provided in-band. The media type is a generic processing model that every agent can learn if there aren’t too many of them (hence the need for standards). The representation is specific to the application being performed by the agent. Each representation therefore provides the transitions that are available at that point in the application.</p><p>When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "23 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/in-band.json",
+            "title": "“Provided in-band”"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "code-on-demand",
+        "kind": "constraint",
+        "label": "Code on demand (optional)",
+        "title": "Code-on-demand (§5.1.7)",
+        "summary": "Clients may be extended by code the server sends; optional, because it reduces visibility.",
+        "quote": "<p>“The final addition to our constraint set for REST comes from the code-on-demand style of Section 3.5.3 (Figure 5-8). REST allows client functionality to be extended by downloading and executing code in the form of applets or scripts. This simplifies clients by reducing the number of features required to be pre-implemented. Allowing features to be downloaded after deployment improves system extensibility. However, it also reduces visibility, and thus is only an optional constraint within REST.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.7",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/code-on-demand.json",
+            "title": "Code on demand (optional)"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_7",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.7"
+          }
+        }
+      }
+    ],
+    "deck:fragment": [
+      {
+        "name": "goal",
+        "label": "The goal, in words (release.goal.md)",
+        "lang": "markdown",
+        "path": "exhibits/merge-watch-release/release.goal.md",
+        "lines": "19–28",
+        "of": 28,
+        "text": "Release a pull request to Dev once it can be merged and its build passes its smoke test.\n\n- Open pull request {pull} of {owner}/{repo} `as pr`\n- At {watcher}, ask to be told when {pr} offers scm:merge `as watch`\n- Once {watch} is answered, at {pr}, merge it by squashing `as merged`\n- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`\n- Once {build} is answered, follow its in-reply-to link to the build `as built`\n  - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`\n- If {smoke.passed}, at {dev}, open environment {environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed `as promotion`\n  Otherwise, at {pr}, act scm:comment with body = \"Not promoted to Dev: smoke scenarios {smoke.failed} failed.\"",
+        "_links": {
+          "self": {
+            "href": "fragments/infer-once--goal.json",
+            "title": "The goal, in words (release.goal.md)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.goal.md#L19-L28",
+            "title": "exhibits/merge-watch-release/release.goal.md, lines 19–28"
+          }
+        }
+      },
+      {
+        "name": "kept",
+        "label": "The kept script, from one model run (release.heart.yaml)",
+        "lang": "yaml",
+        "path": "exhibits/merge-watch-release/release.heart.yaml",
+        "lines": "41–125",
+        "of": 125,
+        "text": "steps:\n  - act: scm:pulls-get\n    fields:\n      owner: ${owner}\n      repo: ${repo}\n      pull_number: ${pull}\n    intent: Open pull request ${pull} of ${owner}/${repo}\n    then:\n      - keep-as: pr\n  - enter: ${watcher}\n    steps:\n      - ask: watcher:watch\n        fields:\n          resource: ${pr.@self}\n          offers: scm:merge\n        reply: watch\n  - once-answered:\n      reply: watch\n      steps:\n        - enter: ${pr.@self}\n          steps:\n            - act: scm:merge\n              fields:\n                method: squash\n              intent: merge it by squashing\n              then:\n                - check:\n                    - field: state\n                      is: closed\n                    - field: merged\n                      is: true\n                    - field: mergeable_state\n                      is: unknown\n                - keep-as: merged\n  - enter: ${jenkins}\n    steps:\n      - ask: ci:build\n        fields:\n          commit: ${merged.merge_commit_sha}\n        reply: build\n  - once-answered:\n      reply: build\n      steps:\n        - follow: hr:in-reply-to\n          intent: follow its in-reply-to link to the build\n          then:\n            - run-script: ci:smoke-test\n              on-link: ci:deployment\n              inputs:\n                book: ${book}\n                author: ${author}\n                renewable: ${renewable}\n                problem: ${problem}\n                comment: ${comment}\n              as: smoke\n  - given:\n      - at: smoke\n        field: passed\n        is: true\n    then:\n      - enter: ${dev}\n        steps:\n          - act: env:get-environment\n            fields:\n              id: ${environment}\n            inferred: get environment ${environment}\n            from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n            then:\n              - act: env:promote\n                fields:\n                  commit: ${merged.merge_commit_sha}\n                  smoke: # review: the reasoner chose it, asked \"promote commit 30a0fa96e3eed2ae20b2b5fa7613a115d56312a3, citing 5 of 5 scenarios passed\"\n                    passed: ${smoke.passing}\n                    of: ${smoke.of}\n                intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n                then:\n                  - check:\n                      - field: commit\n                        is: ${merged.merge_commit_sha}\n    otherwise:\n      - at: ${pr.@self}\n        steps:\n          - act: scm:comment\n            fields:\n              body: \"Not promoted to Dev: smoke scenarios ${smoke.failed} failed.\"",
+        "_links": {
+          "self": {
+            "href": "fragments/infer-once--kept.json",
+            "title": "The kept script, from one model run (release.heart.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.heart.yaml#L41-L125",
+            "title": "exhibits/merge-watch-release/release.heart.yaml, lines 41–125"
+          }
+        }
+      },
+      {
+        "name": "pins",
+        "label": "What it checks before every act (release.pins.yaml)",
+        "lang": "yaml",
+        "path": "exhibits/merge-watch-release/release.pins.yaml",
+        "lines": "1–64",
+        "of": 64,
+        "text": "# What /Users/josh/repos/artie/exhibits/merge-watch-release/release.heart.yaml was recorded against, from /Users/josh/repos/artie/exhibits/merge-watch-release/release.capture.yaml. artie run holds the script to it before every act:\n# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its\n# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and\n# one offered in a set not recorded for it.\nrung: L2\ndigest: sha256-qKM7TXJvTtzvI3H416WCa/y5oYK6wvYch4GhbwCLhKc=\nforms:\n  scm:pulls-get:\n    integrity: sha256-h02WjR7vd61a3clH1/805IIXM3O8OwspKt3KHwUP7/s=\n    act: sha256-0vjYAyfZzEdAjZBvXTUMge5qmujg/1tlkot9bnCWtaI=\n    method: GET\n    sets:\n      - sha256-gImH34GdmXPjwBtQ7RNGKro/Tbf26SFredj/E+jK13c=\n  watcher:watch:\n    integrity: sha256-vfjsEUQ7/+mWV478GxTnnHzzo8rZLb+s3eHW4KJhRFw=\n    act: sha256-BQiZ8TwYquT9Wgp2yiw4eEIqY3c9/0IwgvhuCvV1KHg=\n    method: POST\n    sets:\n      - sha256-T8prIv6TSqXSB9HdposRpsV8AYFUzfYEqiUvr32dX10=\n  scm:merge:\n    integrity: sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pweUa6ioBBwF8=\n    act: sha256-s8/h0c399Nx7AL340i09iHi9+s/nSZ9R+q5MfjgiYUY=\n    method: PUT\n    sets:\n      - sha256-ARE/YVgALeTnzANV8TegQJiue3vljZt3onMex+jMsvs=\n  ci:build:\n    integrity: sha256-xo3vNZ/YJwDkXNstjxyOUmQHZdWN8PojyD9Ub3KzHGQ=\n    act: sha256-9MVTORRjzrcFoMzlwiQWRmnUPVD+jk4sNjjyGG2m4fI=\n    method: POST\n    sets:\n      - sha256-Uv4wXjFFrnajvow8ez6LM8naU0uFYIKuRdyKs4IQA3A=\n  library:search-loans:\n    integrity: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=\n    act: sha256-Z7N30vs6QUGs1xK2hP+w1F0UgY7gyXs1+HawMkOt274=\n    method: GET\n    sets:\n      - sha256-OO1MlqifBoCG+V9lYByf83cmOoCUf75taO/frDYwjWE=\n  library:renew:\n    integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=\n    act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=\n    method: POST\n    sets:\n      - sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU=\n  library:report-problem:\n    integrity: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=\n    act: sha256-Z+8E81vIjCh35uyOKsoSwVMDm2eCmJBVEcbO6oI3uD8=\n    method: POST\n    sets:\n      - sha256-04lPGu1h4kV3Ra9udmDg1UCTzHfqn47zOSXw6TDIKOQ=\n  env:get-environment:\n    integrity: sha256-UWb+xXKngRFe8ibTwO9SrpSUYNPBbji/5JjlwpAEKfQ=\n    act: sha256-myRjFFxsNF8ai44N4fdXgWOPGB3uRptbwrCqaA8yp6s=\n    method: GET\n    sets:\n      - sha256-sy8+OSs554Ilw4WUAs9A0ywntG59u2PLanv0jt/pId4=\n  env:promote:\n    integrity: sha256-TwXThZ20UPUIctrpRXRoHqarKKsEilvB0sVwvK1PY4s=\n    act: sha256-uhGb8WNCB9bBSTcSnGDncK5OOgbvor2iNrT+IZvrEFA=\n    method: POST\n    sets:\n      - sha256-Uk7KIVDEyuxx08fE2x1gvp0hjkFhpH/7gyFyP7k3Vb8=\nlinks:\n  hr:in-reply-to: ''\n  item: ''",
+        "_links": {
+          "self": {
+            "href": "fragments/infer-once--pins.json",
+            "title": "What it checks before every act (release.pins.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.pins.yaml",
+            "title": "exhibits/merge-watch-release/release.pins.yaml, lines 1–64"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "goal",
+  "label": "The goal, in words (release.goal.md)",
+  "lang": "markdown",
+  "path": "exhibits/merge-watch-release/release.goal.md",
+  "lines": "19–28",
+  "of": 28,
+  "text": "Release a pull request to Dev once it can be merged and its build passes its smoke test.\n\n- Open pull request {pull} of {owner}/{repo} `as pr`\n- At {watcher}, ask to be told when {pr} offers scm:merge `as watch`\n- Once {watch} is answered, at {pr}, merge it by squashing `as merged`\n- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`\n- Once {build} is answered, follow its in-reply-to link to the build `as built`\n  - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`\n- If {smoke.passed}, at {dev}, open environment {environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed `as promotion`\n  Otherwise, at {pr}, act scm:comment with body = \"Not promoted to Dev: smoke scenarios {smoke.failed} failed.\"",
+  "_links": {
+    "self": {
+      "href": "map-end--goal.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.goal.md#L19-L28",
+      "title": "exhibits/merge-watch-release/release.goal.md, lines 19–28"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

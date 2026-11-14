@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L2: schemas linked too, and shared everywhere · How far can one vision go · 2.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">A preview of HEART · HEART L2</span></header>
+<h2>L2: schemas linked too, and shared everywhere</h2>
+<div class="split">
+<pre><code># GET /affordance-sets/{hash}
+# Prefer: forms=link, schema=link
+# Cache-Control: public, max-age=31536000, immutable
+_forms:
+  clientcertificate:update:
+    title: Update
+    _links:
+      target:
+        href: /clientcertificates/{id}
+        templated: true
+    hr:templatePointers:
+      id: /clientCertificateId
+    method: PATCH
+    contentType: application/json
+    hr:integrity: sha256-…
+<span class="add">    schema:</span>
+<span class="add">      $ref: /schemas/{hash}</span>
+<span class="add">      hr:integrity: sha256-…</span>
+  clientcertificate:delete:
+    title: Delete
+    _links:
+      target:
+        href: /clientcertificates/{id}
+        templated: true
+    hr:templatePointers:
+      id: /clientCertificateId
+    method: DELETE</code></pre>
+<pre><code># GET /schemas/{hash}
+# Content-Type: application/schema+json
+# Cache-Control: public, max-age=31536000, immutable
+$schema: https://json-schema.org/draft/2020-12/schema
+type: object
+required: [patchOperations]
+properties:
+  patchOperations:
+    type: array
+    items:
+      type: object
+      properties:
+        op:
+          enum: [add, remove, replace,
+                 move, copy, test]
+        path:
+          type: string
+          examples: [/description]
+        value:
+          type: string
+        from:
+          type: string</code></pre>
+</div>
+<p class="cite" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center"><span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#b85c2c;color:#fff;letter-spacing:0.04em">MOCKUP</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">Today</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">L0</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">L1</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#2f7d55;color:#fff">L2</span> <i style="margin-left:0.6rem">A second read: 304 for the certificate; set and schema from cache, no request.</i></p>
+<p class="refs"><a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_4">Cache</a></p>
+</article>
+<nav class="foot"><a href="deck/aws-l1.html" rel="prev"><small>Back</small><b>L1: the forms become one shared, cached set</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#aws-l2">with heart-ts</a></span>
+<a href="deck/rungs.html" rel="next"><small>Next</small><b>L0, L1, L2: one page, three ways to deliver it</b></a></nav>
+</main></div></body></html>

@@ -1,0 +1,102 @@
+{
+  "name": "tokenomics",
+  "title": "Capture once with a model, replay with none",
+  "part": "What it costs, and how it was built",
+  "kicker": "The tokenomics slide",
+  "tone": "light",
+  "number": 40,
+  "of": 53,
+  "html": "<h2>Capture once with a model, replay with none</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr)\">\n  <div class=\"rows\">\n    <pre># release.goal.md: the goal, in words\n- Open pull request {pull} of {owner}/{repo} `as pr`\n- At {watcher}, ask to be told when {pr}\n  offers scm:merge `as watch`\n- Once {watch} is answered, at {pr},\n  merge it by squashing `as merged`\n- At {jenkins}, build commit\n  {merged.merge_commit_sha} `as build`\n- … run the smoke script it links … `as smoke`\n- If {smoke.passed}, at {dev}, promote …\n  Otherwise, at {pr}, act scm:comment …</pre>\n    <p><b>Inspiration: <a href=\"https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture\" target=\"_blank\" rel=\"noopener\">Kelsey Hightower</a></b>’s ZTA: infer once. Fielding’s controls: check every step. The pins are where the two meet.</p>\n    <p class=\"refs\"><deck-ref name=\"zta\"></deck-ref> <deck-fragment name=\"goal\">release.goal.md</deck-fragment></p>\n  </div>\n  <div class=\"rows\">\n    <div class=\"stats\" style=\"grid-template-columns: 1fr 1fr; gap: 1.6rem 1.2rem\">\n      <div class=\"stat\"><b>20</b><span>model calls, once: the capture on real GitHub</span></div>\n      <div class=\"stat\"><b>33,140</b><span>input tokens, plus 2,980 output, once</span></div>\n      <div class=\"stat\"><b>0</b><span>model calls in every replay since</span></div>\n      <div class=\"stat\"><b>2</b><span>forges replayed: real GitHub, and GitLab on this machine</span></div>\n    </div>\n    <p class=\"punch\" style=\"color: var(--bad)\">Pins hold the replay to what was offered. If a form changes, the replay stops, and only then is the model called again, to repair.</p>\n  </div>\n</div>\n",
+  "say": "One Claude capture on real GitHub at rung L2: 20 model calls, 33,140 input and 2,980 output tokens. Then the kept script ran ten releases on two forges, and five more three ways for the cache numbers: zero model calls. Pins stop a replay that no longer fits, so the model is called only to repair. This is Kelsey Hightower's Zero Token Architecture in practice: infer once, run everywhere, as deterministic code; here the kept script is YAML, and the hypermedia keeps the replay honest.",
+  "sources": [
+    {
+      "label": "Report: Real GitHub, Local GitLab",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-real-github/"
+    },
+    {
+      "label": "Kelsey Hightower: ZTA, Zero Token Architecture (2026)",
+      "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"
+    },
+    {
+      "label": "artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "tokenomics.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "proof.json",
+      "title": "One script, real GitHub and a local GitLab"
+    },
+    "next": {
+      "href": "kept-vs-code-mode.json",
+      "title": "A kept script is data, not a program"
+    },
+    "alternate": {
+      "href": "tokenomics.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "zta",
+        "kind": "talk",
+        "label": "Hightower · ZTA",
+        "title": "ZTA: Zero Token Architecture",
+        "summary": "Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. (In my words, from the talk's page and Daniel Cranney's write-up.)",
+        "quote": "<p>“You are all having way too much fun burning way too many tokens”</p><p class=\"note\">His opening line, as quoted in Daniel Cranney, <a href=\"https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture\">“Infer Once, Run Everywhere: Zero-Token Architecture”</a>, WeAreDevelopers, 13 October 2026.</p>",
+        "cite": "Kelsey Hightower, WeAreDevelopers World Congress North America",
+        "date": "26 September 2026",
+        "_links": {
+          "self": {
+            "href": "../refs/zta.json",
+            "title": "Hightower · ZTA"
+          },
+          "describedby": {
+            "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture",
+            "title": "Kelsey Hightower, WeAreDevelopers World Congress North America"
+          }
+        }
+      }
+    ],
+    "deck:fragment": [
+      {
+        "name": "goal",
+        "label": "The goal, in words (release.goal.md)",
+        "lang": "markdown",
+        "path": "exhibits/merge-watch-release/release.goal.md",
+        "lines": "19–28",
+        "of": 28,
+        "text": "Release a pull request to Dev once it can be merged and its build passes its smoke test.\n\n- Open pull request {pull} of {owner}/{repo} `as pr`\n- At {watcher}, ask to be told when {pr} offers scm:merge `as watch`\n- Once {watch} is answered, at {pr}, merge it by squashing `as merged`\n- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`\n- Once {build} is answered, follow its in-reply-to link to the build `as built`\n  - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`\n- If {smoke.passed}, at {dev}, open environment {environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed `as promotion`\n  Otherwise, at {pr}, act scm:comment with body = \"Not promoted to Dev: smoke scenarios {smoke.failed} failed.\"",
+        "_links": {
+          "self": {
+            "href": "fragments/tokenomics--goal.json",
+            "title": "The goal, in words (release.goal.md)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.goal.md#L19-L28",
+            "title": "exhibits/merge-watch-release/release.goal.md, lines 19–28"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+name: proof
+part: "For real: two forges, one vocabulary"
+title: One script, real GitHub and a local GitLab
+kicker: Proof
+say: "Same kept script, same scm: relations. GitHub is the real cloud service; GitLab runs locally with no cloud calls. Each forge has one YAML connector in the gateway that maps its native API to the same typed relations, so scm:merge means the same on both. On the wire, compatible because of the typed relation. So what did all that cost? And how was it built, a few sentences at a time?"
+sources:
+  - ["Pull request #2336", "https://github.com/JogoShugh/heart-github-test/pull/2336"]
+  - ["Report: Real GitHub, Local GitLab", "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-real-github/"]
+  - ["Report: One Script, Two Forges", "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-two-forges/"]
+html: |
+  <h2>One script, real GitHub and a local GitLab</h2>
+  <div class="split">
+    <figure><img src="media/github-503.png" alt="GitHub pull request #2336, merged"><figcaption>Real GitHub: pull request #2336, merged by the replay.</figcaption></figure>
+    <figure><img src="media/gitlab-503.png" alt="Local GitLab merge request !503, merged"><figcaption>Local GitLab: merge request !503, merged by the same script.</figcaption></figure>
+  </div>
+  <p class="lead"><b>On the wire, compatible because of the typed relation.</b> One YAML connector per forge maps its native API to scm:merge, scm:comment… The GitLab runs make no cloud calls and no model calls.</p>

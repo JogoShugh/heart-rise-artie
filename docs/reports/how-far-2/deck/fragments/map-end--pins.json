@@ -1,0 +1,21 @@
+{
+  "name": "pins",
+  "label": "The pins (release.pins.yaml)",
+  "lang": "yaml",
+  "path": "exhibits/merge-watch-release/release.pins.yaml",
+  "lines": "1–64",
+  "of": 64,
+  "text": "# What /Users/josh/repos/artie/exhibits/merge-watch-release/release.heart.yaml was recorded against, from /Users/josh/repos/artie/exhibits/merge-watch-release/release.capture.yaml. artie run holds the script to it before every act:\n# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its\n# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and\n# one offered in a set not recorded for it.\nrung: L2\ndigest: sha256-qKM7TXJvTtzvI3H416WCa/y5oYK6wvYch4GhbwCLhKc=\nforms:\n  scm:pulls-get:\n    integrity: sha256-h02WjR7vd61a3clH1/805IIXM3O8OwspKt3KHwUP7/s=\n    act: sha256-0vjYAyfZzEdAjZBvXTUMge5qmujg/1tlkot9bnCWtaI=\n    method: GET\n    sets:\n      - sha256-gImH34GdmXPjwBtQ7RNGKro/Tbf26SFredj/E+jK13c=\n  watcher:watch:\n    integrity: sha256-vfjsEUQ7/+mWV478GxTnnHzzo8rZLb+s3eHW4KJhRFw=\n    act: sha256-BQiZ8TwYquT9Wgp2yiw4eEIqY3c9/0IwgvhuCvV1KHg=\n    method: POST\n    sets:\n      - sha256-T8prIv6TSqXSB9HdposRpsV8AYFUzfYEqiUvr32dX10=\n  scm:merge:\n    integrity: sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pweUa6ioBBwF8=\n    act: sha256-s8/h0c399Nx7AL340i09iHi9+s/nSZ9R+q5MfjgiYUY=\n    method: PUT\n    sets:\n      - sha256-ARE/YVgALeTnzANV8TegQJiue3vljZt3onMex+jMsvs=\n  ci:build:\n    integrity: sha256-xo3vNZ/YJwDkXNstjxyOUmQHZdWN8PojyD9Ub3KzHGQ=\n    act: sha256-9MVTORRjzrcFoMzlwiQWRmnUPVD+jk4sNjjyGG2m4fI=\n    method: POST\n    sets:\n      - sha256-Uv4wXjFFrnajvow8ez6LM8naU0uFYIKuRdyKs4IQA3A=\n  library:search-loans:\n    integrity: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=\n    act: sha256-Z7N30vs6QUGs1xK2hP+w1F0UgY7gyXs1+HawMkOt274=\n    method: GET\n    sets:\n      - sha256-OO1MlqifBoCG+V9lYByf83cmOoCUf75taO/frDYwjWE=\n  library:renew:\n    integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=\n    act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=\n    method: POST\n    sets:\n      - sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU=\n  library:report-problem:\n    integrity: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=\n    act: sha256-Z+8E81vIjCh35uyOKsoSwVMDm2eCmJBVEcbO6oI3uD8=\n    method: POST\n    sets:\n      - sha256-04lPGu1h4kV3Ra9udmDg1UCTzHfqn47zOSXw6TDIKOQ=\n  env:get-environment:\n    integrity: sha256-UWb+xXKngRFe8ibTwO9SrpSUYNPBbji/5JjlwpAEKfQ=\n    act: sha256-myRjFFxsNF8ai44N4fdXgWOPGB3uRptbwrCqaA8yp6s=\n    method: GET\n    sets:\n      - sha256-sy8+OSs554Ilw4WUAs9A0ywntG59u2PLanv0jt/pId4=\n  env:promote:\n    integrity: sha256-TwXThZ20UPUIctrpRXRoHqarKKsEilvB0sVwvK1PY4s=\n    act: sha256-uhGb8WNCB9bBSTcSnGDncK5OOgbvor2iNrT+IZvrEFA=\n    method: POST\n    sets:\n      - sha256-Uk7KIVDEyuxx08fE2x1gvp0hjkFhpH/7gyFyP7k3Vb8=\nlinks:\n  hr:in-reply-to: ''\n  item: ''",
+  "_links": {
+    "self": {
+      "href": "map-end--pins.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.pins.yaml",
+      "title": "exhibits/merge-watch-release/release.pins.yaml, lines 1–64"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

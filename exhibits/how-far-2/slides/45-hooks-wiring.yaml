@@ -1,0 +1,46 @@
+name: hooks-wiring
+part: "What it costs, and how it was built"
+title: Five hook events, each a shell script
+kicker: For the engineers · The wiring
+say: "core/hooks.json, merged into .claude/settings.json by install.sh. protect-gate runs before every tool; gherkin-first before every edit; gate-bash before every shell command; log-event and lint after every edit; check.sh when the model tries to stop. Exit code 2 blocks the call and sends stderr back to the model."
+sources:
+  - ["bdd-gates: core/hooks.json", "https://github.com/JogoShugh/bdd-gates-skill"]
+  - ["Claude Code hooks reference", "https://code.claude.com/docs/en/hooks"]
+fragments:
+  - name: hooks
+    label: core/hooks.json, whole
+    source: bdd-gates:core/hooks.json
+    lang: json
+html: |
+  <h2>Five hook events, each a shell script</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);">
+    <div class="rows">
+      <pre><code>// core/hooks.json (abridged)
+  "PreToolUse": [
+    { "matcher": "*",
+      …/protect-gate.sh },
+    { "matcher": "Edit|Write|MultiEdit",
+      …/gherkin-first.sh },
+    { "matcher": "Bash",
+      …/gate-bash.sh } ],
+  "PostToolUse": [
+    { "matcher": "Edit|Write|MultiEdit",
+      …/log-event.sh, …/lint.sh } ],
+  "Stop": [
+    …/check.sh  (timeout 600) ],
+  "UserPromptSubmit": [
+    …/refactor-prompt.sh ]</code></pre>
+      <p class="refs"><deck-fragment name="hooks">hooks.json</deck-fragment></p>
+    </div>
+    <div class="rows">
+      <p class="punch">Exit 2 blocks the call and hands stderr to the model.</p>
+      <h3>Blocked in this very session, word for word:</h3>
+      <pre><code>Blocked: this command reaches the
+  TDD gate or refactor mode.
+
+  Blocked: run tests through
+  .claude/bdd-gates/bdd-run.sh [extra
+  args] so the BDD_RUN result is logged.</code></pre>
+      <p>The second stopped a raw test run that would have left no BDD_RUN line in the log.</p>
+    </div>
+  </div>

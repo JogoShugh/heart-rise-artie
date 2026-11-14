@@ -1,0 +1,43 @@
+name: tokenomics
+part: "What it costs, and how it was built"
+title: Capture once with a model, replay with none
+kicker: The tokenomics slide
+say: "One Claude capture on real GitHub at rung L2: 20 model calls, 33,140 input and 2,980 output tokens. Then the kept script ran ten releases on two forges, and five more three ways for the cache numbers: zero model calls. Pins stop a replay that no longer fits, so the model is called only to repair. This is Kelsey Hightower's Zero Token Architecture in practice: infer once, run everywhere, as deterministic code; here the kept script is YAML, and the hypermedia keeps the replay honest."
+sources:
+  - ["Report: Real GitHub, Local GitLab", "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-real-github/"]
+  - ["Kelsey Hightower: ZTA, Zero Token Architecture (2026)", "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"]
+  - ["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]
+fragments:
+  - name: goal
+    label: The goal, in words (release.goal.md)
+    source: exhibits/merge-watch-release/release.goal.md
+    from: Release a pull request to Dev
+    lang: markdown
+html: |
+  <h2>Capture once with a model, replay with none</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr)">
+    <div class="rows">
+      <pre># release.goal.md: the goal, in words
+  - Open pull request {pull} of {owner}/{repo} `as pr`
+  - At {watcher}, ask to be told when {pr}
+    offers scm:merge `as watch`
+  - Once {watch} is answered, at {pr},
+    merge it by squashing `as merged`
+  - At {jenkins}, build commit
+    {merged.merge_commit_sha} `as build`
+  - … run the smoke script it links … `as smoke`
+  - If {smoke.passed}, at {dev}, promote …
+    Otherwise, at {pr}, act scm:comment …</pre>
+      <p><b>Inspiration: <a href="https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture" target="_blank" rel="noopener">Kelsey Hightower</a></b>’s ZTA: infer once. Fielding’s controls: check every step. The pins are where the two meet.</p>
+      <p class="refs"><deck-ref name="zta"></deck-ref> <deck-fragment name="goal">release.goal.md</deck-fragment></p>
+    </div>
+    <div class="rows">
+      <div class="stats" style="grid-template-columns: 1fr 1fr; gap: 1.6rem 1.2rem">
+        <div class="stat"><b>20</b><span>model calls, once: the capture on real GitHub</span></div>
+        <div class="stat"><b>33,140</b><span>input tokens, plus 2,980 output, once</span></div>
+        <div class="stat"><b>0</b><span>model calls in every replay since</span></div>
+        <div class="stat"><b>2</b><span>forges replayed: real GitHub, and GitLab on this machine</span></div>
+      </div>
+      <p class="punch" style="color: var(--bad)">Pins hold the replay to what was offered. If a form changes, the replay stops, and only then is the model called again, to repair.</p>
+    </div>
+  </div>

@@ -1,0 +1,43 @@
+name: step-2-links
+part: "For real: two forges, one vocabulary"
+title: "Links: it names itself and its vocabulary"
+kicker: Building it back up · Step 2 of 5 · HEART L0, simplified
+say: "The gateway's answer adds HAL links: self, the scm: curie that says where the relation names are defined, the forge's own page as an alternate, and typed links to related resources. GitHub's own *_url members became these links and left the data."
+sources:
+  - ["HAL (Kelly)", "https://datatracker.ietf.org/doc/html/draft-kelly-json-hal-11"]
+  - ["RFC 8288 Web Linking", "https://www.rfc-editor.org/rfc/rfc8288"]
+html: |
+  <h2>Links: it names itself and its vocabulary</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr)">
+    <pre># GET http://gateway/repos/JogoShugh/heart-github-test/pulls/2325
+  # Accept: application/hal+json
+  number: 2325
+  title: "Renewals: none during the audit"
+  state: open
+  mergeable_state: clean
+  <span class="add">_links:
+    self:
+      href: /repos/JogoShugh/heart-github-test/pulls/2325
+    curies:
+      - name: scm
+        href: /profiles/scm#{rel}
+        templated: true
+    alternate:
+      href: https://github.com/JogoShugh/heart-github-test/pull/2325
+      type: text/html
+    scm:commits:
+      href: /repos/JogoShugh/heart-github-test/pulls/2325/commits
+    scm:diff:
+      href: https://github.com/JogoShugh/heart-github-test/pull/2325.diff
+      type: text/x-diff</span></pre>
+    <div class="rows">
+      <h3 style="font: 650 1.5rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--leaf)">Where it is, and what its words mean</h3>
+      <ul>
+        <li><b>self:</b> its own address, handed over, never built.</li>
+        <li><b>curies:</b> scm: names resolve to one shared vocabulary, for both forges.</li>
+        <li><b>alternate:</b> the forge’s own page, for people.</li>
+        <li><b>Typed links:</b> GitHub’s *_url members became links and left the data.</li>
+      </ul>
+      <p class="refs"><deck-ref name="rule-4"></deck-ref></p>
+    </div>
+  </div>

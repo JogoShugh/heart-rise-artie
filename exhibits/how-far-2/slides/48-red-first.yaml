@@ -1,0 +1,42 @@
+name: red-first
+part: "What it costs, and how it was built"
+title: The scenario, then the failing run
+kicker: How it was built · Red first, live
+say: "A real one from this work. The real-GitHub capture dropped the step that opens the pull request, because nothing read a value from it; a later step only named it. The scenario says so first, and the run fails on behaviour before any code is written."
+sources:
+  - ["Gherkin reference", "https://cucumber.io/docs/gherkin/reference/"]
+  - ["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]
+fragments:
+  - name: scenario
+    label: The scenario, whole (goal-rise.feature)
+    source: client/artie/src/test/resources/features/goal-rise.feature
+    from: "Scenario: A step that only reads is kept in the script"
+    count: 36
+    lang: gherkin
+html: |
+  <h2>The scenario, then the failing run</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);">
+    <div class="rows">
+      <pre><code>Scenario: A step that only reads is kept in the
+    script when a later step names what it read
+    `as NAME` on a read is no detour when a later step
+    names it: the watch is asked about ${front.@self}
+    Given the file "named-read.goal.md" is
+      - Search the desk's releases that are {state}
+        `as front`
+      - At {watcher}, ask to be told when {front}
+        offers desk:release `as watch`
+    …
+    Then the script has a line with
+      "- act: desk:search-releases"</code></pre>
+      <p class="refs"><deck-fragment name="scenario">the whole scenario</deck-fragment></p>
+    </div>
+    <div class="rows">
+      <pre><code># the red run, logged by the gate
+  496 tests completed, 1 failed,
+  41 skipped
+  testcase: A step that only reads
+  is kept in the script when …</code></pre>
+      <p>Red on behaviour, not on a compile error. The gate logs the run; only then may src/main change.</p>
+    </div>
+  </div>

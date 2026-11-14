@@ -1,0 +1,21 @@
+{
+  "name": "hooks-wiring",
+  "title": "Five hook events, each a shell script",
+  "part": "What it costs, and how it was built",
+  "kicker": "For the engineers · The wiring",
+  "tone": "light",
+  "number": 45,
+  "of": 53,
+  "html": "<h2>Five hook events, each a shell script</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);\">\n  <div class=\"rows\">\n    <pre><code>// core/hooks.json (abridged)\n\"PreToolUse\": [\n  { \"matcher\": \"*\",\n    …/protect-gate.sh },\n  { \"matcher\": \"Edit|Write|MultiEdit\",\n    …/gherkin-first.sh },\n  { \"matcher\": \"Bash\",\n    …/gate-bash.sh } ],\n\"PostToolUse\": [\n  { \"matcher\": \"Edit|Write|MultiEdit\",\n    …/log-event.sh, …/lint.sh } ],\n\"Stop\": [\n  …/check.sh  (timeout 600) ],\n\"UserPromptSubmit\": [\n  …/refactor-prompt.sh ]</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"hooks\">hooks.json</deck-fragment></p>\n  </div>\n  <div class=\"rows\">\n    <p class=\"punch\">Exit 2 blocks the call and hands stderr to the model.</p>\n    <h3>Blocked in this very session, word for word:</h3>\n    <pre><code>Blocked: this command reaches the\nTDD gate or refactor mode.\n\nBlocked: run tests through\n.claude/bdd-gates/bdd-run.sh [extra\nargs] so the BDD_RUN result is logged.</code></pre>\n    <p>The second stopped a raw test run that would have left no BDD_RUN line in the log.</p>\n  </div>\n</div>\n",
+  "say": "core/hooks.json, merged into .claude/settings.json by install.sh. protect-gate runs before every tool; gherkin-first before every edit; gate-bash before every shell command; log-event and lint after every edit; check.sh when the model tries to stop. Exit code 2 blocks the call and sends stderr back to the model.",
+  "sources": [
+    {
+      "label": "bdd-gates: core/hooks.json",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    },
+    {
+      "label": "Claude Code hooks reference",
+      "href": "https://code.claude.com/docs/en/hooks"
+    }
+  ]
+}

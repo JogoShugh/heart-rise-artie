@@ -1,0 +1,49 @@
+name: step-5-after-merge
+part: "For real: two forges, one vocabulary"
+title: "After the merge: the server changed, the client didn’t"
+kicker: Building it back up · Step 5 of 5 · HEART L0, simplified
+say: "The same pull request, read after scm:merge. The state changed, so the forms changed: three left, comment, label and edit. merge, close and reopen are gone, each with its reason. ARTIE needed no new code to know; it read what's offered. The ETag changed too, so any act still holding the old one gets 412."
+sources:
+  - ["artie: github-scm/pull.reader.yaml", "https://github.com/JogoShugh/heart-rise-artie"]
+  - ["Fielding (2008)", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]
+fragments:
+  - name: reader
+    label: Where the reasons come from (github-scm/pull.reader.yaml)
+    source: heart/heart-gateway/connectors/github-scm/pull.reader.yaml
+    lang: yaml
+html: |
+  <h2>After the merge: the server changed, the client didn’t</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr)">
+    <pre># GET …/pulls/2325, after scm:merge
+  <span class="add">ETag: "seq-0.hsf.L0.ed4a2f1e1ab3f687"</span>
+  number: 2325
+  state: closed
+  merged: true
+  mergeable_state: unknown
+  <b>_forms:</b>
+    scm:comment: {…}
+    scm:label: {…}
+    scm:edit: {…}
+  # gone: scm:merge, scm:close, scm:reopen,
+  #       scm:request-review, scm:update-branch</pre>
+    <div class="rows">
+      <pre># GET /unavailable/d0a0136ee8d4d2bb  (as served)
+  unavailable:
+    - title: Close
+      reason: The pull request is already closed.
+    - title: Reopen
+      reason: A merged pull request can't be reopened.
+    - title: Merge
+      reason: A closed pull request can't be merged;
+              reopen it first.
+    - title: Request a review
+      reason: A closed pull request can't have reviews requested;
+              reopen it first.
+    - title: Update the branch
+      reason: A closed pull request's branch isn't updated;
+              reopen it first.
+  # each also has rel: /profiles/scm#close, #reopen, …</pre>
+      <p class="punch">7 forms open, 3 merged. ARTIE needed no new code: it reads what’s offered, as a browser does.</p>
+      <p class="refs"><deck-ref name="think-of-the-web"></deck-ref> <deck-fragment name="reader">pull.reader.yaml</deck-fragment></p>
+    </div>
+  </div>
