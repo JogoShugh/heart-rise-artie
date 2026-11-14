@@ -1,10 +1,11 @@
 name: walk-the-dog
 part: "What it costs, and how it was built"
 title: Walk the dog, ship the feature
-kicker: How this was built
-say: "The honest frame. Free time collapsed: family, a new dog. Typing code stopped being possible. What remained: Claude Code's Remote Control on a phone, a personal Max account, and a test-first discipline strong enough that the code can be trusted while I'm out on a walk. The humor is real: the messages really were that short."
+kicker: How this was built · back to the dog
+say: "Back to the dog, as promised at the start. Everything you've seen was built a few sentences at a time, by thumb, through Claude Code's /remote-control, on a personal Max account at home. What made that safe wasn't my attention; I was holding a leash. It was a test-first discipline: Gherkin, a red run, the code, a green run, a gated commit, every change. The gates log every step, so what passed is on record when I get home. The humor is real: the messages really were that short. The dog has not reviewed a single pull request, and is still the reason they were short."
 sources:
   - ["bdd-gates skill", "https://github.com/JogoShugh/bdd-gates-skill"]
+  - ["Claude Code docs: /remote-control", "https://code.claude.com/docs/en/remote-control"]
 fragments:
   - name: hooks
     label: The hooks that gate every change (core/hooks.json)
@@ -14,21 +15,18 @@ html: |
   <h2>Walk the dog, ship the feature</h2>
   <div class="split">
     <div class="rows">
-      <p class="lead">When there’s no time left to type code: family, a new dog, a phone in one hand and a leash in the other.</p>
+      <p class="lead">Back to the dog. Built a few sentences at a time, one thumb free.</p>
       <ul>
-        <li><b>Claude Code Remote Control</b> on the phone, a personal Max account at home.</li>
+        <li><b>Claude Code’s <code>/remote-control</code></b> on the phone, a personal Max account at home.</li>
         <li><b>Test first, every change:</b> Gherkin, a red run, the code, a green run, a gated commit.</li>
         <li><b>Evidence, not trust:</b> the gates log every step, so what passed is on record when I get home.</li>
-        <li><b>The result:</b> repeatable, reliable RISE behaviour, built a few sentences at a time.</li>
+        <li><b>The result:</b> repeatable, reliable RISE behaviour, built on walks.</li>
       </ul>
-      <p class="refs"><deck-fragment name="hooks">hooks.json</deck-fragment></p>
+      <p class="refs"><deck-ref name="no-time"></deck-ref> <deck-fragment name="hooks">hooks.json</deck-fragment></p>
     </div>
-    <div class="phone">
-      <p class="phone-head">Remote Control</p>
-      <p class="me">Please give me an update</p>
-      <p class="it">Red run logged. Writing the fix.</p>
-      <p class="me">How’s it going?</p>
-      <p class="it">Green. pre-commit: TDD ordering check passed.</p>
-      <p class="note">Illustrative, not a transcript. The two questions are the real ones, every evening.</p>
+    <div class="card dark" style="align-self: center">
+      <p class="lead" style="font-size: 2rem; margin: 0">Code reviews by the dog: 0</p>
+      <p>Prompts shortened by the dog: all of them.</p>
+      <p class="note">What I couldn’t watch, the gates did: red, green, gated commit, logged.</p>
     </div>
   </div>

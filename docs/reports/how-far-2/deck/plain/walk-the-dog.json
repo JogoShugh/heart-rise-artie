@@ -2,16 +2,20 @@
   "name": "walk-the-dog",
   "title": "Walk the dog, ship the feature",
   "part": "What it costs, and how it was built",
-  "kicker": "How this was built",
+  "kicker": "How this was built · back to the dog",
   "tone": "light",
   "number": 48,
   "of": 59,
-  "html": "<h2>Walk the dog, ship the feature</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <p class=\"lead\">When there’s no time left to type code: family, a new dog, a phone in one hand and a leash in the other.</p>\n    <ul>\n      <li><b>Claude Code Remote Control</b> on the phone, a personal Max account at home.</li>\n      <li><b>Test first, every change:</b> Gherkin, a red run, the code, a green run, a gated commit.</li>\n      <li><b>Evidence, not trust:</b> the gates log every step, so what passed is on record when I get home.</li>\n      <li><b>The result:</b> repeatable, reliable RISE behaviour, built a few sentences at a time.</li>\n    </ul>\n    <p class=\"refs\"><deck-fragment name=\"hooks\">hooks.json</deck-fragment></p>\n  </div>\n  <div class=\"phone\">\n    <p class=\"phone-head\">Remote Control</p>\n    <p class=\"me\">Please give me an update</p>\n    <p class=\"it\">Red run logged. Writing the fix.</p>\n    <p class=\"me\">How’s it going?</p>\n    <p class=\"it\">Green. pre-commit: TDD ordering check passed.</p>\n    <p class=\"note\">Illustrative, not a transcript. The two questions are the real ones, every evening.</p>\n  </div>\n</div>\n",
-  "say": "The honest frame. Free time collapsed: family, a new dog. Typing code stopped being possible. What remained: Claude Code's Remote Control on a phone, a personal Max account, and a test-first discipline strong enough that the code can be trusted while I'm out on a walk. The humor is real: the messages really were that short.",
+  "html": "<h2>Walk the dog, ship the feature</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <p class=\"lead\">Back to the dog. Built a few sentences at a time, one thumb free.</p>\n    <ul>\n      <li><b>Claude Code’s <code>/remote-control</code></b> on the phone, a personal Max account at home.</li>\n      <li><b>Test first, every change:</b> Gherkin, a red run, the code, a green run, a gated commit.</li>\n      <li><b>Evidence, not trust:</b> the gates log every step, so what passed is on record when I get home.</li>\n      <li><b>The result:</b> repeatable, reliable RISE behaviour, built on walks.</li>\n    </ul>\n    <p class=\"refs\"><deck-ref name=\"no-time\"></deck-ref> <deck-fragment name=\"hooks\">hooks.json</deck-fragment></p>\n  </div>\n  <div class=\"card dark\" style=\"align-self: center\">\n    <p class=\"lead\" style=\"font-size: 2rem; margin: 0\">Code reviews by the dog: 0</p>\n    <p>Prompts shortened by the dog: all of them.</p>\n    <p class=\"note\">What I couldn’t watch, the gates did: red, green, gated commit, logged.</p>\n  </div>\n</div>\n",
+  "say": "Back to the dog, as promised at the start. Everything you've seen was built a few sentences at a time, by thumb, through Claude Code's /remote-control, on a personal Max account at home. What made that safe wasn't my attention; I was holding a leash. It was a test-first discipline: Gherkin, a red run, the code, a green run, a gated commit, every change. The gates log every step, so what passed is on record when I get home. The humor is real: the messages really were that short. The dog has not reviewed a single pull request, and is still the reason they were short.",
   "sources": [
     {
       "label": "bdd-gates skill",
       "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    },
+    {
+      "label": "Claude Code docs: /remote-control",
+      "href": "https://code.claude.com/docs/en/remote-control"
     }
   ]
 }

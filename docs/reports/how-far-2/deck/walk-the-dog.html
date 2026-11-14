@@ -6,18 +6,18 @@
 <link rel="stylesheet" href="deck-extra.css">
 </head><body>
 <div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
-<article class="slide"><header><span class="part">How this was built</span></header>
+<article class="slide"><header><span class="part">How this was built · back to the dog</span></header>
 <h2>Walk the dog, ship the feature</h2>
 <div class="split">
   <div class="rows">
-    <p class="lead">When there’s no time left to type code: family, a new dog, a phone in one hand and a leash in the other.</p>
+    <p class="lead">Back to the dog. Built a few sentences at a time, one thumb free.</p>
     <ul>
-      <li><b>Claude Code Remote Control</b> on the phone, a personal Max account at home.</li>
+      <li><b>Claude Code’s <code>/remote-control</code></b> on the phone, a personal Max account at home.</li>
       <li><b>Test first, every change:</b> Gherkin, a red run, the code, a green run, a gated commit.</li>
       <li><b>Evidence, not trust:</b> the gates log every step, so what passed is on record when I get home.</li>
-      <li><b>The result:</b> repeatable, reliable RISE behaviour, built a few sentences at a time.</li>
+      <li><b>The result:</b> repeatable, reliable RISE behaviour, built on walks.</li>
     </ul>
-    <p class="refs"><details class="fragment-plain"><summary>The hooks that gate every change (core/hooks.json)</summary><pre><code>{
+    <p class="refs"><a class="ref-plain" href="https://code.claude.com/docs/en/remote-control">NO-TIME</a> <details class="fragment-plain"><summary>The hooks that gate every change (core/hooks.json)</summary><pre><code>{
   &quot;UserPromptSubmit&quot;: [
     {
       &quot;hooks&quot;: [
@@ -95,13 +95,10 @@
   ]
 }</code></pre></details></p>
   </div>
-  <div class="phone">
-    <p class="phone-head">Remote Control</p>
-    <p class="me">Please give me an update</p>
-    <p class="it">Red run logged. Writing the fix.</p>
-    <p class="me">How’s it going?</p>
-    <p class="it">Green. pre-commit: TDD ordering check passed.</p>
-    <p class="note">Illustrative, not a transcript. The two questions are the real ones, every evening.</p>
+  <div class="card dark" style="align-self: center">
+    <p class="lead" style="font-size: 2rem; margin: 0">Code reviews by the dog: 0</p>
+    <p>Prompts shortened by the dog: all of them.</p>
+    <p class="note">What I couldn’t watch, the gates did: red, green, gated commit, logged.</p>
   </div>
 </div>
 </article>
