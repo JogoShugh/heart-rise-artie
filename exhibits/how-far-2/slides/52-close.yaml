@@ -1,14 +1,15 @@
 name: close
 part: "Close"
 tone: dark
-title: The Web gave us the model. Hypertext and hooks let us stop paying it for the same path twice.
+title: "Where to Go From Here"
 kicker: Close
-say: "Building is gated by hooks. Running is driven by hypertext and replayed from kept scripts. Both move work from tokens to processes."
+say: "Recall where we started: have you ever paid a model to find the same path twice? You don't have to. The Web already had the answer for people: put the controls in the answer, next to the information. Do that for agents, and a model finds the way once, a script replays it for free, and a reasoning model only comes back when the controls really change. Build it the same way, one behavior at a time, with gates that hold while you're out walking the dog, and the three R's go all the way up. Everything you saw is in the repositories and the reports, linked on the next slide, including the real merge on GitHub. Run it yourself. And if you find a place where it falls short of Fielding's words, tell me. That's the next measurement."
 html: |
-  <h2>The Web gave us the model. Hypertext and hooks let us stop paying it for the same path twice.</h2>
+  <h2>Where to Go From Here</h2>
   <div class="split" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
-    <div class="step"><h3>Running</h3><p>Driven by hypertext: only what’s offered now. Found once with a model, replayed with none.</p></div>
-    <div class="step"><h3>Building</h3><p>Gated by hooks: Gherkin, red, code, green, commit. No model call to enforce.</p></div>
-    <div class="step"><h3>Both</h3><p>Move work from tokens to processes, where it costs nothing to repeat.</p></div>
+    <div class="step"><h3>Running</h3><p>Controls in the answer. Found once with a model, replayed with none. The model comes back only to repair.</p></div>
+    <div class="step"><h3>Building</h3><p>One behavior at a time: Gherkin, red, code, green, commit, held by hooks while nobody’s watching.</p></div>
+    <div class="step"><h3>Owning the Loop</h3><p>You own the goal and read the record. The AI supports; the controls hold the line.</p></div>
   </div>
-  <p class="punch">Zero tokens to replay. Zero domain code to read. One media type.</p>
+  <p class="lead">Everything you saw is in the repositories and the reports. Run it yourself, and tell me where it falls short of Fielding’s words.</p>
+  <p class="refs"><deck-ref name="repeatability"></deck-ref> <deck-ref name="right-behavior"></deck-ref> <deck-ref name="resilience"></deck-ref> <deck-ref name="ai-in-the-loop"></deck-ref> <deck-ref name="zta"></deck-ref></p>

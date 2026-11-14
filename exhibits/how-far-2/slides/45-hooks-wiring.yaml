@@ -1,5 +1,5 @@
 name: hooks-wiring
-part: "What it costs, and how it was built"
+part: "Built the same way: one behavior at a time"
 title: Five hook events, each a shell script
 kicker: For the engineers · The wiring
 say: "core/hooks.json, merged into .claude/settings.json by install.sh. protect-gate runs before every tool; gherkin-first before every edit; gate-bash before every shell command; log-event and lint after every edit; check.sh when the model tries to stop. Exit code 2 blocks the call and sends stderr back to the model."

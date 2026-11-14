@@ -1,0 +1,25 @@
+{
+  "name": "who-owns-loop",
+  "title": "Who Owns the Loop?",
+  "part": "The question",
+  "kicker": "AI in the loop · not a person rubber-stamping a machine",
+  "tone": "light",
+  "number": 5,
+  "of": 63,
+  "html": "<h2>Who Owns the Loop?</h2>\n<div class=\"split\">\n  <figure>\n    <svg viewBox=\"0 0 440 340\" role=\"img\" aria-label=\"Two axes, human control and automation. A rubber stamp sits at high automation and low real control; the arrangement in this talk sits at high automation and high control.\">\n      <line x1=\"60\" y1=\"290\" x2=\"420\" y2=\"290\" stroke=\"currentColor\" stroke-width=\"2\"/>\n      <line x1=\"60\" y1=\"290\" x2=\"60\" y2=\"20\" stroke=\"currentColor\" stroke-width=\"2\"/>\n      <text x=\"240\" y=\"325\" text-anchor=\"middle\" fill=\"currentColor\" font-size=\"14\">automation →</text>\n      <text x=\"22\" y=\"155\" text-anchor=\"middle\" fill=\"currentColor\" font-size=\"14\" transform=\"rotate(-90 22 155)\">human control →</text>\n      <circle cx=\"340\" cy=\"250\" r=\"9\" fill=\"#c0392b\"/>\n      <text x=\"340\" y=\"232\" text-anchor=\"middle\" fill=\"currentColor\" font-size=\"13\">a person approving 500 a day</text>\n      <circle cx=\"120\" cy=\"70\" r=\"9\" fill=\"#888\"/>\n      <text x=\"120\" y=\"52\" text-anchor=\"middle\" fill=\"currentColor\" font-size=\"13\">typing it all yourself</text>\n      <circle cx=\"300\" cy=\"70\" r=\"11\" fill=\"#2f9e5b\"/>\n      <text x=\"300\" y=\"52\" text-anchor=\"middle\" fill=\"currentColor\" font-size=\"13\" font-weight=\"700\">this talk</text>\n      <text x=\"300\" y=\"98\" text-anchor=\"middle\" fill=\"currentColor\" font-size=\"12\">goal owned · script read · gates hold</text>\n    </svg>\n    <figcaption>After Shneiderman: high automation and high control, together.</figcaption>\n  </figure>\n  <div class=\"rows\">\n    <div><h3>The Person Owns the Goal</h3><p>Said in a sentence. Read back as a kept script.</p></div>\n    <div><h3>The Model Supports</h3><p>Finds the way once. Repairs when the controls change.</p></div>\n    <div><h3>The Controls Hold the Line</h3><p>Hooks for the builder, the server’s forms for the agent. I read the record, not every step.</p></div>\n    <p class=\"refs\"><deck-ref name=\"ai-in-the-loop\"></deck-ref> <deck-ref name=\"hcai\"></deck-ref> <deck-ref name=\"humans-in-charge\"></deck-ref> <deck-ref name=\"reason\"></deck-ref></p>\n  </div>\n</div>\n",
+  "say": "You may have heard 'human in the loop' used as a comfort blanket: put a person at the end of the pipeline to approve whatever the machine decided. Ask that person to approve five hundred decisions a day and see how much reviewing actually happens. Probably not much. There's a better framing, and it isn't mine. Sriraam Natarajan, Kristian Kersting and their co-authors call it AI in the loop: the human is in control of the system, and the AI is there to support the human. Stanford HAI put it plainly in 2022: control should remain in human hands. And Ben Shneiderman showed years ago that more automation doesn't have to mean less control; well-designed systems offer high levels of both. Notice how that maps onto what I described a minute ago. I own the goal; I say it in a sentence. The model finds the way once, and what it found is kept as a script I can read. The hooks and the server's own controls hold the line while I'm walking the dog. I don't approve every step; I read the record. That's high automation and high control at the same time, and it's the arrangement this talk asks for, for agents calling APIs too.",
+  "sources": [
+    {
+      "label": "Natarajan et al.: Human-in-the-loop or AI-in-the-loop? (arXiv, 2024)",
+      "href": "https://arxiv.org/abs/2412.14232"
+    },
+    {
+      "label": "Shneiderman: Human-Centered AI: Reliable, Safe & Trustworthy (arXiv, 2020)",
+      "href": "https://arxiv.org/abs/2002.04087"
+    },
+    {
+      "label": "Lynch: AI in the Loop: Humans Must Remain in Charge (Stanford HAI, 2022)",
+      "href": "https://hai.stanford.edu/news/ai-loop-humans-must-remain-charge"
+    }
+  ]
+}

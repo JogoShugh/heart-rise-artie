@@ -2,7 +2,7 @@ name: step-5-after-merge
 part: "For real: two forges, one vocabulary"
 title: "After the merge: the server changed, the client didn’t"
 kicker: Building it back up · Step 5 of 5 · HEART L0, simplified
-say: "The same pull request, read after scm:merge. The state changed, so the forms changed: three left, comment, label and edit. merge, close and reopen are gone, each with its reason. ARTIE needed no new code to know; it read what's offered. The ETag changed too, so any act still holding the old one gets 412."
+say: "The same pull request, read after scm:merge. The state changed, so the forms changed: three left, comment, label and edit. merge, close and reopen are gone, each with its reason. ARTIE needed no new code to know; it read what's offered. The ETag changed too, so any act still holding the old one gets 412. That's resilience in its plainest form: the server changed, and the client didn't need to."
 sources:
   - ["artie: github-scm/pull.reader.yaml", "https://github.com/JogoShugh/heart-rise-artie"]
   - ["Fielding (2008)", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]
@@ -44,6 +44,6 @@ html: |
               reopen it first.
   # each also has rel: /profiles/scm#close, #reopen, …</pre>
       <p class="punch">7 forms open, 3 merged. ARTIE needed no new code: it reads what’s offered, as a browser does.</p>
-      <p class="refs"><deck-ref name="think-of-the-web"></deck-ref> <deck-fragment name="reader">pull.reader.yaml</deck-fragment></p>
+      <p class="refs"><deck-ref name="think-of-the-web"></deck-ref> <deck-ref name="resilience"></deck-ref> <deck-fragment name="reader">pull.reader.yaml</deck-fragment></p>
     </div>
   </div>

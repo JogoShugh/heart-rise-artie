@@ -1,8 +1,8 @@
 name: hooks
-part: "What it costs, and how it was built"
+part: "Built the same way: one behavior at a time"
 title: Instructions are advisory. Hooks are not.
 kicker: How it was built · Determinism through hooks
-say: "The bdd-gates skill. A model can be told to write the test first; it can't be trusted to always do it. Hooks make it a property of the environment. They cost zero tokens."
+say: "So how do you make sure the model actually works that way, one behavior at a time, when you're not watching? You can tell it to write the test first. It will, most of the time. Most of the time isn't repeatable. So the bdd-gates skill makes it a property of the environment instead: Claude Code hooks guard the edits, and git hooks guard the history. Gherkin first, red logged, green to stop, the order checked at commit, and the gates themselves out of the model's reach. None of it costs a token."
 sources:
   - ["bdd-gates skill", "https://github.com/JogoShugh/bdd-gates-skill"]
   - ["Claude Code hooks", "https://code.claude.com/docs/en/hooks"]
@@ -27,7 +27,7 @@ html: |
         </tbody>
       </table></div>
       <p class="punch">Claude Code hooks guard the edits; git hooks guard the history.</p>
-      <p class="refs"><deck-fragment name="hooks">hooks.json</deck-fragment></p>
+      <p class="refs"><deck-ref name="repeatability"></deck-ref> <deck-ref name="right-behavior"></deck-ref> <deck-ref name="resilience"></deck-ref> <deck-fragment name="hooks">hooks.json</deck-fragment></p>
     </div>
     <div class="card dark" style="box-shadow: inset 0 0 0 1.5px rgba(227, 179, 65, 0.45); align-content: center; padding: 1.6rem;">
       <p style="font: 700 3.6rem/1 var(--display); color: #e3b341; margin: 0;">0</p>

@@ -55,3 +55,10 @@
   summary: "An MCP server with ARTIE inside. The model gets six tools that never change (look, act, follow, describe, explain, back); the state and the acts it allows come in every answer, and ARTIE builds every request. The model never sees an address."
   cite: "heart-mcp (repository)"
   href: https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/mcp
+- name: buster
+  kind: part
+  label: "BUSTER"
+  title: "Buster: a chaos filter for HEART, named after the dog"
+  summary: "Sits in front of a server and tampers with its answers on purpose: forges an ETag, flips a letter in a form, drops an affordance, lies about the rung. Each plugin breaks one rule of the HEART spec and says what the client must do about it; each mutation ends as a pass or a FAIL, seeded so any failure replays exactly, and nothing corrupted is ever cached. Basically Unstoppable Saboteur Terrierizing Every Representation."
+  cite: "Buster (repository)"
+  href: https://github.com/JogoShugh/buster

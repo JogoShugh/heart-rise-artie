@@ -2,7 +2,7 @@ name: divorce
 part: "What the machine web did"
 title: "The divorce: data in the response, controls elsewhere"
 kicker: The machine web
-say: "APIs kept the information and moved the controls out of band: docs, SDKs, OpenAPI, and now MCP tool lists. Agents inherit the divorce: every tool and endpoint is loaded into the context window up front, whatever the current state allows."
+say: "APIs kept the information and moved the controls out of band: docs, SDKs, OpenAPI, and now MCP tool lists. Agents inherit the divorce: every tool and endpoint is loaded into the context window up front, whatever the current state allows. Measure it against right behavior: a list loaded up front says nothing about what the current state allows, so the model has to guess."
 sources:
   - ["Fielding (2008)", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]
   - ["GitHub OpenAPI description", "https://github.com/github/rest-api-description"]
@@ -17,4 +17,4 @@ html: |
   </div>
   <blockquote class="big">“Failure here implies that out-of-band information is driving interaction instead of hypertext.”</blockquote>
   <p class="cite"><a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven" target="_blank" rel="noopener"><b>Roy T. Fielding</b></a>, “REST APIs must be hypertext-driven”, 2008</p>
-  <p class="refs"><deck-ref name="rule-3"></deck-ref></p>
+  <p class="refs"><deck-ref name="rule-3"></deck-ref> <deck-ref name="right-behavior"></deck-ref></p>

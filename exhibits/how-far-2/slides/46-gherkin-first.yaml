@@ -1,5 +1,5 @@
 name: gherkin-first
-part: "What it costs, and how it was built"
+part: "Built the same way: one behavior at a time"
 title: No production write until a feature file changes
 kicker: For the engineers · Gherkin first
 say: "gherkin-first.sh runs before every Edit or Write. If the file is production code and no feature file has an in-flight change, it exits 2 with a message the model reads. log-event.sh, after every edit, appends a fact to the event log, which the pre-commit check reads in order."

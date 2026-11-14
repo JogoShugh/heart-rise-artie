@@ -1,0 +1,139 @@
+{
+  "name": "who-owns-loop",
+  "title": "Who Owns the Loop?",
+  "part": "The question",
+  "kicker": "AI in the loop · not a person rubber-stamping a machine",
+  "tone": "light",
+  "number": 5,
+  "of": 63,
+  "html": "<h2>Who Owns the Loop?</h2>\n<div class=\"split\">\n  <figure>\n    <svg viewBox=\"0 0 440 340\" role=\"img\" aria-label=\"Two axes, human control and automation. A rubber stamp sits at high automation and low real control; the arrangement in this talk sits at high automation and high control.\">\n      <line x1=\"60\" y1=\"290\" x2=\"420\" y2=\"290\" stroke=\"currentColor\" stroke-width=\"2\"/>\n      <line x1=\"60\" y1=\"290\" x2=\"60\" y2=\"20\" stroke=\"currentColor\" stroke-width=\"2\"/>\n      <text x=\"240\" y=\"325\" text-anchor=\"middle\" fill=\"currentColor\" font-size=\"14\">automation →</text>\n      <text x=\"22\" y=\"155\" text-anchor=\"middle\" fill=\"currentColor\" font-size=\"14\" transform=\"rotate(-90 22 155)\">human control →</text>\n      <circle cx=\"340\" cy=\"250\" r=\"9\" fill=\"#c0392b\"/>\n      <text x=\"340\" y=\"232\" text-anchor=\"middle\" fill=\"currentColor\" font-size=\"13\">a person approving 500 a day</text>\n      <circle cx=\"120\" cy=\"70\" r=\"9\" fill=\"#888\"/>\n      <text x=\"120\" y=\"52\" text-anchor=\"middle\" fill=\"currentColor\" font-size=\"13\">typing it all yourself</text>\n      <circle cx=\"300\" cy=\"70\" r=\"11\" fill=\"#2f9e5b\"/>\n      <text x=\"300\" y=\"52\" text-anchor=\"middle\" fill=\"currentColor\" font-size=\"13\" font-weight=\"700\">this talk</text>\n      <text x=\"300\" y=\"98\" text-anchor=\"middle\" fill=\"currentColor\" font-size=\"12\">goal owned · script read · gates hold</text>\n    </svg>\n    <figcaption>After Shneiderman: high automation and high control, together.</figcaption>\n  </figure>\n  <div class=\"rows\">\n    <div><h3>The Person Owns the Goal</h3><p>Said in a sentence. Read back as a kept script.</p></div>\n    <div><h3>The Model Supports</h3><p>Finds the way once. Repairs when the controls change.</p></div>\n    <div><h3>The Controls Hold the Line</h3><p>Hooks for the builder, the server’s forms for the agent. I read the record, not every step.</p></div>\n    <p class=\"refs\"><deck-ref name=\"ai-in-the-loop\"></deck-ref> <deck-ref name=\"hcai\"></deck-ref> <deck-ref name=\"humans-in-charge\"></deck-ref> <deck-ref name=\"reason\"></deck-ref></p>\n  </div>\n</div>\n",
+  "say": "You may have heard 'human in the loop' used as a comfort blanket: put a person at the end of the pipeline to approve whatever the machine decided. Ask that person to approve five hundred decisions a day and see how much reviewing actually happens. Probably not much. There's a better framing, and it isn't mine. Sriraam Natarajan, Kristian Kersting and their co-authors call it AI in the loop: the human is in control of the system, and the AI is there to support the human. Stanford HAI put it plainly in 2022: control should remain in human hands. And Ben Shneiderman showed years ago that more automation doesn't have to mean less control; well-designed systems offer high levels of both. Notice how that maps onto what I described a minute ago. I own the goal; I say it in a sentence. The model finds the way once, and what it found is kept as a script I can read. The hooks and the server's own controls hold the line while I'm walking the dog. I don't approve every step; I read the record. That's high automation and high control at the same time, and it's the arrangement this talk asks for, for agents calling APIs too.",
+  "sources": [
+    {
+      "label": "Natarajan et al.: Human-in-the-loop or AI-in-the-loop? (arXiv, 2024)",
+      "href": "https://arxiv.org/abs/2412.14232"
+    },
+    {
+      "label": "Shneiderman: Human-Centered AI: Reliable, Safe & Trustworthy (arXiv, 2020)",
+      "href": "https://arxiv.org/abs/2002.04087"
+    },
+    {
+      "label": "Lynch: AI in the Loop: Humans Must Remain in Charge (Stanford HAI, 2022)",
+      "href": "https://hai.stanford.edu/news/ai-loop-humans-must-remain-charge"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "who-owns-loop.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "no-time.json",
+      "title": "No Time to Type"
+    },
+    "next": {
+      "href": "infer-once.json",
+      "title": "When to think, and how “once” stays true"
+    },
+    "alternate": {
+      "href": "who-owns-loop.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "ai-in-the-loop",
+        "kind": "loop",
+        "label": "AI-IN-THE-LOOP",
+        "title": "AI in the loop: the person in control, the AI in support",
+        "summary": "Natarajan, Mathur, Sidheekh, Stammer and Kersting contrast human-in-the-loop systems with AI-in-the-loop (AI²L) systems, where the human is in control of the system and the AI is there to support the human, and argue that evaluations should not judge the machine component alone.",
+        "quote": "<p>“We argue that existing evaluation methods often overemphasize the machine (learning) component's performance, neglecting the human expert's critical role.”</p>",
+        "cite": "Natarajan, Mathur, Sidheekh, Stammer and Kersting, “Human-in-the-loop or AI-in-the-loop? Automate or Collaborate?”, arXiv",
+        "date": "18 December 2024",
+        "_links": {
+          "self": {
+            "href": "../refs/ai-in-the-loop.json",
+            "title": "AI-IN-THE-LOOP"
+          },
+          "describedby": {
+            "href": "https://arxiv.org/abs/2412.14232",
+            "title": "Natarajan, Mathur, Sidheekh, Stammer and Kersting, “Human-in-the-loop or AI-in-the-loop? Automate or Collaborate?”, arXiv"
+          }
+        }
+      },
+      {
+        "name": "hcai",
+        "kind": "loop",
+        "label": "HIGH-AND-HIGH",
+        "title": "High automation and high human control, together",
+        "summary": "Shneiderman's human-centered AI framework: more automation does not have to mean less human control. Well-designed systems offer both.",
+        "quote": "<p>“Well-designed technologies that offer high levels of human control and high levels of computer automation can increase human performance, leading to wider adoption.”</p>",
+        "cite": "Ben Shneiderman, “Human-Centered Artificial Intelligence: Reliable, Safe & Trustworthy”, arXiv",
+        "date": "10 February 2020",
+        "_links": {
+          "self": {
+            "href": "../refs/hcai.json",
+            "title": "HIGH-AND-HIGH"
+          },
+          "describedby": {
+            "href": "https://arxiv.org/abs/2002.04087",
+            "title": "Ben Shneiderman, “Human-Centered Artificial Intelligence: Reliable, Safe & Trustworthy”, arXiv"
+          }
+        }
+      },
+      {
+        "name": "humans-in-charge",
+        "kind": "loop",
+        "label": "IN-CHARGE",
+        "title": "AI in the loop: humans must remain in charge",
+        "summary": "Stanford HAI, announcing its 2022 fall conference: put AI in the loop, with control in human hands.",
+        "quote": "<p>“Artificial intelligence should augment humans, be a useful tool in our work, but control should remain in human hands.”</p>",
+        "cite": "Shana Lynch, “AI in the Loop: Humans Must Remain in Charge”, Stanford HAI",
+        "date": "17 October 2022",
+        "_links": {
+          "self": {
+            "href": "../refs/humans-in-charge.json",
+            "title": "IN-CHARGE"
+          },
+          "describedby": {
+            "href": "https://hai.stanford.edu/news/ai-loop-humans-must-remain-charge",
+            "title": "Shana Lynch, “AI in the Loop: Humans Must Remain in Charge”, Stanford HAI"
+          }
+        }
+      },
+      {
+        "name": "reason",
+        "kind": "hype",
+        "label": "REASON",
+        "title": "Reason: the part everyone's excited about",
+        "summary": "Reasoning models can stand in for a person in two places: finding the way the first time, and repairing when the controls change. Everywhere else, paying a model to reason through the same path again is the token maxing Hightower warned about. Useful at the edges; wasted in the middle.",
+        "cite": "The hype, kept at the edges",
+        "_links": {
+          "self": {
+            "href": "../refs/reason.json",
+            "title": "REASON"
+          },
+          "describedby": {
+            "href": "#three-rs",
+            "title": "The hype, kept at the edges"
+          }
+        }
+      }
+    ]
+  }
+}

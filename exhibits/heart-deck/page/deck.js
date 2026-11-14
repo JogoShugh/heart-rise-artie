@@ -134,7 +134,7 @@
   });
 
   // Every pill in the deck, at any time (K): the reference notes, one resource, grouped by kind.
-  var GROUPS = [["Grounds", ["talk", "ground"]], ["Fielding 2000 · constraints", ["constraint"]], ["Fielding 2008 · rules", ["rule"]],
+  var GROUPS = [["Grounds", ["talk", "ground"]], ["The three R’s, and the hype", ["measure", "hype"]], ["Who owns the loop", ["loop"]], ["Fielding 2000 · constraints", ["constraint"]], ["Fielding 2008 · rules", ["rule"]],
     ["Fielding 2008 · comments", ["comment"]], ["The parts", ["part"]], ["Previews: shown later", ["preview"]]];
   var allRefs = null;
   function asEmbedded(r) {

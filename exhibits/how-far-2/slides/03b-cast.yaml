@@ -1,13 +1,13 @@
 name: cast
-part: "Why now"
-title: The cast, before any of it appears
+part: "The question"
+title: "The Cast, Before Any of It Appears"
 kicker: Names you'll hear · each one a pill
-say: "Before anything uses a name, here are the names. MCP is how agents call tools today: a list of named functions, called over JSON-RPC. HEART is our media type: every answer carries the data and the forms for the acts its state allows now. RISE is the asynchronous half: ask now, be told later. ARTIE is the generic client, coupled to HEART the way a browser is coupled to HTML. The gateway is a small server on a laptop that puts our controls in front of GitHub or GitLab. scm is the set of typed relations both forges answer to. L0, L1 and L2 are three ways to deliver the same forms, from all in one answer to cached by link. And heart-mcp is HEART behind six MCP tools that never change. Each is a pill; each comes back."
+say: "Before anything uses a name, here are the names. MCP is how agents call tools today: a list of named functions, called over JSON-RPC. HEART is our media type: every answer carries the data and the forms for the acts its state allows now. RISE is the asynchronous half: ask now, be told later. ARTIE is the generic client, coupled to HEART the way a browser is coupled to HTML. The gateway is a small server on a laptop that puts our controls in front of GitHub or GitLab. scm is the set of typed relations both forges answer to. L0, L1 and L2 are three ways to deliver the same forms, from all in one answer to cached by link. And heart-mcp is HEART behind six MCP tools that never change. One more, and he has four legs: Buster, a chaos filter named after my dog, who tests ARTIE's resilience the way he tests mine. Each is a pill; each comes back."
 sources:
   - ["heart-rise-artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]
   - ["Model Context Protocol: tools", "https://modelcontextprotocol.io/specification/2025-06-18/server/tools"]
 html: |
-  <h2>The cast, before any of it appears</h2>
+  <h2>The Cast, Before Any of It Appears</h2>
   <div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)">
     <div class="rows">
       <div><h3><deck-ref name="mcp"></deck-ref></h3><p>How agents call tools today: named functions, over JSON-RPC.</p></div>
@@ -20,5 +20,6 @@ html: |
       <div><h3><deck-ref name="scm"></deck-ref></h3><p>One set of typed relations both forges answer to.</p></div>
       <div><h3><deck-ref name="rungs"></deck-ref></h3><p>Three ways to deliver the same forms: all in one answer, or cached by link.</p></div>
       <div><h3><deck-ref name="heart-mcp"></deck-ref></h3><p>HEART behind six MCP tools that never change.</p></div>
+      <div><h3><deck-ref name="buster"></deck-ref></h3><p>A chaos filter named after the dog. Tests ARTIE’s resilience.</p></div>
     </div>
   </div>
