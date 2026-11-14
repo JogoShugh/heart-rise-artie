@@ -7,13 +7,13 @@ sources:
   - ["Hightower: ZTA, Zero Token Architecture (talk)", "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"]
 html: |
   <h2>More Than Tokens: The Three R’s</h2>
-  <div class="split" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
-    <div class="step"><h3><deck-ref name="right-behavior"></deck-ref></h3><p>Only what the state allows. When an act is absent, a reason.</p></div>
-    <div class="step"><h3><deck-ref name="repeatability"></deck-ref></h3><p>That right behavior, the same way, every time.</p></div>
-    <div class="step"><h3><deck-ref name="resilience"></deck-ref></h3><p>The server changes, or misbehaves. The client takes the right failure path and carries on.</p></div>
+  <div class="rel-frame">
+    <div class="rel-head"><deck-ref name="reliability"></deck-ref><span>All three together, or it isn’t reliable</span></div>
+    <div class="rel-cards">
+      <div class="step"><h3><deck-ref name="right-behavior"></deck-ref></h3><p>Only what the state allows. When an act is absent, a reason.</p></div>
+      <div class="step"><h3><deck-ref name="repeatability"></deck-ref></h3><p>That right behavior, the same way, every time.</p><p class="note">Given the same inputs, the same outputs, call after call.</p></div>
+      <div class="step"><h3><deck-ref name="resilience"></deck-ref></h3><p>The server changes, or misbehaves. The client takes the right failure path and carries on.</p></div>
+    </div>
   </div>
-  <div class="card dark" style="margin-top: 1.2rem">
-    <p><deck-ref name="reason"></deck-ref> is the hype. A reasoning model can stand in for a person in two places: <b>finding the way the first time</b>, and <b>repairing when the controls change</b>. In the middle, it’s the token maxing Hightower warned us about.</p>
-  </div>
-  <p class="note">Repeatable: given the same inputs, the same outputs, call after call. All three together are what people mean by <deck-ref name="reliability"></deck-ref>; miss one and it’s gone.</p>
-  <p class="punch">Every part of this talk gets measured against these three.</p>
+  <div class="risk-bar"><deck-ref name="risk"></deck-ref><span>Risk, mitigated: lose any one R, and its risk comes back.</span></div>
+  <div class="reason-strip"><deck-ref name="reason"></deck-ref><span>is the hype. A reasoning model can stand in for a person in two places: <b>finding the way the first time</b>, and <b>repairing when the controls change</b>. In the middle, it’s the token maxing Hightower warned us about.</span></div>

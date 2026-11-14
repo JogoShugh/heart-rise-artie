@@ -134,3 +134,19 @@
   .slide .forge { padding: 1rem; }
   .slide .forge .mark { width: 56px; height: 56px; }
 }
+
+/* Reliability over the three R's, risk under them, reason beside the point */
+.slide .rel-frame { border: 2px solid var(--leaf); border-radius: 18px; padding: .9rem 1rem 1rem; margin-top: .4rem; }
+.slide .rel-head { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin: 0 0 .8rem; color: var(--muted); font-size: .95rem; }
+.slide .rel-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.slide .rel-cards .step { margin: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: .5rem; }
+.slide .rel-cards .step p, .slide .rel-cards .step h3 { margin: 0; }
+.slide .rel-cards .note { margin-top: .4rem; font-size: .85rem; color: var(--muted); }
+.slide .risk-bar { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-top: .7rem; padding: .8rem 1rem; border-radius: 14px; background: var(--leaf); color: var(--bg); font: 650 1.25rem var(--display); }
+.slide .risk-bar .ref { background: var(--bg); color: var(--leaf); border-color: var(--bg); }
+.slide .reason-strip { display: flex; align-items: baseline; gap: .7rem; margin-top: .9rem; padding: .8rem 1rem; border: 1.5px dotted var(--muted); border-radius: 14px; font-size: 1rem; }
+.slide .reason-strip .ref { flex: none; }
+@media (max-width: 760px) {
+  .slide .rel-cards { grid-template-columns: minmax(0, 1fr); }
+  .slide .reason-strip { display: block; }
+}
