@@ -1,0 +1,218 @@
+---
+run:
+  inputs:
+    entry:
+      value: http://localhost:8099/
+      given: default
+      default: http://localhost:8099/
+  model:
+    name: claude-sonnet-5-5
+    url: https://api.anthropic.com
+  usage:
+    calls: 3
+    input: 1243
+    output: 561
+    cache_read: 2754
+    cache_write: 0
+---
+at: '2026-11-02T10:02:11.647287Z'
+ms: 42
+mode: script
+say: enter {entry}
+line: 5
+params:
+  entry: http://localhost:8099/
+opens: true
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-02T10:02:11.693478Z'
+ms: 2676
+mode: intent
+say: Find the employees named Baggins
+line: 6
+within: 5
+params:
+  relation: staff:search-employees
+  name: Baggins
+values:
+  name:
+    value: Baggins
+    type: string
+    from:
+      - words
+reason:
+  template: Find the employees named Baggins
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"Employees","hr:manifest":{"forms":{"staff:dismiss":["sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04="],"staff:get-employee":["sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY="],"staff:hire":["sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM="],"staff:search-employees":["sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4="],"staff:update":["sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM="]},"digest":"sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc="}}
+      </state>
+      <offers>
+      {"staff:search-employees":{"title":"Find employees by name","description":"Lists the employees whose name has the text.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"name":{"type":"string","minLength":1,"title":"Name","description":"Part of the employee's first or last name; case is ignored"}},"required":["name"]}},"staff:get-employee":{"title":"Get an employee by number","description":"Goes to one employee, given their number.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Employee number","description":"The employee's number"}},"required":["id"]}},"staff:hire":{"title":"Hire an employee","description":"Hires someone, in a role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object","$id":"/schemas/10847085ef79da90"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Find the employees named Baggins
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01P7jqSS4ATYgYXow5EXMdFh","name":"select","input":{"action":"act","affordance":"staff:search-employees","fields":{"name":"Baggins"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:search-employees
+  title: Find employees by name
+  method: GET
+  target: /employees{?name}
+  address: http://localhost:8099/employees?name=Baggins
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8099/employees?name=Baggins
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Frodo Baggins
+      - Bilbo Baggins
+---
+at: '2026-11-02T10:02:14.372945Z'
+ms: 1570
+mode: intent
+say: Open Frodo Baggins
+line: 7
+within: 6
+params:
+  relation: item
+  title: Frodo Baggins
+values:
+  title:
+    value: Frodo Baggins
+    from:
+      - words
+reason:
+  template: Open Frodo Baggins
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":2}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Frodo Baggins"},{"rel":"item","title":"Bilbo Baggins"}]
+      </links>
+      <intent>
+      Open Frodo Baggins
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01R2bp9HtFf5urM2UFSGe9tx","name":"select","input":{"action":"follow","rel":"item","title":"Frodo Baggins"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: Frodo Baggins
+  method: GET
+  target: http://localhost:8099/employees/1
+  address: http://localhost:8099/employees/1
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T10:02:15.944243Z'
+ms: 3815
+mode: intent
+say: Change his role to "ring bearer, retired"
+line: 8
+within: 7
+params: {}
+reason:
+  template: Change his role to "ring bearer, retired"
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":1,"firstName":"Frodo","lastName":"Baggins","role":"ring bearer","status":"dismissed"}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Change his role to "ring bearer, retired"
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSggsKEAgTGAI4AUIIdGhpbmtpbmcSDGDetECGfWd1/fhdLhoMW+lZBUidgjF6ebL8IjAFYowrIdWgvWtDyRO2fQTWihTPTY7A9loV9WJm+LV3vo+VMFne89ZRNOrcnMztqQUqnwrpUQu30Mu7WIuzd8+x80o1hPqK/2TTRh86j5wcC8HOUK7x3ek5nshOF/zDyw2IVxLkt+g8fbw/6DXUX4SCj7nSrh5CVQh5YeZx7D3a54K3cePnXzPZU3Vsbi4QGSyp2IiUICE9j76OEBQOjzbR7No9WgGK4RICDyXUy95HfGB7E1fNGyIFHD+GkpyA2BfyZDKsyDLDrC4moeHV70YygavuWrpgiMev9tT6KgpXCXREdLFhakLvSrub1KOul/srKXrZ1gUKsIEMkNvJvse5pdeKcjiRIZOfBUm+iHd9K1xJr6JnKCJG3uMdaBNPYT6meZBIe6PNVt7odqA0fENIM4XIT9wTLJ+2zEXvoBPFiR52EKcaRv3cZ580/hbXPyMxLvhHkN9poEMHVkmKc33Ll8moBfqiYGCWa1YZW7ezGl5fMIn+K0zj9NR7AKfM8hxQ6wCPNyZwZqaNqMzJUA+x01XK+jAheyfH7ijOWJN393f9yj+WmO6Qd8zEuDLZJ5pNf3IipAqDy5SPmmv+QE6pC03N/VcbSQHndGhoJ1BX+T3Fa1r0duZb+eV8WHsaGFyf6HB5Tl7KkDuAW83vJifcRQA7EjxtZGy1ThLFSed07C1vhJvgnhGIWGlsHi9pQ+cW0/vGEjksjExveLsFsFo6KPGrLV3DGVvhwCh6kBeBxgpH70VuOQxrSDeJqVZCYWLibL0vILWtUB/XzcAVSQaMJj9AElo6RodzO+LtqzO5s9Z/IM689QLxjoYGB9myc+vKgYJ7H+msq/0/ebudTtsV6IrRNS9hTXHl/GK01sFa1TCzTlZnQNG+FhuGCMGTemdJCHfusXiYg+4G5d5K0K6bCmp7jFVp4Q85eey4Z4E/+ul8cfeEMnGfSBDUIUwqGBleqOy0D+b9iRn7vWOQ74HLLhbSufNGXkuQOFTbC6QbDD+58ramkuDH0UZLiaNBm9tnKO23hLD26WKTf5ajYA/534gduUD2n8QWu9NbBVJmdtl0nW9QKXOzT8eIpRIiHX2a/7I5WPD6XnR0ct87fg/RJUKRdrAxy6AH3Xf/CrNKSpgSEnK77Let5nejocTQ8xNL6VqZ0KUoMVhxeG6fOagJJbUk2WMxQ9ghHqymrs/iPJ4xE/1BQmLZCXE+mcVWi4soqSmCMC2B9cilOw9WTRJJJJsdCz/nlbGCaVwlqVWusly4WJDDyOfbu7u05LUrfaB1zi24hoIQaHBGEwe60D9eSwSRIe0sE9KTe3Im55lRLvcVgpQTEIbG22OvdNskoTfnFuRbADWLET2Pgnx2ARk5o7AhDv9TZehWBjfwVriH8a1Zo9yY40nyei6s6VqFTlfKhSlLVxQymILJabK20Kn4BYOo31/vwcc7YTVg7MyXXV0sfExIbX0CL6hfLopxR7x7Q0eDALL8WPEDT6o5m9o+Jbq7DQdp54pQOxh+Wj1t6qDAfDUqfYhlGEZqkGxFvY/pDUY9j8k6N04mJnbMJJCrqUyQPhEbeCiL6m15OZjg5P6f7T7RFVpSs5u5e/xzrprszC6s/sKquJXEV6ooq99X3fUFaSuEFQ/wMQ95uPH45RlsRA1EWTIo8ID3Ip0l0Y9aoJVpW+Wq4mcw+u3CLF1fcbOpJCcE0toF7CgpbMODkzEn2OrvVz+AZRIGTKnCiSn6+NQI8WYqOjRIUdxThWi/OSyZUOG07/A6TnVPqVbNnHndQXZS3AkASC3NiCr5gVTx38UZktM/YPT1knPd7Y89cQIYAQ=="},{"type":"tool_use","id":"toolu_01Fkqj2cU54gE9h6u8hJwpds","name":"select","input":{"action":"clarify","question":"No action to change Frodo''s role is available right now (his status is \"dismissed\"). Do you want to do something else?"},"caller":{"type":"direct"}}]'
+outcome: refused
+address: http://localhost:8099/employees/1
+refused:
+  kind: unclear to the reasoner
+  by: the client
+  detail: No action to change Frodo's role is available right now (his status is "dismissed"). Do you want to do something else?

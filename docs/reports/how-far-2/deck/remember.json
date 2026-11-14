@@ -1,0 +1,46 @@
+{
+  "name": "remember",
+  "title": "Remember typing every field into one box, and picking GET or POST?",
+  "part": "How the human Web did it",
+  "kicker": "1997 · the web that wasn’t",
+  "tone": "dark",
+  "number": 9,
+  "of": 59,
+  "html": "<h2>Remember typing every field into one box, and picking GET or POST?</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: center\">\n  <figure><img src=\"media/forms-html.png\" alt=\"WebWalker 1.0, a fictional 1997 browser, showing forms.html: a Method menu set to GET, a Location box, a Body box, and the page's entry for RENEW A LOAN: method POST, an address with {loanId}, a body with {card} and {pin}.\"><figcaption>WebWalker 1.0 on forms.html: a method menu and a body box in the browser, because pages couldn’t hold controls.</figcaption></figure>\n  <div class=\"rows\">\n    <div class=\"step\"><h3>1 · Find the act</h3><p>Open <code>forms.html</code>, scroll to RENEW A LOAN.</p></div>\n    <div class=\"step\"><h3>2 · Pick the method</h3><p><b>POST</b> from the browser’s menu.</p></div>\n    <div class=\"step\"><h3>3 · Type the address</h3><p><code>/loans/{loanId}/renew</code>, with your loan number filled in by hand.</p></div>\n    <div class=\"step\"><h3>4 · Type the body</h3><p><code>card=…&amp;pin=…</code>, exactly as shown.</p></div>\n    <p class=\"cite\"><span class=\"fiction\">Fiction</span> A 1997 that never happened, built and run for real: Perl CGI behind Apache.</p>\n  </div>\n</div>\n",
+  "say": "Quick show of hands. Remember when, to renew a library book, you opened the site's forms.html page, scrolled to RENEW A LOAN, picked POST from your browser's method menu, typed the address with your loan number in it, and typed card equals your card number, ampersand, pin equals your PIN, into the body box? This is a fictional browser, WebWalker, on a fictional 1997 web that was built and run for real for a talk called Overheard at Riverside: Perl CGI, Apache, the lot. Every screen here is that site, answering.",
+  "sources": [
+    {
+      "label": "The Web That Wasn’t (report)",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/the-web-that-wasnt/"
+    },
+    {
+      "label": "Overheard at Riverside",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/overheard-at-riverside/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "remember.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "previews.json",
+      "title": "What you'll see, promised now"
+    },
+    "next": {
+      "href": "i-dont-either.json",
+      "title": "I don’t either. Forms arrived, and the page took the controls in"
+    },
+    "alternate": {
+      "href": "remember.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

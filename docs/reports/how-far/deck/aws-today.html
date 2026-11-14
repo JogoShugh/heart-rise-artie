@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS already names the acts. Only the forms are missing · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">A preview of HEART · 1 of 5 · Today</span></header>
+<h2>AWS already names the acts. Only the forms are missing</h2>
+<p class="refs"><small style="background: #B5562B; color: #fff; padding: 0.15rem 0.6rem; border-radius: 1rem; font-weight: 700">MOCKUP</small> <small><b>Today</b> · L0 · L1 · L2</small> <small><i>Green: the relations AWS already offers.</i></small></p>
+<div class="split" style="grid-template-columns: 1fr 1fr 1fr">
+<pre><code># GET /clientcertificates  (AWS's sample)
+<b>_links:</b>
+  curies:
+    name: clientcertificate
+    href: https://docs.aws.amazon.com/
+      apigateway/latest/developerguide/
+      restapi-clientcertificate-{rel}.html
+    templated: true
+  self:
+    href: /clientcertificates
+  clientcertificate:by-id:
+    href: /clientcertificates/
+      {clientcertificate_id}
+    templated: true
+<span class="add">  clientcertificate:generate:
+    href: /clientcertificates</span>
+  item:
+    href: /clientcertificates/xmbiqp</code></pre>
+<pre><code><b>_embedded:</b>
+  item:
+    _links:
+      self:
+        href: /clientcertificates/xmbiqp
+<span class="add">      clientcertificate:delete:
+        href: /clientcertificates/xmbiqp
+      clientcertificate:update:
+        href: /clientcertificates/xmbiqp</span>
+    clientCertificateId: xmbiqp
+    createdDate: 2015-12-08T18:02:16Z
+    description: test-client-cert-2
+    expirationDate: 2016-12-07T18:02:16Z
+    pemEncodedCertificate: |
+      -----BEGIN CERTIFICATE-----
+      MIIC6DC...XuHVdZ5r27XRRXEjg==
+      -----END CERTIFICATE-----</code></pre>
+  <div class="rows">
+    <h3>Still looked up elsewhere</h3>
+    <table>
+      <thead><tr><th>Relation</th><th>Method</th><th>Body</th></tr></thead>
+      <tbody>
+        <tr><td>generate</td><td>POST</td><td>description, tags</td></tr>
+        <tr><td>update</td><td>PATCH</td><td>patchOperations</td></tr>
+        <tr><td>delete</td><td>DELETE</td><td>none</td></tr>
+      </tbody>
+    </table>
+    <p>Three more docs pages, read by a developer and coded into a client. That is the gap HEART closes, one rung at a time.</p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/aws-docs-into-forms.html" rel="prev"><small>Back</small><b>Out of band, then in band: AWS's docs move into the answer</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#aws-today">with heart-ts</a></span>
+<a href="deck/aws-l0-certificate.html" rel="next"><small>Next</small><b>L0: the certificate, with its forms inline</b></a></nav>
+</main></div></body></html>

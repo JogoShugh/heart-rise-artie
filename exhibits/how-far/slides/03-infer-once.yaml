@@ -1,0 +1,38 @@
+name: infer-once
+part: Opening
+title: When to think, and how “once” stays true
+kicker: Infer once. Then what?
+say: "Infer once, run everywhere. But everywhere includes tomorrow, after the API changed. A script frozen against URLs and docs it learned out of band either breaks, or pays tokens to re-learn. Fielding wrote the answer down in 2008: enter with nothing but a bookmark and media types the client already understands, and from then on take every next step from the choices the server puts in the answer. Then a kept replay only has to check that the act it wants is still offered. That check costs no tokens. The model comes back only when the controls really changed, to repair. Hightower tells you to infer once; Fielding tells you how once stays true. The chips show the real thing: the goal in words, the script kept from one model run, and the pins it checks before every act."
+sources:
+  - ["Fielding: REST APIs must be hypertext-driven (2008)", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]
+  - ["Hightower: ZTA, Zero Token Architecture (talk)", "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"]
+fragments:
+  - name: goal
+    label: The goal, in words (release.goal.md)
+    source: exhibits/merge-watch-release/release.goal.md
+    from: Release a pull request to Dev
+    lang: markdown
+  - name: kept
+    label: The kept script, from one model run (release.heart.yaml)
+    source: exhibits/merge-watch-release/release.heart.yaml
+    from: "steps:"
+    lang: yaml
+  - name: pins
+    label: What it checks before every act (release.pins.yaml)
+    source: exhibits/merge-watch-release/release.pins.yaml
+    lang: yaml
+html: |
+  <h2>When to think, and how “once” stays true</h2>
+  <div class="split">
+    <div class="card">
+      <div class="step"><h3>Hightower: when to think</h3><p>Once. Infer the task, then run it as plain, deterministic code. Zero tokens per run. <deck-ref name="zta">ZTA</deck-ref></p></div>
+      <div class="step gap"><h3>The gap</h3><p>“Everywhere” includes tomorrow. A script frozen against out-of-band URLs breaks, or pays tokens to re-learn.</p></div>
+      <div class="step"><h3>Fielding: why it stays true</h3><p>Every answer carries its controls. The replay checks its act is still offered. That check is free.</p></div>
+      <p class="refs"><deck-fragment name="goal">goal</deck-fragment> <deck-fragment name="kept">kept script</deck-fragment> <deck-fragment name="pins">pins</deck-fragment></p>
+    </div>
+    <div class="card dark" style="box-shadow: inset 0 0 0 1.5px rgba(227, 179, 65, 0.45);">
+      <blockquote class="whole">“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</blockquote>
+      <p class="cite"><a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven" target="_blank" rel="noopener"><b>Roy T. Fielding</b></a>, “REST APIs must be hypertext-driven”, 20 Oct 2008</p>
+      <p class="refs"><deck-ref name="rule-6"></deck-ref> <deck-ref name="ai-driven"></deck-ref> <deck-ref name="in-band"></deck-ref> <deck-ref name="code-on-demand"></deck-ref></p>
+    </div>
+  </div>

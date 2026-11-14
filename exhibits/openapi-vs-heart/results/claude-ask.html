@@ -1,0 +1,14 @@
+
+    <section class="card" hx-get="/card?at=http%3A%2F%2Flocalhost%3A8080%2Fbeds%2F2" hx-trigger="every 2s" hx-swap="outerHTML">
+      <h2>bed-2</h2>
+      <table class="state"><tr><th>id</th><td data-member="id">2</td></tr><tr><th>label</th><td data-member="label">bed-2</td></tr><tr><th>widthFt</th><td data-member="widthFt">4</td></tr><tr><th>lengthFt</th><td data-member="lengthFt">8</td></tr><tr><th>status</th><td data-member="status">PLANTED</td></tr><tr><th>cropName</th><td data-member="cropName">tomato</td></tr><tr><th>growthPoints</th><td data-member="growthPoints">80</td></tr><tr><th>moistureLevel</th><td data-member="moistureLevel">40</td></tr></table>
+      <div class="buttons">
+      <form class="act" hx-post="/act?at=http%3A%2F%2Flocalhost%3A8080%2Fbeds%2F2" hx-target="closest .card" hx-swap="outerHTML">
+        <input type="hidden" name="_form" value="garden:water-cell"><input type="number" name="milliliters" aria-label="Water per cell" placeholder="Water per cell" value="250" required min="1" max="1000"><button type="submit">Water the bed</button>
+      </form></div>
+      <nav class="links"></nav>
+      <form class="ask" hx-post="/ask?at=http%3A%2F%2Flocalhost%3A8080%2Fbeds%2F2" hx-target="closest .card" hx-swap="outerHTML">
+        <input name="intent" placeholder="Ask ARTIE" aria-label="Ask ARTIE"><button type="submit">Ask</button>
+      </form>
+      <p class="message">ARTIE did garden:thaw.</p>
+    </section>

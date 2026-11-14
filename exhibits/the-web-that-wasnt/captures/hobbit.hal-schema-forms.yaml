@@ -1,0 +1,55 @@
+note: 'The Hobbit as HAL Schema Forms at L0: return offered, and why renew is absent.'
+request:
+  method: GET
+  url: /loans/3310
+  headers:
+    Accept: application/hal+json
+    Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>
+    Authorization: <Ana's card and PIN>
+response:
+  status: 200
+  headers:
+    Content-Type: application/hal+json
+    ETag: '"seq-1.hsf.L0.3619e672f0d0c70d"'
+  body:
+    id: 3310
+    title: The Hobbit
+    author: J. R. R. Tolkien
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+    _links:
+      self:
+        href: /loans/3310
+      curies:
+      - name: library
+        href: /profiles/library#{rel}
+        templated: true
+      - name: hr
+        href: https://w3id.org/heart-rise/rels/{rel}
+        templated: true
+      hr:unavailable:
+        href: /unavailable/61bc1cd6003e61f0
+        type: application/json
+        integrity: sha256-Ybwc1gA+YfAiY7ZpXlBplOiul6mouOPJFqTT74MgPzU=
+    _forms:
+      library:return:
+        title: Return
+        description: Gives the book back to the library.
+        _links:
+          target:
+            href: /loans/3310/actions/return
+        method: POST
+        contentType: application/json
+        schema:
+          properties: {}
+          type: object
+          $id: /schemas/efddc7bd8bbcef73
+        hr:integrity: sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+why absent:
+  url: /unavailable/61bc1cd6003e61f0
+  body:
+    unavailable:
+    - reason: A hold is waiting for this book, so it can't be renewed.
+      rel: /profiles/library#renew
+      title: Renew

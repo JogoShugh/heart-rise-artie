@@ -1,0 +1,97 @@
+{
+  "name": "proof",
+  "title": "One script, real GitHub and a local GitLab",
+  "part": "For real: two forges, one vocabulary",
+  "kicker": "Proof",
+  "tone": "light",
+  "number": 45,
+  "of": 59,
+  "html": "<h2>One script, real GitHub and a local GitLab</h2>\n<div class=\"split\">\n  <figure><img src=\"media/github-503.png\" alt=\"GitHub pull request #2336, merged\"><figcaption>Real GitHub: pull request #2336, merged by the replay.</figcaption></figure>\n  <figure><img src=\"media/gitlab-503.png\" alt=\"Local GitLab merge request !503, merged\"><figcaption>Local GitLab: merge request !503, merged by the same script.</figcaption></figure>\n</div>\n<p class=\"lead\"><b>On the wire, compatible because of the typed relation.</b> One YAML connector per forge maps its native API to scm:merge, scm:comment… The GitLab runs make no cloud calls and no model calls.</p>\n<p class=\"refs\"><deck-ref name=\"scm\"></deck-ref> <deck-ref name=\"p2\"></deck-ref></p>\n",
+  "say": "Same kept script, same scm: relations. GitHub is the real cloud service; GitLab runs locally with no cloud calls. Each forge has one YAML connector in the gateway that maps its native API to the same typed relations, so scm:merge means the same on both. On the wire, compatible because of the typed relation. So what did all that cost? And how was it built, a few sentences at a time?",
+  "sources": [
+    {
+      "label": "Pull request #2336",
+      "href": "https://github.com/JogoShugh/heart-github-test/pull/2336"
+    },
+    {
+      "label": "Report: Real GitHub, Local GitLab",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-real-github/"
+    },
+    {
+      "label": "Report: One Script, Two Forges",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-two-forges/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "proof.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "console-and-dev.json",
+      "title": "The build’s console, and Dev, promoted or not"
+    },
+    "next": {
+      "href": "tokenomics.json",
+      "title": "Capture once with a model, replay with none"
+    },
+    "alternate": {
+      "href": "proof.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "scm",
+        "kind": "part",
+        "label": "scm:",
+        "title": "scm: one set of typed relations, two forges",
+        "summary": "scm:merge, scm:comment, scm:close and the rest: relation names defined by meaning, not by one server's endpoints. GitHub and GitLab both answer to them, so a kept script runs on either.",
+        "cite": "heart-gateway connectors",
+        "_links": {
+          "self": {
+            "href": "../refs/scm.json",
+            "title": "scm:"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors",
+            "title": "heart-gateway connectors"
+          }
+        }
+      },
+      {
+        "name": "p2",
+        "kind": "preview",
+        "label": "P2 · TWO FORGES",
+        "title": "P2: the same script on a local GitLab",
+        "summary": "The release script kept from GitHub runs unchanged against a local GitLab, because both answer to the same scm: relations.",
+        "cite": "Shown on: One script, real GitHub and a local GitLab",
+        "_links": {
+          "self": {
+            "href": "../refs/p2.json",
+            "title": "P2 · TWO FORGES"
+          },
+          "describedby": {
+            "href": "#proof",
+            "title": "Shown on: One script, real GitHub and a local GitLab"
+          }
+        }
+      }
+    ]
+  }
+}

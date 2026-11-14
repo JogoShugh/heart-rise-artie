@@ -1,0 +1,35 @@
+# A merge request says nothing about what is allowed, so the rules are written here:
+# first by its state, then by the rules below, in order, each with its reason.
+matches:
+  path: /projects/{owner}%2F{repo}/merge_requests/{pull_number}
+allowed:
+  table: /state
+  rows:
+    opened:
+      allow: [merge, comment, close]
+      absent: { reopen: The pull request is already open. }
+    closed:
+      allow: [reopen, comment]
+      absent:
+        close: The pull request is already closed.
+        merge: "A closed pull request can't be merged; reopen it first."
+    merged:
+      allow: [comment]
+      absent:
+        merge: The pull request is already merged.
+        close: "A merged pull request can't be closed."
+        reopen: "A merged pull request can't be reopened."
+  rules:
+    - when: { /draft: true }
+      absent: { merge: "A draft can't be merged; mark it ready first." }
+    # GitLab works mergeability out in the background after a push; until it has, it is checking.
+    - when: { /detailed_merge_status: checking }
+      absent: { merge: "GitLab is still checking whether it can be merged; read it again shortly." }
+    - when: { /detailed_merge_status: unchecked }
+      absent: { merge: "GitLab hasn't checked whether it can be merged yet; read it again shortly." }
+    - when: { /detailed_merge_status: preparing }
+      absent: { merge: "GitLab is still preparing the merge request; read it again shortly." }
+    - when: { /has_conflicts: true }
+      absent: { merge: "The branch has conflicts with its target; resolve them first." }
+    - when: { /detailed_merge_status: need_rebase }
+      absent: { merge: "The branch is behind its target; rebase it first." }

@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ARTIE in Minecraft, Working</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&family=Pixelify+Sans:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<style>
+/* A proof-of-concept report: hero and tiles, the photos as played, concepts beside the code, then a marked aside. */
+:root {
+  --bg: #f2f3ec; --fg: #1d231f; --muted: #5b675e; --accent: #3a7a33; --earth: #87592c; --card: #fffffa;
+  --rule: #d9d9cb; --chip: #e2eedc; --chip-fg: #285a22; --code: #ecebe1; --pre: #f7f6ee;
+  --aside: #fff6e3; --aside-edge: #d39a2c; --aside-fg: #6b4a0f; --concept: #e9f1fb; --concept-edge: #4f7fbf; --concept-fg: #23476f;
+  --bar: rgba(242, 243, 236, 0.92); --k: #8a3b8f; --s: #2f7a3a; --t: #275f9b; --c: #7a8178; --n: #a2561b; --a: #8a5a00; --m: #5d6a2a;
+  --display: "Source Serif 4", Georgia, serif; --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", Menlo, monospace; --pixel: "Pixelify Sans", "IBM Plex Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121714; --fg: #e2e8e2; --muted: #9daf9f; --accent: #7cc56e; --earth: #d29a5f; --card: #19201b;
+  --rule: #2b372e; --chip: #1f331d; --chip-fg: #b2e3a6; --code: #1e2620; --pre: #161c18;
+  --aside: #2a2213; --aside-edge: #b9842a; --aside-fg: #f0d29a; --concept: #17222f; --concept-edge: #5d8fd0; --concept-fg: #b9d3f3;
+  --bar: rgba(18, 23, 20, 0.92); --k: #d59be0; --s: #95d48a; --t: #8cbcf0; --c: #8a948b; --n: #f0ad73; --a: #e8c06a; --m: #c3cf8a; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #121714; --fg: #e2e8e2; --muted: #9daf9f; --accent: #7cc56e; --earth: #d29a5f; --card: #19201b;
+  --rule: #2b372e; --chip: #1f331d; --chip-fg: #b2e3a6; --code: #1e2620; --pre: #161c18;
+  --aside: #2a2213; --aside-edge: #b9842a; --aside-fg: #f0d29a; --concept: #17222f; --concept-edge: #5d8fd0; --concept-fg: #b9d3f3;
+  --bar: rgba(18, 23, 20, 0.92); --k: #d59be0; --s: #95d48a; --t: #8cbcf0; --c: #8a948b; --n: #f0ad73; --a: #e8c06a; --m: #c3cf8a; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px; }
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; }
+h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
+h1 { font: 600 clamp(2rem, 4.4vw, 2.8rem)/1.08 var(--display); }
+h2 { font: 600 1.45rem/1.2 var(--display); }
+h3 { font: 600 1.05rem/1.3 var(--display); }
+p { margin: 0; }
+a { color: var(--accent); }
+code { font: 0.86em var(--mono); background: var(--code); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+section { display: grid; gap: 14px; min-width: 0; }
+.section-lede { color: var(--muted); max-width: 78ch; }
+.hero { display: grid; gap: 12px; }
+.kicker { font: 600 0.78rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.draft { font: 600 0.7rem var(--mono); letter-spacing: 0.06em; background: var(--aside); color: var(--aside-fg); border: 1px solid var(--aside-edge); padding: 1px 8px; border-radius: 5px; }
+.lede { max-width: 74ch; font-size: 1.07rem; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.tile { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.tile .label { font: 600 0.72rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.tile .n { font: 600 1.35rem/1.2 var(--display); color: var(--accent); }
+.tile .sub { font-size: 0.86rem; color: var(--muted); }
+ul.tight, ol.tight { margin: 0; padding-left: 22px; display: grid; gap: 6px; max-width: 84ch; }
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--card); }
+table { border-collapse: collapse; width: 100%; min-width: 680px; font-size: 0.9rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--rule); }
+th { font: 600 0.74rem var(--mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); background: var(--code); }
+tr:last-child td { border-bottom: 0; }
+td.eg { color: var(--muted); }
+.note { font-size: 0.86rem; color: var(--muted); max-width: 84ch; }
+details { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 0 16px; min-width: 0; }
+details[open] { padding-bottom: 14px; }
+summary { cursor: pointer; padding: 12px 0; font-weight: 600; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+details > *:not(summary) + * { margin-top: 10px; }
+
+/* Concepts: a short definition in the margin of what the dialogs show. */
+.concept { background: var(--concept); border-left: 4px solid var(--concept-edge); border-radius: 0 8px 8px 0; padding: 10px 14px; color: var(--fg); max-width: 84ch; display: grid; gap: 4px; }
+.concept b { color: var(--concept-fg); font: 600 0.74rem var(--mono); text-transform: uppercase; letter-spacing: 0.07em; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 600 0.7rem var(--mono); padding: 2px 8px; border-radius: 5px; background: var(--chip); color: var(--chip-fg); }
+
+/* The photos, as played. */
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+figure { margin: 0; display: grid; gap: 8px; align-content: start; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 10px; min-width: 0; }
+figure img { width: 100%; height: auto; border-radius: 6px; display: block; background: #000; }
+figcaption { font-size: 0.88rem; display: grid; gap: 6px; }
+figcaption .n { font: 600 0.72rem var(--mono); color: var(--muted); }
+
+/* Code, highlighted by highlight.js with this report's own colours. */
+.code { display: grid; gap: 6px; min-width: 0; }
+.code .where { font: 0.76rem var(--mono); color: var(--muted); }
+pre { margin: 0; background: var(--pre); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font: 0.8rem/1.5 var(--mono); }
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.hljs-keyword, .hljs-meta .hljs-keyword { color: var(--k); font-weight: 600; }
+.hljs-string, .hljs-regexp { color: var(--s); }
+.hljs-title, .hljs-title.class_, .hljs-title.function_, .hljs-type, .hljs-built_in { color: var(--t); }
+.hljs-comment, .hljs-doctag { color: var(--c); font-style: italic; }
+.hljs-number, .hljs-literal { color: var(--n); }
+.hljs-attr, .hljs-attribute, .hljs-property, .hljs-variable { color: var(--a); }
+.hljs-meta, .hljs-symbol, .hljs-subst, .hljs-tag, .hljs-name, .hljs-section { color: var(--m); }
+.split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.split > * { min-width: 0; }
+.kotlin-notes { margin: 0; padding: 10px 14px 10px 32px; display: grid; gap: 6px; font-size: 0.9rem; background: var(--card); border: 1px solid var(--rule); border-radius: 8px; max-width: 100ch; }
+
+/* The aside: an idea, not built. */
+.aside { background: var(--aside); border: 2px dashed var(--aside-edge); border-radius: 12px; padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.aside h2 { color: var(--aside-fg); }
+.aside .banner { font: 600 0.78rem var(--mono); letter-spacing: 0.05em; color: var(--aside-fg); text-transform: uppercase; }
+.aside .scroll, .aside details, .aside pre { background: var(--card); }
+.loop { counter-reset: s; list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: 86ch; }
+.loop li { counter-increment: s; display: grid; grid-template-columns: 2rem 1fr; gap: 8px; }
+.loop li::before { content: counter(s); font: 600 0.8rem var(--mono); color: var(--chip-fg); background: var(--chip); border-radius: 50%; width: 1.6rem; height: 1.6rem; display: grid; place-items: center; }
+.sources { font-size: 0.86rem; }
+/* The toolbar every report shares: how much detail, and light or dark. */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; flex-wrap: wrap; padding: 10px 0; background: var(--bar); backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule); }
+.seg { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.seg-label { font: 600 0.74rem var(--mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-right: 6px; }
+.seg button, .theme { font: 600 0.82rem var(--mono); color: var(--fg); background: var(--card);
+  border: 1px solid var(--rule); border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+.seg button[aria-checked="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.seg button:focus-visible, .theme:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+/* Story shows no code; Code adds the excerpts and their notes; Bodies adds what was read, opened. */
+body:not([data-detail="1"]):not([data-detail="2"]) :is(.code, .kotlin-notes) { display: none; }
+body:not([data-detail="2"]) .bodies { display: none; }
+body[data-detail="1"] .only-story, body[data-detail="2"] .only-story { display: none; }
+.only-story { font-size: 0.88rem; color: var(--muted); }
+
+</style>
+
+<div class="wrap">
+  <div class="bar" role="toolbar" aria-label="View">
+    <div class="seg" role="radiogroup" aria-label="Detail">
+      <span class="seg-label">Detail</span>
+      <button type="button" data-level="0" role="radio">Story</button>
+      <button type="button" data-level="1" role="radio">Code</button>
+      <button type="button" data-level="2" role="radio">Bodies</button>
+    </div>
+    <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
+  </div>
+  <header class="hero">
+    <div class="kicker"><span>HEART · ARTIE · Proof of concept · 7 November 2026</span><span class="draft">Draft</span></div>
+    <h1>ARTIE in Minecraft, working</h1>
+    <p class="lede">A Paper server plugin shows a HEART resource as a Minecraft dialog. Played on Minecraft 26.3: the deploy service's app <code>web</code>, deployed in two steps, cancelled from a browser, and the stale cancel in Minecraft refused (412) in the server's own words. The plugin knows Minecraft's dialogs and HEART's media type. It knows nothing about deploying.</p>
+    <div class="tiles">
+      <div class="tile"><span class="label">Played on</span><span class="n">Minecraft 26.3</span><span class="sub">Paper 26.3 build 244 on Java 25; plain Minecraft, no mods</span></div>
+      <div class="tile"><span class="label">Scenarios</span><span class="n">8 of 8 pass</span><span class="sub"><code>dialog.feature</code>, against the simulated deploy service</span></div>
+      <div class="tile"><span class="label">Plugin code</span><span class="n">4 Kotlin files</span><span class="sub">394 lines, with ARTIE's own client inside</span></div>
+      <div class="tile"><span class="label">Refused, live</span><span class="n">412 across two clients</span><span class="sub">A browser cancelled first; Minecraft held the old ETag</span></div>
+    </div>
+  </header>
+
+  <section>
+    <h2>The idea</h2>
+    <div class="concept"><b>Concept: a generic client</b><span>A browser has never been told what a bank is. It knows links and forms, and the bank's representations say which to show. A Minecraft dialog can be the same kind of client: it knows buttons and inputs, and a HEART representation says which ones, with what choices, and what happens when one is pressed.</span></div>
+    <ul class="tight">
+      <li><b>ARTIE reads</b> the resource as HAL Schema Forms, inside the plugin, off the game's main thread.</li>
+      <li><b>The plugin draws</b> what ARTIE read as a dialog: the state as lines of text, a button for each act on offer, a line for each act that is absent and why.</li>
+      <li><b>A press goes back</b> with what the player entered. ARTIE sends the act with <code>If-Match</code>; the answer is the next dialog.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>What was played</h2>
+    <p class="section-lede">Photos of the screen, cropped to it, in the order they were taken. Each one shows a hypermedia idea at work.</p>
+    <div class="gallery">
+      <figure><img src="img/1-idle.jpg" alt="Minecraft dialog titled web: environment staging, region us-east, release 1.1, replicas 1, regions staging and production, the line 'Cancel the deployment: No deployment is in progress.', and buttons Deploy and Scale the app." loading="lazy">
+        <figcaption><span class="n">1 · /artie</span><span>The app, idle. Its state as lines; a button for each act on offer; the absent act and why.</span><span class="chips"><span class="chip">information and controls</span><span class="chip">why absent</span></span></figcaption></figure>
+      <figure><img src="img/2-step1.jpg" alt="Dialog titled Deploy: the act's description, 'Step 1 of 2', a cycling button 'environment: staging', buttons Next and Back." loading="lazy">
+        <figcaption><span class="n">2 · Deploy</span><span>Step 1 asks only for the environment: the region's choices depend on it, and a dialog can't change while it's open.</span><span class="chips"><span class="chip">dependent choices</span></span></figcaption></figure>
+      <figure><img src="img/3-step2.jpg" alt="Dialog titled Deploy: 'Step 2 of 2: environment staging', cycling buttons 'region: US East' and 'release: Release 1.0', buttons Deploy and Back." loading="lazy">
+        <figcaption><span class="n">3 · Next</span><span>Step 2 offers only US East (EU West isn't available) and only the releases that succeeded (1.2 failed).</span><span class="chips"><span class="chip">choices from state</span></span></figcaption></figure>
+      <figure><img src="img/4-deploying.jpg" alt="Dialog showing release 1.1, replicas 1, regions, 'Deploy: A deployment is in progress.', 'Scale the app: A deployment is in progress.', and one button, Cancel the deployment." loading="lazy">
+        <figcaption><span class="n">4 · Deploy, sent</span><span>The answer is the next dialog: deploying. Only Cancel is on offer; Deploy and Scale say why not.</span><span class="chips"><span class="chip">the answer drives the next step</span></span></figcaption></figure>
+      <figure><img src="img/5-browser.jpg" alt="The same app in a browser at localhost:8403/apps/web: tiles for id, name, status deploying, environment, region, release, replicas, regions as raw JSON; buttons Deploy, Cancel the deployment, Scale the app." loading="lazy">
+        <figcaption><span class="n">5 · The browser</span><span>The same resource as <code>text/html</code>: the same acts, the absent ones greyed with their reasons.</span><span class="chips"><span class="chip">content negotiation</span></span></figcaption></figure>
+      <figure><img src="img/6-browser-cancel.jpg" alt="Browser dialog Cancel the deployment: 'Cancels the deployment under way.', a Reason field, buttons Cancel and Cancel the deployment." loading="lazy">
+        <figcaption><span class="n">6 · Cancel, in the browser</span><span>The cancel form: one field, <code>reason</code>, from the same schema the dialog uses.</span><span class="chips"><span class="chip">one form, many renderings</span></span></figcaption></figure>
+      <figure><img src="img/8-json.jpg" alt="Terminal showing the HAL Schema Forms JSON: _links with self, curies and hr:unavailable, and _forms with cd:cancel, method DELETE, target /apps/web/actions/cancel{?reason}, schema with reason string." loading="lazy">
+        <figcaption><span class="n">7 · The representation</span><span>What ARTIE reads, by curl: <code>cd:cancel</code>, a <code>DELETE</code> to a templated target, its schema, and the link to why the others are absent.</span><span class="chips"><span class="chip">HAL Schema Forms</span></span></figcaption></figure>
+      <figure><img src="img/7-cancel-form.jpg" alt="Minecraft dialog Cancel the deployment with Minecraft's own 'This is a custom screen' notice, the description, a reason text input, buttons Cancel the deployment and Back." loading="lazy">
+        <figcaption><span class="n">8 · Cancel, in Minecraft</span><span>The same form as a dialog. "This is a custom screen" is Minecraft's own label on every server dialog.</span><span class="chips"><span class="chip">one form, many renderings</span></span></figcaption></figure>
+      <figure><img src="img/9-refused.jpg" alt="Minecraft notice 'Cancel the deployment was refused': 'cd:cancel was refused (412): the validator does not match the current one of the selected representation; re-read, not resent', button OK." loading="lazy">
+        <figcaption><span class="n">9 · Refused</span><span>Cancelled first in the browser. The open dialog still held the old ETag, so the server refused the second cancel; nothing was resent. OK reads the app again.</span><span class="chips"><span class="chip">conditional requests</span><span class="chip">refusals in the server's words</span></span></figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>The hypermedia concepts, as the dialogs show them</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Concept</th><th>What HEART puts in the representation</th><th>What the dialog does</th><th>Photo</th></tr></thead>
+      <tbody>
+        <tr><td>A generic client</td><td>A media type, HAL Schema Forms, that every HEART service speaks</td><td>The plugin's code names no app, no deploy, no region</td><td class="eg">all</td></tr>
+        <tr><td>Information and controls</td><td>The state and its <code>_forms</code>, in one document</td><td>Lines of text, then buttons</td><td class="eg">1</td></tr>
+        <tr><td>Only the legal acts</td><td><code>_forms</code> holds the acts this state offers, no others</td><td>Idle: Deploy and Scale. Deploying: Cancel</td><td class="eg">1, 4</td></tr>
+        <tr><td>Why an act is absent</td><td>An <code>hr:unavailable</code> link to each absent act's reason</td><td>A line per absent act, in the server's words</td><td class="eg">1, 4</td></tr>
+        <tr><td>Choices from state</td><td><code>hr:options</code>: a pointer into the state, or a link to a list, with <code>where</code></td><td>A single option holding only those choices</td><td class="eg">3</td></tr>
+        <tr><td>Dependent choices</td><td>The region's pointer names a field: <code>/regions/{environment}</code></td><td>Asked one step after the environment</td><td class="eg">2, 3</td></tr>
+        <tr><td>Conditional requests</td><td>An ETag on every read</td><td>ARTIE sends it back as <code>If-Match</code> on every act</td><td class="eg">9</td></tr>
+        <tr><td>Refusals in the server's words</td><td>A 412, 409 or 422 with a problem document</td><td>A notice with what the server said; OK reads again</td><td class="eg">9</td></tr>
+        <tr><td>Content negotiation</td><td>One resource; <code>Accept</code> picks HAL Schema Forms, HAL-FORMS or <code>text/html</code></td><td>ARTIE asks for HAL Schema Forms; the browser gets HTML</td><td class="eg">5, 7</td></tr>
+        <tr><td>Hypermedia as the engine of application state</td><td>Every answer carries the next controls</td><td>The answer to a press is the next dialog</td><td class="eg">4</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>How a press travels</h2>
+    <ol class="loop">
+      <li><span>The player presses a button. Minecraft sends the server the button's callback and every input's value.</span></li>
+      <li><span>Paper calls the plugin's callback. It reads each value with <code>getText</code>, by the input's key.</span></li>
+      <li><span>The plugin hands the press to ARTIE off the main thread, so the game never waits on the network.</span></li>
+      <li><span>ARTIE checks the values against the form's choices and schema, then sends the act with <code>If-Match</code>.</span></li>
+      <li><span>The answer, or the refusal, becomes the next dialog, built and shown back on the main thread.</span></li>
+      <li><span>Meanwhile the player sees Minecraft's waiting screen (<code>after_action: wait_for_response</code>), not the world.</span></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>The Kotlin that makes it work</h2>
+    <p class="section-lede">Four files in <code>client/artie-minecraft</code>. One models a dialog; one maps what ARTIE read to dialogs; one asks a form in steps; one is the Paper plugin. ARTIE, the client the rest of the project uses, does the HTTP.</p>
+    <p class="only-story">Set Detail to Code to see each excerpt, with notes on its Kotlin.</p>
+
+    <h3>1 · A dialog, as data</h3>
+    <div class="split">
+      <div class="code"><span class="where">client/artie-minecraft/src/main/kotlin/heart/minecraft/Dialog.kt, lines 5–50</span><pre><code class="language-kotlin">/**
+ * A dialog as Minecraft shows one (Java Edition 1.21.6 and later): a title, lines of text, the inputs a player
+ * fills in, and buttons. It knows nothing of any domain: what it holds comes from the representation.
+ */
+data class Dialog(
+    val title: String,
+    val body: List&lt;String&gt;,
+    val inputs: List&lt;Input&gt; = emptyList(),
+    val buttons: List&lt;Button&gt;,
+)
+
+/** One input a player fills in; what the player entered comes back by [key]. */
+sealed interface Input {
+    val key: String
+    val label: String
+}
+
+/** A line of text, up to [maxLength] characters. */
+data class TextInput(override val key: String, override val label: String, val maxLength: Int) : Input
+
+/** One of a closed set of [options], the first chosen to begin with. */
+data class OptionInput(override val key: String, override val label: String, val options: List&lt;Option&gt;) : Input
+
+/** One option: the [id] that comes back, and what the player is [shown]. */
+data class Option(val id: String, val shown: String)
+
+/** One button: its label, and what pressing it does. */
+data class Button(val label: String, val press: Press)
+
+/** What a button does. The fields [Press.Next] and [Press.Send] carry were filled in by the dialogs before. */
+sealed interface Press {
+    /** Opens the form of the act [rel], at its first step. */
+    data class Open(val rel: String) : Press
+
+    /** Asks for the fields of [rel]&#x27;s form at [step], whose choices may depend on those filled so far. */
+    data class Next(val rel: String, val filled: JsonObject, val step: Int) : Press
+
+    /** Sends the act [rel], titled [title], with what was filled in. */
+    data class Send(val rel: String, val title: String, val filled: JsonObject) : Press
+
+    /** Back to the resource, as held. */
+    data object Back : Press
+
+    /** The resource, read again. */
+    data object Read : Press
+}</code></pre></div>
+      <div>
+        <ul class="kotlin-notes">
+          <li><b><code>data class</code></b> gives a value type: equality by content, <code>copy</code>, a readable <code>toString</code>. The tests compare dialogs as values.</li>
+          <li><b><code>sealed interface</code></b> closes a hierarchy: every kind of <code>Input</code> and <code>Press</code> is in this file, so a <code>when</code> over them must handle each one, and the compiler checks it.</li>
+          <li><b><code>data object</code></b> is a singleton with a value's <code>toString</code>: <code>Back</code> and <code>Read</code> carry nothing.</li>
+          <li>A button carries what it does as data (<code>Press</code>), with the fields filled so far. The dialog keeps no state of its own between steps.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>2 · What ARTIE read, as a dialog</h3>
+    <div class="concept"><b>Concept: the client follows, it doesn't build</b><span>Every button here comes from the representation: <code>rep.affordances</code> for the acts on offer, <code>hr:unavailable</code> for the ones absent. The code never builds an address or decides which acts exist.</span></div>
+    <div class="split">
+      <div class="code"><span class="where">client/artie-minecraft/src/main/kotlin/heart/minecraft/DialogSession.kt, lines 20–44</span><pre><code class="language-kotlin">class DialogSession(private val client: HeartRiseClient) {
+    private val held get() = checkNotNull(client.current) { &quot;no resource is open&quot; }
+
+    /** The resource at [url], as a dialog. */
+    fun open(url: String): Dialog = resource(client.enter(url))
+
+    /** What pressing [button] leads to, with what the player entered in the dialog&#x27;s inputs as [values], by key. */
+    fun press(button: Button, values: Map&lt;String, String&gt;): Dialog = when (val press = button.press) {
+        is Press.Open -&gt; form(press.rel, JsonObject(emptyMap()), 0)
+        is Press.Next -&gt; form(press.rel, steps(press.rel).filled(press.filled, values), press.step)
+        is Press.Send -&gt; send(press, steps(press.rel).filled(press.filled, values))
+        Press.Back -&gt; resource(held)
+        Press.Read -&gt; read(held.url)
+    }
+
+    private fun steps(rel: String): FormSteps {
+        val form = checkNotNull(held.affordance(rel)) { &quot;$rel is not offered now&quot; }
+        return FormSteps(form, client.choices(rel))
+    }
+
+    private fun resource(rep: HeartRepresentation) = Dialog(
+        title = titleOf(rep),
+        body = rep.state.mapNotNull { (name, value) -&gt; line(name, value) } + absent(rep),
+        buttons = rep.affordances.map { (rel, form) -&gt; Button(form.title ?: rel, Press.Open(rel)) },
+    )</code></pre></div>
+      <ul class="kotlin-notes">
+        <li><b><code>when (val press = button.press)</code></b> binds the subject and smart-casts it in each branch: in <code>is Press.Next</code>, <code>press.step</code> is there to read.</li>
+        <li>No <code>else</code> branch: <code>Press</code> is sealed, so the <code>when</code> is exhaustive. A new kind of press won't compile until it's handled here.</li>
+        <li><b><code>private val held get() = …</code></b> is a property with a getter, read fresh each time: ARTIE's current representation, after any re-read.</li>
+        <li><b><code>mapNotNull { (name, value) -> … }</code></b> destructures each state member and drops nulls: a null field has no line.</li>
+        <li>Named arguments (<code>title =</code>, <code>body =</code>, <code>buttons =</code>) read like the dialog they make.</li>
+      </ul>
+    </div>
+    <div class="split">
+      <div class="code"><span class="where">client/artie-minecraft/src/main/kotlin/heart/minecraft/DialogSession.kt, lines 73–90</span><pre><code class="language-kotlin">    private fun send(press: Press.Send, filled: JsonObject): Dialog = try {
+        resource(client.act(press.rel, filled))
+    } catch (refused: ActRefused) {
+        notice(&quot;${press.title} was refused&quot;, refused.message.orEmpty())
+    } catch (refused: AccessRefused) {
+        notice(&quot;${press.title} was refused&quot;, refused.message.orEmpty())
+    }
+
+    /** What the server said, and a button to read the resource again. */
+    private fun notice(title: String, said: String) =
+        Dialog(title, listOf(said), buttons = listOf(Button(&quot;OK&quot;, Press.Read)))
+
+    /** One line for each act that is absent, and why, as the representation&#x27;s `hr:unavailable` says. */
+    private fun absent(rep: HeartRepresentation): List&lt;String&gt; {
+        val said = rep.manifest.unavailable?.let { client.listReader(it.href) } as? JsonObject
+        return ((said?.get(&quot;unavailable&quot;) as? JsonArray) ?: JsonArray(emptyList())).mapNotNull { it as? JsonObject }
+            .map { &quot;${text(it[&quot;title&quot;] ?: it[&quot;rel&quot;])}: ${text(it[&quot;reason&quot;])}&quot; }
+    }</code></pre></div>
+      <ul class="kotlin-notes">
+        <li><b><code>try</code> is an expression</b>: the act's answer becomes the next dialog, a refusal becomes a notice, and either way <code>send</code> returns a <code>Dialog</code>.</li>
+        <li>ARTIE throws a typed refusal for each kind: <code>StaleAct</code> for 412, <code>IllegalTransition</code> for 409, <code>InvalidPayload</code> for 422. All are <code>ActRefused</code>; the message is what the server said.</li>
+        <li><b><code>?.let { … } as? JsonObject</code></b>: follow the link if there is one, and treat the answer as an object only if it is one.</li>
+        <li>The why-absent document is read with ARTIE's <code>listReader</code>, a revalidated GET, so an unchanged answer costs a 304.</li>
+      </ul>
+    </div>
+
+    <h3>3 · A form in steps</h3>
+    <div class="concept"><b>Concept: choices that depend on another field</b><span>The region's <code>hr:options</code> points at <code>/regions/{environment}</code>: its choices depend on the environment chosen. A web form can change as you type; a Minecraft dialog can't change while it's open. So the form is asked in steps, each after the fields its choices need. The steps come from the schema, not from knowing what a region is.</span></div>
+    <div class="split">
+      <div class="code"><span class="where">client/artie-minecraft/src/main/kotlin/heart/minecraft/FormSteps.kt, lines 26–36</span><pre><code class="language-kotlin">    /**
+     * The form&#x27;s properties, a step at a time; one empty step when it has none. A field no other field&#x27;s choices
+     * depend on waits for the last step, so the first steps ask only what the choices after them need.
+     */
+    val steps: List&lt;List&lt;String&gt;&gt; = run {
+        val needed = properties.keys.flatMap(::dependsOn).toSet()
+        val levels = properties.keys.associateWith(::level)
+        val last = levels.values.maxOrNull() ?: 0
+        properties.keys.groupBy { if (it in needed) levels.getValue(it) else last }.toSortedMap().values.toList()
+            .ifEmpty { listOf(emptyList()) }
+    }</code></pre>
+      <span class="where">client/artie-minecraft/src/main/kotlin/heart/minecraft/FormSteps.kt, lines 69–80</span><pre><code class="language-kotlin">    /** How many steps come before [name]&#x27;s: one more than the latest of the fields its choices depend on. */
+    private fun level(name: String, seen: Set&lt;String&gt; = emptySet()): Int =
+        dependsOn(name).filter { it !in seen }.maxOfOrNull { level(it, seen + name) + 1 } ?: 0
+
+    /** The other fields of this form that [name]&#x27;s `hr:options` names: in its pointer, or in a link no state fills. */
+    private fun dependsOn(name: String): Set&lt;String&gt; {
+        val options = declared[name] ?: return emptySet()
+        val pointer = (options[&quot;pointer&quot;] as? JsonPrimitive)?.content?.let(UriTemplate::names).orEmpty()
+        val link = ((options[&quot;link&quot;] as? JsonObject)?.get(&quot;href&quot;) as? JsonPrimitive)?.content
+            ?.let(UriTemplate::names).orEmpty() - (options[&quot;templatePointers&quot;] as? JsonObject)?.keys.orEmpty()
+        return (pointer + link).filter { it in properties &amp;&amp; it != name }.toSet()
+    }</code></pre></div>
+      <ul class="kotlin-notes">
+        <li><b><code>run { … }</code></b> computes a value in a block of its own: the last expression is the result.</li>
+        <li><b>Function references</b> (<code>::level</code>, <code>::dependsOn</code>, <code>UriTemplate::names</code>) pass a function where a lambda would go.</li>
+        <li><b><code>associateWith</code></b> maps each key to a value; <b><code>groupBy</code></b> then gathers fields by step, and <code>toSortedMap()</code> puts the steps in order.</li>
+        <li><b>A default argument</b> (<code>seen: Set&lt;String&gt; = emptySet()</code>) guards the recursion against fields that name each other.</li>
+        <li>For the deploy form: <code>environment</code> is needed by <code>region</code>, so it's step 1; <code>region</code> and <code>release</code> make step 2.</li>
+      </ul>
+    </div>
+
+    <h3>4 · The Paper plugin</h3>
+    <div class="split">
+      <div class="code"><span class="where">client/artie-minecraft/src/main/kotlin/heart/minecraft/ArtiePlugin.kt, lines 38–70</span><pre><code class="language-kotlin">    private inner class Open : BasicCommand {
+        override fun execute(source: CommandSourceStack, args: Array&lt;String&gt;) {
+            val player = source.executor as? Player
+            if (player == null) {
+                source.sender.sendMessage(&quot;Only a player can open a dialog.&quot;)
+                return
+            }
+            val address = args.firstOrNull() ?: config.getString(&quot;start&quot;).orEmpty()
+            val session = DialogSession(ArtieClient(transport()))
+            later(player, session) { session.open(address) }
+        }
+    }
+
+    /** ARTIE&#x27;s wire, as the artie command builds it: credentials by origin, integrity checked, the shared kept. */
+    private fun transport(): CachingTransport {
+        val wire = UserAgentTransport(next = HttpTransport())
+        return CachingTransport(IntegrityCheck(AuthTransport(EnvironmentCredentials(System.getenv()), wire)))
+    }
+
+    /**
+     * Runs [work], ARTIE&#x27;s reads and acts, off the main thread, and shows [player] the dialog it made back on it. A
+     * failure, of either, is a notice.
+     */
+    private fun later(player: Player, session: DialogSession, work: () -&gt; Dialog) {
+        server.scheduler.runTaskAsynchronously(this, Runnable {
+            val dialog = runCatching(work).getOrElse(::failure)
+            server.scheduler.runTask(this, Runnable {
+                val shown = runCatching { render(player, session, dialog) }
+                    .getOrElse { render(player, session, failure(it)) }
+                player.showDialog(shown)
+            })
+        })
+    }</code></pre></div>
+      <ul class="kotlin-notes">
+        <li><b><code>inner class Open : BasicCommand</code></b>: an inner class reaches its plugin's members (<code>config</code>, <code>later</code>). Paper registers it as <code>/artie</code>.</li>
+        <li><b><code>source.executor as? Player</code></b>: a safe cast, null when the console runs it.</li>
+        <li><b><code>args.firstOrNull() ?: config.getString("start")</code></b>: the Elvis operator gives a default, the deploy service's app from <code>config.yml</code>.</li>
+        <li><b><code>Runnable { … }</code></b> is SAM conversion: a lambda where Java wants a one-method interface. The work runs on Paper's async scheduler; the dialog is shown back on the main thread.</li>
+        <li><b><code>runCatching(work).getOrElse(::failure)</code></b> turns any failure into a notice the player can read, not a stack trace in their face.</li>
+      </ul>
+    </div>
+    <div class="split">
+      <div class="code"><span class="where">client/artie-minecraft/src/main/kotlin/heart/minecraft/ArtiePlugin.kt, lines 77–124</span><pre><code class="language-kotlin">    private fun render(player: Player, session: DialogSession, dialog: Dialog): PaperDialog = PaperDialog.create {
+        it.empty()
+            .base(
+                DialogBase.builder(Component.text(dialog.title))
+                    .canCloseWithEscape(true)
+                    // Every button&#x27;s answer is the next dialog: the player waits for it, rather than see the world.
+                    .afterAction(
+                        if (dialog.buttons.isEmpty()) DialogBase.DialogAfterAction.CLOSE
+                        else DialogBase.DialogAfterAction.WAIT_FOR_RESPONSE,
+                    )
+                    .body(dialog.body.map { line -&gt; DialogBody.plainMessage(Component.text(line), WIDTH) })
+                    .inputs(dialog.inputs.map(::input))
+                    .build(),
+            )
+            .type(type(player, session, dialog))
+    }
+
+    /** One button for each of [dialog]&#x27;s, in a column; with none, a notice the player closes. */
+    private fun type(player: Player, session: DialogSession, dialog: Dialog): DialogType =
+        if (dialog.buttons.isEmpty()) {
+            DialogType.notice()
+        } else {
+            DialogType.multiAction(dialog.buttons.map { button(player, session, dialog, it) }).columns(1).build()
+        }
+
+    /** A button that sends back what the player entered in [dialog]&#x27;s inputs, once. */
+    private fun button(player: Player, session: DialogSession, dialog: Dialog, button: Button): ActionButton {
+        val pressed = DialogAction.customClick(
+            { response, _ -&gt;
+                val values = dialog.inputs.associate { it.key to response.getText(it.key).orEmpty() }
+                later(player, session) { session.press(button, values) }
+            },
+            ClickCallback.Options.builder().uses(1).build(),
+        )
+        return ActionButton.create(Component.text(button.label), null, BUTTON_WIDTH, pressed)
+    }
+
+    private fun input(input: Input): DialogInput = when (input) {
+        is TextInput -&gt; DialogInput.text(input.key, Component.text(input.label))
+            .maxLength(input.maxLength).width(WIDTH).build()
+        is OptionInput -&gt; DialogInput.singleOption(
+            input.key,
+            Component.text(input.label),
+            input.options.mapIndexed { index, option -&gt;
+                OptionEntry.create(option.id, Component.text(option.shown), index == 0)
+            },
+        ).width(WIDTH).build()
+    }</code></pre></div>
+      <ul class="kotlin-notes">
+        <li><b><code>PaperDialog.create { it.empty()… }</code></b>: a trailing lambda. Paper hands it a builder; <code>it</code> is the lambda's one parameter.</li>
+        <li>Paper's dialog API mirrors Minecraft's own dialog format: a <b>base</b> (title, body, inputs, after-action) and a <b>type</b> (multi-action, notice).</li>
+        <li><b><code>DialogAction.customClick(callback, options)</code></b>: Paper keeps the callback on the server and sends Minecraft a key for it. <code>uses(1)</code>: each button fires once; the next dialog has new ones.</li>
+        <li><b><code>associate { it.key to response.getText(it.key).orEmpty() }</code></b>: one map from input key to what the player entered; <code>to</code> is an infix function that makes a pair.</li>
+        <li><b><code>when (input)</code></b> over a sealed type, as an expression: a text input or a single option, nothing else. The first option starts chosen (<code>index == 0</code>).</li>
+      </ul>
+    </div>
+
+    <h3>5 · The scenario that predicted photo 9</h3>
+    <p class="note">Written before the plugin code, as the project's gate requires: it failed first, then passed. The live run did the same thing with a real browser as "someone else".</p>
+    <div class="code"><span class="where">client/artie-minecraft/src/test/resources/features/dialog.feature, lines 147–166</span><pre><code class="language-gherkin">  Scenario: Someone deployed first: the act is refused in the server&#x27;s words, and not resent
+    When the player presses &quot;Deploy&quot;
+    And the player fills in, and presses &quot;Next&quot;
+      | environment | staging |
+    And someone else starts deploying &quot;web&quot;
+    And the player fills in, and presses &quot;Deploy&quot;
+      | region  | us-east |
+      | release | 1.1     |
+    Then the dialog is titled &quot;Deploy was refused&quot;
+    And its body reads
+      | cd:deploy was refused (412): the validator does not match the current one of the selected representation; re-read, not resent |
+    And its buttons are
+      | OK |
+    And the deploy service&#x27;s acts, each sent with If-Match, were
+      | method | path                     | body                                                         |
+      | POST   | /apps/web/actions/deploy | {&quot;environment&quot;:&quot;staging&quot;,&quot;region&quot;:&quot;us-east&quot;,&quot;release&quot;:&quot;1.1&quot;} |
+    When the player presses &quot;OK&quot;
+    Then the dialog is titled &quot;web&quot;
+    And its buttons are
+      | Cancel the deployment |</code></pre></div>
+  </section>
+
+  <section>
+    <h2>The server side: one resource, negotiated</h2>
+    <p class="only-story">Set Detail to Code for the server's Kotlin, and to Bodies for what it answered.</p>
+    <div class="concept"><b>Concept: content negotiation</b><span>One resource, several representations. The client says what it can read in <code>Accept</code>; the server picks. ARTIE asks for <code>application/hal+json</code> and gets HAL Schema Forms. A browser asks for <code>text/html</code> and gets HTML with the same acts as buttons. Neither is told about the other.</span></div>
+    <div class="split">
+      <div class="code"><span class="where">heart/heart-core/src/main/kotlin/com/artie/heart/Negotiation.kt, lines 12–15</span><pre><code class="language-kotlin">enum class Dialect(val mediaType: String, val profile: String, val etagTag: String) {
+    HALFORMS(&quot;application/prs.hal-forms+json&quot;, &quot;$HEART_RISE_PROFILE/hal-forms&quot;, &quot;hf&quot;),
+    JSONSCHEMA(&quot;application/hal+json&quot;, &quot;$HEART_RISE_PROFILE/hal-schema-forms&quot;, &quot;hsf&quot;),
+}</code></pre>
+      <span class="where">heart/heart-core/src/main/kotlin/com/artie/heart/Negotiation.kt, lines 67–71</span><pre><code class="language-kotlin">    /**
+     * True when `Accept` names HTML above both dialects, as a browser does: the page for people
+     * ([HtmlView]). A wildcard never selects it, so a client that names nothing still gets HEART.
+     */
+    fun wantsHtml(accept: String?): Boolean = ranksAboveDialects(accept, HTML)</code></pre></div>
+      <ul class="kotlin-notes">
+        <li>The two HEART dialects pair a media type with a profile. HTML isn't a dialect: it's chosen only when <code>Accept</code> ranks <code>text/html</code> above both, as a browser's does.</li>
+        <li>A client that names nothing gets HEART, never HTML: a wildcard doesn't select it.</li>
+      </ul>
+    </div>
+    <div class="split">
+      <div class="code"><span class="where">heart/heart-http4k/src/main/kotlin/com/artie/heart/http4k/ResourceHandler.kt, lines 75–91</span><pre><code class="language-kotlin">    /** [state] as the representation [request] selects, answering 304 when its If-None-Match names it. */
+    fun represent(state: S, request: Request): Response {
+        val accept = request.header(ACCEPT)
+        return when {
+            Negotiation.wantsHtml(accept) -&gt; html.represent(state, request)
+            Negotiation.wantsPlainJson(accept) -&gt; {
+                val ifNoneMatch = request.header(IF_NONE_MATCH)
+                val etag = StateETag.plain(type, state)
+                if (ifNoneMatch != null &amp;&amp; Validators.notModified(ifNoneMatch, etag)) {
+                    Response(Status.NOT_MODIFIED).header(&quot;ETag&quot;, etag).header(VARY, ACCEPT)
+                } else {
+                    plain(Response(Status.OK), state)
+                }
+            }
+            else -&gt; dialect(request).let { Rendered(state, it, limits.rung(it, request)).answer(request) }
+        }
+    }</code></pre></div>
+      <ul class="kotlin-notes">
+        <li>One handler, one state, three answers: HTML, plain JSON (the OpenAPI twin's, every control stripped), or a HEART dialect at a rung.</li>
+        <li>Each answer has its own validator (ETag), so <code>If-None-Match</code> gives a 304 per representation.</li>
+      </ul>
+    </div>
+
+    <h3>HAL Schema Forms, at L0</h3>
+    <div class="split">
+      <div class="code"><span class="where">heart/heart-core/src/main/kotlin/com/artie/heart/Layers.kt, lines 60–80</span><pre><code class="language-kotlin">    fun layer1(state: S, rung: Rung = Rung.L0): Map&lt;String, Any?&gt; {
+        val key = type.state.keyOf(state)
+        val body = LinkedHashMap(type.state.bodyOf(state))
+        val item = type.itemPath.expand(body)
+        val self = mapOf(&quot;href&quot; to item)
+        // Sub-collections name this resource, so their links are Layer 1, never in a shared set.
+        // The state&#x27;s own links and embedded resources (a gateway&#x27;s), beside the declared ones.
+        val said = type.state.hypermediaOf(state)
+        val collections = type.subCollectionLinks(body) + said.links
+        // SPEC §6.1: other resources in the state leave it, embedded under their relations.
+        val embedded = type.embeddedOf(body) + said.embedded
+        val rendering = rung.setRendering
+        if (rendering == null) {
+            body[&quot;_links&quot;] = mapOf(
+                &quot;self&quot; to self,
+                &quot;curies&quot; to type.profile.curies + HR_CURIE,
+                // SPEC §6.12: at L0 the set is embedded, so its explanation link is in Layer 1.
+                UNAVAILABLE_REL to explanationLink(key),
+            ) + collections
+            if (embedded.isNotEmpty()) body[&quot;_embedded&quot;] = embedded
+            body[&quot;_forms&quot;] = forms(offered(key), embedSchemas = true).mapValues { (_, form) -&gt; resolved(form, item) }</code></pre></div>
+      <ul class="kotlin-notes">
+        <li><b>L0 collapses three layers into one hop</b>: state, the offered forms, and each form's full schema.</li>
+        <li><code>offered(key)</code> is where "only the legal acts" happens: the state's key (idle, deploying) decides which forms are written.</li>
+        <li>The <code>hr:unavailable</code> link goes in beside them, so a client can always ask why the others are absent.</li>
+        <li><code>LinkedHashMap</code> keeps the state's members in order, which is the order the dialog's lines come in.</li>
+      </ul>
+    </div>
+
+    <h3>text/html, from that same L0</h3>
+    <div class="split">
+      <div class="code"><span class="where">heart/heart-core/src/main/kotlin/com/artie/heart/HtmlView.kt, lines 21–27</span><pre><code class="language-kotlin">
+    /** [state]&#x27;s HTML, its forms sending [etag] as If-Match. */
+    fun &lt;S, K&gt; of(layers: Layers&lt;S, K&gt;, state: S, etag: String): String {
+        val body = layers.layer1(state, Rung.L0)
+        val type = layers.type
+        val order = type.acts.map { type.profile.reference(it.relation) }
+        return render(body, etag, absent(layers, body), order, fields(listOf(type), choices(type, state)))</code></pre>
+      <span class="where">heart/heart-core/src/main/kotlin/com/artie/heart/HtmlActs.kt, lines 25–37</span><pre><code class="language-kotlin">    fun buttons(entries: List&lt;Entry&gt;): String = if (entries.isEmpty()) &quot;&quot; else
+        &quot;&lt;div class=\&quot;acts\&quot; role=\&quot;toolbar\&quot; aria-label=\&quot;Acts\&quot;&gt;&quot; + entries.joinToString(&quot;&quot;) { entry -&gt;
+            val id = Html.token(entry.key)
+            if (entry.form != null) {
+                &quot;&lt;button type=\&quot;button\&quot; class=\&quot;act\&quot;${Html.attr(&quot;data-rel&quot;, entry.key)}&quot; +
+                    &quot;${Html.attr(&quot;data-dialog&quot;, &quot;act-$id&quot;)}&gt;${Html.text(entry.title)}&lt;/button&gt;&quot;
+            } else {
+                &quot;&lt;button type=\&quot;button\&quot; class=\&quot;act\&quot;${Html.attr(&quot;data-rel&quot;, entry.key)} aria-disabled=\&quot;true\&quot;&quot; +
+                    &quot;${Html.attr(&quot;aria-describedby&quot;, &quot;why-$id&quot;)}&gt;${Html.text(entry.title)}&lt;/button&gt;&quot; +
+                    &quot;&lt;span class=\&quot;why\&quot; id=\&quot;why-$id\&quot; hidden&gt;${Html.text(entry.reason)}&lt;/span&gt;&quot;
+            }
+        } + &quot;&lt;/div&gt;&quot;</code></pre></div>
+      <ul class="kotlin-notes">
+        <li><b>The HTML is rendered from the L0 representation</b> (<code>layers.layer1(state, Rung.L0)</code>): the browser sees a projection of exactly what ARTIE reads, so the two can't disagree about which acts are on offer.</li>
+        <li>An absent act becomes a button with <code>aria-disabled</code> and its reason; the Minecraft dialog makes it a line of text instead. Same information, two renderings.</li>
+        <li>The browser follows no link for choices, so the server fills them in (<code>choices(type, state)</code>). ARTIE resolves <code>hr:options</code> itself, from the state or a linked list.</li>
+      </ul>
+    </div>
+
+    <h3>The three, side by side, read live</h3>
+    <div class="scroll"><table>
+      <thead><tr><th>App web, deploying</th><th>HAL Schema Forms (ARTIE)</th><th>text/html (browser)</th><th>Minecraft dialog (plugin)</th></tr></thead>
+      <tbody>
+        <tr><td>Acts on offer</td><td><code>_forms</code>: <code>cd:cancel</code></td><td>Cancel the deployment, active</td><td>One button, Cancel the deployment</td></tr>
+        <tr><td>Absent acts</td><td><code>hr:unavailable</code> link, two reasons</td><td>Deploy and Scale, greyed, reason on press</td><td>Two lines of text with the reasons</td></tr>
+        <tr><td>The cancel form</td><td><code>DELETE</code>, target <code>…/cancel{?reason}</code>, schema</td><td>A dialog with a Reason field</td><td>A dialog with a reason input</td></tr>
+        <tr><td>Validator</td><td>ETag <code>…hsf.L0…</code></td><td>Its own ETag (<code>html</code>), sent by its forms</td><td>ARTIE's ETag, as <code>If-Match</code></td></tr>
+        <tr><td>Nested state (<code>regions</code>)</td><td>Objects and arrays, as they are</td><td>Titled pairs; a table for each environment</td><td>Its names: staging, production</td></tr>
+      </tbody>
+    </table></div>
+    <figure><img src="img/10-web-today.png" alt="The app web as text/html: tiles for id, name, status idle, environment, region, release, replicas, and Regions laid out as Staging and Production, each a table of name, label and available; buttons Deploy, Cancel the deployment greyed, Scale the app." loading="lazy">
+      <figcaption><span class="n">text/html, read with the current heart-core</span><span>Any structure in the state is laid out as one, at any depth: an object as titled pairs, a list of objects as a table with a column for each member.</span></figcaption></figure>
+    <details class="bodies"><summary>The HAL Schema Forms representation, read while deploying</summary><pre><code class="language-json">{
+    &quot;id&quot;: 1,
+    &quot;name&quot;: &quot;web&quot;,
+    &quot;status&quot;: &quot;deploying&quot;,
+    &quot;environment&quot;: &quot;staging&quot;,
+    &quot;region&quot;: &quot;us-east&quot;,
+    &quot;release&quot;: &quot;1.0&quot;,
+    &quot;replicas&quot;: 1,
+    &quot;regions&quot;: {
+        &quot;staging&quot;: [
+            {
+                &quot;name&quot;: &quot;us-east&quot;,
+                &quot;label&quot;: &quot;US East&quot;,
+                &quot;available&quot;: true
+            },
+            {
+                &quot;name&quot;: &quot;eu-west&quot;,
+                &quot;label&quot;: &quot;EU West&quot;,
+                &quot;available&quot;: false
+            }
+        ],
+        &quot;production&quot;: [
+            {
+                &quot;name&quot;: &quot;us-east&quot;,
+                &quot;label&quot;: &quot;US East&quot;,
+                &quot;available&quot;: true
+            }
+        ]
+    },
+    &quot;_links&quot;: {
+        &quot;self&quot;: {
+            &quot;href&quot;: &quot;/apps/web&quot;
+        },
+        &quot;curies&quot;: [
+            {
+                &quot;name&quot;: &quot;cd&quot;,
+                &quot;href&quot;: &quot;/profiles/cd#{rel}&quot;,
+                &quot;templated&quot;: true
+            },
+            {
+                &quot;name&quot;: &quot;hr&quot;,
+                &quot;href&quot;: &quot;https://w3id.org/heart-rise/rels/{rel}&quot;,
+                &quot;templated&quot;: true
+            }
+        ],
+        &quot;hr:unavailable&quot;: {
+            &quot;href&quot;: &quot;/unavailable/29ebb32ca7f595f1&quot;,
+            &quot;type&quot;: &quot;application/json&quot;,
+            &quot;integrity&quot;: &quot;sha256-KeuzLKf1lfGv05Duh1g2RfanhYYtcMzRxb+6EbRJ18w=&quot;
+        }
+    },
+    &quot;_forms&quot;: {
+        &quot;cd:cancel&quot;: {
+            &quot;title&quot;: &quot;Cancel the deployment&quot;,
+            &quot;description&quot;: &quot;Cancels the deployment under way.&quot;,
+            &quot;_links&quot;: {
+                &quot;target&quot;: {
+                    &quot;href&quot;: &quot;/apps/web/actions/cancel{?reason}&quot;,
+                    &quot;templated&quot;: true
+                }
+            },
+            &quot;method&quot;: &quot;DELETE&quot;,
+            &quot;schema&quot;: {
+                &quot;properties&quot;: {
+                    &quot;reason&quot;: {
+                        &quot;type&quot;: &quot;string&quot;
+                    }
+                },
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;$id&quot;: &quot;/schemas/7d85b751c4997dc5&quot;
+            },
+            &quot;hr:integrity&quot;: &quot;sha256-BWknAt3Re6a8vOASM+goBreLgXjpqwf3WVpZEE0voow=&quot;
+        }
+    }
+}</code></pre></details>
+    <details class="bodies"><summary>Why the other acts are absent (<code>hr:unavailable</code>)</summary><pre><code class="language-json">{
+    &quot;unavailable&quot;: [
+        {
+            &quot;reason&quot;: &quot;A deployment is in progress.&quot;,
+            &quot;rel&quot;: &quot;/profiles/cd#deploy&quot;,
+            &quot;title&quot;: &quot;Deploy&quot;
+        },
+        {
+            &quot;reason&quot;: &quot;A deployment is in progress.&quot;,
+            &quot;rel&quot;: &quot;/profiles/cd#scale&quot;,
+            &quot;title&quot;: &quot;Scale the app&quot;
+        }
+    ]
+}</code></pre></details>
+    <details class="bodies"><summary>The HTML's acts, read while deploying</summary><pre><code class="language-html">&lt;aside class=&quot;side&quot; aria-label=&quot;Acts&quot;&gt;
+&lt;div class=&quot;acts&quot; role=&quot;toolbar&quot; aria-label=&quot;Acts&quot;&gt;
+&lt;button type=&quot;button&quot; class=&quot;act&quot; data-rel=&quot;cd:deploy&quot; aria-disabled=&quot;true&quot; aria-describedby=&quot;why-cd-deploy&quot;&gt;Deploy&lt;/button&gt;
+&lt;span class=&quot;why&quot; id=&quot;why-cd-deploy&quot; hidden&gt;A deployment is in progress.&lt;/span&gt;
+&lt;button type=&quot;button&quot; class=&quot;act&quot; data-rel=&quot;cd:cancel&quot; data-dialog=&quot;act-cd-cancel&quot;&gt;Cancel the deployment&lt;/button&gt;
+&lt;button type=&quot;button&quot; class=&quot;act&quot; data-rel=&quot;cd:scale&quot; aria-disabled=&quot;true&quot; aria-describedby=&quot;why-cd-scale&quot;&gt;Scale the app&lt;/button&gt;
+&lt;span class=&quot;why&quot; id=&quot;why-cd-scale&quot; hidden&gt;A deployment is in progress.&lt;/span&gt;
+&lt;/div&gt;
+&lt;/aside&gt;</code></pre></details>
+  </section>
+
+  <section class="aside" aria-labelledby="aside-h">
+    <div class="banner">Aside · a draft idea · not built, not tested</div>
+    <h2 id="aside-h">A media type for Minecraft dialogs</h2>
+    <p>Today the plugin carries ARTIE and maps HAL Schema Forms to dialogs itself. The server already renders the same L0 as HTML for browsers. It could render it a third way, as Minecraft's own dialog format, and the plugin would shrink to a relay that knows no HEART forms at all. Nothing below exists yet.</p>
+
+    <h3>How it could work</h3>
+    <ul class="tight">
+      <li><b>A media type</b>, for example <code>application/prs.heart-mc-dialog+json</code>, chosen by <code>Accept</code> as <code>text/html</code> is. The <code>prs</code> tree, like HAL-FORMS's, says it's nobody's standard.</li>
+      <li><b>A renderer in heart-core</b>, beside <code>HtmlView</code> and from the same L0 representation: state as <code>plain_message</code> lines, offered acts as buttons, absent acts as grey lines with their reasons.</li>
+      <li><b>Buttons as <code>minecraft:dynamic/custom</code> actions</b> with id <code>heart:read</code> or <code>heart:act</code>. Their <code>additions</code> carry the target, the method and the <code>If-Match</code> value. Minecraft sends back the input values with them.</li>
+      <li><b>Steps from the server.</b> An act's target is already a resource (SPEC §6.3), and a GET of it answers the form. A GET with the fields filled so far would answer the next step, its choices filled by <code>Options.filled</code>, which the HTML already uses.</li>
+      <li><b>Refusals rendered by the server</b> as a notice dialog, as <code>HtmlProblem</code> renders them as HTML.</li>
+      <li><b>Its own validator tag</b> (say <code>mcd</code>), as HTML has <code>html</code>.</li>
+    </ul>
+
+    <h3>What the server might answer (hand-written, unchecked against the game)</h3>
+    <p class="only-story">Set Detail to Code to see the two dialogs, as JSON.</p>
+    <div class="split">
+      <div class="code"><span class="where">The app, deploying</span><pre><code class="language-json">{
+  &quot;type&quot;: &quot;minecraft:multi_action&quot;,
+  &quot;title&quot;: &quot;web&quot;,
+  &quot;can_close_with_escape&quot;: true,
+  &quot;after_action&quot;: &quot;wait_for_response&quot;,
+  &quot;body&quot;: [
+    { &quot;type&quot;: &quot;minecraft:plain_message&quot;, &quot;contents&quot;: &quot;status: deploying&quot; },
+    { &quot;type&quot;: &quot;minecraft:plain_message&quot;, &quot;contents&quot;: &quot;release 1.0 to us-east of staging&quot; },
+    { &quot;type&quot;: &quot;minecraft:plain_message&quot;,
+      &quot;contents&quot;: { &quot;text&quot;: &quot;Deploy: A deployment is in progress.&quot;, &quot;color&quot;: &quot;gray&quot; } },
+    { &quot;type&quot;: &quot;minecraft:plain_message&quot;,
+      &quot;contents&quot;: { &quot;text&quot;: &quot;Scale the app: A deployment is in progress.&quot;, &quot;color&quot;: &quot;gray&quot; } }
+  ],
+  &quot;actions&quot;: [
+    { &quot;label&quot;: &quot;Cancel the deployment&quot;,
+      &quot;action&quot;: { &quot;type&quot;: &quot;minecraft:dynamic/custom&quot;, &quot;id&quot;: &quot;heart:read&quot;,
+                  &quot;additions&quot;: { &quot;href&quot;: &quot;/apps/web/actions/cancel&quot; } } }
+  ]
+}</code></pre></div>
+      <div class="code"><span class="where">GET of the cancel target: the form</span><pre><code class="language-json">{
+  &quot;type&quot;: &quot;minecraft:multi_action&quot;,
+  &quot;title&quot;: &quot;Cancel the deployment&quot;,
+  &quot;after_action&quot;: &quot;wait_for_response&quot;,
+  &quot;body&quot;: [ { &quot;type&quot;: &quot;minecraft:plain_message&quot;, &quot;contents&quot;: &quot;Cancels the deployment under way.&quot; } ],
+  &quot;inputs&quot;: [ { &quot;type&quot;: &quot;minecraft:text&quot;, &quot;key&quot;: &quot;reason&quot;, &quot;label&quot;: &quot;Reason&quot;, &quot;max_length&quot;: 256 } ],
+  &quot;actions&quot;: [
+    { &quot;label&quot;: &quot;Cancel the deployment&quot;,
+      &quot;action&quot;: { &quot;type&quot;: &quot;minecraft:dynamic/custom&quot;, &quot;id&quot;: &quot;heart:act&quot;,
+                  &quot;additions&quot;: { &quot;method&quot;: &quot;DELETE&quot;, &quot;href&quot;: &quot;/apps/web/actions/cancel{?reason}&quot;,
+                                 &quot;if_match&quot;: &quot;\&quot;seq-9.mcd.L0.…\&quot;&quot;, &quot;types&quot;: { &quot;reason&quot;: &quot;string&quot; } } } },
+    { &quot;label&quot;: &quot;Back&quot;,
+      &quot;action&quot;: { &quot;type&quot;: &quot;minecraft:dynamic/custom&quot;, &quot;id&quot;: &quot;heart:read&quot;, &quot;additions&quot;: { &quot;href&quot;: &quot;/apps/web&quot; } } }
+  ]
+}</code></pre></div>
+    </div>
+
+    <h3>The relay plugin would then</h3>
+    <ol class="loop">
+      <li><span>GET the address with the dialog media type's <code>Accept</code>, and the credential for its origin.</span></li>
+      <li><span>Check the answer: keep only <code>dynamic/custom</code> actions with <code>heart:</code> ids; drop <code>run_command</code>, <code>open_url</code>, <code>suggest_command</code> and any click event inside text.</span></li>
+      <li><span>Show it to the player, as Minecraft's format, unchanged otherwise.</span></li>
+      <li><span>On a press, send <code>heart:act</code> to <code>href</code> with <code>method</code> and <code>If-Match</code>, the inputs as JSON typed by <code>types</code>; follow <code>heart:read</code> with a GET.</span></li>
+      <li><span>Show whatever comes back: the next dialog, or the server's notice.</span></li>
+    </ol>
+
+    <h3>What it would move out of the plugin</h3>
+    <div class="scroll"><table>
+      <thead><tr><th>Concern</th><th>Today: ARTIE in the plugin</th><th>With the media type</th></tr></thead>
+      <tbody>
+        <tr><td>Reading HEART</td><td>ARTIE and its libraries: a 5.9 MB jar</td><td>One HTTP GET</td></tr>
+        <tr><td>State and why-absent as lines</td><td><code>DialogSession</code></td><td>The server's renderer</td></tr>
+        <tr><td>Steps for dependent choices</td><td><code>FormSteps</code></td><td>The server, by GET of the act's target</td></tr>
+        <tr><td>Choices from state and links</td><td>ARTIE's <code>FormChoices</code>, with reads of the linked list</td><td>The server, as for HTML</td></tr>
+        <tr><td>Typing what was typed</td><td><code>FormSteps.typed</code></td><td>The relay, from <code>types</code> in the button</td></tr>
+        <tr><td>Drawing with Paper's API</td><td><code>render</code>, <code>input</code>, <code>button</code></td><td>Nothing: the format is Minecraft's own</td></tr>
+        <tr><td>Stays in the plugin</td><td>All of it</td><td>HTTP, credentials, checking actions, threads</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">A guess, not a count: the plugin might fall from about 390 lines plus ARTIE to about 120, while heart-core gains a renderer about the size of the HTML one (<code>Html*.kt</code>, about 575 lines). The win is that the renderer is written once, for every HEART service, and each game server needs only the relay.</p>
+
+    <h3>Caveats</h3>
+    <ul class="tight">
+      <li><b>Not implemented, not tested.</b> The JSON above was written by hand from the dialog format's documentation.</li>
+      <li><b>Paper has no call to show a dialog from raw JSON</b> that I know of. Routes: Minecraft's own <code>/dialog show</code> command, or the game's codec through server internals. Neither is checked.</li>
+      <li><b>The format moves with the game.</b> Dialogs arrived in 1.21.6, and the format may change between versions. The media type would need a version, and servers would follow Minecraft's release cadence.</li>
+      <li><b>Security.</b> Server content is untrusted. A dialog can carry <code>run_command</code>, which runs as the player. The relay must check every action and every click event in text, every time.</li>
+      <li><b>Coupling.</b> A HEART service would carry a game-specific rendering. HEART couples clients to media types on purpose, as the Web does with HTML, but every new kind of client would ask for its own.</li>
+      <li><b>ARTIE still has its place.</b> Goals and kept scripts read HAL Schema Forms; this type is for people in the game. The two can live together: the relay asks for the dialog type first, and falls back to HAL Schema Forms with today's mapping when a server doesn't serve it.</li>
+      <li><b>One credential for everyone.</b> Per-player identity is unsolved either way.</li>
+      <li><b>Bedrock</b> has its own forms (<code>ModalFormData</code>) and would need another rendering.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Rough edges, and what's next</h2>
+    <ul class="tight">
+      <li><b>Nested state in the dialog</b> shows only its names (regions: staging, production). The web view lays any structure out as titled pairs and tables; the dialog could do the same with lines.</li>
+      <li><b>Labels</b> are raw property names (<code>reason</code>, <code>region</code>); "release: Release 1.0" says release twice. A schema's <code>title</code> would fix both.</li>
+      <li><b>Absent acts</b> are lines in Minecraft and greyed buttons in the browser. A Minecraft button can carry a tooltip; it could hold the reason.</li>
+      <li><b>The refusal names the act by its relation</b>, <code>cd:cancel</code>. Its title would read better, with the server's detail after it.</li>
+      <li><b>The idle app shows the last deploy's</b> environment, region and release: the deploy service's model keeps them after a cancel.</li>
+      <li><b>Not built yet:</b> links as buttons, true-or-false fields as toggles, bounded numbers as sliders, and a form with no choices at all.</li>
+    </ul>
+  </section>
+
+  <details>
+    <summary>Run it</summary>
+    <ul class="tight">
+      <li>Build the plugin: <code>cd client &amp;&amp; ./gradlew :artie-minecraft:pluginJar</code>, then copy <code>artie-minecraft/build/libs/artie-minecraft-0.1.0-plugin.jar</code> to a Paper 26.3 server's <code>plugins</code> folder.</li>
+      <li>Run the deploy service: <code>cd heart &amp;&amp; ./gradlew :heart-sims:installSims</code>, then <code>java -cp 'heart-sims/build/sims/lib/*' com.artie.heart.sims.MainKt 8402 deploy.test</code>, and give it regions and releases as <code>kit/entrypoint.sh</code> does.</li>
+      <li>Start Paper on Java 25 with <code>ARTIE_TOKEN_LOCALHOST_8402</code> set to the deploy service's test token; ARTIE reads credentials from the environment by origin.</li>
+      <li>Paper 26.3 starts with its whitelist on: add your name before joining.</li>
+      <li>In the game: <code>/artie</code> opens <code>http://localhost:8402/apps/web</code>; <code>/artie &lt;address&gt;</code> opens any HEART resource.</li>
+    </ul>
+  </details>
+
+  <section class="sources">
+    <h2>Sources</h2>
+    <ul class="tight">
+      <li>Code: <code>client/artie-minecraft</code>, commit <code>52e6c672</code>; the deploy service, <code>heart/heart-sims</code>.</li>
+      <li><a href="https://minecraft.wiki/w/Dialog">Dialog</a>, Minecraft Wiki: the format, its inputs and actions.</li>
+      <li><a href="https://docs.papermc.io/paper/dev/dialogs/">Dialogs</a>, Paper documentation: the API the plugin uses.</li>
+      <li><a href="../minecraft-plan/">ARTIE in Minecraft</a>: the plan this proof of concept follows, phases 0 to 2.</li>
+      <li><a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">REST APIs must be hypertext-driven</a>, Roy T. Fielding, 2008.</li>
+    </ul>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/gherkin.min.js"></script>
+<script>
+  try { hljs.highlightAll(); } catch (e) { /* plain text still reads */ }
+</script>
+<script>// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+</script>
+<script>(function () {
+  var key = 'heart-report-detail', level = '0';
+  try { var kept = localStorage.getItem(key); if (kept === '0' || kept === '1' || kept === '2') level = kept; } catch (e) {}
+  function set(to) {
+    level = to; document.body.dataset.detail = to;
+    document.querySelectorAll('.seg button').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.level === to)); });
+    if (to === '2') document.querySelectorAll('details.bodies').forEach(function (d) { d.open = true; });
+    try { localStorage.setItem(key, to); } catch (e) {}
+  }
+  document.querySelectorAll('.seg button').forEach(function (b) { b.addEventListener('click', function () { set(b.dataset.level); }); });
+  set(level);
+})();</script>
+
+</html>

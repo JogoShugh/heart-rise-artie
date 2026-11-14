@@ -1,0 +1,50 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Mail",
+    "version": "1.0.0",
+    "description": "Mailboxes that send mail: a plain service that publishes only OpenAPI."
+  },
+  "paths": {
+    "/mailboxes/{id}": {
+      "get": {
+        "operationId": "getMailbox",
+        "tags": ["mailboxes"],
+        "summary": "Get a mailbox",
+        "description": "One mailbox, by its name.",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "description": "The mailbox's name", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "The mailbox" } }
+      }
+    },
+    "/mailboxes/{id}/actions/send": {
+      "post": {
+        "operationId": "send",
+        "tags": ["mailboxes"],
+        "summary": "Send mail",
+        "description": "Sends a message from the mailbox.",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "description": "The mailbox's name", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["to", "subject"],
+                "properties": {
+                  "to": { "type": "string", "description": "Who it is sent to" },
+                  "subject": { "type": "string", "description": "What it is about" },
+                  "body": { "type": "string", "description": "What it says" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "The mailbox, its message sent" } }
+      }
+    }
+  }
+}

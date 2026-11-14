@@ -1,0 +1,37 @@
+1 enter http://localhost:8392/: done
+2 act github:repos-get, owner JogoShugh, repo heart-kit-test: done
+3 act github:open-issue, title Triage watch, body Close this issue to stop the triage watch.: new resource
+4 return to http://localhost:8392/repos/JogoShugh/heart-kit-test: done
+5 return to http://localhost:8392/: done
+6 return to http://localhost:8392/: done
+7 act github:issues-list-for-repo, owner JogoShugh, repo heart-kit-test, state open, labels needs-triage: done
+8 follow item, titled A gateway connector for Jira: done
+9 Label it bug, question or enhancement, whichever its words say it is.: done
+10 act github:label, labels [triaged]: done
+11 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/126: done
+12 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/126: done
+13 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues?state=open&labels=needs-triage: done
+14 follow item, titled How do I point artie at a gateway on another port?: done
+15 Label it bug, question or enhancement, whichever its words say it is.: done
+16 act github:label, labels [triaged]: done
+17 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/125: done
+18 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/125: done
+19 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues?state=open&labels=needs-triage: done
+20 follow item, titled artie needs Java 22, but client/README.md says 21: done
+21 Label it bug, question or enhancement, whichever its words say it is.: done
+22 act github:label, labels [triaged]: done
+23 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/124: done
+24 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/124: done
+25 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues?state=open&labels=needs-triage: done
+26 follow item, titled A gateway connector for Jira: done
+27 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues?state=open&labels=needs-triage: done
+28 follow item, titled How do I point artie at a gateway on another port?: done
+29 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues?state=open&labels=needs-triage: done
+30 follow item, titled artie needs Java 22, but client/README.md says 21: done
+31 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues?state=open&labels=needs-triage: done
+32 return to http://localhost:8392/: done
+33 return to http://localhost:8392/: done
+34 return to http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/130: done
+35 return to http://localhost:8392/: done
+report: runs/triage-kept/index.html
+finished, 35 steps; acted: github:repos-get 1, github:open-issue 1, github:issues-list-for-repo 1, github:label 6

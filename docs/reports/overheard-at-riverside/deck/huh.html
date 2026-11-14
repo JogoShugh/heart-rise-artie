@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rules learned by refusal · Overheard at Riverside</title>
+<base href="../">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+</head><body>
+<header class="bar"><div class="bar-in"><div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · plain page</span></div></div></header>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Scene one · 1997</span><span class="fiction">Fiction</span></header>
+<h2>Rules learned by refusal</h2>
+<div class="pair">
+  <ul class="points"><li>Ana sends the renewal for <i>The Hobbit</i>. The answer is 409: a hold is waiting, so it can't be renewed. She only finds out after typing it all.</li><li>Marcus tries 3311 for her, and <i>Matilda</i> renews. <i>Charlotte's Web</i> would fail too, renewed three times already, yet forms.html offers renew for all three.</li><li>Ana asks why the page can't show a Renew button on the books she can renew, and say why on the others. Marcus writes “buttons?” on a sticky note. In that world, nobody reads it.</li><li><b>What it shows:</b> a rule kept in prose, away from the page, is learned by refusal.</li></ul>
+<div class="script">
+    <div class="line"><span class="who ana">Ana</span><p>Sent. It says 409. “A hold is waiting for this book, so it can't be renewed.”</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>Someone's waiting for <i>The Hobbit</i>.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>Couldn't it have told me before I typed all of it?</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>The page doesn't know what you can do. forms.yaml does, the same for every book. Renew is listed for all of them, and the rule is in its description. Try 3311. That's <i>Matilda</i>.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>“Loan 3311 is renewed. It is due 1997-12-03.” And <i>Charlotte's Web</i>?</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>Renewed three times already. It'll say no.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>Then why does forms.html offer it?</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>It offers everything to everyone.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>Why can't the page just show me a Renew button on the books I can renew, and say why on the ones I can't?</p></div>
+    <p class="direction">A long pause.</p>
+    <div class="line"><span class="who marcus">Marcus</span><p>…Huh.</p></div>
+    <p class="direction">He writes “buttons?” on a sticky note. In this world, nobody ever reads it.</p>
+  </div>
+  <figure><img src="media/renew-409.png" alt="WebWalker after a POST typed by hand: 409 Conflict, a hold is waiting for this book." loading="lazy"><figcaption>Typed, sent, refused. Only now does she find out.</figcaption></figure>
+</div>
+<details class="more"><summary>Watch her whole visit</summary>
+  <figure><img src="media/web-that-wasnt.gif" alt="Ana's visit in WebWalker: forms.yaml, forms.html, her loans, a renewal refused 409, then Matilda renewed." loading="lazy"><figcaption>The Perl site, recorded in headless Chrome: forms.yaml, forms.html, her loans, the 409, then <i>Matilda</i>.</figcaption></figure>
+</details>
+<details class="more"><summary>The CGI that said 409</summary>
+  <p class="note">The rules are real, and checked in order: returned already, a hold waiting, renewed the most allowed. Only after all three does it move the due date three weeks on. Ana meets them only after she has sent the request.</p>
+  <pre class="source"><code>sub act {
+    my ($id, $what) = @_;
+    my $loan = find($id) or return answer('404 Not Found', 'No such loan', p("There is no loan $id."));
+    return answer('409 Conflict', 'Cannot do that', p('It was returned already.')) if $loan-&gt;[7];
+    if ($what eq 'return') {
+        $loan-&gt;[7] = 1;
+        save();
+        return answer('200 OK', 'Returned', p("Loan $id is returned. Thank you."));
+    }
+    return answer('409 Conflict', 'Cannot renew', p("A hold is waiting for this book, so it can't be renewed."))
+        if $loan-&gt;[6];
+    return answer('409 Conflict', 'Cannot renew', p("It has been renewed $MOST_RENEWALS times, the most allowed."))
+        if $loan-&gt;[5] &gt;= $MOST_RENEWALS;
+    my ($y, $m, $d) = split /-/, $loan-&gt;[4];
+    my @due = gmtime(timegm(0, 0, 12, $d, $m - 1, $y) + 21 * 86400);
+    $loan-&gt;[4] = sprintf('%04d-%02d-%02d', $due[5] + 1900, $due[4] + 1, $due[3]);
+    $loan-&gt;[5]++;
+    save();
+    answer('200 OK', 'Renewed', p("Loan $id is renewed. It is due $loan-&gt;[4]."));
+}</code></pre><p class="source-at"><code>exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi</code>, lines 55–74</p>
+</details>
+</article>
+<nav class="foot"><a href="deck/sticky-note.html" rel="prev"><small>Back</small><b>The person joins them, by hand</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#huh">with heart-ts</a></span>
+<a href="deck/marriage.html" rel="next" data-rel="next"><small>Next</small><b>The Marriage of Information and Controls</b></a></nav>
+</main></div></body></html>

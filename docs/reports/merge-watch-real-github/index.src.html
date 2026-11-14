@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Real GitHub, Local GitLab</title>
+<meta name="description" content="One release goal captured once with Claude on real GitHub, then the same script replayed with no model on real GitHub and on a local GitLab, side by side.">
+<style>
+  :root { --bg: #f6f5f1; --fg: #1d211f; --soft: #5b625e; --line: #dcdcd4; --card: #ffffff; --code: #f0efe9;
+    --pass: #e6f4ea; --pass-edge: #2f6b4f; --cost: #fff4e0; --cost-edge: #a56a12; --accent: #1f5f8b;
+    --gh: #24292f; --gl: #8a3ffc; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+      --code: #1f2522; --pass: #16321f; --pass-edge: #7cc4a0; --cost: #33270f; --cost-edge: #e0b060; --accent: #8cc4ec;
+      --gh: #c9d1d9; --gl: #b98bff; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+    --code: #1f2522; --pass: #16321f; --pass-edge: #7cc4a0; --cost: #33270f; --cost-edge: #e0b060; --accent: #8cc4ec;
+    --gh: #c9d1d9; --gl: #b98bff; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1200px; margin: 0 auto; padding: 1rem 16px 3rem; }
+  h1 { font-size: 1.55rem; margin: .2rem 0 .4rem; text-wrap: balance; }
+  h2 { font-size: 1.1rem; margin: 1.6rem 0 .5rem; }
+  h3 { font-size: .95rem; margin: .1rem 0 .4rem; }
+  p, li { max-width: 80ch; }
+  .soft { color: var(--soft); }
+  a { color: var(--accent); }
+  code { font: .88em ui-monospace, Menlo, monospace; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .6rem; margin: 1rem 0; }
+  .tile { border-radius: 8px; padding: .7rem .8rem; border: 1px solid; }
+  .tile.cost { background: var(--cost); border-color: var(--cost-edge); }
+  .tile.pass { background: var(--pass); border-color: var(--pass-edge); }
+  .tile b { display: block; font-size: 1.1rem; }
+  .tile span { color: var(--soft); font-size: .88rem; }
+  .wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; border: 1px solid var(--line); padding: .4rem .55rem; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; margin: .4rem 0; }
+  summary { cursor: pointer; padding: .5rem .75rem; font-weight: 600; }
+  pre { margin: 0; padding: .6rem .75rem; background: var(--code); overflow-x: auto; font: 12px/1.45 ui-monospace, Menlo, monospace;
+    white-space: pre-wrap; overflow-wrap: anywhere; max-height: 32rem; overflow-y: auto; }
+  .tabs { display: flex; flex-wrap: wrap; gap: .3rem; border-bottom: 1px solid var(--line); margin: 1.2rem 0 .8rem;
+    position: sticky; top: 0; background: var(--bg); padding-top: .4rem; z-index: 2; }
+  .tabs button { font: inherit; border: 1px solid var(--line); border-bottom: none; background: var(--card); color: var(--fg);
+    padding: .45rem .8rem; border-radius: 8px 8px 0 0; cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .variants { display: flex; flex-wrap: wrap; gap: .3rem; align-items: center; margin: .2rem 0 .8rem; }
+  .variants button { font: inherit; font-size: .9rem; border: 1px solid var(--line); background: var(--card); color: var(--fg);
+    padding: .25rem .6rem; border-radius: 999px; cursor: pointer; }
+  .variants button[aria-pressed="true"] { border-color: var(--accent); outline: 2px solid var(--accent); }
+  .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: .8rem; }
+  .pair > section { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .7rem; min-width: 0; }
+  .forge { font-weight: 700; }
+  .forge.github { color: var(--gh); } .forge.gitlab { color: var(--gl); }
+  figure { margin: 0; }
+  figure img { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; display: block; }
+  .shot { max-height: 40rem; overflow-y: auto; border-radius: 6px; }
+  figcaption { color: var(--soft); font-size: .85rem; margin-top: .3rem; }
+  .call { border-left: 3px solid var(--line); padding-left: .6rem; margin: .5rem 0; }
+  .line { font: 12.5px/1.4 ui-monospace, Menlo, monospace; overflow-wrap: anywhere; }
+  .badge { display: inline-block; font-size: .78rem; padding: 0 .4rem; border-radius: 4px; background: var(--code); border: 1px solid var(--line); }
+  .ok { color: var(--pass-edge); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>One Script: Real GitHub, Then Local GitLab</h1>
+  <p>Claude walked a release goal once against <b>real GitHub</b> (<code>JogoShugh/heart-github-test</code>), choosing each
+    move from what the API offered. ARTIE kept that walk as a script. The same script then released five pull requests on
+    real GitHub and five merge requests on a <b>GitLab running on this Mac</b>, with <b>no model calls</b>, every party read at <b>rung L2</b>, by one desk whose cache outlives each release: forms and schemas fetched once, then read from memory. The GitLab
+    runs touch nothing remote: no cloud service and no enterprise system.</p>
+  <p>Both forges look the same on the wire. The script asks for typed relations, <code>scm:pulls-get</code>,
+    <code>scm:merge</code> and <code>scm:comment</code>, in HAL Schema Forms. Each forge sits behind the same HEART gateway
+    with its own <b>connector</b>, a few YAML files, which maps those relations and their fields to that forge's own REST
+    API and back. Moving the script from GitHub to GitLab means changing one input: the gateway's address.</p>
+
+  <div class="tiles">
+    <div class="tile cost"><b>Captured once, on real GitHub: @@CALLS@@ model calls</b>
+      <span>claude-sonnet-5-5 · @@TOKENS_IN@@ input tokens · @@TOKENS_OUT@@ output · pull request #@@CAPTURE_PULL@@ ·
+        <a href="runs/capture.html">the capture</a></span></div>
+    <div class="tile pass"><b>Real GitHub: 5 releases, 0 model calls</b><span id="tile-github"></span></div>
+    <div class="tile pass"><b>Local GitLab: 5 releases, 0 model calls</b><span id="tile-gitlab"></span></div>
+  </div>
+
+  <h2>The cache: what never touched the network</h2>
+  <p class="soft">The same five releases, run three ways. Each cell counts the requests that went on the network in that
+    release, and how many of them fetched a form set or a schema. A request answered from ARTIE's own cache sends
+    nothing and is in no trace. The L0 run: <a href="../merge-watch-real-github-l0/">its own report</a>.</p>
+@@CACHE@@
+  <ul>
+    <li><b>L0:</b> every answer carries the state, its forms, and each form's full schema, inline: about 59 requests a release, the forms and schemas sent again in every answer.</li>
+    <li><b>L2:</b> the answer carries the state and a link to its form set; the set links each schema. Sets and schemas are content-addressed and fresh for a year.</li>
+    <li><b>L2 with a fresh desk each release:</b> an empty cache every time, so every release fetches its sets and schemas again: about 110 requests.</li>
+    <li><b>L2 with one desk for all five:</b> the first release fetches about 50 sets and schemas. From the second on, they come from ARTIE's cache, in memory, with <b>no network request at all</b>: 0 to 2 fetched, back to L0's 59 requests, but none of them re-sends a form or a schema.</li>
+    <li><b>Answers received, warm (502, 503, 505):</b> local GitLab about 24 KB a release at L2, against 63 KB at L0; real GitHub about 103 KB, against 140 KB, its pull requests themselves being large.</li>
+    <li><b>Unchanged:</b> the script's steps and outcomes, and the native calls to GitHub and GitLab. The rung and the cache are only between ARTIE and the gateways; the resources themselves are still asked again each time, by ETag, and answer 304 when unchanged.</li>
+  </ul>
+
+  <h2>The goal</h2>
+  <pre>@@GOAL@@</pre>
+  <h2>The script captured from it</h2>
+  <details><summary>release.heart.yaml: kept by ARTIE from the one Claude run, run as is on both forges</summary>
+    <pre>@@SCRIPT@@</pre></details>
+
+  <h2>The ten releases</h2>
+  <div class="wrap"><table id="releases">
+    <tr><th>Variant</th><th>Its change</th><th>Real GitHub</th><th>Local GitLab</th></tr>
+  </table></div>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="side" aria-selected="true">Side by side</button>
+    <button role="tab" data-tab="scm" aria-selected="false">scm calls</button>
+    <button role="tab" data-tab="native" aria-selected="false">Native API calls</button>
+    <button role="tab" data-tab="html" aria-selected="false">Gateway text/html</button>
+  </nav>
+  <div class="variants" id="variants"><span class="soft">Variant:</span></div>
+
+  <section data-panel="side">
+    <p class="soft">Each forge's own web page, as each release left it. Same script, same inputs, no model.</p>
+    <div class="pair">
+      <section><h3><span class="forge github">Real GitHub</span> · <span id="side-github-title"></span></h3>
+        <div id="side-github-note"></div>
+        <figure><div class="shot"><img id="side-github-img" alt=""></div><figcaption id="side-github-cap"></figcaption></figure></section>
+      <section><h3><span class="forge gitlab">Local GitLab</span> · <span id="side-gitlab-title"></span></h3>
+        <div id="side-gitlab-note"></div>
+        <figure><div class="shot"><img id="side-gitlab-img" alt=""></div><figcaption id="side-gitlab-cap"></figcaption></figure></section>
+    </div>
+  </section>
+
+  <section data-panel="scm" hidden>
+    <p class="soft">Every request ARTIE made to each forge's gateway in this release, and its answer: the same relations,
+      the same fields, the same shapes. Open one to see its bodies.</p>
+    <div class="pair"><section id="scm-github"></section><section id="scm-gitlab"></section></div>
+  </section>
+
+  <section data-panel="native" hidden>
+    <p class="soft">What each gateway sent to its forge's own REST API while answering those requests: GitHub's
+      <code>api.github.com</code>, GitLab's <code>/api/v4</code>. ARTIE never sees these.</p>
+    <div class="pair"><section id="native-github"></section><section id="native-gitlab"></section></div>
+  </section>
+
+  <section data-panel="html" hidden>
+    <p class="soft">The same resource each gateway served to ARTIE, asked for as <code>text/html</code>: one declaration,
+      every reader. A browser sees the state and the forms this state offers, in scm's words, on either forge.</p>
+    <div class="pair">
+      <section><h3><span class="forge github">Real GitHub</span> · through the gateway</h3>
+        <figure><div class="shot"><img id="html-github-img" alt=""></div><figcaption>The gateway on 8093, in front of api.github.com.</figcaption></figure></section>
+      <section><h3><span class="forge gitlab">Local GitLab</span> · through the gateway</h3>
+        <figure><div class="shot"><img id="html-gitlab-img" alt=""></div><figcaption>The gateway on 8094, in front of GitLab's /api/v4.</figcaption></figure></section>
+    </div>
+  </section>
+
+  <h2>Run it again</h2>
+  <ul class="soft">
+    <li><code>sh exhibits/merge-watch-release/github/gateway.sh</code> and <code>gitlab/gateway.sh</code>: the two gateways.</li>
+    <li><code>RELEASE_SCM=github-live sh exhibits/merge-watch-release/capture-release.sh 501</code>: the one Claude walk.</li>
+    <li><code>RELEASE_SCM=github-live sh exhibits/merge-watch-release/variants.sh docs/reports/merge-watch-real-github/runs/github</code></li>
+    <li><code>RELEASE_SCM=gitlab RELEASE_SHOT=docs/reports/merge-watch-real-github/gitlab-shot.sh sh exhibits/merge-watch-release/variants.sh docs/reports/merge-watch-real-github/runs/gitlab</code></li>
+    <li><code>sh docs/reports/merge-watch-real-github/build.sh</code>: this page.</li>
+  </ul>
+</main>
+<script>@@JS_YAML@@</script>
+<script id="data" type="application/json">@@DATA@@</script>
+<script>
+(() => {
+  const data = JSON.parse(document.getElementById('data').textContent);
+  const changes = { 501: 'renewals: 2 weeks', 502: 'renewals: 4 weeks', 503: 'renewals: 1 week',
+    504: 'renewals: none (smoke test S3 fails)', 505: 'a README line only' };
+  const gh = (n) => `https://github.com/JogoShugh/heart-github-test/pull/${n}`;
+  const el = (tag, attrs = {}, ...kids) => {
+    const e = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => (k === 'text' ? (e.textContent = v) : e.setAttribute(k, v)));
+    kids.forEach((k) => e.append(k));
+    return e;
+  };
+  const yaml = (value) => (value == null ? '(none)' :
+    window.jsyaml.dump(value, { lineWidth: 100, noRefs: true, skipInvalid: true }));
+  const box = (label, value) => {
+    const d = el('details', {}, el('summary', { text: label }));
+    d.addEventListener('toggle', () => { if (d.open && !d.querySelector('pre')) d.append(el('pre', { text: yaml(value) })); }, { once: false });
+    return d;
+  };
+  const outcome = (v) => (v.promoted ? 'merged, promoted to Dev' : 'merged; smoke S3 failed, not promoted; commented');
+
+  for (const forge of ['github', 'gitlab']) {
+    const runs = Object.values(data[forge]);
+    const steps = runs.map((r) => r.steps), secs = runs.map((r) => r.seconds);
+    document.getElementById(`tile-${forge}`).textContent =
+      `${runs.filter((r) => r.promoted).length} promoted, 504 stopped by S3 as it should · ` +
+      `${Math.min(...steps)} to ${Math.max(...steps)} steps, ${Math.min(...secs)} to ${Math.max(...secs)} s each`;
+  }
+  const table = document.getElementById('releases');
+  for (const n of [501, 502, 503, 504, 505]) {
+    const g = data.github[n], l = data.gitlab[n];
+    table.append(el('tr', {}, el('td', { text: String(n) }), el('td', { text: changes[n] }),
+      el('td', {}, el('a', { href: gh(g.pull), text: `#${g.pull}` }), ` · ${outcome(g)} · `,
+        el('a', { href: `runs/github/pr-${n}.html`, text: 'run' })),
+      el('td', {}, `!${l.pull} · ${outcome(l)} · `, el('a', { href: `runs/gitlab/pr-${n}.html`, text: 'run' }))));
+  }
+
+  let variant = 504;
+  const bar = document.getElementById('variants');
+  const buttons = [501, 502, 503, 504, 505].map((n) => {
+    const b = el('button', { type: 'button', text: String(n) });
+    b.addEventListener('click', () => { variant = n; show(); });
+    bar.append(b);
+    return b;
+  });
+
+  function calls(forge, native) {
+    const host = document.getElementById(`${native ? 'native' : 'scm'}-${forge}`);
+    const run = data[forge][variant];
+    host.replaceChildren(el('h3', {}, el('span', { class: `forge ${forge}`, text: forge === 'github' ? 'Real GitHub' : 'Local GitLab' }),
+      ` · ${native ? run.calls.reduce((s, c) => s + c.native.length, 0) + ' native calls' : run.calls.length + ' scm calls'}`));
+    run.calls.forEach((c) => {
+      const head = el('div', { class: 'line' }, el('span', { class: 'badge', text: `step ${c.step}` }), ' ',
+        `${c.method} ${c.url.replace(/^https?:\/\/[^/]+/, '')} → ${c.status}`);
+      const said = el('div', { class: 'soft', text: (c.relation ? c.relation + ' · ' : '') + (c.words || '') });
+      const item = el('div', { class: 'call' }, head, said);
+      if (!native) {
+        if (c.sent != null) item.append(box('request body', c.sent));
+        if (c.answer != null) item.append(box('answer', c.answer));
+      } else if (c.native.length === 0) {
+        item.append(el('div', { class: 'soft', text: c.status === 304 ? 'answered 304 from the gateway: nothing new upstream' : 'no upstream call' }));
+      } else {
+        c.native.forEach((n) => {
+          item.append(el('div', { class: 'line' }, `↳ ${n.method} ${n.url} → ${n.status}`));
+          if (n.sent != null) item.append(box('sent upstream', n.sent));
+          if (n.answer != null) item.append(box('upstream answered', n.answer));
+        });
+      }
+      host.append(item);
+    });
+  }
+
+  function show() {
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.textContent) === variant)));
+    const g = data.github[variant], l = data.gitlab[variant];
+    document.getElementById('side-github-title').replaceChildren(el('a', { href: gh(g.pull), text: `pull request #${g.pull}` }));
+    document.getElementById('side-gitlab-title').textContent = `merge request !${l.pull}`;
+    for (const [forge, run] of [['github', g], ['gitlab', l]]) {
+      document.getElementById(`side-${forge}-note`).replaceChildren(el('p', { class: 'soft',
+        text: `${run.steps} steps in ${run.seconds} s, no model. ${outcome(run)}.` }));
+      const img = document.getElementById(`side-${forge}-img`);
+      img.src = `shots/${forge}-${variant}.png`;
+      img.alt = `${forge === 'github' ? 'GitHub' : 'GitLab'} web page of variant ${variant} after its release`;
+      document.getElementById(`side-${forge}-cap`).textContent = forge === 'github'
+        ? 'github.com, as anyone sees it: merged by the script, and on 504 its comment.'
+        : 'GitLab on this Mac, as anyone sees it: merged by the same script, and on 504 the same comment.';
+    }
+    for (const forge of ['github', 'gitlab']) {
+      calls(forge, false); calls(forge, true);
+      const html = document.getElementById(`html-${forge}-img`);
+      html.src = `shots/html-${forge}-${variant}.png`;
+      html.alt = `The gateway's text/html rendering of variant ${variant}`;
+    }
+  }
+
+  document.querySelectorAll('.tabs button').forEach((tab) => tab.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+    document.querySelectorAll('[data-panel]').forEach((p) => (p.hidden = p.dataset.panel !== tab.dataset.tab));
+    
+  }));
+  show();
+})();
+</script>
+</body>
+</html>

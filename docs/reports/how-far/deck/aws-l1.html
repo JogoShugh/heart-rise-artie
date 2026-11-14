@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L1: the forms become one shared, cached set · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">A preview of HEART · 4 of 5 · HEART L1</span></header>
+<h2>L1: the forms become one shared, cached set</h2>
+<div class="split">
+<pre><code># GET /clientcertificates/xmbiqp
+# Prefer: forms=link
+# 200 OK
+# ETag: "seq-1.hsf.L1"
+# Cache-Control: no-cache
+# Preference-Applied: forms=link
+clientCertificateId: xmbiqp
+createdDate: 2015-12-08T18:02:16Z
+description: test-client-cert-2
+expirationDate: 2016-12-07T18:02:16Z
+pemEncodedCertificate: |
+  -----BEGIN CERTIFICATE----- …
+_links:
+  self:
+    href: /clientcertificates/xmbiqp
+<span class="add">  hr:forms:</span>
+<span class="add">    href: /affordance-sets/{hash}</span>
+<span class="add">    type: application/hal+json</span>
+<span class="add">    profile: https://w3id.org/heart-rise/</span>
+<span class="add">      hal-schema-forms</span>
+<span class="add">    integrity: sha256-…</span></code></pre>
+<pre><code># GET /affordance-sets/{hash}
+# Cache-Control: public, max-age=31536000, immutable
+_forms:
+  clientcertificate:update:
+    title: Update
+    _links:
+      target:
+        href: /clientcertificates/{id}
+        templated: true
+<span class="add">    hr:templatePointers:</span>
+<span class="add">      id: /clientCertificateId</span>
+    method: PATCH
+    contentType: application/json
+    hr:integrity: sha256-…
+    schema:
+      type: object
+      required: [patchOperations]
+      properties:
+        patchOperations: {…as at L0…}
+  clientcertificate:delete:
+    title: Delete
+    _links:
+      target:
+        href: /clientcertificates/{id}
+        templated: true
+    hr:templatePointers:
+      id: /clientCertificateId
+    method: DELETE</code></pre>
+</div>
+<p class="cite" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center"><span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#b85c2c;color:#fff;letter-spacing:0.04em">MOCKUP</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">Today</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">L0</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#2f7d55;color:#fff">L1</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">L2</span> <i style="margin-left:0.6rem">One set for every certificate: fetched once, then read from cache.</i></p>
+<p class="refs"><a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_4">Cache</a></p>
+</article>
+<nav class="foot"><a href="deck/aws-l0-list.html" rel="prev"><small>Back</small><b>L0: the list offers generate, with what it needs</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#aws-l1">with heart-ts</a></span>
+<a href="deck/aws-l2.html" rel="next"><small>Next</small><b>L2: schemas linked too, and shared everywhere</b></a></nav>
+</main></div></body></html>

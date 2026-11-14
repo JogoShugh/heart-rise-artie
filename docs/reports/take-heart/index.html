@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="From hypertext and Fielding to HEART, and from OpenAPI back to HEART: a gateway that guardrails any OpenAPI service, so clients and AI agents only see what is allowed now. Part 1 of 2.">
+<title>Take HEART</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column for the story; diagrams, screenshots and tables break out wider. */
+:root {
+  --bg: #f3f6f5;
+  --surface: #ffffff;
+  --fg: #17211d;
+  --muted: #55645d;
+  --rule: #d3ddd8;
+  --leaf: #2b7a4b;
+  --link: #2f5f8f;
+  --refuse: #a3442e;
+  --gate: #7a5a1f;
+  --code-bg: #e9efec;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732;
+    --leaf: #6cc690; --link: #8ab8e6; --refuse: #e58a72; --gate: #e0b866; --code-bg: #1d2723; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732;
+  --leaf: #6cc690; --link: #8ab8e6; --refuse: #e58a72; --gate: #e0b866; --code-bg: #1d2723; color-scheme: dark;
+}
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 44rem; margin: 0 auto; padding-block: 3rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.6rem; }
+.wide { margin-inline: calc((44rem - min(64rem, 100%)) / 2); }
+@media (max-width: 64rem) { .wide { margin-inline: 0; } }
+h1, h2, h3 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.1rem, 5.5vw, 3.2rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.12rem; }
+p, li { max-width: 65ch; }
+p { margin: 0; }
+section { display: grid; gap: 1rem; min-width: 0; }
+.eyebrow { font: 600 0.74rem/1 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.15rem; color: var(--muted); }
+.thesis { font-family: var(--display); font-weight: 500; font-size: 1.3rem; line-height: 1.45; border-left: 3px solid var(--leaf); padding-left: 1rem; }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.85rem 1rem; font: 0.79rem/1.6 var(--mono); }
+pre code { background: none; padding: 0; font-size: 1em; }
+.k { color: var(--link); } .g { color: var(--leaf); } .c { color: var(--muted); } .r { color: var(--refuse); }
+a { color: var(--link); }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+ul, ol { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.4rem; }
+.note { color: var(--muted); font-size: 0.92rem; }
+
+/* An act: a numbered part of the story, with where we are in one line. */
+.act { display: grid; gap: 0.35rem; padding-top: 1.4rem; border-top: 2px solid var(--rule); }
+.act .n { font: 600 0.74rem/1 var(--body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--leaf); }
+.act h2 { font-size: 1.9rem; }
+.act .where { color: var(--muted); font-size: 0.98rem; }
+
+/* Timeline of hypertext. */
+.timeline { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; border-left: 2px solid var(--rule); }
+.timeline li { position: relative; padding: 0 0 1rem 1.1rem; max-width: none; }
+.timeline li::before { content: ""; position: absolute; left: -0.42rem; top: 0.45rem; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--surface); border: 2px solid var(--leaf); }
+.timeline b { font-family: var(--display); }
+.timeline .y { font: 600 0.8rem var(--mono); color: var(--muted); margin-right: 0.4rem; }
+
+/* Screenshots and frames. */
+figure { margin: 0; display: grid; gap: 0.4rem; min-width: 0; align-content: start; }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 8px; background: #fff; }
+figcaption { font-size: 0.88rem; color: var(--muted); }
+figcaption b { color: var(--fg); }
+.frames { display: grid; grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr)); gap: 1rem; }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
+.tall img { max-height: 34rem; object-fit: cover; object-position: top; }
+
+/* Building JSON back up: each step the whole response, its new lines highlighted. */
+.build { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; counter-reset: b; }
+.build > li { counter-increment: b; display: grid; gap: 0.6rem; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 1rem 1.1rem; max-width: none; min-width: 0; }
+.build .say { display: grid; gap: 0.3rem; }
+.build .say b { font-family: var(--display); font-size: 1.06rem; }
+.build .say b::before { content: counter(b) ". "; color: var(--leaf); }
+pre.doc { font-size: 0.76rem; line-height: 1.5; }
+pre.doc .add, .addkey { background: color-mix(in srgb, var(--leaf) 22%, transparent); }
+pre.doc .ln { display: block; }
+pre.doc code { display: block; min-width: max-content; }
+pre.doc { width: 100%; box-sizing: border-box; }
+.addkey { padding: 0 0.3em; border-radius: 3px; }
+details.advanced { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.9rem 1.1rem; }
+details.advanced > summary { cursor: pointer; font-family: var(--display); font-weight: 650; font-size: 1.1rem; }
+details.advanced > p, details.advanced > ol { margin-top: 0.9rem; }
+details.advanced .build > li { background: var(--bg); }
+/* The earlier side-by-side step layout (no longer used). */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; counter-reset: step; }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 1rem; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.95rem 1.05rem; max-width: none; }
+@media (max-width: 46rem) { .steps > li { grid-template-columns: minmax(0, 1fr); } }
+.steps .say { display: grid; gap: 0.4rem; align-content: start; }
+.steps .say b { font-family: var(--display); font-size: 1.04rem; }
+.steps .say b::before { content: counter(step) ". "; color: var(--leaf); }
+.steps .web { font-size: 0.86rem; color: var(--muted); border-left: 2px solid var(--rule); padding-left: 0.6rem; }
+.steps pre { white-space: pre-wrap; overflow-wrap: anywhere; align-self: start; }
+
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 36rem; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tbody th { font-weight: 500; }
+.hl { background: color-mix(in srgb, var(--gate) 10%, transparent); }
+.pass { color: var(--leaf); font-weight: 600; }
+.fail { color: var(--refuse); font-weight: 600; }
+
+blockquote { margin: 0; font-family: var(--display); font-weight: 500; font-size: 1.14rem; line-height: 1.45; padding-left: 1rem; border-left: 3px solid var(--leaf); }
+.quotes { display: grid; gap: 1.1rem; }
+.quotes figcaption { font-size: 0.88rem; }
+
+.ladder { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; counter-reset: rung; }
+.ladder li { counter-increment: rung; background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--link); border-radius: 8px; padding: 0.85rem 1rem; display: grid; gap: 0.4rem; max-width: none; }
+.ladder li.heart { border-left-color: var(--leaf); }
+.ladder li.gw { border-left-color: var(--gate); }
+.ladder b { font-family: var(--display); font-size: 1.05rem; }
+.ladder b::before { content: counter(rung) ". "; color: var(--muted); }
+
+.why { background: var(--surface); border: 1px dashed var(--rule); border-radius: 10px; padding: 1.1rem 1.2rem; display: grid; gap: 0.7rem; }
+.why .ask { font-family: var(--display); font-size: 1.6rem; font-weight: 650; }
+.next { background: var(--surface); border: 1px solid var(--rule); border-top: 4px solid var(--leaf); border-radius: 10px; padding: 1.1rem 1.2rem; display: grid; gap: 0.7rem; }
+
+/* Two vertical chains, side by side: reading out, acting in. Stacked on narrow screens. */
+.chains { display: grid; grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr)); gap: 1.2rem; }
+.chain { display: grid; gap: 0.7rem; align-content: start; }
+.chain h3 { font-size: 1.05rem; }
+.chain ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.5rem; }
+.chain li { position: relative; display: grid; gap: 0.25rem; background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--rule); border-radius: 8px; padding: 0.7rem 0.9rem; max-width: none; }
+.chain li:not(:last-child)::after { content: "↓"; position: absolute; left: 50%; bottom: -1.45rem; transform: translateX(-50%); color: var(--muted); font-size: 1.1rem; line-height: 1.4rem; }
+.chain li b { font-family: var(--display); font-size: 1rem; }
+.chain li > span:last-child { font-size: 0.88rem; color: var(--muted); }
+.chain .tag { font: 600 0.66rem/1 var(--body); letter-spacing: 0.08em; text-transform: uppercase; }
+.chain .heart { border-left-color: var(--leaf); } .chain .heart .tag { color: var(--leaf); }
+.chain .oas { border-left-color: var(--link); } .chain .oas .tag { color: var(--link); }
+.chain .gw { border-left-color: var(--gate); } .chain .gw .tag { color: var(--gate); }
+.chain .client { border-left-color: var(--muted); } .chain .client .tag { color: var(--muted); }
+/* Mermaid diagrams: drawn on load; the source stays readable if scripts are off. */
+.diagram { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.8rem; overflow-x: auto; }
+.diagram pre.mermaid { background: none; padding: 0; font: 0.78rem/1.5 var(--mono); color: var(--muted); }
+.diagram svg { max-width: 100%; height: auto; }
+footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; display: grid; gap: 0.4rem; }
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <header style="display:grid;gap:0.9rem">
+    <span class="eyebrow">Part 1 of 2 · HEART and the OpenAPI gateway · 16 October 2026</span>
+    <h1>Take HEART: Dynamically Guardrailing OpenAPI Services with HATEOAS</h1>
+    <p class="lede">How the Web learned to put controls next to information, how JSON APIs threw them away, how HEART puts them back, and how a gateway puts them back in front of any OpenAPI service, so every client and every AI agent sees only what it may do right now.</p>
+  </header>
+
+  <p class="thesis">The Web never asked a person to guess what they were allowed to do. Each page showed the information and, beside it, the forms that applied to it now. Machines deserve the same, and with AI agents, need it.</p>
+
+  <!-- ===================================================== ACT I -->
+  <section>
+    <div class="act"><span class="n">Act I</span><h2>Where hypertext came from</h2><p class="where">Eighty years of one idea: information you can act on from where you stand.</p></div>
+    <ul class="timeline">
+      <li><span class="y">1945</span><b>Vannevar Bush, "As We May Think".</b> The Memex: a desk of documents joined by trails a reader follows and adds to.</li>
+      <li><span class="y">1965</span><b>Ted Nelson coins "hypertext"</b>: text that branches, where the reader chooses the path.</li>
+      <li><span class="y">1968</span><b>Douglas Engelbart's demonstration</b>: links, windows and a mouse, live, with information you could click and change.</li>
+      <li><span class="y">1989–91</span><b>Tim Berners-Lee's Web</b>: a proposal at CERN, then the first browser and server. Any page can link to any other, and one generic program, the browser, can follow them all.</li>
+      <li><span class="y">1993–95</span><b>Forms</b>: Mosaic adds fill-out forms, and HTML 2.0 (RFC 1866) makes them standard. Pages stop only showing and start offering things to do.</li>
+      <li><span class="y">2000</span><b>Roy Fielding's dissertation names the architecture</b>: REST, and its least-followed constraint, <i>hypermedia as the engine of application state</i>. The client moves from state to state by choosing among the controls each response carries.</li>
+      <li><span class="y">2008</span><b>Fielding, "REST APIs must be hypertext-driven"</b>: a rebuke to the "REST APIs" that had dropped exactly that.</li>
+    </ul>
+    <p>The browser is the proof that it works. It knows nothing about any one site, and never needs updating when a site changes, because every page tells it what it can do next.</p>
+  </section>
+
+  <!-- ===================================================== ACT II -->
+  <section class="wide">
+    <div class="act"><span class="n">Act II</span><h2>The gateway drug: one web page, four frames</h2><p class="where">From read-only to affordances, on a page about a single garden bed.</p></div>
+    <div class="frames">
+      <figure><img src="img/1-read-only.png" alt="A web page showing bed 2: crop tomato, moisture 40 percent, status planted, and nothing else." width="520" height="330" loading="lazy"><figcaption><b>1. Information.</b> A few values, read-only. You can look, nothing more.</figcaption></figure>
+      <figure><img src="img/2-link.png" alt="The same page with a link: History of this bed." width="520" height="330" loading="lazy"><figcaption><b>2. A link.</b> Now you can go somewhere. The page gave you the address; you didn't build it.</figcaption></figure>
+      <figure><img src="img/3-form.png" alt="The page with a Water form: 250 millilitres, 1 to 1000, and a Water the bed button." width="520" height="330" loading="lazy"><figcaption><b>3. A form.</b> Now you can do something. It says where it goes, what it needs, and the limits.</figcaption></figure>
+      <figure><img src="img/4-state.png" alt="The bed is frozen: the Water form is gone, a Thaw form is offered, and a line says why water isn't offered." width="520" height="330" loading="lazy"><figcaption><b>4. Forms that follow the state.</b> The bed froze overnight. Water is gone, Thaw is offered, and the page says why.</figcaption></figure>
+    </div>
+    <div class="diagram"><pre class="mermaid">
+sequenceDiagram
+  autonumber
+  actor P as Person
+  participant B as Browser
+  participant S as Garden site
+  P->>B: open bed 2
+  B->>S: GET /beds/2
+  S-->>B: the bed, with the forms it allows now (Thaw)
+  B-->>P: shows the values and a Thaw button
+  P->>B: press Thaw
+  B->>S: POST, to where the form said
+  S-->>B: the bed again, with its new forms (Water)
+  Note over B,S: The browser never knew about beds, frost or watering.
+    </pre></div>
+    <p>Frame 4 is Fielding's definition of hypertext, word for word. In 2008 he wrote:</p>
+    <div class="quotes">
+      <figure>
+        <blockquote>"the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions"</blockquote>
+        <figcaption>Note "or automaton". He wasn't only talking about people.</figcaption>
+      </figure>
+      <figure>
+        <blockquote>"Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents."</blockquote>
+        <figcaption>Guidance for automated agents: today we'd say guardrails.</figcaption>
+      </figure>
+      <figure>
+        <blockquote>"All it needs to know is the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of AI-driven."</blockquote>
+        <figcaption>The AI-driven client, named eighteen years before agents.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ===================================================== ACT III -->
+  <section class="wide">
+    <div class="act"><span class="n">Act III</span><h2>JSON APIs threw the controls away. HEART puts them back.</h2><p class="where">The same bed, for machines: from zero affordances up to HEART, one control at a time.</p></div>
+    <p>A typical JSON API returns bed 2 as data, and nothing else: frame 1 again. A program reading it must already know every address, every rule and every field, from documentation written for people, and it learns the rules by failing:</p>
+    <div class="diagram"><pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant C as Client (code written in advance)
+  participant A as JSON API
+  C->>A: GET /beds/2
+  A-->>C: plain state, no controls
+  Note over C: Which acts? Where? Which fields?<br/>All hard-coded from the docs.
+  C->>A: POST /beds/2/actions/water-cell
+  A-->>C: 409 Conflict: the bed is frozen
+  Note over C: It learns the rule by failing.
+    </pre></div>
+    <p>Now build it back up, the way the page was built. Every response below is real: the garden's own answer about bed 2, served by HEART. Each step shows the whole response, with the lines it adds <span class="addkey">highlighted</span>.</p>
+    <ol class="build">
+      <li><div class="say"><b>Data only.</b><p>What a typical JSON API sends: <code>GET /beds/2</code>, <code>Accept: application/json</code>. Frame 1: information, no controls.</p></div>
+<pre class="doc"><code><span class="ln">{</span><span class="ln">  &quot;id&quot;: 2,</span><span class="ln">  &quot;label&quot;: &quot;bed-2&quot;,</span><span class="ln">  &quot;widthFt&quot;: 4,</span><span class="ln">  &quot;lengthFt&quot;: 8,</span><span class="ln">  &quot;status&quot;: &quot;PLANTED&quot;,</span><span class="ln">  &quot;cropName&quot;: &quot;tomato&quot;,</span><span class="ln">  &quot;growthPoints&quot;: 80,</span><span class="ln">  &quot;moistureLevel&quot;: 40</span><span class="ln">}</span></code></pre></li>
+      <li><div class="say"><b>It names itself and its vocabulary.</b><p>A self link, and CURIEs: <code>garden:</code> words are defined in the garden's profile, <code>hr:</code> words in HEART's. Like a page's address, and a page that's about something.</p></div>
+<pre class="doc"><code><span class="ln">{</span><span class="ln">  &quot;id&quot;: 2,</span><span class="ln">  &quot;label&quot;: &quot;bed-2&quot;,</span><span class="ln">  &quot;widthFt&quot;: 4,</span><span class="ln">  &quot;lengthFt&quot;: 8,</span><span class="ln">  &quot;status&quot;: &quot;PLANTED&quot;,</span><span class="ln">  &quot;cropName&quot;: &quot;tomato&quot;,</span><span class="ln">  &quot;growthPoints&quot;: 80,</span><span class="ln">  &quot;moistureLevel&quot;: 40,</span><span class="ln add">  &quot;_links&quot;: {</span><span class="ln add">    &quot;self&quot;: {</span><span class="ln add">      &quot;href&quot;: &quot;/beds/2&quot;</span><span class="ln add">    },</span><span class="ln add">    &quot;curies&quot;: [</span><span class="ln add">      {</span><span class="ln add">        &quot;name&quot;: &quot;garden&quot;,</span><span class="ln add">        &quot;href&quot;: &quot;/profiles/garden#{rel}&quot;,</span><span class="ln add">        &quot;templated&quot;: true</span><span class="ln add">      },</span><span class="ln add">      {</span><span class="ln add">        &quot;name&quot;: &quot;hr&quot;,</span><span class="ln add">        &quot;href&quot;: &quot;https://w3id.org/heart-rise/rels/{rel}&quot;,</span><span class="ln add">        &quot;templated&quot;: true</span><span class="ln add">      }</span><span class="ln add">    ]</span><span class="ln add">  }</span><span class="ln">}</span></code></pre></li>
+      <li><div class="say"><b>Forms: what you can do now, and where.</b><p>The act is keyed by its meaning, <code>garden:water-cell</code>, with a title and description for people and models, a method, and a target. Frame 3's form and button.</p></div>
+<pre class="doc"><code><span class="ln">{</span><span class="ln">  &quot;id&quot;: 2,</span><span class="ln">  &quot;label&quot;: &quot;bed-2&quot;,</span><span class="ln">  &quot;widthFt&quot;: 4,</span><span class="ln">  &quot;lengthFt&quot;: 8,</span><span class="ln">  &quot;status&quot;: &quot;PLANTED&quot;,</span><span class="ln">  &quot;cropName&quot;: &quot;tomato&quot;,</span><span class="ln">  &quot;growthPoints&quot;: 80,</span><span class="ln">  &quot;moistureLevel&quot;: 40,</span><span class="ln">  &quot;_links&quot;: {</span><span class="ln">    &quot;self&quot;: {</span><span class="ln">      &quot;href&quot;: &quot;/beds/2&quot;</span><span class="ln">    },</span><span class="ln">    &quot;curies&quot;: [</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;garden&quot;,</span><span class="ln">        &quot;href&quot;: &quot;/profiles/garden#{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      },</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;hr&quot;,</span><span class="ln">        &quot;href&quot;: &quot;https://w3id.org/heart-rise/rels/{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      }</span><span class="ln">    ]</span><span class="ln">  },</span><span class="ln add">  &quot;_forms&quot;: {</span><span class="ln add">    &quot;garden:water-cell&quot;: {</span><span class="ln add">      &quot;title&quot;: &quot;Water the bed&quot;,</span><span class="ln add">      &quot;description&quot;: &quot;Pours water into every cell of a planted bed. Enough water makes it ready to harvest.&quot;,</span><span class="ln add">      &quot;_links&quot;: {</span><span class="ln add">        &quot;target&quot;: {</span><span class="ln add">          &quot;href&quot;: &quot;/beds/2/actions/water-cell&quot;</span><span class="ln add">        }</span><span class="ln add">      },</span><span class="ln add">      &quot;method&quot;: &quot;POST&quot;,</span><span class="ln add">      &quot;contentType&quot;: &quot;application/json&quot;</span><span class="ln add">    }</span><span class="ln add">  }</span><span class="ln">}</span></code></pre></li>
+      <li><div class="say"><b>What the act needs, embedded.</b><p>Its JSON Schema, inline: the one required field, its limits, an example to start from. Frame 3's "250 ml (1 to 1000)".</p></div>
+<pre class="doc"><code><span class="ln">{</span><span class="ln">  &quot;id&quot;: 2,</span><span class="ln">  &quot;label&quot;: &quot;bed-2&quot;,</span><span class="ln">  &quot;widthFt&quot;: 4,</span><span class="ln">  &quot;lengthFt&quot;: 8,</span><span class="ln">  &quot;status&quot;: &quot;PLANTED&quot;,</span><span class="ln">  &quot;cropName&quot;: &quot;tomato&quot;,</span><span class="ln">  &quot;growthPoints&quot;: 80,</span><span class="ln">  &quot;moistureLevel&quot;: 40,</span><span class="ln">  &quot;_links&quot;: {</span><span class="ln">    &quot;self&quot;: {</span><span class="ln">      &quot;href&quot;: &quot;/beds/2&quot;</span><span class="ln">    },</span><span class="ln">    &quot;curies&quot;: [</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;garden&quot;,</span><span class="ln">        &quot;href&quot;: &quot;/profiles/garden#{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      },</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;hr&quot;,</span><span class="ln">        &quot;href&quot;: &quot;https://w3id.org/heart-rise/rels/{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      }</span><span class="ln">    ]</span><span class="ln">  },</span><span class="ln">  &quot;_forms&quot;: {</span><span class="ln">    &quot;garden:water-cell&quot;: {</span><span class="ln">      &quot;title&quot;: &quot;Water the bed&quot;,</span><span class="ln">      &quot;description&quot;: &quot;Pours water into every cell of a planted bed. Enough water makes it ready to harvest.&quot;,</span><span class="ln">      &quot;_links&quot;: {</span><span class="ln">        &quot;target&quot;: {</span><span class="ln">          &quot;href&quot;: &quot;/beds/2/actions/water-cell&quot;</span><span class="ln">        }</span><span class="ln">      },</span><span class="ln">      &quot;method&quot;: &quot;POST&quot;,</span><span class="ln">      &quot;contentType&quot;: &quot;application/json&quot;,</span><span class="ln add">      &quot;schema&quot;: {</span><span class="ln add">        &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,</span><span class="ln add">        &quot;properties&quot;: {</span><span class="ln add">          &quot;milliliters&quot;: {</span><span class="ln add">            &quot;description&quot;: &quot;Millilitres of water poured into each cell&quot;,</span><span class="ln add">            &quot;examples&quot;: [</span><span class="ln add">              250</span><span class="ln add">            ],</span><span class="ln add">            &quot;maximum&quot;: 1000,</span><span class="ln add">            &quot;minimum&quot;: 1,</span><span class="ln add">            &quot;title&quot;: &quot;Water per cell&quot;,</span><span class="ln add">            &quot;type&quot;: &quot;integer&quot;</span><span class="ln add">          }</span><span class="ln add">        },</span><span class="ln add">        &quot;required&quot;: [</span><span class="ln add">          &quot;milliliters&quot;</span><span class="ln add">        ],</span><span class="ln add">        &quot;title&quot;: &quot;Water Cell&quot;,</span><span class="ln add">        &quot;type&quot;: &quot;object&quot;,</span><span class="ln add">        &quot;$id&quot;: &quot;/schemas/7f232c04c52671dd&quot;</span><span class="ln add">      }</span><span class="ln">    }</span><span class="ln">  }</span><span class="ln">}</span></code></pre></li>
+      <li><div class="say"><b>Why the other acts are absent.</b><p>A link to the explanation, pinned by its integrity. Frame 4's red line, in the server's own words:</p></div>
+<pre class="doc"><code><span class="ln">{</span><span class="ln">  &quot;id&quot;: 2,</span><span class="ln">  &quot;label&quot;: &quot;bed-2&quot;,</span><span class="ln">  &quot;widthFt&quot;: 4,</span><span class="ln">  &quot;lengthFt&quot;: 8,</span><span class="ln">  &quot;status&quot;: &quot;PLANTED&quot;,</span><span class="ln">  &quot;cropName&quot;: &quot;tomato&quot;,</span><span class="ln">  &quot;growthPoints&quot;: 80,</span><span class="ln">  &quot;moistureLevel&quot;: 40,</span><span class="ln">  &quot;_links&quot;: {</span><span class="ln">    &quot;self&quot;: {</span><span class="ln">      &quot;href&quot;: &quot;/beds/2&quot;</span><span class="ln">    },</span><span class="ln">    &quot;curies&quot;: [</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;garden&quot;,</span><span class="ln">        &quot;href&quot;: &quot;/profiles/garden#{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      },</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;hr&quot;,</span><span class="ln">        &quot;href&quot;: &quot;https://w3id.org/heart-rise/rels/{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      }</span><span class="ln">    ],</span><span class="ln add">    &quot;hr:unavailable&quot;: {</span><span class="ln add">      &quot;href&quot;: &quot;/unavailable/3257a9132e2fdd0b&quot;,</span><span class="ln add">      &quot;type&quot;: &quot;application/json&quot;,</span><span class="ln add">      &quot;integrity&quot;: &quot;sha256-MlepEy4v3Qt2z8jIohUJxoffZ2SOwNKCgJP7hMT/XV8=&quot;</span><span class="ln add">    }</span><span class="ln">  },</span><span class="ln">  &quot;_forms&quot;: {</span><span class="ln">    &quot;garden:water-cell&quot;: {</span><span class="ln">      &quot;title&quot;: &quot;Water the bed&quot;,</span><span class="ln">      &quot;description&quot;: &quot;Pours water into every cell of a planted bed. Enough water makes it ready to harvest.&quot;,</span><span class="ln">      &quot;_links&quot;: {</span><span class="ln">        &quot;target&quot;: {</span><span class="ln">          &quot;href&quot;: &quot;/beds/2/actions/water-cell&quot;</span><span class="ln">        }</span><span class="ln">      },</span><span class="ln">      &quot;method&quot;: &quot;POST&quot;,</span><span class="ln">      &quot;contentType&quot;: &quot;application/json&quot;,</span><span class="ln">      &quot;schema&quot;: {</span><span class="ln">        &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,</span><span class="ln">        &quot;properties&quot;: {</span><span class="ln">          &quot;milliliters&quot;: {</span><span class="ln">            &quot;description&quot;: &quot;Millilitres of water poured into each cell&quot;,</span><span class="ln">            &quot;examples&quot;: [</span><span class="ln">              250</span><span class="ln">            ],</span><span class="ln">            &quot;maximum&quot;: 1000,</span><span class="ln">            &quot;minimum&quot;: 1,</span><span class="ln">            &quot;title&quot;: &quot;Water per cell&quot;,</span><span class="ln">            &quot;type&quot;: &quot;integer&quot;</span><span class="ln">          }</span><span class="ln">        },</span><span class="ln">        &quot;required&quot;: [</span><span class="ln">          &quot;milliliters&quot;</span><span class="ln">        ],</span><span class="ln">        &quot;title&quot;: &quot;Water Cell&quot;,</span><span class="ln">        &quot;type&quot;: &quot;object&quot;,</span><span class="ln">        &quot;$id&quot;: &quot;/schemas/7f232c04c52671dd&quot;</span><span class="ln">      }</span><span class="ln">    }</span><span class="ln">  }</span><span class="ln">}</span></code></pre>
+<pre class="doc"><code><span class="ln">{</span><span class="ln">  &quot;unavailable&quot;: [</span><span class="ln">    {</span><span class="ln">      &quot;reason&quot;: &quot;The bed is already planted.&quot;,</span><span class="ln">      &quot;rel&quot;: &quot;/profiles/garden#sow-seed&quot;,</span><span class="ln">      &quot;title&quot;: &quot;Sow a seed&quot;</span><span class="ln">    },</span><span class="ln">    {</span><span class="ln">      &quot;reason&quot;: &quot;The crop is not ready yet; it needs more water to grow.&quot;,</span><span class="ln">      &quot;rel&quot;: &quot;/profiles/garden#harvest&quot;,</span><span class="ln">      &quot;title&quot;: &quot;Harvest the crop&quot;</span><span class="ln">    },</span><span class="ln">    {</span><span class="ln">      &quot;reason&quot;: &quot;The bed is not frozen.&quot;,</span><span class="ln">      &quot;rel&quot;: &quot;/profiles/garden#thaw&quot;,</span><span class="ln">      &quot;title&quot;: &quot;Thaw the bed&quot;</span><span class="ln">    }</span><span class="ln">  ]</span><span class="ln">}</span></code></pre></li>
+      <li><div class="say"><b>The whole response.</b><p>With its HTTP headers: the dialect, the profile it follows, <code>no-cache</code> (check every time), and an ETag. An act must send that ETag back as <code>If-Match</code>; a write that landed first is a 412, never a silent overwrite.</p></div>
+<pre class="doc"><code><span class="ln add">HTTP/1.1 200 OK</span><span class="ln add">Content-Type: application/hal+json</span><span class="ln add">ETag: &quot;seq-3.hsf.L0.da0109b4d9380b72&quot;</span><span class="ln add">Cache-Control: no-cache</span><span class="ln add">Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel=&quot;profile&quot;, &lt;https://w3id.org/heart-rise&gt;; rel=&quot;profile&quot;</span><span class="ln add">Vary: Accept, Prefer, Accept-Profile</span><span class="ln add"> </span><span class="ln">{</span><span class="ln">  &quot;id&quot;: 2,</span><span class="ln">  &quot;label&quot;: &quot;bed-2&quot;,</span><span class="ln">  &quot;widthFt&quot;: 4,</span><span class="ln">  &quot;lengthFt&quot;: 8,</span><span class="ln">  &quot;status&quot;: &quot;PLANTED&quot;,</span><span class="ln">  &quot;cropName&quot;: &quot;tomato&quot;,</span><span class="ln">  &quot;growthPoints&quot;: 80,</span><span class="ln">  &quot;moistureLevel&quot;: 40,</span><span class="ln">  &quot;_links&quot;: {</span><span class="ln">    &quot;self&quot;: {</span><span class="ln">      &quot;href&quot;: &quot;/beds/2&quot;</span><span class="ln">    },</span><span class="ln">    &quot;curies&quot;: [</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;garden&quot;,</span><span class="ln">        &quot;href&quot;: &quot;/profiles/garden#{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      },</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;hr&quot;,</span><span class="ln">        &quot;href&quot;: &quot;https://w3id.org/heart-rise/rels/{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      }</span><span class="ln">    ],</span><span class="ln">    &quot;hr:unavailable&quot;: {</span><span class="ln">      &quot;href&quot;: &quot;/unavailable/3257a9132e2fdd0b&quot;,</span><span class="ln">      &quot;type&quot;: &quot;application/json&quot;,</span><span class="ln">      &quot;integrity&quot;: &quot;sha256-MlepEy4v3Qt2z8jIohUJxoffZ2SOwNKCgJP7hMT/XV8=&quot;</span><span class="ln">    }</span><span class="ln">  },</span><span class="ln">  &quot;_forms&quot;: {</span><span class="ln">    &quot;garden:water-cell&quot;: {</span><span class="ln">      &quot;title&quot;: &quot;Water the bed&quot;,</span><span class="ln">      &quot;description&quot;: &quot;Pours water into every cell of a planted bed. Enough water makes it ready to harvest.&quot;,</span><span class="ln">      &quot;_links&quot;: {</span><span class="ln">        &quot;target&quot;: {</span><span class="ln">          &quot;href&quot;: &quot;/beds/2/actions/water-cell&quot;</span><span class="ln">        }</span><span class="ln">      },</span><span class="ln">      &quot;method&quot;: &quot;POST&quot;,</span><span class="ln">      &quot;contentType&quot;: &quot;application/json&quot;,</span><span class="ln">      &quot;schema&quot;: {</span><span class="ln">        &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,</span><span class="ln">        &quot;properties&quot;: {</span><span class="ln">          &quot;milliliters&quot;: {</span><span class="ln">            &quot;description&quot;: &quot;Millilitres of water poured into each cell&quot;,</span><span class="ln">            &quot;examples&quot;: [</span><span class="ln">              250</span><span class="ln">            ],</span><span class="ln">            &quot;maximum&quot;: 1000,</span><span class="ln">            &quot;minimum&quot;: 1,</span><span class="ln">            &quot;title&quot;: &quot;Water per cell&quot;,</span><span class="ln">            &quot;type&quot;: &quot;integer&quot;</span><span class="ln">          }</span><span class="ln">        },</span><span class="ln">        &quot;required&quot;: [</span><span class="ln">          &quot;milliliters&quot;</span><span class="ln">        ],</span><span class="ln">        &quot;title&quot;: &quot;Water Cell&quot;,</span><span class="ln">        &quot;type&quot;: &quot;object&quot;,</span><span class="ln">        &quot;$id&quot;: &quot;/schemas/7f232c04c52671dd&quot;</span><span class="ln">      }</span><span class="ln">    }</span><span class="ln">  }</span><span class="ln">}</span></code></pre></li>
+      <li><div class="say"><b>The same bed, after the frost.</b><p>Nothing on the client changed. The highlighted lines are what the server changed: the status, the validator, the explanation, and the one form a frozen bed allows. Frame 4.</p></div>
+<pre class="doc"><code><span class="ln">HTTP/1.1 200 OK</span><span class="ln">Content-Type: application/hal+json</span><span class="ln add">ETag: &quot;seq-4.hsf.L0.2247f81de1740d4c&quot;</span><span class="ln">Cache-Control: no-cache</span><span class="ln">Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel=&quot;profile&quot;, &lt;https://w3id.org/heart-rise&gt;; rel=&quot;profile&quot;</span><span class="ln">Vary: Accept, Prefer, Accept-Profile</span><span class="ln"> </span><span class="ln">{</span><span class="ln">  &quot;id&quot;: 2,</span><span class="ln">  &quot;label&quot;: &quot;bed-2&quot;,</span><span class="ln">  &quot;widthFt&quot;: 4,</span><span class="ln">  &quot;lengthFt&quot;: 8,</span><span class="ln add">  &quot;status&quot;: &quot;FROZEN&quot;,</span><span class="ln">  &quot;cropName&quot;: &quot;tomato&quot;,</span><span class="ln">  &quot;growthPoints&quot;: 80,</span><span class="ln">  &quot;moistureLevel&quot;: 40,</span><span class="ln">  &quot;_links&quot;: {</span><span class="ln">    &quot;self&quot;: {</span><span class="ln">      &quot;href&quot;: &quot;/beds/2&quot;</span><span class="ln">    },</span><span class="ln">    &quot;curies&quot;: [</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;garden&quot;,</span><span class="ln">        &quot;href&quot;: &quot;/profiles/garden#{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      },</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;hr&quot;,</span><span class="ln">        &quot;href&quot;: &quot;https://w3id.org/heart-rise/rels/{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      }</span><span class="ln">    ],</span><span class="ln">    &quot;hr:unavailable&quot;: {</span><span class="ln add">      &quot;href&quot;: &quot;/unavailable/5afcf05b76af098e&quot;,</span><span class="ln">      &quot;type&quot;: &quot;application/json&quot;,</span><span class="ln add">      &quot;integrity&quot;: &quot;sha256-WvzwW3avCY7C00xE20JKH6YJtkrdLTm6F9aGkC4W0yE=&quot;</span><span class="ln">    }</span><span class="ln">  },</span><span class="ln">  &quot;_forms&quot;: {</span><span class="ln add">    &quot;garden:thaw&quot;: {</span><span class="ln add">      &quot;title&quot;: &quot;Thaw the bed&quot;,</span><span class="ln add">      &quot;description&quot;: &quot;Covers a frozen bed with fleece. The bed becomes planted again.&quot;,</span><span class="ln">      &quot;_links&quot;: {</span><span class="ln">        &quot;target&quot;: {</span><span class="ln add">          &quot;href&quot;: &quot;/beds/2/actions/thaw&quot;</span><span class="ln">        }</span><span class="ln">      },</span><span class="ln">      &quot;method&quot;: &quot;POST&quot;,</span><span class="ln">      &quot;contentType&quot;: &quot;application/json&quot;,</span><span class="ln">      &quot;schema&quot;: {</span><span class="ln">        &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,</span><span class="ln add">        &quot;properties&quot;: {},</span><span class="ln add">        &quot;title&quot;: &quot;Thaw&quot;,</span><span class="ln">        &quot;type&quot;: &quot;object&quot;,</span><span class="ln add">        &quot;$id&quot;: &quot;/schemas/bd8f0a92596bdbc5&quot;</span><span class="ln">      }</span><span class="ln">    }</span><span class="ln">  }</span><span class="ln">}</span></code></pre>
+<pre class="doc"><code><span class="ln">{</span><span class="ln">  &quot;unavailable&quot;: [</span><span class="ln">    {</span><span class="ln">      &quot;reason&quot;: &quot;The bed is frozen with a crop in it; thaw it first.&quot;,</span><span class="ln">      &quot;rel&quot;: &quot;/profiles/garden#sow-seed&quot;,</span><span class="ln">      &quot;title&quot;: &quot;Sow a seed&quot;</span><span class="ln">    },</span><span class="ln">    {</span><span class="ln">      &quot;reason&quot;: &quot;The bed is frozen; watering now would split the roots. Thaw it first.&quot;,</span><span class="ln">      &quot;rel&quot;: &quot;/profiles/garden#water-cell&quot;,</span><span class="ln">      &quot;title&quot;: &quot;Water the bed&quot;</span><span class="ln">    },</span><span class="ln">    {</span><span class="ln">      &quot;reason&quot;: &quot;The crop is frozen and not ready; thaw it first.&quot;,</span><span class="ln">      &quot;rel&quot;: &quot;/profiles/garden#harvest&quot;,</span><span class="ln">      &quot;title&quot;: &quot;Harvest the crop&quot;</span><span class="ln">    }</span><span class="ln">  ]</span><span class="ln">}</span></code></pre></li>
+    </ol>
+    <p>That's HEART at its first rung, L0: everything in one response, the forms and their schemas fully embedded. A generic client renders whatever comes, the way a browser renders a page.</p>
+    <details class="advanced">
+      <summary>Advanced: making it cheap, with shared affordance sets and schemas (L1, L2)</summary>
+      <p>Every planted bed carries the same forms. So a client can ask for them by reference: one header, <code>Prefer</code>, and the forms move out into a resource of their own, named by its content, cached forever, and shared by every bed in the same state. The answer about the bed shrinks back toward data plus one link.</p>
+      <ol class="build">
+      <li><div class="say"><b>L1: Prefer: forms=link.</b><p>The embedded forms are gone; one <code>hr:forms</code> link takes their place, with the set's integrity. The server confirms the preference it applied.</p></div>
+<pre class="doc"><code><span class="ln">HTTP/1.1 200 OK</span><span class="ln">Content-Type: application/hal+json</span><span class="ln add">ETag: &quot;seq-3.hsf.L1.3e96222f79e90255&quot;</span><span class="ln">Cache-Control: no-cache</span><span class="ln">Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel=&quot;profile&quot;, &lt;https://w3id.org/heart-rise&gt;; rel=&quot;profile&quot;</span><span class="ln">Vary: Accept, Prefer, Accept-Profile</span><span class="ln add">Preference-Applied: forms=link</span><span class="ln"> </span><span class="ln">{</span><span class="ln">  &quot;id&quot;: 2,</span><span class="ln">  &quot;label&quot;: &quot;bed-2&quot;,</span><span class="ln">  &quot;widthFt&quot;: 4,</span><span class="ln">  &quot;lengthFt&quot;: 8,</span><span class="ln">  &quot;status&quot;: &quot;PLANTED&quot;,</span><span class="ln">  &quot;cropName&quot;: &quot;tomato&quot;,</span><span class="ln">  &quot;growthPoints&quot;: 80,</span><span class="ln">  &quot;moistureLevel&quot;: 40,</span><span class="ln">  &quot;_links&quot;: {</span><span class="ln">    &quot;self&quot;: {</span><span class="ln">      &quot;href&quot;: &quot;/beds/2&quot;</span><span class="ln">    },</span><span class="ln">    &quot;curies&quot;: [</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;hr&quot;,</span><span class="ln">        &quot;href&quot;: &quot;https://w3id.org/heart-rise/rels/{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      }</span><span class="ln">    ],</span><span class="ln add">    &quot;hr:forms&quot;: {</span><span class="ln add">      &quot;href&quot;: &quot;/affordance-sets/0f79a6afa3aecc62&quot;,</span><span class="ln add">      &quot;type&quot;: &quot;application/hal+json&quot;,</span><span class="ln add">      &quot;profile&quot;: &quot;https://w3id.org/heart-rise/hal-schema-forms&quot;,</span><span class="ln add">      &quot;integrity&quot;: &quot;sha256-D3mmr6OuzGJMBtgJ9kDovuchlkgwVF99/snUV67spNk=&quot;</span><span class="ln">    }</span><span class="ln">  }</span><span class="ln">}</span></code></pre></li>
+      <li><div class="say"><b>The affordance set it links.</b><p>Served <code>public, max-age=31536000, immutable</code>: the same bytes for every planted bed, so its target is a template, filled from the bed by <code>hr:templatePointers</code>. (A set is served in canonical key order; it's shown here in the same reading order as above.)</p></div>
+<pre class="doc"><code><span class="ln">{</span><span class="ln">  &quot;_links&quot;: {</span><span class="ln">    &quot;curies&quot;: [</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;garden&quot;,</span><span class="ln">        &quot;href&quot;: &quot;/profiles/garden#{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      },</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;hr&quot;,</span><span class="ln">        &quot;href&quot;: &quot;https://w3id.org/heart-rise/rels/{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      }</span><span class="ln">    ],</span><span class="ln">    &quot;hr:unavailable&quot;: {</span><span class="ln">      &quot;href&quot;: &quot;/unavailable/3257a9132e2fdd0b&quot;,</span><span class="ln">      &quot;type&quot;: &quot;application/json&quot;,</span><span class="ln">      &quot;integrity&quot;: &quot;sha256-MlepEy4v3Qt2z8jIohUJxoffZ2SOwNKCgJP7hMT/XV8=&quot;</span><span class="ln">    }</span><span class="ln">  },</span><span class="ln">  &quot;_forms&quot;: {</span><span class="ln">    &quot;garden:water-cell&quot;: {</span><span class="ln">      &quot;title&quot;: &quot;Water the bed&quot;,</span><span class="ln">      &quot;description&quot;: &quot;Pours water into every cell of a planted bed. Enough water makes it ready to harvest.&quot;,</span><span class="ln">      &quot;_links&quot;: {</span><span class="ln">        &quot;target&quot;: {</span><span class="ln add">          &quot;href&quot;: &quot;/beds/{id}/actions/water-cell&quot;,</span><span class="ln add">          &quot;templated&quot;: true</span><span class="ln">        }</span><span class="ln add">      },</span><span class="ln add">      &quot;hr:templatePointers&quot;: {</span><span class="ln add">        &quot;id&quot;: &quot;/id&quot;</span><span class="ln">      },</span><span class="ln">      &quot;method&quot;: &quot;POST&quot;,</span><span class="ln">      &quot;contentType&quot;: &quot;application/json&quot;,</span><span class="ln">      &quot;schema&quot;: {</span><span class="ln">        &quot;type&quot;: &quot;object&quot;,</span><span class="ln">        &quot;title&quot;: &quot;Water Cell&quot;,</span><span class="ln">        &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,</span><span class="ln">        &quot;properties&quot;: {</span><span class="ln">          &quot;milliliters&quot;: {</span><span class="ln">            &quot;type&quot;: &quot;integer&quot;,</span><span class="ln">            &quot;title&quot;: &quot;Water per cell&quot;,</span><span class="ln">            &quot;description&quot;: &quot;Millilitres of water poured into each cell&quot;,</span><span class="ln">            &quot;examples&quot;: [</span><span class="ln">              250</span><span class="ln">            ],</span><span class="ln">            &quot;maximum&quot;: 1000,</span><span class="ln">            &quot;minimum&quot;: 1</span><span class="ln">          }</span><span class="ln">        },</span><span class="ln">        &quot;required&quot;: [</span><span class="ln">          &quot;milliliters&quot;</span><span class="ln">        ],</span><span class="ln">        &quot;$id&quot;: &quot;/schemas/7f232c04c52671dd&quot;</span><span class="ln">      }</span><span class="ln">    }</span><span class="ln">  }</span><span class="ln">}</span></code></pre></li>
+      <li><div class="say"><b>L2: Prefer: forms=link, schema=link.</b><p>Still one link, now to a set whose schemas are references too.</p></div>
+<pre class="doc"><code><span class="ln">HTTP/1.1 200 OK</span><span class="ln">Content-Type: application/hal+json</span><span class="ln add">ETag: &quot;seq-3.hsf.L2.e5fc4c410d71d044&quot;</span><span class="ln">Cache-Control: no-cache</span><span class="ln">Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel=&quot;profile&quot;, &lt;https://w3id.org/heart-rise&gt;; rel=&quot;profile&quot;</span><span class="ln">Vary: Accept, Prefer, Accept-Profile</span><span class="ln add">Preference-Applied: forms=link, schema=link</span><span class="ln"> </span><span class="ln">{</span><span class="ln">  &quot;id&quot;: 2,</span><span class="ln">  &quot;label&quot;: &quot;bed-2&quot;,</span><span class="ln">  &quot;widthFt&quot;: 4,</span><span class="ln">  &quot;lengthFt&quot;: 8,</span><span class="ln">  &quot;status&quot;: &quot;PLANTED&quot;,</span><span class="ln">  &quot;cropName&quot;: &quot;tomato&quot;,</span><span class="ln">  &quot;growthPoints&quot;: 80,</span><span class="ln">  &quot;moistureLevel&quot;: 40,</span><span class="ln">  &quot;_links&quot;: {</span><span class="ln">    &quot;self&quot;: {</span><span class="ln">      &quot;href&quot;: &quot;/beds/2&quot;</span><span class="ln">    },</span><span class="ln">    &quot;curies&quot;: [</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;hr&quot;,</span><span class="ln">        &quot;href&quot;: &quot;https://w3id.org/heart-rise/rels/{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      }</span><span class="ln">    ],</span><span class="ln">    &quot;hr:forms&quot;: {</span><span class="ln add">      &quot;href&quot;: &quot;/affordance-sets/3bba3310d85252f4&quot;,</span><span class="ln">      &quot;type&quot;: &quot;application/hal+json&quot;,</span><span class="ln">      &quot;profile&quot;: &quot;https://w3id.org/heart-rise/hal-schema-forms&quot;,</span><span class="ln add">      &quot;integrity&quot;: &quot;sha256-O7ozENhSUvSNlDFt8RmCRvfTkLDW5gPRWPQGkheoQvM=&quot;</span><span class="ln">    }</span><span class="ln">  }</span><span class="ln">}</span></code></pre></li>
+      <li><div class="say"><b>The set, with its schema by reference.</b><p>Each schema is its own immutable resource, pinned by integrity, shared by every form that uses it:</p></div>
+<pre class="doc"><code><span class="ln">{</span><span class="ln">  &quot;_links&quot;: {</span><span class="ln">    &quot;curies&quot;: [</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;garden&quot;,</span><span class="ln">        &quot;href&quot;: &quot;/profiles/garden#{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      },</span><span class="ln">      {</span><span class="ln">        &quot;name&quot;: &quot;hr&quot;,</span><span class="ln">        &quot;href&quot;: &quot;https://w3id.org/heart-rise/rels/{rel}&quot;,</span><span class="ln">        &quot;templated&quot;: true</span><span class="ln">      }</span><span class="ln">    ],</span><span class="ln">    &quot;hr:unavailable&quot;: {</span><span class="ln">      &quot;href&quot;: &quot;/unavailable/3257a9132e2fdd0b&quot;,</span><span class="ln">      &quot;type&quot;: &quot;application/json&quot;,</span><span class="ln">      &quot;integrity&quot;: &quot;sha256-MlepEy4v3Qt2z8jIohUJxoffZ2SOwNKCgJP7hMT/XV8=&quot;</span><span class="ln">    }</span><span class="ln">  },</span><span class="ln">  &quot;_forms&quot;: {</span><span class="ln">    &quot;garden:water-cell&quot;: {</span><span class="ln">      &quot;title&quot;: &quot;Water the bed&quot;,</span><span class="ln">      &quot;description&quot;: &quot;Pours water into every cell of a planted bed. Enough water makes it ready to harvest.&quot;,</span><span class="ln">      &quot;_links&quot;: {</span><span class="ln">        &quot;target&quot;: {</span><span class="ln">          &quot;href&quot;: &quot;/beds/{id}/actions/water-cell&quot;,</span><span class="ln">          &quot;templated&quot;: true</span><span class="ln">        }</span><span class="ln">      },</span><span class="ln">      &quot;hr:templatePointers&quot;: {</span><span class="ln">        &quot;id&quot;: &quot;/id&quot;</span><span class="ln">      },</span><span class="ln">      &quot;method&quot;: &quot;POST&quot;,</span><span class="ln">      &quot;contentType&quot;: &quot;application/json&quot;,</span><span class="ln">      &quot;schema&quot;: {</span><span class="ln add">        &quot;$ref&quot;: &quot;/schemas/7f232c04c52671dd&quot;,</span><span class="ln add">        &quot;hr:integrity&quot;: &quot;sha256-fyMsBMUmcd0HdvI4xkfZO3dvViJqO0HdGynlKasuMdQ=&quot;</span><span class="ln">      }</span><span class="ln">    }</span><span class="ln">  }</span><span class="ln">}</span></code></pre>
+<pre class="doc"><code><span class="ln">{</span><span class="ln">  &quot;$schema&quot;: &quot;https://json-schema.org/draft/2020-12/schema&quot;,</span><span class="ln">  &quot;properties&quot;: {</span><span class="ln">    &quot;milliliters&quot;: {</span><span class="ln">      &quot;description&quot;: &quot;Millilitres of water poured into each cell&quot;,</span><span class="ln">      &quot;examples&quot;: [</span><span class="ln">        250</span><span class="ln">      ],</span><span class="ln">      &quot;maximum&quot;: 1000,</span><span class="ln">      &quot;minimum&quot;: 1,</span><span class="ln">      &quot;title&quot;: &quot;Water per cell&quot;,</span><span class="ln">      &quot;type&quot;: &quot;integer&quot;</span><span class="ln">    }</span><span class="ln">  },</span><span class="ln">  &quot;required&quot;: [</span><span class="ln">    &quot;milliliters&quot;</span><span class="ln">  ],</span><span class="ln">  &quot;title&quot;: &quot;Water Cell&quot;,</span><span class="ln">  &quot;type&quot;: &quot;object&quot;</span><span class="ln">}</span></code></pre></li>
+      </ol>
+    </details>
+    <p>Agents get frame 4.</p>
+    <div class="diagram"><pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant C as Generic client (ARTIE, or an agent)
+  participant H as HEART server
+  C->>H: GET / (the only address it knows)
+  H-->>C: the bookmark: search and lookup forms
+  C->>H: GET /beds/2
+  H-->>C: state + forms allowed now + ETag
+  Note over C: Choose among what's offered.<br/>Fill the schema. Never guess.
+  C->>H: POST to the form's target, If-Match: ETag
+  H-->>C: the bed's new state, with its new forms
+    </pre></div>
+  </section>
+
+  <!-- ===================================================== ACT IV -->
+  <section class="wide">
+    <div class="act"><span class="n">Act IV</span><h2>Meanwhile, the industry chose the page with every form on it</h2><p class="where">OpenAPI, and how far it can be layered back up.</p></div>
+    <p>Begin again, with a different page. Picture the garden's plant shop putting every inventory action on one page: eight blank forms, every one asking for a plant ID, each with a red sentence saying when it would work. It's accurate. Every form works, if you fill it in right, for a plant in the right state. It's still terrible design: it asks for what it already knows, makes you apply the rules, and teaches by failure. The page on the right is the same shop designed the way the Web is: each plant, as it is now, with only the forms it allows, and a word about the rest.</p>
+    <div class="shots">
+      <figure class="tall"><img src="img/plant-catalog.png" alt="A plant shop page with eight blank inventory forms, each asking for a plant or order ID, with red rules underneath." width="820" height="1290" loading="lazy"><figcaption><b>Every form, for everyone.</b> Blank IDs, rules in red prose.</figcaption></figure>
+      <figure><img src="img/plant-state.png" alt="The same shop: tomato seedlings with restock, reprice and move; basil sold out with only restock; orchids in quarantine with nothing yet, and why." width="820" height="790" loading="lazy"><figcaption><b>Your plants, as they are now.</b> Each shows only what it allows, and says why not.</figcaption></figure>
+    </div>
+    <p><b>An OpenAPI description is the left-hand page.</b> Each form card is an operation; each blank ID is a path parameter; each red sentence is a description. It lists everything a service can ever do, for every resource, in every state. That's what it was designed for, describing HTTP APIs, and it does it well. What it can't say is which of those this plant, or this bed, allows now.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th scope="col">On the page for people</th><th scope="col">In the OpenAPI description</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">A form card, "Release from quarantine"</th><td>An operation, <code>POST /plants/{plantId}/release</code></td></tr>
+        <tr><th scope="row">A blank "Plant ID" field</th><td>A required path parameter</td></tr>
+        <tr><th scope="row">The red sentence about when it works</th><td>The description: "Only allowed when the plant is in quarantine, after 14 days."</td></tr>
+        <tr><th scope="row">Pressing Release on day 9</th><td><code>409 Conflict</code></td></tr>
+      </tbody>
+    </table></div>
+    <p>So layer it back up, the way we built up the JSON. Each rung is something real, and we measured each one against the same garden.</p>
+    <ol class="ladder">
+      <li><b>Read the description at run time.</b><span>No generated code; the client reads operations, titles and schemas while it runs, so moved paths, renamed fields and new inputs don't break it. But it still shows every button on a frozen bed: a description can't know the bed froze.</span></li>
+      <li><b>An allowed-actions field in the answer.</b><span>Many real APIs already do this, each its own way: Google Drive's <code>capabilities</code> (<code>canTrash</code>, <code>canDelete</code>), Box's permissions, PayPal's <code>links</code> with <code>rel</code> and <code>method</code>, OData 4.01's advertised actions (<code>"#Ns.Action": {}</code>, or <code>null</code> when unavailable). The client can now hide what isn't allowed, if it knows that API's convention.</span></li>
+      <li class="heart"><b>A Link to a HEART affordance set.</b><span>One header on each plain answer points at the set of forms for its state, step 7 of Act III, reached from the other side. A client that follows it shows only Thaw on the frozen bed. It's HATEOAS, arrived at by fixing OpenAPI.</span></li>
+      <li class="gw"><b>The gateway.</b><span>Take the description plus any of those signals, and serve the whole of Act III in front of the service: forms, schemas, reasons, validators, the bookmark. Any HEART client, any agent, works unchanged.</span></li>
+    </ol>
+    <div class="shots">
+      <figure><img src="img/tuesday-bespoke.png" alt="The generated dashboard on the frozen bed: status undefined, and a Water form." width="820" height="520" loading="lazy"><figcaption><b>Generated from the description.</b> Status "undefined", and Water on a frozen bed.</figcaption></figure>
+      <figure><img src="img/tuesday-live.png" alt="The spec-reading dashboard on the frozen bed, showing every form: harvest, sow, thaw and water." width="820" height="620" loading="lazy"><figcaption><b>Rung 1, reading the description live.</b> Every button, in every state.</figcaption></figure>
+      <figure><img src="img/tuesday-afford.png" alt="The spec-reading dashboard following the affordance link: only Thaw the bed." width="820" height="520" loading="lazy"><figcaption><b>Rung 3, following the Link.</b> Only Thaw.</figcaption></figure>
+    </div>
+    <div class="diagram"><pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant C as Dynamic OpenAPI client
+  participant A as Service (plain JSON + Link)
+  C->>A: GET /openapi.json (every operation, ever)
+  C->>A: GET /beds/2
+  A-->>C: plain state + Link: rel="…/rels/forms"
+  C->>A: GET the affordance set (cached by content)
+  A-->>C: forms allowed now: garden:thaw
+  Note over C: Keep only operations a form names.
+  C->>A: POST /beds/2/actions/thaw
+    </pre></div>
+  </section>
+
+  <!-- ===================================================== ACT V -->
+  <section class="wide">
+    <div class="act"><span class="n">Act V</span><h2>The gateway: OpenAPI in, HEART out</h2><p class="where">Rung 4, built and proven.</p></div>
+    <p>To test the gateway honestly, we gave it the hardest job: start from a HEART server, flatten it into OpenAPI, and see if the gateway can rebuild HEART from that alone.</p>
+    <div class="chains">
+      <div class="chain">
+        <h3>Reading: the answer travels out</h3>
+        <ol>
+          <li class="heart"><span class="tag">HEART</span><b>The garden server</b><span>Knows beds, rules and frost. Declared once, in Kotlin.</span></li>
+          <li class="oas"><span class="tag">OpenAPI</span><b>Flattened into its twin</b><span><code>/openapi.json</code>, plain JSON with no controls, and one <code>Link</code> header per answer.</span></li>
+          <li class="gw"><span class="tag">Gateway</span><b>Reads the spec and the signal</b><span>Knows nothing about gardens. Builds resource types from the spec; learns what's allowed now from the Link.</span></li>
+          <li class="heart"><span class="tag">HEART</span><b>Rebuilt</b><span>State, forms allowed now, schemas, reasons, ETag, profile, bookmark.</span></li>
+          <li class="client"><span class="tag">Client</span><b>ARTIE renders it</b><span>Unchanged. Shows Thaw on a frozen bed, and nothing else.</span></li>
+        </ol>
+      </div>
+      <div class="chain">
+        <h3>Acting: the request travels in</h3>
+        <ol>
+          <li class="client"><span class="tag">Client</span><b>ARTIE chooses a form</b><span>Fills its schema, posts to the form's target with <code>If-Match</code>: the ETag it saw.</span></li>
+          <li class="gw"><span class="tag">Gateway</span><b>Checks, as HEART must</b><span>Offered now? Body valid? ETag current? Refuses with 409, 422, 412 or 428 before anything is sent.</span></li>
+          <li class="gw"><span class="tag">Gateway</span><b>Re-reads, then calls</b><span>Confirms the bed hasn't changed, then calls the OpenAPI operation, as itself.</span></li>
+          <li class="oas"><span class="tag">OpenAPI</span><b>The service acts</b><span>A plain POST, a plain JSON answer, and a new <code>Link</code> for the new state.</span></li>
+          <li class="heart"><span class="tag">HEART</span><b>New state, new forms</b><span>Rebuilt again: the client sees Water back, with no code change.</span></li>
+        </ol>
+      </div>
+    </div>
+    <div class="why">
+      <p class="ask">…but why?</p>
+      <p>Fair question. We had a perfectly good HEART server. We flattened it into OpenAPI, built a machine to un-flatten it, then pointed a client at the machine to check it hadn't noticed. It's translating a novel into French and back to see whether the translator can be trusted.</p>
+      <p>That's exactly why. The native garden is the answer key: anything the gateway drops shows up as a different result. And the middle of the diagram is everyone else's API. If the gateway can rebuild HEART from the twin, it can build HEART in front of them.</p>
+    </div>
+    <div class="diagram"><pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant C as ARTIE / agent
+  participant W as Gateway
+  participant U as Upstream (OpenAPI service)
+  W->>U: at start: GET /openapi.json, build resource types
+  C->>W: GET /beds/2
+  W->>U: GET /beds/2 (plain JSON)
+  U-->>W: state + signal (Link, capabilities, links…)
+  W-->>C: HEART: state + forms allowed now + reasons + ETag
+  C->>W: POST thaw, If-Match: ETag
+  W->>U: GET /beds/2 again: unchanged since the client saw it?
+  W->>U: POST /beds/2/actions/thaw
+  U-->>W: new state + new signal
+  W-->>C: HEART: new state + new forms
+    </pre></div>
+
+    <h3>The whole gamut, live</h3>
+    <p>We ran every client against the same garden on 16 October 2026: the dashboard generated from the description; the description-reading client without the link (rung 1) and with it (rung 3); ARTIE against native HEART; and ARTIE through the gateway.</p>
+    <p><b>The frost</b>: a change of state, not of the API. The suite checks each client shows exactly the buttons the bed allows.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th scope="col">Client</th><th scope="col">Monday</th><th scope="col">Tuesday, the frost</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Generated from the description</th><td class="pass">3/3</td><td class="fail">3/7</td></tr>
+        <tr><th scope="row">Rung 1: reads the description live</th><td class="fail">0/3</td><td class="fail">1/7</td></tr>
+        <tr><th scope="row">Rung 3: plus the affordance link</th><td class="pass">3/3</td><td class="pass">7/7</td></tr>
+        <tr><th scope="row">ARTIE, native HEART</th><td class="pass">3/3</td><td class="pass">7/7</td></tr>
+        <tr class="hl"><th scope="row">ARTIE, through the gateway</th><td class="pass">3/3</td><td class="pass">7/7</td></tr>
+      </tbody>
+    </table></div>
+    <div class="shots">
+      <figure><img src="img/monday-gateway.png" alt="ARTIE through the gateway, before the frost: bed 2 planted, with a Water form." width="820" height="560" loading="lazy"><figcaption><b>Through the gateway, before the frost.</b> Planted: Water, with its field.</figcaption></figure>
+      <figure><img src="img/tuesday-gateway.png" alt="ARTIE through the gateway, after the frost: bed 2 frozen, only Thaw the bed." width="820" height="560" loading="lazy"><figcaption><b>Through the gateway, after the frost.</b> Frozen: only Thaw. The client didn't change.</figcaption></figure>
+    </div>
+    <p><b>The six Wednesday changes</b>: the API itself changes, one release at a time, and each client, unchanged since Monday, tries to water bed 2. "Scripted" is ARTIE driven by code that names the act <code>garden:water-cell</code> and its field: what hard-coding costs.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th scope="col">Change</th><th scope="col">Generated</th><th scope="col">Rung 1</th><th scope="col">Rung 3</th><th scope="col">ARTIE native</th><th scope="col">ARTIE gateway</th><th scope="col">Scripted native</th><th scope="col">Scripted gateway</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">move-url</th><td class="fail">404</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
+        <tr><th scope="row">rename-field</th><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
+        <tr><th scope="row">rename-act</th><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="fail">not found</td><td class="fail">not found</td></tr>
+        <tr><th scope="row">retitle</th><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
+        <tr><th scope="row">tighter-limit</th><td class="fail">422 at 800 ml</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
+        <tr><th scope="row">new-required-input</th><td class="fail">422</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="fail">422</td><td class="fail">422</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>Through the gateway, every result matches native HEART, change by change.</b> And HEART's conformance kit, run through the gateway in front of an OpenAPI twin, passes <span class="pass">23 of 23</span>: forms, revalidation, 428, 412, 409, 422, credentials, the bookmark.</p>
+    <p class="note">An earlier run differed on rename-act: the garden renamed its HEART relation (<code>water-cell</code> to <code>irrigate</code>) but kept its OpenAPI operation <code>waterCell</code>, and the gateway named relations after operation ids. The fix was at the source: a description generated by a HEART server now says which relation each operation is, in an <code>x-heart-relation</code> extension (switched on with the links, so a published description keeps its bytes), and the gateway uses it where present.</p>
+
+    <h3>What an existing OpenAPI service has to change</h3>
+    <p>Very little, and often nothing. The gateway needs one thing beyond the description: a per-resource signal of what's allowed now.</p>
+    <ol class="ladder">
+      <li class="heart"><b>Add one Link header.</b><span>The best: shared, cached sets of forms, and the only signal besides a table that says why an act is absent.</span></li>
+      <li><b>Nothing new: say what you already say.</b><span>A list of allowed action names, a map of booleans (Drive, Box), an array of links (PayPal), or OData's advertised actions. The gateway reads them as they are.</span></li>
+      <li class="gw"><b>Nothing at all: write the rules down.</b><span>A table in the gateway, "when <code>status</code> is <code>LOCKED</code>, only <code>unlock</code>, because…". Early binding, in one place instead of every client; the last resort.</span></li>
+    </ol>
+    <p>That's configured with a connector: a folder per API, so a fix to one API is a pull request to its folder alone. Most APIs need one small file:</p>
+<pre><code><span class="c"># connectors/drive/connector.yaml</span>
+<span class="k">profile</span>: drive
+<span class="k">readers</span>: [file.reader.yaml]
+
+<span class="c"># connectors/drive/file.reader.yaml: the API's default reader</span>
+<span class="k">allowed</span>:
+  <span class="k">booleans</span>: /capabilities
+  <span class="k">map</span>: { canTrash: trashFile, canDelete: deleteFile }
+<span class="k">hide</span>: [/capabilities]</code></pre>
+    <ul>
+      <li><b>Readers recognize answers.</b> Where an API is inconsistent, a reader can match a member of the body, the media type, or the path; <code>connector.yaml</code> lists them in order and the first that recognizes an answer reads it.</li>
+      <li><b>An escape hatch</b>: a JSONata expression in a file beside its reader, with no I/O and bounded in time and depth.</li>
+      <li><b>Standards need no connector</b>: HEART's Link and OData's advertised actions are read by the gateway itself.</li>
+      <li><b>It fails loudly</b>: a connector naming an operation or path the description lacks stops the gateway at start, naming the file; an answer nothing recognizes is refused. The gateway never guesses.</li>
+    </ul>
+    <p>Its tests put the gateway in front of a small door service that knows nothing about HEART, signalling each of these ways in turn: 26 scenarios, all passing.</p>
+
+    <h3>Honest limits</h3>
+    <ul>
+      <li><b>Without the service's own If-Match</b>, the gateway re-reads before acting and refuses if anything changed, but a write landing in between can't be caught.</li>
+      <li><b>Reasons for absent acts</b> come only from the Link and from tables.</li>
+      <li><b>The gateway calls the service as itself.</b> Services whose rules depend on who's asking need each caller's own credential passed through; planned, not built.</li>
+      <li><b>Our own services so far</b>, and one run of a small suite per table: evidence of behaviour, not a benchmark.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="next">
+      <span class="eyebrow">Coming in Part 2</span>
+      <h2>Your pull requests, as HEART</h2>
+      <p>GitHub publishes its full OpenAPI description, and a pull request is all state: open or closed, draft or ready, mergeable or not, behind or blocked. Part 2 puts the gateway in front of GitHub, so you can ask "what's the status of my PRs?", "why can't I merge #482?", "merge the one that's ready", and be offered merge only when GitHub would accept it, with the reason when it wouldn't: behind main, conflicts, a required check missing, still a draft.</p>
+      <p class="note">On a scratch repository, with the reader's own token; nothing merged on a real repository without explicit say-so.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>History: Vannevar Bush, "As We May Think", The Atlantic, 1945; Ted Nelson, "Complex information processing", ACM, 1965; Douglas Engelbart's demonstration, 1968; Tim Berners-Lee, "Information Management: A Proposal", CERN, 1989; HTML 2.0, RFC 1866, 1995; Roy T. Fielding, <i>Architectural Styles and the Design of Network-based Software Architectures</i>, 2000. Quotes verbatim from Fielding, <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be hypertext-driven"</a>, 20 October 2008, and his comments on it.</span>
+    <span>Real-world signals: <a href="https://developers.google.cn/drive/api/guides/delete?hl=en">Google Drive capabilities</a>, <a href="https://developer.paypal.com/docs/api/payments/v2">PayPal Payments v2 links</a>, <a href="https://github.com/oasis-tcs/odata-specs/blob/ce934de1255d6e8adb6efe179ec5197219ba20f8/odata-protocol/11.5%20Operations.md">OData advertised actions</a>, <a href="https://issues.oasis-open.org/browse/ODATA-978">ODATA-978</a>. JSONata: <a href="https://github.com/dashjoin/jsonata-java">dashjoin jsonata-java</a>.</span>
+    <span>Dashboards: each act is drawn as its own small form, its labelled fields with its button, in every client alike. Code and runs: <code>heart/heart-gateway</code>, <code>heart/heart-http4k</code>; <code>exhibits/openapi-vs-heart/</code> run-matrix.sh and run-changes.sh with <code>HEART_AFFORDANCE_LINKS=true</code>, and run-gateway.sh and run-gateway-changes.sh. The plant shop pages and the four bed pages are mock-ups. Deeper on each act: <a href="../openapi-vs-heart/">OpenAPI and HEART, side by side</a>, <a href="../dynamic-openapi-client/">the dynamic OpenAPI client, checked</a>, <a href="../hateoas-anyway/">in the end we wind up with HATEOAS anyway</a>, <a href="../fielding-review/">Fielding's rules, checked</a>.</span>
+  </footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+  // Mermaid follows the reader's light or dark preference, with the page's own colours.
+  (function () {
+    if (!window.mermaid) return;
+    var dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var css = getComputedStyle(document.documentElement);
+    function v(name) { return css.getPropertyValue(name).trim(); }
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: dark ? "dark" : "neutral",
+      securityLevel: "strict",
+      fontFamily: "IBM Plex Sans, system-ui, sans-serif",
+      themeVariables: { primaryColor: v("--surface"), primaryBorderColor: v("--leaf"), lineColor: v("--muted"), primaryTextColor: v("--fg") },
+      sequence: { useMaxWidth: true, mirrorActors: false },
+      flowchart: { useMaxWidth: true, htmlLabels: true }
+    });
+  })();
+</script>
+</body>
+</html>

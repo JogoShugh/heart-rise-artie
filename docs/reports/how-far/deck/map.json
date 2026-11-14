@@ -1,0 +1,337 @@
+{
+  "name": "map",
+  "title": "Think once. Look and act for free. Own the controls.",
+  "part": "Opening",
+  "kicker": "The whole story · where we’re going",
+  "tone": "dark",
+  "number": 4,
+  "of": 54,
+  "html": "<h2>Think once. Look and act for free. Own the controls.</h2>\n<div class=\"map\">\n  <input type=\"checkbox\" id=\"map-lit\" class=\"map-lit\" checked><label for=\"map-lit\" class=\"map-switch\"><span class=\"off\">Path only</span><span class=\"on\">Everything</span></label>\n  <aside class=\"rail build\">\n    <h4>Building <small>bdd-gates hooks</small></h4>\n    <ol>\n      <li><img src=\"media/icon-cucumber.png\" alt=\"\"><b>Gherkin</b><i>the behaviour, first</i></li>\n      <li class=\"red\"><img src=\"media/icon-x.png\" alt=\"\"><b>red run</b><i>fails on behaviour</i></li>\n      <li><img src=\"media/icon-code.png\" alt=\"\"><b>code</b><i class=\"g\">complexity lint, every edit</i></li>\n      <li class=\"green\"><img src=\"media/icon-check.png\" alt=\"\"><b>green run</b><i class=\"g\">+ architecture rules</i></li>\n      <li><img src=\"media/icon-commit.png\" alt=\"\"><b>gated commit</b><i>order checked: test, then code</i></li>\n    </ol>\n    <p class=\"quiet\">Instructions are advice. Hooks aren’t. <deck-fragment name=\"hooks\">hooks.json</deck-fragment></p>\n  </aside>\n  <div class=\"layers\">\n    <section class=\"band think\"><h4>Think <small>once</small></h4><div class=\"cells\">\n      <div class=\"cell path\"><span class=\"n\">1</span><img src=\"media/icon-md.png\" alt=\"\"><span>release.goal.md<br><small>the goal, in words</small></span> <deck-fragment name=\"goal\">goal</deck-fragment></div>\n      <div class=\"cell path\"><span class=\"n\">2</span><img src=\"media/icon-claude.png\" alt=\"\"><span>Claude captures<br><small>20 calls, once</small></span></div>\n      <div class=\"cell path\"><span class=\"n\">3</span><img src=\"media/icon-yaml.png\" alt=\"\"><span><b>kept YAML + pins</b></span> <deck-fragment name=\"kept\">script</deck-fragment> <deck-fragment name=\"pins\">pins</deck-fragment></div>\n    </div><p class=\"tags\"><deck-ref name=\"zta\">Hightower · ZTA</deck-ref></p></section>\n    <section class=\"band look\"><h4>Look · Act <small>0 tokens a replay</small></h4><div class=\"cells\">\n      <div class=\"cell\"><img src=\"media/icon-globe.png\" alt=\"\">browser</div>\n      <div class=\"cell mono\"><img src=\"media/icon-ts.png\" alt=\"\">heart-ts</div>\n      <div class=\"cell mono\"><img src=\"media/icon-mcp.png\" alt=\"\">heart-mcp</div>\n      <div class=\"cell path hub\"><span class=\"n\">4</span><img src=\"media/icon-compass.png\" alt=\"\"><b>ARTIE</b></div>\n    </div><p class=\"caption\">generic clients: pin check · If-Match · signed · L2 cache</p></section>\n    <section class=\"band wire\"><h4>The wire <small>one media type</small></h4><div class=\"cells\">\n      <div class=\"cell\"><img src=\"media/icon-heart.png\" alt=\"\"><b>HEART = HAL + HAL Schema Forms</b></div>\n      <div class=\"cell\"><img src=\"media/icon-layers.png\" alt=\"\">L0 · L1 · L2</div>\n      <div class=\"cell mono\"><img src=\"media/icon-git.png\" alt=\"\">scm: relations</div>\n      <div class=\"cell mono\"><img src=\"media/icon-info.png\" alt=\"\">hr:unavailable</div>\n    </div><p class=\"caption\"><span class=\"rise\">RISE, dotted blue:</span> watch now, be told later · <deck-ref name=\"rule-6\">Fielding · enter by bookmark</deck-ref></p></section>\n    <section class=\"band ours\"><h4>Our controls <small>in front of theirs</small></h4><div class=\"cells\">\n      <div class=\"cell\"><img src=\"media/icon-toggle.png\" alt=\"\">state-scoped acts</div>\n      <div class=\"cell mono\"><img src=\"media/icon-slash.png\" alt=\"\">412·409·405</div>\n      <div class=\"cell rise-from\"><img src=\"media/icon-bell.png\" alt=\"\"><b>watcher</b></div>\n      <div class=\"cell path hub\"><span class=\"n\">5</span><img src=\"media/icon-shield.png\" alt=\"\"><span><b>gateway</b><br><small>YAML connectors</small></span></div>\n    </div><p class=\"caption\">acts offered only when the state allows; refusals explained · runs on your laptop, in front of GitHub</p></section>\n    <section class=\"band theirs\"><h4>Theirs <small>native APIs</small></h4><div class=\"cells\">\n      <div class=\"cell dim\"><img src=\"media/icon-aws.png\" alt=\"\">preview</div>\n      <div class=\"cell path\"><img src=\"media/icon-server.png\" alt=\"\">Dev</div>\n      <div class=\"cell path rise-from\"><img src=\"media/icon-jenkins.png\" alt=\"\">Jenkins</div><span class=\"smoke\">smoke script, linked</span>\n      <div class=\"scm path\"><p><code>scm:</code> one set of typed relations, two forges</p>\n        <div class=\"cell path\"><img src=\"media/icon-gitlab.png\" alt=\"\">GitLab <deck-fragment name=\"gitlab-merge\">merge</deck-fragment></div>\n        <div class=\"cell hub\"><span class=\"n\">6</span><img src=\"media/icon-github.png\" alt=\"\"><b>GitHub</b> <deck-fragment name=\"github-merge\">merge</deck-fragment></div>\n      </div>\n    </div></section>\n  </div>\n  <aside class=\"rail nums\">\n    <h4>Capture <small>once · Claude · real GitHub</small></h4>\n    <dl><dt>20</dt><dd>model calls</dd><dt>36k</dt><dd>tokens: 33,140 in, 2,980 out</dd></dl>\n    <h4>Replay <small>each release after · no model</small></h4>\n    <dl><dt>0</dt><dd>model calls, tokens</dd></dl>\n    <table><caption>per 100 releases, L2 cache</caption><tr><th></th><th>GitHub</th><th>local GitLab</th></tr>\n      <tr><td>requests never sent</td><td>5,069</td><td>3,985</td></tr><tr><td>bytes never received</td><td>3.4 MB</td><td>3.8 MB</td></tr></table>\n    <h4>Instead of <small>an agent with no hypermedia</small></h4>\n    <dl class=\"rust\"><dt>13.5 MB</dt><dd>GitHub’s OpenAPI, read up front</dd></dl>\n  </aside>\n  <p class=\"legend\"><span class=\"gold-line\"></span><b>The gold path is hypermedia as the engine of application state:</b> every step is a control the last answer offered. Nothing is built from a manual.</p>\n  <p class=\"legend repair\"><span class=\"n red\">7</span>A form changed? The replay stops, the model repairs at ② (the capture), then it’s zero tokens again.</p>\n  <div class=\"rest\">\n    <h4>REST <small>Fielding’s dissertation, 2000</small></h4>\n    <deck-ref name=\"client-server\">client–server</deck-ref>\n    <deck-ref name=\"stateless\">stateless</deck-ref>\n    <deck-ref name=\"cache\">cache ▲ L2</deck-ref>\n    <div class=\"uniform\"><p><deck-ref name=\"uniform-interface\">uniform interface</deck-ref> its four constraints</p>\n      <span>identification of resources</span><span>manipulation of resources through representations</span><span>self-descriptive messages</span><deck-ref name=\"uniform-interface\">HATEOAS ▲ the gold path</deck-ref></div>\n    <deck-ref name=\"layered-system\">layered system ▲ gateway</deck-ref>\n    <span class=\"optional\"><deck-ref name=\"code-on-demand\">code on demand ▲ smoke link</deck-ref><small>optional</small></span>\n  </div>\n</div>\n",
+  "say": "Here's where we're going, on one page. Follow the gold numbers. One: a goal in plain words. Two: Claude captures it once, twenty model calls. Three: what it found is kept as a YAML script with pins. Four: ARTIE, a generic client, replays it with no model. Five: our gateway, on a laptop, in front of GitHub, offers only the acts the state allows. Six: GitHub merges, or the local GitLab, through one set of scm typed relations; Jenkins builds and runs the smoke script it links; Dev gets the promotion. That gold line is hypermedia as the engine of application state: every step is a control the last answer offered. Switch to Everything at the end of the talk: RISE replies in dotted blue, the red repair loop, how it was built on the left, what it cost on the right, and Fielding's constraints underneath.",
+  "sources": [
+    {
+      "label": "Fielding: dissertation, chapter 5 (2000)",
+      "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"
+    },
+    {
+      "label": "Report: Real GitHub, Local GitLab",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-real-github/"
+    },
+    {
+      "label": "bdd-gates skill",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "map.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "infer-once.json",
+      "title": "When to think, and how “once” stays true"
+    },
+    "next": {
+      "href": "walk-the-dog.json",
+      "title": "Walk the dog, ship the feature"
+    },
+    "alternate": {
+      "href": "map.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "zta",
+        "kind": "talk",
+        "label": "Hightower · ZTA",
+        "title": "ZTA: Zero Token Architecture",
+        "summary": "Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. (In my words, from the talk's page and Daniel Cranney's write-up.)",
+        "quote": "<p>“You are all having way too much fun burning way too many tokens”</p><p class=\"note\">His opening line, as quoted in Daniel Cranney, <a href=\"https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture\">“Infer Once, Run Everywhere: Zero-Token Architecture”</a>, WeAreDevelopers, 13 October 2026.</p>",
+        "cite": "Kelsey Hightower, WeAreDevelopers World Congress North America",
+        "date": "26 September 2026",
+        "_links": {
+          "self": {
+            "href": "../refs/zta.json",
+            "title": "Hightower · ZTA"
+          },
+          "describedby": {
+            "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture",
+            "title": "Kelsey Hightower, WeAreDevelopers World Congress North America"
+          }
+        }
+      },
+      {
+        "name": "rule-6",
+        "kind": "rule",
+        "label": "Rule 6 · The bookmark",
+        "title": "Enter with a bookmark; follow what's offered",
+        "summary": "In brief: one URI and known media types to start; every next step chosen from what the server put in the answer.",
+        "quote": "<p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>",
+        "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/rule-6.json",
+            "title": "Rule 6 · The bookmark"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+            "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "client-server",
+        "kind": "constraint",
+        "label": "Client–server",
+        "title": "Client–server (§5.1.2)",
+        "summary": "Separate the user interface from the data; let each side evolve on its own.",
+        "quote": "<p>“The first constraints added to our hybrid style are those of the client-server architectural style (Figure 5-2), described in Section 3.4.1. Separation of concerns is the principle behind the client-server constraints. By separating the user interface concerns from the data storage concerns, we improve the portability of the user interface across multiple platforms and improve scalability by simplifying the server components. Perhaps most significant to the Web, however, is that the separation allows the components to evolve independently, thus supporting the Internet-scale requirement of multiple organizational domains.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.2",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/client-server.json",
+            "title": "Client–server"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_2",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.2"
+          }
+        }
+      },
+      {
+        "name": "stateless",
+        "kind": "constraint",
+        "label": "Stateless",
+        "title": "Stateless (§5.1.3)",
+        "summary": "Every request carries all it needs; session state lives on the client.",
+        "quote": "<p>“We next add a constraint to the client-server interaction: communication must be stateless in nature, as in the client-stateless-server (CSS) style of Section 3.4.3 (Figure 5-3), such that each request from client to server must contain all of the information necessary to understand the request, and cannot take advantage of any stored context on the server. Session state is therefore kept entirely on the client.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.3",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/stateless.json",
+            "title": "Stateless"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_3",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.3"
+          }
+        }
+      },
+      {
+        "name": "cache",
+        "kind": "constraint",
+        "label": "Cache",
+        "title": "Cache (§5.1.4)",
+        "summary": "Label every response cacheable or not, so interactions can be skipped. HEART's L2 form sets are this.",
+        "quote": "<p>“In order to improve network efficiency, we add cache constraints to form the client-cache-stateless-server style of Section 3.4.4 (Figure 5-4). Cache constraints require that the data within a response to a request be implicitly or explicitly labeled as cacheable or non-cacheable. If a response is cacheable, then a client cache is given the right to reuse that response data for later, equivalent requests.</p><p>The advantage of adding cache constraints is that they have the potential to partially or completely eliminate some interactions, improving efficiency, scalability, and user-perceived performance by reducing the average latency of a series of interactions. The trade-off, however, is that a cache can decrease reliability if stale data within the cache differs significantly from the data that would have been obtained had the request been sent directly to the server.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.4",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/cache.json",
+            "title": "Cache"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_4",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.4"
+          }
+        }
+      },
+      {
+        "name": "uniform-interface",
+        "kind": "constraint",
+        "label": "Uniform interface · HATEOAS",
+        "title": "Uniform interface (§5.1.5)",
+        "summary": "One generic interface for every component; its fourth part is hypermedia as the engine of application state.",
+        "quote": "<p>“The central feature that distinguishes the REST architectural style from other network-based styles is its emphasis on a uniform interface between components (Figure 5-6). By applying the software engineering principle of generality to the component interface, the overall system architecture is simplified and the visibility of interactions is improved. Implementations are decoupled from the services they provide, which encourages independent evolvability. The trade-off, though, is that a uniform interface degrades efficiency, since information is transferred in a standardized form rather than one which is specific to an application's needs. The REST interface is designed to be efficient for large-grain hypermedia data transfer, optimizing for the common case of the Web, but resulting in an interface that is not optimal for other forms of architectural interaction.</p><p>In order to obtain a uniform interface, multiple architectural constraints are needed to guide the behavior of components. REST is defined by four interface constraints: identification of resources; manipulation of resources through representations; self-descriptive messages; and, hypermedia as the engine of application state. These constraints will be discussed in Section 5.2.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.5",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/uniform-interface.json",
+            "title": "Uniform interface · HATEOAS"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_5",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.5"
+          }
+        }
+      },
+      {
+        "name": "layered-system",
+        "kind": "constraint",
+        "label": "Layered system",
+        "title": "Layered system (§5.1.6)",
+        "summary": "Each component sees only the next layer; intermediaries can cache and enforce policy. A gateway in front of GitHub is this.",
+        "quote": "<p>“In order to further improve behavior for Internet-scale requirements, we add layered system constraints (Figure 5-7). As described in Section 3.4.2, the layered system style allows an architecture to be composed of hierarchical layers by constraining component behavior such that each component cannot \"see\" beyond the immediate layer with which they are interacting. By restricting knowledge of the system to a single layer, we place a bound on the overall system complexity and promote substrate independence. Layers can be used to encapsulate legacy services and to protect new services from legacy clients, simplifying components by moving infrequently used functionality to a shared intermediary. Intermediaries can also be used to improve system scalability by enabling load balancing of services across multiple networks and processors.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.6",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/layered-system.json",
+            "title": "Layered system"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_6",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.6"
+          }
+        }
+      },
+      {
+        "name": "code-on-demand",
+        "kind": "constraint",
+        "label": "Code on demand (optional)",
+        "title": "Code-on-demand (§5.1.7)",
+        "summary": "Clients may be extended by code the server sends; optional, because it reduces visibility.",
+        "quote": "<p>“The final addition to our constraint set for REST comes from the code-on-demand style of Section 3.5.3 (Figure 5-8). REST allows client functionality to be extended by downloading and executing code in the form of applets or scripts. This simplifies clients by reducing the number of features required to be pre-implemented. Allowing features to be downloaded after deployment improves system extensibility. However, it also reduces visibility, and thus is only an optional constraint within REST.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.7",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/code-on-demand.json",
+            "title": "Code on demand (optional)"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_7",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.7"
+          }
+        }
+      }
+    ],
+    "deck:fragment": [
+      {
+        "name": "goal",
+        "label": "The goal, in words (release.goal.md)",
+        "lang": "markdown",
+        "path": "exhibits/merge-watch-release/release.goal.md",
+        "lines": "19–28",
+        "of": 28,
+        "text": "Release a pull request to Dev once it can be merged and its build passes its smoke test.\n\n- Open pull request {pull} of {owner}/{repo} `as pr`\n- At {watcher}, ask to be told when {pr} offers scm:merge `as watch`\n- Once {watch} is answered, at {pr}, merge it by squashing `as merged`\n- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`\n- Once {build} is answered, follow its in-reply-to link to the build `as built`\n  - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`\n- If {smoke.passed}, at {dev}, open environment {environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed `as promotion`\n  Otherwise, at {pr}, act scm:comment with body = \"Not promoted to Dev: smoke scenarios {smoke.failed} failed.\"",
+        "_links": {
+          "self": {
+            "href": "fragments/map--goal.json",
+            "title": "The goal, in words (release.goal.md)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.goal.md#L19-L28",
+            "title": "exhibits/merge-watch-release/release.goal.md, lines 19–28"
+          }
+        }
+      },
+      {
+        "name": "kept",
+        "label": "The kept script (release.heart.yaml)",
+        "lang": "yaml",
+        "path": "exhibits/merge-watch-release/release.heart.yaml",
+        "lines": "41–125",
+        "of": 125,
+        "text": "steps:\n  - act: scm:pulls-get\n    fields:\n      owner: ${owner}\n      repo: ${repo}\n      pull_number: ${pull}\n    intent: Open pull request ${pull} of ${owner}/${repo}\n    then:\n      - keep-as: pr\n  - enter: ${watcher}\n    steps:\n      - ask: watcher:watch\n        fields:\n          resource: ${pr.@self}\n          offers: scm:merge\n        reply: watch\n  - once-answered:\n      reply: watch\n      steps:\n        - enter: ${pr.@self}\n          steps:\n            - act: scm:merge\n              fields:\n                method: squash\n              intent: merge it by squashing\n              then:\n                - check:\n                    - field: state\n                      is: closed\n                    - field: merged\n                      is: true\n                    - field: mergeable_state\n                      is: unknown\n                - keep-as: merged\n  - enter: ${jenkins}\n    steps:\n      - ask: ci:build\n        fields:\n          commit: ${merged.merge_commit_sha}\n        reply: build\n  - once-answered:\n      reply: build\n      steps:\n        - follow: hr:in-reply-to\n          intent: follow its in-reply-to link to the build\n          then:\n            - run-script: ci:smoke-test\n              on-link: ci:deployment\n              inputs:\n                book: ${book}\n                author: ${author}\n                renewable: ${renewable}\n                problem: ${problem}\n                comment: ${comment}\n              as: smoke\n  - given:\n      - at: smoke\n        field: passed\n        is: true\n    then:\n      - enter: ${dev}\n        steps:\n          - act: env:get-environment\n            fields:\n              id: ${environment}\n            inferred: get environment ${environment}\n            from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n            then:\n              - act: env:promote\n                fields:\n                  commit: ${merged.merge_commit_sha}\n                  smoke: # review: the reasoner chose it, asked \"promote commit 30a0fa96e3eed2ae20b2b5fa7613a115d56312a3, citing 5 of 5 scenarios passed\"\n                    passed: ${smoke.passing}\n                    of: ${smoke.of}\n                intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n                then:\n                  - check:\n                      - field: commit\n                        is: ${merged.merge_commit_sha}\n    otherwise:\n      - at: ${pr.@self}\n        steps:\n          - act: scm:comment\n            fields:\n              body: \"Not promoted to Dev: smoke scenarios ${smoke.failed} failed.\"",
+        "_links": {
+          "self": {
+            "href": "fragments/map--kept.json",
+            "title": "The kept script (release.heart.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.heart.yaml#L41-L125",
+            "title": "exhibits/merge-watch-release/release.heart.yaml, lines 41–125"
+          }
+        }
+      },
+      {
+        "name": "pins",
+        "label": "The pins (release.pins.yaml)",
+        "lang": "yaml",
+        "path": "exhibits/merge-watch-release/release.pins.yaml",
+        "lines": "1–64",
+        "of": 64,
+        "text": "# What /Users/josh/repos/artie/exhibits/merge-watch-release/release.heart.yaml was recorded against, from /Users/josh/repos/artie/exhibits/merge-watch-release/release.capture.yaml. artie run holds the script to it before every act:\n# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its\n# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and\n# one offered in a set not recorded for it.\nrung: L2\ndigest: sha256-qKM7TXJvTtzvI3H416WCa/y5oYK6wvYch4GhbwCLhKc=\nforms:\n  scm:pulls-get:\n    integrity: sha256-h02WjR7vd61a3clH1/805IIXM3O8OwspKt3KHwUP7/s=\n    act: sha256-0vjYAyfZzEdAjZBvXTUMge5qmujg/1tlkot9bnCWtaI=\n    method: GET\n    sets:\n      - sha256-gImH34GdmXPjwBtQ7RNGKro/Tbf26SFredj/E+jK13c=\n  watcher:watch:\n    integrity: sha256-vfjsEUQ7/+mWV478GxTnnHzzo8rZLb+s3eHW4KJhRFw=\n    act: sha256-BQiZ8TwYquT9Wgp2yiw4eEIqY3c9/0IwgvhuCvV1KHg=\n    method: POST\n    sets:\n      - sha256-T8prIv6TSqXSB9HdposRpsV8AYFUzfYEqiUvr32dX10=\n  scm:merge:\n    integrity: sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pweUa6ioBBwF8=\n    act: sha256-s8/h0c399Nx7AL340i09iHi9+s/nSZ9R+q5MfjgiYUY=\n    method: PUT\n    sets:\n      - sha256-ARE/YVgALeTnzANV8TegQJiue3vljZt3onMex+jMsvs=\n  ci:build:\n    integrity: sha256-xo3vNZ/YJwDkXNstjxyOUmQHZdWN8PojyD9Ub3KzHGQ=\n    act: sha256-9MVTORRjzrcFoMzlwiQWRmnUPVD+jk4sNjjyGG2m4fI=\n    method: POST\n    sets:\n      - sha256-Uv4wXjFFrnajvow8ez6LM8naU0uFYIKuRdyKs4IQA3A=\n  library:search-loans:\n    integrity: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=\n    act: sha256-Z7N30vs6QUGs1xK2hP+w1F0UgY7gyXs1+HawMkOt274=\n    method: GET\n    sets:\n      - sha256-OO1MlqifBoCG+V9lYByf83cmOoCUf75taO/frDYwjWE=\n  library:renew:\n    integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=\n    act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=\n    method: POST\n    sets:\n      - sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU=\n  library:report-problem:\n    integrity: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=\n    act: sha256-Z+8E81vIjCh35uyOKsoSwVMDm2eCmJBVEcbO6oI3uD8=\n    method: POST\n    sets:\n      - sha256-04lPGu1h4kV3Ra9udmDg1UCTzHfqn47zOSXw6TDIKOQ=\n  env:get-environment:\n    integrity: sha256-UWb+xXKngRFe8ibTwO9SrpSUYNPBbji/5JjlwpAEKfQ=\n    act: sha256-myRjFFxsNF8ai44N4fdXgWOPGB3uRptbwrCqaA8yp6s=\n    method: GET\n    sets:\n      - sha256-sy8+OSs554Ilw4WUAs9A0ywntG59u2PLanv0jt/pId4=\n  env:promote:\n    integrity: sha256-TwXThZ20UPUIctrpRXRoHqarKKsEilvB0sVwvK1PY4s=\n    act: sha256-uhGb8WNCB9bBSTcSnGDncK5OOgbvor2iNrT+IZvrEFA=\n    method: POST\n    sets:\n      - sha256-Uk7KIVDEyuxx08fE2x1gvp0hjkFhpH/7gyFyP7k3Vb8=\nlinks:\n  hr:in-reply-to: ''\n  item: ''",
+        "_links": {
+          "self": {
+            "href": "fragments/map--pins.json",
+            "title": "The pins (release.pins.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.pins.yaml",
+            "title": "exhibits/merge-watch-release/release.pins.yaml, lines 1–64"
+          }
+        }
+      },
+      {
+        "name": "github-merge",
+        "label": "scm:merge on GitHub: the gateway's connector",
+        "lang": "yaml",
+        "path": "heart/heart-gateway/connectors/github-scm/pull.resource.yaml",
+        "lines": "31–52",
+        "of": 109,
+        "text": "merge:\n  operation: pulls/merge\n  title: Merge\n  description: Merge the pull request into its base branch.\n  fields: [commit_title, commit_message]\n  # scm's method, as GitHub's merge_method takes it.\n  inputs:\n    method:\n      type: string\n      enum: [merge, squash, rebase]\n      title: Merge method\n      description: The merge method to use.\n  values:\n    method:\n      merge: { merge_method: merge }\n      squash: { merge_method: squash }\n      rebase: { merge_method: rebase }\n  # GitHub merges only if the head is still at this sha: the head the client's view had.\n  bind: { sha: /head/sha }\n  # GitHub's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.\n  stale: 409\n  refused: 405",
+        "_links": {
+          "self": {
+            "href": "fragments/map--github-merge.json",
+            "title": "scm:merge on GitHub: the gateway's connector"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-gateway/connectors/github-scm/pull.resource.yaml#L31-L52",
+            "title": "heart/heart-gateway/connectors/github-scm/pull.resource.yaml, lines 31–52"
+          }
+        }
+      },
+      {
+        "name": "gitlab-merge",
+        "label": "scm:merge on GitLab: the gateway's connector",
+        "lang": "yaml",
+        "path": "heart/heart-gateway/connectors/gitlab/pull.resource.yaml",
+        "lines": "45–65",
+        "of": 82,
+        "text": "merge:\n  operation: pulls/merge\n  title: Merge\n  description: Merge the pull request into its target branch.\n  fields: [merge_commit_message]\n  # scm's method, as GitHub's merge takes it; GitLab squashes or not, and merges with a merge commit either way.\n  inputs:\n    method:\n      type: string\n      enum: [merge, squash]\n      title: Merge method\n      description: The merge method to use.\n  values:\n    method:\n      merge: { squash: false }\n      squash: { squash: true }\n  # GitLab merges only if the source branch's head is still at this sha: the head the client's view had.\n  bind: { sha: /sha }\n  # GitLab's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.\n  stale: 409\n  refused: 405",
+        "_links": {
+          "self": {
+            "href": "fragments/map--gitlab-merge.json",
+            "title": "scm:merge on GitLab: the gateway's connector"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-gateway/connectors/gitlab/pull.resource.yaml#L45-L65",
+            "title": "heart/heart-gateway/connectors/gitlab/pull.resource.yaml, lines 45–65"
+          }
+        }
+      },
+      {
+        "name": "hooks",
+        "label": "The hooks that gate every change (core/hooks.json)",
+        "lang": "json",
+        "path": "bdd-gates: core/hooks.json",
+        "lines": "1–77",
+        "of": 77,
+        "text": "{\n  \"UserPromptSubmit\": [\n    {\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/refactor-prompt.sh\",\n          \"timeout\": 15\n        }\n      ]\n    }\n  ],\n  \"PreToolUse\": [\n    {\n      \"matcher\": \"*\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/protect-gate.sh\",\n          \"timeout\": 10\n        }\n      ]\n    },\n    {\n      \"matcher\": \"Edit|Write|MultiEdit\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/gherkin-first.sh\",\n          \"timeout\": 15,\n          \"statusMessage\": \"Checking Gherkin-first ordering...\"\n        }\n      ]\n    },\n    {\n      \"matcher\": \"Bash\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/gate-bash.sh\",\n          \"timeout\": 10\n        }\n      ]\n    }\n  ],\n  \"PostToolUse\": [\n    {\n      \"matcher\": \"Edit|Write|MultiEdit\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/log-event.sh\",\n          \"timeout\": 15,\n          \"statusMessage\": \"Logging TDD event...\"\n        },\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/lint.sh\",\n          \"timeout\": 180,\n          \"statusMessage\": \"Running lint gate...\"\n        }\n      ]\n    }\n  ],\n  \"Stop\": [\n    {\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/check.sh\",\n          \"timeout\": 600,\n          \"statusMessage\": \"Running full check gate...\"\n        }\n      ]\n    }\n  ]\n}",
+        "_links": {
+          "self": {
+            "href": "fragments/map--hooks.json",
+            "title": "The hooks that gate every change (core/hooks.json)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/hooks.json",
+            "title": "core/hooks.json, lines 1–77"
+          }
+        }
+      }
+    ]
+  }
+}

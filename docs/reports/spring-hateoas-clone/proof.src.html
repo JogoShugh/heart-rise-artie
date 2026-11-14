@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Clone, Proven</title>
+<style>
+  :root { --bg: #f6f5f1; --fg: #1d211f; --soft: #5b625e; --line: #dcdcd4; --card: #ffffff; --pass: #e6f4ea; --pass-edge: #2f6b4f;
+    --code: #f0efe9; color-scheme: light;
+    --kt-kw: #8a3f8f; --kt-str: #2f6f3f; --kt-tpl: #b0641c; --kt-cm: #7b847e; --kt-fn: #1f5a8a; --kt-num: #a0522d; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+      --pass: #16321f; --pass-edge: #7cc4a0; --code: #1f2522; color-scheme: dark;
+      --kt-kw: #d79ad9; --kt-str: #9fd6ac; --kt-tpl: #e6a35c; --kt-cm: #7f8b84; --kt-fn: #8cc0ea; --kt-num: #e0a080; }
+  }
+  :root[data-theme="dark"] { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+    --pass: #16321f; --pass-edge: #7cc4a0; --code: #1f2522; color-scheme: dark;
+    --kt-kw: #d79ad9; --kt-str: #9fd6ac; --kt-tpl: #e6a35c; --kt-cm: #7f8b84; --kt-fn: #8cc0ea; --kt-num: #e0a080; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 1rem max(16px, env(safe-area-inset-left, 0px)) 3rem; }
+  h1 { font-size: 1.5rem; margin: .2rem 0 .3rem; text-wrap: balance; }
+  h2 { font-size: 1.1rem; margin: 1.8rem 0 .5rem; }
+  p, li { color: var(--soft); max-width: 75ch; }
+  code { font: .88em ui-monospace, Menlo, monospace; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .6rem; margin: 1rem 0; }
+  .tile { background: var(--pass); border: 1px solid var(--pass-edge); border-radius: 8px; padding: .7rem .8rem; }
+  .tile b { display: block; font-size: 1.35rem; }
+  .tile span { color: var(--soft); font-size: .88rem; }
+  .wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; border: 1px solid var(--line); padding: .4rem .55rem; }
+  th { font-weight: 600; }
+  td code { white-space: nowrap; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; margin: .5rem 0; }
+  summary { cursor: pointer; padding: .55rem .8rem; font-weight: 600; }
+  pre { margin: 0; padding: .7rem .8rem; background: var(--code); overflow-x: auto; font: 12.5px/1.45 ui-monospace, Menlo, monospace; }
+</style>
+</head>
+<body>
+<main>
+  <h1>The Clone, Proven</h1>
+  <p>The employees simulator in <code>heart/heart-sims</code>, switched to answer as Spring's example, against
+    Spring HATEOAS's own <code>affordances</code> example run untouched, on @@RUN_DATE@@ (UTC).</p>
+
+  <div class="tiles">
+    <div class="tile"><b>@@SIDE_STEPS@@ / @@SIDE_STEPS@@</b><span>exchanges the same: status, Content-Type, Location, ETag and body, byte for byte</span></div>
+    <div class="tile"><b>6 / 6</b><span>steps of ARTIE's script done on each, unchanged; the same output, line for line</span></div>
+    <div class="tile"><b>0</b><span>differences in ARTIE's two traces, beside clocks, trace ids and the server's name</span></div>
+    <div class="tile"><b>c100c56</b><span>the example's commit, 2021-04-07; its checkout clean</span></div>
+  </div>
+
+  <h2>The example, as run</h2>
+  <div class="wrap"><table>
+    <tr><th>What</th><th>Value</th></tr>
+    <tr><td>Repository</td><td><code>https://github.com/spring-projects/spring-hateoas-examples</code>, module <code>affordances</code></td></tr>
+    <tr><td>Commit</td><td><code>@@COMMIT@@</code></td></tr>
+    <tr><td>Changed locally</td><td>@@DIRTY@@ files (<code>git status --short</code>)</td></tr>
+    <tr><td>Spring Boot</td><td><code>@@BOOT@@</code> (the parent POM)</td></tr>
+    <tr><td>Spring HATEOAS</td><td><code>@@HATEOAS@@</code> (resolved in the container's Maven repository)</td></tr>
+    <tr><td>Java</td><td><code>@@JAVA@@</code>, image <code>@@IMAGE@@</code></td></tr>
+    <tr><td>Started with</td><td><code>@@CMD@@</code></td></tr>
+    <tr><td>Served at</td><td><code>http://localhost:8097</code> (container port 8080), Tomcat</td></tr>
+  </table></div>
+  <p>Its versions are its own and old: Spring Boot 2.3 and Spring HATEOAS 1.1, the example's last commit in 2021.
+    Nothing was upgraded or patched to run it.</p>
+
+  <h2>The clone, as run</h2>
+  <div class="wrap"><table>
+    <tr><th>What</th><th>Value</th></tr>
+    <tr><td>Code</td><td><code>heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/employees/StockSpring.kt</code>, shown whole below</td></tr>
+    <tr><td>Commit</td><td><code>@@OUR_COMMIT@@</code> of this repository</td></tr>
+    <tr><td>Started with</td><td><code>java -cp 'heart/heart-sims/build/sims/lib/*' com.artie.heart.sims.MainKt 8096 employees.test</code></td></tr>
+    <tr><td>Switched to answer as Spring's example</td><td><code>PUT /_sim/employees/mode</code>, body <code>stock-spring</code>; reset first with <code>POST /_sim/reset</code></td></tr>
+    <tr><td>Served at</td><td><code>http://localhost:8096</code>, Jetty, in http4k</td></tr>
+  </table></div>
+
+  <h2>How it was compared</h2>
+  <ul>
+    <li><b>Side by side.</b> <code>SpringCloneTrace</code> (in <code>heart-sims/src/test</code>) sends each request to the
+      clone, then the same request to the example. It stops the run at the first difference in status, Content-Type,
+      Location, ETag or body. Both write every link absolute, against the address they were asked at, so the example's
+      origin is written as the clone's before the bytes are compared. Nothing else is changed. The tab
+      <b>Side by side</b> shows each exchange, with the example's own answer as its comparison.</li>
+    <li><b>ARTIE.</b> <code>wild/fresh-run/explore.kts</code>, the script first run against the example on 2026-11-02,
+      run again on each, with only its entry changed for the clone. The two tabs <b>ARTIE on</b> show each run line by
+      line.</li>
+    <li>Both started fresh before each run: the example's container restarted, the clone reset.</li>
+  </ul>
+
+  <h2>Every behaviour the example shows, in both</h2>
+  <div class="wrap"><table>
+    <tr><th>Behaviour</th><th>Where the example does it</th><th>Seen at</th></tr>
+    <tr><td>HAL-FORMS when asked for it, or for anything (<code>*/*</code>)</td><td><code>@EnableHypermediaSupport(type = HAL_FORMS)</code></td><td>Side by side 1, 3</td></tr>
+    <tr><td>Asked for <code>application/hal+json</code>: its own JSON, <code>links</code> as an array, <code>content</code>, no forms</td><td>Spring HATEOAS's default rendering</td><td>Side by side 2, 5</td></tr>
+    <tr><td>Templates' methods in lower case: <code>post</code>, <code>put</code>, <code>delete</code></td><td><code>afford(methodOn(…))</code></td><td>Side by side 1, 4</td></tr>
+    <tr><td>Templates name every field of an employee (<code>firstName</code>, <code>id</code>, <code>lastName</code>, <code>role</code>), none for a delete</td><td><code>afford(…updateEmployee(null, id))</code>, <code>afford(…deleteEmployee(id))</code></td><td>Side by side 1, 4</td></tr>
+    <tr><td>No <code>target</code> on a template, no profile, no ETag</td><td>not written anywhere</td><td>every exchange</td></tr>
+    <tr><td>If-None-Match and If-Match ignored: read in full, written anyway</td><td>no validators</td><td>Side by side 6, 10</td></tr>
+    <tr><td>Create, update and delete answered 204 with no body; create and update name the employee in Location</td><td><code>ResponseEntity.noContent().location(uri)</code></td><td>Side by side 8, 10, 12</td></tr>
+    <tr><td>A missing employee: 404, empty, no problem document</td><td><code>ResponseEntity.notFound().build()</code></td><td>Side by side 7, 13</td></tr>
+    <tr><td>New ids from the store's sequence: Samwise is 3</td><td><code>repository.save</code>, after the two loaded at start</td><td>Side by side 8</td></tr>
+    <tr><td>Links absolute, against the address asked</td><td><code>linkTo(methodOn(…))</code></td><td>every exchange</td></tr>
+  </table></div>
+
+  <h2>What differs, and why it doesn't count</h2>
+  <div class="wrap"><table>
+    <tr><th>Difference</th><th>The example</th><th>The clone</th><th>A client reads it?</th></tr>
+    <tr><td>Server header</td><td>none</td><td><code>Server: Jetty(12.0.16)</code></td><td>no</td></tr>
+    <tr><td>Reason phrase</td><td>none (<code>HTTP/1.1 200</code>)</td><td><code>OK</code>, <code>No Content</code></td><td>no (RFC 9110 §15: ignore it)</td></tr>
+    <tr><td>Order of headers, <code>Date</code></td><td colspan="2">each its own</td><td>no</td></tr>
+    <tr><td>Origin in links</td><td><code>localhost:8097</code></td><td><code>localhost:8096</code></td><td>yes, and each is right for where it was asked</td></tr>
+  </table></div>
+
+  <h2>Not covered</h2>
+  <ul>
+    <li>A method sent in lower case, as the templates write it: Tomcat refuses <code>post</code> with 405
+      (2026-11-02 log). The clients here send methods upper case, so neither run sends one.</li>
+    <li>The example's other modules, and errors it has no code for, such as a body that isn't JSON.</li>
+  </ul>
+
+  <h2>The sources, whole</h2>
+  <details><summary>EmployeeController.java, the example</summary><pre>@@CONTROLLER@@</pre></details>
+  <details><summary>HypermediaConfiguration.java, the example</summary><pre>@@CONFIG@@</pre></details>
+  <details><summary>DatabaseLoader.java, the example</summary><pre>@@LOADER@@</pre></details>
+  <details><summary>StockSpring.kt, the clone</summary><pre><code class="kotlin">@@CLONE@@</code></pre></details>
+  <details><summary>SpringCloneTrace.kt, the comparison</summary><pre><code class="kotlin">@@HARNESS@@</code></pre></details>
+  <details><summary>Run it again</summary><pre>@@RERUN@@</pre></details>
+</main>
+<script>@@KOTLIN_VIEW@@</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-labelledby="mapping-title mapping-desc">
+<title id="mapping-title">Each line of the goal, and the script line it became</title>
+<desc id="mapping-desc">The goal's lines map one to one onto the generated script: named relations, checks as facts, the wait with its give-up, and one act(intent = …) where the goal said reasoned.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="mapping-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="230" y="30" text-anchor="middle">merge.goal.md</text>
+<text class="h" x="715" y="30" text-anchor="middle">merge.kts, made from the run</text>
+<rect class="box" x="20" y="50" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="83">In {owner}/{repo}</text>
+<path class="line" d="M422 78 L488 78" marker-end="url(#mapping-head)"/>
+<rect class="box" x="490" y="50" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="83">act(&quot;github:repos-get&quot;, owner, repo)</text>
+<rect class="box" x="20" y="120" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="153">Open an issue … `as watch`</text>
+<path class="line" d="M422 148 L488 148" marker-end="url(#mapping-head)"/>
+<rect class="box" x="490" y="120" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="144">act(&quot;github:open-issue&quot;) {</text>
+<text class="m" x="506" y="164">  keepAs(&quot;watch&quot;) }</text>
+<rect class="box" x="20" y="190" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="223">Until someone closes {watch}</text>
+<path class="line" d="M422 218 L488 218" marker-end="url(#mapping-head)"/>
+<rect class="box" x="490" y="190" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="214">watch(until = { at(&quot;watch&quot;) {</text>
+<text class="m" x="506" y="234">  &quot;state&quot; eq &quot;closed&quot; } })</text>
+<rect class="box" x="20" y="260" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="293">Whenever … labelled {label} changes</text>
+<path class="line" d="M422 288 L488 288" marker-end="url(#mapping-head)"/>
+<rect class="box" x="490" y="260" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="284">act(&quot;github:pulls-list&quot;, labels) {</text>
+<text class="m" x="506" y="304">  whenever { has { labels has label }</text>
+<rect class="box" x="20" y="330" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="363">If it's labelled {hold}, leave it …</text>
+<path class="line" d="M422 358 L488 358" marker-end="url(#mapping-head)"/>
+<rect class="box" x="490" y="330" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="354">leaveWhere(&quot;…say so once.&quot;) {</text>
+<text class="m" x="506" y="374">  &quot;github:labels&quot; has hold }</text>
+<rect class="box" x="20" y="400" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="433">Once it can be merged, merge it …</text>
+<path class="line" d="M422 428 L488 428" marker-end="url(#mapping-head)"/>
+<rect class="box" x="490" y="400" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="424">once(&quot;github:merge&quot;, giveUp = 3.minutes)</text>
+<text class="m" x="506" y="444">  { act(&quot;github:merge&quot;, squash) }</text>
+<rect class="hl" x="20" y="470" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="503">Otherwise, … `reasoned`</text>
+<path class="line" d="M422 498 L488 498" marker-end="url(#mapping-head)"/>
+<rect class="hl" x="490" y="470" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="494">otherwise = { why -&gt;</text>
+<text class="m" x="506" y="514">  act(intent = &quot;…$why&quot;) }</text>
+</svg>

@@ -1,0 +1,46 @@
+{
+  "name": "release-desk-jenkins",
+  "title": "The release desk, and Jenkins, for real",
+  "part": "The whole release",
+  "kicker": "The whole release · 1 of 2",
+  "tone": "light",
+  "number": 38,
+  "of": 54,
+  "html": "<h2>The release desk, and Jenkins, for real</h2>\n<div class=\"split\">\n  <figure><img src=\"media/desk.png\" alt=\"The release desk's text/html representation, offering Release a pull request\"><figcaption>The release desk, as text/html: “Release a pull request” is its act.</figcaption></figure>\n  <figure><img src=\"media/jenkins.png\" alt=\"Jenkins in a container listing builds #33 to #37\"><figcaption>Jenkins in a container: builds #33 to #37, one per release (#33 failed).</figcaption></figure>\n</div>\n<p class=\"lead\">Every party is a HEART service, read and acted on by the same client. Jenkins sits behind a thin HEART wrapper and answers back through RISE.</p>\n",
+  "say": "The release desk is a HEART service: a person, or ARTIE, asks it to release a pull request, and it runs the kept script. Its own text/html is shown here, after five releases on the GitHub test repository, run today. Jenkins is real, the official image, in a container on this Mac, building each merged commit and answering back through RISE when the build finishes.",
+  "sources": [
+    {
+      "label": "Jenkins (official image)",
+      "href": "https://hub.docker.com/r/jenkins/jenkins"
+    },
+    {
+      "label": "artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "release-desk-jenkins.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "step-5-after-merge.json",
+      "title": "After the merge: the server changed, the client didn’t"
+    },
+    "next": {
+      "href": "console-and-dev.json",
+      "title": "The build’s console, and Dev, promoted or not"
+    },
+    "alternate": {
+      "href": "release-desk-jenkins.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "loop",
+  "label": "SKILL.md, the work loop",
+  "lang": "markdown",
+  "path": "bdd-gates: SKILL.md",
+  "lines": "65–71",
+  "of": 113,
+  "text": "1. Write or change the `.feature` scenario. Use Scenario Outlines and data\n   tables, not repeated Given/When/Then blocks.\n2. Run the BDD suite (native command, or `.claude/bdd-gates/bdd-run.sh` on\n   wrapper stacks). See it **fail** for the right reason: `BDD_RUN FAIL`.\n3. Write step definitions, then production code. The gate now allows it.\n4. Run the suite until `BDD_RUN PASS`. Fix lint findings as they appear.\n5. End the turn. The Stop gate runs the full check.",
+  "_links": {
+    "self": {
+      "href": "skill-md--loop.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/SKILL.md#L65-L71",
+      "title": "SKILL.md, lines 65–71"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

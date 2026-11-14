@@ -1,0 +1,57 @@
+---
+run:
+  inputs:
+    validators:
+      value: 'true'
+      given: given
+      default: 'false'
+    gateway:
+      value: http://localhost:8098
+      given: given
+      default: http://localhost:8098
+---
+at: '2026-11-02T15:18:42.858941Z'
+ms: 34
+mode: script
+say: send {method} {url}
+line: 7
+within: 6
+params:
+  method: GET
+  url: http://localhost:8098/repos/acme/web/issues/7
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: http://localhost:8098/repos/acme/web/issues/7
+    from:
+      - parts:
+          http://localhost:8098:
+            input: gateway
+outcome: done
+address: http://localhost:8098/repos/acme/web/issues/7
+---
+at: '2026-11-02T15:18:42.904910Z'
+ms: 3
+mode: script
+say: send {method} {url}
+line: 8
+within: 6
+params:
+  method: PATCH
+  url: http://localhost:8098/repos/acme/web/issues/7
+values:
+  method:
+    value: PATCH
+    from:
+      - constant
+  url:
+    value: http://localhost:8098/repos/acme/web/issues/7
+    from:
+      - parts:
+          http://localhost:8098:
+            input: gateway
+outcome: refused
+address: http://localhost:8098/repos/acme/web/issues/7

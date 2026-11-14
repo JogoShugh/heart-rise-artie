@@ -1,0 +1,37 @@
+name: step-1-data
+part: "For real: two forges, one vocabulary"
+title: "Only data: what most APIs send today"
+kicker: Building it back up · Step 1 of 5 · HEART L0, simplified
+say: "Start where most APIs are. GitHub's pull request, as data only, shortened from about 40 fields. It says what the pull request is. It says nothing about what you can do with it. Those controls live out of band: docs pages, an SDK, a 13.5 MB OpenAPI file. Like AWS's three docs pages in the preview."
+sources:
+  - ["GitHub REST: get a pull request", "https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request"]
+  - ["GitHub OpenAPI description", "https://github.com/github/rest-api-description"]
+html: |
+  <h2>Only data: what most APIs send today</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr)">
+    <pre># GET /repos/JogoShugh/heart-github-test/pulls/2325
+  # Accept: application/json
+  number: 2325
+  title: "Renewals: none during the audit"
+  body: Variant 504 of the Riverside Public Library release.
+  state: open
+  merged: false
+  draft: false
+  mergeable_state: clean
+  head:
+    ref: library/pr-504
+    sha: e266e3b53e0e04204c4f8eff6b14208ba53aafea
+  base:
+    ref: library/main
+  # …and about 30 more fields</pre>
+    <div class="rows">
+      <h3 style="font: 650 1.7rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--bad)">And the controls?</h3>
+      <ul>
+        <li>Can it be merged now? By which methods? With what fields?</li>
+        <li>Can I comment? Reopen? Request a review?</li>
+        <li>Answered elsewhere: docs pages, an SDK, a 13.5 MB OpenAPI file, read by a developer and coded into a client.</li>
+      </ul>
+      <p class="cite"><i>The same gap as AWS’s three docs pages, in the preview.</i></p>
+      <p class="refs"><deck-ref name="rule-3"></deck-ref> <deck-ref name="rule-6"></deck-ref> <deck-ref name="p1"></deck-ref></p>
+    </div>
+  </div>

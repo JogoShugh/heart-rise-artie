@@ -1,0 +1,85 @@
+{
+  "name": "token-maxing",
+  "title": "From token maxing to tokenomics",
+  "part": "Why now",
+  "kicker": "Why this talk",
+  "tone": "light",
+  "number": 2,
+  "of": 59,
+  "html": "<h2>From token maxing to tokenomics</h2>\n<div class=\"split\">\n  <div class=\"card dark\" style=\"box-shadow: inset 0 0 0 1.5px rgba(227, 179, 65, 0.45);\">\n    <blockquote class=\"big\">“You are all having way too much fun burning way too many tokens”</blockquote>\n    <p class=\"cite\"><a href=\"https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture\" target=\"_blank\" rel=\"noopener\"><b>Kelsey Hightower</b>, opening <b>ZTA: Zero Token Architecture</b></a>, WeAreDevelopers World Congress North America, 26 Sep 2026</p>\n    <p>Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code.</p>\n    <p class=\"refs\"><deck-ref name=\"zta\"></deck-ref></p>\n  </div>\n  <div class=\"rows\">\n    <div><h3>Token maxing</h3><p>Companies ranked engineers by tokens burned. Meta’s internal leaderboard covered 85,000+ employees.</p></div>\n    <div><h3>The bill</h3><p>Per-token prices for GPT-4-class models fell about 98% since late 2022. Enterprise AI bills rose anyway: volume.</p></div>\n    <div><h3>The turn</h3><p>The FinOps Foundation’s J.R. Storment: from tokenmaxxing and “go fast” to guardrails and control. Ashish Bhatia: enablement first, governance next.</p></div>\n    <p class=\"punch\">Token maxing re-learns the API on every call. Tokenomics learns it once and keeps something that stays true. What keeps it true?</p>\n  </div>\n</div>\n",
+  "say": "Start with Kelsey Hightower. He opened his talk ZTA, Zero Token Architecture, at the WeAreDevelopers World Congress North America in September 2026 by telling the room they were having way too much fun burning way too many tokens. His point: agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. That lands at a moment when the industry is turning. Companies ranked engineers by tokens burned; Meta's internal leaderboard covered more than 85,000 employees. Per-token prices for GPT-4-class models fell about 98% since late 2022, yet enterprise AI bills went up, because volume went up. J.R. Storment of the FinOps Foundation says the conversation moved from tokenmaxxing and go fast to guardrails and control. Ashish Bhatia puts it in two phases: the first was enablement, the next is governance. Token maxing re-learns the API on every call. Tokenomics learns it once and keeps something that stays true. So the question for the rest of the talk: what keeps it true?",
+  "sources": [
+    {
+      "label": "Hightower: ZTA, Zero Token Architecture (talk)",
+      "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"
+    },
+    {
+      "label": "Cranney: Infer Once, Run Everywhere",
+      "href": "https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture"
+    },
+    {
+      "label": "Bhatia: From Tokenmaxing to Tokenomics",
+      "href": "https://ashbhatia.substack.com/p/from-tokenmaxing-to-tokenomics"
+    },
+    {
+      "label": "The Next Web: Token prices fell 98%",
+      "href": "https://thenextweb.com/news/token-prices-fell-98-enterprise-ai-bills-tripled-now-the-industry-wants-a-standards-body-to-explain-why"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "token-maxing.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "title.json",
+      "title": "How far can one Web architect’s vision go?"
+    },
+    "next": {
+      "href": "no-time.json",
+      "title": "No time to type"
+    },
+    "alternate": {
+      "href": "token-maxing.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "zta",
+        "kind": "talk",
+        "label": "ZTA",
+        "title": "ZTA: Zero Token Architecture",
+        "summary": "Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. (In my words, from the talk's page and Daniel Cranney's write-up.)",
+        "quote": "<p>“You are all having way too much fun burning way too many tokens”</p><p class=\"note\">His opening line, as quoted in Daniel Cranney, <a href=\"https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture\">“Infer Once, Run Everywhere: Zero-Token Architecture”</a>, WeAreDevelopers, 13 October 2026.</p>",
+        "cite": "Kelsey Hightower, WeAreDevelopers World Congress North America",
+        "date": "26 September 2026",
+        "_links": {
+          "self": {
+            "href": "../refs/zta.json",
+            "title": "ZTA"
+          },
+          "describedby": {
+            "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture",
+            "title": "Kelsey Hightower, WeAreDevelopers World Congress North America"
+          }
+        }
+      }
+    ]
+  }
+}

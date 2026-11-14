@@ -1,0 +1,115 @@
+what: The merge watch from generated YAML, local models and Claude, on the
+  scratch repository
+runs:
+  - run: intent-instruct-1
+    attempts: 1
+    model: qwen3:30b-a3b-instruct-2507-q4_K_M
+    merged: true
+    told: true
+    seconds: 496
+    steps: 328
+    acted: github:repos-get 1, github:open-issue 1, github:pulls-list 3,
+      github:merge 1, github:label 1, github:comment 1; noted 71
+    calls: 8
+    input: 11376
+    cache_read: 12291
+    output: 401
+    stale: 2
+    unclear: 1
+    wrong: 0
+  - run: intent-instruct-2
+    attempts: 1
+    model: qwen3:30b-a3b-instruct-2507-q4_K_M
+    merged: true
+    told: true
+    seconds: 462
+    steps: 332
+    acted: github:repos-get 1, github:open-issue 1, github:pulls-list 3,
+      github:merge 1, github:label 1, github:comment 1; noted 72
+    calls: 8
+    input: 6624
+    cache_read: 17061
+    output: 421
+    stale: 2
+    unclear: 1
+    wrong: 0
+  - run: intent-instruct-3
+    attempts: 1
+    model: qwen3:30b-a3b-instruct-2507-q4_K_M
+    merged: true
+    told: true
+    seconds: 445
+    steps: 336
+    acted: github:repos-get 1, github:open-issue 1, github:pulls-list 3,
+      github:merge 1, github:label 1, github:comment 1; noted 73
+    calls: 8
+    input: 6622
+    cache_read: 17062
+    output: 408
+    stale: 2
+    unclear: 1
+    wrong: 0
+  - run: intent-thinking-1
+    attempts: 1
+    model: qwen3:30b-a3b
+    merged: true
+    told: true
+    seconds: 558
+    steps: 332
+    acted: github:repos-get 1, github:open-issue 1, github:pulls-list 2,
+      github:merge 1, github:label 1, github:comment 1; noted 73
+    calls: 7
+    input: 11350
+    cache_read: 9642
+    output: 3218
+    stale: 1
+    unclear: 0
+    wrong: 0
+  - run: intent-thinking-2
+    attempts: 1
+    model: qwen3:30b-a3b
+    merged: true
+    told: true
+    seconds: 480
+    steps: 336
+    acted: github:repos-get 1, github:open-issue 1, github:pulls-list 2,
+      github:merge 1, github:label 1, github:comment 1; noted 74
+    calls: 7
+    input: 6631
+    cache_read: 14365
+    output: 3235
+    stale: 1
+    unclear: 0
+    wrong: 0
+  - run: intent-thinking-3
+    attempts: 1
+    model: qwen3:30b-a3b
+    merged: true
+    told: true
+    seconds: 493
+    steps: 340
+    acted: github:repos-get 1, github:open-issue 1, github:pulls-list 2,
+      github:merge 1, github:label 1, github:comment 1; noted 75
+    calls: 7
+    input: 6616
+    cache_read: 14362
+    output: 3203
+    stale: 1
+    unclear: 0
+    wrong: 0
+  - run: kept-instruct-1
+    attempts: 1
+    model: qwen3:30b-a3b-instruct-2507-q4_K_M
+    merged: true
+    told: true
+    seconds: 650
+    steps: 525
+    acted: github:repos-get 1, github:open-issue 1, github:pulls-list 4,
+      github:merge 1, github:label 1, github:comment 1; noted 78
+    calls: 4
+    input: 3680
+    cache_read: 6255
+    output: 214
+    stale: 2
+    unclear: 1
+    wrong: 0

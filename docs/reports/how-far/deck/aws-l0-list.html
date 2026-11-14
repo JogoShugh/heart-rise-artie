@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L0: the list offers generate, with what it needs · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">A preview of HEART · 3 of 5 · HEART L0</span></header>
+<h2>L0: the list offers generate, with what it needs</h2>
+<div class="split">
+<pre><code># GET /clientcertificates
+# 200 OK, ETag: "seq-7.hsf.L0", Cache-Control: no-cache
+_links:
+  self:
+    href: /clientcertificates
+  curies:
+    - name: clientcertificate
+      href: /profiles/clientcertificate#{rel}
+      templated: true
+_embedded:
+  item:
+    - clientCertificateId: xmbiqp
+      description: test-client-cert-2
+      expirationDate: 2016-12-07T18:02:16Z
+      _links:
+        self:
+          href: /clientcertificates/xmbiqp
+      _forms:
+        clientcertificate:update: {…}
+        clientcertificate:delete: {…}</code></pre>
+<pre><code><span class="add">_forms:</span>
+<span class="add">  clientcertificate:generate:</span>
+    title: Generate a client certificate
+    _links:
+      target:
+        href: /clientcertificates
+    method: POST
+    contentType: application/json
+    schema:
+      type: object
+      properties:
+        description:
+          type: string
+        tags:
+          type: object
+          additionalProperties: {type: string}
+<span class="add">  clientcertificate:by-id:</span>
+    title: Find a certificate by its id
+    _links:
+      target:
+        href: /clientcertificates/{clientcertificate_id}
+        templated: true
+    method: GET
+    schema:
+      type: object
+      required: [clientcertificate_id]
+      properties:
+        clientcertificate_id: {type: string}</code></pre>
+</div>
+<p class="cite" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center"><span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#b85c2c;color:#fff;letter-spacing:0.04em">MOCKUP</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">Today</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#2f7d55;color:#fff">L0</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">L1</span> <span style="display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)">L2</span> <i style="margin-left:0.6rem">The list carries its own acts, and each item carries its own.</i></p>
+</article>
+<nav class="foot"><a href="deck/aws-l0-certificate.html" rel="prev"><small>Back</small><b>L0: the certificate, with its forms inline</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#aws-l0-list">with heart-ts</a></span>
+<a href="deck/aws-l1.html" rel="next"><small>Next</small><b>L1: the forms become one shared, cached set</b></a></nav>
+</main></div></body></html>

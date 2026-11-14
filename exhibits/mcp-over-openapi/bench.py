@@ -1,0 +1,1319 @@
+"""
+MCP over OpenAPI, as others build it, beside heart-mcp: one agent loop, the same model, system prompt and task
+for every arm, against the employees service in the heart-sims image (localhost:8099, reset before each run).
+
+  .venv/bin/python -I bench.py --arms fastmcp,meta-tools,heart-mcp,artie-goal,artie-script --tasks t1,t2,t3 --reps 3
+
+Each run is one line in runs/<stamp>.jsonl: tokens per model call (from the API's own usage), tool calls with
+their inputs and the size of what came back, the HTTP requests the service received (from the simulator's log),
+the service's state after, and whether the task was done. The token is read from the environment and written
+nowhere; a record with it in is not written.
+"""
+import argparse
+import asyncio
+import hashlib
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+import threading
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+import anthropic
+import httpx
+import httpx2
+import yaml
+from fastmcp import Client, FastMCP
+from fastmcp.client.transports import StdioTransport
+
+BASE = os.environ.get("BENCH_BASE", "http://localhost:8099")
+TOKEN_VARIABLE = f"ARTIE_TOKEN_LOCALHOST_{BASE.rsplit(':', 1)[1]}"
+TOKEN = os.environ.get("BENCH_TOKEN") or os.environ["EMPLOYEES_TOKEN"]
+AUTH = {"Authorization": f"Bearer {TOKEN}"}
+PLAIN = {**AUTH, "Accept": "application/json"}
+HERE = Path(__file__).parent
+HEART_MCP = Path(os.environ.get("HEART_MCP_BIN", HERE / "../../mcp/heart-mcp-server/build/install/heart-mcp/bin/heart-mcp"))
+OPENAPI_MCP = "@ivotoby/openapi-mcp-server@1.16.1"
+JAVA_22 = "/Users/josh/Library/Java/JavaVirtualMachines/openjdk-22.0.1/Contents/Home"
+
+SYSTEM = (
+    "You work an employee records service through the tools you are given. Do the task you are asked, using "
+    "only the tools. The person who asked is away, so do not ask questions. When you are done, say what happened "
+    "in one or two sentences."
+)
+
+TASKS = {
+    "t1": {
+        "name": "hire, promote, dismiss",
+        "text": 'Hire Samwise Gamgee as a gardener. Then change Samwise\'s role to "gardener, mayor". '
+                "Then dismiss Bilbo Baggins.",
+    },
+    "t2": {
+        "name": "a dismissed employee",
+        "text": 'Change Frodo Baggins\'s role to "ring bearer, retired".',
+    },
+    "t3": {
+        "name": "someone else changes him meanwhile",
+        "text": 'Frodo Baggins is retiring: add ", retired" to the end of his current role, keeping the rest of '
+                "it as it is.",
+    },
+    "t4": {
+        "name": "someone else changes him, words that set",
+        "text": 'Change Frodo Baggins\'s role to "ring bearer, retired".',
+    },
+}
+TASKS["t5"] = {
+    "name": "every employee named Miller one step through leaving",
+    "text": "Move every employee named Miller one step through leaving: give notice to anyone working, dismiss anyone "
+            "on notice, and leave the dismissed as they are.",
+}
+# t5 (spec/PLAN-COST-FOLLOWS-STATES.md): the service with its notice release, and employees named Miller seeded through
+# its own acts before the run: so many working, so many on notice, so many dismissed. What each was seeded as, by id.
+POPULATION = {"sizes": (2, 2, 2)}
+SEEDED = {}
+FIRST_NAMES = (
+    'Anna', 'James', 'Maria', 'David', 'Laura', 'Michael', 'Sarah', 'Robert', 'Emily', 'Daniel', 'Olivia', 'Thomas',
+    'Grace', 'Peter', 'Hannah', 'Paul', 'Julia', 'Mark', 'Rachel', 'Simon', 'Claire', 'Andrew', 'Megan', 'Steven',
+    'Alice', 'Brian', 'Helen', 'Kevin', 'Nora', 'Gary', 'Diana', 'Eric', 'Fiona', 'Henry', 'Irene', 'Jack',
+    'Karen', 'Leo', 'Molly', 'Nathan', 'Paula', 'Ryan', 'Sophie', 'Tyler', 'Vera', 'Walter', 'Amy', 'Ben',
+    'Carla', 'Dennis', 'Ellen', 'Frank', 'Gina', 'Hugo', 'Ivy', 'Jason', 'Kate', 'Liam', 'Mia', 'Noah',
+    'Owen', 'Pam', 'Quinn', 'Rosa', 'Sam', 'Tina', 'Uma', 'Victor', 'Wendy', 'Xavier', 'Yara', 'Zack',
+    'Abby', 'Carl', 'Dora', 'Ethan', 'Faye', 'Glen', 'Holly', 'Ian', 'Joan', 'Kurt', 'Lena', 'Max',
+    'Nina', 'Oscar', 'Pia', 'Reid', 'Sofia', 'Tess',
+)
+STEP_ON = {"working": "on notice", "on notice": "dismissed", "dismissed": "dismissed"}
+# The surname t5 is run for (--surname): the employees seeded share it, and the task names it.
+SURNAME = {"name": "Miller"}
+INTERFERED_ROLE = "keeper of the Red Book"
+INTERFERED = {"t3", "t4"}
+
+# ---- GitHub through the owner's gateway (exhibits/own-controls): heart-sims' small GitHub, the gateway in front ----
+# BENCH_BASE=http://localhost:8098 BENCH_TOKEN=github-token bench.py --arms fastmcp-github --tasks g1 --dam conditional --meddle
+
+GITHUB_SYSTEM = (
+    "You work a GitHub repository's issues through the tools you are given. Do the task you are asked, using only "
+    "the tools. The person who asked is away, so do not ask questions. When you are done, say what happened in one "
+    "or two sentences."
+)
+TASKS["g1"] = {
+    "name": "triage an issue a teammate is closing",
+    "text": 'In the repository acme/web, issue 7 has been triaged: add " (triaged)" to the end of its current '
+            "title, keeping the rest of it as it is, then close it as completed.",
+}
+# The teammate, on GitHub itself, past the gateway, right after the client first reads issue 7 (as ladder.sh).
+TEAMMATE = {"issue": 7, "title": "The nightly build is slow on Mondays", "state": "closed",
+            "state_reason": "not_planned"}
+PASS = {"X-Gateway-Mode": "pass-through"}
+DAM = {"rungs": ""}
+# The issue operations of GitHub's own description, as a host would pick them for an issues task.
+GITHUB_PATHS = ["/repos/{owner}/{repo}/issues", "/repos/{owner}/{repo}/issues/{issue_number}",
+                "/repos/{owner}/{repo}/issues/{issue_number}/comments"]
+
+
+def github(task):
+    return task.startswith("g")
+
+
+# ---- the service: reset, setup, its log, and what it holds after ----
+
+def sim(method, path, **kwargs):
+    return httpx.request(method, BASE + path, timeout=10, **kwargs)
+
+
+MEDDLE = {"on": False}
+SEQUENCE = {"on": False}
+
+
+def interfere(task, offset):
+    """Someone else changes Frodo once the client has read him: by the sim, right after the read (certain, for any
+    client), or by a thread that watches the log (a model's pause lets it in; a script's milliseconds may not)."""
+    if task not in INTERFERED or github(task) or (SEQUENCE["on"] and not MEDDLE["on"]):
+        return None  # in --sequence, a run with no teammate has none
+    if MEDDLE["on"]:
+        sim("PUT", "/_sim/employees/meddle", json={"employee": 1, "role": INTERFERED_ROLE}).raise_for_status()
+        return None
+    return Interferer(offset)
+
+
+def setup(task):
+    sim("POST", "/_sim/reset").raise_for_status()
+    if github(task):
+        sim("PUT", "/_sim/github/dam", content=DAM["rungs"]).raise_for_status()
+        if MEDDLE["on"]:
+            sim("PUT", "/_sim/github/meddle", json=TEAMMATE).raise_for_status()
+    if task == "t2":
+        sim("DELETE", "/employees/1/actions/dismiss", headers=PLAIN).raise_for_status()
+    if task == "t5":
+        seed_employees()
+
+
+def seed_employees():
+    """The notice release on, then the Millers hired, given notice and dismissed through the service's own acts."""
+    sim("PUT", "/_sim/employees/changes", content="notice").raise_for_status()
+    SEEDED.clear()
+    working, notice, dismissed = POPULATION["sizes"]
+    states = ["working"] * working + ["on notice"] * notice + ["dismissed"] * dismissed
+    for n, state in enumerate(states, start=1):
+        hired = sim("POST", "/actions/hire", headers=PLAIN,
+                    json={"firstName": FIRST_NAMES[n - 1], "lastName": SURNAME["name"], "role": "clerk"})
+        hired.raise_for_status()
+        number = int(hired.headers["Location"].rsplit("/", 1)[1])
+        if state != "working":
+            sim("POST", f"/employees/{number}/actions/give-notice", headers=PLAIN).raise_for_status()
+        if state == "dismissed":
+            sim("DELETE", f"/employees/{number}/actions/dismiss", headers=PLAIN).raise_for_status()
+        SEEDED[number] = state
+
+
+def log():
+    return sim("GET", "/_sim/log").json()
+
+
+def employee(number):
+    answer = sim("GET", f"/employees/{number}", headers=PLAIN)
+    return answer.json() if answer.status_code == 200 else None
+
+
+def everyone():
+    found, number = [], 1
+    while (one := employee(number)) is not None:
+        found.append(one)
+        number += 1
+    return found
+
+
+def check(task, held, final_text):
+    if github(task):
+        issue = sim("GET", "/repos/acme/web/issues/7", headers={**PLAIN, **PASS}).json()
+        title_kept = issue["title"].startswith(TEAMMATE["title"])
+        reason_kept = issue.get("state_reason") == TEAMMATE["state_reason"]
+        triaged = issue["title"].endswith("(triaged)")
+        said = bool(re.search(r"not.planned|already closed|teammate|someone|changed|412|428|409", final_text or "", re.I))
+        return {"done": title_kept and reason_kept and triaged, "title": issue["title"], "state": issue["state"],
+                "state_reason": issue.get("state_reason"), "teammate_title_kept": title_kept,
+                "teammate_reason_kept": reason_kept, "triaged": triaged, "said_why": said}
+    if task == "t5":
+        status = {one["id"]: one["status"] for one in held}
+        moved = sum(1 for number, was in SEEDED.items() if status.get(number) == STEP_ON[was])
+        others = [one for one in held if one["id"] not in SEEDED]
+        untouched = all(one["status"] == "working" for one in others)
+        return {"done": moved == len(SEEDED) and untouched, "moved": moved, "seeded": len(SEEDED),
+                "others_untouched": untouched, "employees": len(held), "population": list(POPULATION["sizes"])}
+    by_name = {}
+    for one in held:
+        by_name.setdefault(f"{one['firstName']} {one['lastName']}", []).append(one)
+    working = sorted((o["firstName"], o["role"]) for o in held if o["status"] == "working")
+    if task == "t1":
+        done = working == [("Frodo", "ring bearer"), ("Samwise", "gardener, mayor")] and len(held) == 3
+        return {"done": done, "working": working, "employees": len(held)}
+    if task == "t2":
+        frodo = by_name["Frodo Baggins"][0]
+        untouched = frodo["role"] == "ring bearer" and frodo["status"] == "dismissed" and len(held) == 2
+        said = bool(re.search(r"dismiss", final_text or "", re.I))
+        return {"done": untouched and said, "untouched": untouched, "said_why": said, "working": working,
+                "employees": len(held)}
+    frodo = by_name["Frodo Baggins"][0]
+    role = frodo["role"]
+    if task == "t4":
+        # Words that set a value, met by someone else's change: right is never to write over it unseen. Stopping
+        # and saying so, or writing it and saying whose change it replaced, are both open; done means said.
+        # Said: the other value named, or the change said as ARTIE's guard says it, by the member.
+        mentioned = bool(re.search(f"{INTERFERED_ROLE}|someone else changed role", final_text or "", re.I))
+        overwrote = role == "ring bearer, retired"
+        return {"done": mentioned, "role": role, "overwrote": overwrote, "mentioned": mentioned,
+                "silent_overwrite": overwrote and not mentioned, "employees": len(held)}
+    # In --sequence, a run with no teammate is right when his own role gets ", retired".
+    teammate = not SEQUENCE["on"] or MEDDLE["on"]
+    expected = f"{INTERFERED_ROLE}, retired" if teammate else "ring bearer, retired"
+    return {"done": role == expected, "role": role, "expected": expected,
+            "lost_update": teammate and role == "ring bearer, retired", "employees": len(held)}
+
+
+class Interferer(threading.Thread):
+    """For t3: once the client has read Frodo, someone else changes his role, as a person at another desk would."""
+
+    def __init__(self, offset):
+        super().__init__(daemon=True)
+        self.offset, self.fired, self.stopped = offset, None, threading.Event()
+
+    def run(self):
+        while not self.stopped.is_set():
+            for entry in log()[self.offset:]:
+                path = entry["url"].split("?")[0]
+                if entry["method"] == "GET" and path == "/employees/1" and "X-Interferer" not in entry["headers"]:
+                    body = {"firstName": "Frodo", "lastName": "Baggins", "role": INTERFERED_ROLE}
+                    answer = sim("PUT", "/employees/1/actions/update", json=body, headers={**PLAIN, "X-Interferer": "1"})
+                    self.fired = {"at": now(), "status": answer.status_code}
+                    return
+            time.sleep(0.05)
+
+
+CHANGE = {"names": "", "when": "start"}
+ALL_CHANGES = "moved,renamed,required,method,notice"
+
+
+class ChangeUnder(threading.Thread):
+    """
+    The service changes under the client (PUT /_sim/employees/changes): at the start, once the client is ready
+    (an MCP server has built its tools from the description as it was), or midway, once the client's first act
+    has been answered.
+    """
+
+    def __init__(self, offset):
+        super().__init__(daemon=True)
+        self.offset, self.fired, self.stopped = offset, None, threading.Event()
+
+    def apply(self):
+        sim("PUT", "/_sim/employees/changes", content=CHANGE["names"]).raise_for_status()
+        self.fired = now()
+
+    def run(self):
+        while not self.stopped.is_set():
+            for entry in log()[self.offset:]:
+                acted = entry["method"] in ("POST", "PUT", "PATCH", "DELETE") and 200 <= entry["status"] < 300
+                if acted and "X-Interferer" not in entry["headers"]:
+                    self.apply()
+                    return
+            time.sleep(0.05)
+
+
+def change_under(offset):
+    if not CHANGE["names"]:
+        return None
+    change = ChangeUnder(offset)
+    if CHANGE["when"] in ("start", "before"):
+        change.apply()
+    else:
+        change.start()
+    return change
+
+
+def requests_since(offset):
+    seen = [e for e in log()[offset:] if "X-Interferer" not in e["headers"] and e["url"] != "/openapi.json"]
+    return [{"method": e["method"], "url": e["url"], "status": e["status"],
+             "accept": e["headers"].get("Accept"), "if_match": e["headers"].get("If-Match")} for e in seen]
+
+
+# ---- the arms: an MCP client for each ----
+
+def openapi_spec():
+    return httpx.get(BASE + "/openapi.json", headers=AUTH, timeout=10).json()
+
+
+def per_endpoint(spec=None):
+    http = httpx2.AsyncClient(base_url=BASE, headers=PLAIN, timeout=30)
+    return FastMCP.from_openapi(spec or openapi_spec(), client=http, name="employees")
+
+
+def typical_spec():
+    """
+    The twin as a typical hand-written spec would be: each operation described by its summary alone ("Update the
+    employee"), without the sentences heart-core writes about the state an act needs ("Only allowed when status is
+    working"). The endpoints, schemas and answers are the same.
+    """
+    spec = openapi_spec()
+    for path in spec["paths"].values():
+        for operation in path.values():
+            if isinstance(operation, dict) and "operationId" in operation:
+                operation["description"] = operation.get("summary", "")
+    return spec
+
+
+def meta_tools():
+    """
+    The meta-tools pattern, as Stainless's dynamic mode describes it (list the endpoints, get one's schema, invoke
+    it), built here over FastMCP's own per-endpoint tools, so the endpoints, their schemas and their calls are the
+    same as the per-endpoint arm's; only what the model is handed differs.
+    """
+    inner = per_endpoint()
+    outer = FastMCP("employees-dynamic")
+
+    async def endpoints():
+        async with Client(inner) as client:
+            return await client.list_tools()
+
+    @outer.tool
+    async def list_api_endpoints(search: str = "") -> list[dict]:
+        """List the API's endpoints, each with its name and description. With search, only those whose name or
+        description contains it. Use get_api_endpoint_schema for an endpoint's input, then invoke_api_endpoint."""
+        found = [{"name": t.name, "description": t.description} for t in await endpoints()]
+        return [e for e in found if search.lower() in (e["name"] + " " + (e["description"] or "")).lower()]
+
+    @outer.tool
+    async def get_api_endpoint_schema(endpoint: str) -> dict:
+        """The JSON Schema of an endpoint's input, by its name from list_api_endpoints."""
+        for tool in await endpoints():
+            if tool.name == endpoint:
+                return {"name": tool.name, "description": tool.description, "input_schema": tool.input_schema}
+        return {"error": f"no endpoint {endpoint}"}
+
+    @outer.tool
+    async def invoke_api_endpoint(endpoint: str, args: dict) -> str:
+        """Call an endpoint by its name, with args that match its input schema. Returns the API's answer."""
+        async with Client(inner) as client:
+            return result_text(await client.call_tool_mcp(endpoint, args))
+
+    return outer
+
+
+def github_tools():
+    """FastMCP's per-endpoint tools for GitHub's issue operations, from GitHub's own description, through the gateway."""
+    spec = json.loads((HERE / "specs/github.json").read_text())
+    spec["paths"] = {path: spec["paths"][path] for path in GITHUB_PATHS}
+    http = httpx2.AsyncClient(base_url=BASE, headers={**PLAIN, **PASS}, timeout=30)
+    return FastMCP.from_openapi(spec, client=http, name="github")
+
+
+def arm_client(arm):
+    if arm == "fastmcp-github":
+        return Client(github_tools())
+    if arm == "fastmcp":
+        return Client(per_endpoint())
+    if arm == "fastmcp-typical":
+        return Client(per_endpoint(typical_spec()))
+    if arm == "meta-tools":
+        return Client(meta_tools())
+    if arm.startswith("openapi-mcp-"):
+        env = {**os.environ, "API_BASE_URL": BASE, "OPENAPI_SPEC_PATH": f"{BASE}/openapi.json",
+               "API_HEADERS": f"Authorization:Bearer {TOKEN},Accept:application/json",
+               "TOOLS_MODE": arm.removeprefix("openapi-mcp-"), "VERBOSE": "false"}
+        return Client(StdioTransport("npx", ["-y", OPENAPI_MCP], env=env, log_file=HERE / "runs/openapi-mcp.log"))
+    if arm in ("heart-mcp", "heart-mcp-lean"):
+        # heart-mcp as the benchmark first met it (HEART_MCP_BIN, a frozen copy), or as built now: each act's
+        # schema shown once, no hr: members in the state (mcp-lean.feature).
+        binary = HEART_MCP if arm == "heart-mcp" else HERE / "../../mcp/heart-mcp-server/build/install/heart-mcp/bin/heart-mcp"
+        env = {**os.environ, "JAVA_HOME": JAVA_22, "HEART_BOOKMARKS": f"employees={BASE}/", TOKEN_VARIABLE: TOKEN}
+        return Client(StdioTransport(str(binary.resolve()), [], env=env, log_file=HERE / f"runs/{arm}.log"))
+    raise SystemExit(f"no arm {arm}")
+
+
+def as_tool(tool):
+    return {"name": tool.name, "description": tool.description or "", "input_schema": tool.input_schema}
+
+
+def result_text(result):
+    parts = [getattr(c, "text", None) or json.dumps(getattr(c, "model_dump", lambda: str(c))()) for c in result.content]
+    text = "\n".join(parts)
+    if not text and getattr(result, "structured_content", None):
+        text = json.dumps(result.structured_content)
+    return text
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+
+
+# ---- one run ----
+
+async def run(model, arm, task, max_turns, api):
+    setup(task)
+    system = GITHUB_SYSTEM if github(task) else SYSTEM
+    offset = len(log())
+    interferer = interfere(task, offset)
+    started, calls, tools_used, final_text, error = time.time(), [], [], None, None
+    if CHANGE["names"] and CHANGE["when"] == "before":
+        # The control: changed before the MCP server builds its tools, as after a restart following a release.
+        sim("PUT", "/_sim/employees/changes", content=CHANGE["names"]).raise_for_status()
+    async with arm_client(arm) as client:
+        tools = [as_tool(t) for t in await client.list_tools()]
+        change = change_under(offset)
+        base = api.messages.count_tokens(model=model, system=system, messages=[{"role": "user", "content": "x"}])
+        with_tools = api.messages.count_tokens(model=model, system=system, tools=tools,
+                                               messages=[{"role": "user", "content": "x"}])
+        if interferer:
+            interferer.start()
+        messages = [{"role": "user", "content": TASKS[task]["text"]}]
+        cached_tools = cached(tools)
+        for _ in range(max_turns):
+            t0 = time.time()
+            answer = api.messages.create(model=model, max_tokens=2048, system=system, tools=cached_tools,
+                                         messages=marked(messages))
+            calls.append({**usage_of(answer.usage), "ms": int((time.time() - t0) * 1000), "stop": answer.stop_reason})
+            messages.append({"role": "assistant", "content": [b.model_dump(exclude_none=True) for b in answer.content]})
+            uses = [b for b in answer.content if b.type == "tool_use"]
+            if not uses:
+                final_text = "\n".join(b.text for b in answer.content if b.type == "text")
+                break
+            results = []
+            for use in uses:
+                t1 = time.time()
+                try:
+                    outcome = await client.call_tool_mcp(use.name, use.input)
+                    text, is_error = result_text(outcome), bool(outcome.is_error)
+                except Exception as broken:  # a tool that throws is answered as an error, as hosts do
+                    text, is_error = f"error: {broken}", True
+                tools_used.append({"tool": use.name, "input": use.input, "error": is_error, "chars": len(text),
+                                   "ms": int((time.time() - t1) * 1000), "result": text[:4000]})
+                results.append({"type": "tool_result", "tool_use_id": use.id, "content": text or "(empty)",
+                                "is_error": is_error})
+            messages.append({"role": "user", "content": results})
+        else:
+            error = f"stopped after {max_turns} turns"
+    if interferer:
+        interferer.stopped.set()
+    if change:
+        change.stopped.set()
+    requests = requests_since(offset)
+    held = everyone()
+    record = {
+        "dam": DAM["rungs"] if github(task) else None,
+        "change": CHANGE["names"] or None, "when": CHANGE["when"] if CHANGE["names"] else None,
+        "changed_at": change.fired if change else None,
+        "at": now(), "model": model, "arm": arm, "task": task, "seconds": round(time.time() - started, 1),
+        "tools_offered": len(tools), "tool_names": [t["name"] for t in tools],
+        "tool_definition_tokens": with_tools.input_tokens - base.input_tokens,
+        **totals(calls), "calls": calls,
+        "tool_calls": len(tools_used), "tool_errors": sum(t["error"] for t in tools_used), "tools": tools_used,
+        "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests), "requests": requests,
+        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and (task in INTERFERED or github(task)) else None),
+        "check": check(task, held, final_text), "final_text": final_text, "error": error,
+    }
+    return record
+
+
+# ---- prompt caching, as a host does it: the tools, and each turn's last block ----
+
+def cached(tools):
+    return tools[:-1] + [{**tools[-1], "cache_control": {"type": "ephemeral"}}] if tools else tools
+
+
+def marked(messages):
+    """The messages with the last block of the last one marked for the cache; the kept messages stay unmarked."""
+    last = messages[-1]
+    content = last["content"]
+    blocks = [{"type": "text", "text": content}] if isinstance(content, str) else [dict(b) for b in content]
+    blocks[-1] = {**blocks[-1], "cache_control": {"type": "ephemeral"}}
+    return messages[:-1] + [{**last, "content": blocks}]
+
+
+def usage_of(usage):
+    return {"input": usage.input_tokens, "output": usage.output_tokens,
+            "cache_read": getattr(usage, "cache_read_input_tokens", None) or 0,
+            "cache_write": getattr(usage, "cache_creation_input_tokens", None) or 0}
+
+
+def totals(calls):
+    """Input as billed (uncached), what the cache read and wrote, and every input token the model took in."""
+    input_, read, write = (sum(c[k] for c in calls) for k in ("input", "cache_read", "cache_write"))
+    return {"model_calls": len(calls), "input_tokens": input_, "output_tokens": sum(c["output"] for c in calls),
+            "cache_read": read, "cache_write": write, "input_processed": input_ + read + write}
+
+
+# ---- code mode (spec/PLAN-CODE-MODE-VS-HEART.md): the model writes a program, a sandbox runs it ----
+# As Anthropic's "Code execution with MCP" and Cloudflare's Code Mode do it, steelmanned: one function per operation
+# of the service's OpenAPI description, built from it at the start of each run (so a release is seen), each
+# answering its status, ETag and body, and taking If-Match where the description says a write may; a sandbox with
+# no network but the service, read-only, with a time, memory and process limit.
+
+SANDBOX_NET = os.environ.get("BENCH_SANDBOX_NET", "heart-bench")
+SANDBOX_SERVICE = os.environ.get("BENCH_SANDBOX_SERVICE", "http://heart-sims-tt:8099")
+SANDBOX_IMAGE = "python:3.12-slim"
+SAVED = HERE / "runs/codemode"
+
+CODE_SYSTEM = (
+    "You work an employee records service by writing Python programs. Your one tool, run_program, runs a program in "
+    "a sandbox; `import api` there gives one function per operation of the service, listed below. Each returns a "
+    "dict: status, etag (the ETag header, or None) and body. Print what you need to see. Do the task you are asked, "
+    "using only programs. The person who asked is away, so do not ask questions. When you are done, say what "
+    "happened in one or two sentences.\n\nThe api module:\n\n"
+)
+
+RUN_PROGRAM = {
+    "name": "run_program",
+    "description": "Run a Python 3.12 program in the sandbox, with `import api` available. Returns its exit code, "
+                   "its standard output and its standard error.",
+    "input_schema": {"type": "object", "properties": {"code": {"type": "string", "description": "The program"}},
+                     "required": ["code"]},
+}
+
+# code-heart: code mode on the service as it answers by itself, its HEART side, told nothing about it but where it is
+# and how to authenticate; no library, no description, no word of hypermedia, ETags or forms.
+CODE_HEART_SYSTEM = (
+    "You work an employee records service by writing Python programs. Your one tool, run_program, runs a Python "
+    "3.12 program in a sandbox that can reach the service. The service is at the address in the environment "
+    "variable API_BASE; every request needs the header Authorization: Bearer followed by the environment variable "
+    "API_TOKEN. Print what you need to see. Do the task you are asked, using only programs. The person who asked is "
+    "away, so do not ask questions. When you are done, say what happened in one or two sentences."
+)
+
+# code-heart-hsf: the same, told also to ask for HAL Schema Forms, its forms and schemas in the answer (rung L0).
+# code-heart-l2: told also to ask for them by link, as ARTIE does at rung L2. Those headers alone, in each.
+HSF_HEADERS = (
+    " Send these headers with every request too: Accept: application/hal+json; Accept-Profile: "
+    "<https://w3id.org/heart-rise/hal-schema-forms>."
+)
+L2_HEADERS = (
+    " Send these headers with every request too: Accept: application/hal+json; Accept-Profile: "
+    "<https://w3id.org/heart-rise/hal-schema-forms>; Prefer: forms=link, schema=link."
+)
+HEART_HEADERS = {"code-heart": "", "code-heart-hsf": HSF_HEADERS, "code-heart-l2": L2_HEADERS}
+
+# Three more, each changing one thing. code-heart-noapi: told nothing, with the OpenAPI description its index links
+# to withheld (a proxy answers /openapi.json 404, sandbox/no-openapi.conf), so it has the hypermedia alone.
+# code-heart-hsf-doc and code-heart-l2-doc: the format's documentation beside the program (the sandbox reaches no
+# other network, so the profile's URI can't be followed). code-heart-l2-16: L2 with 16 turns, not 8.
+FORMAT_DOC = HERE / "../../spec/HAL-SCHEMA-FORMS-HR.md"
+DOC_TOLD = (
+    " The format the service answers in, HAL Schema Forms with its H.E.A.R.T. profile, is documented in the file "
+    "hal-schema-forms.md beside your program."
+)
+HEART_HEADERS.update({
+    "code-heart-noapi": "", "code-heart-hsf-doc": HSF_HEADERS + DOC_TOLD, "code-heart-l2-doc": L2_HEADERS + DOC_TOLD,
+    "code-heart-l2-16": L2_HEADERS,
+})
+# code-heart-hsf-docprompt and code-heart-l2-docprompt: the format's document in the system prompt, the same bytes
+# every run, marked for the prompt cache, so it is read at a cache read's price and costs no turns.
+DOC_IN_PROMPT = (
+    " The format the service answers in, HAL Schema Forms with its H.E.A.R.T. profile, is documented below.\n\n"
+)
+ARM_DOC_PROMPT = {"code-heart-hsf-docprompt", "code-heart-l2-docprompt"}
+HEART_HEADERS.update({"code-heart-hsf-docprompt": HSF_HEADERS, "code-heart-l2-docprompt": L2_HEADERS})
+ARM_TURNS = {"code-heart-l2-16": 16}
+ARM_SERVICE = {"code-heart-noapi": os.environ.get("BENCH_SANDBOX_NOAPI", "http://heart-bench-noapi:8099")}
+ARM_DOCS = {"code-heart-hsf-doc", "code-heart-l2-doc"}
+# What the sandbox holds for the arm running now: the service's address, and whether the format's documentation.
+SANDBOX = {"service": SANDBOX_SERVICE, "doc": False}
+
+RUN_PLAIN_PROGRAM = {
+    **RUN_PROGRAM,
+    "description": "Run a Python 3.12 program in the sandbox. Returns its exit code, its standard output and its "
+                   "standard error.",
+}
+
+
+def api_library(spec):
+    """The api module's source, and its documentation for the model: one function per operation of [spec]."""
+    source = [
+        "import json, os, urllib.error, urllib.parse, urllib.request",
+        "BASE, TOKEN = os.environ['API_BASE'], os.environ['API_TOKEN']",
+        "def _call(method, path, query=None, body=None, if_match=None, content_type='application/json'):",
+        "    query = {k: v for k, v in (query or {}).items() if v is not None}",
+        "    url = BASE + path + ('?' + urllib.parse.urlencode(query) if query else '')",
+        "    headers = {'Authorization': 'Bearer ' + TOKEN, 'Accept': 'application/json'}",
+        "    data = None",
+        "    if body is not None:",
+        "        data, headers['Content-Type'] = json.dumps(body).encode(), content_type",
+        "    if if_match:",
+        "        headers['If-Match'] = if_match",
+        "    request = urllib.request.Request(url, data=data, method=method, headers=headers)",
+        "    try:",
+        "        with urllib.request.urlopen(request, timeout=20) as r:",
+        "            status, etag, text = r.status, r.headers.get('ETag'), r.read().decode()",
+        "    except urllib.error.HTTPError as e:",
+        "        status, etag, text = e.code, e.headers.get('ETag'), e.read().decode()",
+        "    try:",
+        "        parsed = json.loads(text) if text else None",
+        "    except ValueError:",
+        "        parsed = text",
+        "    return {'status': status, 'etag': etag, 'body': parsed}",
+    ]
+    docs = []
+    for path, operations in spec["paths"].items():
+        for method, operation in operations.items():
+            if not isinstance(operation, dict) or "operationId" not in operation:
+                continue
+            name = re.sub(r"\W", "_", operation["operationId"])
+            parameters = operation.get("parameters", [])
+            in_path = [p["name"] for p in parameters if p.get("in") == "path"]
+            in_query = [p["name"] for p in parameters if p.get("in") == "query"]
+            conditional = any(p.get("name") == "If-Match" for p in parameters)
+            takes_body = "requestBody" in operation
+            # The body's media type as the description gives it: JSON, or a JSON Merge Patch after the method release.
+            content_type = next(iter(operation["requestBody"]["content"])) if takes_body else "application/json"
+            arguments = in_path + (["body"] if takes_body else []) + [f"{q}=None" for q in in_query] + \
+                (["if_match=None"] if conditional else [])
+            pythonic = re.sub(r"\{(\w+)\}", r"{\1}", path)
+            query = "{" + ", ".join(f"'{q}': {q}" for q in in_query) + "}" if in_query else "None"
+            source.append(f"def {name}({', '.join(arguments)}):")
+            source.append(f"    return _call('{method.upper()}', f'{pythonic}', {query}, "
+                          f"{'body' if takes_body else 'None'}, {'if_match' if conditional else 'None'}, "
+                          f"'{content_type}')")
+            body = ""
+            if takes_body:
+                schema = operation["requestBody"]["content"][content_type]["schema"]
+                if "$ref" in schema:
+                    schema = spec["components"]["schemas"][schema["$ref"].rsplit("/", 1)[1]]
+                body = f"\n    body: {json.dumps(schema.get('properties', {}))}, required {schema.get('required', [])}"
+                if content_type != "application/json":
+                    body += f", sent as {content_type}"
+            prose = (operation.get("summary", "") + ". " + operation.get("description", "")).strip()
+            conditional_doc = "\n    if_match: the etag you read; with it, refused 412 if the state moved since" \
+                if conditional else ""
+            docs.append(f"api.{name}({', '.join(arguments)})  # {method.upper()} {path}\n    {prose}{body}"
+                        f"{conditional_doc}")
+    return "\n".join(source) + "\n", "\n\n".join(docs)
+
+
+def sandboxed(program, library):
+    """[program] run in the sandbox beside the api module: its exit code, output and errors."""
+    runs = HERE / "runs"
+    runs.mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=runs) as folder:
+        Path(folder, "program.py").write_text(program)
+        if library:
+            Path(folder, "api.py").write_text(library)
+        if SANDBOX["doc"]:
+            Path(folder, "hal-schema-forms.md").write_text(FORMAT_DOC.read_text())
+        command = ["docker", "run", "--rm", "--network", SANDBOX_NET, "--read-only", "--cpus", "1",
+                   "--memory", "256m", "--pids-limit", "64", "-e", f"API_BASE={SANDBOX['service']}",
+                   "-e", f"API_TOKEN={TOKEN}", "-v", f"{folder}:/code:ro", "-w", "/code", SANDBOX_IMAGE,
+                   "python", "program.py"]
+        try:
+            done = subprocess.run(command, capture_output=True, text=True, timeout=120)
+            return done.returncode, done.stdout[-4000:], done.stderr[-2000:]
+        except subprocess.TimeoutExpired:
+            return 124, "", "the program ran past its time limit"
+
+
+def program_turns(model, api, task, library, system, opening, max_turns):
+    """The model writing programs until it says it is done: its calls, the programs it ran, its last word."""
+    messages = [{"role": "user", "content": opening}]
+    tools = cached([RUN_PROGRAM if library else RUN_PLAIN_PROGRAM])
+    # Every program that finished, in order: together they did the task, as a saved skill would do it again.
+    calls, programs, final_text, finished = [], [], None, []
+    for _ in range(max_turns):
+        t0 = time.time()
+        answer = api.messages.create(model=model, max_tokens=4096, system=system, tools=tools,
+                                     messages=marked(messages))
+        calls.append({**usage_of(answer.usage), "ms": int((time.time() - t0) * 1000), "stop": answer.stop_reason})
+        messages.append({"role": "assistant", "content": [b.model_dump(exclude_none=True) for b in answer.content]})
+        uses = [b for b in answer.content if b.type == "tool_use"]
+        if not uses:
+            final_text = "\n".join(b.text for b in answer.content if b.type == "text")
+            break
+        results = []
+        for use in uses:
+            code = use.input.get("code", "")
+            exit_, out, err = sandboxed(code, library)
+            programs.append({"sha": hashlib.sha256(code.encode()).hexdigest()[:12], "exit": exit_,
+                             "lines": code.count("\n") + 1, **({} if library else {"code": code})})
+            if exit_ == 0:
+                finished.append(code)
+            results.append({"type": "tool_result", "tool_use_id": use.id, "is_error": exit_ != 0,
+                            "content": f"exit {exit_}\nstdout:\n{out or '(none)'}\nstderr:\n{err or '(none)'}"})
+        messages.append({"role": "user", "content": results})
+    return calls, programs, final_text, finished
+
+
+def run_code(model, arm, task, max_turns, api):
+    """code-fresh: a new program each run. code-saved: the first that finished, run again; written anew on failure."""
+    setup(task)
+    offset = len(log())
+    interferer = interfere(task, offset)
+    if interferer:
+        interferer.start()
+    change = change_under(offset)
+    started = time.time()
+    SANDBOX.update(service=ARM_SERVICE.get(arm, SANDBOX_SERVICE), doc=arm in ARM_DOCS)
+    if arm in ARM_DOC_PROMPT:
+        text = CODE_HEART_SYSTEM + HEART_HEADERS[arm] + DOC_IN_PROMPT + FORMAT_DOC.read_text()
+        library, system = "", [{"type": "text", "text": text, "cache_control": {"type": "ephemeral"}}]
+    elif arm in HEART_HEADERS:
+        library, system = "", CODE_HEART_SYSTEM + HEART_HEADERS[arm]
+    else:
+        library, docs = api_library(openapi_spec())
+        system = CODE_SYSTEM + docs
+    saved = SAVED / f"{task}.programs.json"
+    calls, programs, final_text, finished, replayed = [], [], None, None, None
+    if arm == "code-saved" and saved.exists():
+        # The saved programs, run again in order; the first that fails ends the replay.
+        outputs, exit_, err = [], 0, ""
+        for code in json.loads(saved.read_text()):
+            exit_, out, err = sandboxed(code, library)
+            outputs.append(out)
+            programs.append({"sha": hashlib.sha256(code.encode()).hexdigest()[:12], "exit": exit_, "saved": True})
+            if exit_ != 0:
+                break
+        replayed = {"exit": exit_, "stdout": "".join(outputs)[-1500:], "stderr": err[-800:]}
+        if exit_ == 0:
+            final_text = replayed["stdout"]
+    if final_text is None:
+        opening = TASKS[task]["text"]
+        if replayed:
+            opening += (f"\n\nA program kept from an earlier run of this task failed this time (exit "
+                        f"{replayed['exit']}):\n{replayed['stderr'] or replayed['stdout']}")
+        calls, programs_written, final_text, finished = program_turns(model, api, task, library, system, opening,
+                                                                      max_turns)
+        programs += programs_written
+    if arm == "code-saved" and finished:
+        SAVED.mkdir(parents=True, exist_ok=True)
+        saved.write_text(json.dumps(finished, indent=2))
+    if interferer:
+        interferer.stopped.set()
+    if change:
+        change.stopped.set()
+    requests = requests_since(offset)
+    held = everyone()
+    return {
+        "change": CHANGE["names"] or None, "when": CHANGE["when"] if CHANGE["names"] else None,
+        "changed_at": change.fired if change else None,
+        "at": now(), "model": model if calls else None, "arm": arm, "task": task,
+        "seconds": round(time.time() - started, 1), "tools_offered": 1, "tool_definition_tokens": None,
+        **totals(calls), "calls": calls, "programs": programs, "replayed": replayed,
+        "tool_calls": len(programs), "tool_errors": sum(p["exit"] != 0 for p in programs), "tools": None,
+        "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests), "requests": requests,
+        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and task in INTERFERED else None),
+        "check": check(task, held, final_text), "final_text": final_text, "error": None,
+    }
+
+
+# ---- Two more ways to keep code mode's work (spec/ideas/code-mode-runs-artie.md) ----
+# code-skill: code mode at its best keeping, as Anthropic's "Code execution with MCP" and Agent Skills describe it.
+# The model saves working code as a skill, a function taking the values a person would change, with a SKILL.md;
+# a later run reads the skill, fills its arguments and runs it, and writes programs again only if it fails.
+# code-artie: code mode with ARTIE, in its own container, as its one tool. The model writes no program: it gives
+# ARTIE a goal in plain words once, ARTIE finds the way and keeps it as a .heart.yaml, and later runs run that.
+
+# Each arm keeps its skills apart: code-skill-escalate starts from none, as code-artie-escalate did.
+SKILLS = {"code-skill": HERE / "runs/codemode/skills", "code-skill-escalate": HERE / "runs/codemode/skills-escalate"}
+SKILL_TOLD = (
+    "\n\nWhen programs have done the task, save the work as a skill with save_skill, so that the next time the task "
+    "is asked it is run again rather than written again: a module whose run(**arguments) does the whole task, "
+    "taking as arguments the values a person would change, looking up IDs and ETags each time rather than writing "
+    "them in, and raising an exception on any status it did not expect, so that a failure shows. Give it a SKILL.md "
+    "saying what it does and its arguments. Saved skills are listed with the task: if one fits, run it with "
+    "run_skill and its arguments, and write programs only if it fails; then save the skill again."
+)
+SAVE_SKILL = {
+    "name": "save_skill",
+    "description": "Save a skill for later runs: its SKILL.md and a Python module defining run(**arguments), which "
+                   "runs in the sandbox with `import api` available.",
+    "input_schema": {"type": "object", "properties": {
+        "name": {"type": "string", "description": "a short name, lower case with hyphens"},
+        "skill_md": {"type": "string", "description": "what the skill does, and its arguments"},
+        "code": {"type": "string", "description": "the module, defining run(**arguments)"}},
+        "required": ["name", "skill_md", "code"]},
+}
+# code-skill-escalate: kept skills run by a plain harness with no model, as code-artie-escalate runs ARTIE's kept
+# scripts. Code mode is called only when a skill raises, with what it said.
+SKILL_HARNESS_TOLD = (
+    " The next time this task is asked, a plain harness with no model runs the skills you saved this time, in the "
+    "order saved, each with the arguments you gave save_skill, and calls you only if one fails. So give save_skill "
+    "the arguments this task runs it with."
+)
+SKILL_INPUTS_TOLD = (
+    " A task may come with inputs: values that change from run to run, given by name. In save_skill's arguments, "
+    "write each as {name}, in braces, never its value: the harness gives it again each run."
+)
+RUN_SKILL = {
+    "name": "run_skill",
+    "description": "Run a saved skill in the sandbox: run(**arguments). Returns its exit code, its standard output "
+                   "and its standard error.",
+    "input_schema": {"type": "object", "properties": {
+        "name": {"type": "string"}, "arguments": {"type": "object"}}, "required": ["name", "arguments"]},
+}
+
+SAVE_SKILL_WITH_ARGUMENTS = {**SAVE_SKILL, "input_schema": {**SAVE_SKILL["input_schema"], "properties": {
+    **SAVE_SKILL["input_schema"]["properties"],
+    "arguments": {"type": "object", "description": "the arguments this task runs it with"}}}}
+
+ARTIE_WORK = HERE / "runs/code-artie"
+ARTIE_IMAGE = "eclipse-temurin:25-jre-alpine"
+CODE_ARTIE_SYSTEM = (
+    "You work an employee records service through ARTIE, a generic client for hypermedia services, which runs in "
+    "its own container. ARTIE enters at the service's address and follows the links and forms the service offers; "
+    "it knows nothing else about the service. You have two tools. artie_find gives ARTIE a goal in plain words: it "
+    "does the goal with its own model, then keeps the way it found as a script under the name you give, held to "
+    "the forms the service offered. A goal is a sentence of plain words, then its steps as a Markdown list, one a "
+    "line; a step nested under another works on what that one found. Steps nested under a step run once, in order, "
+    "so a step done for each of many says so in its own words, with its conditions, as in\n\n"
+    "Ship the open orders of {customer}.\n\n- Find the open orders of {customer}\n"
+    "  - Move each of them on: pack any not packed, ship any packed, leave any shipped\n\n"
+    "artie_run runs a kept script with no model; if a form it uses has changed, the "
+    "step falls back to its words and the repair is kept. Both answer ARTIE's exit code, what it did, and where it "
+    "ended with what was true there, so there is no need to look again after them. artie_look reads one address "
+    "the service has handed ARTIE, a bookmark, with no model. Kept scripts are listed with the task: if one does "
+    "the task, run it; use artie_find for a task no kept script does, or after a kept script failed. The person who "
+    "asked is away, so do not ask questions. When you are done, say what happened in one or two sentences."
+)
+INPUTS_TOLD = (
+    " A task may come with inputs: values that change from run to run, given by name. Write each in a goal as "
+    "{name}, in braces, never its value: ARTIE keeps it as an input of the script, given again each run."
+)
+ARTIE_FIND = {
+    "name": "artie_find",
+    "description": "ARTIE does the goal with its own model and keeps the way it found as a script named name.",
+    "input_schema": {"type": "object", "properties": {
+        "name": {"type": "string", "description": "a short name for the kept script, lower case with hyphens"},
+        "goal": {"type": "string", "description": "the goal, in plain words"}}, "required": ["name", "goal"]},
+}
+ARTIE_RUN = {
+    "name": "artie_run",
+    "description": "Run the kept script named name, with no model unless a form it uses has changed.",
+    "input_schema": {"type": "object", "properties": {"name": {"type": "string"}}, "required": ["name"]},
+}
+# A bookmark is any address the service handed over (a link, a form's target, a Location), not only its root: ARTIE
+# enters there and reads what is true and what is offered, with no model. One it was never handed, it won't read.
+ARTIE_LOOK = {
+    "name": "artie_look",
+    "description": "Read one address the service has handed ARTIE in an earlier run: what is true there now, and "
+                   "what it offers. No model.",
+    "input_schema": {"type": "object", "properties": {"address": {"type": "string"}}, "required": ["address"]},
+}
+
+
+def named(name):
+    return re.sub(r"[^a-z0-9-]+", "-", str(name).lower()).strip("-") or "task"
+
+
+def tool_turns(model, api, system, opening, tools, handle, max_turns):
+    """The model calling [tools] until it says it is done; [handle] answers each call with its text and exit."""
+    messages = [{"role": "user", "content": opening}]
+    calls, final_text = [], None
+    for _ in range(max_turns):
+        t0 = time.time()
+        answer = api.messages.create(model=model, max_tokens=4096, system=system, tools=cached(tools),
+                                     messages=marked(messages))
+        calls.append({**usage_of(answer.usage), "ms": int((time.time() - t0) * 1000), "stop": answer.stop_reason})
+        messages.append({"role": "assistant", "content": [b.model_dump(exclude_none=True) for b in answer.content]})
+        uses = [b for b in answer.content if b.type == "tool_use"]
+        if not uses:
+            final_text = "\n".join(b.text for b in answer.content if b.type == "text")
+            break
+        results = []
+        for use in uses:
+            text, failed = handle(use)
+            results.append({"type": "tool_result", "tool_use_id": use.id, "is_error": failed, "content": text})
+        messages.append({"role": "user", "content": results})
+    return calls, final_text
+
+
+def skill_program(code, arguments):
+    """The saved module, then a call of its run with [arguments]."""
+    return f"{code}\n\nif __name__ == '__main__':\n    import json\n    run(**json.loads({json.dumps(arguments)!r}))\n"
+
+
+def templated(arguments, inputs):
+    """[arguments] with each input's value written {name}, as the harness keeps them."""
+    def one(value):
+        if isinstance(value, str):
+            for name, given in inputs.items():
+                value = value.replace(given, "{" + name + "}")
+        return value
+    return {k: one(v) for k, v in arguments.items()}
+
+
+def filled(arguments, inputs):
+    """[arguments] with each {name} given this run's input."""
+    def one(value):
+        if isinstance(value, str):
+            for name, given in inputs.items():
+                value = value.replace("{" + name + "}", given)
+        return value
+    return {k: one(v) for k, v in arguments.items()}
+
+
+def run_code_skill(model, task, max_turns, api, escalate=False):
+    """code-skill: code mode keeping skills, the model in every run. With [escalate] (code-skill-escalate), a plain
+    harness runs the skills that did the task last time with no model, and calls the model only when one raises."""
+    arm = "code-skill-escalate" if escalate else "code-skill"
+    setup(task)
+    offset = len(log())
+    interferer = interfere(task, offset)
+    if interferer:
+        interferer.start()
+    change = change_under(offset)
+    started = time.time()
+    SANDBOX.update(service=SANDBOX_SERVICE, doc=False)
+    library, docs = api_library(openapi_spec())
+    folder_of = SKILLS[arm]
+    inputs = task_inputs(task) if escalate else {}
+    system = CODE_SYSTEM + docs + SKILL_TOLD + (SKILL_HARNESS_TOLD + (SKILL_INPUTS_TOLD if inputs else "")
+                                                if escalate else "")
+    programs, skill_runs, skills_saved, plan_saved = [], [], [], {}
+    by = {"who": "harness"}
+
+    def run_skill(name, arguments):
+        source = folder_of / named(name) / "skill.py"
+        if not source.exists():
+            return 1, f"no skill named {name}"
+        exit_, out, err = sandboxed(skill_program(source.read_text(), arguments), library)
+        skill_runs.append({"name": source.parent.name, "arguments": arguments, "exit": exit_, "by": by["who"]})
+        return exit_, f"exit {exit_}\nstdout:\n{out or '(none)'}\nstderr:\n{err or '(none)'}"
+
+    def handle(use):
+        if use.name == "save_skill":
+            folder = folder_of / named(use.input.get("name"))
+            folder.mkdir(parents=True, exist_ok=True)
+            (folder / "SKILL.md").write_text(use.input.get("skill_md", ""))
+            (folder / "skill.py").write_text(use.input.get("code", ""))
+            skills_saved.append(folder.name)
+            if "arguments" in use.input:
+                plan_saved[folder.name] = templated(use.input.get("arguments") or {}, inputs)
+            return f"saved {folder.name}", False
+        if use.name == "run_skill":
+            exit_, text = run_skill(use.input.get("name"), use.input.get("arguments") or {})
+            return text, exit_ != 0
+        code = use.input.get("code", "")
+        exit_, out, err = sandboxed(code, library)
+        programs.append({"sha": hashlib.sha256(code.encode()).hexdigest()[:12], "exit": exit_,
+                         "lines": code.count("\n") + 1, "code": code})
+        return f"exit {exit_}\nstdout:\n{out or '(none)'}\nstderr:\n{err or '(none)'}", exit_ != 0
+
+    plan = folder_of / f"{task}.plan.json"
+    calls, final_text, failed = [], None, None
+    if escalate and plan.exists():
+        # The skills that did this task last time, run by the harness in order, with no model.
+        said = []
+        for step in json.loads(plan.read_text()):
+            exit_, text = run_skill(step["name"], filled(step["arguments"], inputs))
+            said.append(text)
+            if exit_ != 0:
+                failed = f"{step['name']} with {json.dumps(filled(step['arguments'], inputs))}: {text}"
+                break
+        else:
+            final_text = "\n".join(said)
+    if final_text is None:
+        by["who"] = "model"
+        saved = sorted(folder_of.glob("*/SKILL.md"))
+        opening = TASKS[task]["text"]
+        if inputs:
+            opening += "\n\nInputs: " + ", ".join(f"{k} = {v}" for k, v in inputs.items())
+        if saved:
+            opening += "\n\nSaved skills:\n\n" + "\n\n".join(f"## {p.parent.name}\n{p.read_text()}" for p in saved)
+        if failed:
+            opening += f"\n\nThe saved skills that did this task last time were run again, and one failed:\n{failed}"
+        tools = [RUN_PROGRAM, SAVE_SKILL_WITH_ARGUMENTS if escalate else SAVE_SKILL] + ([RUN_SKILL] if saved else [])
+        calls, final_text = tool_turns(model, api, system, opening, tools, handle, max_turns)
+        ran = {r["name"]: templated(r["arguments"], inputs) for r in skill_runs if r["by"] == "model" and r["exit"] == 0}
+        # The harness keeps what the model saved with arguments; failing that, the skills it ran and finished.
+        if escalate and final_text is not None and (plan_saved or ran):
+            plan.write_text(json.dumps([{"name": k, "arguments": v} for k, v in (plan_saved or ran).items()],
+                                       indent=2))
+    return finished_record(model, arm, task, started, offset, interferer, change, calls, final_text, {
+        "programs": programs, "skill_runs": skill_runs, "skills_saved": skills_saved, "inputs": inputs,
+        "escalated": bool(calls),
+        "tool_calls": len(programs) + len(skill_runs), "sandbox_runs": len(programs) + len(skill_runs),
+        "tool_errors": sum(p["exit"] != 0 for p in programs + skill_runs)})
+
+
+def artie_in_container(arguments, model):
+    """ARTIE, run in its own container on the service's network, so the service is at localhost: the one place
+    ARTIE sends a credential over plain HTTP. It holds the model key; no model-written code runs beside it."""
+    command = ["docker", "run", "--rm", "--network", "container:heart-sims-tt", "-e", "ANTHROPIC_API_KEY",
+               "-e", f"{TOKEN_VARIABLE}={TOKEN}", "-v", f"{ARTIE.resolve().parent.parent}:/artie:ro",
+               "-v", f"{ARTIE_WORK.resolve()}:/work", "-w", "/work/kept", ARTIE_IMAGE, "/artie/bin/artie"]
+    done = subprocess.run(command + arguments, capture_output=True, text=True, timeout=900)
+    return done.returncode, (done.stdout + done.stderr).strip()
+
+
+def trace_docs(trace):
+    path = ARTIE_WORK / "traces" / trace
+    return [d or {} for d in yaml.safe_load_all(path.read_text())] if path.exists() else []
+
+
+def artie_usage(trace):
+    """The model usage ARTIE's own run wrote in its trace."""
+    docs = trace_docs(trace)
+    return ((docs[0] if docs else {}).get("run") or {}).get("usage") or {}
+
+
+def ended(trace):
+    """What ARTIE's last act left, where, and what it offers then; or, for a run with no act, what it read."""
+    docs = [d for d in trace_docs(trace) if (d.get("now") or {}).get("state") is not None]
+    acted = [d for d in docs if (d.get("chose") or {}).get("kind") == "form"]
+    last = (acted or docs or [None])[-1]
+    if not last:
+        return ""
+    now_ = last["now"]
+    state = json.dumps(now_["state"])
+    state = state if len(state) <= 1500 else state[:1500] + " …"
+    where = "After its last act" if acted else "Read"
+    return f"\n{where}, at {last.get('address')}: {state}; offered: {', '.join(now_.get('forms') or []) or 'nothing'}"
+
+
+def handed_addresses():
+    """Every address the service has handed ARTIE in its runs here."""
+    seen = set()
+    for path in (ARTIE_WORK / "traces").glob("*.yaml"):
+        for doc in trace_docs(path.name):
+            for address in (doc.get("address"), (doc.get("chose") or {}).get("address")):
+                if address:
+                    seen.add(str(address))
+    return seen
+
+
+def task_inputs(task):
+    """The values a task comes with, structured, as a queue or a form hands them over: t5's surname."""
+    return {"surname": SURNAME["name"]} if task == "t5" else {}
+
+
+def declared_inputs(script):
+    """The inputs the kept script [script] declares."""
+    doc = yaml.safe_load(script.read_text()) or {}
+    return list((doc.get("inputs") or {}).keys())
+
+
+def run_code_artie(model, task, max_turns, api, escalate=False):
+    """code-artie: code mode with ARTIE as its one tool. With [escalate] (code-artie-escalate), the harness runs the
+    scripts that did the task last time with no model, and calls the model only when ARTIE exits nonzero."""
+    arm = "code-artie-escalate" if escalate else "code-artie"
+    setup(task)
+    offset = len(log())
+    interferer = interfere(task, offset)
+    if interferer:
+        interferer.start()
+    change = change_under(offset)
+    started = time.time()
+    kept_dir = ARTIE_WORK / "kept"
+    kept_dir.mkdir(parents=True, exist_ok=True)
+    (ARTIE_WORK / "traces").mkdir(exist_ok=True)
+    inputs = task_inputs(task)
+    artie_calls, inner = [], []
+
+    def artie(tool, name, arguments):
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+        trace = f"{name}-{stamp}.yaml"
+        exit_, out = arguments(trace)
+        usage = artie_usage(trace)
+        inner.append({"input": usage.get("input", 0), "output": usage.get("output", 0),
+                      "cache_read": usage.get("cache_read", 0), "cache_write": usage.get("cache_write", 0),
+                      "calls": usage.get("calls", 0)})
+        artie_calls.append({"tool": tool, "name": name, "exit": exit_, "trace": trace,
+                            "model_calls": usage.get("calls", 0), "by": "model" if calls_open["on"] else "harness"})
+        lines = out.splitlines()
+        shown = "\n".join(lines[-40:]) if len(lines) > 40 else out
+        return exit_, f"exit {exit_}\n{shown}{ended(trace)}"
+
+    def reasoned(trace):
+        return ["--reasoner", "claude", "--model", model, "--trace", f"../traces/{trace}"]
+
+    def run_kept(name):
+        given = [f"{k}={inputs[k]}" for k in declared_inputs(kept_dir / f"{name}.heart.yaml") if k in inputs]
+        return artie("artie_run", name, lambda trace: artie_in_container(
+            ["run", f"{name}.heart.yaml"] + given + reasoned(trace), model))
+
+    def find(name, goal):
+        named_inputs = [k for k in inputs if "{" + k + "}" in goal]
+        front = "".join(f"  {k}:\n" for k in named_inputs)
+        # A goal in one paragraph is one step: ARTIE's default of 10 moves a step stops it a few members into a list.
+        (kept_dir / f"{name}.goal.md").write_text(
+            f"---\nstart: {BASE}/\nlimits: {{ moves: 200, step: 100 }}\n" + (f"inputs:\n{front}" if front else "") +
+            f"---\n\n{goal.strip()}\n")
+        given = [f"{k}={inputs[k]}" for k in named_inputs]
+
+        def go(trace):
+            # The goal run reads at L2; a kept script reads at its lock file's rung, as artie run does by itself.
+            exit_, out = artie_in_container(["run", f"{name}.goal.md"] + given + ["--rung", "L2"] + reasoned(trace),
+                                            model)
+            if exit_ == 0:
+                made, said = artie_in_container(["generate", f"../traces/{trace}", "--out", f"{name}.heart.yaml",
+                                                 "--format", "yaml", "--script", f"{name}.goal.md"], model)
+                (kept_dir / f"{name}.config.yaml").write_text("on-change: intent\nkeep: auto\n")
+                out += f"\n\nartie generate (exit {made}):\n{said}"
+            return exit_, out
+        return artie("artie_find", name, go)
+
+    def look(address):
+        if address not in handed_addresses():
+            return 1, f"ARTIE reads only an address the service has handed it; it was never handed {address}"
+        looks = ARTIE_WORK / "looks"
+        looks.mkdir(exist_ok=True)
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+        (looks / f"look-{stamp}.heart.yaml").write_text(f"heart: 1\nkind: kept\nstart: {address}\nsteps: []\n")
+        return artie("artie_look", "look", lambda trace: artie_in_container(
+            ["run", f"../looks/look-{stamp}.heart.yaml", "--rung", "L2", "--trace", f"../traces/{trace}"], model))
+
+    def handle(use):
+        name = named(use.input.get("name"))
+        if use.name == "artie_find":
+            exit_, text = find(name, use.input.get("goal", ""))
+        elif use.name == "artie_look":
+            exit_, text = look(str(use.input.get("address", "")))
+        elif (kept_dir / f"{name}.heart.yaml").exists():
+            exit_, text = run_kept(name)
+        else:
+            return f"no kept script named {name}", True
+        return text, exit_ != 0
+
+    calls_open = {"on": False}
+    plan = kept_dir / f"{task}.plan.json"
+    calls, final_text, failed = [], None, None
+    if escalate and plan.exists():
+        # The scripts that did this task last time, run by the harness in order, with no model.
+        for name in json.loads(plan.read_text()):
+            exit_, text = run_kept(name)
+            if exit_ != 0:
+                failed = text
+                break
+        else:
+            final_text = "the kept scripts ran: " + ", ".join(json.loads(plan.read_text()))
+    if final_text is None:
+        calls_open["on"] = True
+        kept = sorted(kept_dir.glob("*.heart.yaml"))
+        opening = TASKS[task]["text"]
+        if inputs:
+            opening += "\n\nInputs: " + ", ".join(f"{k} = {v}" for k, v in inputs.items())
+        if kept:
+            words = {p: (kept_dir / p.name.replace(".heart.yaml", ".goal.md")).read_text().split("---", 2)[-1].strip()
+                     for p in kept}
+            opening += "\n\nKept scripts:\n" + "\n".join(
+                f"- {p.name[:-len('.heart.yaml')]}: {w}" for p, w in words.items())
+        if failed:
+            opening += f"\n\nThe kept scripts that did this task last time were run again, and one failed:\n{failed}"
+        tools = [ARTIE_FIND, ARTIE_RUN, ARTIE_LOOK]
+        calls, final_text = tool_turns(model, api, CODE_ARTIE_SYSTEM + (INPUTS_TOLD if inputs else ""), opening, tools,
+                                       handle, max_turns)
+        done = [a["name"] for a in artie_calls if a["by"] == "model" and a["exit"] == 0
+                and a["tool"] in ("artie_find", "artie_run")]
+        if escalate and final_text is not None and done:
+            plan.write_text(json.dumps(list(dict.fromkeys(done))))
+    outer = totals(calls)
+    artie_total = totals(inner)
+    return finished_record(model, arm, task, started, offset, interferer, change, calls + inner, final_text, {
+        "outer": outer, "artie": {**artie_total, "model_calls": sum(i["calls"] for i in inner)},
+        "model_calls": outer["model_calls"] + sum(i["calls"] for i in inner), "inputs": inputs,
+        "escalated": bool(calls), "artie_calls": artie_calls, "programs": [], "tool_calls": len(artie_calls),
+        "sandbox_runs": 0, "tool_errors": sum(a["exit"] != 0 for a in artie_calls)})
+
+
+def finished_record(model, arm, task, started, offset, interferer, change, calls, final_text, more):
+    if interferer:
+        interferer.stopped.set()
+    if change:
+        change.stopped.set()
+    requests = requests_since(offset)
+    held = everyone()
+    return {
+        "change": CHANGE["names"] or None, "when": CHANGE["when"] if CHANGE["names"] else None,
+        "changed_at": change.fired if change else None,
+        "at": now(), "model": model, "arm": arm, "task": task, "seconds": round(time.time() - started, 1),
+        "tools_offered": None, "tool_definition_tokens": None, **totals(calls), "calls": calls,
+        "tools": None, "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests),
+        "requests": requests,
+        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and task in INTERFERED else None),
+        "check": check(task, held, final_text), "final_text": final_text, "error": None, **more,
+    }
+
+
+# ---- ARTIE, native: a goal run with the reasoner, or a script with no model ----
+
+ARTIE = HERE / "../../client/artie-cli/build/install/artie/bin/artie"
+# A goal run plans from the words; an intent run is the goal's steps as act(intent = …), each chosen from what is
+# offered then; a kept script is artie generate's script from a clean goal run, held to its pins, with no model.
+ARTIE_SOURCES = {"artie-goal": "{task}.goal.md", "artie-intent": "{task}.intent.kts", "artie-kept": "{task}.kept.kts",
+                 "artie-script": "{task}.kts", "artie-data": "{task}.kept.heart.yaml",
+                 "artie-grow": "{task}.grow.heart.yaml", "artie-generated": "{task}.generated.heart.yaml"}
+# artie-data, the kept script held as data, is given the reasoner only to fall back to its words when a form changed
+# (its config says on-change: intent); it calls the model on no other step.
+# artie-grow: t5's kept script with the give-notice case alone; a member in another state falls back to its words.
+ARTIE_REASONING = {"artie-goal", "artie-intent", "artie-data", "artie-grow"}
+
+
+def run_artie(model, arm, task):
+    setup(task)
+    offset = len(log())
+    interferer = interfere(task, offset)
+    if interferer:
+        interferer.start()
+    change = change_under(offset)
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    trace = HERE / f"runs/artie/{arm}-{task}-{stamp}.yaml"
+    trace.parent.mkdir(exist_ok=True)
+    source = HERE / "artie" / ARTIE_SOURCES[arm].format(task=task)
+    command = [str(ARTIE.resolve()), "run", str(source), "--rung", "L2", "--trace", str(trace)]
+    if arm in ARTIE_REASONING:
+        command += ["--reasoner", "claude", "--model", model]
+    env = {**os.environ, TOKEN_VARIABLE: TOKEN}
+    started = time.time()
+    # Run beside the script, as a person does, so its lock file and config are found beside it.
+    done = subprocess.run(command, env=env, capture_output=True, text=True, timeout=900, cwd=source.parent)
+    if interferer:
+        interferer.stopped.set()
+    if change:
+        change.stopped.set()
+    output = (done.stdout + done.stderr).strip()
+    run_doc = next(iter(yaml.safe_load_all(trace.read_text())), {}) if trace.exists() else {}
+    usage = ((run_doc or {}).get("run") or {}).get("usage") or {}
+    calls = [{"input": usage.get("input", 0), "output": usage.get("output", 0),
+              "cache_read": usage.get("cache_read", 0), "cache_write": usage.get("cache_write", 0)}]
+    requests = requests_since(offset)
+    held = everyone()
+    return {
+        "change": CHANGE["names"] or None, "when": CHANGE["when"] if CHANGE["names"] else None,
+        "changed_at": change.fired if change else None,
+        "at": now(), "model": model if arm in ARTIE_REASONING else None, "arm": arm, "task": task,
+        "seconds": round(time.time() - started, 1), "exit": done.returncode,
+        "tools_offered": None, "tool_definition_tokens": None,
+        **totals(calls), "model_calls": usage.get("calls", 0), "calls": None,
+        "tool_calls": len(re.findall(r"^\d+ ", output, re.M)), "tool_errors": None, "tools": None,
+        "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests), "requests": requests,
+        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and (task in INTERFERED or github(task)) else None),
+        "check": check(task, held, output), "final_text": output[-3000:], "trace": str(trace.relative_to(HERE)),
+        "error": None if done.returncode == 0 else f"exit {done.returncode}",
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--arms", default="fastmcp,fastmcp-typical,meta-tools,heart-mcp,artie-goal,artie-script")
+    parser.add_argument("--tasks", default="t1,t2,t3")
+    parser.add_argument("--reps", type=int, default=3)
+    parser.add_argument("--start", type=int, default=1, help="the first run's number: with --sequence, its phase")
+    parser.add_argument("--population", default="2,2,2", help="t5: how many employees working, on notice, dismissed")
+    parser.add_argument("--model", default="claude-sonnet-5-5")
+    parser.add_argument("--surname", default="Miller", help="t5: the surname of the employees seeded and moved")
+    parser.add_argument("--max-turns", type=int, default=25)
+    parser.add_argument("--out")
+    parser.add_argument("--changes", default="", help=f"changes to make under the client; all is {ALL_CHANGES}")
+    parser.add_argument("--when", default="start", choices=["before", "start", "midway"])
+    parser.add_argument("--meddle", action="store_true", help="the sim changes Frodo right after the client reads him")
+    parser.add_argument("--dam", default="", help="the GitHub gateway owner's rungs (GATEWAY_DAM), for g tasks")
+    parser.add_argument("--sequence", action="store_true",
+                        help="spec/PLAN-CODE-MODE-VS-HEART.md: runs 1-3 as they are, 4-6 with a teammate's change "
+                             "(meddle), 7 on with a field renamed")
+    args = parser.parse_args()
+    POPULATION["sizes"] = tuple(int(n) for n in args.population.split(","))
+    SURNAME["name"] = args.surname
+    TASKS["t5"]["text"] = TASKS["t5"]["text"].replace("Miller", args.surname)
+    CHANGE["names"] = ALL_CHANGES if args.changes == "all" else args.changes
+    CHANGE["when"] = args.when
+    MEDDLE["on"] = args.meddle
+    SEQUENCE["on"] = args.sequence
+    DAM["rungs"] = args.dam
+    (HERE / "runs").mkdir(exist_ok=True)
+    out = Path(args.out or HERE / f"runs/{datetime.now().strftime('%Y%m%d-%H%M%S')}.jsonl")
+    api = anthropic.Anthropic()
+    for rep in range(args.start - 1, args.start - 1 + args.reps):
+        if args.sequence:
+            MEDDLE["on"] = 3 <= rep <= 5
+            CHANGE["names"], CHANGE["when"] = ("renamed", "start") if rep >= 6 else ("", "start")
+        for task in args.tasks.split(","):
+            for arm in args.arms.split(","):
+                if arm in ("artie-script", "artie-kept") and task in INTERFERED and not args.meddle:
+                    continue  # a script reads and acts within milliseconds: no one can change Frodo in between
+                if arm == "artie-kept" and not (HERE / "artie" / f"{task}.kept.kts").exists():
+                    continue  # kept only from a goal run that acted: task 2's acted on nothing
+                try:
+                    turns = 16 if task == "t5" else ARM_TURNS.get(arm, min(args.max_turns, 8))
+                    if arm in ("code-skill", "code-skill-escalate"):
+                        record = run_code_skill(args.model, task, turns, api, escalate=arm == "code-skill-escalate")
+                    elif arm in ("code-artie", "code-artie-escalate"):
+                        record = run_code_artie(args.model, task, turns, api, escalate=arm == "code-artie-escalate")
+                    elif arm.startswith("code-"):
+                        record = run_code(args.model, arm, task, turns, api)
+                    elif arm.startswith("artie-"):
+                        record = run_artie(args.model, arm, task)
+                    else:
+                        record = asyncio.run(run(args.model, arm, task, args.max_turns, api))
+                except Exception as broken:
+                    record = {"at": now(), "model": args.model, "arm": arm, "task": task, "failed": repr(broken)}
+                record["rep"] = rep + 1
+                line = json.dumps(record)
+                if TOKEN in line or re.search(r"sk-ant", line):
+                    raise SystemExit("a secret is in the record; not written")
+                with out.open("a") as file:
+                    file.write(line + "\n")
+                check_ = record.get("check", {})
+                print(f"{rep + 1} {task} {arm:14} done={check_.get('done')} in={record.get('input_processed')} "
+                      f"out={record.get('output_tokens')} calls={record.get('model_calls')} tools={record.get('tool_calls')} "
+                      f"http={record.get('http')} 4xx={record.get('http_4xx')} {record.get('failed', '')}", flush=True)
+    print(f"written: {out}")
+
+
+if __name__ == "__main__":
+    sys.exit(main())

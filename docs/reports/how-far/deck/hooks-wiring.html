@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Five hook events, each a shell script · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">For the engineers · The wiring</span></header>
+<h2>Five hook events, each a shell script</h2>
+<div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);">
+  <div class="rows">
+    <pre><code>// core/hooks.json (abridged)
+"PreToolUse": [
+  { "matcher": "*",
+    …/protect-gate.sh },
+  { "matcher": "Edit|Write|MultiEdit",
+    …/gherkin-first.sh },
+  { "matcher": "Bash",
+    …/gate-bash.sh } ],
+"PostToolUse": [
+  { "matcher": "Edit|Write|MultiEdit",
+    …/log-event.sh, …/lint.sh } ],
+"Stop": [
+  …/check.sh  (timeout 600) ],
+"UserPromptSubmit": [
+  …/refactor-prompt.sh ]</code></pre>
+    <p class="refs"><details class="fragment-plain"><summary>core/hooks.json, whole</summary><pre><code>{
+  &quot;UserPromptSubmit&quot;: [
+    {
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/refactor-prompt.sh&quot;,
+          &quot;timeout&quot;: 15
+        }
+      ]
+    }
+  ],
+  &quot;PreToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/protect-gate.sh&quot;,
+          &quot;timeout&quot;: 10
+        }
+      ]
+    },
+    {
+      &quot;matcher&quot;: &quot;Edit|Write|MultiEdit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/gherkin-first.sh&quot;,
+          &quot;timeout&quot;: 15,
+          &quot;statusMessage&quot;: &quot;Checking Gherkin-first ordering...&quot;
+        }
+      ]
+    },
+    {
+      &quot;matcher&quot;: &quot;Bash&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/gate-bash.sh&quot;,
+          &quot;timeout&quot;: 10
+        }
+      ]
+    }
+  ],
+  &quot;PostToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;Edit|Write|MultiEdit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/log-event.sh&quot;,
+          &quot;timeout&quot;: 15,
+          &quot;statusMessage&quot;: &quot;Logging TDD event...&quot;
+        },
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/lint.sh&quot;,
+          &quot;timeout&quot;: 180,
+          &quot;statusMessage&quot;: &quot;Running lint gate...&quot;
+        }
+      ]
+    }
+  ],
+  &quot;Stop&quot;: [
+    {
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/check.sh&quot;,
+          &quot;timeout&quot;: 600,
+          &quot;statusMessage&quot;: &quot;Running full check gate...&quot;
+        }
+      ]
+    }
+  ]
+}</code></pre></details></p>
+  </div>
+  <div class="rows">
+    <p class="punch">Exit 2 blocks the call and hands stderr to the model.</p>
+    <h3>Blocked in this very session, word for word:</h3>
+    <pre><code>Blocked: this command reaches the
+TDD gate or refactor mode.
+
+Blocked: run tests through
+.claude/bdd-gates/bdd-run.sh [extra
+args] so the BDD_RUN result is logged.</code></pre>
+    <p>The second stopped a raw test run that would have left no BDD_RUN line in the log.</p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/skill-md.html" rel="prev"><small>Back</small><b>The skill tells the model the loop, and that the gates win</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#hooks-wiring">with heart-ts</a></span>
+<a href="deck/gherkin-first.html" rel="next"><small>Next</small><b>No production write until a feature file changes</b></a></nav>
+</main></div></body></html>

@@ -1,0 +1,57 @@
+# The parts the talk names, each defined once, up front, before any slide uses it.
+- name: mcp
+  kind: part
+  label: "MCP"
+  title: "MCP: how agents call tools today"
+  summary: "The Model Context Protocol. A server lists named tools, each with a description and a JSON Schema for its arguments; the agent calls one by name. Every call is a JSON-RPC 2.0 message (tools/call). The list belongs to the session, not to the state of any one thing."
+  cite: "Model Context Protocol: tools"
+  href: https://modelcontextprotocol.io/specification/2025-06-18/server/tools
+- name: heart
+  kind: part
+  label: "HEART"
+  title: "HEART: one media type, information and controls together"
+  summary: "Hypermedia Enforced Agentic Reliable Transactions. HAL with HAL Schema Forms, plus a small profile. Every answer carries the resource's data and the forms for the acts its state allows now, each with a method, an address and a JSON Schema; an act that isn't offered can say why (hr:unavailable)."
+  cite: "HAL Schema Forms, the HEART profile"
+  href: https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/spec/HAL-SCHEMA-FORMS-HR.md
+- name: rise
+  kind: part
+  label: "RISE"
+  title: "RISE: tell me when it's done"
+  summary: "Reciprocal Interface for State Exchange. Replies for asynchronous work: ask now, be told later. A watcher or a build answers back when it is ready, as Jenkins does in the release."
+  cite: "heart-rise-artie (repository)"
+  href: https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc
+- name: artie
+  kind: part
+  label: "ARTIE"
+  title: "ARTIE: the generic client"
+  summary: "Autonomous Restful Traversal and Interactive Engine. Coupled to HEART and HTTP, and to nothing about any one API, as a browser is to HTML. It enters by a bookmark, checks a kept script's pins against what is offered, sends each act with its If-Match validator, and caches forms and schemas (L2)."
+  cite: "heart-rise-artie (repository)"
+  href: https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/client
+- name: gateway
+  kind: part
+  label: "GATEWAY"
+  title: "The gateway: our controls in front of theirs"
+  summary: "A small server, on a laptop, in front of an API we don't control (GitHub, a local GitLab). YAML connectors map each act onto the native call and say when it is offered; the gateway answers in HEART."
+  cite: "heart-gateway connectors"
+  href: https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors
+- name: scm
+  kind: part
+  label: "scm:"
+  title: "scm: one set of typed relations, two forges"
+  summary: "scm:merge, scm:comment, scm:close and the rest: relation names defined by meaning, not by one server's endpoints. GitHub and GitLab both answer to them, so a kept script runs on either."
+  cite: "heart-gateway connectors"
+  href: https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors
+- name: rungs
+  kind: part
+  label: "L0 · L1 · L2"
+  title: "L0, L1, L2: three ways to deliver the same forms"
+  summary: "L0: everything in one answer. L1: the forms by link, so they are shared and cacheable. L2: the forms and their schemas by link, checked by integrity hashes, so a replay sends almost nothing it has seen before."
+  cite: "HAL Schema Forms, the HEART profile"
+  href: https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/spec/HAL-SCHEMA-FORMS-HR.md
+- name: heart-mcp
+  kind: part
+  label: "heart-mcp"
+  title: "heart-mcp: HEART behind six fixed MCP tools"
+  summary: "An MCP server with ARTIE inside. The model gets six tools that never change (look, act, follow, describe, explain, back); the state and the acts it allows come in every answer, and ARTIE builds every request. The model never sees an address."
+  cite: "heart-mcp (repository)"
+  href: https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/mcp

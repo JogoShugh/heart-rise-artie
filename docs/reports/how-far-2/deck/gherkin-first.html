@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>No production write until a feature file changes · How far can one vision go · 2.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">For the engineers · Gherkin first</span></header>
+<h2>No production write until a feature file changes</h2>
+<div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);">
+  <div class="rows">
+    <pre><code># core/gherkin-first.sh (PreToolUse)
+rel=$(bdd_rel "$file_path")
+bdd_is_prod "$rel" || exit 0
+bdd_features_dirty &amp;&amp; exit 0
+# The author switched refactor mode on
+bdd_refactor_on &amp;&amp; exit 0
+
+cat &gt;&amp;2 &lt;&lt;EOF
+Blocked: about to modify production code
+($rel) with no feature file change in this
+changeset yet. Write or update the Gherkin
+scenario first, run the BDD suite to see it
+fail, then implement.
+EOF
+exit 2</code></pre>
+    <p class="refs"><details class="fragment-plain"><summary>core/gherkin-first.sh (PreToolUse)</summary><pre><code>#!/usr/bin/env bash
+# PreToolUse (Edit|Write|MultiEdit). Blocks a write to production code unless
+# a feature file already has an in-flight change, or the author switched
+# refactor mode on (scripts/refactor-mode). Exit 2 blocks the tool call
+# and sends stderr back to Claude.
+set -o pipefail
+. &quot;$(dirname &quot;$0&quot;)/lib.sh&quot;
+
+file_path=$(bdd_hook_file_path)
+[ -n &quot;$file_path&quot; ] || exit 0
+bdd_has_config || exit 0
+bdd_load
+
+rel=$(bdd_rel &quot;$file_path&quot;)
+bdd_is_prod &quot;$rel&quot; || exit 0
+bdd_features_dirty &amp;&amp; exit 0
+# The author switched refactor mode on: pre-commit checks its own terms.
+bdd_refactor_on &amp;&amp; exit 0
+
+cat &gt;&amp;2 &lt;&lt;EOF
+Blocked: about to modify production code ($rel) with no feature file change in this changeset yet.
+Write or update the Gherkin scenario first, run the BDD suite to see it fail, then implement.
+Feature patterns: $(bdd_list featurePatterns | tr '\n' ' ')
+EOF
+exit 2</code></pre></details></p>
+  </div>
+  <div class="rows">
+    <pre><code># core/log-event.sh (PostToolUse)
+if bdd_is_prod "$rel"; then
+  bdd_append "MAIN_WRITE $rel"
+elif bdd_is_feature "$rel"; then
+  bdd_append "FEATURE_WRITE $rel"
+fi</code></pre>
+    <p class="refs"><details class="fragment-plain"><summary>core/log-event.sh (PostToolUse)</summary><pre><code>#!/usr/bin/env bash
+# PostToolUse (Edit|Write|MultiEdit). Records MAIN_WRITE / FEATURE_WRITE facts
+# in .claude/tdd-events.log for the pre-commit ordering check. Never blocks.
+set -o pipefail
+. &quot;$(dirname &quot;$0&quot;)/lib.sh&quot;
+
+file_path=$(bdd_hook_file_path)
+[ -n &quot;$file_path&quot; ] || exit 0
+bdd_has_config || exit 0
+bdd_load
+
+rel=$(bdd_rel &quot;$file_path&quot;)
+if bdd_is_prod &quot;$rel&quot;; then
+  bdd_append &quot;MAIN_WRITE $rel&quot;
+elif bdd_is_feature &quot;$rel&quot;; then
+  bdd_append &quot;FEATURE_WRITE $rel&quot;
+fi
+exit 0</code></pre></details></p>
+    <pre><code># core/bdd-run.sh: every run, pass or fail
+if [ $ec -eq 0 ]; then
+  bdd_append "BDD_RUN PASS exit=0"
+else
+  bdd_append "BDD_RUN FAIL exit=$ec"
+fi</code></pre>
+    <p class="refs"><details class="fragment-plain"><summary>core/bdd-run.sh, every run, pass or fail</summary><pre><code>#!/usr/bin/env bash
+# Runs the BDD suite and records &quot;BDD_RUN PASS|FAIL&quot; in the event log, pass or
+# fail. For stacks with bddLogging &quot;wrapper&quot; (no native build hook that runs
+# after a failed test task). Extra args are appended to bddCommand.
+# Exits with the suite's own exit code.
+set -o pipefail
+. &quot;$(dirname &quot;$0&quot;)/lib.sh&quot;
+
+bdd_has_config || { echo &quot;bdd-run: no $(bdd_config)&quot; &gt;&amp;2; exit 1; }
+cmd=$(bdd_value bddCommand)
+[ -n &quot;$cmd&quot; ] || { echo &quot;bdd-run: bddCommand not set in $(bdd_config)&quot; &gt;&amp;2; exit 1; }
+
+cd &quot;$(bdd_root)&quot; || exit 1
+if [ $# -gt 0 ]; then
+  bash -c &quot;$cmd $*&quot;
+else
+  bash -c &quot;$cmd&quot;
+fi
+ec=$?
+
+if [ $ec -eq 0 ]; then
+  bdd_append &quot;BDD_RUN PASS exit=0&quot;
+else
+  bdd_append &quot;BDD_RUN FAIL exit=$ec&quot;
+fi
+exit $ec</code></pre></details></p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/hooks-wiring.html" rel="prev"><small>Back</small><b>Five hook events, each a shell script</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#gherkin-first">with heart-ts</a></span>
+<a href="deck/pre-commit.html" rel="next"><small>Next</small><b>git pre-commit reads the log in order</b></a></nav>
+</main></div></body></html>

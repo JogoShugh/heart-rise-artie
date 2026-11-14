@@ -1,0 +1,64 @@
+# Fielding's own comments on his 2008 post, quoted whole by paragraph, as written.
+- name: hypertext
+  kind: comment
+  label: "HYPERTEXT"
+  title: What hypertext means
+  summary: "His definition: information and controls, presented together. Machines can follow links too."
+  quote: "<p>“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions. Hypermedia is just an expansion on what text means to include temporal anchors within a media stream; most researchers have dropped the distinction.</p><p>Hypertext does not need to be HTML on a browser. Machines can follow links when they understand the data format and relationship types.”</p>"
+  cite: Roy T. Fielding, comment on “REST APIs must be hypertext-driven”
+  date: 20 October 2008
+  href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-718
+- name: think-of-the-web
+  kind: comment
+  label: "BROWSER-TEST"
+  title: Browsers don't know resource types
+  summary: "A browser knows the links and forms, not whether it's a bank or a wiki. Typed relations guide automated agents."
+  quote: "<p>“A truly RESTful API looks like hypertext. Every addressable unit of information carries an address, either explicitly (e.g., link and id attributes) or implicitly (e.g., derived from the media type definition and representation structure). Query results are represented by a list of links with summary information, not by arrays of object representations (query is not a substitute for identification of resources). Resource representations are self-descriptive: the client does not need to know if a resource is OpenSocialist because it is just acting on the representations received.</p><p>Think of it in terms of the Web. How many Web browsers are aware of the distinction between an online-banking resource and a Wiki resource? None of them. They don’t need to be aware of the resource types. What they need to be aware of is the potential state transitions — the links and forms — and what semantics/actions are implied by traversing those links. A browser represents them as distinct UI controls so that a user can see potential transitions and anticipate the effect of chosen actions. A spider can follow them to the extent that the relationships are known to be safe. Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.”</p>"
+  cite: Roy T. Fielding, comment on “REST APIs must be hypertext-driven”
+  date: 20 October 2008
+  href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-720
+- name: decades
+  kind: comment
+  label: "DECADES"
+  title: Long-term design
+  summary: "REST trades short-term efficiency for longevity and independent evolution."
+  quote: "<p>“REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution. Many of the constraints are directly opposed to short-term efficiency. Unfortunately, people are fairly good at short-term design, and usually awful at long-term design. Most don’t think they need to design past the current release. There are more than a few software methodologies that portray any long-term thinking as wrong-headed, ivory tower design (which it can be if it isn’t motivated by real requirements).”</p>"
+  cite: Roy T. Fielding, comment on “REST APIs must be hypertext-driven”
+  date: 20 October 2008
+  href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-724
+- name: prior-knowledge
+  kind: comment
+  label: "742"
+  title: Prior knowledge, concentrated
+  summary: "REST doesn't remove prior knowledge; it concentrates it in media types and relation types, which can be standardized."
+  quote: "<p>“Of course the client has prior knowledge. Every protocol, every media type definition, every URI scheme, and every link relationship type constitutes prior knowledge that the client must know (or learn) in order to make use of that knowledge. REST doesn’t eliminate the need for a clue. What REST does is concentrate that need for prior knowledge into readily standardizable forms. That is the essential distinction between data-oriented and control-oriented integration.</p><p>It has value because it is far easier to standardize representation and relation types than it is to standardize objects and object-specific interfaces. In other words, there are fewer things to learn and they can be recombined in unanticipated ways while remaining understandable to the client.”</p>"
+  cite: Roy T. Fielding, comment on “REST APIs must be hypertext-driven”
+  date: 22 October 2008
+  href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-742
+- name: follow-your-nose
+  kind: comment
+  label: "FOLLOW-NOSE"
+  title: How far ahead is the client looking?
+  summary: "A pre-programmed client and a deliberating one can leave the same trace; what matters is how the client decides."
+  quote: "<p>“The short answer: “follow your nose”. That is the phrase we usually use to distinguish the process of following information-provided transitions/semantics versus following a set procedure or interface declaration outside of that flow of information. Basically, how far ahead is the client looking?</p><p>The difficulty in providing any trace criterion for REST is that what matters is how the client decides to take transitions. A client that has been pre-programmed to make a sequence of requests (regardless of the response) is going to produce the same network trace as one that examines each response and makes deliberate decisions based on the content.”</p>"
+  cite: Roy T. Fielding, comment on “REST APIs must be hypertext-driven”
+  date: 23 October 2008
+  href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-753
+- name: in-band
+  kind: comment
+  label: "IN-BAND"
+  title: Instructions in every representation
+  summary: "The media type is learned once; each representation carries the transitions available at that point."
+  quote: "<p>“The media type identifies a specification that defines how a representation is to be processed. That is out-of-band information (all communication is dependent on some prior knowledge). What you are missing is that each representation contains the specific instructions for interfacing with a given service, provided in-band. The media type is a generic processing model that every agent can learn if there aren’t too many of them (hence the need for standards). The representation is specific to the application being performed by the agent. Each representation therefore provides the transitions that are available at that point in the application.</p><p>When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p>"
+  cite: Roy T. Fielding, comment on “REST APIs must be hypertext-driven”
+  date: 23 October 2008
+  href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754
+- name: ai-driven
+  kind: comment
+  label: "JUST-IN-TIME"
+  title: Instructions just before acting
+  summary: "A client that acts only on the instructions it just received doesn't need to know how the resource is built. 2008, and he named AI."
+  quote: "<p>“A distributed queue is an implementation choice. You can certainly implement some applications by having them interact with a queue-like resource in a RESTful manner. However, if your client relies on the resource being a queue, then it certainly isn’t a RESTful API. Do you see the difference? Encoding knowledge within clients and servers of the other side’s implementation mechanism is what we are trying to avoid.</p><p>If a client is receiving instructions on how to interact with a resource just before acting only on those instructions, then the client doesn’t care if the resource is a distributed queue. It simply doesn’t need to know how the resource is implemented. All it needs to know is the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of AI-driven.”</p>"
+  cite: Roy T. Fielding, comment on “REST APIs must be hypertext-driven”
+  date: 8 November 2008
+  href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-842

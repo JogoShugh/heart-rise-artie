@@ -1,0 +1,332 @@
+---
+run:
+  inputs:
+    entry:
+      value: http://localhost:8099/
+      given: default
+      default: http://localhost:8099/
+  model:
+    name: claude-sonnet-5-5
+    url: https://api.anthropic.com
+  usage:
+    calls: 4
+    input: 1904
+    output: 594
+    cache_read: 3672
+    cache_write: 0
+---
+at: '2026-11-02T10:42:57.546050Z'
+ms: 43
+mode: script
+say: enter {entry}
+line: 6
+params:
+  entry: http://localhost:8099/
+opens: true
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-02T10:42:57.594758Z'
+ms: 1837
+mode: intent
+say: Find the employees named Baggins
+line: 7
+within: 6
+params:
+  relation: staff:search-employees
+  name: Baggins
+values:
+  name:
+    value: Baggins
+    type: string
+    from:
+      - words
+reason:
+  template: Find the employees named Baggins
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"Employees","hr:manifest":{"forms":{"staff:dismiss":["sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04="],"staff:get-employee":["sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY="],"staff:hire":["sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM="],"staff:search-employees":["sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4="],"staff:update":["sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM="]},"digest":"sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc="}}
+      </state>
+      <offers>
+      {"staff:search-employees":{"title":"Find employees by name","description":"Lists the employees whose name has the text.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"name":{"type":"string","minLength":1,"title":"Name","description":"Part of the employee's first or last name; case is ignored"}},"required":["name"]}},"staff:get-employee":{"title":"Get an employee by number","description":"Goes to one employee, given their number.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Employee number","description":"The employee's number"}},"required":["id"]}},"staff:hire":{"title":"Hire an employee","description":"Hires someone, in a role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object","$id":"/schemas/10847085ef79da90"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Find the employees named Baggins
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01XN9qG1Po7wTBr8jWjVfDQS","name":"select","input":{"action":"act","affordance":"staff:search-employees","fields":{"name":"Baggins"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:search-employees
+  title: Find employees by name
+  method: GET
+  target: /employees{?name}
+  address: http://localhost:8099/employees?name=Baggins
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8099/employees?name=Baggins
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Frodo Baggins
+      - Bilbo Baggins
+---
+at: '2026-11-02T10:42:59.434619Z'
+ms: 1440
+mode: intent
+say: Open Frodo Baggins
+line: 8
+within: 7
+params:
+  relation: item
+  title: Frodo Baggins
+values:
+  title:
+    value: Frodo Baggins
+    from:
+      - words
+reason:
+  template: Open Frodo Baggins
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":2}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Frodo Baggins"},{"rel":"item","title":"Bilbo Baggins"}]
+      </links>
+      <intent>
+      Open Frodo Baggins
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_013BQsBRKRqA1mVm6HvZENEA","name":"select","input":{"action":"follow","rel":"item","title":"Frodo Baggins"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: Frodo Baggins
+  method: GET
+  target: http://localhost:8099/employees/1
+  address: http://localhost:8099/employees/1
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+keeps:
+  /firstName:
+    - 4
+  /lastName:
+    - 4
+---
+at: '2026-11-02T10:43:00.877016Z'
+ms: 1492
+mode: intent
+say: Change his role to "ring bearer, retired"
+line: 9
+within: 8
+params:
+  relation: staff:update
+  firstName: Frodo
+  lastName: Baggins
+  role: ring bearer, retired
+values:
+  firstName:
+    value: Frodo
+    type: string
+    from:
+      - step: 3
+        pointer: /firstName
+  lastName:
+    value: Baggins
+    type: string
+    from:
+      - step: 3
+        pointer: /lastName
+  role:
+    value: ring bearer, retired
+    type: string
+    from:
+      - words
+reason:
+  template: Change his role to "ring bearer, retired"
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":1,"firstName":"Frodo","lastName":"Baggins","role":"ring bearer","status":"working"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Change his role to "ring bearer, retired"
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSngYKEAgTGAI4AUIIdGhpbmtpbmcSDAm7tRN/BMMpFmV+DBoMZFzCH3yXUX6MgWqOIjB+1ZO8v1xEC7d2Tr+6qvcVFVq2DZ7EF6y9UHYSNde9DlLWlGR3id6i2gKVziDR860quwWAdPJnSu/Nfmk94qJy5aIY8SutbKz0kvCycdLm0I/IcAgtxMS3xRwcSPGusOwLZ9ywgFvFERlT4xBnLxtNYEmTcJZEW0yercSFUCle25AAzYJCpDE3qjMAMHWPfIZdCYdfqKJgcBOLYW20paWfniDK4ScdlxV02X7sT0GoSTSUuIJEKVAWJmL814dfSQW9KnT2q/oxhC1M9RIFE1iuJDWEK98KXJqAA5WoMmPQN+8yp6rrwddqbkyqgUlrrhOtbrtxGLVrbowkScYQfmoqFSIs4szbNX2ickUdHcvn9tNYfgEV43ECvO4xl3pU3zuWjLrXv/Mkl5/egioeTq1YliVactdLR6Ea1wYily3FLE/gOVR99GhovYQ1AE4Un1otY9Cjht8DbXFtfcCCzModVJnTLIQg5wqRtE5yO9Jugfmbdp53t1EmTBluqqyFaXH6eeo5Ax1tZaaTnj+TBGuLqtrpwC82xzmt4x6tJTkq1bTwAlYuDoe1oHpC2VB5M7BhL69H7J2Y8rKxhzI3KhSFoYnabbXGHeTsQmL1e9L6F1a6NFTszNWBWfEKpMwLwjh5SGv4OTLiMYhzTRntEBafVNaFBZNW0vvNYkTFEU2dU/wHO08IOa1TtqdguLg3nGbpchjvcZhs7+kY6iTlETStizQr4FdZlH31v4J0xguqiD0GDaYoA5MwYowwP8GmbfczXuWMySL4IiNt+UkjjSRnjafZx4Wqna0yinqNcEby98eEFmqVd0VNp5cNu8KTSH59SXV+dKj3cn2jXW+DhAS4yJ/CQQ313IytYsDMdwed7pMamhgOoqDuS2ACeHoDJKzRWsr2ZqmJRetHFsg+85IzC93vFfp97JbSO2sZOjRyUJhjdkDcx6cMPltmRwheO/BcGImPgFyq2rqnd3nfOJiiNbcsiaohl/OyGDqiVLgYAQ=="},{"type":"tool_use","id":"toolu_015CV8zXe2tAFXAfCAbvXhhc","name":"select","input":{"action":"act","affordance":"staff:update","fields":{"firstName":"Frodo","lastName":"Baggins","role":"ring bearer, retired"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:update
+  title: Update the employee
+  method: PUT
+  target: /employees/{id}/actions/update
+  address: http://localhost:8099/employees/1/actions/update
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/2f822c4fedc9305e
+    integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+  form: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+  schema:
+    href: http://localhost:8099/schemas/10847085ef79da90
+    integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+  if-match: '"seq-1.hsf.L2.a903f9549f3b7164"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: refused
+address: http://localhost:8099/employees/1
+refused:
+  kind: stale
+  by: the server
+  detail: the resource changed since it was read
+---
+at: '2026-11-02T10:43:02.373329Z'
+ms: 6
+mode: script
+say: return to {address}
+line: 9
+within: 8
+params:
+  address: http://localhost:8099/employees/1
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: keeper of the Red Book
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T10:43:02.381183Z'
+ms: 4487
+mode: intent
+say: Change his role to "ring bearer, retired"
+line: 9
+within: 8
+params: {}
+reason:
+  template: Change his role to "ring bearer, retired"
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":1,"firstName":"Frodo","lastName":"Baggins","role":"keeper of the Red Book","status":"working"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Change his role to "ring bearer, retired". Your choice here, staff:update with {"firstName":"Frodo","lastName":"Baggins","role":"ring bearer, retired"}, was refused: the resource changed since it was read Since then: role was "ring bearer", now "keeper of the Red Book". Decide again from what is there now. If these words would undo or write over that change, do not act: ask, naming it.
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSwwYKEAgTGAI4AUIIdGhpbmtpbmcSDOy/ZqxQEYh/VrN0IBoMttlC1/A+bTIhnr+MIjAKia3vNyL0qP9WnC06lukEbRcXZ+2ahFRmjBFFJZ6o2kLfXxvunHLGZRUeA52gyVEq4AWqulI5SHMSG7qX1Kwxxgq69a/T+mzhJMs8DKS2wSaCSb1GjjeBCV41u/jmRIQUCftVmisExZW0Sbqo6x+xLyqUFm2CCgI54k9Id49Kv4pXYyzYMh9VEFDMMWEorLvB34Av3r/4hoEVRJrMVFeOzZxyE/pUMtAQbgoDk9LruWbWxvRQNJ6JYRP9Uq3gNTPpQGfVHJeUvDelM5fXvySOR/QqBFDpjqDAyxB0ec4yc7lQwA3Ou8k52KKdXuq2fa+v+ZhzD7CUnl9PIRXKdJ11fuqhmzx1vygR3kbaaoPsCKLIBPIM0VXWAZ4OGMh3JV7B/0UG+oegnF6eYMZWtidJ2rOqaLlb0gUah0lZXLaNB3TuK2u2F3+ZnodvLBH2qryjQpqacPpuiPVfSjgSWcDvFLFka+jpcm9nH3ocUQPCP6YdEAUtXBFbTyNg2d2fT/aoILM1WIsq473dtulp0xKVUyhRXx1tryY/bszjUJ6jHoGNNV+BAZ6TGIzBOtK320KzHICYmJF4pWvFW2ttiMjbe2Tzanok2SLyaYdETPmtiBZHcPwfJSp/1AKEZHHkh4ZEkshWPHBpTwtd59H+1T/xMICHRppj1GriJmkUaJucSZ8ihCGsjn1JRAiL0vZJwzwsI3JkDWZIyEj85l/2eoNzWZX0NYIL8Ht+rjlfLvkwWfmx9cZGN1NJxaNhUYyWLFFa+iLPn9/C7aYHifTW4OvnlCArE2TXoemHUzdlqGHCZ29+2UI3AH71h1IF8ZxToEHVlCYGWbmOaofcjRyoE5QcDdRHG5glDlw1Tk8fN5iWZxi+aC0siVBJ7qsj/cZD3BPm0h0Hw7Ta/np4yxDj/51fXxa3bT2DTSYl8CouQvUwx0bc3FFyO6OUZP/++E9SJRFrhBDk9R8ltEXPO7Mbs0qmZ2hlyvHV2QTUcONzuNlBOVszYN9U1WhDs3Kz9nXzJpnMqQhLxBROCdpI8DoOtKxZ5h13GAE="},{"type":"tool_use","id":"toolu_01FSrTkRFAvjv4UjHKRChYot","name":"select","input":{"action":"clarify","question":"Frodo''s role was changed from \"ring bearer\" to \"keeper of the Red Book\" since you last read it. Do you still want to overwrite that with \"ring bearer, retired\"?"},"caller":{"type":"direct"}}]'
+outcome: refused
+address: http://localhost:8099/employees/1
+refused:
+  kind: unclear to the reasoner
+  by: the client
+  detail: Frodo's role was changed from "ring bearer" to "keeper of the Red Book" since you last read it. Do you still want to overwrite that with "ring bearer, retired"?

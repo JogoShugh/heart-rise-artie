@@ -1,0 +1,17 @@
+{
+  "name": "garden-dashboard-live",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OpenAPI at its best: a dashboard with no generated code that reads the garden's OpenAPI description while it runs.",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/dashboard.js"
+  },
+  "dependencies": {
+    "htmx.org": "2.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "20.16.5",
+    "typescript": "5.5.4"
+  }
+}

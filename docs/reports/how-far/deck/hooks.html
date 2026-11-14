@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instructions are advisory. Hooks are not. · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">How it was built · Determinism through hooks</span></header>
+<h2>Instructions are advisory. Hooks are not.</h2>
+<div class="split" style="grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);">
+  <div class="rows">
+    <div class="table-scroll"><table>
+      <thead><tr><th>Gate</th><th>Where</th><th>What it holds</th></tr></thead>
+      <tbody>
+        <tr><td>Gherkin first</td><td>PreToolUse</td><td>No production code until a scenario says what it must do</td></tr>
+        <tr><td>Red, logged</td><td>PostToolUse</td><td>A failing test run is recorded before the first src/main write</td></tr>
+        <tr><td>Green to stop</td><td>Stop</td><td>The session can’t end with the suite red</td></tr>
+        <tr><td>Ordering at commit</td><td>git pre-commit</td><td>The log must show feature, red, code, green, in that order</td></tr>
+        <tr><td>Gate protection</td><td>PreToolUse</td><td>The gates and their log can’t be edited by the model</td></tr>
+      </tbody>
+    </table></div>
+    <p class="punch">Claude Code hooks guard the edits; git hooks guard the history.</p>
+    <p class="refs"><details class="fragment-plain"><summary>The hooks that gate every change (core/hooks.json)</summary><pre><code>{
+  &quot;UserPromptSubmit&quot;: [
+    {
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/refactor-prompt.sh&quot;,
+          &quot;timeout&quot;: 15
+        }
+      ]
+    }
+  ],
+  &quot;PreToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/protect-gate.sh&quot;,
+          &quot;timeout&quot;: 10
+        }
+      ]
+    },
+    {
+      &quot;matcher&quot;: &quot;Edit|Write|MultiEdit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/gherkin-first.sh&quot;,
+          &quot;timeout&quot;: 15,
+          &quot;statusMessage&quot;: &quot;Checking Gherkin-first ordering...&quot;
+        }
+      ]
+    },
+    {
+      &quot;matcher&quot;: &quot;Bash&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/gate-bash.sh&quot;,
+          &quot;timeout&quot;: 10
+        }
+      ]
+    }
+  ],
+  &quot;PostToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;Edit|Write|MultiEdit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/log-event.sh&quot;,
+          &quot;timeout&quot;: 15,
+          &quot;statusMessage&quot;: &quot;Logging TDD event...&quot;
+        },
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/lint.sh&quot;,
+          &quot;timeout&quot;: 180,
+          &quot;statusMessage&quot;: &quot;Running lint gate...&quot;
+        }
+      ]
+    }
+  ],
+  &quot;Stop&quot;: [
+    {
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;\&quot;${CLAUDE_PROJECT_DIR}\&quot;/.claude/bdd-gates/check.sh&quot;,
+          &quot;timeout&quot;: 600,
+          &quot;statusMessage&quot;: &quot;Running full check gate...&quot;
+        }
+      ]
+    }
+  ]
+}</code></pre></details></p>
+  </div>
+  <div class="card dark" style="box-shadow: inset 0 0 0 1.5px rgba(227, 179, 65, 0.45); align-content: center; padding: 1.6rem;">
+    <p style="font: 700 3.6rem/1 var(--display); color: #e3b341; margin: 0;">0</p>
+    <p>model calls to enforce them. The gates are scripts the harness runs, not instructions the model may forget.</p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/proof.html" rel="prev"><small>Back</small><b>One script, real GitHub and a local GitLab</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#hooks">with heart-ts</a></span>
+<a href="deck/skill-md.html" rel="next"><small>Next</small><b>The skill tells the model the loop, and that the gates win</b></a></nav>
+</main></div></body></html>

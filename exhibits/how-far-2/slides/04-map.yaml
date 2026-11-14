@@ -1,0 +1,113 @@
+name: map
+part: "Why now"
+tone: dark
+title: "Think once. Look and act for free. Own the controls."
+kicker: The whole story · where we’re going
+say: "Here's where we're going, on one page. Follow the gold numbers. One: a goal in plain words. Two: Claude captures it once, twenty model calls. Three: what it found is kept as a YAML script with pins. Four: ARTIE, a generic client, replays it with no model. Five: our gateway, on a laptop, in front of GitHub, offers only the acts the state allows. Six: GitHub merges, or the local GitLab, through one set of scm typed relations; Jenkins builds and runs the smoke script it links; Dev gets the promotion. That gold line is hypermedia as the engine of application state: every step is a control the last answer offered. Switch to Everything at the end of the talk: RISE replies in dotted blue, the red repair loop, how it was built on the left, what it cost on the right, and Fielding's constraints underneath. Next, five promises from this map."
+sources:
+  - ["Fielding: dissertation, chapter 5 (2000)", "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"]
+  - ["Report: Real GitHub, Local GitLab", "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-real-github/"]
+  - ["bdd-gates skill", "https://github.com/JogoShugh/bdd-gates-skill"]
+fragments:
+  - name: goal
+    label: The goal, in words (release.goal.md)
+    source: exhibits/merge-watch-release/release.goal.md
+    from: Release a pull request to Dev
+    lang: markdown
+  - name: kept
+    label: The kept script (release.heart.yaml)
+    source: exhibits/merge-watch-release/release.heart.yaml
+    from: "steps:"
+    lang: yaml
+  - name: pins
+    label: The pins (release.pins.yaml)
+    source: exhibits/merge-watch-release/release.pins.yaml
+    lang: yaml
+  - name: github-merge
+    label: "scm:merge on GitHub: the gateway's connector"
+    source: heart/heart-gateway/connectors/github-scm/pull.resource.yaml
+    from: "  merge:"
+    count: 22
+    lang: yaml
+  - name: gitlab-merge
+    label: "scm:merge on GitLab: the gateway's connector"
+    source: heart/heart-gateway/connectors/gitlab/pull.resource.yaml
+    from: "  merge:"
+    count: 21
+    lang: yaml
+  - name: hooks
+    label: The hooks that gate every change (core/hooks.json)
+    source: bdd-gates:core/hooks.json
+    lang: json
+html: |
+  <h2>Think once. Look and act for free. Own the controls.</h2>
+  <div class="map">
+    <input type="checkbox" id="map-lit" class="map-lit" checked><label for="map-lit" class="map-switch"><span class="off">Path only</span><span class="on">Everything</span></label>
+    <aside class="rail build">
+      <h4>Building <small>bdd-gates hooks</small></h4>
+      <ol>
+        <li><img src="media/icon-cucumber.png" alt=""><b>Gherkin</b><i>the behaviour, first</i></li>
+        <li class="red"><img src="media/icon-x.png" alt=""><b>red run</b><i>fails on behaviour</i></li>
+        <li><img src="media/icon-code.png" alt=""><b>code</b><i class="g">complexity lint, every edit</i></li>
+        <li class="green"><img src="media/icon-check.png" alt=""><b>green run</b><i class="g">+ architecture rules</i></li>
+        <li><img src="media/icon-commit.png" alt=""><b>gated commit</b><i>order checked: test, then code</i></li>
+      </ol>
+      <p class="quiet">Instructions are advice. Hooks aren’t. <deck-fragment name="hooks">hooks.json</deck-fragment></p>
+    </aside>
+    <div class="layers">
+      <section class="band think"><h4>Think <small>once</small></h4><div class="cells">
+        <div class="cell path"><span class="n">1</span><img src="media/icon-md.png" alt=""><span>release.goal.md<br><small>the goal, in words</small></span> <deck-fragment name="goal">goal</deck-fragment></div>
+        <div class="cell path"><span class="n">2</span><img src="media/icon-claude.png" alt=""><span>Claude captures<br><small>20 calls, once</small></span></div>
+        <div class="cell path"><span class="n">3</span><img src="media/icon-yaml.png" alt=""><span><b>kept YAML + pins</b></span> <deck-fragment name="kept">script</deck-fragment> <deck-fragment name="pins">pins</deck-fragment></div>
+      </div><p class="tags"><deck-ref name="zta">Hightower · ZTA</deck-ref></p></section>
+      <section class="band look"><h4>Look · Act <small>0 tokens a replay</small></h4><div class="cells">
+        <div class="cell"><img src="media/icon-globe.png" alt="">browser</div>
+        <div class="cell mono"><img src="media/icon-ts.png" alt="">heart-ts</div>
+        <div class="cell mono"><img src="media/icon-mcp.png" alt="">heart-mcp</div>
+        <div class="cell path hub"><span class="n">4</span><img src="media/icon-compass.png" alt=""><b>ARTIE</b></div>
+      </div><p class="caption">generic clients: pin check · If-Match · signed · L2 cache</p></section>
+      <section class="band wire"><h4>The wire <small>one media type</small></h4><div class="cells">
+        <div class="cell"><img src="media/icon-heart.png" alt=""><b>HEART = HAL + HAL Schema Forms</b></div>
+        <div class="cell"><img src="media/icon-layers.png" alt="">L0 · L1 · L2</div>
+        <div class="cell mono"><img src="media/icon-git.png" alt="">scm: relations</div>
+        <div class="cell mono"><img src="media/icon-info.png" alt="">hr:unavailable</div>
+      </div><p class="caption"><span class="rise">RISE, dotted blue:</span> watch now, be told later · <deck-ref name="rule-6">Fielding · enter by bookmark</deck-ref></p></section>
+      <section class="band ours"><h4>Our controls <small>in front of theirs</small></h4><div class="cells">
+        <div class="cell"><img src="media/icon-toggle.png" alt="">state-scoped acts</div>
+        <div class="cell mono"><img src="media/icon-slash.png" alt="">412·409·405</div>
+        <div class="cell rise-from"><img src="media/icon-bell.png" alt=""><b>watcher</b></div>
+        <div class="cell path hub"><span class="n">5</span><img src="media/icon-shield.png" alt=""><span><b>gateway</b><br><small>YAML connectors</small></span></div>
+      </div><p class="caption">acts offered only when the state allows; refusals explained · runs on your laptop, in front of GitHub</p></section>
+      <section class="band theirs"><h4>Theirs <small>native APIs</small></h4><div class="cells">
+        <div class="cell dim"><img src="media/icon-aws.png" alt="">preview</div>
+        <div class="cell path"><img src="media/icon-server.png" alt="">Dev</div>
+        <div class="cell path rise-from"><img src="media/icon-jenkins.png" alt="">Jenkins</div><span class="smoke">smoke script, linked</span>
+        <div class="scm path"><p><code>scm:</code> one set of typed relations, two forges</p>
+          <div class="cell path"><img src="media/icon-gitlab.png" alt="">GitLab <deck-fragment name="gitlab-merge">merge</deck-fragment></div>
+          <div class="cell hub"><span class="n">6</span><img src="media/icon-github.png" alt=""><b>GitHub</b> <deck-fragment name="github-merge">merge</deck-fragment></div>
+        </div>
+      </div></section>
+    </div>
+    <aside class="rail nums">
+      <h4>Capture <small>once · Claude · real GitHub</small></h4>
+      <dl><dt>20</dt><dd>model calls</dd><dt>36k</dt><dd>tokens: 33,140 in, 2,980 out</dd></dl>
+      <h4>Replay <small>each release after · no model</small></h4>
+      <dl><dt>0</dt><dd>model calls, tokens</dd></dl>
+      <table><caption>per 100 releases, L2 cache</caption><tr><th></th><th>GitHub</th><th>local GitLab</th></tr>
+        <tr><td>requests never sent</td><td>5,069</td><td>3,985</td></tr><tr><td>bytes never received</td><td>3.4 MB</td><td>3.8 MB</td></tr></table>
+      <h4>Instead of <small>an agent with no hypermedia</small></h4>
+      <dl class="rust"><dt>13.5 MB</dt><dd>GitHub’s OpenAPI, read up front</dd></dl>
+    </aside>
+    <p class="legend"><span class="gold-line"></span><b>The gold path is hypermedia as the engine of application state:</b> every step is a control the last answer offered. Nothing is built from a manual.</p>
+    <p class="legend repair"><span class="n red">7</span>A form changed? The replay stops, the model repairs at ② (the capture), then it’s zero tokens again.</p>
+    <div class="rest">
+      <h4>REST <small>Fielding’s dissertation, 2000</small></h4>
+      <deck-ref name="client-server">client–server</deck-ref>
+      <deck-ref name="stateless">stateless</deck-ref>
+      <deck-ref name="cache">cache ▲ L2</deck-ref>
+      <div class="uniform"><p><deck-ref name="uniform-interface">uniform interface</deck-ref> its four constraints</p>
+        <span>identification of resources</span><span>manipulation of resources through representations</span><span>self-descriptive messages</span><deck-ref name="uniform-interface">HATEOAS ▲ the gold path</deck-ref></div>
+      <deck-ref name="layered-system">layered system ▲ gateway</deck-ref>
+      <span class="optional"><deck-ref name="code-on-demand">code on demand ▲ smoke link</deck-ref><small>optional</small></span>
+    </div>
+  </div>

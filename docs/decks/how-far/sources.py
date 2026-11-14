@@ -1,0 +1,18 @@
+{
+2:'src(s, [["Claude Code Remote Control", "https://code.claude.com/docs/en/remote-control"], ["Claude Code hooks", "https://code.claude.com/docs/en/hooks"], ["bdd-gates skill", "https://github.com/JogoShugh/bdd-gates-skill"]]);',
+3:'src(s, [["Fielding, REST APIs must be hypertext-driven (2008)", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]], true);',
+4:'src(s, [["Fielding, dissertation, ch. 5: REST", "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"]]);',
+5:'src(s, [["Brown et al., Language Models are Few-Shot Learners (GPT-3), Table 2.2", "https://arxiv.org/abs/2005.14165"], ["Common Crawl", "https://commoncrawl.org/"]]);',
+6:'src(s, [["Fielding, 2008 post and its comments", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]], true);',
+7:'src(s, [["Fielding (2008)", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"], ["GitHub OpenAPI description", "https://github.com/github/rest-api-description"]]);',
+8:'src(s, [["Fielding, 2008 post and its comments", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]]);',
+9:'src(s, [["artie: HEART, RISE, ARTIE", "https://github.com/JogoShugh/heart-rise-artie"], ["HAL Schema Forms", "https://github.com/jbadeau/hal-schema-forms"], ["JSON Schema 2020-12", "https://json-schema.org/draft/2020-12"], ["RFC 9421 HTTP Message Signatures", "https://www.rfc-editor.org/rfc/rfc9421"]]);',
+10:'src(s, [["Pull request #2336", "https://github.com/JogoShugh/heart-github-test/pull/2336"], ["Report: Real GitHub, Local GitLab", "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-real-github/"]]);',
+11:'src(s, [["RFC 9111 HTTP Caching", "https://www.rfc-editor.org/rfc/rfc9111"], ["Report: the cache, release by release", "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-real-github/"]]);',
+13:'src(s, [["Report: Real GitHub, Local GitLab", "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-real-github/"], ["Kelsey Hightower: ZTA, Zero Token Architecture (2026)", "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"], ["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]]);',
+14:'src(s, [["Pull request #2336", "https://github.com/JogoShugh/heart-github-test/pull/2336"], ["Report: Real GitHub, Local GitLab", "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-real-github/"], ["Report: One Script, Two Forges", "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-two-forges/"]]);',
+15:'src(s, [["bdd-gates skill", "https://github.com/JogoShugh/bdd-gates-skill"], ["Claude Code hooks", "https://code.claude.com/docs/en/hooks"], ["Git hooks", "https://git-scm.com/docs/githooks"]]);',
+16:'src(s, [["Gherkin reference", "https://cucumber.io/docs/gherkin/reference/"], ["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]]);',
+17:'src(s, [["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"], ["bdd-gates skill", "https://github.com/JogoShugh/bdd-gates-skill"]]);',
+18:'src(s, [["bdd-gates: protect-gate.sh, refactor mode", "https://github.com/JogoShugh/bdd-gates-skill"]]);',
+}

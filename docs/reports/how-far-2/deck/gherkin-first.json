@@ -1,0 +1,110 @@
+{
+  "name": "gherkin-first",
+  "title": "No production write until a feature file changes",
+  "part": "What it costs, and how it was built",
+  "kicker": "For the engineers · Gherkin first",
+  "tone": "light",
+  "number": 52,
+  "of": 59,
+  "html": "<h2>No production write until a feature file changes</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);\">\n  <div class=\"rows\">\n    <pre><code># core/gherkin-first.sh (PreToolUse)\nrel=$(bdd_rel \"$file_path\")\nbdd_is_prod \"$rel\" || exit 0\nbdd_features_dirty &amp;&amp; exit 0\n# The author switched refactor mode on\nbdd_refactor_on &amp;&amp; exit 0\n\ncat &gt;&amp;2 &lt;&lt;EOF\nBlocked: about to modify production code\n($rel) with no feature file change in this\nchangeset yet. Write or update the Gherkin\nscenario first, run the BDD suite to see it\nfail, then implement.\nEOF\nexit 2</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"gherkin-first\">gherkin-first.sh</deck-fragment></p>\n  </div>\n  <div class=\"rows\">\n    <pre><code># core/log-event.sh (PostToolUse)\nif bdd_is_prod \"$rel\"; then\n  bdd_append \"MAIN_WRITE $rel\"\nelif bdd_is_feature \"$rel\"; then\n  bdd_append \"FEATURE_WRITE $rel\"\nfi</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"log-event\">log-event.sh</deck-fragment></p>\n    <pre><code># core/bdd-run.sh: every run, pass or fail\nif [ $ec -eq 0 ]; then\n  bdd_append \"BDD_RUN PASS exit=0\"\nelse\n  bdd_append \"BDD_RUN FAIL exit=$ec\"\nfi</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"bdd-run\">bdd-run.sh</deck-fragment></p>\n  </div>\n</div>\n",
+  "say": "gherkin-first.sh runs before every Edit or Write. If the file is production code and no feature file has an in-flight change, it exits 2 with a message the model reads. log-event.sh, after every edit, appends a fact to the event log, which the pre-commit check reads in order.",
+  "sources": [
+    {
+      "label": "bdd-gates: core/",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "gherkin-first.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "hooks-wiring.json",
+      "title": "Five hook events, each a shell script"
+    },
+    "next": {
+      "href": "pre-commit.json",
+      "title": "git pre-commit reads the log in order"
+    },
+    "alternate": {
+      "href": "gherkin-first.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:fragment": [
+      {
+        "name": "gherkin-first",
+        "label": "core/gherkin-first.sh (PreToolUse)",
+        "lang": "bash",
+        "path": "bdd-gates: core/gherkin-first.sh",
+        "lines": "1–25",
+        "of": 25,
+        "text": "#!/usr/bin/env bash\n# PreToolUse (Edit|Write|MultiEdit). Blocks a write to production code unless\n# a feature file already has an in-flight change, or the author switched\n# refactor mode on (scripts/refactor-mode). Exit 2 blocks the tool call\n# and sends stderr back to Claude.\nset -o pipefail\n. \"$(dirname \"$0\")/lib.sh\"\n\nfile_path=$(bdd_hook_file_path)\n[ -n \"$file_path\" ] || exit 0\nbdd_has_config || exit 0\nbdd_load\n\nrel=$(bdd_rel \"$file_path\")\nbdd_is_prod \"$rel\" || exit 0\nbdd_features_dirty && exit 0\n# The author switched refactor mode on: pre-commit checks its own terms.\nbdd_refactor_on && exit 0\n\ncat >&2 <<EOF\nBlocked: about to modify production code ($rel) with no feature file change in this changeset yet.\nWrite or update the Gherkin scenario first, run the BDD suite to see it fail, then implement.\nFeature patterns: $(bdd_list featurePatterns | tr '\\n' ' ')\nEOF\nexit 2",
+        "_links": {
+          "self": {
+            "href": "fragments/gherkin-first--gherkin-first.json",
+            "title": "core/gherkin-first.sh (PreToolUse)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/gherkin-first.sh",
+            "title": "core/gherkin-first.sh, lines 1–25"
+          }
+        }
+      },
+      {
+        "name": "log-event",
+        "label": "core/log-event.sh (PostToolUse)",
+        "lang": "bash",
+        "path": "bdd-gates: core/log-event.sh",
+        "lines": "1–18",
+        "of": 18,
+        "text": "#!/usr/bin/env bash\n# PostToolUse (Edit|Write|MultiEdit). Records MAIN_WRITE / FEATURE_WRITE facts\n# in .claude/tdd-events.log for the pre-commit ordering check. Never blocks.\nset -o pipefail\n. \"$(dirname \"$0\")/lib.sh\"\n\nfile_path=$(bdd_hook_file_path)\n[ -n \"$file_path\" ] || exit 0\nbdd_has_config || exit 0\nbdd_load\n\nrel=$(bdd_rel \"$file_path\")\nif bdd_is_prod \"$rel\"; then\n  bdd_append \"MAIN_WRITE $rel\"\nelif bdd_is_feature \"$rel\"; then\n  bdd_append \"FEATURE_WRITE $rel\"\nfi\nexit 0",
+        "_links": {
+          "self": {
+            "href": "fragments/gherkin-first--log-event.json",
+            "title": "core/log-event.sh (PostToolUse)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/log-event.sh",
+            "title": "core/log-event.sh, lines 1–18"
+          }
+        }
+      },
+      {
+        "name": "bdd-run",
+        "label": "core/bdd-run.sh, every run, pass or fail",
+        "lang": "bash",
+        "path": "bdd-gates: core/bdd-run.sh",
+        "lines": "1–26",
+        "of": 26,
+        "text": "#!/usr/bin/env bash\n# Runs the BDD suite and records \"BDD_RUN PASS|FAIL\" in the event log, pass or\n# fail. For stacks with bddLogging \"wrapper\" (no native build hook that runs\n# after a failed test task). Extra args are appended to bddCommand.\n# Exits with the suite's own exit code.\nset -o pipefail\n. \"$(dirname \"$0\")/lib.sh\"\n\nbdd_has_config || { echo \"bdd-run: no $(bdd_config)\" >&2; exit 1; }\ncmd=$(bdd_value bddCommand)\n[ -n \"$cmd\" ] || { echo \"bdd-run: bddCommand not set in $(bdd_config)\" >&2; exit 1; }\n\ncd \"$(bdd_root)\" || exit 1\nif [ $# -gt 0 ]; then\n  bash -c \"$cmd $*\"\nelse\n  bash -c \"$cmd\"\nfi\nec=$?\n\nif [ $ec -eq 0 ]; then\n  bdd_append \"BDD_RUN PASS exit=0\"\nelse\n  bdd_append \"BDD_RUN FAIL exit=$ec\"\nfi\nexit $ec",
+        "_links": {
+          "self": {
+            "href": "fragments/gherkin-first--bdd-run.json",
+            "title": "core/bdd-run.sh, every run, pass or fail"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/bdd-run.sh",
+            "title": "core/bdd-run.sh, lines 1–26"
+          }
+        }
+      }
+    ]
+  }
+}

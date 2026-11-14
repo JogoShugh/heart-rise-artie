@@ -1,0 +1,10 @@
+# What a build from this folder never needs: Gradle's output and caches (each
+# module's own build folder, not a source package named build), and anything
+# that may hold a credential (the gateway's live scripts, .env files).
+build
+*/build
+.gradle
+*/.gradle
+**/node_modules
+**/live
+**/.env

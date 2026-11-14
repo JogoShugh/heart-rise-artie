@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The scenario, then the failing run · How far can one vision go · 2.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">How it was built · Red first, live</span></header>
+<h2>The scenario, then the failing run</h2>
+<div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);">
+  <div class="rows">
+    <pre><code>Scenario: A step that only reads is kept in the
+  script when a later step names what it read
+  `as NAME` on a read is no detour when a later step
+  names it: the watch is asked about ${front.@self}
+  Given the file "named-read.goal.md" is
+    - Search the desk's releases that are {state}
+      `as front`
+    - At {watcher}, ask to be told when {front}
+      offers desk:release `as watch`
+  …
+  Then the script has a line with
+    "- act: desk:search-releases"</code></pre>
+    <p class="refs"><details class="fragment-plain"><summary>The scenario, whole (goal-rise.feature)</summary><pre><code>Scenario: A step that only reads is kept in the script when a later step names what it read
+  `as NAME` on a read is no detour when a later step names it: the watch is asked about
+  `${front.@self}`, so the script reads front first, though no value of front is sent.
+  Given the file &quot;named-read.goal.md&quot; is
+    &quot;&quot;&quot;
+    ---
+    start: &quot;{desk}&quot;
+    inputs:
+      desk:
+      watcher:
+      state:
+    ---
+
+    Watch the desk's releases in a state.
+
+    - Search the desk's releases that are {state} `as front`
+    - At {watcher}, ask to be told when {front} offers desk:release `as watch`
+    &quot;&quot;&quot;
+  And the planner will move
+    | move | words                                                          | opens |
+    | act  | search the desk's releases that are running                    | yes   |
+    | done |                                                                |       |
+    | act  | ask to be told when the releases found offer desk:release      | yes   |
+    | done |                                                                |       |
+  And ARTIE's reasoner will choose, in order
+    | form                 | follow | fields                                                                          |
+    | desk:search-releases |        | {&quot;name&quot;: &quot;running&quot;}                                                             |
+    | watcher:watch        |        | {&quot;resource&quot;: &quot;http://localhost:8160/releases?name=running&quot;, &quot;offers&quot;: &quot;desk:release&quot;} |
+  When the goal &quot;named-read.goal.md&quot; runs with ARTIE in the desk, captured in &quot;named-read.trace.yaml&quot;, given
+    | name    | value                  |
+    | desk    | http://localhost:8160/ |
+    | watcher | http://localhost:8099/ |
+    | state   | running                |
+  Then the run finished
+  When artie generated &quot;named-read.heart.yaml&quot; as data from &quot;named-read.trace.yaml&quot; and &quot;named-read.goal.md&quot;
+  Then the script &quot;named-read.heart.yaml&quot; has a line with &quot;- act: desk:search-releases&quot;</code></pre></details></p>
+  </div>
+  <div class="rows">
+    <pre><code># the red run, logged by the gate
+496 tests completed, 1 failed,
+41 skipped
+testcase: A step that only reads
+is kept in the script when …</code></pre>
+    <p>Red on behaviour, not on a compile error. The gate logs the run; only then may src/main change.</p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/pre-commit.html" rel="prev"><small>Back</small><b>git pre-commit reads the log in order</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#red-first">with heart-ts</a></span>
+<a href="deck/code-green-commit.html" rel="next"><small>Next</small><b>The fix, the green run, the gated commit</b></a></nav>
+</main></div></body></html>

@@ -1,0 +1,20 @@
+{
+  "name": "mcp",
+  "kind": "part",
+  "label": "MCP",
+  "title": "MCP: how agents call tools today",
+  "summary": "The Model Context Protocol. A server lists named tools, each with a description and a JSON Schema for its arguments; the agent calls one by name. Every call is a JSON-RPC 2.0 message (tools/call). The list belongs to the session, not to the state of any one thing.",
+  "cite": "Model Context Protocol: tools",
+  "_links": {
+    "describedby": {
+      "href": "https://modelcontextprotocol.io/specification/2025-06-18/server/tools",
+      "title": "Model Context Protocol: tools"
+    },
+    "self": {
+      "href": "mcp.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+name: frustration
+part: "What the machine web did"
+tone: dark
+title: "Our question: how far can we take his vision today?"
+kicker: 20 October 2008 · Fielding’s frustration
+say: "Not 'who got REST wrong'. The question is constructive: take the 2008 post at its word, with today's models and tools, and see how far it goes. The pills are the short forms from the start: his six rules from that post, each whole. The last row is his 2000 constraints. He wasn't asking for something new. It already runs in production."
+sources:
+  - ["Fielding: REST APIs must be hypertext-driven (2008)", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]
+  - ["Fielding: dissertation, chapter 5 (2000)", "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"]
+html: |
+  <h2>Our question: how far can we take his vision today?</h2>
+  <div class="split">
+    <div class="rows">
+      <blockquote class="big">“I am getting frustrated by the number of people calling any HTTP-based interface a REST API.”</blockquote>
+      <p class="cite">Roy T. Fielding, “REST APIs must be hypertext-driven”, 20 Oct 2008 · <deck-ref name="frustrated"></deck-ref></p>
+      <p class="lead">Not “who got it wrong”. How far can we go if we take one Web architect’s vision at its word, with the tools we have now?</p>
+    </div>
+    <figure><img src="media/fielding-crop.png" alt="Fielding's 2008 post, 'REST APIs must be hypertext-driven', as it appears on his blog"></figure>
+  </div>
+  <p class="refs"><small>His six rules</small> <deck-ref name="rule-1"></deck-ref> <deck-ref name="rule-2"></deck-ref> <deck-ref name="rule-3"></deck-ref> <deck-ref name="rule-4"></deck-ref> <deck-ref name="rule-5"></deck-ref> <deck-ref name="rule-6"></deck-ref></p>
+  <p class="refs"><small>REST, 2000</small> <deck-ref name="client-server"></deck-ref> <deck-ref name="stateless"></deck-ref> <deck-ref name="cache"></deck-ref> <deck-ref name="uniform-interface"></deck-ref> <deck-ref name="layered-system"></deck-ref> <deck-ref name="code-on-demand"></deck-ref></p>

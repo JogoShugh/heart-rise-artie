@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Only data: what most APIs send today · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Building it back up · Step 1 of 5 · HEART L0, simplified</span></header>
+<h2>Only data: what most APIs send today</h2>
+<div class="split" style="grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr)">
+  <pre># GET /repos/JogoShugh/heart-github-test/pulls/2325
+# Accept: application/json
+number: 2325
+title: "Renewals: none during the audit"
+body: Variant 504 of the Riverside Public Library release.
+state: open
+merged: false
+draft: false
+mergeable_state: clean
+head:
+  ref: library/pr-504
+  sha: e266e3b53e0e04204c4f8eff6b14208ba53aafea
+base:
+  ref: library/main
+# …and about 30 more fields</pre>
+  <div class="rows">
+    <h3 style="font: 650 1.7rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--bad)">And the controls?</h3>
+    <ul>
+      <li>Can it be merged now? By which methods? With what fields?</li>
+      <li>Can I comment? Reopen? Request a review?</li>
+      <li>Answered elsewhere: docs pages, an SDK, a 13.5 MB OpenAPI file, read by a developer and coded into a client.</li>
+    </ul>
+    <p class="cite"><i>The same gap as AWS’s three docs pages, in the preview.</i></p>
+    <p class="refs"><a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">Rule 3 · Describe the media type</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">Rule 6 · The bookmark</a></p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/one-plain-ui.html" rel="prev"><small>Back</small><b>One plain UI, rendered from the shared relations</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#step-1-data">with heart-ts</a></span>
+<a href="deck/step-2-links.html" rel="next"><small>Next</small><b>Links: it names itself and its vocabulary</b></a></nav>
+</main></div></body></html>

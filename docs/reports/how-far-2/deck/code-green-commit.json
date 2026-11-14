@@ -1,0 +1,76 @@
+{
+  "name": "code-green-commit",
+  "title": "The fix, the green run, the gated commit",
+  "part": "What it costs, and how it was built",
+  "kicker": "How it was built · Code, green, commit",
+  "tone": "light",
+  "number": 55,
+  "of": 59,
+  "html": "<h2>The fix, the green run, the gated commit</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);\">\n  <div class=\"rows\">\n    <pre><code>// Detours.kt: keep a read another step names\nprivate fun named(capture: Capture): Set&lt;Int&gt; {\n  val marks = capture.steps.associateWith {\n    capture.marks(it) }\n  return marks.filter { (step, own) -&gt;\n    val name = own[\"as\"]?.toString()\n      ?: return@filter false\n    val mention = Regex(\"\"\"\\{$name[.}]\"\"\")\n    marks.any { (other, its) -&gt; other.line !=\n      step.line &amp;&amp; its.values.any {\n        mention.containsMatchIn(\"$it\") } }\n  }.keys.map { it.number }.toSet()</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"detours\">Detours.kt</deck-fragment></p>\n    <pre><code>pre-commit: TDD ordering check passed.\n# then the capture again, and the open-PR step stays</code></pre>\n  </div>\n  <div class=\"rows\">\n    <figure><img src=\"media/testreport-crop.png\" alt=\"The artie-cli test report: 198 tests, 0 failures\"><figcaption>artie-cli test report: 198 tests, 0 failures.</figcaption></figure>\n    <p class=\"punch\">Then the replay, on real GitHub and local GitLab, with the regenerated script.</p>\n  </div>\n</div>\n",
+  "say": "The fix in Detours.kt: keep a step whose `as` name another step mentions. Then green, then the commit, which the git pre-commit hook checks for ordering. The report beside it is the module's real test report.",
+  "sources": [
+    {
+      "label": "artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    },
+    {
+      "label": "bdd-gates skill",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "code-green-commit.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "red-first.json",
+      "title": "The scenario, then the failing run"
+    },
+    "next": {
+      "href": "gate-says-no.json",
+      "title": "The gates hold, even against the model"
+    },
+    "alternate": {
+      "href": "code-green-commit.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:fragment": [
+      {
+        "name": "detours",
+        "label": "Detours.kt, keep a read another step names",
+        "lang": "kotlin",
+        "path": "client/artie-cli/src/main/kotlin/heart/cli/generate/Detours.kt",
+        "lines": "63–70",
+        "of": 84,
+        "text": "private fun named(capture: Capture): Set<Int> {\n    val marks = capture.steps.associateWith { capture.marks(it) }\n    return marks.filter { (step, own) ->\n        val name = own[\"as\"]?.toString() ?: return@filter false\n        val mention = Regex(\"\"\"\\{$name[.}]\"\"\")\n        marks.any { (other, its) -> other.line != step.line && its.values.any { mention.containsMatchIn(\"$it\") } }\n    }.keys.map { it.number }.toSet()\n}",
+        "_links": {
+          "self": {
+            "href": "fragments/code-green-commit--detours.json",
+            "title": "Detours.kt, keep a read another step names"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/client/artie-cli/src/main/kotlin/heart/cli/generate/Detours.kt#L63-L70",
+            "title": "client/artie-cli/src/main/kotlin/heart/cli/generate/Detours.kt, lines 63–70"
+          }
+        }
+      }
+    ]
+  }
+}

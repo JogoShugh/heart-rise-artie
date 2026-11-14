@@ -1,0 +1,97 @@
+{
+  "name": "how-heart-mcp-works",
+  "title": "heart-mcp: six fixed tools, and the state in every answer",
+  "part": "Putting them back together",
+  "kicker": "Counterpoint · how heart-mcp works",
+  "tone": "light",
+  "number": 22,
+  "of": 59,
+  "html": "<h2>heart-mcp: six fixed tools, and the state in every answer</h2>\n<div class=\"flow\" style=\"grid-template-columns: minmax(0, 0.8fr) auto minmax(0, 1.5fr) auto minmax(0, 1fr)\">\n  <div class=\"box green\"><h3>The model</h3><p>in any MCP host: Claude Code, Claude Desktop, your agent</p><p><b>chooses</b> the next move</p></div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"panel\">\n    <span class=\"label\">heart-mcp · six tools that never change</span>\n    <table style=\"font-size: 0.86rem\">\n      <tr><td><code>heart_look</code></td><td>go to a bookmark, or read this resource again</td></tr>\n      <tr><td><code>heart_act</code></td><td>take one <b>offered</b> act, by name, with fields</td></tr>\n      <tr><td><code>heart_follow</code></td><td>follow a link, by rel and title</td></tr>\n      <tr><td><code>heart_describe</code></td><td>the service’s fuller description of an act</td></tr>\n      <tr><td><code>heart_explain</code></td><td>why an act isn’t offered now; nothing is sent</td></tr>\n      <tr><td><code>heart_back</code></td><td>back one resource, read again</td></tr>\n    </table>\n    <span class=\"faint\">checks the choice: is the act offered? do the fields fit its schema? If not, nothing is sent.</span>\n  </div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"box\"><h3>ARTIE, inside</h3><p><b>builds every request</b>: address, method, If-Match, credential, L2 forms with integrity checked</p><p>→ any HEART service, or the gateway in front of GitHub</p></div>\n</div>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin-top: 0.4rem\">\n  <div class=\"panel\"><span class=\"label\">Every answer holds</span><p><b>state</b> · the resource’s fields<br><b>acts</b> · offered now: name, title, description, schema<br><b>links</b> · rel and title<br><b>outcome</b> · acted · rejected-before-sending · stale · not-offered · invalid-input · rule-refused</p></div>\n  <div class=\"panel\"><span class=\"label\">What the model never sees</span><p class=\"big\" style=\"font-family: var(--body)\">an address, a method, a header, a validator, a credential</p><span class=\"faint\">It can’t build a request, and it can’t call an act that isn’t offered.</span></div>\n</div>\n<p class=\"refs\"><deck-ref name=\"in-band\"></deck-ref> <deck-ref name=\"think-of-the-web\"></deck-ref></p>\n",
+  "say": "So what would an MCP server look like if it worked like a browser? That's heart-mcp. It gives the model six tools that never change, like a browser's buttons: look, act, follow, describe, explain, back. What changes is what each one answers: the resource's state, the acts offered right now, each with its name, title, description and schema, and the links. The model chooses. heart-mcp checks the choice against what was offered, and against the act's schema, before anything is sent. ARTIE, inside it, builds the request: the address, the method, the If-Match validator, the credential. The model never sees any of those. It can't build a request, and it can't call an act that isn't offered. And when something's off, the outcome says which: acted, rejected before sending, stale, not offered, invalid input, or refused by a rule, in the service's own words. Next, the same thing on real GitHub.",
+  "sources": [
+    {
+      "label": "heart-mcp: README",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/mcp/README.md"
+    },
+    {
+      "label": "heart-mcp: how it works",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/mcp/docs/HOW-IT-WORKS.md"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "how-heart-mcp-works.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "generic-client.json",
+      "title": "ARTIE is to APIs what a browser is to web pages"
+    },
+    "next": {
+      "href": "heart-mcp-github.json",
+      "title": "The same model, given state instead of a catalogue"
+    },
+    "alternate": {
+      "href": "how-heart-mcp-works.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "in-band",
+        "kind": "comment",
+        "label": "IN-BAND",
+        "title": "Instructions in every representation",
+        "summary": "The media type is learned once; each representation carries the transitions available at that point.",
+        "quote": "<p>“The media type identifies a specification that defines how a representation is to be processed. That is out-of-band information (all communication is dependent on some prior knowledge). What you are missing is that each representation contains the specific instructions for interfacing with a given service, provided in-band. The media type is a generic processing model that every agent can learn if there aren’t too many of them (hence the need for standards). The representation is specific to the application being performed by the agent. Each representation therefore provides the transitions that are available at that point in the application.</p><p>When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "23 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/in-band.json",
+            "title": "IN-BAND"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "think-of-the-web",
+        "kind": "comment",
+        "label": "BROWSER-TEST",
+        "title": "Browsers don't know resource types",
+        "summary": "A browser knows the links and forms, not whether it's a bank or a wiki. Typed relations guide automated agents.",
+        "quote": "<p>“A truly RESTful API looks like hypertext. Every addressable unit of information carries an address, either explicitly (e.g., link and id attributes) or implicitly (e.g., derived from the media type definition and representation structure). Query results are represented by a list of links with summary information, not by arrays of object representations (query is not a substitute for identification of resources). Resource representations are self-descriptive: the client does not need to know if a resource is OpenSocialist because it is just acting on the representations received.</p><p>Think of it in terms of the Web. How many Web browsers are aware of the distinction between an online-banking resource and a Wiki resource? None of them. They don’t need to be aware of the resource types. What they need to be aware of is the potential state transitions — the links and forms — and what semantics/actions are implied by traversing those links. A browser represents them as distinct UI controls so that a user can see potential transitions and anticipate the effect of chosen actions. A spider can follow them to the extent that the relationships are known to be safe. Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/think-of-the-web.json",
+            "title": "BROWSER-TEST"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-720",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      }
+    ]
+  }
+}

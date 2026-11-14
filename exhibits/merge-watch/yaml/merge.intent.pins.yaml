@@ -1,0 +1,40 @@
+# What yaml/merge.intent.heart.yaml was recorded against, from runs/yaml/goal-claude.trace.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its
+# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
+# one offered in a set not recorded for it.
+rung: L0
+digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+forms:
+  github:repos-get:
+    integrity: sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+    act: sha256-PrNDFZycQXO0vDomT70X2hUukyXEia4UgE6Z7EXsru0=
+    method: GET
+    sets: []
+  github:open-issue:
+    integrity: sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+    act: sha256-zSq9d1NxXf4kXLKZaTlHo/9x0j+E3X2SJkMhbOdk21U=
+    method: POST
+    sets: []
+  github:pulls-list:
+    integrity: sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+    act: sha256-JnqWXA8jwi6kuV+gBZyeTqllWNghoA7r3aX2i9RW/8Y=
+    method: GET
+    sets: []
+  github:merge:
+    integrity: sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+    act: sha256-rIPDcwcEW99MvpphQzxbgRrzOPoH90Q4lEQrZ+emAMo=
+    method: PUT
+    sets: []
+  github:label:
+    integrity: sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+    act: sha256-52QH/EEb/wie75haftuFgclmhGpgn+V7v/mFQQwxhrU=
+    method: POST
+    sets: []
+  github:comment:
+    integrity: sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+    act: sha256-hlKO8GQge5XCho1Q3O2p3EQT4tMnMfv7zt+tYAinXwc=
+    method: POST
+    sets: []
+links:
+  item: ''
+  next: ''

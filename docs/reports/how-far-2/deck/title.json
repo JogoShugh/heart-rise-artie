@@ -1,0 +1,122 @@
+{
+  "name": "title",
+  "title": "How far can one Web architect’s vision go?",
+  "part": "Why now",
+  "kicker": "Hypertext, inference and hooks",
+  "tone": "dark",
+  "number": 1,
+  "of": 59,
+  "html": "<h1>How far can one Web architect’s vision go?</h1>\n<p class=\"lead\">Hypertext, inference, and hooks: determinism around a model.</p>\n<p class=\"refs\"><small>One loop, for a person and for an agent</small> <span class=\"ref kind-comment\" aria-hidden=\"true\">Look</span> <span class=\"ref\" aria-hidden=\"true\">Think</span> <span class=\"ref kind-comment\" aria-hidden=\"true\">Act</span></p>\n<p class=\"refs\"><small>Grounded in</small> <deck-ref name=\"zta\"></deck-ref> <deck-ref name=\"no-time\"></deck-ref> <deck-ref name=\"rule-6\"></deck-ref> <deck-ref name=\"hypertext\"></deck-ref></p>\n",
+  "say": "The question for the next half hour: if we take one Web architect's 2008 vision at its word, with today's tools, how far does it go? Two halves: running (hypertext lets a model find a path once, then a script replays it), and building (hooks put determinism around the model that wrote the code). Three grounds, each a pill you can click at any time: ZTA, no time to type, and Fielding's rules.",
+  "sources": [],
+  "_links": {
+    "self": {
+      "href": "title.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "next": {
+      "href": "token-maxing.json",
+      "title": "From token maxing to tokenomics"
+    },
+    "alternate": {
+      "href": "title.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "zta",
+        "kind": "talk",
+        "label": "ZTA",
+        "title": "ZTA: Zero Token Architecture",
+        "summary": "Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. (In my words, from the talk's page and Daniel Cranney's write-up.)",
+        "quote": "<p>“You are all having way too much fun burning way too many tokens”</p><p class=\"note\">His opening line, as quoted in Daniel Cranney, <a href=\"https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture\">“Infer Once, Run Everywhere: Zero-Token Architecture”</a>, WeAreDevelopers, 13 October 2026.</p>",
+        "cite": "Kelsey Hightower, WeAreDevelopers World Congress North America",
+        "date": "26 September 2026",
+        "_links": {
+          "self": {
+            "href": "../refs/zta.json",
+            "title": "ZTA"
+          },
+          "describedby": {
+            "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture",
+            "title": "Kelsey Hightower, WeAreDevelopers World Congress North America"
+          }
+        }
+      },
+      {
+        "name": "no-time",
+        "kind": "ground",
+        "label": "NO-TIME",
+        "title": "No time to type",
+        "summary": "Most of my work is steered by thumb, from a phone, through Claude Code's /remote-control, away from the keyboard. So the agents have to act safely while nobody watches every step, and cheaply when they do the same thing again. Hypermedia gives the first (only what the state allows is offered); kept scripts give the second (zero tokens to replay).",
+        "cite": "Claude Code docs: /remote-control, continue a local session from a phone or a browser",
+        "_links": {
+          "self": {
+            "href": "../refs/no-time.json",
+            "title": "NO-TIME"
+          },
+          "describedby": {
+            "href": "https://code.claude.com/docs/en/remote-control",
+            "title": "Claude Code docs: /remote-control, continue a local session from a phone or a browser"
+          }
+        }
+      },
+      {
+        "name": "rule-6",
+        "kind": "rule",
+        "label": "R6 · BOOKMARK",
+        "title": "Enter with a bookmark; follow what's offered",
+        "summary": "In brief: one URI and known media types to start; every next step chosen from what the server put in the answer.",
+        "quote": "<p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>",
+        "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/rule-6.json",
+            "title": "R6 · BOOKMARK"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+            "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "hypertext",
+        "kind": "comment",
+        "label": "HYPERTEXT",
+        "title": "What hypertext means",
+        "summary": "His definition: information and controls, presented together. Machines can follow links too.",
+        "quote": "<p>“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions. Hypermedia is just an expansion on what text means to include temporal anchors within a media stream; most researchers have dropped the distinction.</p><p>Hypertext does not need to be HTML on a browser. Machines can follow links when they understand the data format and relationship types.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/hypertext.json",
+            "title": "HYPERTEXT"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-718",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      }
+    ]
+  }
+}

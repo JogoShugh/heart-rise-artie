@@ -1,0 +1,201 @@
+{
+  "name": "cast",
+  "title": "The cast, before any of it appears",
+  "part": "Why now",
+  "kicker": "Names you'll hear · each one a pill",
+  "tone": "light",
+  "number": 6,
+  "of": 59,
+  "html": "<h2>The cast, before any of it appears</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)\">\n  <div class=\"rows\">\n    <div><h3><deck-ref name=\"mcp\"></deck-ref></h3><p>How agents call tools today: named functions, over JSON-RPC.</p></div>\n    <div><h3><deck-ref name=\"heart\"></deck-ref></h3><p>Our media type: the data and the acts its state allows now, in one answer.</p></div>\n    <div><h3><deck-ref name=\"rise\"></deck-ref></h3><p>The asynchronous half: ask now, be told later.</p></div>\n    <div><h3><deck-ref name=\"artie\"></deck-ref></h3><p>The generic client: to APIs what a browser is to web pages.</p></div>\n  </div>\n  <div class=\"rows\">\n    <div><h3><deck-ref name=\"gateway\"></deck-ref></h3><p>Our controls, on a laptop, in front of GitHub or GitLab.</p></div>\n    <div><h3><deck-ref name=\"scm\"></deck-ref></h3><p>One set of typed relations both forges answer to.</p></div>\n    <div><h3><deck-ref name=\"rungs\"></deck-ref></h3><p>Three ways to deliver the same forms: all in one answer, or cached by link.</p></div>\n    <div><h3><deck-ref name=\"heart-mcp\"></deck-ref></h3><p>HEART behind six MCP tools that never change.</p></div>\n  </div>\n</div>\n",
+  "say": "Before anything uses a name, here are the names. MCP is how agents call tools today: a list of named functions, called over JSON-RPC. HEART is our media type: every answer carries the data and the forms for the acts its state allows now. RISE is the asynchronous half: ask now, be told later. ARTIE is the generic client, coupled to HEART the way a browser is coupled to HTML. The gateway is a small server on a laptop that puts our controls in front of GitHub or GitLab. scm is the set of typed relations both forges answer to. L0, L1 and L2 are three ways to deliver the same forms, from all in one answer to cached by link. And heart-mcp is HEART behind six MCP tools that never change. Each is a pill; each comes back.",
+  "sources": [
+    {
+      "label": "heart-rise-artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    },
+    {
+      "label": "Model Context Protocol: tools",
+      "href": "https://modelcontextprotocol.io/specification/2025-06-18/server/tools"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "cast.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "rules.json",
+      "title": "The rules we hold to: Fielding, 2000 and 2008"
+    },
+    "next": {
+      "href": "map.json",
+      "title": "Think once. Look and act for free. Own the controls."
+    },
+    "alternate": {
+      "href": "cast.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "mcp",
+        "kind": "part",
+        "label": "MCP",
+        "title": "MCP: how agents call tools today",
+        "summary": "The Model Context Protocol. A server lists named tools, each with a description and a JSON Schema for its arguments; the agent calls one by name. Every call is a JSON-RPC 2.0 message (tools/call). The list belongs to the session, not to the state of any one thing.",
+        "cite": "Model Context Protocol: tools",
+        "_links": {
+          "self": {
+            "href": "../refs/mcp.json",
+            "title": "MCP"
+          },
+          "describedby": {
+            "href": "https://modelcontextprotocol.io/specification/2025-06-18/server/tools",
+            "title": "Model Context Protocol: tools"
+          }
+        }
+      },
+      {
+        "name": "heart",
+        "kind": "part",
+        "label": "HEART",
+        "title": "HEART: one media type, information and controls together",
+        "summary": "Hypermedia Enforced Agentic Reliable Transactions. HAL with HAL Schema Forms, plus a small profile. Every answer carries the resource's data and the forms for the acts its state allows now, each with a method, an address and a JSON Schema; an act that isn't offered can say why (hr:unavailable).",
+        "cite": "HAL Schema Forms, the HEART profile",
+        "_links": {
+          "self": {
+            "href": "../refs/heart.json",
+            "title": "HEART"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/spec/HAL-SCHEMA-FORMS-HR.md",
+            "title": "HAL Schema Forms, the HEART profile"
+          }
+        }
+      },
+      {
+        "name": "rise",
+        "kind": "part",
+        "label": "RISE",
+        "title": "RISE: tell me when it's done",
+        "summary": "Reciprocal Interface for State Exchange. Replies for asynchronous work: ask now, be told later. A watcher or a build answers back when it is ready, as Jenkins does in the release.",
+        "cite": "heart-rise-artie (repository)",
+        "_links": {
+          "self": {
+            "href": "../refs/rise.json",
+            "title": "RISE"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc",
+            "title": "heart-rise-artie (repository)"
+          }
+        }
+      },
+      {
+        "name": "artie",
+        "kind": "part",
+        "label": "ARTIE",
+        "title": "ARTIE: the generic client",
+        "summary": "Autonomous Restful Traversal and Interactive Engine. Coupled to HEART and HTTP, and to nothing about any one API, as a browser is to HTML. It enters by a bookmark, checks a kept script's pins against what is offered, sends each act with its If-Match validator, and caches forms and schemas (L2).",
+        "cite": "heart-rise-artie (repository)",
+        "_links": {
+          "self": {
+            "href": "../refs/artie.json",
+            "title": "ARTIE"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/client",
+            "title": "heart-rise-artie (repository)"
+          }
+        }
+      },
+      {
+        "name": "gateway",
+        "kind": "part",
+        "label": "GATEWAY",
+        "title": "The gateway: our controls in front of theirs",
+        "summary": "A small server, on a laptop, in front of an API we don't control (GitHub, a local GitLab). YAML connectors map each act onto the native call and say when it is offered; the gateway answers in HEART.",
+        "cite": "heart-gateway connectors",
+        "_links": {
+          "self": {
+            "href": "../refs/gateway.json",
+            "title": "GATEWAY"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors",
+            "title": "heart-gateway connectors"
+          }
+        }
+      },
+      {
+        "name": "scm",
+        "kind": "part",
+        "label": "scm:",
+        "title": "scm: one set of typed relations, two forges",
+        "summary": "scm:merge, scm:comment, scm:close and the rest: relation names defined by meaning, not by one server's endpoints. GitHub and GitLab both answer to them, so a kept script runs on either.",
+        "cite": "heart-gateway connectors",
+        "_links": {
+          "self": {
+            "href": "../refs/scm.json",
+            "title": "scm:"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors",
+            "title": "heart-gateway connectors"
+          }
+        }
+      },
+      {
+        "name": "rungs",
+        "kind": "part",
+        "label": "L0 · L1 · L2",
+        "title": "L0, L1, L2: three ways to deliver the same forms",
+        "summary": "L0: everything in one answer. L1: the forms by link, so they are shared and cacheable. L2: the forms and their schemas by link, checked by integrity hashes, so a replay sends almost nothing it has seen before.",
+        "cite": "HAL Schema Forms, the HEART profile",
+        "_links": {
+          "self": {
+            "href": "../refs/rungs.json",
+            "title": "L0 · L1 · L2"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/spec/HAL-SCHEMA-FORMS-HR.md",
+            "title": "HAL Schema Forms, the HEART profile"
+          }
+        }
+      },
+      {
+        "name": "heart-mcp",
+        "kind": "part",
+        "label": "heart-mcp",
+        "title": "heart-mcp: HEART behind six fixed MCP tools",
+        "summary": "An MCP server with ARTIE inside. The model gets six tools that never change (look, act, follow, describe, explain, back); the state and the acts it allows come in every answer, and ARTIE builds every request. The model never sees an address.",
+        "cite": "heart-mcp (repository)",
+        "_links": {
+          "self": {
+            "href": "../refs/heart-mcp.json",
+            "title": "heart-mcp"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/mcp",
+            "title": "heart-mcp (repository)"
+          }
+        }
+      }
+    ]
+  }
+}

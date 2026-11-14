@@ -1,0 +1,1140 @@
+steps:
+- at: "2026-11-12T01:15:52.484411Z"
+  mode: "script"
+  say: "The entry, asked for as {accept}"
+  params:
+    accept: "application/prs.hal-forms+json"
+  request:
+    method: "GET"
+    url: "http://localhost:8096/employees"
+    headers:
+      Accept: "application/prs.hal-forms+json"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/prs.hal-forms+json"
+    body:
+      _embedded:
+        employees:
+        - id: 1
+          firstName: "Frodo"
+          lastName: "Baggins"
+          role: "ring bearer"
+          _links:
+            self:
+              href: "http://localhost:8096/employees/1"
+            employees:
+              href: "http://localhost:8096/employees"
+          _templates:
+            default:
+              method: "put"
+              properties:
+              - name: "firstName"
+              - name: "id"
+              - name: "lastName"
+              - name: "role"
+            deleteEmployee:
+              method: "delete"
+              properties: []
+        - id: 2
+          firstName: "Bilbo"
+          lastName: "Baggins"
+          role: "burglar"
+          _links:
+            self:
+              href: "http://localhost:8096/employees/2"
+            employees:
+              href: "http://localhost:8096/employees"
+          _templates:
+            default:
+              method: "put"
+              properties:
+              - name: "firstName"
+              - name: "id"
+              - name: "lastName"
+              - name: "role"
+            deleteEmployee:
+              method: "delete"
+              properties: []
+      _links:
+        self:
+          href: "http://localhost:8096/employees"
+      _templates:
+        default:
+          method: "post"
+          properties:
+          - name: "firstName"
+          - name: "id"
+          - name: "lastName"
+          - name: "role"
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "GET"
+      url: "http://localhost:8097/employees"
+      headers:
+        Accept: "application/prs.hal-forms+json"
+      body: null
+    response:
+      status: 200
+      headers:
+        Content-Type: "application/prs.hal-forms+json"
+      body:
+        _embedded:
+          employees:
+          - id: 1
+            firstName: "Frodo"
+            lastName: "Baggins"
+            role: "ring bearer"
+            _links:
+              self:
+                href: "http://localhost:8097/employees/1"
+              employees:
+                href: "http://localhost:8097/employees"
+            _templates:
+              default:
+                method: "put"
+                properties:
+                - name: "firstName"
+                - name: "id"
+                - name: "lastName"
+                - name: "role"
+              deleteEmployee:
+                method: "delete"
+                properties: []
+          - id: 2
+            firstName: "Bilbo"
+            lastName: "Baggins"
+            role: "burglar"
+            _links:
+              self:
+                href: "http://localhost:8097/employees/2"
+              employees:
+                href: "http://localhost:8097/employees"
+            _templates:
+              default:
+                method: "put"
+                properties:
+                - name: "firstName"
+                - name: "id"
+                - name: "lastName"
+                - name: "role"
+              deleteEmployee:
+                method: "delete"
+                properties: []
+        _links:
+          self:
+            href: "http://localhost:8097/employees"
+        _templates:
+          default:
+            method: "post"
+            properties:
+            - name: "firstName"
+            - name: "id"
+            - name: "lastName"
+            - name: "role"
+  summary: "Read, as Spring's example answers, byte for byte"
+  expect: 200
+  ms: 4
+  entry: true
+- at: "2026-11-12T01:15:52.521049Z"
+  mode: "script"
+  say: "The entry, asked for as {accept}: Spring's own JSON, links in an array, no\
+    \ forms"
+  params:
+    accept: "application/hal+json"
+  request:
+    method: "GET"
+    url: "http://localhost:8096/employees"
+    headers:
+      Accept: "application/hal+json"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/hal+json"
+    body:
+      links:
+      - rel: "self"
+        href: "http://localhost:8096/employees"
+      content:
+      - id: 1
+        firstName: "Frodo"
+        lastName: "Baggins"
+        role: "ring bearer"
+        links:
+        - rel: "self"
+          href: "http://localhost:8096/employees/1"
+        - rel: "employees"
+          href: "http://localhost:8096/employees"
+      - id: 2
+        firstName: "Bilbo"
+        lastName: "Baggins"
+        role: "burglar"
+        links:
+        - rel: "self"
+          href: "http://localhost:8096/employees/2"
+        - rel: "employees"
+          href: "http://localhost:8096/employees"
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "GET"
+      url: "http://localhost:8097/employees"
+      headers:
+        Accept: "application/hal+json"
+      body: null
+    response:
+      status: 200
+      headers:
+        Content-Type: "application/hal+json"
+      body:
+        links:
+        - rel: "self"
+          href: "http://localhost:8097/employees"
+        content:
+        - id: 1
+          firstName: "Frodo"
+          lastName: "Baggins"
+          role: "ring bearer"
+          links:
+          - rel: "self"
+            href: "http://localhost:8097/employees/1"
+          - rel: "employees"
+            href: "http://localhost:8097/employees"
+        - id: 2
+          firstName: "Bilbo"
+          lastName: "Baggins"
+          role: "burglar"
+          links:
+          - rel: "self"
+            href: "http://localhost:8097/employees/2"
+          - rel: "employees"
+            href: "http://localhost:8097/employees"
+  summary: "Read, as Spring's example answers, byte for byte"
+  expect: 200
+  ms: 1
+- at: "2026-11-12T01:15:52.536503Z"
+  mode: "script"
+  say: "The entry, asked for as {accept}: HAL-FORMS"
+  params:
+    accept: "*/*"
+  request:
+    method: "GET"
+    url: "http://localhost:8096/employees"
+    headers:
+      Accept: "*/*"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/prs.hal-forms+json"
+    body:
+      _embedded:
+        employees:
+        - id: 1
+          firstName: "Frodo"
+          lastName: "Baggins"
+          role: "ring bearer"
+          _links:
+            self:
+              href: "http://localhost:8096/employees/1"
+            employees:
+              href: "http://localhost:8096/employees"
+          _templates:
+            default:
+              method: "put"
+              properties:
+              - name: "firstName"
+              - name: "id"
+              - name: "lastName"
+              - name: "role"
+            deleteEmployee:
+              method: "delete"
+              properties: []
+        - id: 2
+          firstName: "Bilbo"
+          lastName: "Baggins"
+          role: "burglar"
+          _links:
+            self:
+              href: "http://localhost:8096/employees/2"
+            employees:
+              href: "http://localhost:8096/employees"
+          _templates:
+            default:
+              method: "put"
+              properties:
+              - name: "firstName"
+              - name: "id"
+              - name: "lastName"
+              - name: "role"
+            deleteEmployee:
+              method: "delete"
+              properties: []
+      _links:
+        self:
+          href: "http://localhost:8096/employees"
+      _templates:
+        default:
+          method: "post"
+          properties:
+          - name: "firstName"
+          - name: "id"
+          - name: "lastName"
+          - name: "role"
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "GET"
+      url: "http://localhost:8097/employees"
+      headers:
+        Accept: "*/*"
+      body: null
+    response:
+      status: 200
+      headers:
+        Content-Type: "application/prs.hal-forms+json"
+      body:
+        _embedded:
+          employees:
+          - id: 1
+            firstName: "Frodo"
+            lastName: "Baggins"
+            role: "ring bearer"
+            _links:
+              self:
+                href: "http://localhost:8097/employees/1"
+              employees:
+                href: "http://localhost:8097/employees"
+            _templates:
+              default:
+                method: "put"
+                properties:
+                - name: "firstName"
+                - name: "id"
+                - name: "lastName"
+                - name: "role"
+              deleteEmployee:
+                method: "delete"
+                properties: []
+          - id: 2
+            firstName: "Bilbo"
+            lastName: "Baggins"
+            role: "burglar"
+            _links:
+              self:
+                href: "http://localhost:8097/employees/2"
+              employees:
+                href: "http://localhost:8097/employees"
+            _templates:
+              default:
+                method: "put"
+                properties:
+                - name: "firstName"
+                - name: "id"
+                - name: "lastName"
+                - name: "role"
+              deleteEmployee:
+                method: "delete"
+                properties: []
+        _links:
+          self:
+            href: "http://localhost:8097/employees"
+        _templates:
+          default:
+            method: "post"
+            properties:
+            - name: "firstName"
+            - name: "id"
+            - name: "lastName"
+            - name: "role"
+  summary: "Read, as Spring's example answers, byte for byte"
+  expect: 200
+  ms: 1
+- at: "2026-11-12T01:15:52.545746Z"
+  mode: "script"
+  say: "Employee {id}, as {accept}"
+  params:
+    id: 1
+    accept: "application/prs.hal-forms+json"
+  request:
+    method: "GET"
+    url: "http://localhost:8096/employees/1"
+    headers:
+      Accept: "application/prs.hal-forms+json"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/prs.hal-forms+json"
+    body:
+      id: 1
+      firstName: "Frodo"
+      lastName: "Baggins"
+      role: "ring bearer"
+      _links:
+        self:
+          href: "http://localhost:8096/employees/1"
+        employees:
+          href: "http://localhost:8096/employees"
+      _templates:
+        default:
+          method: "put"
+          properties:
+          - name: "firstName"
+          - name: "id"
+          - name: "lastName"
+          - name: "role"
+        deleteEmployee:
+          method: "delete"
+          properties: []
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "GET"
+      url: "http://localhost:8097/employees/1"
+      headers:
+        Accept: "application/prs.hal-forms+json"
+      body: null
+    response:
+      status: 200
+      headers:
+        Content-Type: "application/prs.hal-forms+json"
+      body:
+        id: 1
+        firstName: "Frodo"
+        lastName: "Baggins"
+        role: "ring bearer"
+        _links:
+          self:
+            href: "http://localhost:8097/employees/1"
+          employees:
+            href: "http://localhost:8097/employees"
+        _templates:
+          default:
+            method: "put"
+            properties:
+            - name: "firstName"
+            - name: "id"
+            - name: "lastName"
+            - name: "role"
+          deleteEmployee:
+            method: "delete"
+            properties: []
+  summary: "Read, as Spring's example answers, byte for byte"
+  expect: 200
+  ms: 1
+- at: "2026-11-12T01:15:52.567234Z"
+  mode: "script"
+  say: "Employee {id}, as {accept}"
+  params:
+    id: 1
+    accept: "application/hal+json"
+  request:
+    method: "GET"
+    url: "http://localhost:8096/employees/1"
+    headers:
+      Accept: "application/hal+json"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/hal+json"
+    body:
+      id: 1
+      firstName: "Frodo"
+      lastName: "Baggins"
+      role: "ring bearer"
+      links:
+      - rel: "self"
+        href: "http://localhost:8096/employees/1"
+      - rel: "employees"
+        href: "http://localhost:8096/employees"
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "GET"
+      url: "http://localhost:8097/employees/1"
+      headers:
+        Accept: "application/hal+json"
+      body: null
+    response:
+      status: 200
+      headers:
+        Content-Type: "application/hal+json"
+      body:
+        id: 1
+        firstName: "Frodo"
+        lastName: "Baggins"
+        role: "ring bearer"
+        links:
+        - rel: "self"
+          href: "http://localhost:8097/employees/1"
+        - rel: "employees"
+          href: "http://localhost:8097/employees"
+  summary: "Read, as Spring's example answers, byte for byte"
+  expect: 200
+  ms: 1
+- at: "2026-11-12T01:15:52.574042Z"
+  mode: "script"
+  say: "Employee {id} again, with If-None-Match: no ETag was given, so nothing to\
+    \ revalidate, read in full"
+  params:
+    id: 1
+  request:
+    method: "GET"
+    url: "http://localhost:8096/employees/1"
+    headers:
+      Accept: "application/prs.hal-forms+json"
+      If-None-Match: "\"1\""
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/prs.hal-forms+json"
+    body:
+      id: 1
+      firstName: "Frodo"
+      lastName: "Baggins"
+      role: "ring bearer"
+      _links:
+        self:
+          href: "http://localhost:8096/employees/1"
+        employees:
+          href: "http://localhost:8096/employees"
+      _templates:
+        default:
+          method: "put"
+          properties:
+          - name: "firstName"
+          - name: "id"
+          - name: "lastName"
+          - name: "role"
+        deleteEmployee:
+          method: "delete"
+          properties: []
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "GET"
+      url: "http://localhost:8097/employees/1"
+      headers:
+        Accept: "application/prs.hal-forms+json"
+        If-None-Match: "\"1\""
+      body: null
+    response:
+      status: 200
+      headers:
+        Content-Type: "application/prs.hal-forms+json"
+      body:
+        id: 1
+        firstName: "Frodo"
+        lastName: "Baggins"
+        role: "ring bearer"
+        _links:
+          self:
+            href: "http://localhost:8097/employees/1"
+          employees:
+            href: "http://localhost:8097/employees"
+        _templates:
+          default:
+            method: "put"
+            properties:
+            - name: "firstName"
+            - name: "id"
+            - name: "lastName"
+            - name: "role"
+          deleteEmployee:
+            method: "delete"
+            properties: []
+  summary: "Read, as Spring's example answers, byte for byte"
+  expect: 200
+  ms: 1
+- at: "2026-11-12T01:15:52.580258Z"
+  mode: "script"
+  say: "Employee {id}, who never was"
+  params:
+    id: 99
+    accept: "application/prs.hal-forms+json"
+  request:
+    method: "GET"
+    url: "http://localhost:8096/employees/99"
+    headers:
+      Accept: "application/prs.hal-forms+json"
+    body: null
+  response:
+    status: 404
+    headers:
+      Content-Length: "0"
+    body: null
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "GET"
+      url: "http://localhost:8097/employees/99"
+      headers:
+        Accept: "application/prs.hal-forms+json"
+      body: null
+    response:
+      status: 404
+      headers:
+        Content-Length: "0"
+      body: null
+  summary: "Not found, with no body, as Spring's example answers, byte for byte"
+  expect: 404
+  ms: 1
+  entry: true
+- at: "2026-11-12T01:15:52.585862Z"
+  mode: "script"
+  say: "Act {relation} on the entry: hire {firstName}, by POST, answered with no body"
+  params:
+    relation: "default"
+    firstName: "Samwise"
+  request:
+    method: "POST"
+    url: "http://localhost:8096/employees"
+    headers:
+      Accept: "application/prs.hal-forms+json"
+      Content-Type: "application/json"
+    body:
+      firstName: "Samwise"
+      lastName: "Gamgee"
+      role: "gardener"
+  response:
+    status: 204
+    headers:
+      Location: "http://localhost:8096/employees/3"
+    body: null
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "POST"
+      url: "http://localhost:8097/employees"
+      headers:
+        Accept: "application/prs.hal-forms+json"
+        Content-Type: "application/json"
+      body:
+        firstName: "Samwise"
+        lastName: "Gamgee"
+        role: "gardener"
+    response:
+      status: 204
+      headers:
+        Location: "http://localhost:8097/employees/3"
+      body: null
+  summary: "No content, as Spring's example answers, byte for byte"
+  expect: 204
+  ms: 1
+- at: "2026-11-12T01:15:52.608936Z"
+  mode: "script"
+  say: "The entry again: {count} employees"
+  params:
+    count: 3
+    accept: "application/prs.hal-forms+json"
+  request:
+    method: "GET"
+    url: "http://localhost:8096/employees"
+    headers:
+      Accept: "application/prs.hal-forms+json"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/prs.hal-forms+json"
+    body:
+      _embedded:
+        employees:
+        - id: 1
+          firstName: "Frodo"
+          lastName: "Baggins"
+          role: "ring bearer"
+          _links:
+            self:
+              href: "http://localhost:8096/employees/1"
+            employees:
+              href: "http://localhost:8096/employees"
+          _templates:
+            default:
+              method: "put"
+              properties:
+              - name: "firstName"
+              - name: "id"
+              - name: "lastName"
+              - name: "role"
+            deleteEmployee:
+              method: "delete"
+              properties: []
+        - id: 2
+          firstName: "Bilbo"
+          lastName: "Baggins"
+          role: "burglar"
+          _links:
+            self:
+              href: "http://localhost:8096/employees/2"
+            employees:
+              href: "http://localhost:8096/employees"
+          _templates:
+            default:
+              method: "put"
+              properties:
+              - name: "firstName"
+              - name: "id"
+              - name: "lastName"
+              - name: "role"
+            deleteEmployee:
+              method: "delete"
+              properties: []
+        - id: 3
+          firstName: "Samwise"
+          lastName: "Gamgee"
+          role: "gardener"
+          _links:
+            self:
+              href: "http://localhost:8096/employees/3"
+            employees:
+              href: "http://localhost:8096/employees"
+          _templates:
+            default:
+              method: "put"
+              properties:
+              - name: "firstName"
+              - name: "id"
+              - name: "lastName"
+              - name: "role"
+            deleteEmployee:
+              method: "delete"
+              properties: []
+      _links:
+        self:
+          href: "http://localhost:8096/employees"
+      _templates:
+        default:
+          method: "post"
+          properties:
+          - name: "firstName"
+          - name: "id"
+          - name: "lastName"
+          - name: "role"
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "GET"
+      url: "http://localhost:8097/employees"
+      headers:
+        Accept: "application/prs.hal-forms+json"
+      body: null
+    response:
+      status: 200
+      headers:
+        Content-Type: "application/prs.hal-forms+json"
+      body:
+        _embedded:
+          employees:
+          - id: 1
+            firstName: "Frodo"
+            lastName: "Baggins"
+            role: "ring bearer"
+            _links:
+              self:
+                href: "http://localhost:8097/employees/1"
+              employees:
+                href: "http://localhost:8097/employees"
+            _templates:
+              default:
+                method: "put"
+                properties:
+                - name: "firstName"
+                - name: "id"
+                - name: "lastName"
+                - name: "role"
+              deleteEmployee:
+                method: "delete"
+                properties: []
+          - id: 2
+            firstName: "Bilbo"
+            lastName: "Baggins"
+            role: "burglar"
+            _links:
+              self:
+                href: "http://localhost:8097/employees/2"
+              employees:
+                href: "http://localhost:8097/employees"
+            _templates:
+              default:
+                method: "put"
+                properties:
+                - name: "firstName"
+                - name: "id"
+                - name: "lastName"
+                - name: "role"
+              deleteEmployee:
+                method: "delete"
+                properties: []
+          - id: 3
+            firstName: "Samwise"
+            lastName: "Gamgee"
+            role: "gardener"
+            _links:
+              self:
+                href: "http://localhost:8097/employees/3"
+              employees:
+                href: "http://localhost:8097/employees"
+            _templates:
+              default:
+                method: "put"
+                properties:
+                - name: "firstName"
+                - name: "id"
+                - name: "lastName"
+                - name: "role"
+              deleteEmployee:
+                method: "delete"
+                properties: []
+        _links:
+          self:
+            href: "http://localhost:8097/employees"
+        _templates:
+          default:
+            method: "post"
+            properties:
+            - name: "firstName"
+            - name: "id"
+            - name: "lastName"
+            - name: "role"
+  summary: "Read, as Spring's example answers, byte for byte"
+  expect: 200
+  ms: 1
+- at: "2026-11-12T01:15:52.61978Z"
+  mode: "script"
+  say: "Act {relation} on employee {id}: {role}, by PUT, with an If-Match that matches\
+    \ nothing, taken anyway"
+  params:
+    relation: "default"
+    id: 1
+    role: "ring bearer, retired"
+  request:
+    method: "PUT"
+    url: "http://localhost:8096/employees/1"
+    headers:
+      Accept: "application/prs.hal-forms+json"
+      Content-Type: "application/json"
+      If-Match: "\"stale\""
+    body:
+      firstName: "Frodo"
+      lastName: "Baggins"
+      role: "ring bearer, retired"
+  response:
+    status: 204
+    headers:
+      Location: "http://localhost:8096/employees/1"
+    body: null
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "PUT"
+      url: "http://localhost:8097/employees/1"
+      headers:
+        Accept: "application/prs.hal-forms+json"
+        Content-Type: "application/json"
+        If-Match: "\"stale\""
+      body:
+        firstName: "Frodo"
+        lastName: "Baggins"
+        role: "ring bearer, retired"
+    response:
+      status: 204
+      headers:
+        Location: "http://localhost:8097/employees/1"
+      body: null
+  summary: "No content, as Spring's example answers, byte for byte"
+  expect: 204
+  ms: 3
+- at: "2026-11-12T01:15:52.634457Z"
+  mode: "script"
+  say: "Employee {id}, as changed"
+  params:
+    id: 1
+    accept: "application/prs.hal-forms+json"
+  request:
+    method: "GET"
+    url: "http://localhost:8096/employees/1"
+    headers:
+      Accept: "application/prs.hal-forms+json"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/prs.hal-forms+json"
+    body:
+      id: 1
+      firstName: "Frodo"
+      lastName: "Baggins"
+      role: "ring bearer, retired"
+      _links:
+        self:
+          href: "http://localhost:8096/employees/1"
+        employees:
+          href: "http://localhost:8096/employees"
+      _templates:
+        default:
+          method: "put"
+          properties:
+          - name: "firstName"
+          - name: "id"
+          - name: "lastName"
+          - name: "role"
+        deleteEmployee:
+          method: "delete"
+          properties: []
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "GET"
+      url: "http://localhost:8097/employees/1"
+      headers:
+        Accept: "application/prs.hal-forms+json"
+      body: null
+    response:
+      status: 200
+      headers:
+        Content-Type: "application/prs.hal-forms+json"
+      body:
+        id: 1
+        firstName: "Frodo"
+        lastName: "Baggins"
+        role: "ring bearer, retired"
+        _links:
+          self:
+            href: "http://localhost:8097/employees/1"
+          employees:
+            href: "http://localhost:8097/employees"
+        _templates:
+          default:
+            method: "put"
+            properties:
+            - name: "firstName"
+            - name: "id"
+            - name: "lastName"
+            - name: "role"
+          deleteEmployee:
+            method: "delete"
+            properties: []
+  summary: "Read, as Spring's example answers, byte for byte"
+  expect: 200
+  ms: 1
+- at: "2026-11-12T01:15:52.640635Z"
+  mode: "script"
+  say: "Act {relation} on employee {id}, by DELETE, answered with no body"
+  params:
+    relation: "deleteEmployee"
+    id: 1
+  request:
+    method: "DELETE"
+    url: "http://localhost:8096/employees/1"
+    headers: {}
+    body: null
+  response:
+    status: 204
+    headers: {}
+    body: null
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "DELETE"
+      url: "http://localhost:8097/employees/1"
+      headers: {}
+      body: null
+    response:
+      status: 204
+      headers: {}
+      body: null
+  summary: "No content, as Spring's example answers, byte for byte"
+  expect: 204
+  ms: 1
+- at: "2026-11-12T01:15:52.650039Z"
+  mode: "script"
+  say: "Employee {id}, gone"
+  params:
+    id: 1
+    accept: "application/prs.hal-forms+json"
+  request:
+    method: "GET"
+    url: "http://localhost:8096/employees/1"
+    headers:
+      Accept: "application/prs.hal-forms+json"
+    body: null
+  response:
+    status: 404
+    headers:
+      Content-Length: "0"
+    body: null
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "GET"
+      url: "http://localhost:8097/employees/1"
+      headers:
+        Accept: "application/prs.hal-forms+json"
+      body: null
+    response:
+      status: 404
+      headers:
+        Content-Length: "0"
+      body: null
+  summary: "Not found, with no body, as Spring's example answers, byte for byte"
+  expect: 404
+  ms: 1
+- at: "2026-11-12T01:15:52.655085Z"
+  mode: "script"
+  say: "The entry at the end"
+  params:
+    accept: "application/prs.hal-forms+json"
+  request:
+    method: "GET"
+    url: "http://localhost:8096/employees"
+    headers:
+      Accept: "application/prs.hal-forms+json"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/prs.hal-forms+json"
+    body:
+      _embedded:
+        employees:
+        - id: 2
+          firstName: "Bilbo"
+          lastName: "Baggins"
+          role: "burglar"
+          _links:
+            self:
+              href: "http://localhost:8096/employees/2"
+            employees:
+              href: "http://localhost:8096/employees"
+          _templates:
+            default:
+              method: "put"
+              properties:
+              - name: "firstName"
+              - name: "id"
+              - name: "lastName"
+              - name: "role"
+            deleteEmployee:
+              method: "delete"
+              properties: []
+        - id: 3
+          firstName: "Samwise"
+          lastName: "Gamgee"
+          role: "gardener"
+          _links:
+            self:
+              href: "http://localhost:8096/employees/3"
+            employees:
+              href: "http://localhost:8096/employees"
+          _templates:
+            default:
+              method: "put"
+              properties:
+              - name: "firstName"
+              - name: "id"
+              - name: "lastName"
+              - name: "role"
+            deleteEmployee:
+              method: "delete"
+              properties: []
+      _links:
+        self:
+          href: "http://localhost:8096/employees"
+      _templates:
+        default:
+          method: "post"
+          properties:
+          - name: "firstName"
+          - name: "id"
+          - name: "lastName"
+          - name: "role"
+  compare:
+    label: "Spring HATEOAS's affordances example, commit c100c56, at http://localhost:8097"
+    diff: true
+    request:
+      method: "GET"
+      url: "http://localhost:8097/employees"
+      headers:
+        Accept: "application/prs.hal-forms+json"
+      body: null
+    response:
+      status: 200
+      headers:
+        Content-Type: "application/prs.hal-forms+json"
+      body:
+        _embedded:
+          employees:
+          - id: 2
+            firstName: "Bilbo"
+            lastName: "Baggins"
+            role: "burglar"
+            _links:
+              self:
+                href: "http://localhost:8097/employees/2"
+              employees:
+                href: "http://localhost:8097/employees"
+            _templates:
+              default:
+                method: "put"
+                properties:
+                - name: "firstName"
+                - name: "id"
+                - name: "lastName"
+                - name: "role"
+              deleteEmployee:
+                method: "delete"
+                properties: []
+          - id: 3
+            firstName: "Samwise"
+            lastName: "Gamgee"
+            role: "gardener"
+            _links:
+              self:
+                href: "http://localhost:8097/employees/3"
+              employees:
+                href: "http://localhost:8097/employees"
+            _templates:
+              default:
+                method: "put"
+                properties:
+                - name: "firstName"
+                - name: "id"
+                - name: "lastName"
+                - name: "role"
+              deleteEmployee:
+                method: "delete"
+                properties: []
+        _links:
+          self:
+            href: "http://localhost:8097/employees"
+        _templates:
+          default:
+            method: "post"
+            properties:
+            - name: "firstName"
+            - name: "id"
+            - name: "lastName"
+            - name: "role"
+  summary: "Read, as Spring's example answers, byte for byte"
+  expect: 200
+  ms: 1

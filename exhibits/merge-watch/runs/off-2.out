@@ -1,0 +1,269 @@
+1 enter https://localhost:8392/: done
+2 act github:repos-get, owner JogoShugh, repo heart-github-test: done
+3 act github:open-issue, title Merge watch, body Close this issue to stop the watch.: new resource
+4 return to https://localhost:8392/repos/JogoShugh/heart-github-test: done
+5 return to https://localhost:8392/: done
+6 return to https://localhost:8392/: done
+7 act github:pulls-list, owner JogoShugh, repo heart-github-test, labels dependencies: done
+8 follow item, titled Bump left-pad from 1.0.0 to 11.1.0 (1027-172055): done
+9 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/838: done
+10 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+11 follow item, titled Bump left-pad from 1.0.0 to 10.1.0 (1027-165654): done
+12 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/835: done
+13 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+14 follow item, titled Bump left-pad from 1.0.0 to 5.0.2 (1026-072805): done
+15 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/823: done
+16 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+17 follow item, titled Bump left-pad from 1.0.0 to 5.0.1 (1026-072656): done
+note: Left https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/822: leave it, and say so once.
+18 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+19 follow item, titled Bump left-pad from 1.0.0 to 3.0.9 (1026-010636): done
+20 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/817: done
+21 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+22 follow item, titled Bump left-pad from 1.0.0 to 3.0.5 (1026-004106): done
+23 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/813: done
+24 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+25 follow item, titled Bump left-pad from 1.0.0 to 3.0.3 (1026-003551): done
+26 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/811: done
+27 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+28 follow item, titled Bump left-pad from 1.0.0 to 3.0.2 (1026-003143): done
+note: Left https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/810: leave it, and say so once.
+29 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+30 follow item, titled Bump left-pad from 1.0.0 to 2.0.4 (1025-222357): done
+31 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/806: done
+32 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+33 follow item, titled Bump left-pad from 1.0.0 to 2.0.3 (1025-222249): done
+note: Left https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/805: leave it, and say so once.
+34 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+35 follow item, titled Bump left-pad from 1.0.0 to 2.0.2 (1025-222037): done
+36 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/803: done
+37 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+38 return to https://localhost:8392/: done
+39 return to https://localhost:8392/: done
+40 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/839: done
+41 return to https://localhost:8392/: done
+42 return to https://localhost:8392/: done
+43 act github:pulls-list, owner JogoShugh, repo heart-github-test, labels dependencies: done
+44 follow item, titled Bump left-pad from 1.0.0 to 11.1.0 (1027-172055): done
+45 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/838: done
+46 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+47 follow item, titled Bump left-pad from 1.0.0 to 10.1.0 (1027-165654): done
+48 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/835: done
+49 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+50 follow item, titled Bump left-pad from 1.0.0 to 5.0.2 (1026-072805): done
+51 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/823: done
+52 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+53 follow item, titled Bump left-pad from 1.0.0 to 5.0.1 (1026-072656): done
+54 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+55 follow item, titled Bump left-pad from 1.0.0 to 3.0.9 (1026-010636): done
+56 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/817: done
+57 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+58 follow item, titled Bump left-pad from 1.0.0 to 3.0.5 (1026-004106): done
+59 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/813: done
+60 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+61 follow item, titled Bump left-pad from 1.0.0 to 3.0.3 (1026-003551): done
+62 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/811: done
+63 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+64 follow item, titled Bump left-pad from 1.0.0 to 3.0.2 (1026-003143): done
+65 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+66 follow item, titled Bump left-pad from 1.0.0 to 2.0.4 (1025-222357): done
+67 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/806: done
+68 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+69 follow item, titled Bump left-pad from 1.0.0 to 2.0.3 (1025-222249): done
+70 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+71 follow item, titled Bump left-pad from 1.0.0 to 2.0.2 (1025-222037): done
+72 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/803: done
+73 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+74 return to https://localhost:8392/: done
+75 return to https://localhost:8392/: done
+76 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/839: done
+77 return to https://localhost:8392/: done
+78 return to https://localhost:8392/: done
+79 act github:pulls-list, owner JogoShugh, repo heart-github-test, labels dependencies: done
+80 follow item, titled Bump left-pad from 1.0.0 to 11.1.0 (1027-172055): done
+81 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/838: done
+82 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+83 follow item, titled Bump left-pad from 1.0.0 to 10.1.0 (1027-165654): done
+84 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/835: done
+85 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+86 follow item, titled Bump left-pad from 1.0.0 to 5.0.2 (1026-072805): done
+87 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/823: done
+88 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+89 follow item, titled Bump left-pad from 1.0.0 to 5.0.1 (1026-072656): done
+90 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+91 follow item, titled Bump left-pad from 1.0.0 to 3.0.9 (1026-010636): done
+92 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/817: done
+93 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+94 follow item, titled Bump left-pad from 1.0.0 to 3.0.5 (1026-004106): done
+95 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/813: done
+96 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+97 follow item, titled Bump left-pad from 1.0.0 to 3.0.3 (1026-003551): done
+98 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/811: done
+99 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+100 follow item, titled Bump left-pad from 1.0.0 to 3.0.2 (1026-003143): done
+101 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+102 follow item, titled Bump left-pad from 1.0.0 to 2.0.4 (1025-222357): done
+103 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/806: done
+104 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+105 follow item, titled Bump left-pad from 1.0.0 to 2.0.3 (1025-222249): done
+106 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+107 follow item, titled Bump left-pad from 1.0.0 to 2.0.2 (1025-222037): done
+108 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/803: done
+109 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+110 return to https://localhost:8392/: done
+111 return to https://localhost:8392/: done
+112 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/839: done
+113 return to https://localhost:8392/: done
+114 return to https://localhost:8392/: done
+115 act github:pulls-list, owner JogoShugh, repo heart-github-test, labels dependencies: done
+116 follow item, titled Bump left-pad from 1.0.0 to 11.1.0 (1027-172055): done
+117 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/838: done
+118 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+119 follow item, titled Bump left-pad from 1.0.0 to 10.1.0 (1027-165654): done
+120 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/835: done
+121 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+122 follow item, titled Bump left-pad from 1.0.0 to 5.0.2 (1026-072805): done
+123 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/823: done
+124 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+125 follow item, titled Bump left-pad from 1.0.0 to 5.0.1 (1026-072656): done
+126 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+127 follow item, titled Bump left-pad from 1.0.0 to 3.0.9 (1026-010636): done
+128 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/817: done
+129 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+130 follow item, titled Bump left-pad from 1.0.0 to 3.0.5 (1026-004106): done
+131 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/813: done
+132 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+133 follow item, titled Bump left-pad from 1.0.0 to 3.0.3 (1026-003551): done
+134 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/811: done
+135 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+136 follow item, titled Bump left-pad from 1.0.0 to 3.0.2 (1026-003143): done
+137 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+138 follow item, titled Bump left-pad from 1.0.0 to 2.0.4 (1025-222357): done
+139 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/806: done
+140 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+141 follow item, titled Bump left-pad from 1.0.0 to 2.0.3 (1025-222249): done
+142 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+143 follow item, titled Bump left-pad from 1.0.0 to 2.0.2 (1025-222037): done
+144 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/803: done
+145 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+146 return to https://localhost:8392/: done
+147 return to https://localhost:8392/: done
+148 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/839: done
+149 return to https://localhost:8392/: done
+150 return to https://localhost:8392/: done
+151 act github:pulls-list, owner JogoShugh, repo heart-github-test, labels dependencies: done
+152 follow item, titled Bump left-pad from 1.0.0 to 11.1.0 (1027-172055): done
+153 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/838: done
+154 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+155 follow item, titled Bump left-pad from 1.0.0 to 10.1.0 (1027-165654): done
+156 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/835: done
+157 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+158 follow item, titled Bump left-pad from 1.0.0 to 5.0.2 (1026-072805): done
+159 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/823: done
+160 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+161 follow item, titled Bump left-pad from 1.0.0 to 5.0.1 (1026-072656): done
+162 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+163 follow item, titled Bump left-pad from 1.0.0 to 3.0.9 (1026-010636): done
+164 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/817: done
+165 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+166 follow item, titled Bump left-pad from 1.0.0 to 3.0.5 (1026-004106): done
+167 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/813: done
+168 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+169 follow item, titled Bump left-pad from 1.0.0 to 3.0.3 (1026-003551): done
+170 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/811: done
+171 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+172 follow item, titled Bump left-pad from 1.0.0 to 3.0.2 (1026-003143): done
+173 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+174 follow item, titled Bump left-pad from 1.0.0 to 2.0.4 (1025-222357): done
+175 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/806: done
+176 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+177 follow item, titled Bump left-pad from 1.0.0 to 2.0.3 (1025-222249): done
+178 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+179 follow item, titled Bump left-pad from 1.0.0 to 2.0.2 (1025-222037): done
+180 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/803: done
+181 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+182 return to https://localhost:8392/: done
+183 return to https://localhost:8392/: done
+184 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/839: done
+185 return to https://localhost:8392/: done
+186 return to https://localhost:8392/: done
+187 act github:pulls-list, owner JogoShugh, repo heart-github-test, labels dependencies: done
+188 follow item, titled Bump left-pad from 1.0.0 to 11.1.0 (1027-172055): done
+189 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/838: done
+190 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+191 follow item, titled Bump left-pad from 1.0.0 to 10.1.0 (1027-165654): done
+192 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/835: done
+193 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+194 follow item, titled Bump left-pad from 1.0.0 to 5.0.2 (1026-072805): done
+195 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/823: done
+196 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+197 follow item, titled Bump left-pad from 1.0.0 to 5.0.1 (1026-072656): done
+198 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+199 follow item, titled Bump left-pad from 1.0.0 to 3.0.9 (1026-010636): done
+200 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/817: done
+201 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+202 follow item, titled Bump left-pad from 1.0.0 to 3.0.5 (1026-004106): done
+203 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/813: done
+204 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+205 follow item, titled Bump left-pad from 1.0.0 to 3.0.3 (1026-003551): done
+206 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/811: done
+207 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+208 follow item, titled Bump left-pad from 1.0.0 to 3.0.2 (1026-003143): done
+209 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+210 follow item, titled Bump left-pad from 1.0.0 to 2.0.4 (1025-222357): done
+211 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/806: done
+212 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+213 follow item, titled Bump left-pad from 1.0.0 to 2.0.3 (1025-222249): done
+214 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+215 follow item, titled Bump left-pad from 1.0.0 to 2.0.2 (1025-222037): done
+216 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/803: done
+217 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+218 return to https://localhost:8392/: done
+219 return to https://localhost:8392/: done
+220 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/839: done
+221 return to https://localhost:8392/: done
+222 return to https://localhost:8392/: done
+223 act github:pulls-list, owner JogoShugh, repo heart-github-test, labels dependencies: done
+224 follow item, titled Bump left-pad from 1.0.0 to 11.1.0 (1027-172055): done
+225 tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: The branch is behind its base; update it first.: new resource
+226 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/838: done
+227 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+228 follow item, titled Bump left-pad from 1.0.0 to 10.1.0 (1027-165654): done
+229 tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: The branch is behind its base; update it first.: new resource
+230 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/835: done
+231 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+232 follow item, titled Bump left-pad from 1.0.0 to 5.0.2 (1026-072805): done
+233 tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first.: new resource
+234 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/823: done
+235 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+236 follow item, titled Bump left-pad from 1.0.0 to 5.0.1 (1026-072656): done
+237 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+238 follow item, titled Bump left-pad from 1.0.0 to 3.0.9 (1026-010636): done
+239 tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first.: new resource
+240 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/817: done
+241 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+242 follow item, titled Bump left-pad from 1.0.0 to 3.0.5 (1026-004106): done
+243 tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: The branch is behind its base; update it first.: new resource
+244 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/813: done
+245 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+246 follow item, titled Bump left-pad from 1.0.0 to 3.0.3 (1026-003551): done
+247 tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first.: new resource
+248 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/811: done
+249 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+250 follow item, titled Bump left-pad from 1.0.0 to 3.0.2 (1026-003143): done
+251 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+252 follow item, titled Bump left-pad from 1.0.0 to 2.0.4 (1025-222357): done
+253 tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: The branch is behind its base; update it first.: new resource
+254 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/806: done
+255 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+256 follow item, titled Bump left-pad from 1.0.0 to 2.0.3 (1025-222249): done
+257 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+258 follow item, titled Bump left-pad from 1.0.0 to 2.0.2 (1025-222037): done
+259 tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first.: new resource
+260 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/803: done
+261 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies: done
+262 return to https://localhost:8392/: done
+263 return to https://localhost:8392/: done
+264 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/839: done
+265 return to https://localhost:8392/: done
+finished, 265 steps

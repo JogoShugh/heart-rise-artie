@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Checks, Three Ways</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="The garden and GitHub tasks, scripted, reasoned and hybrid, three live runs each, now checking facts with matchers; and two checks that fail on purpose, as facts and as a condition drawn by Power-assert.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+:root { --bg:#f3f6f5; --surface:#fff; --fg:#17211d; --muted:#55645d; --rule:#d3ddd8; --link:#2f5f8f; --code-bg:#eef2f0;
+  --kt-kw:#8a3f8f; --kt-str:#2f6f3f; --kt-tpl:#b0641c; --kt-cm:#7b847e; --kt-fn:#1f5a8a; --kt-num:#a0522d;
+  --display:"Literata",Georgia,serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#111816; --surface:#18211e; --fg:#e2ebe6; --muted:#98a9a1; --rule:#2a3732; --link:#8ab8e6; --code-bg:#1d2622;
+  --kt-kw:#d79ad9; --kt-str:#9fd6ac; --kt-tpl:#e6a35c; --kt-cm:#7f8b84; --kt-fn:#8cc0ea; --kt-num:#e0a080; color-scheme:dark; } }
+:root[data-theme="dark"] { --bg:#111816; --surface:#18211e; --fg:#e2ebe6; --muted:#98a9a1; --rule:#2a3732; --link:#8ab8e6; --code-bg:#1d2622;
+  --kt-kw:#d79ad9; --kt-str:#9fd6ac; --kt-tpl:#e6a35c; --kt-cm:#7f8b84; --kt-fn:#8cc0ea; --kt-num:#e0a080; color-scheme:dark; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 var(--body);
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width:60rem; margin:0 auto; padding-block:3rem 4rem; display:grid; grid-template-columns:minmax(0,1fr); gap:1.4rem; }
+main > * { min-width:0; }
+h1 { font:650 2.1rem/1.15 var(--display); margin:0; text-wrap:balance; }
+h2 { font:650 1.35rem/1.25 var(--display); margin:.6rem 0 0; }
+p, li { max-width:44rem; } p { margin:0; } .lede, .muted { color:var(--muted); }
+ul { margin:0; padding-left:1.2rem; display:grid; gap:.35rem; }
+a { color:var(--link); } code { font-family:var(--mono); font-size:.86rem; }
+.scroll { overflow-x:auto; background:var(--surface); border:1px solid var(--rule); border-radius:8px; }
+table { border-collapse:collapse; width:100%; }
+th, td { text-align:left; padding:.45rem .7rem; border-bottom:1px solid var(--rule); vertical-align:top; font-size:.92rem; }
+th { font:600 .78rem/1.3 var(--body); letter-spacing:.03em; text-transform:uppercase; color:var(--muted); }
+tr:last-child td { border-bottom:0; } td { font-variant-numeric:tabular-nums; }
+table.choices td:first-child { min-width:14rem; }
+pre { margin:0; background:var(--code-bg); border:1px solid var(--rule); border-radius:8px; padding:1rem; overflow-x:auto; font:.8rem/1.5 var(--mono); }
+.reports { display:grid; gap:.5rem; }
+@media (max-width: 640px) { table.runs thead { display:none; } table.runs tr { display:grid; grid-template-columns:1fr 1fr; padding:.4rem 0; border-bottom:1px solid var(--rule); } table.runs td { border:0; padding:.15rem .7rem; } }
+table.facts td:first-child { min-width:10rem; }
+
+</style>
+</head>
+<body>
+<main>
+  <h1>Checks, Three Ways</h1>
+  <p class="lede">The garden task over CoAP and the GitHub task through the HEART gateway, each done scripted, reasoned by Claude, and hybrid, three live runs of each on 2026-10-18, with checks now written as facts: a member and a matcher, <code>check("state" eq "closed", "state_reason" eq "completed")</code>. Then two checks that fail on purpose, to show what a failure says.</p>
+  <h2>How each way did</h2>
+  <div class="scroll"><table class="num"><thead><tr><th>Task</th><th>Way</th><th>Median time</th><th>Range</th><th>Model calls</th><th>Facts held</th><th>Finished</th></tr></thead><tbody><tr><td>Garden, over CoAP</td><td>Scripted</td><td>0.2 s</td><td>0.1 to 0.4 s</td><td>0</td><td>2 of 2 · 2 of 2 · 2 of 2</td><td>3 of 3</td></tr><tr><td>Garden, over CoAP</td><td>Reasoned</td><td>8.2 s</td><td>4.2 to 11.0 s</td><td>3</td><td>2 of 2 · 2 of 2 · 2 of 2</td><td>3 of 3</td></tr><tr><td>Garden, over CoAP</td><td>Hybrid</td><td>5.4 s</td><td>2.1 to 6.0 s</td><td>1</td><td>2 of 2 · 2 of 2 · 2 of 2</td><td>3 of 3</td></tr><tr><td>GitHub, through the gateway</td><td>Scripted</td><td>20.8 s</td><td>20.2 to 20.9 s</td><td>0</td><td>4 of 4 · 4 of 4 · 4 of 4</td><td>3 of 3</td></tr><tr><td>GitHub, through the gateway</td><td>Reasoned</td><td>46.5 s</td><td>44.7 to 47.8 s</td><td>10</td><td>4 of 4 · 4 of 4 · 4 of 4</td><td>3 of 3</td></tr><tr><td>GitHub, through the gateway</td><td>Hybrid</td><td>23.4 s</td><td>20.7 to 23.9 s</td><td>1</td><td>4 of 4 · 4 of 4 · 4 of 4</td><td>3 of 3</td></tr></tbody></table></div>
+  <p>Facts held: each run's own count, run 1 · run 2 · run 3. Time is from the first step to the last, as the trace has it; the whole run, in the next table, adds starting Java and compiling the script, about 2.5 seconds. Every GitHub run wrote to the scratch repository for real; every garden run built, sowed and watered a new bed.</p>
+  <h2>Every run</h2>
+  <div class="scroll"><table class="runs"><thead><tr><th>Run</th><th>Steps' time</th><th>Whole run</th><th>Steps</th><th>Model calls</th><th>Checks</th><th>Made</th></tr></thead><tbody><tr><td>Garden scripted 1</td><td>0.4 s</td><td>3.0 s</td><td>6</td><td>0</td><td>1, 2 of 2 facts held</td><td>bed 5</td></tr><tr><td>Garden scripted 2</td><td>0.2 s</td><td>2.6 s</td><td>6</td><td>0</td><td>1, 2 of 2 facts held</td><td>bed 8</td></tr><tr><td>Garden scripted 3</td><td>0.1 s</td><td>2.6 s</td><td>6</td><td>0</td><td>1, 2 of 2 facts held</td><td>bed 11</td></tr><tr><td>Garden reasoned 1</td><td>4.2 s</td><td>6.5 s</td><td>6</td><td>3</td><td>1, 2 of 2 facts held</td><td>bed 6</td></tr><tr><td>Garden reasoned 2</td><td>8.2 s</td><td>10.5 s</td><td>6</td><td>3</td><td>1, 2 of 2 facts held</td><td>bed 9</td></tr><tr><td>Garden reasoned 3</td><td>11.0 s</td><td>13.3 s</td><td>6</td><td>3</td><td>1, 2 of 2 facts held</td><td>bed 12</td></tr><tr><td>Garden hybrid 1</td><td>5.4 s</td><td>7.8 s</td><td>6</td><td>1</td><td>1, 2 of 2 facts held</td><td>bed 7</td></tr><tr><td>Garden hybrid 2</td><td>6.0 s</td><td>8.3 s</td><td>6</td><td>1</td><td>1, 2 of 2 facts held</td><td>bed 10</td></tr><tr><td>Garden hybrid 3</td><td>2.1 s</td><td>4.4 s</td><td>6</td><td>1</td><td>1, 2 of 2 facts held</td><td>bed 13</td></tr><tr><td>GitHub scripted 1</td><td>20.8 s</td><td>23.4 s</td><td>22</td><td>0</td><td>3, 4 of 4 facts held</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/69">#69</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/70">#70</a></td></tr><tr><td>GitHub scripted 2</td><td>20.2 s</td><td>22.7 s</td><td>22</td><td>0</td><td>3, 4 of 4 facts held</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/75">#75</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/76">#76</a></td></tr><tr><td>GitHub scripted 3</td><td>20.9 s</td><td>23.5 s</td><td>22</td><td>0</td><td>3, 4 of 4 facts held</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/81">#81</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/82">#82</a></td></tr><tr><td>GitHub reasoned 1</td><td>46.5 s</td><td>49.0 s</td><td>22</td><td>10</td><td>3, 4 of 4 facts held</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/71">#71</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/72">#72</a></td></tr><tr><td>GitHub reasoned 2</td><td>47.8 s</td><td>50.5 s</td><td>22</td><td>10</td><td>3, 4 of 4 facts held</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/77">#77</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/78">#78</a></td></tr><tr><td>GitHub reasoned 3</td><td>44.7 s</td><td>47.2 s</td><td>22</td><td>10</td><td>3, 4 of 4 facts held</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/83">#83</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/84">#84</a></td></tr><tr><td>GitHub hybrid 1</td><td>23.4 s</td><td>26.0 s</td><td>22</td><td>1</td><td>3, 4 of 4 facts held</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/73">#73</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/74">#74</a></td></tr><tr><td>GitHub hybrid 2</td><td>23.9 s</td><td>26.5 s</td><td>22</td><td>1</td><td>3, 4 of 4 facts held</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/79">#79</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/80">#80</a></td></tr><tr><td>GitHub hybrid 3</td><td>20.7 s</td><td>23.2 s</td><td>22</td><td>1</td><td>3, 4 of 4 facts held</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/85">#85</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/86">#86</a></td></tr></tbody></table></div>
+  <h2>What the checks said</h2>
+  <p>A check now keeps each fact in the trace as data: the member, the test with its own words, and what was held. These are run 1's.</p>
+  <div class="scroll"><table class="facts"><thead><tr><th>Run 1</th><th>Each fact: member, test, what was held</th></tr></thead><tbody><tr><td>Garden scripted</td><td><code>cropName eq basil</code> <span class="muted">held basil</span> ✓<br><code>moistureLevel above 0</code> <span class="muted">held 25</span> ✓</td></tr><tr><td>Garden reasoned</td><td><code>cropName eq basil</code> <span class="muted">held basil</span> ✓<br><code>moistureLevel above 0</code> <span class="muted">held 25</span> ✓</td></tr><tr><td>Garden hybrid</td><td><code>cropName eq basil</code> <span class="muted">held basil</span> ✓<br><code>moistureLevel above 0</code> <span class="muted">held 25</span> ✓</td></tr><tr><td>GitHub scripted</td><td><code>merged eq true</code> <span class="muted">held true</span> ✓</td></tr><tr><td>GitHub scripted</td><td><code>body eq Fixed in 1.2 by #70.</code> <span class="muted">held Fixed in 1.2 by #70.</span> ✓</td></tr><tr><td>GitHub scripted</td><td><code>state eq closed</code> <span class="muted">held closed</span> ✓<br><code>state_reason eq completed</code> <span class="muted">held completed</span> ✓</td></tr><tr><td>GitHub reasoned</td><td><code>merged eq true</code> <span class="muted">held true</span> ✓</td></tr><tr><td>GitHub reasoned</td><td><code>body eq Fixed in 1.2 by #72.</code> <span class="muted">held Fixed in 1.2 by #72.</span> ✓</td></tr><tr><td>GitHub reasoned</td><td><code>state eq closed</code> <span class="muted">held closed</span> ✓<br><code>state_reason eq completed</code> <span class="muted">held completed</span> ✓</td></tr><tr><td>GitHub hybrid</td><td><code>merged eq true</code> <span class="muted">held true</span> ✓</td></tr><tr><td>GitHub hybrid</td><td><code>body eq Fixed in 1.2 by #74.</code> <span class="muted">held Fixed in 1.2 by #74.</span> ✓</td></tr><tr><td>GitHub hybrid</td><td><code>state eq closed</code> <span class="muted">held closed</span> ✓<br><code>state_reason eq completed</code> <span class="muted">held completed</span> ✓</td></tr></tbody></table></div>
+  <h2>When a check fails</h2>
+  <p>Two short runs, read only, against the same repository, written to fail. As facts, every fact is tested and each one that failed is told, with what was expected and what was held:</p>
+  <pre><code class="kotlin">// Checks that fail on purpose, read only: the repository is public with issues on, not a private one on trunk.
+heart(&quot;http://localhost:8392/&quot;) {
+    act(&quot;github:repos-get&quot;, &quot;owner&quot; to &quot;JogoShugh&quot;, &quot;repo&quot; to &quot;heart-github-test&quot;)
+    check(&quot;visibility&quot; eq &quot;public&quot;, &quot;has_issues&quot; eq true, &quot;open_issues_count&quot; to atLeast(0))
+    check(&quot;visibility&quot; eq &quot;private&quot;, &quot;default_branch&quot; eq &quot;trunk&quot;, &quot;topics&quot; has &quot;heart&quot;, &quot;archived&quot; eq false)
+}
+</code></pre>
+  <div class="scroll"><table class="facts"><thead><tr><th>The second check's facts</th></tr></thead><tbody><tr><td><code>visibility eq private</code> <span class="muted">held public</span> ✗</td></tr><tr><td><code>default_branch eq trunk</code> <span class="muted">held main</span> ✗</td></tr><tr><td><code>topics has heart</code> <span class="muted">held []</span> ✗</td></tr><tr><td><code>archived eq false</code> <span class="muted">held false</span> ✓</td></tr></tbody></table></div>
+  <pre>stopped at step 3, "check": "visibility: expected private, was public; default_branch: expected trunk, was main; topics: expected heart, was []"</pre>
+  <p>As a condition, for what no single fact can say, such as two members compared: Power-assert draws the condition with the value of each part. The trace keeps the drawing; <code>artie run</code> prints it above the run's end.</p>
+  <pre><code class="kotlin">// A condition that fails on purpose, read only: two members compared, which no single fact can say.
+heart(&quot;http://localhost:8392/&quot;) {
+    act(&quot;github:repos-get&quot;, &quot;owner&quot; to &quot;JogoShugh&quot;, &quot;repo&quot; to &quot;heart-github-test&quot;)
+    val open = state[&quot;open_issues_count&quot;] as Long
+    val forks = state[&quot;forks_count&quot;] as Long
+    check(open &lt; forks) { &quot;a busy repository should have more forks than open issues&quot; }
+}
+</code></pre>
+  <pre>check(open &lt; forks) { &quot;a busy repository should have more forks than open issues&quot; }
+      |    | |
+      |    | 0
+      |    false
+      14
+stopped at step 2, "check": "a busy repository should have more forks than open issues"</pre>
+  <h2>The runs, step by step</h2>
+  <div class="reports"><a href="garden-scripted/index.html">Garden, over CoAP, scripted, run 1</a><a href="garden-reasoned/index.html">Garden, over CoAP, reasoned, run 1</a><a href="garden-hybrid/index.html">Garden, over CoAP, hybrid, run 1</a><a href="github-scripted/index.html">GitHub, through the gateway, scripted, run 1</a><a href="github-reasoned/index.html">GitHub, through the gateway, reasoned, run 1</a><a href="github-hybrid/index.html">GitHub, through the gateway, hybrid, run 1</a><a href="facts-fail/index.html">Facts that fail, on purpose</a><a href="condition-fail/index.html">A condition that fails, on purpose, drawn</a></div>
+  <h2>The scripts</h2>
+  <p>Garden, over CoAP, scripted</p><pre><code class="kotlin">// The garden task, scripted: every selection written down. Build a 4 by 4 herb bed, plant basil about
+// 2 cm deep, water it with 250 ml per cell, and check the bed. No model.
+//   artie run tests/garden-task-scripted.kts
+val entry by input(default = &quot;coap://localhost:5683/&quot;)
+
+heart(entry) {
+    act(&quot;garden:build-bed&quot;, &quot;label&quot; to &quot;Herbs, scripted&quot;, &quot;widthFt&quot; to 4, &quot;lengthFt&quot; to 4) {
+        act(&quot;garden:sow-seed&quot;, &quot;seedType&quot; to &quot;basil&quot;, &quot;depthCm&quot; to 2)
+        act(&quot;garden:water-cell&quot;, &quot;milliliters&quot; to 250)
+        check(&quot;cropName&quot; eq &quot;basil&quot;, &quot;moistureLevel&quot; above 0)
+    }
+}
+</code></pre><p>Garden, over CoAP, reasoned</p><pre><code class="kotlin">// The garden task, reasoned: each move said in words; the model chooses the form and its fields from
+// what the garden offers, and ARTIE checks each choice before sending it. Needs --reasoner claude.
+//   artie run tests/garden-task-reasoned.kts --reasoner claude
+val entry by input(default = &quot;coap://localhost:5683/&quot;)
+
+heart(entry) {
+    reason(&quot;build a 4 by 4 foot herb bed called \&quot;Herbs, reasoned\&quot;&quot;) {
+        reason(&quot;plant basil in it, about 2 centimetres deep&quot;)
+        reason(&quot;water it with 250 millilitres per cell&quot;)
+        check(&quot;cropName&quot; eq &quot;basil&quot;, &quot;moistureLevel&quot; above 0)
+    }
+}
+</code></pre><p>Garden, over CoAP, hybrid</p><pre><code class="kotlin">// The garden task, hybrid: the script builds and waters, exactly; the model makes the one choice that
+// is a matter of judgement, what to plant for pesto and how deep. Needs --reasoner claude.
+//   artie run tests/garden-task-hybrid.kts --reasoner claude
+val entry by input(default = &quot;coap://localhost:5683/&quot;)
+
+heart(entry) {
+    act(&quot;garden:build-bed&quot;, &quot;label&quot; to &quot;Herbs, hybrid&quot;, &quot;widthFt&quot; to 4, &quot;lengthFt&quot; to 4) {
+        reason(&quot;plant the herb that pesto is made from, at a sensible depth&quot;)
+        act(&quot;garden:water-cell&quot;, &quot;milliliters&quot; to 250)
+        check(&quot;cropName&quot; eq &quot;basil&quot;, &quot;moistureLevel&quot; above 0)
+    }
+}
+</code></pre><p>GitHub, through the gateway, scripted</p><pre><code class="kotlin">// The GitHub task, scripted: every selection written down, no model. From the bookmark: open an issue, branch
+// from main, commit the fix, open a pull request that relates to the issue, wait until GitHub can merge it and
+// merge it, then comment on the issue that it is fixed in 1.2 and close it. Real writes, to the repository given.
+//   artie run tests/github-task-scripted.kts owner=JogoShugh repo=heart-github-test
+val owner by input()
+val repo by input()
+val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(&quot;MMdd-HHmmss&quot;)))
+
+heart(&quot;http://localhost:8392/&quot;) {
+    var issue = 0L
+    var pull = 0L
+    act(&quot;github:repos-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo) {
+        act(&quot;github:open-issue&quot;, &quot;title&quot; to &quot;Crash when a bed has no name (scripted)&quot;, &quot;body&quot; to &quot;Opened by a HEART script.&quot;) {
+            issue = state[&quot;number&quot;] as Long
+        }
+    }
+    // The branch is named, as a person would: a list of branches is paged, and main may not be on its first page.
+    act(&quot;github:repos-get-branch&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, &quot;branch&quot; to &quot;main&quot;) {
+        act(&quot;github:branch-from-here&quot;, &quot;name&quot; to &quot;fix-blank-names-scripted-$stamp&quot;) {
+            act(
+                &quot;github:commit-file&quot;,
+                &quot;path&quot; to &quot;fix-scripted-$stamp.md&quot;,
+                &quot;message&quot; to &quot;Refuse a bed with no name&quot;,
+                &quot;content&quot; to &quot;Bed names may not be blank.\n&quot;,
+            )
+            act(
+                &quot;github:open-pull-request&quot;,
+                &quot;title&quot; to &quot;Refuse a bed with no name (scripted)&quot;,
+                &quot;base&quot; to &quot;main&quot;,
+                &quot;body&quot; to &quot;Relates to #$issue.&quot;,
+            ) {
+                pull = state[&quot;number&quot;] as Long
+                // GitHub works out whether it can merge a new pull request a moment after it opens.
+                until(tries = 20) { offers(&quot;github:merge&quot;) }
+                act(&quot;github:merge&quot;, &quot;merge_method&quot; to &quot;squash&quot;)
+                check(&quot;merged&quot; eq true)
+            }
+        }
+    }
+    act(&quot;github:issues-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, &quot;issue_number&quot; to issue) {
+        // The comment is a new resource: visit it, then come back to the issue to close it.
+        act(&quot;github:comment&quot;, &quot;body&quot; to &quot;Fixed in 1.2 by #$pull.&quot;) {
+            check(&quot;body&quot; eq &quot;Fixed in 1.2 by #$pull.&quot;)
+        }
+        act(&quot;github:close&quot;)
+        check(&quot;state&quot; eq &quot;closed&quot;, &quot;state_reason&quot; eq &quot;completed&quot;)
+    }
+}
+</code></pre><p>GitHub, through the gateway, reasoned</p><pre><code class="kotlin">// The GitHub task, reasoned: each move said in words; the model chooses the form or link and its fields from what
+// the gateway offers, and ARTIE checks each choice before sending it. The same task as github-task-scripted.kts.
+// Needs --reasoner claude. Real writes, to the repository given.
+//   artie run tests/github-task-reasoned.kts owner=JogoShugh repo=heart-github-test --reasoner claude
+val owner by input()
+val repo by input()
+val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(&quot;MMdd-HHmmss&quot;)))
+
+heart(&quot;http://localhost:8392/&quot;) {
+    var issue = 0L
+    var pull = 0L
+    reason(&quot;open the repository $owner/$repo&quot;) {
+        reason(&quot;open an issue titled \&quot;Crash when a bed has no name (reasoned)\&quot;, saying it was opened by a HEART script&quot;) {
+            issue = state[&quot;number&quot;] as Long
+        }
+    }
+    reason(&quot;open the branch main of $owner/$repo&quot;) {
+        reason(&quot;start a new branch from here, named fix-blank-names-reasoned-$stamp&quot;) {
+            reason(&quot;commit a file named fix-reasoned-$stamp.md, saying \&quot;Bed names may not be blank.\&quot;, with the message \&quot;Refuse a bed with no name\&quot;&quot;)
+            reason(&quot;open a pull request into main titled \&quot;Refuse a bed with no name (reasoned)\&quot;, saying it relates to #$issue&quot;) {
+                pull = state[&quot;number&quot;] as Long
+                // GitHub works out whether it can merge a new pull request a moment after it opens.
+                until(tries = 20) { offers(&quot;github:merge&quot;) }
+                reason(&quot;merge it, squashing its commits&quot;)
+                check(&quot;merged&quot; eq true)
+            }
+        }
+    }
+    reason(&quot;open issue $issue in $owner/$repo&quot;) {
+        // The comment is a new resource: visit it, then come back to the issue to close it.
+        reason(&quot;comment on it: Fixed in 1.2 by #$pull.&quot;) {
+            check(&quot;body&quot; eq &quot;Fixed in 1.2 by #$pull.&quot;)
+        }
+        reason(&quot;close it, since the fix is done&quot;)
+        check(&quot;state&quot; eq &quot;closed&quot;, &quot;state_reason&quot; eq &quot;completed&quot;)
+    }
+}
+</code></pre><p>GitHub, through the gateway, hybrid</p><pre><code class="kotlin">// The GitHub task, hybrid: the script does every step exactly, as github-task-scripted.kts does, but the one
+// choice that is a matter of judgement, which way to close the issue (completed, not planned, or a duplicate),
+// the model makes. Needs --reasoner claude. Real writes, to the repository given.
+//   artie run tests/github-task-hybrid.kts owner=JogoShugh repo=heart-github-test --reasoner claude
+val owner by input()
+val repo by input()
+val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(&quot;MMdd-HHmmss&quot;)))
+
+heart(&quot;http://localhost:8392/&quot;) {
+    var issue = 0L
+    var pull = 0L
+    act(&quot;github:repos-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo) {
+        act(&quot;github:open-issue&quot;, &quot;title&quot; to &quot;Crash when a bed has no name (hybrid)&quot;, &quot;body&quot; to &quot;Opened by a HEART script.&quot;) {
+            issue = state[&quot;number&quot;] as Long
+        }
+    }
+    // The branch is named, as a person would: a list of branches is paged, and main may not be on its first page.
+    act(&quot;github:repos-get-branch&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, &quot;branch&quot; to &quot;main&quot;) {
+        act(&quot;github:branch-from-here&quot;, &quot;name&quot; to &quot;fix-blank-names-hybrid-$stamp&quot;) {
+            act(
+                &quot;github:commit-file&quot;,
+                &quot;path&quot; to &quot;fix-hybrid-$stamp.md&quot;,
+                &quot;message&quot; to &quot;Refuse a bed with no name&quot;,
+                &quot;content&quot; to &quot;Bed names may not be blank.\n&quot;,
+            )
+            act(
+                &quot;github:open-pull-request&quot;,
+                &quot;title&quot; to &quot;Refuse a bed with no name (hybrid)&quot;,
+                &quot;base&quot; to &quot;main&quot;,
+                &quot;body&quot; to &quot;Relates to #$issue.&quot;,
+            ) {
+                pull = state[&quot;number&quot;] as Long
+                // GitHub works out whether it can merge a new pull request a moment after it opens.
+                until(tries = 20) { offers(&quot;github:merge&quot;) }
+                act(&quot;github:merge&quot;, &quot;merge_method&quot; to &quot;squash&quot;)
+                check(&quot;merged&quot; eq true)
+            }
+        }
+    }
+    act(&quot;github:issues-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, &quot;issue_number&quot; to issue) {
+        // The comment is a new resource: visit it, then come back to the issue to close it.
+        act(&quot;github:comment&quot;, &quot;body&quot; to &quot;Fixed in 1.2 by #$pull.&quot;) {
+            check(&quot;body&quot; eq &quot;Fixed in 1.2 by #$pull.&quot;)
+        }
+        reason(&quot;close it the right way: the fix shipped in 1.2&quot;)
+        check(&quot;state&quot; eq &quot;closed&quot;, &quot;state_reason&quot; eq &quot;completed&quot;)
+    }
+}
+</code></pre>
+  <p class="muted">Every run: ARTIE and heart-script at 9193367 (checks as facts, 974a025; Power-assert, 6fbcecc), the gateway at e171027. Claude Sonnet 5.5 (claude-sonnet-5-5) as the reasoner. The scratch repository is JogoShugh/heart-github-test.</p>
+</main>
+<script>
+// Kotlin syntax colouring for heart-scripts shown in reports: comments, strings (with their $templates),
+// keywords, numbers, and calls, the DSL's verbs among them. Every <code class="kotlin"> on the page is
+// coloured in place, from its text, so the page needs no library. The rules come with it, so no page can
+// leave them out; their colours are the page's own tokens (--kt-kw, --kt-str, --kt-tpl, --kt-cm, --kt-fn,
+// --kt-num, light and dark), with light values to fall back on when a page has none.
+(() => {
+  const KEYWORDS = new Set(["val", "var", "fun", "if", "else", "when", "return", "by", "to", "in", "is", "as",
+    "null", "true", "false", "class", "object", "for", "while", "import", "package", "this", "it"]);
+  const TOKEN = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*")|\b(\d+(?:\.\d+)?L?)\b|\b([A-Za-z_]\w*)\b/g;
+  const span = (cls, text) => {
+    const s = document.createElement("span");
+    s.className = cls;
+    s.textContent = text;
+    return s;
+  };
+  // A string, its ${…} and $name templates marked inside it.
+  const string = (text) => {
+    const s = document.createElement("span");
+    s.className = "kt-str";
+    let last = 0;
+    text.replace(/\$\{[^}]*\}|\$[A-Za-z_]\w*/g, (m, at) => {
+      s.append(document.createTextNode(text.slice(last, at)), span("kt-tpl", m));
+      last = at + m.length;
+      return m;
+    });
+    s.append(document.createTextNode(text.slice(last)));
+    return s;
+  };
+  const colour = (code) => {
+    const text = code.textContent;
+    const out = document.createDocumentFragment();
+    let last = 0;
+    for (const m of text.matchAll(TOKEN)) {
+      out.append(document.createTextNode(text.slice(last, m.index)));
+      const [all, comment, str, num, word] = m;
+      // A call: a name with ( or { after it. Tested on what follows, as a lookahead alone can't be captured.
+      const call = word && /^\s*[({]/.test(text.slice(m.index + all.length));
+      if (comment) out.append(span("kt-cm", comment));
+      else if (str) out.append(string(str));
+      else if (num) out.append(span("kt-num", num));
+      else if (KEYWORDS.has(word)) out.append(span("kt-kw", word));
+      else if (call) out.append(span("kt-fn", word));
+      else out.append(document.createTextNode(all));
+      last = m.index + all.length;
+    }
+    out.append(document.createTextNode(text.slice(last)));
+    code.replaceChildren(out);
+  };
+  const rules = document.createElement("style");
+  rules.textContent = [
+    ".kt-kw { color: var(--kt-kw, #8a3f8f); font-weight: 500; }", ".kt-str { color: var(--kt-str, #2f6f3f); }",
+    ".kt-tpl { color: var(--kt-tpl, #b0641c); }", ".kt-cm { color: var(--kt-cm, #7b847e); font-style: italic; }",
+    ".kt-fn { color: var(--kt-fn, #1f5a8a); }", ".kt-num { color: var(--kt-num, #a0522d); }",
+  ].join("\n");
+  document.head.append(rules);
+  document.querySelectorAll("code.kotlin").forEach(colour);
+})();
+
+</script>
+</body>
+</html>

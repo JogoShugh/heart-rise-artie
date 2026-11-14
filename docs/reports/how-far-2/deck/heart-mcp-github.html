@@ -1,0 +1,1482 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The same model, given state instead of a catalogue · How far can one vision go · 2.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Counterpoint · heart-mcp on real GitHub</span></header>
+<h2>The same model, given state instead of a catalogue</h2>
+<div class="split" style="grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr)">
+  <div class="rows">
+    <div class="step"><h3>Before · pull request #2344, open, mergeable</h3><p>Offered now: <code>scm:merge</code> <code>scm:close</code> <code>scm:comment</code> <code>scm:edit</code> <code>scm:label</code> <code>scm:request-review</code> <code>scm:update-branch</code></p></div>
+    <div class="step"><h3>heart_act · scm:merge · method: squash</h3><p><b>acted</b>: “scm:merge was done.” Sent once, with the validator from the state it read. GitHub merged it: <code>66be32c</code>.</p></div>
+    <div class="step"><h3>After · closed, merged</h3><p>Offered now: <code>scm:comment</code> <code>scm:edit</code> <code>scm:label</code></p></div>
+    <div class="step gap"><h3>heart_act · scm:merge, again</h3><p><b>rejected-before-sending</b>: “scm:merge is not offered now. Offered: scm:comment, scm:edit, scm:label. Nothing was sent.”</p></div>
+    <div class="step"><h3>heart_explain · scm:merge</h3><p>“A closed pull request can’t be merged; reopen it first.”</p></div>
+  </div>
+  <div class="rows">
+    <div class="stats">
+      <div class="stat"><b>6</b><span>tools, never changing: look, act, follow, describe, explain, back</span></div>
+      <div class="stat"><b>7</b><span>turns, 22.6 s, Claude Code headless</span></div>
+      <div class="stat"><b>1</b><span>act sent to GitHub; the second never left the machine</span></div>
+      <div class="stat"><b>0</b><span>addresses, methods or headers shown to the model</span></div>
+    </div>
+    <p class="punch">Tool search found the six tools. The state came in every answer.</p>
+    <p class="refs"><details class="fragment-plain"><summary>The whole run, every call and answer (transcript.yaml)</summary><pre><code>run:
+  what: Claude Code (claude -p), heart-mcp its only MCP server, the HEART gateway for real GitHub at localhost:8093
+  when: 2026-11-14T03:58Z
+  prompt: &quot;Using only the heart tools: in the github service, open pull request 2344 of JogoShugh/heart-github-test. If it
+    can be merged, merge it by squashing. Then try to merge it a second time. Report exactly what the service said each
+    time, and which acts were offered before and after the merge.&quot;
+  pull_request: https://github.com/JogoShugh/heart-github-test/pull/2344
+  model: claude-opus-5-5
+  mcp_servers:
+    - &quot;heart: connected&quot;
+  tools:
+    - mcp__heart__heart_act
+    - mcp__heart__heart_back
+    - mcp__heart__heart_describe
+    - mcp__heart__heart_explain
+    - mcp__heart__heart_follow
+    - mcp__heart__heart_look
+  result:
+    turns: 7
+    duration_ms: 22635
+    cost_usd_reported: 0.26748299999999997
+steps:
+  - call: ToolSearch
+    input:
+      query: select:mcp__heart__heart_act,mcp__heart__heart_back,mcp__heart__heart_describe,mcp__heart__heart_explain,mcp__heart__heart_follow,mcp__heart__heart_look
+      max_results: 6
+  - answer: &quot;&quot;
+  - call: heart_look
+    input:
+      service: github
+  - answer:
+      resource:
+        state:
+          title: GitHub v3 REST API
+      acts:
+        - name: scm:issues-get
+          title: Get an issue
+          description: &gt;-
+            The API returns a [`301 Moved Permanently`
+            status](https://docs.github.com/rest/guides/best-practices-for-using-the-rest-api#follow-redirects) if the
+            issue was
+
+            [transferred](https://docs.github.com/articles/transferring-an-issue-to-another-repository/) to another
+            repository. If
+
+            the issue was transferred to or deleted from a repository where the authenticated user lacks read access,
+            the API
+
+            returns a `404 Not Found` status. If the issue was deleted from a repository where the authenticated user
+            has read
+
+            access, the API returns a `410 Gone` status. To receive webhook events for transferred and deleted issues,
+            subscribe
+
+            to the [`issues`](https://docs.github.com/webhooks/event-payloads/#issues) webhook.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            properties:
+              issue_number:
+                description: The number that identifies the issue.
+                title: Issue_number
+                type: integer
+              owner:
+                description: The account owner of the repository. The name is not case sensitive.
+                title: Owner
+                type: string
+              repo:
+                description: The name of the repository without the `.git` extension. The name is not case sensitive.
+                title: Repo
+                type: string
+            required:
+              - owner
+              - repo
+              - issue_number
+            type: object
+        - name: scm:issues-get-comment
+          title: Get an issue comment
+          description: You can use the REST API to get comments on issues and pull requests. Every pull request is an issue, but
+            not every issue is a pull request.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            properties:
+              comment_id:
+                description: The unique identifier of the comment.
+                format: int64
+                title: Comment_id
+                type: integer
+              owner:
+                description: The account owner of the repository. The name is not case sensitive.
+                title: Owner
+                type: string
+              repo:
+                description: The name of the repository without the `.git` extension. The name is not case sensitive.
+                title: Repo
+                type: string
+            required:
+              - owner
+              - repo
+              - comment_id
+            type: object
+        - name: scm:issues-list-comments
+          title: List issue comments
+          description: You can use the REST API to list comments on issues and pull requests. Every pull request is an issue, but
+            not every issue is a pull request.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            properties:
+              issue_number:
+                description: The number that identifies the issue.
+                title: Issue_number
+                type: integer
+              owner:
+                description: The account owner of the repository. The name is not case sensitive.
+                title: Owner
+                type: string
+              repo:
+                description: The name of the repository without the `.git` extension. The name is not case sensitive.
+                title: Repo
+                type: string
+              since:
+                description: &quot;Only show results that were last updated after the given time. This is a timestamp in [ISO
+                  8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`.&quot;
+                format: date-time
+                title: Since
+                type: string
+            required:
+              - owner
+              - repo
+              - issue_number
+            type: object
+        - name: scm:issues-list-for-repo
+          title: List repository issues
+          description: &quot;List issues in a repository. Only open issues will be listed. Pull requests are left out: list them with
+            github:pulls-list, which filters by labels too.&quot;
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            properties:
+              assignee:
+                description: Can be the name of a user. Pass in `none` for issues with no assigned user, and `*` for issues assigned to
+                  any user.
+                title: Assignee
+                type: string
+              creator:
+                description: The user that created the issue.
+                title: Creator
+                type: string
+              direction:
+                default: desc
+                description: The direction to sort the results by.
+                enum:
+                  - asc
+                  - desc
+                title: Direction
+                type: string
+              labels:
+                description: &quot;A list of comma separated label names. Example: `bug,ui,@high`&quot;
+                title: Labels
+                type: string
+              mentioned:
+                description: A user that's mentioned in the issue.
+                title: Mentioned
+                type: string
+              milestone:
+                description: If an `integer` is passed, it should refer to a milestone by its `number` field. If the string `*` is
+                  passed, issues with any milestone are accepted. If the string `none` is passed, issues without
+                  milestones are returned.
+                title: Milestone
+                type: string
+              owner:
+                description: The account owner of the repository. The name is not case sensitive.
+                title: Owner
+                type: string
+              repo:
+                description: The name of the repository without the `.git` extension. The name is not case sensitive.
+                title: Repo
+                type: string
+              since:
+                description: &quot;Only show results that were last updated after the given time. This is a timestamp in [ISO
+                  8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`.&quot;
+                format: date-time
+                title: Since
+                type: string
+              sort:
+                default: created
+                description: What to sort results by.
+                enum:
+                  - created
+                  - updated
+                  - comments
+                title: Sort
+                type: string
+              state:
+                default: open
+                description: Indicates the state of the issues to return.
+                enum:
+                  - open
+                  - closed
+                  - all
+                title: State
+                type: string
+            required:
+              - owner
+              - repo
+            type: object
+        - name: scm:pulls-get
+          title: Get a pull request
+          description: Draft pull requests are available in public repositories with GitHub Free and GitHub Free for
+            organizations, GitHub Pro, and legacy per-repository billing plans, and in public and private repositories
+            with GitHub Team and GitHub Enterprise Cloud. For more information, see [GitHub's
+            products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help
+            documentation.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            properties:
+              owner:
+                description: The account owner of the repository. The name is not case sensitive.
+                title: Owner
+                type: string
+              pull_number:
+                description: The number that identifies the pull request.
+                title: Pull_number
+                type: integer
+              repo:
+                description: The name of the repository without the `.git` extension. The name is not case sensitive.
+                title: Repo
+                type: string
+            required:
+              - owner
+              - repo
+              - pull_number
+            type: object
+        - name: scm:pulls-list
+          title: List pull requests
+          description: Lists pull requests in a specified repository.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            properties:
+              direction:
+                description: &quot;The direction of the sort. Default: `desc` when sort is `created` or sort is not specified, otherwise
+                  `asc`.&quot;
+                enum:
+                  - asc
+                  - desc
+                title: Direction
+                type: string
+              labels:
+                description: &quot;A list of comma separated label names. Example: `bug,ui,@high`&quot;
+                title: Labels
+                type: string
+              owner:
+                description: The account owner of the repository. The name is not case sensitive.
+                title: Owner
+                type: string
+              repo:
+                description: The name of the repository without the `.git` extension. The name is not case sensitive.
+                title: Repo
+                type: string
+              sort:
+                default: created
+                description: What to sort results by. `popularity` will sort by the number of comments. `long-running` will sort by date
+                  created and will limit the results to pull requests that have been open for more than a month and have
+                  had activity within the past month.
+                enum:
+                  - created
+                  - updated
+                  - popularity
+                  - long-running
+                title: Sort
+                type: string
+              state:
+                default: open
+                description: Either `open`, `closed`, or `all` to filter by state.
+                enum:
+                  - open
+                  - closed
+                  - all
+                title: State
+                type: string
+            required:
+              - owner
+              - repo
+            type: object
+        - name: scm:repos-get
+          title: Get a repository
+          description: The `parent` and `source` objects are present when the repository is a fork. `parent` is the repository
+            this repository was forked from, `source` is the ultimate source for the network.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            properties:
+              owner:
+                description: The account owner of the repository. The name is not case sensitive.
+                title: Owner
+                type: string
+              repo:
+                description: The name of the repository without the `.git` extension. The name is not case sensitive.
+                title: Repo
+                type: string
+            required:
+              - owner
+              - repo
+            type: object
+        - name: scm:repos-get-branch
+          title: Get a branch
+          description: Get a branch
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            properties:
+              branch:
+                description: The name of the branch. Cannot contain wildcard characters. To use wildcard characters in branch names, use
+                  [the GraphQL API](https://docs.github.com/graphql).
+                title: Branch
+                type: string
+              owner:
+                description: The account owner of the repository. The name is not case sensitive.
+                title: Owner
+                type: string
+              repo:
+                description: The name of the repository without the `.git` extension. The name is not case sensitive.
+                title: Repo
+                type: string
+            required:
+              - owner
+              - repo
+              - branch
+            type: object
+        - name: scm:repos-list-branches
+          title: List branches
+          description: List branches
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            properties:
+              owner:
+                description: The account owner of the repository. The name is not case sensitive.
+                title: Owner
+                type: string
+              protected:
+                description: Setting to `true` returns only branches protected by branch protections or rulesets. When set to `false`,
+                  only unprotected branches are returned. Omitting this parameter returns all branches.
+                title: Protected
+                type: boolean
+              repo:
+                description: The name of the repository without the `.git` extension. The name is not case sensitive.
+                title: Repo
+                type: string
+            required:
+              - owner
+              - repo
+            type: object
+        - name: scm:repos-list-for-user
+          title: List repositories for a user
+          description: Lists public repositories for the specified user.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            properties:
+              direction:
+                description: &quot;The order to sort by. Default: `asc` when using `full_name`, otherwise `desc`.&quot;
+                enum:
+                  - asc
+                  - desc
+                title: Direction
+                type: string
+              sort:
+                default: full_name
+                description: The property to sort the results by.
+                enum:
+                  - created
+                  - updated
+                  - pushed
+                  - full_name
+                title: Sort
+                type: string
+              type:
+                default: owner
+                description: Limit results to repositories of the specified type.
+                enum:
+                  - all
+                  - owner
+                  - member
+                title: Type
+                type: string
+              username:
+                description: The handle for the GitHub user account.
+                title: Username
+                type: string
+            required:
+              - username
+            type: object
+      links:
+        - rel: alternate
+        - rel: hr:affordances
+  - call: heart_act
+    input:
+      act: scm:pulls-get
+      fields:
+        owner: JogoShugh
+        repo: heart-github-test
+        pull_number: 2344
+  - answer:
+      resource:
+        state:
+          id: 5306975352
+          node_id: PR_kwDOVM7WJc8AAAABPFIEeA
+          number: 2344
+          state: open
+          locked: false
+          title: &quot;Renewals: one week while stock is short&quot;
+          body: Variant 503 of the Riverside Public Library release.
+          labels: []
+          milestone: null
+          active_lock_reason: null
+          created_at: 2026-11-14T03:58:02Z
+          updated_at: 2026-11-14T03:58:02Z
+          closed_at: null
+          merged_at: null
+          merge_commit_sha: 48d8e716f120c59db113fee727c4fec305f05a9a
+          assignee: null
+          assignees: []
+          requested_reviewers: []
+          requested_teams: []
+          head:
+            label: JogoShugh:library/pr-503
+            ref: library/pr-503
+            sha: 0a2e4cff0ae652ae2b7f226f648de015135ec980
+          base:
+            label: JogoShugh:library/main
+            ref: library/main
+            sha: 6c58894f1c19d744e67c8e2b054b0d8217011596
+          author_association: OWNER
+          auto_merge: null
+          draft: false
+          merged: false
+          mergeable: true
+          rebaseable: true
+          mergeable_state: clean
+          merged_by: null
+          comments: 0
+          review_comments: 0
+          maintainer_can_modify: false
+          commits: 1
+          additions: 3
+          deletions: 1
+          changed_files: 2
+      acts:
+        - name: scm:close
+          title: Close
+          description: Close it; a pull request unmerged, an issue as completed.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            additionalProperties: false
+            properties: {}
+            required: []
+            title: Close
+            type: object
+        - name: scm:comment
+          title: Comment
+          description: Add a comment to the pull request's conversation.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            additionalProperties: false
+            properties:
+              body:
+                description: The contents of the comment.
+                title: Body
+                type: string
+            required:
+              - body
+            title: Comment
+            type: object
+        - name: scm:edit
+          title: Edit
+          description: Change its title or description.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            additionalProperties: false
+            properties:
+              body:
+                description: The contents of the pull request.
+                title: Body
+                type: string
+              title:
+                description: The title of the pull request.
+                title: Title
+                type: string
+            required: []
+            title: Edit
+            type: object
+        - name: scm:label
+          title: Label
+          description: Add labels to the pull request.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            additionalProperties: false
+            properties:
+              labels:
+                description: The labels to add to the issue's existing labels. You can also pass an `array` of labels directly, but
+                  GitHub recommends passing an object with the `labels` key. To replace all of the labels for an issue,
+                  use &quot;[Set labels for an issue](https://docs.github.com/rest/issues/labels#set-labels-for-an-issue).&quot;
+                items:
+                  oneOf:
+                    - type: string
+                    - properties:
+                        confidence:
+                          description: The confidence level for this label choice.
+                          enum:
+                            - low
+                            - medium
+                            - high
+                          type: string
+                        name:
+                          description: The name of the label to add.
+                          type: string
+                        rationale:
+                          description: Optional reasoning for adding this label.
+                          type: string
+                        suggest:
+                          description: If `true`, the label is stored as a pending suggestion for human review rather than applied directly.
+                          type: boolean
+                      required:
+                        - name
+                      type: object
+                minItems: 1
+                title: Labels
+                type: array
+            required: []
+            title: Label
+            type: object
+        - name: scm:merge
+          title: Merge
+          description: Merge the pull request into its base branch.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            additionalProperties: false
+            properties:
+              commit_message:
+                description: Extra detail to append to automatic commit message.
+                title: Commit message
+                type: string
+              commit_title:
+                description: Title for the automatic commit message.
+                title: Commit title
+                type: string
+              method:
+                description: The merge method to use.
+                enum:
+                  - merge
+                  - squash
+                  - rebase
+                title: Merge method
+                type: string
+            required:
+              - method
+            title: Merge
+            type: object
+        - name: scm:request-review
+          title: Request a review
+          description: Ask people or teams to review the pull request.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            additionalProperties: false
+            anyOf:
+              - required:
+                  - reviewers
+              - required:
+                  - team_reviewers
+            properties:
+              reviewers:
+                description: The people to ask, by their logins, such as octocat.
+                items:
+                  type: string
+                title: Reviewers
+                type: array
+              team_reviewers:
+                description: The teams to ask, by their slugs, such as maintainers.
+                items:
+                  type: string
+                title: Team reviewers
+                type: array
+            required: []
+            title: Request a review
+            type: object
+        - name: scm:update-branch
+          title: Update the branch
+          description: Bring the latest changes from the base branch into this one.
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            additionalProperties: false
+            properties: {}
+            required: []
+            title: Update the branch
+            type: object
+      links:
+        - rel: scm:issues-list-comments
+        - rel: scm:commits
+        - rel: scm:issues-get
+      embedded:
+        - rel: author
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:head-user
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:head-repo
+          state:
+            homepage: null
+            license: null
+            mirror_url: null
+        - rel: scm:base-user
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:base-repo
+          state:
+            id: 1422841381
+            node_id: R_kgDOVM7WJQ
+            name: heart-github-test
+            full_name: JogoShugh/heart-github-test
+            private: false
+            fork: false
+            homepage: null
+            default_branch: main
+            license: null
+            mirror_url: null
+      outcome:
+        kind: acted
+        message: scm:pulls-get was done.
+  - said: &quot;Mergeable: true, state clean. Merging.&quot;
+  - call: heart_act
+    input:
+      act: scm:merge
+      fields:
+        method: squash
+  - answer:
+      resource:
+        state:
+          id: 5306975352
+          node_id: PR_kwDOVM7WJc8AAAABPFIEeA
+          number: 2344
+          state: closed
+          locked: false
+          title: &quot;Renewals: one week while stock is short&quot;
+          body: Variant 503 of the Riverside Public Library release.
+          created_at: 2026-11-14T03:58:02Z
+          updated_at: 2026-11-14T03:58:49Z
+          closed_at: 2026-11-14T03:58:49Z
+          merged_at: 2026-11-14T03:58:49Z
+          merge_commit_sha: 66be32c9db5daaa4f23bd8acab9b5710fac8d6c9
+          assignees: []
+          requested_reviewers: []
+          requested_teams: []
+          labels: []
+          milestone: null
+          draft: false
+          head:
+            label: JogoShugh:library/pr-503
+            ref: library/pr-503
+            sha: 0a2e4cff0ae652ae2b7f226f648de015135ec980
+          base:
+            label: JogoShugh:library/main
+            ref: library/main
+            sha: 6c58894f1c19d744e67c8e2b054b0d8217011596
+          author_association: OWNER
+          auto_merge: null
+          assignee: null
+          active_lock_reason: null
+          merged: true
+          mergeable: null
+          rebaseable: null
+          mergeable_state: unknown
+          comments: 0
+          review_comments: 0
+          maintainer_can_modify: false
+          commits: 1
+          additions: 3
+          deletions: 1
+          changed_files: 2
+      acts:
+        - name: scm:comment
+          title: Comment
+          schema: as before
+        - name: scm:edit
+          title: Edit
+          schema: as before
+        - name: scm:label
+          title: Label
+          schema: as before
+      links:
+        - rel: scm:issues-get
+        - rel: scm:issues-list-comments
+        - rel: scm:commits
+      embedded:
+        - rel: author
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:merged-by
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:head-user
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:head-repo
+          state:
+            homepage: null
+            mirror_url: null
+            license: null
+        - rel: scm:base-user
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:base-repo
+          state:
+            id: 1422841381
+            node_id: R_kgDOVM7WJQ
+            name: heart-github-test
+            full_name: JogoShugh/heart-github-test
+            private: false
+            fork: false
+            homepage: null
+            mirror_url: null
+            license: null
+            default_branch: main
+      outcome:
+        kind: acted
+        message: scm:merge was done.
+  - call: heart_act
+    input:
+      act: scm:merge
+      fields:
+        method: squash
+  - answer:
+      resource:
+        state:
+          id: 5306975352
+          node_id: PR_kwDOVM7WJc8AAAABPFIEeA
+          number: 2344
+          state: closed
+          locked: false
+          title: &quot;Renewals: one week while stock is short&quot;
+          body: Variant 503 of the Riverside Public Library release.
+          created_at: 2026-11-14T03:58:02Z
+          updated_at: 2026-11-14T03:58:49Z
+          closed_at: 2026-11-14T03:58:49Z
+          merged_at: 2026-11-14T03:58:49Z
+          merge_commit_sha: 66be32c9db5daaa4f23bd8acab9b5710fac8d6c9
+          assignees: []
+          requested_reviewers: []
+          requested_teams: []
+          labels: []
+          milestone: null
+          draft: false
+          head:
+            label: JogoShugh:library/pr-503
+            ref: library/pr-503
+            sha: 0a2e4cff0ae652ae2b7f226f648de015135ec980
+          base:
+            label: JogoShugh:library/main
+            ref: library/main
+            sha: 6c58894f1c19d744e67c8e2b054b0d8217011596
+          author_association: OWNER
+          auto_merge: null
+          assignee: null
+          active_lock_reason: null
+          merged: true
+          mergeable: null
+          rebaseable: null
+          mergeable_state: unknown
+          comments: 0
+          review_comments: 0
+          maintainer_can_modify: false
+          commits: 1
+          additions: 3
+          deletions: 1
+          changed_files: 2
+      acts:
+        - name: scm:comment
+          title: Comment
+          schema: as before
+        - name: scm:edit
+          title: Edit
+          schema: as before
+        - name: scm:label
+          title: Label
+          schema: as before
+      links:
+        - rel: scm:issues-get
+        - rel: scm:issues-list-comments
+        - rel: scm:commits
+      embedded:
+        - rel: author
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:merged-by
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:head-user
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:head-repo
+          state:
+            homepage: null
+            mirror_url: null
+            license: null
+        - rel: scm:base-user
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:base-repo
+          state:
+            id: 1422841381
+            node_id: R_kgDOVM7WJQ
+            name: heart-github-test
+            full_name: JogoShugh/heart-github-test
+            private: false
+            fork: false
+            homepage: null
+            mirror_url: null
+            license: null
+            default_branch: main
+      outcome:
+        kind: rejected-before-sending
+        message: &quot;scm:merge is not offered now. Offered: scm:comment, scm:edit, scm:label. Nothing was sent.&quot;
+  - call: heart_explain
+    input:
+      act: scm:merge
+  - answer:
+      resource:
+        state:
+          id: 5306975352
+          node_id: PR_kwDOVM7WJc8AAAABPFIEeA
+          number: 2344
+          state: closed
+          locked: false
+          title: &quot;Renewals: one week while stock is short&quot;
+          body: Variant 503 of the Riverside Public Library release.
+          created_at: 2026-11-14T03:58:02Z
+          updated_at: 2026-11-14T03:58:49Z
+          closed_at: 2026-11-14T03:58:49Z
+          merged_at: 2026-11-14T03:58:49Z
+          merge_commit_sha: 66be32c9db5daaa4f23bd8acab9b5710fac8d6c9
+          assignees: []
+          requested_reviewers: []
+          requested_teams: []
+          labels: []
+          milestone: null
+          draft: false
+          head:
+            label: JogoShugh:library/pr-503
+            ref: library/pr-503
+            sha: 0a2e4cff0ae652ae2b7f226f648de015135ec980
+          base:
+            label: JogoShugh:library/main
+            ref: library/main
+            sha: 6c58894f1c19d744e67c8e2b054b0d8217011596
+          author_association: OWNER
+          auto_merge: null
+          assignee: null
+          active_lock_reason: null
+          merged: true
+          mergeable: null
+          rebaseable: null
+          mergeable_state: unknown
+          comments: 0
+          review_comments: 0
+          maintainer_can_modify: false
+          commits: 1
+          additions: 3
+          deletions: 1
+          changed_files: 2
+      acts:
+        - name: scm:comment
+          title: Comment
+          schema: as before
+        - name: scm:edit
+          title: Edit
+          schema: as before
+        - name: scm:label
+          title: Label
+          schema: as before
+      links:
+        - rel: scm:issues-get
+        - rel: scm:issues-list-comments
+        - rel: scm:commits
+      embedded:
+        - rel: author
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:merged-by
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:head-user
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:head-repo
+          state:
+            homepage: null
+            mirror_url: null
+            license: null
+        - rel: scm:base-user
+          state:
+            login: JogoShugh
+            id: 1863005
+            node_id: MDQ6VXNlcjE4NjMwMDU=
+            gravatar_id: &quot;&quot;
+            type: User
+            user_view_type: public
+            site_admin: false
+        - rel: scm:base-repo
+          state:
+            id: 1422841381
+            node_id: R_kgDOVM7WJQ
+            name: heart-github-test
+            full_name: JogoShugh/heart-github-test
+            private: false
+            fork: false
+            homepage: null
+            mirror_url: null
+            license: null
+            default_branch: main
+      explanation: A closed pull request can't be merged; reopen it first.
+  - said: &gt;-
+      PR 2344 (&quot;Renewals: one week while stock is short&quot;) merged once by squash. Second merge attempt never reached
+      GitHub.
+
+
+      **Before merge:** PR `open`, `mergeable: true`, `mergeable_state: &quot;clean&quot;`. Head `library/pr-503`, base
+      `library/main`. Acts offered:
+
+      - `scm:close`
+
+      - `scm:comment`
+
+      - `scm:edit`
+
+      - `scm:label`
+
+      - `scm:merge`
+
+      - `scm:request-review`
+
+      - `scm:update-branch`
+
+
+      **First merge** (`scm:merge`, `method: &quot;squash&quot;`): service answered `{&quot;kind&quot;:&quot;acted&quot;,&quot;message&quot;:&quot;scm:merge was
+      done.&quot;}`. PR now `state: &quot;closed&quot;`, `merged: true`, `merged_at: &quot;2026-11-14T03:58:49Z&quot;`, `merge_commit_sha:
+      &quot;66be32c9db5daaa4f23bd8acab9b5710fac8d6c9&quot;`.
+
+
+      **After merge:** acts offered only `scm:comment`, `scm:edit`, `scm:label`. Service dropped `scm:merge`,
+      `scm:close`, `scm:request-review` and `scm:update-branch`.
+
+
+      **Second merge** (same act, same fields): service answered `{&quot;kind&quot;:&quot;rejected-before-sending&quot;,&quot;message&quot;:&quot;scm:merge
+      is not offered now. Offered: scm:comment, scm:edit, scm:label. Nothing was sent.&quot;}`
+
+
+      I also asked service why `scm:merge` no longer offered (`heart_explain`, sends nothing to GitHub). Service reason:
+      &quot;A closed pull request can't be merged; reopen it first.&quot;</code></pre></details> <a class="ref-plain" href="deck/heart-mcp-github.html">P5 · AGENT ON STATE</a> <details class="fragment-plain"><summary>What ARTIE did inside heart-mcp (artie-events.yaml)</summary><pre><code>- timestamp: 2026-11-14T03:58:40.534246Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: eff617c584c54fb0
+  severity_text: INFO
+  event_name: rung.applied
+  body: took rung L2 from Preference-Applied
+  attributes:
+    url.full: http://localhost:8093/
+    heart.preference_applied: forms=link, schema=link
+    heart.rung: L2
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.535706Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: eff617c584c54fb0
+  severity_text: INFO
+  event_name: forms.followed
+  body: followed the forms link at L2
+  attributes:
+    url.full: http://localhost:8093/
+    heart.forms.href: http://localhost:8093/affordance-sets/808987df819d9973
+    heart.rung: L2
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.538763Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 8c3a60a668d3264b
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/affordance-sets/808987df819d9973
+    heart.integrity.expected: sha256-gImH34GdmXPjwBtQ7RNGKro/Tbf26SFredj/E+jK13c=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.541031Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: bc7f119fdfe2b6cf
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/1202effcbb3aaee9
+    heart.integrity.expected: sha256-EgLv/Ls6rumxePJO3OoundY0ReLmH28CePbUzfqPMy8=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.542377Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: b3fbf735d3b1e3c0
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/951cd92d9e676d55
+    heart.integrity.expected: sha256-lRzZLZ5nbVWTfVgdvjNiNzC7rEpEcetn52V7HiuQ4VQ=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.543760Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 68a8c8661660c7a6
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/0e07732e34ca0505
+    heart.integrity.expected: sha256-DgdzLjTKBQWP75sELR8HJRqcCQMwMEvAQSfEni+yyi4=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.545629Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: dad0e025ea6ca1f5
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/520d270ce928f031
+    heart.integrity.expected: sha256-Ug0nDOko8DEvsaJQo63KglhL6ildf8pLYO7QrsC9zYo=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.546972Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: bc9b6ea130b61739
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/60185a2dc910fe20
+    heart.integrity.expected: sha256-YBhaLckQ/iDRg7GI0vfUCgoj0gJ5Dx3Gs4W7a0nP/DU=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.548164Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 0c7bd89de87780ec
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/b9c839ada8894d91
+    heart.integrity.expected: sha256-ucg5raiJTZGVScIfXJPlRQ+pQzmX4gFlgOeSv24nWu4=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.549307Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 22dc731c3236e5a5
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/4d1844fe91bfdd08
+    heart.integrity.expected: sha256-TRhE/pG/3QhI/GVipkzvSxQc7BQoq/M0LR7tmgaW03U=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.550516Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: ad5376777cd489ef
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/784b3bc2c6308951
+    heart.integrity.expected: sha256-eEs7wsYwiVHBNbQ8USIOzGYrNZbWvQQM3C4o8mso1NM=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.551792Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 503c76412f1adf99
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/5a59b44f8fbe57d1
+    heart.integrity.expected: sha256-Wlm0T4++V9Efw1SLF/vAazAW1L0vhok2b3wjjmlMD68=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.552920Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 26c28c13906f5c7a
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/83c399bcb77c18c6
+    heart.integrity.expected: sha256-g8OZvLd8GMakgrjcpXCbRc2XkwNCCJQpeMe0EieviCc=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.546485Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 4605a2ec2cb476a6
+  severity_text: INFO
+  event_name: rung.applied
+  body: took rung L2 from Preference-Applied
+  attributes:
+    url.full: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+    heart.preference_applied: forms=link, schema=link
+    heart.rung: L2
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.546734Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 4605a2ec2cb476a6
+  severity_text: INFO
+  event_name: forms.followed
+  body: followed the forms link at L2
+  attributes:
+    url.full: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+    heart.forms.href: http://localhost:8093/affordance-sets/01113f6158002de4
+    heart.rung: L2
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.548662Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 41d0043198560d0c
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/affordance-sets/01113f6158002de4
+    heart.integrity.expected: sha256-ARE/YVgALeTnzANV8TegQJiue3vljZt3onMex+jMsvs=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.550455Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: a4dce5678ed15550
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/91c3b4ed90232223
+    heart.integrity.expected: sha256-kcO07ZAjIiNEsnLOU1aO2JC/CKNiwa+6Gqu1/F9I7EQ=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.551606Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 3faa249843217c5c
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/5cc19958fe9e94c5
+    heart.integrity.expected: sha256-XMGZWP6elMXOVrYKTlD6jSeXgyK6rFV/cFG4ZEM86oE=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.552607Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 8008196da0281c58
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/9f05e4cceb013a00
+    heart.integrity.expected: sha256-nwXkzOsBOgBBslpGxZupP0tlZHqv+DailyXYqBAhxo8=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.553710Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 4a21f0aa2cbc4bd3
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/6657324c8d4f4e78
+    heart.integrity.expected: sha256-ZlcyTI1PTniypG4ZtJXbnAThEtQqMnaMgaEuKcphU3M=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.554838Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 3ea24fd4500a19f3
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/0647075df7c2cd05
+    heart.integrity.expected: sha256-BkcHXffCzQXofzOADr7MhD1DvyZdRrMqSxagcPovIlM=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.555873Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: b41ae5871b0fc6a2
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/fab3ba59fd5e4a8d
+    heart.integrity.expected: sha256-+rO6Wf1eSo2HLQHDi1iwnPVfkbEOoA1YRasuuzmsMow=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.556957Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 41a2b021a3760eeb
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/62f60422b20449be
+    heart.integrity.expected: sha256-YvYEIrIESb4E3ismIYqpPBq7domgLG6KytRr4SQpjT8=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.942263Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 86b12d3367a1a03d
+  severity_text: INFO
+  event_name: act.sent
+  body: sent scm:merge with validator &quot;seq-0.hsf.L2.66835c9c7c8fc78d&quot;
+  attributes:
+    url.full: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344/actions/merge
+    heart.rel: scm:merge
+    heart.method: PUT
+    heart.if_match: '&quot;seq-0.hsf.L2.66835c9c7c8fc78d&quot;'
+    heart.resource: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+    heart.code: &quot;200&quot;
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.946229Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 4605a2ec2cb476a6
+  severity_text: INFO
+  event_name: rung.applied
+  body: took rung L2 from Preference-Applied
+  attributes:
+    url.full: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+    heart.preference_applied: forms=link, schema=link
+    heart.rung: L2
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.946402Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 4605a2ec2cb476a6
+  severity_text: INFO
+  event_name: forms.followed
+  body: followed the forms link at L2
+  attributes:
+    url.full: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+    heart.forms.href: http://localhost:8093/affordance-sets/0ec39d1095fd2ba6
+    heart.rung: L2
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.947933Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 8daa20fc3e82bd1a
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/affordance-sets/0ec39d1095fd2ba6
+    heart.integrity.expected: sha256-DsOdEJX9K6YeBaIkIcTuNUMM/OJwmuEM+8ATagoylW4=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.948230Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: cf722bf74e0615cc
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/5cc19958fe9e94c5
+    heart.integrity.expected: sha256-XMGZWP6elMXOVrYKTlD6jSeXgyK6rFV/cFG4ZEM86oE=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.948549Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 444889af30ff038a
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/9f05e4cceb013a00
+    heart.integrity.expected: sha256-nwXkzOsBOgBBslpGxZupP0tlZHqv+DailyXYqBAhxo8=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.949Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 91517eaabb096f5a
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/6657324c8d4f4e78
+    heart.integrity.expected: sha256-ZlcyTI1PTniypG4ZtJXbnAThEtQqMnaMgaEuKcphU3M=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:54.020812Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 63f783d4f3c710d3
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/unavailable/d0a0136ee8d4d2bb
+    heart.integrity.expected: sha256-0KATbujU0rucCp6OcpAy4T6ufex919p1QuOKqtJ8DLc=
+  resource:
+    service.name: ARTIE
+    service.version: &quot;0.5&quot;
+    user_agent.original: ARTIE/0.5 (heart-mcp)</code></pre></details> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754">IN-BAND</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-842">JUST-IN-TIME</a></p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/how-heart-mcp-works.html" rel="prev"><small>Back</small><b>heart-mcp: six fixed tools, and the state in every answer</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#heart-mcp-github">with heart-ts</a></span>
+<a href="deck/aws-callback.html" rel="next"><small>Next</small><b>What if AWS’s HAL became HEART?</b></a></nav>
+</main></div></body></html>

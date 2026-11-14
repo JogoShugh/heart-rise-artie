@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merge Watch Release</title>
+<meta name="description" content="A pull request released to Dev across five HEART parties, every wait a RISE reply: watched, merged in git, built by a real Jenkins, smoke tested, promoted or stopped.">
+<style>
+  :root { --bg: #f6f5f1; --fg: #1d211f; --soft: #5b625e; --line: #dcdcd4; --tab: #ffffff; --accent: #2f6b4f; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --tab: #1d2220;
+      --accent: #7cc4a0; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --tab: #1d2220;
+    --accent: #7cc4a0; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { padding-block: 1.25rem .5rem;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  h1 { margin: 0 0 .35rem; font-size: 1.6rem; text-wrap: balance; }
+  p { margin: 0; color: var(--soft); max-width: 75ch; }
+  [role="tablist"] { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .9rem; }
+  [role="tab"] { font: inherit; padding: .45rem .9rem; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--tab); color: var(--fg); cursor: pointer; }
+  [role="tab"][aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); }
+  iframe { display: block; width: 100%; height: calc(100vh - 10rem); min-height: 32rem; border: 0;
+    border-top: 1px solid var(--line); background: var(--bg); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Merge Watch Release</h1>
+  <p>Reason once, then run again with other inputs and no model: the smoke test captured from one run with Claude,
+    then five pull requests released by ARTIE across five HEART parties, each with its own inputs, zero model calls.</p>
+  <div role="tablist" aria-label="Part">
+    <button role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true">Overview</button>
+    <button role="tab" id="tab-pass" aria-controls="panel-pass" aria-selected="false">Released: pull request 501</button>
+    <button role="tab" id="tab-fail" aria-controls="panel-fail" aria-selected="false">Stopped: pull request 504</button>
+    <button role="tab" id="tab-sequence" aria-controls="panel-sequence" aria-selected="false">Sequence</button>
+    <button role="tab" id="tab-junctions" aria-controls="panel-junctions" aria-selected="false">Junctions</button>
+  </div>
+</header>
+<iframe id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" src="overview.html" title="Overview"></iframe>
+<iframe id="panel-pass" role="tabpanel" aria-labelledby="tab-pass" src="runs/pr-501.html" title="Pull request 501, released" hidden></iframe>
+<iframe id="panel-fail" role="tabpanel" aria-labelledby="tab-fail" src="runs/pr-504.html" title="Pull request 504, stopped" hidden></iframe>
+<iframe id="panel-sequence" role="tabpanel" aria-labelledby="tab-sequence" src="sequence.html" title="Sequence" hidden></iframe>
+<iframe id="panel-junctions" role="tabpanel" aria-labelledby="tab-junctions" src="junctions.html" title="Junctions" hidden></iframe>
+<script>
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  const show = (name) => tabs.forEach((tab) => {
+    const on = tab.id === `tab-${name}`;
+    tab.setAttribute("aria-selected", String(on));
+    document.getElementById(tab.getAttribute("aria-controls")).hidden = !on;
+  });
+  tabs.forEach((tab) => tab.addEventListener("click", () => show(tab.id.slice(4))));
+  const wanted = location.hash.slice(1);
+  if (tabs.some((tab) => tab.id === `tab-${wanted}`)) show(wanted);
+</script>
+</body>
+</html>

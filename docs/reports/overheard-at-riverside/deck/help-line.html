@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Every act from a manual · Overheard at Riverside</title>
+<base href="../">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+</head><body>
+<header class="bar"><div class="bar-in"><div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · plain page</span></div></div></header>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Scene one · 1997</span><span class="fiction">Fiction</span></header>
+<h2>Every act from a manual</h2>
+<aside class="preamble then"><span class="label">In the web that wasn't</span><p>Ana Torres wants to renew her three library books. The library's site gives her a manual of addresses and a page of numbers. She copies, types and sends, and only then learns whether she was allowed.</p></aside>
+
+<p class="setting">Fall 1997, a Tuesday evening, in the web that wasn't. Ana Torres has three library books due. She calls Riverside Public Library, and Marcus answers.</p>
+<div class="pair">
+  <ul class="points"><li>Fall 1997, in the web that wasn't. Ana Torres has three books due, and calls Marcus on the library's help line: she thinks she's renewing them wrong.</li><li>Marcus sends her to forms.html. It lists every act the site has, the same for every loan, each with a method, an address with {loanId} in it, and what to type.</li><li>Her loan numbers are on another page. To renew, Ana has to find each number there and type it into the address herself.</li><li><b>What it shows:</b> the information is on one page and the controls on another, and Ana is the one who joins them.</li></ul>
+<div class="script">
+    <div class="line"><span class="who ana">Ana</span><p>I'm trying to renew my books online, and I think I'm doing it wrong.</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>Do you have forms.html open?</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>It says, “To do something, type its address into your browser.” Number three, in capitals: RENEW A LOAN. Method, POST. Address, <code>/cgi-bin/library.cgi/loans/{loanId}/renew</code>.</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>That's the one. Put your loan number where it says loanId.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>And where do I get my loan number?</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>From your loans page. Type its address, with your card number and your PIN on the end.</p></div>
+  </div>
+  <figure><img src="media/forms-html.png" alt="forms.html at RENEW A LOAN: method POST, an address with {loanId}, a body with {card} and {pin}." loading="lazy"><figcaption>forms.html: every operation, for every loan alike, and what to type.</figcaption></figure>
+</div>
+<details class="more"><summary>What's real behind the scene</summary>
+  <ul>
+    <li>A site as 1997 would run it: Apache, and CGI scripts in Perl with CGI.pm.</li>
+    <li>Imagine YAML existed in 1997, and the equivalent of OpenAPI was made then, named <code>forms.yaml</code>. <code>forms.cgi</code> reads it with YAML::XS and writes <code>forms.html</code>, the page people browse it by.</li>
+    <li>WebWalker, the browser of the web that wasn't, has a method menu and a body box, because pages have no forms.</li>
+  </ul>
+</details>
+<details class="more"><summary>The CGI behind forms.html</summary>
+  <p class="note">forms.cgi reads forms.yaml, the OpenAPI of this 1997, and walks every path and method in it. For each it prints the rule, the method, the address with its placeholders, and what to type. Nothing in it knows a loan.</p>
+  <pre class="source"><code>my $n = 0;
+for my $path (sort keys %{ $api-&gt;{paths} }) {
+    for my $method (sort keys %{ $api-&gt;{paths}{$path} }) {
+        my $op = $api-&gt;{paths}{$path}{$method};
+        my @params = map { resolve($_) } @{ $op-&gt;{parameters} || [] };
+        my @query = grep { $_-&gt;{in} eq 'query' } @params;
+        my $address = $server . $path . (@query ? '?' . join('&amp;', map { "$_-&gt;{name}={$_-&gt;{name}}" } @query) : '');
+        my ($type) = keys %{ $op-&gt;{requestBody}{content} || {} };
+        my $schema = $type ? resolve($op-&gt;{requestBody}{content}{$type}{schema}) : undef;
+        my @body = $schema ? @{ $schema-&gt;{required} || [ sort keys %{ $schema-&gt;{properties} } ] } : ();
+        my @fields = ((map { [$_-&gt;{name}, $_-&gt;{description}] } @params),
+                      (map { [$_, $schema-&gt;{properties}{$_}{description}] } @body));
+
+        print h3(++$n . '. ' . uc $op-&gt;{summary});
+        print p(i($op-&gt;{description})) if $op-&gt;{description};
+        my @rows = (Tr(td(b('Method')), td(tt(uc $method))), Tr(td(b('Address')), td(tt(escapeHTML($address)))));
+        push @rows, Tr(td(b('Body')), td(tt(escapeHTML(join '&amp;', map { "$_={$_}" } @body)))) if @body;
+        print table({ -border =&gt; 0, -cellpadding =&gt; 2 }, @rows);
+        print p(b('What to type:')), ul(map { li(tt("{$_-&gt;[0]}") . " -- $_-&gt;[1]") } @fields);
+        print p(b('Answers:')),
+              ul(map { li(tt($_) . " -- $op-&gt;{responses}{$_}{description}") } sort keys %{ $op-&gt;{responses} });
+        print hr();
+    }
+}</code></pre><p class="source-at"><code>exhibits/the-web-that-wasnt/perl/cgi-bin/forms.cgi</code>, lines 30–53</p>
+</details>
+</article>
+<nav class="foot"><a href="deck/heart.html" rel="prev"><small>Back</small><b>HEART, in brief</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#help-line">with heart-ts</a></span>
+<a href="deck/sticky-note.html" rel="next" data-rel="next"><small>Next</small><b>The person joins them, by hand</b></a></nav>
+</main></div></body></html>

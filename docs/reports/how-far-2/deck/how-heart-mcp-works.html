@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>heart-mcp: six fixed tools, and the state in every answer · How far can one vision go · 2.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Counterpoint · how heart-mcp works</span></header>
+<h2>heart-mcp: six fixed tools, and the state in every answer</h2>
+<div class="flow" style="grid-template-columns: minmax(0, 0.8fr) auto minmax(0, 1.5fr) auto minmax(0, 1fr)">
+  <div class="box green"><h3>The model</h3><p>in any MCP host: Claude Code, Claude Desktop, your agent</p><p><b>chooses</b> the next move</p></div>
+  <span class="arrow" aria-hidden="true"></span>
+  <div class="panel">
+    <span class="label">heart-mcp · six tools that never change</span>
+    <table style="font-size: 0.86rem">
+      <tr><td><code>heart_look</code></td><td>go to a bookmark, or read this resource again</td></tr>
+      <tr><td><code>heart_act</code></td><td>take one <b>offered</b> act, by name, with fields</td></tr>
+      <tr><td><code>heart_follow</code></td><td>follow a link, by rel and title</td></tr>
+      <tr><td><code>heart_describe</code></td><td>the service’s fuller description of an act</td></tr>
+      <tr><td><code>heart_explain</code></td><td>why an act isn’t offered now; nothing is sent</td></tr>
+      <tr><td><code>heart_back</code></td><td>back one resource, read again</td></tr>
+    </table>
+    <span class="faint">checks the choice: is the act offered? do the fields fit its schema? If not, nothing is sent.</span>
+  </div>
+  <span class="arrow" aria-hidden="true"></span>
+  <div class="box"><h3>ARTIE, inside</h3><p><b>builds every request</b>: address, method, If-Match, credential, L2 forms with integrity checked</p><p>→ any HEART service, or the gateway in front of GitHub</p></div>
+</div>
+<div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin-top: 0.4rem">
+  <div class="panel"><span class="label">Every answer holds</span><p><b>state</b> · the resource’s fields<br><b>acts</b> · offered now: name, title, description, schema<br><b>links</b> · rel and title<br><b>outcome</b> · acted · rejected-before-sending · stale · not-offered · invalid-input · rule-refused</p></div>
+  <div class="panel"><span class="label">What the model never sees</span><p class="big" style="font-family: var(--body)">an address, a method, a header, a validator, a credential</p><span class="faint">It can’t build a request, and it can’t call an act that isn’t offered.</span></div>
+</div>
+<p class="refs"><a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754">IN-BAND</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-720">BROWSER-TEST</a></p>
+</article>
+<nav class="foot"><a href="deck/generic-client.html" rel="prev"><small>Back</small><b>ARTIE is to APIs what a browser is to web pages</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#how-heart-mcp-works">with heart-ts</a></span>
+<a href="deck/heart-mcp-github.html" rel="next"><small>Next</small><b>The same model, given state instead of a catalogue</b></a></nav>
+</main></div></body></html>

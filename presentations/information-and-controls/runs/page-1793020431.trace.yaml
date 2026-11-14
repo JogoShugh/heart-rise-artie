@@ -1,0 +1,23 @@
+---
+run:
+  inputs:
+    essay:
+      value: essay.html
+      given: default
+      default: essay.html
+      question: Where is the essay?
+    diagrams:
+      value: diagrams
+      given: default
+      default: diagrams
+      question: Which folder holds the SVG files?
+    out:
+      value: ../../docs/reports/information-and-controls/index.html
+      given: given
+      default: index.html
+      question: Where to write the page?
+    artifact:
+      value: /private/tmp/claude-501/-Users-josh-repos-artie/ce35ac87-5f2b-400b-873a-eb705d98bae2/scratchpad/information-and-controls.html
+      given: given
+      default: ''
+      question: Where to write the artifact copy, if anywhere?

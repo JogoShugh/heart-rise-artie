@@ -1,0 +1,93 @@
+diff --git a/bespoke-1.0/src/dashboard.ts b/bespoke-1.1/src/dashboard.ts
+index fa2b532..e7585d8 100644
+--- a/bespoke-1.0/src/dashboard.ts
++++ b/bespoke-1.1/src/dashboard.ts
+@@ -1,4 +1,5 @@
+-// The garden team's dashboard, built on Monday against garden-1.0.0.json.
++// The garden team's dashboard, 1.1.0: rebuilt on Tuesday against garden-1.1.0.json,
++// after the server shipped the frost. Built first on Monday against garden-1.0.0.json.
+ //
+ // It is what a typical team writes: a client generated from the OpenAPI description
+ // (src/generated, by OpenAPI Generator), and a small web page on top. Everything the
+@@ -9,7 +10,7 @@ import http from "node:http";
+ import { readFileSync } from "node:fs";
+ import { BedsApi, Configuration, ResponseError, type Bed, BedStatusEnum } from "./generated";
+ 
+-const VERSION = "1.0.0";
++const VERSION = "1.1.0";
+ const port = Number(process.env.PORT ?? 3001);
+ const garden = process.env.GARDEN_URL ?? "http://localhost:8080";
+ 
+@@ -27,6 +28,7 @@ const STATUS_LABEL: Record<BedStatusEnum, string> = {
+     EMPTY: "Empty",
+     PLANTED: "Planted",
+     READY_TO_HARVEST: "Ready to harvest",
++    FROZEN: "Frozen",
+ };
+ 
+ type Button = { title: string; action: string; fields: string };
+@@ -40,14 +42,17 @@ const SOW: Button = {
+     fields: `<input name="seedType" value="basil" aria-label="Seed"><input name="depthCm" type="number" min="1" max="10" value="2" aria-label="Depth">`,
+ };
+ const HARVEST: Button = { title: "Harvest the crop", action: "harvest", fields: "" };
++const THAW: Button = { title: "Thaw the bed", action: "thaw", fields: "" };
+ 
+-// From the description: sow an empty bed, harvest a ready one, water a planted one.
++// From the description: sow an empty bed, harvest a ready one, thaw a frozen one, water a planted one.
+ function buttonsFor(status: BedStatusEnum): Button[] {
+     switch (status) {
+         case BedStatusEnum.Empty:
+             return [SOW];
+         case BedStatusEnum.ReadyToHarvest:
+             return [HARVEST];
++        case BedStatusEnum.Frozen:
++            return [THAW];
+         default:
+             return [WATER];
+     }
+@@ -64,6 +69,8 @@ async function act(id: number, action: string, form: URLSearchParams): Promise<B
+             }));
+         case "harvest":
+             return logged("POST", `/beds/${id}/actions/harvest`, () => api.harvest({ id, body: {} }));
++        case "thaw":
++            return logged("POST", `/beds/${id}/actions/thaw`, () => api.thaw({ id, body: {} }));
+         default:
+             throw new Error(`no action ${action}`);
+     }
+@@ -124,7 +131,7 @@ const mark = readFileSync(`${__dirname}/../../shared/mark.svg`, "utf8");
+ 
+ http.createServer(async (req, res) => {
+     const url = new URL(req.url ?? "/", `http://localhost:${port}`);
+-    const match = url.pathname.match(/^\/beds\/(\d+)(?:\/(card|water|sow|harvest))?$/);
++    const match = url.pathname.match(/^\/beds\/(\d+)(?:\/(card|water|sow|harvest|thaw))?$/);
+     const send = (status: number, type: string, body: string | Buffer) => {
+         res.writeHead(status, { "Content-Type": type });
+         res.end(body);
+diff --git a/bespoke-1.0/package.json b/bespoke-1.1/package.json
+index fd95023..5cc2c7d 100644
+--- a/bespoke-1.0/package.json
++++ b/bespoke-1.1/package.json
+@@ -1,8 +1,8 @@
+ {
+   "name": "garden-dashboard",
+-  "version": "1.0.0",
++  "version": "1.1.0",
+   "private": true,
+-  "description": "The garden team's dashboard, built against garden-1.0.0.json with a generated client.",
++  "description": "The garden team's dashboard, rebuilt against garden-1.1.0.json with a generated client.",
+   "scripts": {
+     "generate": "./generate.sh",
+     "build": "tsc",
+diff --git a/bespoke-1.0/generate.sh b/bespoke-1.1/generate.sh
+index 3be1fea..a30074d 100755
+--- a/bespoke-1.0/generate.sh
++++ b/bespoke-1.1/generate.sh
+@@ -3,7 +3,7 @@
+ # with the pinned OpenAPI Generator image. The generated code is committed, as teams do.
+ set -euo pipefail
+ here=$(cd "$(dirname "$0")" && pwd)
+-spec=${1:-garden-1.0.0.json}
++spec=${1:-garden-1.1.0.json}
+ rm -rf "$here/src/generated"
+ docker run --rm -u "$(id -u):$(id -g)" -v "$here/..:/exhibit" openapitools/openapi-generator-cli:v7.8.0 generate \
+   -i "/exhibit/openapi/$spec" -g typescript-fetch -o "/exhibit/$(basename "$here")/src/generated" \

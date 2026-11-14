@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RISE Library, End to End</title>
+<meta name="description" content="Ana asks Riverside Public Library to tell her when loan 3310 can be renewed; the same run at L0 and at L2, each a tab.">
+<style>
+  :root {
+    --bg: #f6f5f1; --fg: #1d211f; --soft: #5b625e; --line: #dcdcd4; --tab: #ffffff; --accent: #2f6b4f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --tab: #1d2220; --accent: #7cc4a0;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --tab: #1d2220; --accent: #7cc4a0;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { padding-block: 1.25rem .5rem;
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  h1 { margin: 0 0 .35rem; font-size: 1.6rem; text-wrap: balance; }
+  p { margin: 0; color: var(--soft); max-width: 70ch; }
+  code { font: .88em ui-monospace, Menlo, monospace; }
+  [role="tablist"] { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .9rem; }
+  [role="tab"] { font: inherit; padding: .45rem .9rem; border: 1px solid var(--line); border-radius: 6px;
+    background: var(--tab); color: var(--fg); cursor: pointer; }
+  [role="tab"][aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); }
+  iframe { display: block; width: 100%; height: calc(100vh - 11rem); min-height: 32rem; border: 0;
+    border-top: 1px solid var(--line); background: var(--bg); }
+</style>
+</head>
+<body>
+<header>
+  <h1>RISE: The Library and Ana, End to End</h1>
+  <p>One run, twice. At L0 each answer carries its forms and their schemas in place. At L2 each answer links its
+    shared affordance set, and each form there links its schema by <code>$ref</code>, read once and checked against
+    its integrity. Every address answers while the simulator runs:
+    <code>java -cp 'heart/heart-sims/build/sims/lib/*' com.artie.heart.sims.MainKt rise</code>.</p>
+  <div role="tablist" aria-label="Rung">
+    <button role="tab" id="tab-l0" aria-controls="panel-l0" aria-selected="true">L0: forms and schemas in place</button>
+    <button role="tab" id="tab-l2" aria-controls="panel-l2" aria-selected="false">L2: forms and schemas by link</button>
+  </div>
+</header>
+<iframe id="panel-l0" role="tabpanel" aria-labelledby="tab-l0" src="l0.html" title="The run at L0"></iframe>
+<iframe id="panel-l2" role="tabpanel" aria-labelledby="tab-l2" src="l2.html" title="The run at L2" hidden></iframe>
+<script>
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  const show = (name) => tabs.forEach((tab) => {
+    const on = tab.id === `tab-${name}`;
+    tab.setAttribute("aria-selected", String(on));
+    document.getElementById(tab.getAttribute("aria-controls")).hidden = !on;
+  });
+  tabs.forEach((tab) => tab.addEventListener("click", () => show(tab.id.slice(4))));
+  if (location.hash === "#l2") show("l2");
+</script>
+</body>
+</html>

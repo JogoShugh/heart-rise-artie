@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>git pre-commit reads the log in order · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">For the engineers · The commit</span></header>
+<h2>git pre-commit reads the log in order</h2>
+<div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);">
+  <div class="rows">
+    <pre><code># .githooks/pre-commit (abridged)
+feature=$(first_line ' FEATURE_WRITE ')
+fail=$(first_line "${run_re}FAIL")
+main=$(first_line ' MAIN_WRITE ')
+[ -n "$feature" ] || reasons+=("no FEATURE_WRITE
+  since the last commit")
+[ -n "$fail" ] || reasons+=("no failing BDD run
+  since the last commit (the scenario was never
+  seen red)")
+[ "$fail" -gt "$main" ] &amp;&amp; reasons+=("production
+  code was written before the BDD suite was
+  seen failing")
+case "$last_run" in *" PASS"*) ;; *) reasons+=(
+  "the latest BDD run … is not PASS") ;; esac
+echo "pre-commit: TDD ordering check passed."</code></pre>
+    <p class="refs"><details class="fragment-plain"><summary>core/pre-commit, the ordering check</summary><pre><code>feature=$(first_line ' FEATURE_WRITE ')
+fail=$(first_line &quot;${run_re}FAIL&quot;)
+main=$(first_line ' MAIN_WRITE ')
+last_run=$(printf '%s\n' &quot;$recent&quot; | grep -E -- &quot;$run_re&quot; | tail -1)
+
+reasons=()
+[ -n &quot;$feature&quot; ] || reasons+=(&quot;no FEATURE_WRITE since the last commit&quot;)
+[ -n &quot;$fail&quot; ] || reasons+=(&quot;no failing BDD run since the last commit (the scenario was never seen red)&quot;)
+if [ -n &quot;$feature&quot; ] &amp;&amp; [ -n &quot;$main&quot; ] &amp;&amp; [ &quot;$feature&quot; -gt &quot;$main&quot; ]; then
+  reasons+=(&quot;production code was written before any feature file&quot;)
+fi
+if [ -n &quot;$fail&quot; ] &amp;&amp; [ -n &quot;$main&quot; ] &amp;&amp; [ &quot;$fail&quot; -gt &quot;$main&quot; ]; then
+  reasons+=(&quot;production code was written before the BDD suite was seen failing&quot;)
+fi
+case &quot;$last_run&quot; in
+  *&quot; PASS&quot;*) ;;
+  *) reasons+=(&quot;the latest BDD run since the last commit is not PASS&quot;) ;;
+esac
+
+if [ ${#reasons[@]} -gt 0 ]; then
+  echo &quot;pre-commit: TDD ordering check FAILED:&quot; &gt;&amp;2
+  printf '  - %s\n' &quot;${reasons[@]}&quot; &gt;&amp;2
+  echo &quot;&quot; &gt;&amp;2
+  echo &quot;Events since the last commit:&quot; &gt;&amp;2
+  printf '%s\n' &quot;$recent&quot; | sed 's/^/  /' &gt;&amp;2
+  exit 1
+fi
+
+echo &quot;pre-commit: TDD ordering check passed.&quot;</code></pre></details></p>
+  </div>
+  <div class="rows">
+    <h3>Three facts, in order</h3>
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) 1.5rem; gap: 0.7rem 0.6rem; align-items: center;">
+      <span style="display: block; text-align: center; font: 700 1rem/1.2 var(--body); padding: 0.7rem 1rem; border-radius: 999px; background: #c9d8ce; color: #17201b;">FEATURE_WRITE</span> <span aria-hidden="true">↓</span>
+      <span style="display: block; text-align: center; font: 700 1rem/1.2 var(--body); padding: 0.7rem 1rem; border-radius: 999px; background: #b4562c; color: #fff;">BDD_RUN FAIL</span> <span aria-hidden="true">↓</span>
+      <span style="display: block; text-align: center; font: 700 1rem/1.2 var(--body); padding: 0.7rem 1rem; border-radius: 999px; background: #c9d8ce; color: #17201b;">MAIN_WRITE …</span> <span aria-hidden="true">↓</span>
+      <span style="display: block; text-align: center; font: 700 1rem/1.2 var(--body); padding: 0.7rem 1rem; border-radius: 999px; background: #2f7d55; color: #fff;">BDD_RUN PASS</span>
+    </div>
+    <p>Works for a plain terminal git commit too. <span style="white-space: nowrap;">--no-verify</span> and git commit -n are blocked for the model by protect-gate.sh.</p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/gherkin-first.html" rel="prev"><small>Back</small><b>No production write until a feature file changes</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#pre-commit">with heart-ts</a></span>
+<a href="deck/red-first.html" rel="next"><small>Next</small><b>The scenario, then the failing run</b></a></nav>
+</main></div></body></html>

@@ -1,0 +1,73 @@
+{
+  "name": "look-think-act",
+  "title": "Look, Think, Act = Sync, Reason, Act",
+  "part": "Putting them back together",
+  "kicker": "One loop, two readers",
+  "tone": "light",
+  "number": 19,
+  "of": 59,
+  "html": "<h2>Look, Think, Act = Sync, Reason, Act</h2>\n<div class=\"flow\" style=\"grid-template-columns: 11rem auto 11rem minmax(0, 1fr); gap: 0.7rem 0.8rem\">\n  <span style=\"font: 600 0.8rem var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)\">A person</span><span></span><span style=\"font: 600 0.8rem var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted)\">ARTIE</span><span></span>\n  <div class=\"panel\" style=\"border-radius: 999px; padding: 0.6rem 1rem; text-align: center; align-content: center\"><b>Look</b></div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"box green\" style=\"border-radius: 999px; padding: 0.6rem 1rem; text-align: center\"><b>Sync</b></div>\n  <p style=\"align-self: center; margin: 0 0 0 0.6rem\">Read the representation: the state and the controls offered now.</p>\n  <div class=\"panel\" style=\"border-radius: 999px; padding: 0.6rem 1rem; text-align: center; align-content: center\"><b>Think</b></div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"box\" style=\"border-radius: 999px; padding: 0.6rem 1rem; text-align: center; background: #e3b341; color: #17201b; box-shadow: none\"><b>Reason</b></div>\n  <p style=\"align-self: center; margin: 0 0 0 0.6rem\">Choose among what’s offered. The only place a model sits, and a kept script can stand in for it.</p>\n  <div class=\"panel\" style=\"border-radius: 999px; padding: 0.6rem 1rem; text-align: center; align-content: center\"><b>Act</b></div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"box green\" style=\"border-radius: 999px; padding: 0.6rem 1rem; text-align: center\"><b>Act</b></div>\n  <p style=\"align-self: center; margin: 0 0 0 0.6rem\">Send the form: method, target, fields, If-Match, signed.</p>\n</div>\n<p class=\"verdict\"><span class=\"no\" style=\"margin-left: 0\">Think is the only step that costs tokens.</span> Look and Act read and send controls the server handed over: free on every replay.</p>\n<blockquote class=\"big\">“Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.”</blockquote>\n<p class=\"cite\"><a href=\"https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven\" target=\"_blank\" rel=\"noopener\"><b>Roy T. Fielding</b></a>, comment, 2008 · <deck-ref name=\"think-of-the-web\"></deck-ref></p>\n",
+  "say": "A person in a browser and ARTIE run the same loop. Sync and Act are plain code. Reason is the only place a model sits, and a kept script can stand in for it on every later run. Think is the only step that costs tokens: Hightower's budget, spent once. Look and Act are Fielding's controls, read for free.",
+  "sources": [
+    {
+      "label": "Fielding, 2008 post and its comments",
+      "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "look-think-act.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "in-production.json",
+      "title": "Hypermedia is already in production"
+    },
+    "next": {
+      "href": "heart-rise-artie.json",
+      "title": "HEART, RISE and ARTIE"
+    },
+    "alternate": {
+      "href": "look-think-act.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "think-of-the-web",
+        "kind": "comment",
+        "label": "BROWSER-TEST",
+        "title": "Browsers don't know resource types",
+        "summary": "A browser knows the links and forms, not whether it's a bank or a wiki. Typed relations guide automated agents.",
+        "quote": "<p>“A truly RESTful API looks like hypertext. Every addressable unit of information carries an address, either explicitly (e.g., link and id attributes) or implicitly (e.g., derived from the media type definition and representation structure). Query results are represented by a list of links with summary information, not by arrays of object representations (query is not a substitute for identification of resources). Resource representations are self-descriptive: the client does not need to know if a resource is OpenSocialist because it is just acting on the representations received.</p><p>Think of it in terms of the Web. How many Web browsers are aware of the distinction between an online-banking resource and a Wiki resource? None of them. They don’t need to be aware of the resource types. What they need to be aware of is the potential state transitions — the links and forms — and what semantics/actions are implied by traversing those links. A browser represents them as distinct UI controls so that a user can see potential transitions and anticipate the effect of chosen actions. A spider can follow them to the extent that the relationships are known to be safe. Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/think-of-the-web.json",
+            "title": "BROWSER-TEST"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-720",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      }
+    ]
+  }
+}

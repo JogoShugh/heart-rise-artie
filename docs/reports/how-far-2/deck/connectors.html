@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scm:merge, written once per forge · How far can one vision go · 2.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">For the engineers · The connectors</span></header>
+<h2>scm:merge, written once per forge</h2>
+<div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)">
+  <div>
+<pre><code># github-scm/pull.resource.yaml
+merge:
+  operation: pulls/merge
+  fields: [commit_title, commit_message]
+  inputs:
+    method:
+      enum: [merge, squash, rebase]
+<span class="add">  values:
+    method:
+      merge:  {merge_method: merge}
+      squash: {merge_method: squash}
+      rebase: {merge_method: rebase}</span>
+  bind: {sha: /head/sha}
+  stale: 409
+  refused: 405</code></pre>
+    <p class="refs"><details class="fragment-plain"><summary>GitHub's merge act (github-scm/pull.resource.yaml)</summary><pre><code>merge:
+  operation: pulls/merge
+  title: Merge
+  description: Merge the pull request into its base branch.
+  fields: [commit_title, commit_message]
+  # scm's method, as GitHub's merge_method takes it.
+  inputs:
+    method:
+      type: string
+      enum: [merge, squash, rebase]
+      title: Merge method
+      description: The merge method to use.
+  values:
+    method:
+      merge: { merge_method: merge }
+      squash: { merge_method: squash }
+      rebase: { merge_method: rebase }
+  # GitHub merges only if the head is still at this sha: the head the client's view had.
+  bind: { sha: /head/sha }
+  # GitHub's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.
+  stale: 409
+  refused: 405</code></pre></details></p>
+  </div>
+  <div>
+<pre><code># gitlab/pull.resource.yaml
+merge:
+  operation: pulls/merge
+  fields: [merge_commit_message]
+  inputs:
+    method:
+      enum: [merge, squash]
+<span class="add">  values:
+    method:
+      merge:  {squash: false}
+      squash: {squash: true}</span>
+  bind: {sha: /sha}
+  stale: 409
+  refused: 405
+# + normal: state, merged, mergeable_state</code></pre>
+    <p class="refs"><details class="fragment-plain"><summary>GitLab's merge act (gitlab/pull.resource.yaml)</summary><pre><code>merge:
+  operation: pulls/merge
+  title: Merge
+  description: Merge the pull request into its target branch.
+  fields: [merge_commit_message]
+  # scm's method, as GitHub's merge takes it; GitLab squashes or not, and merges with a merge commit either way.
+  inputs:
+    method:
+      type: string
+      enum: [merge, squash]
+      title: Merge method
+      description: The merge method to use.
+  values:
+    method:
+      merge: { squash: false }
+      squash: { squash: true }
+  # GitLab merges only if the source branch's head is still at this sha: the head the client's view had.
+  bind: { sha: /sha }
+  # GitLab's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.
+  stale: 409
+  refused: 405</code></pre></details></p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/mapping.html" rel="prev"><small>Back</small><b>How each scm: relation maps to each forge</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#connectors">with heart-ts</a></span>
+<a href="deck/one-plain-ui.html" rel="next"><small>Next</small><b>One plain UI, rendered from the shared relations</b></a></nav>
+</main></div></body></html>

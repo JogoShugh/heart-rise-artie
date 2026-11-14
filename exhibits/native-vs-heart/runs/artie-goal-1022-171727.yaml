@@ -1,0 +1,7807 @@
+---
+run:
+  inputs:
+    gateway:
+      value: https://localhost:8392/
+      given: given
+      default: http://localhost:8392/
+      question: Where is the gateway?
+    owner:
+      value: JogoShugh
+      given: given
+      question: Whose repository?
+    repo:
+      value: heart-github-test
+      given: default
+      default: heart-github-test
+      question: Which repository?
+    stamp:
+      value: 1022-171727
+      given: given
+      default: 1022-171732
+    label:
+      value: bug
+      given: default
+      default: bug
+      question: Which label marks a bug?
+---
+at: '2026-10-22T21:17:32.938585Z'
+ms: 109
+mode: script
+say: enter {entry}
+line: 12
+params:
+  entry: https://localhost:8392/
+opens: true
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-22T21:17:33.051610Z'
+ms: 436
+mode: script
+say: act {relation}, owner {owner}, repo {repo}
+intent: get the repository JogoShugh/heart-github-test
+line: 22
+within: 12
+params:
+  relation: github:repos-get
+  owner: JogoShugh
+  repo: heart-github-test
+values:
+  owner:
+    value: JogoShugh
+    type: string
+    from:
+      - input: owner
+  repo:
+    value: heart-github-test
+    type: string
+    from:
+      - input: repo
+opens: true
+chose:
+  kind: form
+  relation: github:repos-get
+  title: Get a repository
+  method: GET
+  target: /repos/{owner}/{repo}
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test
+now:
+  state:
+    id: 1422841381
+    node_id: R_kgDOVM7WJQ
+    name: heart-github-test
+    full_name: JogoShugh/heart-github-test
+    private: false
+    description: null
+    fork: false
+    created_at: '2026-10-17T01:37:34Z'
+    updated_at: '2026-10-22T21:16:06Z'
+    pushed_at: '2026-10-22T21:17:00Z'
+    homepage: null
+    size: 177
+    stargazers_count: 0
+    watchers_count: 0
+    language: null
+    has_issues: true
+    has_projects: true
+    has_downloads: false
+    has_wiki: true
+    has_pages: false
+    has_discussions: false
+    forks_count: 0
+    mirror_url: null
+    archived: false
+    disabled: false
+    open_issues_count: 67
+    license: null
+    allow_forking: true
+    is_template: false
+    web_commit_signoff_required: false
+    has_pull_requests: true
+    pull_request_creation_policy: all
+    topics: []
+    visibility: public
+    forks: 0
+    open_issues: 67
+    watchers: 0
+    default_branch: main
+    permissions:
+      admin: true
+      maintain: true
+      push: true
+      triage: true
+      pull: true
+    allow_squash_merge: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_auto_merge: false
+    delete_branch_on_merge: false
+    allow_update_branch: false
+    use_squash_pr_title_as_default: false
+    squash_merge_commit_message: COMMIT_MESSAGES
+    squash_merge_commit_title: COMMIT_OR_PR_TITLE
+    merge_commit_message: PR_TITLE
+    merge_commit_title: MERGE_MESSAGE
+    security_and_analysis:
+      secret_scanning:
+        status: enabled
+      secret_scanning_push_protection:
+        status: enabled
+      dependabot_security_updates:
+        status: disabled
+      secret_scanning_non_provider_patterns:
+        status: disabled
+      secret_scanning_validity_checks:
+        status: disabled
+    network_count: 0
+    subscribers_count: 0
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+  forms:
+    - github:open-issue
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:repos-list-branches:
+      - null
+    alternate:
+      - null
+    github:forks:
+      - null
+    github:keys:
+      - null
+    github:collaborators:
+      - null
+    github:teams:
+      - null
+    github:hooks:
+      - null
+    github:issue-events:
+      - null
+    github:events:
+      - null
+    github:assignees:
+      - null
+    github:branches:
+      - null
+    github:tags:
+      - null
+    github:blobs:
+      - null
+    github:git-tags:
+      - null
+    github:git-refs:
+      - null
+    github:trees:
+      - null
+    github:statuses:
+      - null
+    github:languages:
+      - null
+    github:stargazers:
+      - null
+    github:contributors:
+      - null
+    github:subscribers:
+      - null
+    github:subscription:
+      - null
+    github:commits:
+      - null
+    github:git-commits:
+      - null
+    github:comments:
+      - null
+    github:issue-comment:
+      - null
+    github:contents:
+      - null
+    github:compare:
+      - null
+    github:merges:
+      - null
+    github:archive:
+      - null
+    github:downloads:
+      - null
+    github:issues:
+      - null
+    github:pulls:
+      - null
+    github:milestones:
+      - null
+    github:notifications:
+      - null
+    github:labels:
+      - null
+    github:releases:
+      - null
+    github:deployments:
+      - null
+    github:git:
+      - null
+    github:ssh:
+      - null
+    github:clone:
+      - null
+    github:svn:
+      - null
+  embedded:
+    github:owner:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+keeps:
+  /default_branch:
+    - 16
+    - 23
+  /hr:address/owner:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:owner/0/login:
+    - 38
+    - 44
+    - 51
+  /name:
+    - 38
+    - 44
+    - 51
+  /hr:address/repo:
+    - 38
+    - 44
+    - 51
+---
+at: '2026-10-22T21:17:33.490551Z'
+ms: 2121
+mode: script
+say: act {relation}, title {title}, body {body}
+intent: 'Open an issue titled "Crash when a bed has no name (1022-171727)" with the body: a bed with a blank name crashes the garden'
+line: 23
+within: 22
+params:
+  relation: github:open-issue
+  title: Crash when a bed has no name (1022-171727)
+  body: a bed with a blank name crashes the garden
+values:
+  title:
+    value: Crash when a bed has no name (1022-171727)
+    from:
+      - parts:
+          '1022-171727':
+            input: stamp
+  body:
+    value: a bed with a blank name crashes the garden
+    type: string
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: github:open-issue
+  title: Open an issue
+  method: POST
+  target: /repos/{owner}/{repo}/actions/open-issue
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/actions/open-issue
+  picked: relation
+  not sent:
+    - assignees
+    - labels
+    - milestone
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/b7cdf9d9bd2f16e8
+    integrity: sha256-t8352b0vFug59dPyOrG80DIEf+lWTm4RO0sUfhLHR+Y=
+  form: sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI=
+  schema:
+    href: https://localhost:8392/schemas/f7a8db931b33fcf1
+    integrity: sha256-96jbkxsz/PG3PVDvXBkQMk/mpIId+DfmGRMwWHa2zQE=
+  if-match: '"seq-0.hsf.L2.c9bd62082b769f4f"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:open-issue
+  links:
+    - alternate
+    - github:archive
+    - github:assignees
+    - github:blobs
+    - github:branches
+    - github:clone
+    - github:collaborators
+    - github:comments
+    - github:commits
+    - github:compare
+    - github:contents
+    - github:contributors
+    - github:deployments
+    - github:downloads
+    - github:events
+    - github:forks
+    - github:git
+    - github:git-commits
+    - github:git-refs
+    - github:git-tags
+    - github:hooks
+    - github:issue-comment
+    - github:issue-events
+    - github:issues
+    - github:keys
+    - github:labels
+    - github:languages
+    - github:merges
+    - github:milestones
+    - github:notifications
+    - github:pulls
+    - github:releases
+    - github:repos-list-branches
+    - github:ssh
+    - github:stargazers
+    - github:statuses
+    - github:subscribers
+    - github:subscription
+    - github:svn
+    - github:tags
+    - github:teams
+    - github:trees
+    - hr:forms
+    - self
+outcome: new resource
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+now:
+  state:
+    id: 5987604207
+    node_id: I_kwDOVM7WJc8AAAABZOOW7w
+    number: 572
+    title: Crash when a bed has no name (1022-171727)
+    labels: []
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: '2026-10-22T21:17:34Z'
+    updated_at: '2026-10-22T21:17:34Z'
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: a bed with a blank name crashes the garden
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '572'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+keeps:
+  /number:
+    - 11
+    - 23
+    - 25
+    - 27
+    - 38
+  /hr:address/owner:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:user/0/login:
+    - 38
+    - 44
+    - 51
+  /hr:address/repo:
+    - 38
+    - 44
+    - 51
+  /hr:address/issue_number:
+    - 38
+---
+at: '2026-10-22T21:17:35.615652Z'
+ms: 758
+mode: script
+say: return to {address}
+line: 27
+within: 23
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+now:
+  state:
+    id: 5987604207
+    node_id: I_kwDOVM7WJc8AAAABZOOW7w
+    number: 572
+    title: Crash when a bed has no name (1022-171727)
+    labels: []
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: '2026-10-22T21:17:34Z'
+    updated_at: '2026-10-22T21:17:34Z'
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: a bed with a blank name crashes the garden
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '572'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-22T21:17:36.375054Z'
+ms: 3110
+mode: script
+say: act {relation}, labels {labels}
+intent: Label it with bug
+line: 30
+within: 23
+params:
+  relation: github:label
+  labels:
+    - bug
+values:
+  labels:
+    value:
+      - bug
+    type: array
+    from:
+      - parts:
+          bug:
+            input: label
+opens: true
+chose:
+  kind: form
+  relation: github:label
+  title: Label
+  method: POST
+  target: /repos/{owner}/{repo}/issues/{issue_number}/actions/label
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572/actions/label
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/7b85aa229b1d478d
+    integrity: sha256-e4WqIpsdR41ubEY4SSx18ueTbsZXnin0GaU2OSy4kPE=
+  form: sha256-8R+R85FzQjiJVpZak/M1sl6QjftjUVxwEERrkW5FzPc=
+  schema:
+    href: https://localhost:8392/schemas/518ccfba3b53293d
+    integrity: sha256-UYzPujtTKT2NuCMw8IdWJAWOL5ev6Unwt85ZwqTcYEU=
+  if-match: '"seq-0.hsf.L2.fec2497657ff20a5"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    - alternate
+    - github:events
+    - github:issues-list-comments
+    - github:issues-list-sub-issues
+    - github:labels
+    - github:reactions
+    - github:repos-get
+    - github:timeline
+    - hr:forms
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+now:
+  state:
+    id: 5987604207
+    node_id: I_kwDOVM7WJc8AAAABZOOW7w
+    number: 572
+    title: Crash when a bed has no name (1022-171727)
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: '2026-10-22T21:17:34Z'
+    updated_at: '2026-10-22T21:17:38Z'
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: a bed with a blank name crashes the garden
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '572'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12724094924
+          node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+          name: bug
+          color: d73a4a
+          default: true
+          description: Something isn't working
+          archived_at: null
+          archived_by: null
+keeps:
+  /hr:address/owner:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:user/0/login:
+    - 38
+    - 44
+    - 51
+  /hr:address/repo:
+    - 38
+    - 44
+    - 51
+  /number:
+    - 38
+  /hr:address/issue_number:
+    - 38
+---
+at: '2026-10-22T21:17:39.487953Z'
+ms: 540
+mode: script
+say: return to {address}
+line: 30
+within: 23
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+now:
+  state:
+    id: 5987604207
+    node_id: I_kwDOVM7WJc8AAAABZOOW7w
+    number: 572
+    title: Crash when a bed has no name (1022-171727)
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: '2026-10-22T21:17:34Z'
+    updated_at: '2026-10-22T21:17:38Z'
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: a bed with a blank name crashes the garden
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '572'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12724094924
+          node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+          name: bug
+          color: d73a4a
+          default: true
+          description: Something isn't working
+          archived_at: null
+          archived_by: null
+---
+at: '2026-10-22T21:17:40.028941Z'
+ms: 2681
+mode: script
+say: act {relation}, assignees {assignees}
+intent: assign it to JogoShugh
+line: 31
+within: 23
+params:
+  relation: github:assign
+  assignees:
+    - JogoShugh
+values:
+  assignees:
+    value:
+      - JogoShugh
+    type: array
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+opens: true
+chose:
+  kind: form
+  relation: github:assign
+  title: Assign
+  method: POST
+  target: /repos/{owner}/{repo}/issues/{issue_number}/actions/assign
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572/actions/assign
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/7b85aa229b1d478d
+    integrity: sha256-e4WqIpsdR41ubEY4SSx18ueTbsZXnin0GaU2OSy4kPE=
+  form: sha256-VscVtuEo5Tk2ZKoux1zt3PeDF2khsJ/DkO2uKd3V7GQ=
+  schema:
+    href: https://localhost:8392/schemas/526745cba616cfce
+    integrity: sha256-UmdFy6YWz86OTzuaEOA7+qO+2atybEMjJJ79yhfKhcE=
+  if-match: '"seq-0.hsf.L2.2cde80b1c5a1449a"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    - alternate
+    - github:events
+    - github:issues-list-comments
+    - github:issues-list-sub-issues
+    - github:labels
+    - github:reactions
+    - github:repos-get
+    - github:timeline
+    - hr:forms
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+now:
+  state:
+    id: 5987604207
+    node_id: I_kwDOVM7WJc8AAAABZOOW7w
+    number: 572
+    title: Crash when a bed has no name (1022-171727)
+    state: open
+    locked: false
+    milestone: null
+    comments: 0
+    created_at: '2026-10-22T21:17:34Z'
+    updated_at: '2026-10-22T21:17:41Z'
+    closed_at: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: a bed with a blank name crashes the garden
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '572'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignee:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignees:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12724094924
+          node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+          name: bug
+          color: d73a4a
+          default: true
+          description: Something isn't working
+          archived_at: null
+          archived_by: null
+keeps:
+  /hr:address/owner:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:user/0/login:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:assignee/0/login:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:assignees/0/login:
+    - 38
+    - 44
+    - 51
+  /hr:address/repo:
+    - 38
+    - 44
+    - 51
+  /number:
+    - 38
+  /hr:address/issue_number:
+    - 38
+---
+at: '2026-10-22T21:17:42.712463Z'
+ms: 613
+mode: script
+say: return to {address}
+line: 31
+within: 23
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+now:
+  state:
+    id: 5987604207
+    node_id: I_kwDOVM7WJc8AAAABZOOW7w
+    number: 572
+    title: Crash when a bed has no name (1022-171727)
+    state: open
+    locked: false
+    milestone: null
+    comments: 0
+    created_at: '2026-10-22T21:17:34Z'
+    updated_at: '2026-10-22T21:17:41Z'
+    closed_at: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: a bed with a blank name crashes the garden
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '572'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignee:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignees:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12724094924
+          node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+          name: bug
+          color: d73a4a
+          default: true
+          description: Something isn't working
+          archived_at: null
+          archived_by: null
+---
+at: '2026-10-22T21:17:43.327806Z'
+ms: 0
+mode: script
+say: check
+line: 32
+within: 23
+params:
+  facts:
+    - member: state
+      test: eq open
+      held: open
+      holds: true
+outcome: held
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+now:
+  state:
+    id: 5987604207
+    node_id: I_kwDOVM7WJc8AAAABZOOW7w
+    number: 572
+    title: Crash when a bed has no name (1022-171727)
+    state: open
+    locked: false
+    milestone: null
+    comments: 0
+    created_at: '2026-10-22T21:17:34Z'
+    updated_at: '2026-10-22T21:17:41Z'
+    closed_at: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: a bed with a blank name crashes the garden
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '572'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignee:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignees:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12724094924
+          node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+          name: bug
+          color: d73a4a
+          default: true
+          description: Something isn't working
+          archived_at: null
+          archived_by: null
+---
+at: '2026-10-22T21:17:43.328081Z'
+ms: 228
+mode: script
+say: return to {address}
+line: 23
+within: 22
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test
+now:
+  state:
+    id: 1422841381
+    node_id: R_kgDOVM7WJQ
+    name: heart-github-test
+    full_name: JogoShugh/heart-github-test
+    private: false
+    description: null
+    fork: false
+    created_at: '2026-10-17T01:37:34Z'
+    updated_at: '2026-10-22T21:16:06Z'
+    pushed_at: '2026-10-22T21:17:00Z'
+    homepage: null
+    size: 177
+    stargazers_count: 0
+    watchers_count: 0
+    language: null
+    has_issues: true
+    has_projects: true
+    has_downloads: false
+    has_wiki: true
+    has_pages: false
+    has_discussions: false
+    forks_count: 0
+    mirror_url: null
+    archived: false
+    disabled: false
+    open_issues_count: 68
+    license: null
+    allow_forking: true
+    is_template: false
+    web_commit_signoff_required: false
+    has_pull_requests: true
+    pull_request_creation_policy: all
+    topics: []
+    visibility: public
+    forks: 0
+    open_issues: 68
+    watchers: 0
+    default_branch: main
+    permissions:
+      admin: true
+      maintain: true
+      push: true
+      triage: true
+      pull: true
+    allow_squash_merge: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_auto_merge: false
+    delete_branch_on_merge: false
+    allow_update_branch: false
+    use_squash_pr_title_as_default: false
+    squash_merge_commit_message: COMMIT_MESSAGES
+    squash_merge_commit_title: COMMIT_OR_PR_TITLE
+    merge_commit_message: PR_TITLE
+    merge_commit_title: MERGE_MESSAGE
+    security_and_analysis:
+      secret_scanning:
+        status: enabled
+      secret_scanning_push_protection:
+        status: enabled
+      dependabot_security_updates:
+        status: disabled
+      secret_scanning_non_provider_patterns:
+        status: disabled
+      secret_scanning_validity_checks:
+        status: disabled
+    network_count: 0
+    subscribers_count: 0
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+  forms:
+    - github:open-issue
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:repos-list-branches:
+      - null
+    alternate:
+      - null
+    github:forks:
+      - null
+    github:keys:
+      - null
+    github:collaborators:
+      - null
+    github:teams:
+      - null
+    github:hooks:
+      - null
+    github:issue-events:
+      - null
+    github:events:
+      - null
+    github:assignees:
+      - null
+    github:branches:
+      - null
+    github:tags:
+      - null
+    github:blobs:
+      - null
+    github:git-tags:
+      - null
+    github:git-refs:
+      - null
+    github:trees:
+      - null
+    github:statuses:
+      - null
+    github:languages:
+      - null
+    github:stargazers:
+      - null
+    github:contributors:
+      - null
+    github:subscribers:
+      - null
+    github:subscription:
+      - null
+    github:commits:
+      - null
+    github:git-commits:
+      - null
+    github:comments:
+      - null
+    github:issue-comment:
+      - null
+    github:contents:
+      - null
+    github:compare:
+      - null
+    github:merges:
+      - null
+    github:archive:
+      - null
+    github:downloads:
+      - null
+    github:issues:
+      - null
+    github:pulls:
+      - null
+    github:milestones:
+      - null
+    github:notifications:
+      - null
+    github:labels:
+      - null
+    github:releases:
+      - null
+    github:deployments:
+      - null
+    github:git:
+      - null
+    github:ssh:
+      - null
+    github:clone:
+      - null
+    github:svn:
+      - null
+  embedded:
+    github:owner:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-22T21:17:43.557832Z'
+ms: 1971
+mode: script
+say: act {relation}, title {title}, body {body}
+intent: 'Open an issue titled "Test blank bed names (1022-171727)" with the body: part of #572'
+line: 34
+within: 22
+params:
+  relation: github:open-issue
+  title: Test blank bed names (1022-171727)
+  body: 'part of #572'
+values:
+  title:
+    value: Test blank bed names (1022-171727)
+    from:
+      - parts:
+          '1022-171727':
+            input: stamp
+  body:
+    value: 'part of #572'
+    type: string
+    from:
+      - parts:
+          '572':
+            step: 3
+            pointer: /number
+opens: true
+chose:
+  kind: form
+  relation: github:open-issue
+  title: Open an issue
+  method: POST
+  target: /repos/{owner}/{repo}/actions/open-issue
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/actions/open-issue
+  picked: relation
+  not sent:
+    - assignees
+    - labels
+    - milestone
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/b7cdf9d9bd2f16e8
+    integrity: sha256-t8352b0vFug59dPyOrG80DIEf+lWTm4RO0sUfhLHR+Y=
+  form: sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI=
+  schema:
+    href: https://localhost:8392/schemas/f7a8db931b33fcf1
+    integrity: sha256-96jbkxsz/PG3PVDvXBkQMk/mpIId+DfmGRMwWHa2zQE=
+  if-match: '"seq-0.hsf.L2.c1558bf083f19956"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:open-issue
+  links:
+    - alternate
+    - github:archive
+    - github:assignees
+    - github:blobs
+    - github:branches
+    - github:clone
+    - github:collaborators
+    - github:comments
+    - github:commits
+    - github:compare
+    - github:contents
+    - github:contributors
+    - github:deployments
+    - github:downloads
+    - github:events
+    - github:forks
+    - github:git
+    - github:git-commits
+    - github:git-refs
+    - github:git-tags
+    - github:hooks
+    - github:issue-comment
+    - github:issue-events
+    - github:issues
+    - github:keys
+    - github:labels
+    - github:languages
+    - github:merges
+    - github:milestones
+    - github:notifications
+    - github:pulls
+    - github:releases
+    - github:repos-list-branches
+    - github:ssh
+    - github:stargazers
+    - github:statuses
+    - github:subscribers
+    - github:subscription
+    - github:svn
+    - github:tags
+    - github:teams
+    - github:trees
+    - hr:forms
+    - self
+outcome: new resource
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/573
+now:
+  state:
+    id: 5987606344
+    node_id: I_kwDOVM7WJc8AAAABZOOfSA
+    number: 573
+    title: Test blank bed names (1022-171727)
+    labels: []
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: '2026-10-22T21:17:44Z'
+    updated_at: '2026-10-22T21:17:44Z'
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: 'part of #572'
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '573'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+keeps:
+  /number:
+    - 25
+    - 27
+    - 41
+    - 44
+  /hr:address/owner:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:user/0/login:
+    - 38
+    - 44
+    - 51
+  /hr:address/repo:
+    - 38
+    - 44
+    - 51
+  /id:
+    - 39
+  /hr:address/issue_number:
+    - 44
+---
+at: '2026-10-22T21:17:45.533696Z'
+ms: 217
+mode: script
+say: return to {address}
+line: 34
+within: 22
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test
+now:
+  state:
+    id: 1422841381
+    node_id: R_kgDOVM7WJQ
+    name: heart-github-test
+    full_name: JogoShugh/heart-github-test
+    private: false
+    description: null
+    fork: false
+    created_at: '2026-10-17T01:37:34Z'
+    updated_at: '2026-10-22T21:16:06Z'
+    pushed_at: '2026-10-22T21:17:00Z'
+    homepage: null
+    size: 177
+    stargazers_count: 0
+    watchers_count: 0
+    language: null
+    has_issues: true
+    has_projects: true
+    has_downloads: false
+    has_wiki: true
+    has_pages: false
+    has_discussions: false
+    forks_count: 0
+    mirror_url: null
+    archived: false
+    disabled: false
+    open_issues_count: 69
+    license: null
+    allow_forking: true
+    is_template: false
+    web_commit_signoff_required: false
+    has_pull_requests: true
+    pull_request_creation_policy: all
+    topics: []
+    visibility: public
+    forks: 0
+    open_issues: 69
+    watchers: 0
+    default_branch: main
+    permissions:
+      admin: true
+      maintain: true
+      push: true
+      triage: true
+      pull: true
+    allow_squash_merge: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_auto_merge: false
+    delete_branch_on_merge: false
+    allow_update_branch: false
+    use_squash_pr_title_as_default: false
+    squash_merge_commit_message: COMMIT_MESSAGES
+    squash_merge_commit_title: COMMIT_OR_PR_TITLE
+    merge_commit_message: PR_TITLE
+    merge_commit_title: MERGE_MESSAGE
+    security_and_analysis:
+      secret_scanning:
+        status: enabled
+      secret_scanning_push_protection:
+        status: enabled
+      dependabot_security_updates:
+        status: disabled
+      secret_scanning_non_provider_patterns:
+        status: disabled
+      secret_scanning_validity_checks:
+        status: disabled
+    network_count: 0
+    subscribers_count: 0
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+  forms:
+    - github:open-issue
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:repos-list-branches:
+      - null
+    alternate:
+      - null
+    github:forks:
+      - null
+    github:keys:
+      - null
+    github:collaborators:
+      - null
+    github:teams:
+      - null
+    github:hooks:
+      - null
+    github:issue-events:
+      - null
+    github:events:
+      - null
+    github:assignees:
+      - null
+    github:branches:
+      - null
+    github:tags:
+      - null
+    github:blobs:
+      - null
+    github:git-tags:
+      - null
+    github:git-refs:
+      - null
+    github:trees:
+      - null
+    github:statuses:
+      - null
+    github:languages:
+      - null
+    github:stargazers:
+      - null
+    github:contributors:
+      - null
+    github:subscribers:
+      - null
+    github:subscription:
+      - null
+    github:commits:
+      - null
+    github:git-commits:
+      - null
+    github:comments:
+      - null
+    github:issue-comment:
+      - null
+    github:contents:
+      - null
+    github:compare:
+      - null
+    github:merges:
+      - null
+    github:archive:
+      - null
+    github:downloads:
+      - null
+    github:issues:
+      - null
+    github:pulls:
+      - null
+    github:milestones:
+      - null
+    github:notifications:
+      - null
+    github:labels:
+      - null
+    github:releases:
+      - null
+    github:deployments:
+      - null
+    github:git:
+      - null
+    github:ssh:
+      - null
+    github:clone:
+      - null
+    github:svn:
+      - null
+  embedded:
+    github:owner:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-22T21:17:45.752097Z'
+ms: 1894
+mode: script
+say: act {relation}, title {title}, body {body}
+intent: 'Open an issue titled "Garden crashes on an empty bed name (1022-171727)" with the body: seen on the demo garden'
+line: 41
+within: 22
+params:
+  relation: github:open-issue
+  title: Garden crashes on an empty bed name (1022-171727)
+  body: seen on the demo garden
+values:
+  title:
+    value: Garden crashes on an empty bed name (1022-171727)
+    from:
+      - parts:
+          '1022-171727':
+            input: stamp
+  body:
+    value: seen on the demo garden
+    type: string
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: github:open-issue
+  title: Open an issue
+  method: POST
+  target: /repos/{owner}/{repo}/actions/open-issue
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/actions/open-issue
+  picked: relation
+  not sent:
+    - assignees
+    - labels
+    - milestone
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/b7cdf9d9bd2f16e8
+    integrity: sha256-t8352b0vFug59dPyOrG80DIEf+lWTm4RO0sUfhLHR+Y=
+  form: sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI=
+  schema:
+    href: https://localhost:8392/schemas/f7a8db931b33fcf1
+    integrity: sha256-96jbkxsz/PG3PVDvXBkQMk/mpIId+DfmGRMwWHa2zQE=
+  if-match: '"seq-0.hsf.L2.6f84eeaf753268c2"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:open-issue
+  links:
+    - alternate
+    - github:archive
+    - github:assignees
+    - github:blobs
+    - github:branches
+    - github:clone
+    - github:collaborators
+    - github:comments
+    - github:commits
+    - github:compare
+    - github:contents
+    - github:contributors
+    - github:deployments
+    - github:downloads
+    - github:events
+    - github:forks
+    - github:git
+    - github:git-commits
+    - github:git-refs
+    - github:git-tags
+    - github:hooks
+    - github:issue-comment
+    - github:issue-events
+    - github:issues
+    - github:keys
+    - github:labels
+    - github:languages
+    - github:merges
+    - github:milestones
+    - github:notifications
+    - github:pulls
+    - github:releases
+    - github:repos-list-branches
+    - github:ssh
+    - github:stargazers
+    - github:statuses
+    - github:subscribers
+    - github:subscription
+    - github:svn
+    - github:tags
+    - github:teams
+    - github:trees
+    - hr:forms
+    - self
+outcome: new resource
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/574
+now:
+  state:
+    id: 5987606852
+    node_id: I_kwDOVM7WJc8AAAABZOOhRA
+    number: 574
+    title: Garden crashes on an empty bed name (1022-171727)
+    labels: []
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: '2026-10-22T21:17:46Z'
+    updated_at: '2026-10-22T21:17:46Z'
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: seen on the demo garden
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '574'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+keeps:
+  /hr:address/owner:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:user/0/login:
+    - 38
+    - 44
+    - 51
+  /hr:address/repo:
+    - 38
+    - 44
+    - 51
+  /number:
+    - 51
+  /hr:address/issue_number:
+    - 51
+---
+at: '2026-10-22T21:17:47.650526Z'
+ms: 271
+mode: script
+say: return to {address}
+line: 41
+within: 22
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test
+now:
+  state:
+    id: 1422841381
+    node_id: R_kgDOVM7WJQ
+    name: heart-github-test
+    full_name: JogoShugh/heart-github-test
+    private: false
+    description: null
+    fork: false
+    created_at: '2026-10-17T01:37:34Z'
+    updated_at: '2026-10-22T21:16:06Z'
+    pushed_at: '2026-10-22T21:17:00Z'
+    homepage: null
+    size: 177
+    stargazers_count: 0
+    watchers_count: 0
+    language: null
+    has_issues: true
+    has_projects: true
+    has_downloads: false
+    has_wiki: true
+    has_pages: false
+    has_discussions: false
+    forks_count: 0
+    mirror_url: null
+    archived: false
+    disabled: false
+    open_issues_count: 70
+    license: null
+    allow_forking: true
+    is_template: false
+    web_commit_signoff_required: false
+    has_pull_requests: true
+    pull_request_creation_policy: all
+    topics: []
+    visibility: public
+    forks: 0
+    open_issues: 70
+    watchers: 0
+    default_branch: main
+    permissions:
+      admin: true
+      maintain: true
+      push: true
+      triage: true
+      pull: true
+    allow_squash_merge: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_auto_merge: false
+    delete_branch_on_merge: false
+    allow_update_branch: false
+    use_squash_pr_title_as_default: false
+    squash_merge_commit_message: COMMIT_MESSAGES
+    squash_merge_commit_title: COMMIT_OR_PR_TITLE
+    merge_commit_message: PR_TITLE
+    merge_commit_title: MERGE_MESSAGE
+    security_and_analysis:
+      secret_scanning:
+        status: enabled
+      secret_scanning_push_protection:
+        status: enabled
+      dependabot_security_updates:
+        status: disabled
+      secret_scanning_non_provider_patterns:
+        status: disabled
+      secret_scanning_validity_checks:
+        status: disabled
+    network_count: 0
+    subscribers_count: 0
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+  forms:
+    - github:open-issue
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:repos-list-branches:
+      - null
+    alternate:
+      - null
+    github:forks:
+      - null
+    github:keys:
+      - null
+    github:collaborators:
+      - null
+    github:teams:
+      - null
+    github:hooks:
+      - null
+    github:issue-events:
+      - null
+    github:events:
+      - null
+    github:assignees:
+      - null
+    github:branches:
+      - null
+    github:tags:
+      - null
+    github:blobs:
+      - null
+    github:git-tags:
+      - null
+    github:git-refs:
+      - null
+    github:trees:
+      - null
+    github:statuses:
+      - null
+    github:languages:
+      - null
+    github:stargazers:
+      - null
+    github:contributors:
+      - null
+    github:subscribers:
+      - null
+    github:subscription:
+      - null
+    github:commits:
+      - null
+    github:git-commits:
+      - null
+    github:comments:
+      - null
+    github:issue-comment:
+      - null
+    github:contents:
+      - null
+    github:compare:
+      - null
+    github:merges:
+      - null
+    github:archive:
+      - null
+    github:downloads:
+      - null
+    github:issues:
+      - null
+    github:pulls:
+      - null
+    github:milestones:
+      - null
+    github:notifications:
+      - null
+    github:labels:
+      - null
+    github:releases:
+      - null
+    github:deployments:
+      - null
+    github:git:
+      - null
+    github:ssh:
+      - null
+    github:clone:
+      - null
+    github:svn:
+      - null
+  embedded:
+    github:owner:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-22T21:17:47.923338Z'
+ms: 915
+mode: script
+say: follow {relation}
+intent: follow the link to list the branches
+line: 47
+within: 22
+params:
+  relation: github:repos-list-branches
+opens: true
+chose:
+  kind: link
+  relation: github:repos-list-branches
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/branches
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches
+  picked: relation
+guard:
+  checked: lenient
+offered:
+  forms:
+    - github:open-issue
+  links:
+    - alternate
+    - github:archive
+    - github:assignees
+    - github:blobs
+    - github:branches
+    - github:clone
+    - github:collaborators
+    - github:comments
+    - github:commits
+    - github:compare
+    - github:contents
+    - github:contributors
+    - github:deployments
+    - github:downloads
+    - github:events
+    - github:forks
+    - github:git
+    - github:git-commits
+    - github:git-refs
+    - github:git-tags
+    - github:hooks
+    - github:issue-comment
+    - github:issue-events
+    - github:issues
+    - github:keys
+    - github:labels
+    - github:languages
+    - github:merges
+    - github:milestones
+    - github:notifications
+    - github:pulls
+    - github:releases
+    - github:repos-list-branches
+    - github:ssh
+    - github:stargazers
+    - github:statuses
+    - github:subscribers
+    - github:subscription
+    - github:svn
+    - github:tags
+    - github:teams
+    - github:trees
+    - hr:forms
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches
+now:
+  state:
+    count: 106
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - behind
+      - blocked
+      - clean
+      - closed
+      - conflict
+      - draft
+      - fix-blank-names-1021-222907
+      - fix-blank-names-1021-223102
+      - fix-blank-names-1022-062745
+      - fix-blank-names-1022-064219
+      - fix-blank-names-1022-064648
+      - fix-blank-names-1022-065759
+      - fix-blank-names-1022-070245
+      - fix-blank-names-1022-070410
+      - fix-blank-names-1022-071000
+      - fix-blank-names-1022-071029
+      - fix-blank-names-1022-071143
+      - fix-blank-names-1022-071244
+      - fix-blank-names-1022-072058
+      - fix-blank-names-1022-072213
+---
+at: '2026-10-22T21:17:48.840292Z'
+ms: 5156
+mode: script
+say: follow {relation}, titled {title}
+intent: follow the link to the main branch
+line: 48
+within: 47
+params:
+  relation: item
+  title: main
+values:
+  title:
+    value: main
+    from:
+      - step: 2
+        pointer: /default_branch
+opens: true
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/main
+now:
+  state:
+    name: main
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: main
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+          node_id: C_kwDOVM7WJdoAKGY3MWExNGFlMzNmZjBmMTljYjRjMWEyNDM3MTc1YzAzNDY5MzM5MmE
+          parents:
+            - sha: e4cbcbd8965ac82ac004900b8b9d031ebba65475
+---
+at: '2026-10-22T21:17:53.998907Z'
+ms: 1494
+mode: script
+say: act {relation}, name {name}
+intent: start a new branch named fix-blank-names-1022-171727 from here
+line: 49
+within: 48
+params:
+  relation: github:branch-from-here
+  name: fix-blank-names-1022-171727
+values:
+  name:
+    value: fix-blank-names-1022-171727
+    type: string
+    from:
+      - parts:
+          '1022-171727':
+            input: stamp
+opens: true
+chose:
+  kind: form
+  relation: github:branch-from-here
+  title: Branch from here
+  method: POST
+  target: /repos/{owner}/{repo}/branches/{branch}/actions/branch-from-here
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/main/actions/branch-from-here
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/0ab135182ebda88a
+    integrity: sha256-CrE1GC69qIrIcfOYj1LItvRJl2l6+ahefGhs1QAd11E=
+  form: sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+  schema:
+    href: https://localhost:8392/schemas/222e354902f56b39
+    integrity: sha256-Ii41SQL1azknua6MirSv0GWeOOGMJhEv0gNcLxGWRfA=
+  if-match: '"seq-0.hsf.L2.d0bc0654ce033164"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    - alternate
+    - github:protection
+    - hr:forms
+    - self
+outcome: new resource
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727
+now:
+  state:
+    name: fix-blank-names-1022-171727
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: fix-blank-names-1022-171727
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+          node_id: C_kwDOVM7WJdoAKGY3MWExNGFlMzNmZjBmMTljYjRjMWEyNDM3MTc1YzAzNDY5MzM5MmE
+          parents:
+            - sha: e4cbcbd8965ac82ac004900b8b9d031ebba65475
+keeps:
+  /hr:address/owner:
+    - 38
+    - 44
+    - 51
+  /hr:address/repo:
+    - 38
+    - 44
+    - 51
+---
+at: '2026-10-22T21:17:55.495275Z'
+ms: 245
+mode: script
+say: return to {address}
+line: 52
+within: 49
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727
+now:
+  state:
+    name: fix-blank-names-1022-171727
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: fix-blank-names-1022-171727
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+          node_id: C_kwDOVM7WJdoAKGY3MWExNGFlMzNmZjBmMTljYjRjMWEyNDM3MTc1YzAzNDY5MzM5MmE
+          parents:
+            - sha: e4cbcbd8965ac82ac004900b8b9d031ebba65475
+---
+at: '2026-10-22T21:17:55.741962Z'
+ms: 1887
+mode: script
+say: act {relation}, path {path}, message {message}, content {content}
+intent: Commit a file named fix-1022-171727.md with the content "Bed names may not be blank." and the commit message "Refuse a bed with no name"
+line: 53
+within: 49
+params:
+  relation: github:commit-file
+  path: fix-1022-171727.md
+  message: Refuse a bed with no name
+  content: Bed names may not be blank.
+values:
+  path:
+    value: fix-1022-171727.md
+    type: string
+    from:
+      - parts:
+          '1022-171727':
+            input: stamp
+  message:
+    value: Refuse a bed with no name
+    type: string
+    from:
+      - constant
+  content:
+    value: Bed names may not be blank.
+    type: string
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: github:commit-file
+  title: Commit a file
+  method: PUT
+  target: /repos/{owner}/{repo}/branches/{branch}/actions/commit-file
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727/actions/commit-file
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/0ab135182ebda88a
+    integrity: sha256-CrE1GC69qIrIcfOYj1LItvRJl2l6+ahefGhs1QAd11E=
+  form: sha256-VU+w5uVUgaj2J43DM9jlUCmIZ1jNGPlRKajRrAlQN9Y=
+  schema:
+    href: https://localhost:8392/schemas/b2f56ca079a95386
+    integrity: sha256-svVsoHmpU4YbdX2cRd0MWqU1hqDTwVtlLUibmkyUd7g=
+  if-match: '"seq-0.hsf.L2.c34f4be7bccdc87e"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    - alternate
+    - github:protection
+    - hr:forms
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727
+now:
+  state:
+    name: fix-blank-names-1022-171727
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: fix-blank-names-1022-171727
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: 0d536524a4ed6e67f588b74702748eda0375469e
+          node_id: C_kwDOVM7WJdoAKDBkNTM2NTI0YTRlZDZlNjdmNTg4Yjc0NzAyNzQ4ZWRhMDM3NTQ2OWU
+          parents:
+            - sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+keeps:
+  /hr:address/owner:
+    - 38
+    - 44
+    - 51
+  /hr:address/repo:
+    - 38
+    - 44
+    - 51
+---
+at: '2026-10-22T21:17:57.633652Z'
+ms: 214
+mode: script
+say: return to {address}
+line: 53
+within: 49
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727
+now:
+  state:
+    name: fix-blank-names-1022-171727
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: fix-blank-names-1022-171727
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: 0d536524a4ed6e67f588b74702748eda0375469e
+          node_id: C_kwDOVM7WJdoAKDBkNTM2NTI0YTRlZDZlNjdmNTg4Yjc0NzAyNzQ4ZWRhMDM3NTQ2OWU
+          parents:
+            - sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+---
+at: '2026-10-22T21:17:57.849311Z'
+ms: 2177
+mode: script
+say: act {relation}, path {path}, message {message}, content {content}
+intent: Commit a file named test-1022-171727.md with the content "A bed with a blank name is refused." and the commit message "Test that a blank bed name is refused"
+line: 58
+within: 49
+params:
+  relation: github:commit-file
+  path: test-1022-171727.md
+  message: Test that a blank bed name is refused
+  content: A bed with a blank name is refused.
+values:
+  path:
+    value: test-1022-171727.md
+    type: string
+    from:
+      - parts:
+          '1022-171727':
+            input: stamp
+  message:
+    value: Test that a blank bed name is refused
+    type: string
+    from:
+      - constant
+  content:
+    value: A bed with a blank name is refused.
+    type: string
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: github:commit-file
+  title: Commit a file
+  method: PUT
+  target: /repos/{owner}/{repo}/branches/{branch}/actions/commit-file
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727/actions/commit-file
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/0ab135182ebda88a
+    integrity: sha256-CrE1GC69qIrIcfOYj1LItvRJl2l6+ahefGhs1QAd11E=
+  form: sha256-VU+w5uVUgaj2J43DM9jlUCmIZ1jNGPlRKajRrAlQN9Y=
+  schema:
+    href: https://localhost:8392/schemas/b2f56ca079a95386
+    integrity: sha256-svVsoHmpU4YbdX2cRd0MWqU1hqDTwVtlLUibmkyUd7g=
+  if-match: '"seq-0.hsf.L2.9d87f53b3e0dc4d3"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    - alternate
+    - github:protection
+    - hr:forms
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727
+now:
+  state:
+    name: fix-blank-names-1022-171727
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: fix-blank-names-1022-171727
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: ddf2b9002e2fffe4fbc9b15fc9027cca173b8a8d
+          node_id: C_kwDOVM7WJdoAKGRkZjJiOTAwMmUyZmZmZTRmYmM5YjE1ZmM5MDI3Y2NhMTczYjhhOGQ
+          parents:
+            - sha: 0d536524a4ed6e67f588b74702748eda0375469e
+keeps:
+  /hr:address/owner:
+    - 38
+    - 44
+    - 51
+  /hr:address/repo:
+    - 38
+    - 44
+    - 51
+---
+at: '2026-10-22T21:18:00.029720Z'
+ms: 223
+mode: script
+say: return to {address}
+line: 58
+within: 49
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727
+now:
+  state:
+    name: fix-blank-names-1022-171727
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: fix-blank-names-1022-171727
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: ddf2b9002e2fffe4fbc9b15fc9027cca173b8a8d
+          node_id: C_kwDOVM7WJdoAKGRkZjJiOTAwMmUyZmZmZTRmYmM5YjE1ZmM5MDI3Y2NhMTczYjhhOGQ
+          parents:
+            - sha: 0d536524a4ed6e67f588b74702748eda0375469e
+---
+at: '2026-10-22T21:18:00.253998Z'
+ms: 2636
+mode: script
+say: act {relation}, base {base}, title {title}, body {body}
+intent: 'Open a pull request into main titled "Refuse a bed with no name (1022-171727)" with the body: fixes #572'
+line: 63
+within: 49
+params:
+  relation: github:open-pull-request
+  base: main
+  title: Refuse a bed with no name (1022-171727)
+  body: 'fixes #572'
+values:
+  base:
+    value: main
+    type: string
+    from:
+      - step: 2
+        pointer: /default_branch
+  title:
+    value: Refuse a bed with no name (1022-171727)
+    type: string
+    from:
+      - parts:
+          '1022-171727':
+            input: stamp
+  body:
+    value: 'fixes #572'
+    type: string
+    from:
+      - parts:
+          '572':
+            step: 3
+            pointer: /number
+opens: true
+chose:
+  kind: form
+  relation: github:open-pull-request
+  title: Open a pull request
+  method: POST
+  target: /repos/{owner}/{repo}/branches/{branch}/actions/open-pull-request
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727/actions/open-pull-request
+  picked: relation
+  not sent:
+    - draft
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/0ab135182ebda88a
+    integrity: sha256-CrE1GC69qIrIcfOYj1LItvRJl2l6+ahefGhs1QAd11E=
+  form: sha256-PE4HJf8D9pKBuS8GjywYA5kUlxGDtzJU9LtqfoDdBMI=
+  schema:
+    href: https://localhost:8392/schemas/991c0e30445a0adc
+    integrity: sha256-mRwOMERaCtzoWpSH8i+m5OfeNAQuH9W/rfaoInELWjs=
+  if-match: '"seq-0.hsf.L2.3debbe08aca3946d"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    - alternate
+    - github:protection
+    - hr:forms
+    - self
+outcome: new resource
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+now:
+  state:
+    id: 4974252515
+    node_id: PR_kwDOVM7WJc8AAAABKH0R4w
+    number: 575
+    state: open
+    locked: false
+    title: Refuse a bed with no name (1022-171727)
+    body: 'fixes #572'
+    created_at: '2026-10-22T21:18:01Z'
+    updated_at: '2026-10-22T21:18:01Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-1022-171727
+      ref: fix-blank-names-1022-171727
+      sha: ddf2b9002e2fffe4fbc9b15fc9027cca173b8a8d
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: false
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 2
+    additions: 2
+    deletions: 0
+    changed_files: 2
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '575'
+  forms:
+    - github:close
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 71
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 71
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 71
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 71
+          watchers: 0
+          default_branch: main
+keeps:
+  /body:
+    - 25
+    - 27
+  /number:
+    - 30
+    - 41
+    - 45
+  /hr:address/owner:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:user/0/login:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:head-user/0/login:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:base-user/0/login:
+    - 38
+    - 44
+    - 51
+  /hr:address/repo:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:head-repo/0/name:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:base-repo/0/name:
+    - 38
+    - 44
+    - 51
+---
+at: '2026-10-22T21:18:02.892446Z'
+ms: 734
+mode: script
+say: return to {address}
+line: 68
+within: 63
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+now:
+  state:
+    id: 4974252515
+    node_id: PR_kwDOVM7WJc8AAAABKH0R4w
+    number: 575
+    state: open
+    locked: false
+    title: Refuse a bed with no name (1022-171727)
+    body: 'fixes #572'
+    created_at: '2026-10-22T21:18:01Z'
+    updated_at: '2026-10-22T21:18:01Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 123f3dc3f91213cc6644840ccdd27640c3f404a6
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-1022-171727
+      ref: fix-blank-names-1022-171727
+      sha: ddf2b9002e2fffe4fbc9b15fc9027cca173b8a8d
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: false
+    mergeable: true
+    rebaseable: true
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 2
+    additions: 2
+    deletions: 0
+    changed_files: 2
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '575'
+  forms:
+    - github:close
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 71
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 71
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 71
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 71
+          watchers: 0
+          default_branch: main
+---
+at: '2026-10-22T21:18:03.628194Z'
+ms: 1268
+mode: script
+say: act {relation}, body {body}
+intent: 'change its description to: fixes #572 and is tested by #573'
+line: 77
+within: 75
+params:
+  relation: github:edit
+  body: 'fixes #572 and is tested by #573'
+values:
+  body:
+    value: 'fixes #572 and is tested by #573'
+    type: string
+    from:
+      - parts:
+          '572':
+            step: 3
+            pointer: /number
+          '573':
+            step: 11
+            pointer: /number
+          'fixes #572':
+            step: 23
+            pointer: /body
+chose:
+  kind: form
+  relation: github:edit
+  title: Edit
+  method: PATCH
+  target: /repos/{owner}/{repo}/pulls/{pull_number}/actions/edit
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575/actions/edit
+  picked: relation
+  not sent:
+    - title
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/484914bc30e6dba5
+    integrity: sha256-SEkUvDDm26VvDpv2jdsfdBUxa7xoVdTvgNvxRB5DC8Q=
+  form: sha256-PPOR0s5dm5evRf0IV5+78ZnwNxK8GtbKkmEJJlgFdB0=
+  schema:
+    href: https://localhost:8392/schemas/fb4df3cd80dce5ca
+    integrity: sha256-+03zzYDc5cpVtIJPpc/bIl6pfLS5WLoByAcoUVOn5fs=
+  if-match: '"seq-0.hsf.L2.1ff8fca60c763845"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:close
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    - alternate
+    - github:commits
+    - github:diff
+    - github:issues-get
+    - github:issues-list-comments
+    - github:patch
+    - github:review-comment
+    - github:review-comments
+    - github:statuses
+    - hr:forms
+    - self
+outcome: refused
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+refused:
+  kind: stale
+  by: the client
+  detail: since it was read, someone else changed body, which this act writes; sending it again would overwrite theirs
+---
+at: '2026-10-22T21:18:04.898042Z'
+ms: 588
+mode: script
+say: return to {address}
+line: 75
+within: 63
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+now:
+  state:
+    id: 4974252515
+    node_id: PR_kwDOVM7WJc8AAAABKH0R4w
+    number: 575
+    state: open
+    locked: false
+    title: Refuse a bed with no name (1022-171727)
+    body: |-
+      fixes #572
+      
+      Reviewer: please add a migration note before this goes in.
+    created_at: '2026-10-22T21:18:01Z'
+    updated_at: '2026-10-22T21:18:03Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 123f3dc3f91213cc6644840ccdd27640c3f404a6
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-1022-171727
+      ref: fix-blank-names-1022-171727
+      sha: ddf2b9002e2fffe4fbc9b15fc9027cca173b8a8d
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: false
+    mergeable: true
+    rebaseable: true
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 2
+    additions: 2
+    deletions: 0
+    changed_files: 2
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '575'
+  forms:
+    - github:close
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 70
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 70
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 70
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 70
+          watchers: 0
+          default_branch: main
+---
+at: '2026-10-22T21:18:05.486533Z'
+ms: 2365
+mode: script
+say: act {relation}, body {body}
+intent: 'change its description to: fixes #572 and is tested by #573'
+line: 77
+within: 75
+params:
+  relation: github:edit
+  body: |-
+    fixes #572 and is tested by #573
+    
+    Reviewer: please add a migration note before this goes in.
+values:
+  body:
+    value: |-
+      fixes #572 and is tested by #573
+      
+      Reviewer: please add a migration note before this goes in.
+    type: string
+    from:
+      - parts:
+          '572':
+            step: 3
+            pointer: /number
+          '573':
+            step: 11
+            pointer: /number
+          'fixes #572':
+            step: 23
+            pointer: /body
+opens: true
+chose:
+  kind: form
+  relation: github:edit
+  title: Edit
+  method: PATCH
+  target: /repos/{owner}/{repo}/pulls/{pull_number}/actions/edit
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575/actions/edit
+  picked: relation
+  not sent:
+    - title
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/484914bc30e6dba5
+    integrity: sha256-SEkUvDDm26VvDpv2jdsfdBUxa7xoVdTvgNvxRB5DC8Q=
+  form: sha256-PPOR0s5dm5evRf0IV5+78ZnwNxK8GtbKkmEJJlgFdB0=
+  schema:
+    href: https://localhost:8392/schemas/fb4df3cd80dce5ca
+    integrity: sha256-+03zzYDc5cpVtIJPpc/bIl6pfLS5WLoByAcoUVOn5fs=
+  if-match: '"seq-0.hsf.L2.20009a81d2b976ea"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:close
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    - alternate
+    - github:commits
+    - github:diff
+    - github:issues-get
+    - github:issues-list-comments
+    - github:patch
+    - github:review-comment
+    - github:review-comments
+    - github:statuses
+    - hr:forms
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+now:
+  state:
+    id: 4974252515
+    node_id: PR_kwDOVM7WJc8AAAABKH0R4w
+    number: 575
+    state: open
+    locked: false
+    title: Refuse a bed with no name (1022-171727)
+    body: |-
+      fixes #572 and is tested by #573
+      
+      Reviewer: please add a migration note before this goes in.
+    created_at: '2026-10-22T21:18:01Z'
+    updated_at: '2026-10-22T21:18:06Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 123f3dc3f91213cc6644840ccdd27640c3f404a6
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-1022-171727
+      ref: fix-blank-names-1022-171727
+      sha: ddf2b9002e2fffe4fbc9b15fc9027cca173b8a8d
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: false
+    mergeable: true
+    rebaseable: true
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 2
+    additions: 2
+    deletions: 0
+    changed_files: 2
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '575'
+  forms:
+    - github:close
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 70
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 70
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 70
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 70
+          watchers: 0
+          default_branch: main
+keeps:
+  /hr:address/owner:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:user/0/login:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:head-user/0/login:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:base-user/0/login:
+    - 38
+    - 44
+    - 51
+  /hr:address/repo:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:head-repo/0/name:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:base-repo/0/name:
+    - 38
+    - 44
+    - 51
+---
+at: '2026-10-22T21:18:07.854253Z'
+ms: 478
+mode: script
+say: return to {address}
+line: 77
+within: 75
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+now:
+  state:
+    id: 4974252515
+    node_id: PR_kwDOVM7WJc8AAAABKH0R4w
+    number: 575
+    state: open
+    locked: false
+    title: Refuse a bed with no name (1022-171727)
+    body: |-
+      fixes #572 and is tested by #573
+      
+      Reviewer: please add a migration note before this goes in.
+    created_at: '2026-10-22T21:18:01Z'
+    updated_at: '2026-10-22T21:18:06Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 123f3dc3f91213cc6644840ccdd27640c3f404a6
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-1022-171727
+      ref: fix-blank-names-1022-171727
+      sha: ddf2b9002e2fffe4fbc9b15fc9027cca173b8a8d
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: false
+    mergeable: true
+    rebaseable: true
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 2
+    additions: 2
+    deletions: 0
+    changed_files: 2
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '575'
+  forms:
+    - github:close
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 69
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 69
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 69
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 69
+          watchers: 0
+          default_branch: main
+---
+at: '2026-10-22T21:18:08.334917Z'
+ms: 0
+mode: script
+say: until
+line: 82
+within: 63
+params: {}
+waited:
+  for: offers("github:merge") || state["draft"] == true
+  reads: 0
+outcome: held
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+now:
+  state:
+    id: 4974252515
+    node_id: PR_kwDOVM7WJc8AAAABKH0R4w
+    number: 575
+    state: open
+    locked: false
+    title: Refuse a bed with no name (1022-171727)
+    body: |-
+      fixes #572 and is tested by #573
+      
+      Reviewer: please add a migration note before this goes in.
+    created_at: '2026-10-22T21:18:01Z'
+    updated_at: '2026-10-22T21:18:06Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 123f3dc3f91213cc6644840ccdd27640c3f404a6
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-1022-171727
+      ref: fix-blank-names-1022-171727
+      sha: ddf2b9002e2fffe4fbc9b15fc9027cca173b8a8d
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: false
+    mergeable: true
+    rebaseable: true
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 2
+    additions: 2
+    deletions: 0
+    changed_files: 2
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '575'
+  forms:
+    - github:close
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 69
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 69
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 69
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 69
+          watchers: 0
+          default_branch: main
+---
+at: '2026-10-22T21:18:08.335920Z'
+ms: 4272
+mode: script
+say: act {relation}, merge_method {merge_method}, commit_title {commit_title}
+intent: merge it by squashing its commits, with the commit title "Refuse a bed with no name (#575)"
+line: 84
+within: 63
+params:
+  relation: github:merge
+  merge_method: squash
+  commit_title: Refuse a bed with no name (#575)
+values:
+  merge_method:
+    value: squash
+    type: string
+    from:
+      - constant
+  commit_title:
+    value: Refuse a bed with no name (#575)
+    type: string
+    from:
+      - parts:
+          '575':
+            step: 23
+            pointer: /number
+opens: true
+chose:
+  kind: form
+  relation: github:merge
+  title: Merge
+  method: PUT
+  target: /repos/{owner}/{repo}/pulls/{pull_number}/actions/merge
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575/actions/merge
+  picked: relation
+  not sent:
+    - commit_message
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/484914bc30e6dba5
+    integrity: sha256-SEkUvDDm26VvDpv2jdsfdBUxa7xoVdTvgNvxRB5DC8Q=
+  form: sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk=
+  schema:
+    href: https://localhost:8392/schemas/0f68e71ca6a8837d
+    integrity: sha256-D2jnHKaog30eN9l15vAwZrWapDF8CrLyMG7Tzd7mK7c=
+  if-match: '"seq-0.hsf.L2.9c659036e6550c18"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:close
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    - alternate
+    - github:commits
+    - github:diff
+    - github:issues-get
+    - github:issues-list-comments
+    - github:patch
+    - github:review-comment
+    - github:review-comments
+    - github:statuses
+    - hr:forms
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+now:
+  state:
+    id: 4974252515
+    node_id: PR_kwDOVM7WJc8AAAABKH0R4w
+    number: 575
+    state: closed
+    locked: false
+    title: Refuse a bed with no name (1022-171727)
+    body: |-
+      fixes #572 and is tested by #573
+      
+      Reviewer: please add a migration note before this goes in.
+    created_at: '2026-10-22T21:18:01Z'
+    updated_at: '2026-10-22T21:18:11Z'
+    closed_at: '2026-10-22T21:18:11Z'
+    merged_at: '2026-10-22T21:18:11Z'
+    merge_commit_sha: d49b2b6ba4eda7477ae13e6ab152b065a5fed0c0
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-1022-171727
+      ref: fix-blank-names-1022-171727
+      sha: ddf2b9002e2fffe4fbc9b15fc9027cca173b8a8d
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: true
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 2
+    additions: 2
+    deletions: 0
+    changed_files: 2
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '575'
+  forms:
+    - github:edit
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:merged-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 68
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 68
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:17:59Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 68
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 68
+          watchers: 0
+          default_branch: main
+keeps:
+  /hr:address/owner:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:user/0/login:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:merged-by/0/login:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:head-user/0/login:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:base-user/0/login:
+    - 38
+    - 44
+    - 51
+  /hr:address/repo:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:head-repo/0/name:
+    - 38
+    - 44
+    - 51
+  /_embedded/github:base-repo/0/name:
+    - 38
+    - 44
+    - 51
+---
+at: '2026-10-22T21:18:12.611085Z'
+ms: 469
+mode: script
+say: return to {address}
+line: 84
+within: 63
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+now:
+  state:
+    id: 4974252515
+    node_id: PR_kwDOVM7WJc8AAAABKH0R4w
+    number: 575
+    state: closed
+    locked: false
+    title: Refuse a bed with no name (1022-171727)
+    body: |-
+      fixes #572 and is tested by #573
+      
+      Reviewer: please add a migration note before this goes in.
+    created_at: '2026-10-22T21:18:01Z'
+    updated_at: '2026-10-22T21:18:11Z'
+    closed_at: '2026-10-22T21:18:11Z'
+    merged_at: '2026-10-22T21:18:11Z'
+    merge_commit_sha: d49b2b6ba4eda7477ae13e6ab152b065a5fed0c0
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-1022-171727
+      ref: fix-blank-names-1022-171727
+      sha: ddf2b9002e2fffe4fbc9b15fc9027cca173b8a8d
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: true
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 2
+    additions: 2
+    deletions: 0
+    changed_files: 2
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '575'
+  forms:
+    - github:edit
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:merged-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:18:10Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 68
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 68
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:18:10Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 68
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 68
+          watchers: 0
+          default_branch: main
+---
+at: '2026-10-22T21:18:13.080915Z'
+ms: 0
+mode: script
+say: check
+line: 88
+within: 63
+params:
+  facts:
+    - member: merged
+      test: eq true
+      held: 'true'
+      holds: true
+outcome: held
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/575
+now:
+  state:
+    id: 4974252515
+    node_id: PR_kwDOVM7WJc8AAAABKH0R4w
+    number: 575
+    state: closed
+    locked: false
+    title: Refuse a bed with no name (1022-171727)
+    body: |-
+      fixes #572 and is tested by #573
+      
+      Reviewer: please add a migration note before this goes in.
+    created_at: '2026-10-22T21:18:01Z'
+    updated_at: '2026-10-22T21:18:11Z'
+    closed_at: '2026-10-22T21:18:11Z'
+    merged_at: '2026-10-22T21:18:11Z'
+    merge_commit_sha: d49b2b6ba4eda7477ae13e6ab152b065a5fed0c0
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-1022-171727
+      ref: fix-blank-names-1022-171727
+      sha: ddf2b9002e2fffe4fbc9b15fc9027cca173b8a8d
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: true
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 2
+    additions: 2
+    deletions: 0
+    changed_files: 2
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '575'
+  forms:
+    - github:edit
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:merged-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:18:10Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 68
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 68
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-22T21:16:06Z'
+          pushed_at: '2026-10-22T21:18:10Z'
+          homepage: null
+          size: 177
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 68
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 68
+          watchers: 0
+          default_branch: main
+---
+at: '2026-10-22T21:18:13.081051Z'
+ms: 198
+mode: script
+say: return to {address}
+line: 63
+within: 49
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171727
+now:
+  state:
+    name: fix-blank-names-1022-171727
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: fix-blank-names-1022-171727
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: ddf2b9002e2fffe4fbc9b15fc9027cca173b8a8d
+          node_id: C_kwDOVM7WJdoAKGRkZjJiOTAwMmUyZmZmZTRmYmM5YjE1ZmM5MDI3Y2NhMTczYjhhOGQ
+          parents:
+            - sha: 0d536524a4ed6e67f588b74702748eda0375469e
+---
+at: '2026-10-22T21:18:13.280276Z'
+ms: 214
+mode: script
+say: return to {address}
+line: 49
+within: 48
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/main
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches/main
+now:
+  state:
+    name: main
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: main
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: d49b2b6ba4eda7477ae13e6ab152b065a5fed0c0
+          node_id: C_kwDOVM7WJdoAKGQ0OWIyYjZiYTRlZGE3NDc3YWUxM2U2YWIxNTJiMDY1YTVmZWQwYzA
+          parents:
+            - sha: f71a14ae33ff0f19cb4c1a2437175c034693392a
+---
+at: '2026-10-22T21:18:13.494727Z'
+ms: 764
+mode: script
+say: return to {address}
+line: 48
+within: 47
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/branches
+now:
+  state:
+    count: 107
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - behind
+      - blocked
+      - clean
+      - closed
+      - conflict
+      - draft
+      - fix-blank-names-1021-222907
+      - fix-blank-names-1021-223102
+      - fix-blank-names-1022-062745
+      - fix-blank-names-1022-064219
+      - fix-blank-names-1022-064648
+      - fix-blank-names-1022-065759
+      - fix-blank-names-1022-070245
+      - fix-blank-names-1022-070410
+      - fix-blank-names-1022-071000
+      - fix-blank-names-1022-071029
+      - fix-blank-names-1022-071143
+      - fix-blank-names-1022-071244
+      - fix-blank-names-1022-072058
+      - fix-blank-names-1022-072213
+---
+at: '2026-10-22T21:18:14.260483Z'
+ms: 179
+mode: script
+say: return to {address}
+line: 47
+within: 22
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test
+now:
+  state:
+    id: 1422841381
+    node_id: R_kgDOVM7WJQ
+    name: heart-github-test
+    full_name: JogoShugh/heart-github-test
+    private: false
+    description: null
+    fork: false
+    created_at: '2026-10-17T01:37:34Z'
+    updated_at: '2026-10-22T21:16:06Z'
+    pushed_at: '2026-10-22T21:18:10Z'
+    homepage: null
+    size: 177
+    stargazers_count: 0
+    watchers_count: 0
+    language: null
+    has_issues: true
+    has_projects: true
+    has_downloads: false
+    has_wiki: true
+    has_pages: false
+    has_discussions: false
+    forks_count: 0
+    mirror_url: null
+    archived: false
+    disabled: false
+    open_issues_count: 68
+    license: null
+    allow_forking: true
+    is_template: false
+    web_commit_signoff_required: false
+    has_pull_requests: true
+    pull_request_creation_policy: all
+    topics: []
+    visibility: public
+    forks: 0
+    open_issues: 68
+    watchers: 0
+    default_branch: main
+    permissions:
+      admin: true
+      maintain: true
+      push: true
+      triage: true
+      pull: true
+    allow_squash_merge: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_auto_merge: false
+    delete_branch_on_merge: false
+    allow_update_branch: false
+    use_squash_pr_title_as_default: false
+    squash_merge_commit_message: COMMIT_MESSAGES
+    squash_merge_commit_title: COMMIT_OR_PR_TITLE
+    merge_commit_message: PR_TITLE
+    merge_commit_title: MERGE_MESSAGE
+    security_and_analysis:
+      secret_scanning:
+        status: enabled
+      secret_scanning_push_protection:
+        status: enabled
+      dependabot_security_updates:
+        status: disabled
+      secret_scanning_non_provider_patterns:
+        status: disabled
+      secret_scanning_validity_checks:
+        status: disabled
+    network_count: 0
+    subscribers_count: 0
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+  forms:
+    - github:open-issue
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:repos-list-branches:
+      - null
+    alternate:
+      - null
+    github:forks:
+      - null
+    github:keys:
+      - null
+    github:collaborators:
+      - null
+    github:teams:
+      - null
+    github:hooks:
+      - null
+    github:issue-events:
+      - null
+    github:events:
+      - null
+    github:assignees:
+      - null
+    github:branches:
+      - null
+    github:tags:
+      - null
+    github:blobs:
+      - null
+    github:git-tags:
+      - null
+    github:git-refs:
+      - null
+    github:trees:
+      - null
+    github:statuses:
+      - null
+    github:languages:
+      - null
+    github:stargazers:
+      - null
+    github:contributors:
+      - null
+    github:subscribers:
+      - null
+    github:subscription:
+      - null
+    github:commits:
+      - null
+    github:git-commits:
+      - null
+    github:comments:
+      - null
+    github:issue-comment:
+      - null
+    github:contents:
+      - null
+    github:compare:
+      - null
+    github:merges:
+      - null
+    github:archive:
+      - null
+    github:downloads:
+      - null
+    github:issues:
+      - null
+    github:pulls:
+      - null
+    github:milestones:
+      - null
+    github:notifications:
+      - null
+    github:labels:
+      - null
+    github:releases:
+      - null
+    github:deployments:
+      - null
+    github:git:
+      - null
+    github:ssh:
+      - null
+    github:clone:
+      - null
+    github:svn:
+      - null
+  embedded:
+    github:owner:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-22T21:18:14.440296Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 22
+within: 12
+params:
+  address: https://localhost:8392/
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-22T21:18:14.444598Z'
+ms: 537
+mode: script
+say: act {relation}, owner {owner}, repo {repo}, issue_number {issue_number}
+intent: get issue 572 of JogoShugh/heart-github-test
+line: 98
+within: 12
+params:
+  relation: github:issues-get
+  owner: JogoShugh
+  repo: heart-github-test
+  issue_number: 572
+values:
+  owner:
+    value: JogoShugh
+    type: string
+    from:
+      - input: owner
+      - step: 2
+        pointer: /hr:address/owner
+      - step: 2
+        pointer: /_embedded/github:owner/0/login
+      - step: 3
+        pointer: /hr:address/owner
+      - step: 3
+        pointer: /_embedded/github:user/0/login
+      - step: 5
+        pointer: /hr:address/owner
+      - step: 5
+        pointer: /_embedded/github:user/0/login
+      - step: 7
+        pointer: /hr:address/owner
+      - step: 7
+        pointer: /_embedded/github:user/0/login
+      - step: 7
+        pointer: /_embedded/github:assignee/0/login
+      - step: 7
+        pointer: /_embedded/github:assignees/0/login
+      - step: 11
+        pointer: /hr:address/owner
+      - step: 11
+        pointer: /_embedded/github:user/0/login
+      - step: 13
+        pointer: /hr:address/owner
+      - step: 13
+        pointer: /_embedded/github:user/0/login
+      - step: 17
+        pointer: /hr:address/owner
+      - step: 19
+        pointer: /hr:address/owner
+      - step: 21
+        pointer: /hr:address/owner
+      - step: 23
+        pointer: /hr:address/owner
+      - step: 23
+        pointer: /_embedded/github:user/0/login
+      - step: 23
+        pointer: /_embedded/github:head-user/0/login
+      - step: 23
+        pointer: /_embedded/github:base-user/0/login
+      - step: 27
+        pointer: /hr:address/owner
+      - step: 27
+        pointer: /_embedded/github:user/0/login
+      - step: 27
+        pointer: /_embedded/github:head-user/0/login
+      - step: 27
+        pointer: /_embedded/github:base-user/0/login
+      - step: 30
+        pointer: /hr:address/owner
+      - step: 30
+        pointer: /_embedded/github:user/0/login
+      - step: 30
+        pointer: /_embedded/github:merged-by/0/login
+      - step: 30
+        pointer: /_embedded/github:head-user/0/login
+      - step: 30
+        pointer: /_embedded/github:base-user/0/login
+  repo:
+    value: heart-github-test
+    type: string
+    from:
+      - input: repo
+      - step: 2
+        pointer: /name
+      - step: 2
+        pointer: /hr:address/repo
+      - step: 3
+        pointer: /hr:address/repo
+      - step: 5
+        pointer: /hr:address/repo
+      - step: 7
+        pointer: /hr:address/repo
+      - step: 11
+        pointer: /hr:address/repo
+      - step: 13
+        pointer: /hr:address/repo
+      - step: 17
+        pointer: /hr:address/repo
+      - step: 19
+        pointer: /hr:address/repo
+      - step: 21
+        pointer: /hr:address/repo
+      - step: 23
+        pointer: /hr:address/repo
+      - step: 23
+        pointer: /_embedded/github:head-repo/0/name
+      - step: 23
+        pointer: /_embedded/github:base-repo/0/name
+      - step: 27
+        pointer: /hr:address/repo
+      - step: 27
+        pointer: /_embedded/github:head-repo/0/name
+      - step: 27
+        pointer: /_embedded/github:base-repo/0/name
+      - step: 30
+        pointer: /hr:address/repo
+      - step: 30
+        pointer: /_embedded/github:head-repo/0/name
+      - step: 30
+        pointer: /_embedded/github:base-repo/0/name
+  issue_number:
+    value: 572
+    type: integer
+    from:
+      - step: 3
+        pointer: /number
+      - step: 3
+        pointer: /hr:address/issue_number
+      - step: 5
+        pointer: /number
+      - step: 5
+        pointer: /hr:address/issue_number
+      - step: 7
+        pointer: /number
+      - step: 7
+        pointer: /hr:address/issue_number
+opens: true
+chose:
+  kind: form
+  relation: github:issues-get
+  title: Get an issue
+  method: GET
+  target: /repos/{owner}/{repo}/issues/{issue_number}
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+now:
+  state:
+    id: 5987604207
+    node_id: I_kwDOVM7WJc8AAAABZOOW7w
+    number: 572
+    title: Crash when a bed has no name (1022-171727)
+    state: closed
+    locked: true
+    milestone: null
+    comments: 1
+    created_at: '2026-10-22T21:17:34Z'
+    updated_at: '2026-10-22T21:18:06Z'
+    closed_at: '2026-10-22T21:18:04Z'
+    author_association: OWNER
+    active_lock_reason: off-topic
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: a bed with a blank name crashes the garden
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: not_planned
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '572'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+    - github:unlock
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignee:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignees:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:closed-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12724094924
+          node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+          name: bug
+          color: d73a4a
+          default: true
+          description: Something isn't working
+          archived_at: null
+          archived_by: null
+keeps:
+  /hr:address/owner:
+    - 44
+    - 51
+  /_embedded/github:user/0/login:
+    - 44
+    - 51
+  /_embedded/github:assignee/0/login:
+    - 44
+    - 51
+  /_embedded/github:assignees/0/login:
+    - 44
+    - 51
+  /_embedded/github:closed-by/0/login:
+    - 44
+    - 51
+  /hr:address/repo:
+    - 44
+    - 51
+---
+at: '2026-10-22T21:18:14.986358Z'
+ms: 2867
+mode: script
+say: act {relation}, sub_issue_id {sub_issue_id}
+intent: add sub-issue by id 5987606344
+line: 103
+within: 98
+params:
+  relation: github:add-sub-issue
+  sub_issue_id: 5987606344
+values:
+  sub_issue_id:
+    value: 5987606344
+    type: integer
+    from:
+      - step: 11
+        pointer: /id
+opens: true
+chose:
+  kind: form
+  relation: github:add-sub-issue
+  title: Add a sub-issue
+  method: POST
+  target: /repos/{owner}/{repo}/issues/{issue_number}/actions/add-sub-issue
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572/actions/add-sub-issue
+  picked: relation
+  not sent:
+    - replace_parent
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/6ab9cc0ef59b7557
+    integrity: sha256-arnMDvWbdVeCghaxE4orD/rzQIV9qNqcEylfNqS+25w=
+  form: sha256-CP30wrvSlg+x9cHdEAsLY7mNqe2ooV3jA3MIzZYKhP0=
+  schema:
+    href: https://localhost:8392/schemas/b1651a34a9b03777
+    integrity: sha256-sWUaNKmwN3fqIMAJ84rDT7OrJYGljw60ucFnL2/bkKQ=
+  if-match: '"seq-0.hsf.L2.65feea5d3c9304b0"'
+  checked: lenient
+  warning: 'the set holding github:add-sub-issue changed: pinned sha256-ofqOEjf+BDhfudqRP1SnJgHpZUleKf6YeibKODntxz0=, offered sha256-arnMDvWbdVeCghaxE4orD/rzQIV9qNqcEylfNqS+25w='
+  held: form
+offered:
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+    - github:unlock
+  links:
+    - alternate
+    - github:events
+    - github:issues-list-comments
+    - github:issues-list-sub-issues
+    - github:labels
+    - github:reactions
+    - github:repos-get
+    - github:timeline
+    - hr:forms
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+now:
+  state:
+    id: 5987604207
+    node_id: I_kwDOVM7WJc8AAAABZOOW7w
+    number: 572
+    title: Crash when a bed has no name (1022-171727)
+    state: closed
+    locked: true
+    milestone: null
+    comments: 1
+    created_at: '2026-10-22T21:17:34Z'
+    updated_at: '2026-10-22T21:18:06Z'
+    closed_at: '2026-10-22T21:18:04Z'
+    author_association: OWNER
+    active_lock_reason: off-topic
+    sub_issues_summary:
+      total: 1
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: a bed with a blank name crashes the garden
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: not_planned
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '572'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+    - github:unlock
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignee:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignees:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:closed-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12724094924
+          node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+          name: bug
+          color: d73a4a
+          default: true
+          description: Something isn't working
+          archived_at: null
+          archived_by: null
+keeps:
+  /hr:address/owner:
+    - 44
+    - 51
+  /_embedded/github:user/0/login:
+    - 44
+    - 51
+  /_embedded/github:assignee/0/login:
+    - 44
+    - 51
+  /_embedded/github:assignees/0/login:
+    - 44
+    - 51
+  /_embedded/github:closed-by/0/login:
+    - 44
+    - 51
+  /hr:address/repo:
+    - 44
+    - 51
+---
+at: '2026-10-22T21:18:17.855529Z'
+ms: 488
+mode: script
+say: return to {address}
+line: 103
+within: 98
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+now:
+  state:
+    id: 5987604207
+    node_id: I_kwDOVM7WJc8AAAABZOOW7w
+    number: 572
+    title: Crash when a bed has no name (1022-171727)
+    state: closed
+    locked: true
+    milestone: null
+    comments: 1
+    created_at: '2026-10-22T21:17:34Z'
+    updated_at: '2026-10-22T21:18:06Z'
+    closed_at: '2026-10-22T21:18:04Z'
+    author_association: OWNER
+    active_lock_reason: off-topic
+    sub_issues_summary:
+      total: 1
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: a bed with a blank name crashes the garden
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: not_planned
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '572'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+    - github:unlock
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignee:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignees:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:closed-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12724094924
+          node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+          name: bug
+          color: d73a4a
+          default: true
+          description: Something isn't working
+          archived_at: null
+          archived_by: null
+---
+at: '2026-10-22T21:18:18.344841Z'
+ms: 3035
+mode: script
+say: act {relation}, body {body}
+intent: 'comment on it: Fixed in #575, tested in #573.'
+line: 105
+within: 98
+params:
+  relation: github:comment
+  body: 'Fixed in #575, tested in #573.'
+values:
+  body:
+    value: 'Fixed in #575, tested in #573.'
+    type: string
+    from:
+      - parts:
+          '573':
+            step: 11
+            pointer: /number
+          '575':
+            step: 23
+            pointer: /number
+opens: true
+chose:
+  kind: form
+  relation: github:comment
+  title: Comment
+  method: POST
+  target: /repos/{owner}/{repo}/issues/{issue_number}/actions/comment
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572/actions/comment
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/6ab9cc0ef59b7557
+    integrity: sha256-arnMDvWbdVeCghaxE4orD/rzQIV9qNqcEylfNqS+25w=
+  form: sha256-rEchf4MSX+3aH4c5JE6jPFuMsn5M7PMYR4os6ETeizk=
+  schema:
+    href: https://localhost:8392/schemas/ed35e5c584ac8de1
+    integrity: sha256-7TXlxYSsjeGU+EYIxodHAFtCYel24Fb0XIH1qDwdV0k=
+  if-match: '"seq-0.hsf.L2.d11475760c86728c"'
+  checked: lenient
+  warning: 'the set holding github:comment changed: pinned sha256-ofqOEjf+BDhfudqRP1SnJgHpZUleKf6YeibKODntxz0= or sha256-e4WqIpsdR41ubEY4SSx18ueTbsZXnin0GaU2OSy4kPE=, offered sha256-arnMDvWbdVeCghaxE4orD/rzQIV9qNqcEylfNqS+25w='
+  held: form
+offered:
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+    - github:unlock
+  links:
+    - alternate
+    - github:events
+    - github:issues-list-comments
+    - github:issues-list-sub-issues
+    - github:labels
+    - github:reactions
+    - github:repos-get
+    - github:timeline
+    - hr:forms
+    - self
+outcome: new resource
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/comments/6351531621
+now:
+  state:
+    id: 6351531621
+    node_id: IC_kwDOVM7WJc8AAAABepSuZQ
+    created_at: '2026-10-22T21:18:19Z'
+    updated_at: '2026-10-22T21:18:19Z'
+    author_association: OWNER
+    body: 'Fixed in #575, tested in #573.'
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    minimized: null
+    pin: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      comment_id: '6351531621'
+  forms:
+    - github:edit
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:reactions:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+keeps:
+  /hr:address/owner:
+    - 44
+    - 51
+  /_embedded/github:user/0/login:
+    - 44
+    - 51
+  /hr:address/repo:
+    - 44
+    - 51
+---
+at: '2026-10-22T21:18:21.383200Z'
+ms: 507
+mode: script
+say: return to {address}
+line: 105
+within: 98
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/572
+now:
+  state:
+    id: 5987604207
+    node_id: I_kwDOVM7WJc8AAAABZOOW7w
+    number: 572
+    title: Crash when a bed has no name (1022-171727)
+    state: closed
+    locked: true
+    milestone: null
+    comments: 2
+    created_at: '2026-10-22T21:17:34Z'
+    updated_at: '2026-10-22T21:18:19Z'
+    closed_at: '2026-10-22T21:18:04Z'
+    author_association: OWNER
+    active_lock_reason: off-topic
+    sub_issues_summary:
+      total: 1
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: a bed with a blank name crashes the garden
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: not_planned
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '572'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+    - github:unlock
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignee:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:assignees:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:closed-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12724094924
+          node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+          name: bug
+          color: d73a4a
+          default: true
+          description: Something isn't working
+          archived_at: null
+          archived_by: null
+---
+at: '2026-10-22T21:18:21.894551Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 98
+within: 12
+params:
+  address: https://localhost:8392/
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-22T21:18:21.897155Z'
+ms: 497
+mode: script
+say: act {relation}, owner {owner}, repo {repo}, issue_number {issue_number}
+intent: get issue 573 of JogoShugh/heart-github-test
+line: 116
+within: 12
+params:
+  relation: github:issues-get
+  owner: JogoShugh
+  repo: heart-github-test
+  issue_number: 573
+values:
+  owner:
+    value: JogoShugh
+    type: string
+    from:
+      - input: owner
+      - step: 2
+        pointer: /hr:address/owner
+      - step: 2
+        pointer: /_embedded/github:owner/0/login
+      - step: 3
+        pointer: /hr:address/owner
+      - step: 3
+        pointer: /_embedded/github:user/0/login
+      - step: 5
+        pointer: /hr:address/owner
+      - step: 5
+        pointer: /_embedded/github:user/0/login
+      - step: 7
+        pointer: /hr:address/owner
+      - step: 7
+        pointer: /_embedded/github:user/0/login
+      - step: 7
+        pointer: /_embedded/github:assignee/0/login
+      - step: 7
+        pointer: /_embedded/github:assignees/0/login
+      - step: 11
+        pointer: /hr:address/owner
+      - step: 11
+        pointer: /_embedded/github:user/0/login
+      - step: 13
+        pointer: /hr:address/owner
+      - step: 13
+        pointer: /_embedded/github:user/0/login
+      - step: 17
+        pointer: /hr:address/owner
+      - step: 19
+        pointer: /hr:address/owner
+      - step: 21
+        pointer: /hr:address/owner
+      - step: 23
+        pointer: /hr:address/owner
+      - step: 23
+        pointer: /_embedded/github:user/0/login
+      - step: 23
+        pointer: /_embedded/github:head-user/0/login
+      - step: 23
+        pointer: /_embedded/github:base-user/0/login
+      - step: 27
+        pointer: /hr:address/owner
+      - step: 27
+        pointer: /_embedded/github:user/0/login
+      - step: 27
+        pointer: /_embedded/github:head-user/0/login
+      - step: 27
+        pointer: /_embedded/github:base-user/0/login
+      - step: 30
+        pointer: /hr:address/owner
+      - step: 30
+        pointer: /_embedded/github:user/0/login
+      - step: 30
+        pointer: /_embedded/github:merged-by/0/login
+      - step: 30
+        pointer: /_embedded/github:head-user/0/login
+      - step: 30
+        pointer: /_embedded/github:base-user/0/login
+      - step: 38
+        pointer: /hr:address/owner
+      - step: 38
+        pointer: /_embedded/github:user/0/login
+      - step: 38
+        pointer: /_embedded/github:assignee/0/login
+      - step: 38
+        pointer: /_embedded/github:assignees/0/login
+      - step: 38
+        pointer: /_embedded/github:closed-by/0/login
+      - step: 39
+        pointer: /hr:address/owner
+      - step: 39
+        pointer: /_embedded/github:user/0/login
+      - step: 39
+        pointer: /_embedded/github:assignee/0/login
+      - step: 39
+        pointer: /_embedded/github:assignees/0/login
+      - step: 39
+        pointer: /_embedded/github:closed-by/0/login
+      - step: 41
+        pointer: /hr:address/owner
+      - step: 41
+        pointer: /_embedded/github:user/0/login
+  repo:
+    value: heart-github-test
+    type: string
+    from:
+      - input: repo
+      - step: 2
+        pointer: /name
+      - step: 2
+        pointer: /hr:address/repo
+      - step: 3
+        pointer: /hr:address/repo
+      - step: 5
+        pointer: /hr:address/repo
+      - step: 7
+        pointer: /hr:address/repo
+      - step: 11
+        pointer: /hr:address/repo
+      - step: 13
+        pointer: /hr:address/repo
+      - step: 17
+        pointer: /hr:address/repo
+      - step: 19
+        pointer: /hr:address/repo
+      - step: 21
+        pointer: /hr:address/repo
+      - step: 23
+        pointer: /hr:address/repo
+      - step: 23
+        pointer: /_embedded/github:head-repo/0/name
+      - step: 23
+        pointer: /_embedded/github:base-repo/0/name
+      - step: 27
+        pointer: /hr:address/repo
+      - step: 27
+        pointer: /_embedded/github:head-repo/0/name
+      - step: 27
+        pointer: /_embedded/github:base-repo/0/name
+      - step: 30
+        pointer: /hr:address/repo
+      - step: 30
+        pointer: /_embedded/github:head-repo/0/name
+      - step: 30
+        pointer: /_embedded/github:base-repo/0/name
+      - step: 38
+        pointer: /hr:address/repo
+      - step: 39
+        pointer: /hr:address/repo
+      - step: 41
+        pointer: /hr:address/repo
+  issue_number:
+    value: 573
+    type: integer
+    from:
+      - step: 11
+        pointer: /number
+      - step: 11
+        pointer: /hr:address/issue_number
+opens: true
+chose:
+  kind: form
+  relation: github:issues-get
+  title: Get an issue
+  method: GET
+  target: /repos/{owner}/{repo}/issues/{issue_number}
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/573
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/573
+now:
+  state:
+    id: 5987606344
+    node_id: I_kwDOVM7WJc8AAAABZOOfSA
+    number: 573
+    title: Test blank bed names (1022-171727)
+    labels: []
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: '2026-10-22T21:17:44Z'
+    updated_at: '2026-10-22T21:17:44Z'
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: 'part of #572'
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '573'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+keeps:
+  /hr:address/owner:
+    - 51
+  /_embedded/github:user/0/login:
+    - 51
+  /hr:address/repo:
+    - 51
+---
+at: '2026-10-22T21:18:22.400468Z'
+ms: 3041
+mode: script
+say: act {relation}, body {body}
+intent: 'comment on it: The test went in with #575.'
+line: 123
+within: 121
+params:
+  relation: github:comment
+  body: 'The test went in with #575.'
+values:
+  body:
+    value: 'The test went in with #575.'
+    type: string
+    from:
+      - parts:
+          '575':
+            step: 23
+            pointer: /number
+opens: true
+chose:
+  kind: form
+  relation: github:comment
+  title: Comment
+  method: POST
+  target: /repos/{owner}/{repo}/issues/{issue_number}/actions/comment
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/573/actions/comment
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/7b85aa229b1d478d
+    integrity: sha256-e4WqIpsdR41ubEY4SSx18ueTbsZXnin0GaU2OSy4kPE=
+  form: sha256-rEchf4MSX+3aH4c5JE6jPFuMsn5M7PMYR4os6ETeizk=
+  schema:
+    href: https://localhost:8392/schemas/ed35e5c584ac8de1
+    integrity: sha256-7TXlxYSsjeGU+EYIxodHAFtCYel24Fb0XIH1qDwdV0k=
+  if-match: '"seq-0.hsf.L2.1cfdb26d3d7b1b79"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    - alternate
+    - github:events
+    - github:issues-get
+    - github:issues-list-comments
+    - github:issues-list-sub-issues
+    - github:labels
+    - github:reactions
+    - github:repos-get
+    - github:timeline
+    - hr:forms
+    - self
+outcome: new resource
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/comments/6351532805
+now:
+  state:
+    id: 6351532805
+    node_id: IC_kwDOVM7WJc8AAAABepSzBQ
+    created_at: '2026-10-22T21:18:23Z'
+    updated_at: '2026-10-22T21:18:23Z'
+    author_association: OWNER
+    body: 'The test went in with #575.'
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    minimized: null
+    pin: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      comment_id: '6351532805'
+  forms:
+    - github:edit
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:reactions:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+keeps:
+  /hr:address/owner:
+    - 51
+  /_embedded/github:user/0/login:
+    - 51
+  /hr:address/repo:
+    - 51
+---
+at: '2026-10-22T21:18:25.444573Z'
+ms: 464
+mode: script
+say: return to {address}
+line: 123
+within: 121
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/573
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/573
+now:
+  state:
+    id: 5987606344
+    node_id: I_kwDOVM7WJc8AAAABZOOfSA
+    number: 573
+    title: Test blank bed names (1022-171727)
+    labels: []
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 1
+    created_at: '2026-10-22T21:17:44Z'
+    updated_at: '2026-10-22T21:18:24Z'
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: 'part of #572'
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '573'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-22T21:18:25.909311Z'
+ms: 2468
+mode: script
+say: act {relation}
+intent: close it as completed
+line: 126
+within: 121
+params:
+  relation: github:close
+opens: true
+chose:
+  kind: form
+  relation: github:close
+  title: Close
+  method: PATCH
+  target: /repos/{owner}/{repo}/issues/{issue_number}/actions/close
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/573/actions/close
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/7b85aa229b1d478d
+    integrity: sha256-e4WqIpsdR41ubEY4SSx18ueTbsZXnin0GaU2OSy4kPE=
+  form: sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+  schema:
+    href: https://localhost:8392/schemas/91c3b4ed90232223
+    integrity: sha256-kcO07ZAjIiNEsnLOU1aO2JC/CKNiwa+6Gqu1/F9I7EQ=
+  if-match: '"seq-0.hsf.L2.8f0af4ecb3c45666"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    - alternate
+    - github:events
+    - github:issues-get
+    - github:issues-list-comments
+    - github:issues-list-sub-issues
+    - github:labels
+    - github:reactions
+    - github:repos-get
+    - github:timeline
+    - hr:forms
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/573
+now:
+  state:
+    id: 5987606344
+    node_id: I_kwDOVM7WJc8AAAABZOOfSA
+    number: 573
+    title: Test blank bed names (1022-171727)
+    labels: []
+    state: closed
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 1
+    created_at: '2026-10-22T21:17:44Z'
+    updated_at: '2026-10-22T21:18:27Z'
+    closed_at: '2026-10-22T21:18:27Z'
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: 'part of #572'
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: completed
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '573'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:closed-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+keeps:
+  /hr:address/owner:
+    - 51
+  /_embedded/github:user/0/login:
+    - 51
+  /_embedded/github:closed-by/0/login:
+    - 51
+  /hr:address/repo:
+    - 51
+---
+at: '2026-10-22T21:18:28.378270Z'
+ms: 452
+mode: script
+say: return to {address}
+line: 126
+within: 121
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/573
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/573
+now:
+  state:
+    id: 5987606344
+    node_id: I_kwDOVM7WJc8AAAABZOOfSA
+    number: 573
+    title: Test blank bed names (1022-171727)
+    labels: []
+    state: closed
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 1
+    created_at: '2026-10-22T21:17:44Z'
+    updated_at: '2026-10-22T21:18:27Z'
+    closed_at: '2026-10-22T21:18:27Z'
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: 'part of #572'
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: completed
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '573'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:closed-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-22T21:18:28.831177Z'
+ms: 0
+mode: script
+say: check
+line: 127
+within: 121
+params:
+  facts:
+    - member: state
+      test: eq closed
+      held: closed
+      holds: true
+outcome: held
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/573
+now:
+  state:
+    id: 5987606344
+    node_id: I_kwDOVM7WJc8AAAABZOOfSA
+    number: 573
+    title: Test blank bed names (1022-171727)
+    labels: []
+    state: closed
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 1
+    created_at: '2026-10-22T21:17:44Z'
+    updated_at: '2026-10-22T21:18:27Z'
+    closed_at: '2026-10-22T21:18:27Z'
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: 'part of #572'
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: completed
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '573'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:closed-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-22T21:18:28.831337Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 116
+within: 12
+params:
+  address: https://localhost:8392/
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-22T21:18:28.834279Z'
+ms: 452
+mode: script
+say: act {relation}, owner {owner}, repo {repo}, issue_number {issue_number}
+intent: get issue 574 of JogoShugh/heart-github-test
+line: 133
+within: 12
+params:
+  relation: github:issues-get
+  owner: JogoShugh
+  repo: heart-github-test
+  issue_number: 574
+values:
+  owner:
+    value: JogoShugh
+    type: string
+    from:
+      - input: owner
+      - step: 2
+        pointer: /hr:address/owner
+      - step: 2
+        pointer: /_embedded/github:owner/0/login
+      - step: 3
+        pointer: /hr:address/owner
+      - step: 3
+        pointer: /_embedded/github:user/0/login
+      - step: 5
+        pointer: /hr:address/owner
+      - step: 5
+        pointer: /_embedded/github:user/0/login
+      - step: 7
+        pointer: /hr:address/owner
+      - step: 7
+        pointer: /_embedded/github:user/0/login
+      - step: 7
+        pointer: /_embedded/github:assignee/0/login
+      - step: 7
+        pointer: /_embedded/github:assignees/0/login
+      - step: 11
+        pointer: /hr:address/owner
+      - step: 11
+        pointer: /_embedded/github:user/0/login
+      - step: 13
+        pointer: /hr:address/owner
+      - step: 13
+        pointer: /_embedded/github:user/0/login
+      - step: 17
+        pointer: /hr:address/owner
+      - step: 19
+        pointer: /hr:address/owner
+      - step: 21
+        pointer: /hr:address/owner
+      - step: 23
+        pointer: /hr:address/owner
+      - step: 23
+        pointer: /_embedded/github:user/0/login
+      - step: 23
+        pointer: /_embedded/github:head-user/0/login
+      - step: 23
+        pointer: /_embedded/github:base-user/0/login
+      - step: 27
+        pointer: /hr:address/owner
+      - step: 27
+        pointer: /_embedded/github:user/0/login
+      - step: 27
+        pointer: /_embedded/github:head-user/0/login
+      - step: 27
+        pointer: /_embedded/github:base-user/0/login
+      - step: 30
+        pointer: /hr:address/owner
+      - step: 30
+        pointer: /_embedded/github:user/0/login
+      - step: 30
+        pointer: /_embedded/github:merged-by/0/login
+      - step: 30
+        pointer: /_embedded/github:head-user/0/login
+      - step: 30
+        pointer: /_embedded/github:base-user/0/login
+      - step: 38
+        pointer: /hr:address/owner
+      - step: 38
+        pointer: /_embedded/github:user/0/login
+      - step: 38
+        pointer: /_embedded/github:assignee/0/login
+      - step: 38
+        pointer: /_embedded/github:assignees/0/login
+      - step: 38
+        pointer: /_embedded/github:closed-by/0/login
+      - step: 39
+        pointer: /hr:address/owner
+      - step: 39
+        pointer: /_embedded/github:user/0/login
+      - step: 39
+        pointer: /_embedded/github:assignee/0/login
+      - step: 39
+        pointer: /_embedded/github:assignees/0/login
+      - step: 39
+        pointer: /_embedded/github:closed-by/0/login
+      - step: 41
+        pointer: /hr:address/owner
+      - step: 41
+        pointer: /_embedded/github:user/0/login
+      - step: 44
+        pointer: /hr:address/owner
+      - step: 44
+        pointer: /_embedded/github:user/0/login
+      - step: 45
+        pointer: /hr:address/owner
+      - step: 45
+        pointer: /_embedded/github:user/0/login
+      - step: 47
+        pointer: /hr:address/owner
+      - step: 47
+        pointer: /_embedded/github:user/0/login
+      - step: 47
+        pointer: /_embedded/github:closed-by/0/login
+  repo:
+    value: heart-github-test
+    type: string
+    from:
+      - input: repo
+      - step: 2
+        pointer: /name
+      - step: 2
+        pointer: /hr:address/repo
+      - step: 3
+        pointer: /hr:address/repo
+      - step: 5
+        pointer: /hr:address/repo
+      - step: 7
+        pointer: /hr:address/repo
+      - step: 11
+        pointer: /hr:address/repo
+      - step: 13
+        pointer: /hr:address/repo
+      - step: 17
+        pointer: /hr:address/repo
+      - step: 19
+        pointer: /hr:address/repo
+      - step: 21
+        pointer: /hr:address/repo
+      - step: 23
+        pointer: /hr:address/repo
+      - step: 23
+        pointer: /_embedded/github:head-repo/0/name
+      - step: 23
+        pointer: /_embedded/github:base-repo/0/name
+      - step: 27
+        pointer: /hr:address/repo
+      - step: 27
+        pointer: /_embedded/github:head-repo/0/name
+      - step: 27
+        pointer: /_embedded/github:base-repo/0/name
+      - step: 30
+        pointer: /hr:address/repo
+      - step: 30
+        pointer: /_embedded/github:head-repo/0/name
+      - step: 30
+        pointer: /_embedded/github:base-repo/0/name
+      - step: 38
+        pointer: /hr:address/repo
+      - step: 39
+        pointer: /hr:address/repo
+      - step: 41
+        pointer: /hr:address/repo
+      - step: 44
+        pointer: /hr:address/repo
+      - step: 45
+        pointer: /hr:address/repo
+      - step: 47
+        pointer: /hr:address/repo
+  issue_number:
+    value: 574
+    type: integer
+    from:
+      - step: 13
+        pointer: /number
+      - step: 13
+        pointer: /hr:address/issue_number
+opens: true
+chose:
+  kind: form
+  relation: github:issues-get
+  title: Get an issue
+  method: GET
+  target: /repos/{owner}/{repo}/issues/{issue_number}
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/574
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/574
+now:
+  state:
+    id: 5987606852
+    node_id: I_kwDOVM7WJc8AAAABZOOhRA
+    number: 574
+    title: Garden crashes on an empty bed name (1022-171727)
+    labels: []
+    state: closed
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 1
+    created_at: '2026-10-22T21:17:46Z'
+    updated_at: '2026-10-22T21:18:09Z'
+    closed_at: '2026-10-22T21:18:07Z'
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: seen on the demo garden
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: completed
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '574'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:closed-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-22T21:18:29.296529Z'
+ms: 1
+mode: script
+say: return to {address}
+line: 133
+within: 12
+params:
+  address: https://localhost:8392/
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When to think, and how “once” stays true · How far can one vision go · 2.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Infer once. Then what?</span></header>
+<h2>When to think, and how “once” stays true</h2>
+<div class="split">
+  <div class="card">
+    <div class="step"><h3>Hightower: when to think</h3><p>Once. Infer the task, then run it as plain, deterministic code. Zero tokens per run. <a class="ref-plain" href="https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture">ZTA</a></p></div>
+    <div class="step gap"><h3>The gap</h3><p>“Everywhere” includes tomorrow. A script frozen against out-of-band URLs breaks, or pays tokens to re-learn.</p></div>
+    <div class="step"><h3>Fielding: why it stays true</h3><p>Every answer carries its controls. The replay checks its act is still offered. That check is free.</p></div>
+    <p class="refs"><details class="fragment-plain"><summary>The goal, in words (release.goal.md)</summary><pre><code>Release a pull request to Dev once it can be merged and its build passes its smoke test.
+
+- Open pull request {pull} of {owner}/{repo} `as pr`
+- At {watcher}, ask to be told when {pr} offers scm:merge `as watch`
+- Once {watch} is answered, at {pr}, merge it by squashing `as merged`
+- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`
+- Once {build} is answered, follow its in-reply-to link to the build `as built`
+  - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`
+- If {smoke.passed}, at {dev}, open environment {environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed `as promotion`
+  Otherwise, at {pr}, act scm:comment with body = &quot;Not promoted to Dev: smoke scenarios {smoke.failed} failed.&quot;</code></pre></details> <details class="fragment-plain"><summary>The kept script, from one model run (release.heart.yaml)</summary><pre><code>steps:
+  - act: scm:pulls-get
+    fields:
+      owner: ${owner}
+      repo: ${repo}
+      pull_number: ${pull}
+    intent: Open pull request ${pull} of ${owner}/${repo}
+    then:
+      - keep-as: pr
+  - enter: ${watcher}
+    steps:
+      - ask: watcher:watch
+        fields:
+          resource: ${pr.@self}
+          offers: scm:merge
+        reply: watch
+  - once-answered:
+      reply: watch
+      steps:
+        - enter: ${pr.@self}
+          steps:
+            - act: scm:merge
+              fields:
+                method: squash
+              intent: merge it by squashing
+              then:
+                - check:
+                    - field: state
+                      is: closed
+                    - field: merged
+                      is: true
+                    - field: mergeable_state
+                      is: unknown
+                - keep-as: merged
+  - enter: ${jenkins}
+    steps:
+      - ask: ci:build
+        fields:
+          commit: ${merged.merge_commit_sha}
+        reply: build
+  - once-answered:
+      reply: build
+      steps:
+        - follow: hr:in-reply-to
+          intent: follow its in-reply-to link to the build
+          then:
+            - run-script: ci:smoke-test
+              on-link: ci:deployment
+              inputs:
+                book: ${book}
+                author: ${author}
+                renewable: ${renewable}
+                problem: ${problem}
+                comment: ${comment}
+              as: smoke
+  - given:
+      - at: smoke
+        field: passed
+        is: true
+    then:
+      - enter: ${dev}
+        steps:
+          - act: env:get-environment
+            fields:
+              id: ${environment}
+            inferred: get environment ${environment}
+            from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
+            then:
+              - act: env:promote
+                fields:
+                  commit: ${merged.merge_commit_sha}
+                  smoke: # review: the reasoner chose it, asked &quot;promote commit 30a0fa96e3eed2ae20b2b5fa7613a115d56312a3, citing 5 of 5 scenarios passed&quot;
+                    passed: ${smoke.passing}
+                    of: ${smoke.of}
+                intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed
+                then:
+                  - check:
+                      - field: commit
+                        is: ${merged.merge_commit_sha}
+    otherwise:
+      - at: ${pr.@self}
+        steps:
+          - act: scm:comment
+            fields:
+              body: &quot;Not promoted to Dev: smoke scenarios ${smoke.failed} failed.&quot;</code></pre></details> <details class="fragment-plain"><summary>What it checks before every act (release.pins.yaml)</summary><pre><code># What /Users/josh/repos/artie/exhibits/merge-watch-release/release.heart.yaml was recorded against, from /Users/josh/repos/artie/exhibits/merge-watch-release/release.capture.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its
+# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
+# one offered in a set not recorded for it.
+rung: L2
+digest: sha256-qKM7TXJvTtzvI3H416WCa/y5oYK6wvYch4GhbwCLhKc=
+forms:
+  scm:pulls-get:
+    integrity: sha256-h02WjR7vd61a3clH1/805IIXM3O8OwspKt3KHwUP7/s=
+    act: sha256-0vjYAyfZzEdAjZBvXTUMge5qmujg/1tlkot9bnCWtaI=
+    method: GET
+    sets:
+      - sha256-gImH34GdmXPjwBtQ7RNGKro/Tbf26SFredj/E+jK13c=
+  watcher:watch:
+    integrity: sha256-vfjsEUQ7/+mWV478GxTnnHzzo8rZLb+s3eHW4KJhRFw=
+    act: sha256-BQiZ8TwYquT9Wgp2yiw4eEIqY3c9/0IwgvhuCvV1KHg=
+    method: POST
+    sets:
+      - sha256-T8prIv6TSqXSB9HdposRpsV8AYFUzfYEqiUvr32dX10=
+  scm:merge:
+    integrity: sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pweUa6ioBBwF8=
+    act: sha256-s8/h0c399Nx7AL340i09iHi9+s/nSZ9R+q5MfjgiYUY=
+    method: PUT
+    sets:
+      - sha256-ARE/YVgALeTnzANV8TegQJiue3vljZt3onMex+jMsvs=
+  ci:build:
+    integrity: sha256-xo3vNZ/YJwDkXNstjxyOUmQHZdWN8PojyD9Ub3KzHGQ=
+    act: sha256-9MVTORRjzrcFoMzlwiQWRmnUPVD+jk4sNjjyGG2m4fI=
+    method: POST
+    sets:
+      - sha256-Uv4wXjFFrnajvow8ez6LM8naU0uFYIKuRdyKs4IQA3A=
+  library:search-loans:
+    integrity: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+    act: sha256-Z7N30vs6QUGs1xK2hP+w1F0UgY7gyXs1+HawMkOt274=
+    method: GET
+    sets:
+      - sha256-OO1MlqifBoCG+V9lYByf83cmOoCUf75taO/frDYwjWE=
+  library:renew:
+    integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+    act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    method: POST
+    sets:
+      - sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU=
+  library:report-problem:
+    integrity: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+    act: sha256-Z+8E81vIjCh35uyOKsoSwVMDm2eCmJBVEcbO6oI3uD8=
+    method: POST
+    sets:
+      - sha256-04lPGu1h4kV3Ra9udmDg1UCTzHfqn47zOSXw6TDIKOQ=
+  env:get-environment:
+    integrity: sha256-UWb+xXKngRFe8ibTwO9SrpSUYNPBbji/5JjlwpAEKfQ=
+    act: sha256-myRjFFxsNF8ai44N4fdXgWOPGB3uRptbwrCqaA8yp6s=
+    method: GET
+    sets:
+      - sha256-sy8+OSs554Ilw4WUAs9A0ywntG59u2PLanv0jt/pId4=
+  env:promote:
+    integrity: sha256-TwXThZ20UPUIctrpRXRoHqarKKsEilvB0sVwvK1PY4s=
+    act: sha256-uhGb8WNCB9bBSTcSnGDncK5OOgbvor2iNrT+IZvrEFA=
+    method: POST
+    sets:
+      - sha256-Uk7KIVDEyuxx08fE2x1gvp0hjkFhpH/7gyFyP7k3Vb8=
+links:
+  hr:in-reply-to: ''
+  item: ''</code></pre></details></p>
+  </div>
+  <div class="card dark" style="box-shadow: inset 0 0 0 1.5px rgba(227, 179, 65, 0.45);">
+    <blockquote class="whole">“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</blockquote>
+    <p class="cite"><a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven" target="_blank" rel="noopener"><b>Roy T. Fielding</b></a>, “REST APIs must be hypertext-driven”, 20 Oct 2008</p>
+    <p class="refs"><a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">R6 · BOOKMARK</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-842">JUST-IN-TIME</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754">IN-BAND</a> <a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_7">COD · optional</a></p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/no-time.html" rel="prev"><small>Back</small><b>No time to type</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#infer-once">with heart-ts</a></span>
+<a href="deck/rules.html" rel="next"><small>Next</small><b>The rules we hold to: Fielding, 2000 and 2008</b></a></nav>
+</main></div></body></html>

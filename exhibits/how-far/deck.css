@@ -1,0 +1,121 @@
+/* How far: the map slide, the whole story on one page. Always dark, like its PowerPoint twin. */
+.map { --gold: #e3b341; --rust: #d9653b; --blue: #6fa8dc; --sage: #a9b8ae; --pale: #edf2ee; --chip: #1b2b22; --chipline: #4a5e52;
+  display: grid; grid-template-columns: 11rem minmax(0, 1fr) 12rem; gap: 0.7rem; color: var(--pale); font-size: 0.82rem; position: relative; }
+.map h4 { margin: 0; font: 600 0.72rem var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--gold); display: grid; gap: 0.1rem; }
+.map h4 small { font: italic 400 0.72rem var(--body); letter-spacing: 0; text-transform: none; color: var(--sage); }
+.map img { width: 1.05rem; height: 1.05rem; flex: none; }
+.map .map-lit { position: absolute; opacity: 0; pointer-events: none; }
+.map .map-switch { grid-column: 1 / -1; justify-self: end; cursor: pointer; display: inline-flex; border: 1px solid #2d3a31; border-radius: 999px; overflow: hidden; font: 600 0.72rem var(--body); }
+.map .map-switch span { padding: 0.3rem 0.75rem; color: var(--sage); }
+.map .map-lit:not(:checked) + .map-switch .off, .map .map-lit:checked + .map-switch .on { background: var(--gold); color: #17201b; }
+.map .map-lit:focus-visible + .map-switch { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* Rails */
+.map .rail { background: #223028; border-radius: 10px; padding: 0.8rem; display: grid; gap: 0.6rem; align-content: start; }
+.map .build ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.45rem; }
+.map .build li { display: grid; grid-template-columns: 1.1rem 1fr; gap: 0.1rem 0.45rem; align-items: center; background: #33443a; border-radius: 7px; padding: 0.35rem 0.5rem; max-width: none; }
+.map .build li.red { background: #8a3c1e; } .map .build li.green { background: #2f7d55; }
+.map .build li i { grid-column: 2; font-size: 0.7rem; color: var(--sage); }
+.map .build li i.g { color: var(--gold); }
+.map .quiet { font-style: italic; font-size: 0.75rem; color: var(--pale); }
+.map .nums dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0.15rem 0.5rem; align-items: baseline; }
+.map .nums dt { font: 650 1.25rem var(--display); color: var(--gold); }
+.map .nums dd { margin: 0; font-size: 0.72rem; }
+.map .nums dl.rust dt { color: var(--rust); }
+.map .nums table { border-collapse: collapse; font-size: 0.7rem; width: 100%; }
+.map .nums caption { text-align: left; font-style: italic; color: var(--sage); padding-bottom: 0.2rem; }
+.map .nums th { text-align: left; color: var(--sage); font-weight: 600; }
+.map .nums td:not(:first-child) { font: 650 0.9rem var(--display); color: var(--gold); }
+
+/* The stack */
+.map .layers { display: grid; gap: 0.35rem; }
+.map .band { border-radius: 10px; padding: 0.55rem 0.7rem; display: grid; grid-template-columns: 7.2rem minmax(0, 1fr); gap: 0.2rem 0.6rem; }
+.map .band.think { background: #2c5e45; } .map .band.look { background: #2f7d55; } .map .band.wire { background: #24503b; }
+.map .band.ours { background: #3a5a48; } .map .band.theirs { background: #39403b; }
+.map .band h4 { grid-row: span 2; }
+.map .cells { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: stretch; }
+.map .cell { position: relative; display: flex; align-items: center; gap: 0.4rem; background: var(--chip); border: 1px solid var(--chipline); border-radius: 8px; padding: 0.4rem 0.6rem; line-height: 1.25; }
+.map .cell small { color: var(--sage); }
+.map .cell.mono { font-family: var(--mono); font-size: 0.76rem; }
+.map .cell.hub { border: 2px solid var(--gold); }
+.map .cell.dim { color: var(--sage); }
+.map .cell .n, .map .legend .n { flex: none; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: var(--gold); color: #17201b; font: 700 0.75rem/1.35rem var(--body); text-align: center; }
+.map .legend .n.red { background: var(--rust); color: #fff; }
+.map .smoke { align-self: center; font: italic 0.66rem var(--body); color: #9fc3e6; border: 1px dashed var(--blue); border-radius: 6px; background: #0f1512; padding: 0.2rem 0.45rem; }
+.map .cell b { font: inherit; font-weight: 700; text-transform: none; letter-spacing: 0; }
+.map .uniform { flex: 1 1 32rem; }
+.map .rise-from { box-shadow: inset 0 -3px 0 0 var(--blue); }
+.map .scm { border: 1px solid var(--gold); border-radius: 9px; padding: 0.2rem 0.4rem 0.4rem; display: flex; flex-wrap: wrap; gap: 0.4rem; background: #26332b; }
+.map .scm p { flex-basis: 100%; margin: 0; font: italic 0.7rem var(--body); color: var(--pale); }
+.map .scm code { font-style: normal; color: var(--gold); background: none; padding: 0; font-weight: 700; }
+.map .caption, .map .tags { grid-column: 2; margin: 0; font-size: 0.72rem; color: var(--sage); max-width: none; }
+.map .rise { color: var(--blue); font-weight: 600; }
+.map .legend { grid-column: 1 / -1; margin: 0; display: flex; gap: 0.6rem; align-items: center; max-width: none; font-size: 0.85rem; }
+.map .legend b { color: var(--gold); }
+.map .legend.repair { color: var(--rust); font-style: italic; }
+.map .gold-line { flex: none; width: 1.6rem; height: 3px; background: var(--gold); border-radius: 2px; }
+
+/* REST, underneath */
+.map .rest { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; background: #0f1512; border: 1px solid #2d3a31; border-radius: 10px; padding: 0.6rem; }
+.map .rest h4 { margin-right: 0.4rem; }
+.map .uniform { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; border: 1px solid #2e6a9e; background: #163b5c; border-radius: 9px; padding: 0.35rem 0.45rem; }
+.map .uniform p { flex-basis: 100%; margin: 0; color: #9fc3e6; font-size: 0.72rem; max-width: none; }
+.map .uniform > span { font-size: 0.7rem; font-weight: 600; color: #dcebfa; background: #1d4f78; border-radius: 6px; padding: 0.25rem 0.5rem; }
+.map .uniform .ref:last-child { background: var(--gold); color: #17201b; }
+.map .optional { display: inline-flex; flex-direction: column; align-items: center; border: 1.5px dashed var(--blue); border-radius: 999px; padding: 0.2rem 0.3rem; }
+.map .optional small { font: italic 0.62rem var(--body); color: #9fc3e6; }
+.map .optional .ref { border: 0; }
+
+/* The path: only the numbered steps lit, until Everything */
+.map .map-lit:not(:checked) ~ .rail, .map .map-lit:not(:checked) ~ .rest,
+.map .map-lit:not(:checked) ~ .legend.repair,
+.map .map-lit:not(:checked) ~ .layers .cell:not(.path):not(.hub),
+.map .map-lit:not(:checked) ~ .layers .caption,
+.map .map-lit:not(:checked) ~ .layers .tags,
+.map .map-lit:not(:checked) ~ .layers .smoke { opacity: 0.28; transition: opacity 0.3s; }
+.map .map-lit:not(:checked) ~ .layers .rise-from { box-shadow: none; }
+.map .layers .cell.path { border-color: var(--gold); }
+
+@media (max-width: 62rem) {
+  .map { grid-template-columns: minmax(0, 1fr); }
+  .map .band { grid-template-columns: minmax(0, 1fr); }
+  .map .band h4 { grid-row: auto; }
+  .map .caption, .map .tags { grid-column: 1; }
+  .map .map-switch { position: static; justify-self: start; }
+}
+.slide .map .cell b, .slide .map .cell small { text-transform: none; letter-spacing: 0; font-family: var(--body); }
+.slide .map .cell small { font-size: 0.72rem; font-weight: 400; }
+
+/* The AWS docs moving into the answer (slide aws-docs-into-forms), animated by morph.js */
+.slide .aw-apart { display: grid; grid-template-columns: minmax(0, 1fr) 2.2rem minmax(0, 1.15fr); gap: 0.6rem; align-items: stretch; }
+.slide .hl { display: grid; align-content: start; gap: 0.08rem; background: #0f1512; color: #dce7df; border: 1px solid #2d3a31; border-radius: 10px;
+  padding: 0.8rem 1rem; font: 0.8rem/1.55 var(--mono); }
+.slide .hl > span, .slide .hl-cols span[class^="i"], .slide .hl-cols > div > span { display: block; white-space: pre-wrap; }
+.slide .hl .hl-label { font: 600 0.66rem var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: #a9b8ae; margin-bottom: 0.4rem; }
+.slide .hl .hl-note { margin-top: 0.6rem; font: italic 0.82rem var(--body); color: #e3b341; }
+.slide .hl .k { color: #a9b8ae; }
+.slide .hl .k.add { color: #8fd694; font-weight: 700; }
+.slide .hl .rel { color: #8fd694; }
+.slide .hl .i1 { padding-left: 1.2em; } .slide .hl .i2 { padding-left: 2.4em; } .slide .hl .i3 { padding-left: 3.6em; }
+.slide .hl .i4 { padding-left: 4.8em; } .slide .hl .i5 { padding-left: 6em; } .slide .hl .i6 { padding-left: 7.2em; } .slide .hl .i7 { padding-left: 8.4em; }
+.slide .hl-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 0 1.2rem; }
+.slide .aw-gap { margin: 0; display: grid; place-items: center; max-width: none; }
+.slide .aw-gap span { writing-mode: vertical-rl; transform: rotate(180deg); font: italic 0.72rem var(--body); color: #e8735f; text-align: center; }
+/* The docs replica: a plain docs page in a browser frame */
+.slide .aw { background: #ffffff; color: #16191f; border-radius: 10px; overflow: hidden; border: 1px solid #d5dbdb; display: grid; align-content: start; }
+.slide .aw-bar { background: #232f3e; color: #ffffff; font: 600 0.7rem var(--body); padding: 0.45rem 0.8rem; display: flex; gap: 0.6rem; }
+.slide .aw-bar em { margin-left: auto; font-weight: 400; color: #ff9900; }
+.slide .aw-page { padding: 0.6rem 0.9rem 0.8rem; display: grid; gap: 0.3rem; font: 0.78rem/1.45 "Amazon Ember", "Helvetica Neue", Arial, sans-serif; }
+.slide .aw-page h4 { margin: 0; font: 700 1.05rem "Helvetica Neue", Arial, sans-serif; color: #16191f; }
+.slide .aw-page h4.aw-next { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #eaeded; }
+.slide .aw-page h5 { margin: 0.2rem 0 0; font: 700 0.8rem "Helvetica Neue", Arial, sans-serif; color: #16191f; }
+.slide .aw-d { margin: 0; max-width: none; color: #16191f; font-size: 0.76rem; }
+.slide .aw-code { margin: 0; background: #f2f3f3; color: #16191f; border-radius: 4px; padding: 0.45rem 0.6rem; font: 0.74rem/1.45 var(--mono); white-space: pre-wrap; }
+.slide .aw .tk { background: #fff3d6; border-radius: 3px; }
+.slide .tk.aw-m { font-weight: 700; color: #c7511f; }
+.slide .hl .tk.aw-m { color: #ffb37a; }
+@media (max-width: 56rem) { .slide .aw-apart { grid-template-columns: minmax(0, 1fr); } .slide .aw-gap span { writing-mode: horizontal-tb; transform: none; } .slide .hl-cols { grid-template-columns: minmax(0, 1fr); } }
+
+/* The divorce: the size of the controls' bag */
+.slide .dv-bag { display: flex; align-items: baseline; gap: 0.6rem; margin: 0.2rem 0 0.4rem; font: italic 0.85rem var(--body); color: var(--muted); }
+.slide .dv-bag b { font: 650 clamp(2.2rem, 5vw, 3.4rem)/1 var(--display); font-style: normal; color: var(--bad); }

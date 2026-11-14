@@ -1,0 +1,26 @@
+{
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "cd ../conformance && npx cucumber-js"
+  },
+  "buildCommand": "npx tsc",
+  "inPlace": true,
+  "mutate": [
+    "src/**/*.ts",
+    "!src/index.ts"
+  ],
+  "reporters": [
+    "clear-text",
+    "progress"
+  ],
+  "clearTextReporter": {
+    "allowColor": false,
+    "reportTests": false,
+    "reportScoreTable": true
+  },
+  "timeoutMS": 30000,
+  "tempDirName": ".stryker-tmp",
+  "thresholds": {
+    "break": 97
+  }
+}

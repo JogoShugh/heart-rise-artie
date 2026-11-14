@@ -1,0 +1,413 @@
+- timestamp: 2026-11-14T03:58:40.534246Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: eff617c584c54fb0
+  severity_text: INFO
+  event_name: rung.applied
+  body: took rung L2 from Preference-Applied
+  attributes:
+    url.full: http://localhost:8093/
+    heart.preference_applied: forms=link, schema=link
+    heart.rung: L2
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.535706Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: eff617c584c54fb0
+  severity_text: INFO
+  event_name: forms.followed
+  body: followed the forms link at L2
+  attributes:
+    url.full: http://localhost:8093/
+    heart.forms.href: http://localhost:8093/affordance-sets/808987df819d9973
+    heart.rung: L2
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.538763Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 8c3a60a668d3264b
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/affordance-sets/808987df819d9973
+    heart.integrity.expected: sha256-gImH34GdmXPjwBtQ7RNGKro/Tbf26SFredj/E+jK13c=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.541031Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: bc7f119fdfe2b6cf
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/1202effcbb3aaee9
+    heart.integrity.expected: sha256-EgLv/Ls6rumxePJO3OoundY0ReLmH28CePbUzfqPMy8=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.542377Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: b3fbf735d3b1e3c0
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/951cd92d9e676d55
+    heart.integrity.expected: sha256-lRzZLZ5nbVWTfVgdvjNiNzC7rEpEcetn52V7HiuQ4VQ=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.543760Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 68a8c8661660c7a6
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/0e07732e34ca0505
+    heart.integrity.expected: sha256-DgdzLjTKBQWP75sELR8HJRqcCQMwMEvAQSfEni+yyi4=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.545629Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: dad0e025ea6ca1f5
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/520d270ce928f031
+    heart.integrity.expected: sha256-Ug0nDOko8DEvsaJQo63KglhL6ildf8pLYO7QrsC9zYo=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.546972Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: bc9b6ea130b61739
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/60185a2dc910fe20
+    heart.integrity.expected: sha256-YBhaLckQ/iDRg7GI0vfUCgoj0gJ5Dx3Gs4W7a0nP/DU=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.548164Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 0c7bd89de87780ec
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/b9c839ada8894d91
+    heart.integrity.expected: sha256-ucg5raiJTZGVScIfXJPlRQ+pQzmX4gFlgOeSv24nWu4=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.549307Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 22dc731c3236e5a5
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/4d1844fe91bfdd08
+    heart.integrity.expected: sha256-TRhE/pG/3QhI/GVipkzvSxQc7BQoq/M0LR7tmgaW03U=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.550516Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: ad5376777cd489ef
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/784b3bc2c6308951
+    heart.integrity.expected: sha256-eEs7wsYwiVHBNbQ8USIOzGYrNZbWvQQM3C4o8mso1NM=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.551792Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 503c76412f1adf99
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/5a59b44f8fbe57d1
+    heart.integrity.expected: sha256-Wlm0T4++V9Efw1SLF/vAazAW1L0vhok2b3wjjmlMD68=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:40.552920Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 26c28c13906f5c7a
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/83c399bcb77c18c6
+    heart.integrity.expected: sha256-g8OZvLd8GMakgrjcpXCbRc2XkwNCCJQpeMe0EieviCc=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.546485Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 4605a2ec2cb476a6
+  severity_text: INFO
+  event_name: rung.applied
+  body: took rung L2 from Preference-Applied
+  attributes:
+    url.full: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+    heart.preference_applied: forms=link, schema=link
+    heart.rung: L2
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.546734Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 4605a2ec2cb476a6
+  severity_text: INFO
+  event_name: forms.followed
+  body: followed the forms link at L2
+  attributes:
+    url.full: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+    heart.forms.href: http://localhost:8093/affordance-sets/01113f6158002de4
+    heart.rung: L2
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.548662Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 41d0043198560d0c
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/affordance-sets/01113f6158002de4
+    heart.integrity.expected: sha256-ARE/YVgALeTnzANV8TegQJiue3vljZt3onMex+jMsvs=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.550455Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: a4dce5678ed15550
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/91c3b4ed90232223
+    heart.integrity.expected: sha256-kcO07ZAjIiNEsnLOU1aO2JC/CKNiwa+6Gqu1/F9I7EQ=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.551606Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 3faa249843217c5c
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/5cc19958fe9e94c5
+    heart.integrity.expected: sha256-XMGZWP6elMXOVrYKTlD6jSeXgyK6rFV/cFG4ZEM86oE=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.552607Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 8008196da0281c58
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/9f05e4cceb013a00
+    heart.integrity.expected: sha256-nwXkzOsBOgBBslpGxZupP0tlZHqv+DailyXYqBAhxo8=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.553710Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 4a21f0aa2cbc4bd3
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/6657324c8d4f4e78
+    heart.integrity.expected: sha256-ZlcyTI1PTniypG4ZtJXbnAThEtQqMnaMgaEuKcphU3M=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.554838Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 3ea24fd4500a19f3
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/0647075df7c2cd05
+    heart.integrity.expected: sha256-BkcHXffCzQXofzOADr7MhD1DvyZdRrMqSxagcPovIlM=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.555873Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: b41ae5871b0fc6a2
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/fab3ba59fd5e4a8d
+    heart.integrity.expected: sha256-+rO6Wf1eSo2HLQHDi1iwnPVfkbEOoA1YRasuuzmsMow=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:43.556957Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 41a2b021a3760eeb
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/62f60422b20449be
+    heart.integrity.expected: sha256-YvYEIrIESb4E3ismIYqpPBq7domgLG6KytRr4SQpjT8=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.942263Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 86b12d3367a1a03d
+  severity_text: INFO
+  event_name: act.sent
+  body: sent scm:merge with validator "seq-0.hsf.L2.66835c9c7c8fc78d"
+  attributes:
+    url.full: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344/actions/merge
+    heart.rel: scm:merge
+    heart.method: PUT
+    heart.if_match: '"seq-0.hsf.L2.66835c9c7c8fc78d"'
+    heart.resource: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+    heart.code: "200"
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.946229Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 4605a2ec2cb476a6
+  severity_text: INFO
+  event_name: rung.applied
+  body: took rung L2 from Preference-Applied
+  attributes:
+    url.full: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+    heart.preference_applied: forms=link, schema=link
+    heart.rung: L2
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.946402Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 4605a2ec2cb476a6
+  severity_text: INFO
+  event_name: forms.followed
+  body: followed the forms link at L2
+  attributes:
+    url.full: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+    heart.forms.href: http://localhost:8093/affordance-sets/0ec39d1095fd2ba6
+    heart.rung: L2
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.947933Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 8daa20fc3e82bd1a
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/affordance-sets/0ec39d1095fd2ba6
+    heart.integrity.expected: sha256-DsOdEJX9K6YeBaIkIcTuNUMM/OJwmuEM+8ATagoylW4=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.948230Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: cf722bf74e0615cc
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/5cc19958fe9e94c5
+    heart.integrity.expected: sha256-XMGZWP6elMXOVrYKTlD6jSeXgyK6rFV/cFG4ZEM86oE=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.948549Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 444889af30ff038a
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/9f05e4cceb013a00
+    heart.integrity.expected: sha256-nwXkzOsBOgBBslpGxZupP0tlZHqv+DailyXYqBAhxo8=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:50.949Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 91517eaabb096f5a
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/schemas/6657324c8d4f4e78
+    heart.integrity.expected: sha256-ZlcyTI1PTniypG4ZtJXbnAThEtQqMnaMgaEuKcphU3M=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)
+- timestamp: 2026-11-14T03:58:54.020812Z
+  trace_id: e60b198f91357f4b8257ca8da993ab91
+  span_id: 63f783d4f3c710d3
+  severity_text: INFO
+  event_name: integrity.ok
+  body: the bytes match the link's integrity
+  attributes:
+    url.full: http://localhost:8093/unavailable/d0a0136ee8d4d2bb
+    heart.integrity.expected: sha256-0KATbujU0rucCp6OcpAy4T6ufex919p1QuOKqtJ8DLc=
+  resource:
+    service.name: ARTIE
+    service.version: "0.5"
+    user_agent.original: ARTIE/0.5 (heart-mcp)

@@ -1,0 +1,98 @@
+{
+  "name": "step-4-guards",
+  "title": "Guards, and why the other acts are absent",
+  "part": "For real: two forges, one vocabulary",
+  "kicker": "Building it back up · Step 4 of 5 · HEART L0, simplified",
+  "tone": "light",
+  "number": 41,
+  "of": 59,
+  "html": "<h2>Guards, and why the other acts are absent</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr)\">\n  <div class=\"rows\">\n    <pre># 200 OK\nContent-Type: application/hal+json\nContent-Profile: &lt;https://w3id.org/heart-rise/\n                  hal-schema-forms&gt;\nETag: \"seq-0.hsf.L0.6042001a61e14760\"\nCache-Control: no-cache\nVary: Accept, Prefer, Accept-Profile\nLink: &lt;…/pulls/2325&gt;; rel=\"alternate\";\n        type=\"application/prs.hal-forms+json\",\n      &lt;…/pulls/2325&gt;; rel=\"alternate\"; type=\"text/html\"</pre>\n    <pre># the act carries what it read\nPUT /repos/…/pulls/2325/actions/merge\n<span class=\"add\">If-Match: \"seq-0.hsf.L0.6042001a61e14760\"</span>\n{method: squash}\n# changed since? 412, not a lost update</pre>\n  </div>\n  <div class=\"rows\">\n    <pre><b>_links:</b>\n  hr:unavailable:\n    href: /unavailable/bf257b5ee24d7901\n    integrity: sha256-vyV7XuJNeQF8…\n# GET /unavailable/bf257b5ee24d7901  (as served)\nunavailable:\n  - rel: /profiles/scm#reopen\n    title: Reopen\n    <span class=\"add\">reason: The pull request is already open.</span>\n# the reason is the connector's own words:\n# github-scm/pull.reader.yaml\n#   open:\n#     absent:\n#       reopen: The pull request is\n#               already open.</pre>\n    <p class=\"refs\"><deck-ref name=\"in-band\"></deck-ref> <deck-fragment name=\"reader\">pull.reader.yaml</deck-fragment></p>\n  </div>\n</div>\n",
+  "say": "The whole answer's headers: the profile, the ETag, no-cache, and the alternates the gateway also serves (HAL-FORMS, text/html, plain JSON). An act sends the ETag back as If-Match: if the pull request changed since it was read, the answer is 412, not a lost update. And the absent acts have reasons: reopen isn't offered because the pull request is already open, in the connector's own words.",
+  "sources": [
+    {
+      "label": "RFC 9110: If-Match, 412",
+      "href": "https://www.rfc-editor.org/rfc/rfc9110#name-if-match"
+    },
+    {
+      "label": "artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "step-4-guards.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "step-3-forms.json",
+      "title": "Forms: what you can do now, and how"
+    },
+    "next": {
+      "href": "step-5-after-merge.json",
+      "title": "After the merge: the server changed, the client didn’t"
+    },
+    "alternate": {
+      "href": "step-4-guards.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "in-band",
+        "kind": "comment",
+        "label": "IN-BAND",
+        "title": "Instructions in every representation",
+        "summary": "The media type is learned once; each representation carries the transitions available at that point.",
+        "quote": "<p>“The media type identifies a specification that defines how a representation is to be processed. That is out-of-band information (all communication is dependent on some prior knowledge). What you are missing is that each representation contains the specific instructions for interfacing with a given service, provided in-band. The media type is a generic processing model that every agent can learn if there aren’t too many of them (hence the need for standards). The representation is specific to the application being performed by the agent. Each representation therefore provides the transitions that are available at that point in the application.</p><p>When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "23 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/in-band.json",
+            "title": "IN-BAND"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      }
+    ],
+    "deck:fragment": [
+      {
+        "name": "reader",
+        "label": "The connector's own words (github-scm/pull.reader.yaml)",
+        "lang": "yaml",
+        "path": "heart/heart-gateway/connectors/github-scm/pull.reader.yaml",
+        "lines": "1–53",
+        "of": 53,
+        "text": "# A pull request says nothing about what is allowed, so the rules are written here:\n# first by its state, then by the rules below, in order, each with its reason.\nmatches:\n  path: /repos/{owner}/{repo}/pulls/{pull_number}\nallowed:\n  table: /state\n  rows:\n    open:\n      allow: [close, merge, edit, request-review, update-branch, comment, label]\n      absent: { reopen: The pull request is already open. }\n    closed:\n      allow: [reopen, edit, comment, label]\n      absent:\n        close: The pull request is already closed.\n        merge: \"A closed pull request can't be merged; reopen it first.\"\n        request-review: \"A closed pull request can't have reviews requested; reopen it first.\"\n        update-branch: \"A closed pull request's branch isn't updated; reopen it first.\"\n  rules:\n    # The repository's own answer says whether the caller may push (the fact named in pull.resource.yaml).\n    - when: { \"repository:/permissions/push\": false }\n      absent:\n        close: You can't push to this repository.\n        reopen: You can't push to this repository.\n        merge: You can't push to this repository.\n        edit: You can't push to this repository.\n        request-review: You can't push to this repository.\n        update-branch: You can't push to this repository.\n    # Labels are triage's, as on an issue.\n    - when: { \"repository:/permissions/triage\": false }\n      absent: { label: You need triage access to this repository. }\n    # A locked conversation takes comments only from collaborators with push access, as an issue's does.\n    - when: { /locked: true, \"repository:/permissions/push\": false }\n      absent: { comment: The conversation is locked; only collaborators can comment. }\n    - when: { /merged: true }\n      absent: { reopen: A merged pull request can't be reopened. }\n    - when: { /draft: true }\n      absent: { merge: \"A draft can't be merged; mark it ready for review first.\" }\n    # GitHub works mergeability out in the background; until it has, mergeable is null.\n    - when: { /mergeable: null }\n      absent: { merge: \"GitHub is still checking whether it can be merged; read it again shortly.\" }\n    # GitHub says behind only when the base's protection asks for up-to-date branches and names a required\n    # check; with none required, a branch behind its base is clean (seen live, 2026-10-16).\n    - when: { /mergeable_state: behind }\n      absent: { merge: \"The branch is behind its base; update it first.\" }\n    # Without that protection, the gateway's own rule: GitHub's compare says the base has commits the branch lacks.\n    - when: { /state: open, \"compare:/behind_by\": { not: 0 } }\n      absent: { merge: \"The branch is behind its base; update it first.\" }\n    - when: { /mergeable_state: dirty }\n      absent:\n        merge: \"The branch has conflicts with its base; resolve them first.\"\n        update-branch: \"The branch has conflicts with its base; resolve them first.\"\n    - when: { /mergeable_state: blocked }\n      absent: { merge: \"Branch protection blocks the merge: a required check or review is missing.\" }",
+        "_links": {
+          "self": {
+            "href": "fragments/step-4-guards--reader.json",
+            "title": "The connector's own words (github-scm/pull.reader.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-gateway/connectors/github-scm/pull.reader.yaml",
+            "title": "heart/heart-gateway/connectors/github-scm/pull.reader.yaml, lines 1–53"
+          }
+        }
+      }
+    ]
+  }
+}

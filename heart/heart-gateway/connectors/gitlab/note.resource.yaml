@@ -1,0 +1,10 @@
+# A merge request's note, a comment: read by notes/get. A note names its project only by its ID, so it is served at
+# the project's ID, as GitLab also reads it.
+noun: note
+collection: notes
+read: notes/get
+pointers:
+  project_id: /project_id
+  noteable_iid: /noteable_iid
+  note_id: /id
+title: /body

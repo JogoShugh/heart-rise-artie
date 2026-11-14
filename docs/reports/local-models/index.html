@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Local Models Below the Goal</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: the Reason on Rails reading column; one device, the ladder of forms, with where a laptop model can stand. */
+:root {
+  --paper: #F7F3EA; --ink: #1D2128; --muted: #5B6370; --rule: #DDD5C6; --panel: #FFFDF8;
+  --accent: #A45F12; --accent-soft: #F6E3C2; --code: #EFE9DC; --good: #2F6B3A; --good-soft: #DFF0DC; --bad: #A3352B; --bad-soft: #F6DEDA;
+  --display: 'IBM Plex Sans', system-ui, sans-serif; --body: 'Source Serif 4', Georgia, serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A; --good: #9FD49A; --good-soft: #1E3322; --bad: #F09A90; --bad-soft: #3A2020;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A; --good: #9FD49A; --good-soft: #1E3322; --bad: #F09A90; --bad-soft: #3A2020;
+  color-scheme: dark }
+body { background: var(--paper); color: var(--ink); margin: 0; font: 400 1.125rem/1.7 var(--body); }
+main { max-width: 44rem; margin: 0 auto; padding-block: 3.5rem 5rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.masthead { border-bottom: 1px solid var(--rule); padding-bottom: 1.8rem; margin-bottom: 1rem; }
+.kicker { font: 600 0.8rem/1.3 var(--display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin: 0 0 1rem; }
+h1 { font: 600 clamp(2.2rem, 6vw, 3.3rem)/1.05 var(--display); margin: 0 0 1rem; text-wrap: balance; letter-spacing: -0.01em; }
+.dek { font-size: 1.25rem; line-height: 1.5; color: var(--muted); margin: 0; }
+h2 { font: 600 1.5rem/1.25 var(--display); margin: 3rem 0 0.9rem; text-wrap: balance; }
+p { margin: 0 0 1rem; }
+a { color: var(--accent); text-underline-offset: 2px; }
+code { font: 0.86em var(--mono); background: var(--code); padding: 0.1em 0.3em; border-radius: 4px; }
+ul.obs { margin: 1rem 0 1.4rem; padding: 0; list-style: none; display: grid; gap: 0.5rem; }
+ul.obs li { position: relative; padding-left: 1.4rem; }
+ul.obs li::before { content: ""; position: absolute; left: 0.2rem; top: 0.68em; width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--accent); }
+ul.obs b { font-weight: 600; }
+.table { overflow-x: auto; margin: 1rem 0 1.4rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; min-width: 34rem; font: 400 0.9rem/1.45 var(--display); font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--rule); }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-weight: 600; color: var(--muted); font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; }
+tbody th { font-weight: 600; }
+tr.ref td, tr.ref th { color: var(--muted); font-style: italic; }
+.pass { color: var(--good); font-weight: 600; }
+.fail { color: var(--bad); font-weight: 600; }
+ol.ladder { list-style: none; padding: 0; margin: 1.6rem 0; display: grid; gap: 0.5rem; }
+ol.ladder li { border: 1px solid var(--rule); border-radius: 10px; padding: 0.75rem 1rem; background: var(--panel);
+  display: grid; grid-template-columns: 8.5rem minmax(0, 1fr) 7.5rem; gap: 0.3rem 1rem; align-items: start;
+  font: 400 0.92rem/1.45 var(--display); }
+ol.ladder b { font-weight: 600; }
+ol.ladder span { color: var(--muted); min-width: 0; }
+ol.ladder em { font-style: normal; font-weight: 600; text-align: right; border-radius: 999px; padding: 0.15rem 0.6rem; justify-self: end; }
+ol.ladder li.no em { color: var(--bad); background: var(--bad-soft); }
+ol.ladder li.yes em { color: var(--good); background: var(--good-soft); }
+ol.ladder li.na em { color: var(--muted); background: var(--code); }
+@media (max-width: 560px) { ol.ladder li { grid-template-columns: 1fr; } ol.ladder em { justify-self: start; } }
+details.src { margin: 0.6rem 0; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); }
+details.src > summary { cursor: pointer; padding: 0.7rem 1rem; list-style: none; font: 600 0.95rem/1.4 var(--display); color: var(--accent); }
+details.src > summary::-webkit-details-marker { display: none; }
+details.src > summary::before { content: "+"; display: inline-block; width: 1.2rem; }
+details.src[open] > summary::before { content: "−"; }
+details.src > summary small { font-weight: 400; color: var(--muted); margin-left: 0.3rem; }
+details.src > p { font: 400 0.92rem/1.55 var(--display); color: var(--muted); margin: 0 1rem 0.6rem; }
+details.src pre { margin: 0 1rem 1rem; background: var(--code); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto;
+  font: 0.78rem/1.55 var(--mono); }
+details.src > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.bottom { margin: 2rem 0; padding: 1rem 1.2rem; border: 1px solid var(--accent); border-radius: 12px; background: var(--accent-soft); }
+.bottom p { font: 400 1rem/1.6 var(--display); margin: 0 0 0.5rem; }
+.bottom p:last-child { margin: 0; }
+.sources { margin-top: 3.5rem; border-top: 1px solid var(--rule); padding-top: 1rem; font: 400 0.9rem/1.6 var(--display); color: var(--muted); }
+.sources ul { padding-left: 1.2rem; margin: 0.4rem 0 0; }
+</style>
+</head><body>
+<main>
+<header class="masthead">
+<p class="kicker">HEART and ARTIE · one laptop, no key · 30 October 2026</p>
+<h1>Local Models Below the Goal</h1>
+<p class="dek">The merge watch, run with a model on a MacBook instead of Claude. No local model could plan the goal. Once the goal was a script, a 30B model did nearly every run on its own.</p>
+</header>
+
+<h2>The question</h2>
+<p>Every goal run before this one reasoned with Claude. The same run should work with a model on the laptop, with nothing else changed: the same goal file, the same gateway in front of GitHub, the same trace and scripts. Then we can ask what the model buys, and what the structure buys, of a free, small model too.</p>
+<ul class="obs">
+<li><b>The machine:</b> Apple M3 Max, 36 GB of memory. Ollama serves the same Messages API as Claude's, tools included, on localhost.</li>
+<li><b>The change to ARTIE:</b> three settings, <code>--model</code>, <code>--model-url</code> and <code>--max-tokens</code>. The prompts, tools, trace and generator stayed as they were.</li>
+<li><b>The task:</b> the merge watch from <a href="https://claude.ai/artifact/F64QuLx25etg9vTq8mkpHU">Reason on Rails</a>, on a scratch repository: merge a fresh dependency bump, and tell the author of a draft once why it wasn't merged.</li>
+</ul>
+
+<h2>Two jobs for a model</h2>
+<p>A goal run asks the model to do two different things:</p>
+<ul class="obs">
+<li><b>The planner</b> holds the goal's steps: which is next, when one is done, when to wait.</li>
+<li><b>The reasoner</b> is given a few words and the forms the server offers now, and picks one form and fills it in.</li>
+</ul>
+<p>Each step down the ladder hands more of that work to the script. Here is where a laptop model could stand:</p>
+<ol class="ladder" aria-label="The forms of the merge watch, from the plain-text goal down">
+<li class="no"><b>Goal</b><span>Plain text. The model plans every step and picks every act.</span><em>failed, 0 of 6</em></li>
+<li class="yes"><b>Intent script</b><span>The steps are code. The model picks each act from what's offered.</span><em>16 of 20</em></li>
+<li class="yes"><b>Kept script</b><span>Every act pinned. The model writes only the friendly sentence.</span><em>1 of 1</em></li>
+<li class="na"><b>Bare</b><span>Direct GitHub calls, no model except that sentence.</span><em>not needed</em></li>
+</ol>
+<p>The goal as the person wrote it, and each form <code>artie generate</code> made from Claude's run of it. Open one to read it.</p>
+<details class="src"><summary>The goal <small>plain text, merge.goal.md</small></summary>
+<p>What the person wrote. A goal run hands every line to the model: the planner picks the next step, the reasoner the act. No local model got past its second line.</p>
+<pre><code>---
+start: https://localhost:8392/
+inputs:
+  owner: { question: "Whose repository?" }
+  repo:  { default: heart-github-test, question: "Which repository?" }
+  label: { default: dependencies, question: "Which label marks a dependency bump?" }
+  hold:  { default: hold, question: "Which label means a person objects?" }
+  told:  { default: watch-told, question: "Which label marks a pull request the watch has told why?" }
+---
+
+Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed.
+
+- In {owner}/{repo}
+  - Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+  - Whenever a pull request labelled {label} changes `as pr`
+    - If it's labelled {hold}, leave it, and say so once.
+    - If it's labelled {told}, leave it.
+    - Once it can be merged, merge it by squashing.
+      Or give up after 3 minutes.
+      Otherwise, label it {told}, then tell its author in one friendly sentence why it wasn't merged and what to do next. `reasoned`
+- Until someone closes {watch}</code></pre>
+</details>
+<details class="src"><summary>The intent script <small>merge.intent.kts</small></summary>
+<p>The goal's shape as code: the nesting, the watch, the wait and the give-up. Each act is still in words, for the reasoner to choose from what the gateway offers on every run. This is where the local models passed 16 of 20.</p>
+<pre><code>// Generated by artie generate from runs/live-8.yaml, the run of merge.goal.md.
+// The run in words: its shape as it nested, each act said in words for the reasoner to choose on every run.
+// What it was offered is pinned in merge.intent.pins.yaml, held to before every act.
+// 2 steps call the model on every run, and 4 acts in the watch each time one is reached: artie run needs --reasoner.
+//   artie run merge.intent.kts owner=JogoShugh --reasoner claude
+import kotlin.time.Duration.Companion.minutes
+val owner by input(question = "Whose repository?")
+val repo by input(default = "heart-github-test", question = "Which repository?")
+val label by input(default = "dependencies", question = "Which label marks a dependency bump?")
+val hold by input(default = "hold", question = "Which label means a person objects?")
+val told by input(default = "watch-told", question = "Which label marks a pull request the watch has told why?")
+
+heart("https://localhost:8392/") {
+    act(inferred = "get the repository $owner/$repo", fromIntent = "In ${owner}/${repo}") {
+        act(intent = """Open an issue titled "Merge watch", saying "Close this issue to stop the watch."""") {
+            keepAs("watch")
+        }
+    }
+    watch(until = { at("watch") { "state" eq "closed" } }) {
+        act(inferred = "list pull requests of ${owner}/${repo} filtered by label ${label}", fromIntent = "a pull request labelled ${label} changes") {
+            whenever {
+                has { "github:labels" has label }
+                leaveWhere("leave it, and say so once.") { "github:labels" has hold }
+                leaveWhere("leave it.") { "github:labels" has told }
+                once("github:merge", giveUp = 3.minutes, otherwise = { why -&gt;
+                    act(intent = "label it ${told}")
+                    act(intent = "tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: ${why ?: "no reason given"}")
+                }) {
+                    act(intent = "merge it by squashing.") {}
+                }
+            }
+        }
+    }
+}</code></pre>
+</details>
+<details class="src"><summary>The kept script <small>merge.kts</small></summary>
+<p>Every act pinned to the relation and fields Claude's run chose, held to merge.pins.yaml. Only the two acts after a give-up stay in words, so the model is asked only when a bump can't be merged.</p>
+<pre><code>// Generated by artie generate from runs/live-8.yaml, the run of merge.goal.md.
+// Every selection as that run made it, nested as it nested; an act it left to the model stays in words.
+// What it was offered is pinned in merge.pins.yaml, held to before every act.
+// 2 acts in the watch call the model each time one is reached: artie run needs --reasoner.
+//   artie run merge.kts owner=JogoShugh --reasoner claude
+import kotlin.time.Duration.Companion.minutes
+val owner by input(question = "Whose repository?")
+val repo by input(default = "heart-github-test", question = "Which repository?")
+val label by input(default = "dependencies", question = "Which label marks a dependency bump?")
+val hold by input(default = "hold", question = "Which label means a person objects?")
+val told by input(default = "watch-told", question = "Which label marks a pull request the watch has told why?")
+
+heart("https://localhost:8392/") {
+    act("github:repos-get", inferred = "get the repository $owner/$repo", fromIntent = "In ${owner}/${repo}", fields = {
+        "owner" to owner
+        "repo" to repo
+    }) {
+        act("github:open-issue", intent = """Open an issue titled "Merge watch", saying "Close this issue to stop the watch."""", fields = {
+            "title" to "Merge watch"
+            "body" to "Close this issue to stop the watch."
+        }) {
+            keepAs("watch")
+        }
+    }
+    watch(until = { at("watch") { "state" eq "closed" } }) {
+        act("github:pulls-list", "owner" to owner, "repo" to repo, "labels" to label, inferred = "list pull requests of ${owner}/${repo} filtered by label ${label}", fromIntent = "a pull request labelled ${label} changes") {
+            whenever {
+                has { "github:labels" has label }
+                leaveWhere("leave it, and say so once.") { "github:labels" has hold }
+                leaveWhere("leave it.") { "github:labels" has told }
+                once("github:merge", giveUp = 3.minutes, otherwise = { why -&gt;
+                    act(intent = "label it ${told}")
+                    act(intent = "tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: ${why ?: "no reason given"}")
+                }) {
+                    act("github:merge", "merge_method" to "squash", intent = "merge it by squashing.") {}
+                }
+            }
+        }
+    }
+}</code></pre>
+</details>
+<details class="src"><summary>The bare script <small>merge.bare.kts</small></summary>
+<p>The kept script's acts brought down to the GitHub calls they made, at fixed addresses, with no gateway and no forms. One call still asks a model: write(…), for the sentence to the author.</p>
+<pre><code>// Made by artie generate --bare from runs/live-8.yaml and runs/live-8.upstream.yaml (spec/ideas/bare-runs.md, "Rails"):
+// the kept script's watch, its words kept, each act brought down to the call it made to the service, at a
+// fixed address. No entry, no forms, no validators, no reasons for absence: where the kept script waits for a
+// form, this tries the call, and the service's refusal is the only gate.
+import kotlin.time.Duration.Companion.minutes
+
+val owner by input(question = "Whose repository?")
+val repo by input(default = "heart-github-test", question = "Which repository?")
+val label by input(default = "dependencies", question = "Which label marks a dependency bump?")
+val hold by input(default = "hold", question = "Which label means a person objects?")
+val told by input(default = "watch-told", question = "Which label marks a pull request the watch has told why?")
+
+bare {
+    val watch = call("POST", "https://api.github.com/repos/${owner}/${repo}/issues", mapOf("title" to "Merge watch", "body" to "Close this issue to stop the watch."))
+    watch(until = { call("GET", "https://api.github.com/repos/${owner}/${repo}/issues/${watch["number"].text}")["state"].text == "closed" }) {
+        whenever(call("GET", "https://api.github.com/repos/${owner}/${repo}/issues?labels=${label}")) { item -&gt;
+            val member = call("GET", "https://api.github.com/repos/${owner}/${repo}/pulls/${item["number"].text}")
+            has(member["labels"] has label)
+            leaveWhere("leave it, and say so once.", member["labels"] has hold)
+            leaveWhere("leave it.", member["labels"] has told)
+            once("PUT", "https://api.github.com/repos/${owner}/${repo}/pulls/${member["number"].text}/merge", mapOf("merge_method" to "squash", "sha" to member["head"]["sha"].text), giveUp = 3.minutes, otherwise = { why -&gt;
+                call("POST", "https://api.github.com/repos/${owner}/${repo}/issues/${member["number"].text}/labels", mapOf("labels" to listOf("${told}")))
+                call("POST", "https://api.github.com/repos/${owner}/${repo}/issues/${member["number"].text}/comments", mapOf("body" to write("tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: ${why ?: "no reason given"}")))
+            })
+        }
+    }
+}</code></pre>
+</details>
+
+<h2>The goal: no local model planned it</h2>
+<div class="table"><table>
+<thead><tr><th scope="col">Model</th><th scope="col">Runs</th><th scope="col">How far it got</th><th scope="col">Result</th></tr></thead>
+<tbody>
+<tr><th scope="row">qwen3 30B-A3B instruct</th><td>2</td><td>Step 1: listed issues instead of opening the repository</td><td class="fail">fail</td></tr>
+<tr><th scope="row">qwen3 30B-A3B thinking</th><td>1</td><td>Step 1: the same mistake</td><td class="fail">fail</td></tr>
+<tr><th scope="row">qwen3 32B dense, thinking</th><td>1</td><td>Step 1: asked the same thing nine times, refused each time</td><td class="fail">fail</td></tr>
+<tr><th scope="row">gpt-oss 20B</th><td>1</td><td>Step 1 planned right, then named the form by its title</td><td class="fail">fail</td></tr>
+<tr><th scope="row">qwen3-coder 30B</th><td>1</td><td>Step 1 right, step 2 wrong</td><td class="fail">fail</td></tr>
+<tr class="ref"><th scope="row">Claude, for reference</th><td>10</td><td>All steps</td><td>pass</td></tr>
+</tbody></table></div>
+<p>Each build went wrong at the first or second step, in its own way. What they share: they acted on the goal's headline, "merge dependency bumps", rather than on the step marked now. A clearer rule in the planner's prompt didn't change that.</p>
+
+<h2>Below the goal: the scripts</h2>
+<p>The same scene, run from the scripts <code>artie generate</code> wrote from Claude's run of the goal. The script holds the steps; the model only picks each act.</p>
+<div class="table"><table>
+<thead><tr><th scope="col">Model and script</th><th scope="col">Valid runs</th><th scope="col">Full pass</th><th scope="col">Model mistakes</th><th scope="col">Other failures</th></tr></thead>
+<tbody>
+<tr><th scope="row">qwen3 30B-A3B instruct, intent</th><td>11</td><td class="pass">9</td><td>1</td><td>1: a GitHub check stuck past the give-up</td></tr>
+<tr><th scope="row">qwen3 30B-A3B instruct, kept</th><td>1</td><td class="pass">1</td><td>0</td><td>0</td></tr>
+<tr><th scope="row">qwen3 30B-A3B thinking, intent</th><td>9</td><td class="pass">7</td><td>0</td><td>2: a check's timing, and a stale act (412)</td></tr>
+<tr class="ref"><th scope="row">Claude, intent</th><td>10</td><td>10</td><td>0</td><td>0</td></tr>
+</tbody></table></div>
+<p>The friendly sentence to the author worked too: every local model wrote it, from the gateway's own reason, such as "A draft can't be merged; mark it ready for review first."</p>
+
+<h2>What a run costs</h2>
+<div class="table"><table>
+<thead><tr><th scope="col">Model, intent script</th><th scope="col">Model calls</th><th scope="col">Output tokens</th><th scope="col">Seconds</th><th scope="col">Money</th></tr></thead>
+<tbody>
+<tr><th scope="row">qwen3 30B-A3B instruct</th><td>6–11</td><td>320–550</td><td>276–318</td><td>none</td></tr>
+<tr><th scope="row">qwen3 30B-A3B thinking</th><td>6–10</td><td>2,200–4,000</td><td>340–430</td><td>none</td></tr>
+<tr class="ref"><th scope="row">Claude</th><td>6</td><td>about 21,000 tokens in</td><td>not measured</td><td>API price</td></tr>
+</tbody></table></div>
+<p>Most of the seconds are the watch's three-minute give-up and its walk over the repository's open pull requests, not model time. Warm calls took 3 to 8 seconds; the first, cold call about 30. The thinking build spends seven times the output tokens for its one fewer mistake.</p>
+
+<div class="bottom">
+<p><b>Goals:</b> local models passed 0 of 6 runs.</p>
+<p><b>Scripts:</b> local models fully passed 17 of 21 runs, and chose one act wrong in about 230.</p>
+<p><b>The split that works today:</b> Claude plans a goal's first run, <code>artie generate</code> keeps it as a script, and a local model does the reasoner's part of every run after, for no money.</p>
+</div>
+
+<h2>Limits</h2>
+<ul class="obs">
+<li>One scene, one machine, one family of models in most rows. Enough to show the shape, not to rank models.</li>
+<li>Four runs lost to the setup are left out: three to slow gateway connections while a large model loaded beside it, and one to reinstalling ARTIE mid-run.</li>
+<li>The kept script ran once on a local model. Its result matches the intent runs, but it is one run.</li>
+</ul>
+
+<footer class="sources">
+<b>Sources</b>
+<ul>
+<li>Plan and full results: <a href="https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/spec/PLAN-LOCAL-MODEL.md">spec/PLAN-LOCAL-MODEL.md</a></li>
+<li>The first spike's prompts and answers: <a href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/exhibits/local-model">exhibits/local-model</a></li>
+<li>Claude's bench of the same watch: <a href="https://claude.ai/artifact/F64QuLx25etg9vTq8mkpHU">Reason on Rails</a></li>
+</ul>
+</footer>
+</main>
+</body></html>

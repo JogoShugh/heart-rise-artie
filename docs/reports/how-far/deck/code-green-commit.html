@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The fix, the green run, the gated commit · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">How it was built · Code, green, commit</span></header>
+<h2>The fix, the green run, the gated commit</h2>
+<div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);">
+  <div class="rows">
+    <pre><code>// Detours.kt: keep a read another step names
+private fun named(capture: Capture): Set&lt;Int&gt; {
+  val marks = capture.steps.associateWith {
+    capture.marks(it) }
+  return marks.filter { (step, own) -&gt;
+    val name = own["as"]?.toString()
+      ?: return@filter false
+    val mention = Regex("""\{$name[.}]""")
+    marks.any { (other, its) -&gt; other.line !=
+      step.line &amp;&amp; its.values.any {
+        mention.containsMatchIn("$it") } }
+  }.keys.map { it.number }.toSet()</code></pre>
+    <p class="refs"><details class="fragment-plain"><summary>Detours.kt, keep a read another step names</summary><pre><code>private fun named(capture: Capture): Set&lt;Int&gt; {
+    val marks = capture.steps.associateWith { capture.marks(it) }
+    return marks.filter { (step, own) -&gt;
+        val name = own[&quot;as&quot;]?.toString() ?: return@filter false
+        val mention = Regex(&quot;&quot;&quot;\{$name[.}]&quot;&quot;&quot;)
+        marks.any { (other, its) -&gt; other.line != step.line &amp;&amp; its.values.any { mention.containsMatchIn(&quot;$it&quot;) } }
+    }.keys.map { it.number }.toSet()
+}</code></pre></details></p>
+    <pre><code>pre-commit: TDD ordering check passed.
+# then the capture again, and the open-PR step stays</code></pre>
+  </div>
+  <div class="rows">
+    <figure><img src="media/testreport-crop.png" alt="The artie-cli test report: 198 tests, 0 failures"><figcaption>artie-cli test report: 198 tests, 0 failures.</figcaption></figure>
+    <p class="punch">Then the replay, on real GitHub and local GitLab, with the regenerated script.</p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/red-first.html" rel="prev"><small>Back</small><b>The scenario, then the failing run</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#code-green-commit">with heart-ts</a></span>
+<a href="deck/gate-says-no.html" rel="next"><small>Next</small><b>The gates hold, even against the model</b></a></nav>
+</main></div></body></html>

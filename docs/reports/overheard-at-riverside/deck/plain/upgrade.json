@@ -1,0 +1,9 @@
+{
+  "name": "upgrade",
+  "title": "Upgrading is optional",
+  "part": "Closing",
+  "fiction": false,
+  "number": 22,
+  "of": 25,
+  "html": "<h2>Upgrading is optional</h2>\n<p class=\"dek\">Switch the deck to Plain JSON at the top, then back to HEART. Same slides, same client.</p>\n<div class=\"pair\">\n  <div class=\"step human\">\n    <b>Plain JSON</b>\n    <ul>\n      <li>Each slide is data only: no links, no profile.</li>\n      <li>heart-ts reads it as data only, and offers nothing.</li>\n      <li>So the page has to know the list, build every address from <code>deck/plain/{name}.json</code>, and count to the next one: a client of forms.yaml.</li>\n    </ul>\n  </div>\n  <div class=\"step agent\">\n    <b>HEART</b>\n    <ul>\n      <li>The same data, with its links and its profile.</li>\n      <li>The same client follows them.</li>\n      <li>The page knows one address: the contents.</li>\n    </ul>\n  </div>\n</div>\n<p class=\"lead\">Nothing in the client chose the upgrade. The resources did.</p>\n<details class=\"more\"><summary>And a plain JSON client reading the HEART files?</summary>\n  <ul>\n    <li>It still works. HAL is JSON: the slide's data is all there, and <code>_links</code> is one more member it ignores.</li>\n    <li>So a service can add its controls without breaking the clients it has, and each client takes them up when it is ready.</li>\n  </ul>\n</details>\n"
+}

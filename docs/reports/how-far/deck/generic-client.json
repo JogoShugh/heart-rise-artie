@@ -1,0 +1,101 @@
+{
+  "name": "generic-client",
+  "title": "ARTIE is to APIs what a browser is to web pages",
+  "part": "Putting them back together",
+  "kicker": "Putting them back together · The generic client",
+  "tone": "light",
+  "number": 17,
+  "of": 54,
+  "html": "<h2>ARTIE is to APIs what a browser is to web pages</h2>\n<div class=\"flow\">\n  <div class=\"box\"><h3>Web browser</h3><p>one generic client, for every site</p></div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"panel\"><span class=\"label\">Speaks, and is coupled to</span><span class=\"big\">text/html<br>+ HTTP</span><span class=\"faint\">image/jpeg · image/png · text/css · text/javascript · image/svg+xml · font/woff2</span></div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"tiles\"><div>An online bank</div><div>A wiki</div><div>A shop</div><div class=\"ghost\">Any site not yet built</div></div>\n\n  <div class=\"box green\"><h3>ARTIE</h3><p>one generic client, for every API</p></div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"panel\"><span class=\"label\">Speaks, and is coupled to</span><span class=\"big\">application/hal+json<br>+ HEART profile + HTTP</span><span class=\"faint\">application/schema+json · application/problem+json · application/yaml</span></div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"tiles\"><div>AWS API Gateway (preview next)</div><div>GitHub</div><div>GitLab</div><div class=\"ghost\">Any API not yet built</div></div>\n</div>\n<p class=\"verdict\"><span class=\"yes\">Coupled to:</span> the media type and the protocol. <span class=\"no\">Not coupled to:</span> certificates, pull requests, merge rules, URL layouts, or which acts exist today. Zero domain code.</p>\n<p class=\"refs\"><deck-ref name=\"think-of-the-web\"></deck-ref> <deck-ref name=\"uniform-interface\"></deck-ref></p>\n",
+  "say": "The browser is coupled to HTML and HTTP, and to nothing about any site: not account numbers, not URL layouts, not which buttons exist today. That's why a bank can change its forms tonight and nobody updates their browser. ARTIE is coupled the same way, to one media type, HAL with HEART's schema forms, and HTTP. Zero domain code: no client certificates, no pull requests, no merge rules. Each answer carries its controls. The next slides preview what that looks like on an API you know, AWS API Gateway.",
+  "sources": [
+    {
+      "label": "Fielding, dissertation, ch. 5",
+      "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"
+    },
+    {
+      "label": "HAL Schema Forms",
+      "href": "https://github.com/jbadeau/hal-schema-forms"
+    },
+    {
+      "label": "artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "generic-client.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "heart-rise-artie.json",
+      "title": "HEART, RISE and ARTIE"
+    },
+    "next": {
+      "href": "aws-callback.json",
+      "title": "What if AWS’s HAL became HEART?"
+    },
+    "alternate": {
+      "href": "generic-client.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "think-of-the-web",
+        "kind": "comment",
+        "label": "“Think of it in terms of the Web”",
+        "title": "Browsers don't know resource types",
+        "summary": "A browser knows the links and forms, not whether it's a bank or a wiki. Typed relations guide automated agents.",
+        "quote": "<p>“A truly RESTful API looks like hypertext. Every addressable unit of information carries an address, either explicitly (e.g., link and id attributes) or implicitly (e.g., derived from the media type definition and representation structure). Query results are represented by a list of links with summary information, not by arrays of object representations (query is not a substitute for identification of resources). Resource representations are self-descriptive: the client does not need to know if a resource is OpenSocialist because it is just acting on the representations received.</p><p>Think of it in terms of the Web. How many Web browsers are aware of the distinction between an online-banking resource and a Wiki resource? None of them. They don’t need to be aware of the resource types. What they need to be aware of is the potential state transitions — the links and forms — and what semantics/actions are implied by traversing those links. A browser represents them as distinct UI controls so that a user can see potential transitions and anticipate the effect of chosen actions. A spider can follow them to the extent that the relationships are known to be safe. Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/think-of-the-web.json",
+            "title": "“Think of it in terms of the Web”"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-720",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "uniform-interface",
+        "kind": "constraint",
+        "label": "Uniform interface · HATEOAS",
+        "title": "Uniform interface (§5.1.5)",
+        "summary": "One generic interface for every component; its fourth part is hypermedia as the engine of application state.",
+        "quote": "<p>“The central feature that distinguishes the REST architectural style from other network-based styles is its emphasis on a uniform interface between components (Figure 5-6). By applying the software engineering principle of generality to the component interface, the overall system architecture is simplified and the visibility of interactions is improved. Implementations are decoupled from the services they provide, which encourages independent evolvability. The trade-off, though, is that a uniform interface degrades efficiency, since information is transferred in a standardized form rather than one which is specific to an application's needs. The REST interface is designed to be efficient for large-grain hypermedia data transfer, optimizing for the common case of the Web, but resulting in an interface that is not optimal for other forms of architectural interaction.</p><p>In order to obtain a uniform interface, multiple architectural constraints are needed to guide the behavior of components. REST is defined by four interface constraints: identification of resources; manipulation of resources through representations; self-descriptive messages; and, hypermedia as the engine of application state. These constraints will be discussed in Section 5.2.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.5",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/uniform-interface.json",
+            "title": "Uniform interface · HATEOAS"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_5",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.5"
+          }
+        }
+      }
+    ]
+  }
+}

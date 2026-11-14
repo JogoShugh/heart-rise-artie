@@ -1,0 +1,35 @@
+name: huh
+part: Scene one · 1997
+title: "Rules learned by refusal"
+fiction: true
+html: |
+  <h2>Rules learned by refusal</h2>
+  <div class="pair">
+    <div class="script">
+      <div class="line"><span class="who ana">Ana</span><p>Sent. It says 409. “A hold is waiting for this book, so it can't be renewed.”</p></div>
+      <div class="line"><span class="who marcus">Marcus</span><p>Someone's waiting for <i>The Hobbit</i>.</p></div>
+      <div class="line"><span class="who ana">Ana</span><p>Couldn't it have told me before I typed all of it?</p></div>
+      <div class="line"><span class="who marcus">Marcus</span><p>The page doesn't know what you can do. forms.yaml does, the same for every book. Renew is listed for all of them, and the rule is in its description. Try 3311. That's <i>Matilda</i>.</p></div>
+      <div class="line"><span class="who ana">Ana</span><p>“Loan 3311 is renewed. It is due 1997-12-03.” And <i>Charlotte's Web</i>?</p></div>
+      <div class="line"><span class="who marcus">Marcus</span><p>Renewed three times already. It'll say no.</p></div>
+      <div class="line"><span class="who ana">Ana</span><p>Then why does forms.html offer it?</p></div>
+      <div class="line"><span class="who marcus">Marcus</span><p>It offers everything to everyone.</p></div>
+      <div class="line"><span class="who ana">Ana</span><p>Why can't the page just show me a Renew button on the books I can renew, and say why on the ones I can't?</p></div>
+      <p class="direction">A long pause.</p>
+      <div class="line"><span class="who marcus">Marcus</span><p>…Huh.</p></div>
+      <p class="direction">He writes “buttons?” on a sticky note. In this world, nobody ever reads it.</p>
+    </div>
+    <figure><img src="media/renew-409.png" alt="WebWalker after a POST typed by hand: 409 Conflict, a hold is waiting for this book." loading="lazy"><figcaption>Typed, sent, refused. Only now does she find out.</figcaption></figure>
+  </div>
+  <details class="more"><summary>Watch her whole visit</summary>
+    <figure><img src="media/web-that-wasnt.gif" alt="Ana's visit in WebWalker: forms.yaml, forms.html, her loans, a renewal refused 409, then Matilda renewed." loading="lazy"><figcaption>The Perl site, recorded in headless Chrome: forms.yaml, forms.html, her loans, the 409, then <i>Matilda</i>.</figcaption></figure>
+  </details>
+  <details class="more"><summary>The CGI that said 409</summary>
+    <p class="note">The rules are real, and checked in order: returned already, a hold waiting, renewed the most allowed. Only after all three does it move the due date three weeks on. Ana meets them only after she has sent the request.</p>
+    <pre class="source" data-source="exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi" data-from="sub act {"></pre>
+  </details>
+points:
+  - "Ana sends the renewal for <i>The Hobbit</i>. The answer is 409: a hold is waiting, so it can't be renewed. She only finds out after typing it all."
+  - "Marcus tries 3311 for her, and <i>Matilda</i> renews. <i>Charlotte's Web</i> would fail too, renewed three times already, yet forms.html offers renew for all three."
+  - "Ana asks why the page can't show a Renew button on the books she can renew, and say why on the others. Marcus writes “buttons?” on a sticky note. In that world, nobody reads it."
+  - "<b>What it shows:</b> a rule kept in prose, away from the page, is learned by refusal."

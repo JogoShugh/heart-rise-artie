@@ -1,0 +1,36 @@
+# What the talk promises early and shows later. Each points at the slide that keeps the promise.
+- name: p1
+  kind: preview
+  label: "P1 · REAL MERGE"
+  title: "P1: a real merge on GitHub"
+  summary: "A pull request on real GitHub, walked step by step through our gateway: data only, then links, then forms, then guards, then merged, with only the acts its state allows."
+  cite: "Shown on: Only data, what most APIs send today"
+  href: "#step-1-data"
+- name: p2
+  kind: preview
+  label: "P2 · TWO FORGES"
+  title: "P2: the same script on a local GitLab"
+  summary: "The release script kept from GitHub runs unchanged against a local GitLab, because both answer to the same scm: relations."
+  cite: "Shown on: One script, real GitHub and a local GitLab"
+  href: "#proof"
+- name: p3
+  kind: preview
+  label: "P3 · ZERO TOKENS"
+  title: "P3: zero tokens to replay"
+  summary: "Claude captures the release once (20 model calls); every release after replays it with no model, and the L2 cache spares thousands of requests per 100 releases."
+  cite: "Shown on: Capture once with a model, replay with none"
+  href: "#tokenomics"
+- name: p4
+  kind: preview
+  label: "P4 · AWS FORMS"
+  title: "P4: AWS's docs become forms"
+  summary: "An API you know, AWS API Gateway: the method, address, content type and body its docs describe move into the answer as forms, under AWS's own relation names."
+  cite: "Shown on: Out of band, then in band"
+  href: "#aws-docs-into-forms"
+- name: p5
+  kind: preview
+  label: "P5 · AGENT ON STATE"
+  title: "P5: an agent given state, not a catalogue"
+  summary: "Claude Code with heart-mcp as its only MCP server merges a real pull request once, and its second try is refused before anything is sent, with the service's reason."
+  cite: "Shown on: The same model, given state instead of a catalogue"
+  href: "#heart-mcp-github"

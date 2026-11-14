@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenAPI clients can opt in · Overheard at Riverside</title>
+<base href="../">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+</head><body>
+<header class="bar"><div class="bar-in"><div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · plain page</span></div></div></header>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Scene four · an hour later</span><span class="fiction">Fiction</span></header>
+<h2>OpenAPI clients can opt in</h2>
+<ul class="points"><li>Priya asks whether Sam's assistant, which reads OpenAPI, has to switch to HEART to stop guessing.</li><li>Sam says no: each plain JSON answer can carry one more header, a link to the forms that loan allows now. A client that ignores it never notices.</li><li>Opted in, the assistant skips renew for <i>The Hobbit</i> and sends nothing that would be refused.</li><li><b>What it shows:</b> HEART can be taken up one client at a time.</li></ul>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>Your agent reads our OpenAPI. Does it have to switch to HEART to stop guessing?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>No. Each plain answer can carry one more header: a link to what this loan allows now. The description already says how to read it.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>And a client that doesn't read it?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Never notices. Same body, one header it ignores.</p></div>
+</div>
+<pre><code>GET /loans/3310   Accept: application/json
+
+200 OK   Content-Type: application/json
+<span class="add">Link: &lt;/affordance-sets/76c46cea7232ed43&gt;; rel="https://w3id.org/heart-rise/rels/forms";
+      type="application/hal+json"; integrity="sha256-dsRs6nIy7UNUPi6OIILLINPmCkhlW8yhxdwuxe7pDCI="</span>
+
+{ "id": 3310, "title": "The Hobbit", …, "standing": "hold waiting" }</code></pre>
+<div class="pair">
+  <div class="step human">
+    <b>Reading the description alone</b>
+    <ul>
+      <li><i>The Hobbit</i>: renew and return both look possible.</li>
+      <li>It renews, and learns only after the call: 409, “A hold is waiting for this book, so it can't be renewed.”</li>
+    </ul>
+  </div>
+  <div class="step agent">
+    <b>Opted in to the link</b>
+    <ul>
+      <li><i>The Hobbit</i>: return only. Nothing is sent that would be refused.</li>
+      <li><i>Matilda</i>: renew and return.</li>
+      <li>Each set is fetched once by its address, and checked against its integrity.</li>
+    </ul>
+  </div>
+</div>
+<details class="more"><summary>What opting in takes, in the client</summary>
+<pre><code>// The link the description documents (x-heart-affordances), the set it names,
+// and the operations a form in it matches, by method and path template.
+async function allowedNow(header, candidates) {
+  const link = linked(header);
+  if (!link) return { offered: candidates, from: "no link" };
+  if (!sets.has(link.href)) {
+    const set = await send("GET", link.href, { Accept: link.type });
+    const [algorithm, digest] = link.integrity.split(/-(.*)/s);
+    const intact = createHash(algorithm).update(set.bytes).digest("base64") === digest;
+    if (!intact) throw new Error(`the set at ${link.href} does not match its integrity`);
+    sets.set(link.href, Object.values(set.json._forms));
+  }
+  const forms = sets.get(link.href);
+  return { offered: candidates.filter((op) =&gt; forms.some((f) =&gt;
+    f.method === op.method &amp;&amp; matches(op.path, f._links.target.href))), from: link.href };
+}</code></pre>
+  <p class="note">From <code>live/openapi-client.mjs</code>, an OpenAPI client of the running library service; every exchange is in <code>openapi-optin.capture.yaml</code>. The description's <code>x-heart-affordances</code> names the header, the relation, and how to match.</p>
+</details>
+</article>
+<nav class="foot"><a href="deck/in-charge.html" rel="prev"><small>Back</small><b>Declared once, enforced by the server</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#openapi-opt-in">with heart-ts</a></span>
+<a href="deck/ai-driven.html" rel="next" data-rel="next"><small>Next</small><b>A purpose, not a program</b></a></nav>
+</main></div></body></html>

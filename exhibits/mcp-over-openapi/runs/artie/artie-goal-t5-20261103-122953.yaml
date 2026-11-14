@@ -1,0 +1,1178 @@
+---
+run:
+  inputs: {}
+  source: |-
+    act(intent = "search employees named Miller")
+    act(intent = "open employee Anna Miller")
+    act(intent = "give notice to this employee")
+    act(intent = "open the employee James Miller")
+    act(intent = "give notice to this employee")
+    act(intent = "open the employee Maria Miller")
+    act(intent = "dismiss this employee")
+    act(intent = "open the employee David Miller")
+    act(intent = "dismiss this employee")
+    act(intent = "open the employee Laura Miller")
+    act(intent = "open the employee Michael Miller")
+  marks:
+    '1':
+      intent: Find the employees named Miller
+    '2':
+      fromIntent: 'Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are'
+    '3':
+      fromIntent: 'Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are'
+    '4':
+      fromIntent: 'Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are'
+    '5':
+      fromIntent: 'Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are'
+    '6':
+      fromIntent: 'Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are'
+    '7':
+      fromIntent: 'Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are'
+    '8':
+      fromIntent: 'Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are'
+    '9':
+      fromIntent: 'Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are'
+    '10':
+      fromIntent: 'Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are'
+    '11':
+      intent: 'Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are'
+  moves:
+    - 'why: Search employees by name Miller to find them.'
+    - 'search employees named Miller: acted staff:search-employees, done, at http://localhost:8099/employees?name=Miller'
+    - 'why: The search for Miller was done and it lists 6 employees, so this step is complete.'
+    - 'done: Find the employees named Miller'
+    - 'why: Need to see each Miller''s status; start with the first in the list.'
+    - 'open employee Anna Miller: followed item, done, at http://localhost:8099/employees/3'
+    - 'why: Anna Miller is working, so give notice.'
+    - 'give notice to this employee: acted staff:give-notice, done, at http://localhost:8099/employees/3'
+    - 'why: Anna is moved one step (now on notice); return to the Miller list to open the next employee.'
+    - back to http://localhost:8099/employees?name=Miller
+    - 'why: Anna is handled; open the next Miller, James.'
+    - 'open the employee James Miller: followed item, done, at http://localhost:8099/employees/4'
+    - 'why: James Miller is working, so give notice.'
+    - 'give notice to this employee: acted staff:give-notice, done, at http://localhost:8099/employees/4'
+    - 'why: James has had his one step; return to the Miller list to open the next employee.'
+    - back to http://localhost:8099/employees?name=Miller
+    - 'why: Anna and James are handled; open the next Miller, Maria.'
+    - 'open the employee Maria Miller: followed item, done, at http://localhost:8099/employees/5'
+    - 'why: Maria Miller is on notice, so dismiss her.'
+    - 'dismiss this employee: acted staff:dismiss, done, at http://localhost:8099/employees/5'
+    - 'why: Maria is handled; return to the Miller list to open the next employee.'
+    - back to http://localhost:8099/employees?name=Miller
+    - 'why: Anna, James, Maria are handled; open the next Miller, David.'
+    - 'open the employee David Miller: followed item, done, at http://localhost:8099/employees/6'
+    - 'why: David Miller is on notice, so dismiss him.'
+    - 'dismiss this employee: acted staff:dismiss, done, at http://localhost:8099/employees/6'
+    - 'why: David is handled; return to the Miller list to open the next employee (5th of 6).'
+    - back to http://localhost:8099/employees?name=Miller
+    - 'why: Next Miller in the list is Laura (5th of 6); open her to see her status.'
+    - 'open the employee Laura Miller: followed item, done, at http://localhost:8099/employees/7'
+    - 'why: Laura is dismissed, so leave her; return to the Miller list to open the 6th employee.'
+    - back to http://localhost:8099/employees?name=Miller
+    - 'why: Open the 6th Miller, Michael, to see his status.'
+    - 'open the employee Michael Miller: followed item, done, at http://localhost:8099/employees/8'
+    - 'why: Michael Miller is dismissed, so leave him; all six Millers are handled.'
+    - 'done: Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are'
+  model:
+    name: claude-sonnet-5-5
+    url: https://api.anthropic.com
+  usage:
+    calls: 18
+    input: 16343
+    output: 2565
+    cache_read: 32148
+    cache_write: 0
+---
+at: '2026-11-03T17:29:54.426341Z'
+ms: 62
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8099/
+opens: true
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:give-notice:
+          - sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-GCerD3XToO0sVD76Cf3xiuMDVGXnig5O0MLt8iHQGB4=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T17:29:56.764667Z'
+ms: 1870
+mode: intent
+say: search employees named Miller
+line: 1
+params:
+  relation: staff:search-employees
+  name: Miller
+values:
+  name:
+    value: Miller
+    type: string
+    from:
+      - words
+reason:
+  template: search employees named Miller
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"Employees","hr:manifest":{"forms":{"staff:dismiss":["sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04="],"staff:get-employee":["sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY="],"staff:give-notice":["sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA="],"staff:hire":["sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM="],"staff:search-employees":["sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4="],"staff:update":["sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM="]},"digest":"sha256-GCerD3XToO0sVD76Cf3xiuMDVGXnig5O0MLt8iHQGB4="}}
+      </state>
+      <offers>
+      {"staff:search-employees":{"title":"Find employees by name","description":"Lists the employees whose name has the text.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"name":{"type":"string","minLength":1,"title":"Name","description":"Part of the employee's first or last name; case is ignored"}},"required":["name"]}},"staff:get-employee":{"title":"Get an employee by number","description":"Goes to one employee, given their number.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Employee number","description":"The employee's number"}},"required":["id"]}},"staff:hire":{"title":"Hire an employee","description":"Hires someone, in a role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object","$id":"/schemas/10847085ef79da90"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      search employees named Miller
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01RSgBf68FhQKMY76VJDPfjo","name":"select","input":{"action":"act","affordance":"staff:search-employees","fields":{"name":"Miller"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:search-employees
+  title: Find employees by name
+  method: GET
+  target: /employees{?name}
+  address: http://localhost:8099/employees?name=Miller
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8099/employees?name=Miller
+now:
+  state:
+    count: 6
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Anna Miller
+      - James Miller
+      - Maria Miller
+      - David Miller
+      - Laura Miller
+      - Michael Miller
+---
+at: '2026-11-03T17:30:03.468752Z'
+ms: 1881
+mode: intent
+say: open employee Anna Miller
+line: 2
+within: 1
+params:
+  relation: item
+  title: Anna Miller
+values:
+  title:
+    value: Anna Miller
+    from:
+      - chosen
+reason:
+  template: open employee Anna Miller
+  slots: {}
+opens: true
+judgement: true
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":6}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Anna Miller"},{"rel":"item","title":"James Miller"},{"rel":"item","title":"Maria Miller"},{"rel":"item","title":"David Miller"},{"rel":"item","title":"Laura Miller"},{"rel":"item","title":"Michael Miller"}]
+      </links>
+      <intent>
+      open employee Anna Miller
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01GRgZH5Ea5UjFJGCzHjKokB","name":"select","input":{"action":"follow","rel":"item","title":"Anna Miller"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: Anna Miller
+  method: GET
+  target: http://localhost:8099/employees/3
+  address: http://localhost:8099/employees/3
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/3
+now:
+  state:
+    id: 3
+    firstName: Anna
+    lastName: Miller
+    role: clerk
+    status: working
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+keeps:
+  /lastName:
+    - 7
+    - 11
+    - 15
+    - 19
+    - 21
+---
+at: '2026-11-03T17:30:08.114551Z'
+ms: 1134
+mode: intent
+say: give notice to this employee
+line: 3
+within: 2
+params:
+  relation: staff:give-notice
+reason:
+  template: give notice to this employee
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":3,"firstName":"Anna","lastName":"Miller","role":"clerk","status":"working"}
+      </state>
+      <offers>
+      {"staff:give-notice":{"title":"Give notice","description":"Puts the employee on notice, before dismissing them.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      give notice to this employee
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01HyyvzUeTBZsvACKjCahgqR","name":"select","input":{"action":"act","affordance":"staff:give-notice","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:give-notice
+  title: Give notice
+  method: POST
+  target: /employees/{id}/actions/give-notice
+  address: http://localhost:8099/employees/3/actions/give-notice
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/0489e15c599ce443
+    integrity: sha256-BInhXFmc5EODDFLpqj4ZeggX2J+nAafNRcm1dEWwsEo=
+  form: sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.223269219190c9ed"'
+offered:
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/3
+now:
+  state:
+    id: 3
+    firstName: Anna
+    lastName: Miller
+    role: clerk
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:11.389716Z'
+ms: 10
+mode: script
+say: return to {address}
+line: 3
+within: 2
+params:
+  address: http://localhost:8099/employees/3
+outcome: done
+address: http://localhost:8099/employees/3
+now:
+  state:
+    id: 3
+    firstName: Anna
+    lastName: Miller
+    role: clerk
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:11.400832Z'
+ms: 6
+mode: script
+say: return to {address}
+line: 3
+within: 2
+params:
+  address: http://localhost:8099/employees?name=Miller
+outcome: done
+address: http://localhost:8099/employees?name=Miller
+now:
+  state:
+    count: 6
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Anna Miller
+      - James Miller
+      - Maria Miller
+      - David Miller
+      - Laura Miller
+      - Michael Miller
+---
+at: '2026-11-03T17:30:13.781930Z'
+ms: 1658
+mode: intent
+say: open the employee James Miller
+line: 4
+within: 1
+params:
+  relation: item
+  title: James Miller
+values:
+  title:
+    value: James Miller
+    from:
+      - parts:
+          Miller:
+            step: 3
+            pointer: /lastName
+reason:
+  template: open the employee James Miller
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":6}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Anna Miller"},{"rel":"item","title":"James Miller"},{"rel":"item","title":"Maria Miller"},{"rel":"item","title":"David Miller"},{"rel":"item","title":"Laura Miller"},{"rel":"item","title":"Michael Miller"}]
+      </links>
+      <intent>
+      open the employee James Miller
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_013oVFTT298AXtujqHBt3NXZ","name":"select","input":{"action":"follow","rel":"item","title":"James Miller"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: James Miller
+  method: GET
+  target: http://localhost:8099/employees/4
+  address: http://localhost:8099/employees/4
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/4
+now:
+  state:
+    id: 4
+    firstName: James
+    lastName: Miller
+    role: clerk
+    status: working
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:17.353071Z'
+ms: 1511
+mode: intent
+say: give notice to this employee
+line: 5
+within: 4
+params:
+  relation: staff:give-notice
+reason:
+  template: give notice to this employee
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":4,"firstName":"James","lastName":"Miller","role":"clerk","status":"working"}
+      </state>
+      <offers>
+      {"staff:give-notice":{"title":"Give notice","description":"Puts the employee on notice, before dismissing them.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      give notice to this employee
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01UmBtENwVRxToofoFhVZxE1","name":"select","input":{"action":"act","affordance":"staff:give-notice","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:give-notice
+  title: Give notice
+  method: POST
+  target: /employees/{id}/actions/give-notice
+  address: http://localhost:8099/employees/4/actions/give-notice
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/0489e15c599ce443
+    integrity: sha256-BInhXFmc5EODDFLpqj4ZeggX2J+nAafNRcm1dEWwsEo=
+  form: sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.42e52faa7f06cd7c"'
+offered:
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/4
+now:
+  state:
+    id: 4
+    firstName: James
+    lastName: Miller
+    role: clerk
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:21.166347Z'
+ms: 5
+mode: script
+say: return to {address}
+line: 5
+within: 4
+params:
+  address: http://localhost:8099/employees/4
+outcome: done
+address: http://localhost:8099/employees/4
+now:
+  state:
+    id: 4
+    firstName: James
+    lastName: Miller
+    role: clerk
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:21.172438Z'
+ms: 4
+mode: script
+say: return to {address}
+line: 5
+within: 4
+params:
+  address: http://localhost:8099/employees?name=Miller
+outcome: done
+address: http://localhost:8099/employees?name=Miller
+now:
+  state:
+    count: 6
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Anna Miller
+      - James Miller
+      - Maria Miller
+      - David Miller
+      - Laura Miller
+      - Michael Miller
+---
+at: '2026-11-03T17:30:23.274095Z'
+ms: 1289
+mode: intent
+say: open the employee Maria Miller
+line: 6
+within: 1
+params:
+  relation: item
+  title: Maria Miller
+values:
+  title:
+    value: Maria Miller
+    from:
+      - parts:
+          Miller:
+            step: 3
+            pointer: /lastName
+reason:
+  template: open the employee Maria Miller
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":6}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Anna Miller"},{"rel":"item","title":"James Miller"},{"rel":"item","title":"Maria Miller"},{"rel":"item","title":"David Miller"},{"rel":"item","title":"Laura Miller"},{"rel":"item","title":"Michael Miller"}]
+      </links>
+      <intent>
+      open the employee Maria Miller
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01QfKhVa7AysnuDNGZfGyT69","name":"select","input":{"action":"follow","rel":"item","title":"Maria Miller"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: Maria Miller
+  method: GET
+  target: http://localhost:8099/employees/5
+  address: http://localhost:8099/employees/5
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/5
+now:
+  state:
+    id: 5
+    firstName: Maria
+    lastName: Miller
+    role: clerk
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:25.914613Z'
+ms: 1843
+mode: intent
+say: dismiss this employee
+line: 7
+within: 6
+params:
+  relation: staff:dismiss
+reason:
+  template: dismiss this employee
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":5,"firstName":"Maria","lastName":"Miller","role":"clerk","status":"on notice"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      dismiss this employee
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01AVkWiYW12QMqe53vW1n11Y","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/dismiss
+  address: http://localhost:8099/employees/5/actions/dismiss
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/e90ab1498c6b5e60
+    integrity: sha256-6QqxSYxrXmDlN+MsiOsUZmir+dmZR+SLMlU1BKG9BeQ=
+  form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-2.hsf.L2.35c0b9edcb817baf"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/5
+now:
+  state:
+    id: 5
+    firstName: Maria
+    lastName: Miller
+    role: clerk
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:29.665717Z'
+ms: 10
+mode: script
+say: return to {address}
+line: 7
+within: 6
+params:
+  address: http://localhost:8099/employees/5
+outcome: done
+address: http://localhost:8099/employees/5
+now:
+  state:
+    id: 5
+    firstName: Maria
+    lastName: Miller
+    role: clerk
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:29.676799Z'
+ms: 5
+mode: script
+say: return to {address}
+line: 7
+within: 6
+params:
+  address: http://localhost:8099/employees?name=Miller
+outcome: done
+address: http://localhost:8099/employees?name=Miller
+now:
+  state:
+    count: 6
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Anna Miller
+      - James Miller
+      - Maria Miller
+      - David Miller
+      - Laura Miller
+      - Michael Miller
+---
+at: '2026-11-03T17:30:31.666210Z'
+ms: 2791
+mode: intent
+say: open the employee David Miller
+line: 8
+within: 1
+params:
+  relation: item
+  title: David Miller
+values:
+  title:
+    value: David Miller
+    from:
+      - parts:
+          Miller:
+            step: 3
+            pointer: /lastName
+reason:
+  template: open the employee David Miller
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":6}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Anna Miller"},{"rel":"item","title":"James Miller"},{"rel":"item","title":"Maria Miller"},{"rel":"item","title":"David Miller"},{"rel":"item","title":"Laura Miller"},{"rel":"item","title":"Michael Miller"}]
+      </links>
+      <intent>
+      open the employee David Miller
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01PFX1rvXEFmDao1nxfP5nqH","name":"select","input":{"action":"follow","rel":"item","title":"David Miller"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: David Miller
+  method: GET
+  target: http://localhost:8099/employees/6
+  address: http://localhost:8099/employees/6
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/6
+now:
+  state:
+    id: 6
+    firstName: David
+    lastName: Miller
+    role: clerk
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:36.203653Z'
+ms: 1777
+mode: intent
+say: dismiss this employee
+line: 9
+within: 8
+params:
+  relation: staff:dismiss
+reason:
+  template: dismiss this employee
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":6,"firstName":"David","lastName":"Miller","role":"clerk","status":"on notice"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      dismiss this employee
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01Tj3hBDNRQ1wKRywEh9cRok","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/dismiss
+  address: http://localhost:8099/employees/6/actions/dismiss
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/e90ab1498c6b5e60
+    integrity: sha256-6QqxSYxrXmDlN+MsiOsUZmir+dmZR+SLMlU1BKG9BeQ=
+  form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-2.hsf.L2.ff6ba68c8ef0bd2a"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/6
+now:
+  state:
+    id: 6
+    firstName: David
+    lastName: Miller
+    role: clerk
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:40.051802Z'
+ms: 4
+mode: script
+say: return to {address}
+line: 9
+within: 8
+params:
+  address: http://localhost:8099/employees/6
+outcome: done
+address: http://localhost:8099/employees/6
+now:
+  state:
+    id: 6
+    firstName: David
+    lastName: Miller
+    role: clerk
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:40.056839Z'
+ms: 4
+mode: script
+say: return to {address}
+line: 9
+within: 8
+params:
+  address: http://localhost:8099/employees?name=Miller
+outcome: done
+address: http://localhost:8099/employees?name=Miller
+now:
+  state:
+    count: 6
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Anna Miller
+      - James Miller
+      - Maria Miller
+      - David Miller
+      - Laura Miller
+      - Michael Miller
+---
+at: '2026-11-03T17:30:42.220310Z'
+ms: 1422
+mode: intent
+say: open the employee Laura Miller
+line: 10
+within: 1
+params:
+  relation: item
+  title: Laura Miller
+values:
+  title:
+    value: Laura Miller
+    from:
+      - parts:
+          Miller:
+            step: 3
+            pointer: /lastName
+reason:
+  template: open the employee Laura Miller
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":6}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Anna Miller"},{"rel":"item","title":"James Miller"},{"rel":"item","title":"Maria Miller"},{"rel":"item","title":"David Miller"},{"rel":"item","title":"Laura Miller"},{"rel":"item","title":"Michael Miller"}]
+      </links>
+      <intent>
+      open the employee Laura Miller
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01PXB7zV1Qh3tECq1dWgdACq","name":"select","input":{"action":"follow","rel":"item","title":"Laura Miller"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: Laura Miller
+  method: GET
+  target: http://localhost:8099/employees/7
+  address: http://localhost:8099/employees/7
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/7
+now:
+  state:
+    id: 7
+    firstName: Laura
+    lastName: Miller
+    role: clerk
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:45.855519Z'
+ms: 7
+mode: script
+say: return to {address}
+line: 10
+within: 1
+params:
+  address: http://localhost:8099/employees?name=Miller
+outcome: done
+address: http://localhost:8099/employees?name=Miller
+now:
+  state:
+    count: 6
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Anna Miller
+      - James Miller
+      - Maria Miller
+      - David Miller
+      - Laura Miller
+      - Michael Miller
+---
+at: '2026-11-03T17:30:47.752531Z'
+ms: 1660
+mode: intent
+say: open the employee Michael Miller
+line: 11
+within: 1
+params:
+  relation: item
+  title: Michael Miller
+values:
+  title:
+    value: Michael Miller
+    from:
+      - parts:
+          Miller:
+            step: 3
+            pointer: /lastName
+reason:
+  template: open the employee Michael Miller
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":6}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Anna Miller"},{"rel":"item","title":"James Miller"},{"rel":"item","title":"Maria Miller"},{"rel":"item","title":"David Miller"},{"rel":"item","title":"Laura Miller"},{"rel":"item","title":"Michael Miller"}]
+      </links>
+      <intent>
+      open the employee Michael Miller
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_015oeuPxB2fE3UD7gbjyZ6zr","name":"select","input":{"action":"follow","rel":"item","title":"Michael Miller"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: Michael Miller
+  method: GET
+  target: http://localhost:8099/employees/8
+  address: http://localhost:8099/employees/8
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/8
+now:
+  state:
+    id: 8
+    firstName: Michael
+    lastName: Miller
+    role: clerk
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T17:30:50.898140Z'
+ms: 4
+mode: script
+say: return to {address}
+line: 11
+within: 1
+params:
+  address: http://localhost:8099/employees?name=Miller
+outcome: done
+address: http://localhost:8099/employees?name=Miller
+now:
+  state:
+    count: 6
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Anna Miller
+      - James Miller
+      - Maria Miller
+      - David Miller
+      - Laura Miller
+      - Michael Miller
+---
+at: '2026-11-03T17:30:50.902834Z'
+ms: 3
+mode: script
+say: return to {address}
+line: 11
+within: 1
+params:
+  address: http://localhost:8099/
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:give-notice:
+          - sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-GCerD3XToO0sVD76Cf3xiuMDVGXnig5O0MLt8iHQGB4=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null

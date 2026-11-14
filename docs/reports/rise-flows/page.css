@@ -1,0 +1,112 @@
+/* RISE, end to end: the overview, the chips, a lane diagram per flow, then its messages. */
+/* The JSON viewer's tokens, from the shared report palette. */
+:root { --surface: var(--panel); --code-bg: var(--track); --leaf: var(--good); --gate: var(--bad); --fg: var(--ink); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+#rise { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; min-width: 0; }
+.over-h { font-size: 19px; }
+table.overview td:first-child { white-space: nowrap; }
+table.overview tr.grp th { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+  background: var(--track); padding: 6px 12px; }
+table.overview .count { display: block; font: 12px var(--mono); color: var(--muted); }
+td.dash { color: var(--muted); }
+
+/* The chips: one per flow, grouped; sticky on wide screens. */
+.chips { display: grid; gap: 8px; padding-block: 10px; background: var(--bg); border-bottom: 1px solid var(--rule); }
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.chip-label { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); min-width: 15ch; }
+.chip { font: 500 13px var(--body); color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 14px;
+  padding: 3px 11px; text-decoration: none; }
+.chip:hover { border-color: var(--accent); }
+.chip[aria-current="page"] { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+@media (min-width: 900px) {
+  .chips { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; }
+  .msg, .msg-note, .msg-sec, .slot { scroll-margin-top: 150px; }
+}
+
+/* A flow: its title, what to notice, the diagram, the messages. */
+.flow { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; min-width: 0; }
+.flow > .lede { color: var(--ink); font-size: 16px; }
+ul.points { margin: 0; padding-left: 20px; display: grid; gap: 4px; max-width: 84ch; }
+.settle { background: var(--warn-bg); color: var(--ink); border-radius: 6px; padding: 8px 12px; max-width: none; }
+.settle b { color: var(--warn); }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bar .sub { margin-right: auto; }
+.btn { font: 500 12px var(--mono); border: 1px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: 12px;
+  padding: 3px 10px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+
+/* The lane diagram: a column per party, a dashed lifeline down each, an arrow per message. */
+.seq-scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+.seq { --line: var(--ink); }
+.seq-head { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); border-bottom: 1px solid var(--rule); }
+.lane-h { text-align: center; padding: 10px 6px; display: grid; gap: 2px; align-content: start; }
+.lane-h b { font: 600 15px/1.2 var(--display); }
+.lane-h small { font: 11.5px/1.3 var(--mono); color: var(--muted); }
+.seq-body { position: relative; padding-block: 6px 14px; }
+.life { position: absolute; top: 0; bottom: 0; border-left: 1px dashed var(--rule); }
+.seq-sec { position: relative; z-index: 1; margin: 10px 0 4px; padding: 4px 10px; font: 500 11.5px var(--mono); letter-spacing: .05em;
+  text-transform: uppercase; color: var(--muted); background: var(--track); }
+.seq-note-row { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); padding-block: 3px; }
+.seq-note { position: relative; z-index: 1; margin: 0 8px; padding: 4px 8px; text-align: left; font: 12px/1.35 var(--body); color: var(--ink);
+  background: var(--quiet-bg); border: 1px solid var(--rule); border-radius: 4px; cursor: pointer;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.seq-note:hover { border-color: var(--accent); }
+.seq-msg { position: relative; display: block; width: 100%; height: 38px; border: 0; padding: 0; background: none; cursor: pointer;
+  font: inherit; color: inherit; }
+.seq-msg:hover { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.arrow { position: absolute; bottom: 9px; height: 0; border-top: 2px solid var(--line); }
+.arrow.answer { --line: var(--muted); border-top-style: dashed; }
+.arrow.amqp { --line: var(--accent); }
+.arrow.amqp.answer { --line: color-mix(in srgb, var(--accent) 60%, var(--muted)); }
+.arrow.call { --line: var(--warn); }
+.arrow::after { content: ""; position: absolute; top: -7px; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+.arrow.right::after { right: -2px; border-left: 9px solid var(--line); }
+.arrow.left::after { left: -2px; border-right: 9px solid var(--line); }
+.arrow { border-top-color: var(--line); }
+.lbl { position: absolute; left: 50%; bottom: 3px; transform: translateX(-50%); max-width: calc(100% + 40px); padding: 0 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font: 12px/1.5 var(--mono); color: var(--ink); background: var(--panel);
+  border-radius: 4px; }
+.lbl.good { color: var(--good); } .lbl.safe { color: var(--safe); } .lbl.bad { color: var(--bad); }
+.lbl .n { display: inline-block; min-width: 18px; margin-right: 6px; padding: 0 4px; border-radius: 9px; background: var(--track);
+  color: var(--muted); font-size: 11px; text-align: center; }
+
+/* The messages. */
+ol.msgs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; min-width: 0; }
+.msg { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px; display: grid; gap: 8px; min-width: 0;
+  scroll-margin-top: 16px; }
+.msg.flash { animation: flash 1.4s ease-out; }
+@keyframes flash { from { box-shadow: 0 0 0 3px var(--accent); } to { box-shadow: 0 0 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .msg.flash { animation: none; outline: 2px solid var(--accent); } }
+.msg-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.msg-head .tag { margin: 0; }
+.num { font: 600 12px var(--mono); min-width: 26px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--track);
+  display: inline-grid; place-items: center; }
+.who { font: 500 13px var(--mono); color: var(--muted); }
+pre.lines { margin: 0; font: 13px/1.55 var(--mono); overflow-x: auto; white-space: pre; color: var(--ink); }
+pre.lines b { font-weight: 600; }
+pre.lines b.st { color: var(--c); }
+.msg .note { color: var(--muted); font-size: 14px; }
+.msg-note { padding: 2px 14px; border-left: 3px solid var(--rule); display: grid; gap: 2px; scroll-margin-top: 16px; }
+.msg-note .who { font-size: 12px; }
+.msg-note p { font-size: 14px; }
+.msg-sec { scroll-margin-top: 16px; padding-top: 8px; }
+.piece-lead { color: var(--muted); font-size: 14px; margin-bottom: 6px; }
+.flow h3 { margin-top: 6px; }
+
+/* In plain English: a row per flow, its name then a few sentences; stacked on a phone. */
+.plain { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.plain > .lede { color: var(--muted); }
+.plain h4 { margin-top: 6px; }
+.rows { display: grid; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; min-width: 0; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.4fr); gap: 18px; padding: 12px 14px;
+  border-top: 1px solid var(--rule); }
+.row-head { border-top: 0; padding-block: 8px; font: 500 11.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.row-flow { display: grid; gap: 3px; align-content: start; color: var(--ink); text-decoration: none; }
+.row-flow:hover b { color: var(--accent); text-decoration: underline; }
+.card-flow { font: 500 11.5px var(--mono); color: var(--accent); }
+.row-flow b { font: 600 17px/1.25 var(--display); }
+.plain-text { font-size: 14.5px; color: var(--ink); }
+@media (max-width: 720px) {
+  .row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .row-head { display: none; }
+}

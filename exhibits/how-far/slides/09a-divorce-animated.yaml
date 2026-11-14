@@ -1,0 +1,80 @@
+name: divorce-animated
+part: Why it matters
+title: The divorce of information from controls
+kicker: The machine web
+code:
+  file: morph.js
+  title: Animates the slide's stills, as its HTML says
+say: "Here's a real pull request on GitHub's own page: what it is, and what you can do with it now, together. Squash and merge, because there are no conflicts. Comment. Close. Now watch what the machine web does with that same page. The information goes one way: JSON, the pull request's fields, and nothing about what you may do. The controls go the other: GitHub's OpenAPI description, 13.5 megabytes, the same for every pull request in every state. The merge button becomes a path and a method. The squash menu becomes an enum. 'No conflicts' becomes a 405 you find out about after you try. The client, or the agent, has to join them back together, every time. That's the divorce."
+sources:
+  - ["GitHub REST: merge a pull request", "https://docs.github.com/en/rest/pulls/pulls#merge-a-pull-request"]
+  - ["GitHub REST: create an issue comment", "https://docs.github.com/en/rest/issues/comments#create-an-issue-comment"]
+  - ["GitHub OpenAPI description", "https://github.com/github/rest-api-description"]
+  - ["Overheard at Riverside: the divorce", "https://jogoshugh.github.io/heart-rise-artie/reports/overheard-at-riverside/#divorce"]
+html: |
+  <h2>The divorce of information from controls</h2>
+  <div class="morph" data-start="page" data-cycles='[{"to": "apart", "label": "The divorce", "head": "The divorce of information from controls"}]'>
+    <div class="mo-stage">
+      <section class="mo-scene" data-scene="page">
+        <div class="dv-browser">
+          <div class="dv-url">github.com/JogoShugh/heart-github-test/pull/2325</div>
+          <div class="dv-screen">
+            <b class="dv-book">Renewals: none during the audit</b>
+            <div class="dv-fields">
+              <div class="tk tk-card" data-token="number"><small>Pull request</small><span>#2325</span></div>
+              <div class="tk tk-card" data-token="state"><small>State</small><span>Open</span></div>
+              <div class="tk tk-card" data-token="branch"><small>Wants to merge</small><span>library/pr-504 → library/main</span></div>
+              <div class="tk tk-card" data-token="sha"><small>Head</small><span>e266e3b</span></div>
+            </div>
+            <div class="dv-acts">
+              <div class="tk tk-note" data-token="why">This branch has no conflicts with the base branch.</div>
+              <div class="tk tk-button" data-token="merge">Squash and merge</div>
+              <div class="dv-dialog">
+                <span class="dv-field">Merge method</span>
+                <div class="tk tk-select" data-token="method">Create a merge commit · Squash and merge · Rebase and merge</div>
+                <span class="dv-field">Comment</span>
+                <div class="tk tk-text" data-token="comment">Leave a comment</div>
+              </div>
+              <div class="tk tk-button" data-token="close">Close pull request</div>
+            </div>
+          </div>
+        </div>
+        <p class="mo-cap">GitHub’s own page for one pull request: what it is, on the left; what you can do with it now, on the right, with the reason merging is allowed.</p>
+      </section>
+      <section class="mo-scene" data-scene="apart">
+        <div class="dv-apart">
+          <div class="dv-doc">
+            <span class="dv-label">Information · GET /repos/…/pulls/2325 · application/json</span>
+            <div class="dv-code">
+              <span>{</span>
+              <span class="tk tk-line tk-info i1" data-token="number">"number": 2325,</span>
+              <span class="i1">"title": "Renewals: none during the audit",</span>
+              <span class="tk tk-line tk-info i1" data-token="state">"state": "open",</span>
+              <span class="tk tk-line tk-info i1" data-token="branch">"head": {"ref": "library/pr-504"}, "base": {"ref": "library/main"},</span>
+              <span class="tk tk-line tk-info i1" data-token="sha">"sha": "e266e3b53e0e04204c4f8eff6b14208ba53aafea",</span>
+              <span class="i1">"mergeable_state": "clean"</span>
+              <span>}</span>
+            </div>
+          </div>
+          <p class="dv-gap"><span>The client joins them, and learns the rules from a 405 and a 409</span></p>
+          <div class="dv-doc">
+            <span class="dv-label">Controls · api.github.com.json · 13.5 MB · every pull request alike</span>
+            <span class="dv-bag"><b>13.5 MB</b> one file, every operation, every state</span>
+            <div class="dv-code">
+              <span>paths:</span>
+              <span class="tk tk-line tk-ctl i1" data-token="merge">/repos/{owner}/{repo}/pulls/{pull_number}/merge:</span>
+              <span class="i2">put:</span>
+              <span class="tk tk-line tk-ctl i3" data-token="method">merge_method: { enum: [merge, squash, rebase] }</span>
+              <span class="i3">sha: { type: string }</span>
+              <span class="tk tk-line tk-said i3" data-token="why">405: not mergeable · 409: the head moved</span>
+              <span class="tk tk-line tk-ctl i1" data-token="comment">/repos/{owner}/{repo}/issues/{issue_number}/comments: post: body</span>
+              <span class="tk tk-line tk-ctl i1" data-token="close">/repos/{owner}/{repo}/pulls/{pull_number}: patch: state: { enum: [open, closed] }</span>
+              <span class="i1">… and every other operation GitHub has, for every state</span>
+            </div>
+          </div>
+        </div>
+        <p class="mo-cap">The machine web’s version of that page: the data in one answer, the controls in a 13.5 MB description beside it, the same whatever state the pull request is in. Whoever calls it joins the two.</p>
+      </section>
+    </div>
+  </div>
+  <p class="refs"><deck-ref name="rule-3"></deck-ref> <deck-ref name="rule-4"></deck-ref> <deck-ref name="in-band"></deck-ref></p>

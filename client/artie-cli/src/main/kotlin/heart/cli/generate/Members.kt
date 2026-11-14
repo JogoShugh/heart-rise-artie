@@ -1,0 +1,137 @@
+package heart.cli.generate
+
+import java.net.URI
+
+/*
+ * A list's members a run visited one by one (spec/PLAN-COST-FOLLOWS-STATES.md, step 3): written one by one, by name,
+ * a script serves those members alone. A list the run went through, every member of every page, is written as a
+ * for-each over it, which goes through every member it lists, page after page, each time the script runs: each member
+ * acted on by what it offers (when-offered), or, where each member is a list of its own, gone through the same way.
+ * A value the run read from a member and sent inside the loop is read from whichever member the loop is at.
+ */
+
+/** The link a list names each of its members by (RFC 6573), as `for-each` follows it. */
+private const val ITEM = "item"
+
+/** The link a list names its next page by (RFC 8288), as `for-each` follows it to the list's end. */
+private const val NEXT = "next"
+
+/**
+ * A list the run went through, page after page: its [members], each opened by its item link, and, when each member
+ * is a list of its own, those lists' members gone through the same way ([inner]); null when each holds an act or none.
+ */
+internal class Loop(val members: List<Walked.Selection>, val inner: Loop?, private val opener: String? = null) {
+    /**
+     * What the loop calls each member, by which the steps inside read it: where its members live, as one of them
+     * (`/members/…`, a member; `/loans/…`, a loan); else what the search that made the list names
+     * (`staff:search-employees`, an employee); `item` where neither can be told.
+     */
+    val name: String
+        get() {
+            val place = members.first().step.chose["address"]?.toString()
+                ?.let { runCatching { URI(it).path }.getOrNull() }?.split('/')?.firstOrNull { it.isNotEmpty() }
+            val searched = opener?.substringAfter(':')?.takeIf { it.startsWith(SEARCH) }?.removePrefix(SEARCH)
+            return (place ?: searched)?.let(::one) ?: ITEM
+        }
+
+    /** The list [opened] made, as this loop over its [members]. */
+    fun openedBy(opened: String?) = Loop(members, inner, opened)
+
+    /**
+     * Each member's visit, at every depth, by the name of the loop it is a member of: the steps inside read what the
+     * run read from it by that name. A member whose name a loop inside it reuses is hidden there, so it is in none.
+     */
+    val scope: Map<Int, String>
+        get() {
+            val inside = inner?.scope.orEmpty()
+            return inside + if (name in inside.values) emptyMap() else members.associate { it.step.number to name }
+        }
+
+    /** The acts made on the members of the loop at its heart, in the order the run made them. */
+    val acts: List<Walked.Selection>
+        get() = inner?.acts ?: members.flatMap { it.block.statements }.filterIsInstance<Walked.Selection>()
+
+    private companion object {
+        const val SEARCH = "search-"
+        const val PLURAL_IES = 3
+
+        /** One of [many]: members a member, entries an entry. */
+        fun one(many: String): String = when {
+            many.endsWith("ies") -> many.dropLast(PLURAL_IES) + "y"
+            many.endsWith("s") -> many.dropLast(1)
+            else -> many
+        }
+    }
+}
+
+/**
+ * The list [block] went through, as one loop: every member of its page, and of each page after it the run reached by
+ * its next link, opened by its item link; each holding an act or none, each act sending what every other on its form
+ * sent, or a list of its own gone through the same way. Null when [block] is anything else, and it is written as the
+ * run made it: a page the run picked some members of, or a member [chosen] by its title, as an input gave it.
+ */
+internal fun loop(block: Block, chosen: (String) -> Boolean): Loop? =
+    pages(block)?.takeUnless { members -> members.any { chosen(title(it)) } }?.let(::over)?.openedBy(block.opener)
+        ?.takeIf(::alike)
+
+/** The acts made on [members], one for each form, in the order the run first made them. */
+internal fun cases(members: List<Walked.Selection>): List<Walked.Selection> =
+    members.flatMap { it.block.statements }.filterIsInstance<Walked.Selection>().distinctBy { it.step.relation }
+
+/** [members] as one loop: each holding an act or none, alike; or each a list of its own, or nothing, gone through. */
+private fun over(members: List<Walked.Selection>): Loop? = when {
+    members.isEmpty() || !members.all(::opened) -> null
+    members.all(::acted) -> Loop(members, null)
+    else -> listsOf(members)?.let(::over)?.let { Loop(members, it) }
+}
+
+/** The members of the lists [members] are, all together; null when one holds anything but a list. */
+private fun listsOf(members: List<Walked.Selection>): List<Walked.Selection>? {
+    val lists = members.filter { it.block.statements.isNotEmpty() }.map { pages(it.block) }
+    return if (lists.any { it == null }) null else lists.filterNotNull().flatten()
+}
+
+/**
+ * The members [block]'s page and the pages after it list, when the run opened every one of them and followed the next
+ * page from the last; null otherwise.
+ */
+private fun pages(block: Block): List<Walked.Selection>? {
+    val selections = block.statements.filterIsInstance<Walked.Selection>()
+        .takeIf { it.isNotEmpty() && it.size == block.statements.size }
+    val next = selections?.last()?.takeIf { it.call == Call.Follow && it.step.relation == NEXT }
+    val page = selections?.let { if (next == null) it else it.dropLast(1) }?.takeIf { every(block, it) }
+    val rest = next?.let { pages(it.block) }
+    return if (page == null || next != null && rest == null) null else page + rest.orEmpty()
+}
+
+/** Whether [page] is every member [block]'s list links; where the list isn't known, two at least, as a list has. */
+private fun every(block: Block, page: List<Walked.Selection>): Boolean = page.all { it.step.relation == ITEM } &&
+    if (block.listed.isEmpty()) page.size >= 2 else page.map(::title).toSet() == block.listed.toSet()
+
+/** Whether [visit] opened a member by its item link, keeping nothing from it. */
+private fun opened(visit: Walked.Selection): Boolean =
+    visit.call == Call.Follow && visit.step.relation == ITEM && visit.step.opens && visit.block.keeps.isEmpty()
+
+/** Whether [visit] made one act at the member it opened, or none. */
+private fun acted(visit: Walked.Selection): Boolean {
+    val inside = visit.block.statements
+    val act = inside.singleOrNull() as? Walked.Selection
+    return inside.isEmpty() || act != null && act.call == Call.Act && act.block.statements.isEmpty()
+}
+
+/**
+ * Whether every act on the same form of [loop] sent what every other sent, but its form: the same value, or the same
+ * member of the member of a loop it is in, read by the loop's name and the member's pointer.
+ */
+private fun alike(loop: Loop): Boolean {
+    val scope = loop.scope
+    fun sent(step: Step): Map<*, *> = (step.params - "relation").mapValues { (field, value) ->
+        step.values[field].map()["from"].list().firstNotNullOfOrNull { source ->
+            scope[(source.map()["step"] as? Number)?.toInt()]?.let { name -> name + source.map()["pointer"] }
+        } ?: value
+    }
+    return loop.acts.groupBy { it.step.relation }.values.all { same -> same.map { sent(it.step) }.distinct().size == 1 }
+}
+
+/** The title [visit] followed its item link by. */
+private fun title(visit: Walked.Selection): String = visit.step.params["title"]?.toString().orEmpty()

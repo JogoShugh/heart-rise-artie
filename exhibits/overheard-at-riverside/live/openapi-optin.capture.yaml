@@ -1,0 +1,237 @@
+what: An OpenAPI client of Riverside's library, live from heart-sims, before and after it opts in to the affordance link
+at: 2026-11-05T01:24:24.274Z
+service: heart-sims library.test (heart/heart-sims), Bearer credential not recorded
+steps:
+  - say: "It reads the description: six operations, every one listed for every loan"
+    outcome:
+      operations:
+        - GET /accounts
+        - GET /accounts/{id}
+        - GET /loans
+        - GET /loans/{id}
+        - POST /loans/{id}/actions/renew
+        - POST /loans/{id}/actions/return
+    exchanges:
+      - request:
+          method: GET
+          url: /openapi.json
+          headers: {}
+        response:
+          status: 200
+          content-type: application/vnd.oai.openapi+json;version=3.1
+          body: (the description, read once)
+  - say: "The Hobbit, as it always read it: renew and return both look possible"
+    outcome:
+      title: The Hobbit
+      standing: hold waiting
+      offered:
+        - Renew
+        - Return
+      from: the description alone
+    exchanges:
+      - request:
+          method: GET
+          url: /loans/3310
+          headers:
+            Accept: application/json
+        response:
+          status: 200
+          content-type: application/json
+          link: </affordance-sets/76c46cea7232ed43>; rel="https://w3id.org/heart-rise/rels/forms"; type="application/hal+json";
+            integrity="sha256-dsRs6nIy7UNUPi6OIILLINPmCkhlW8yhxdwuxe7pDCI="
+          body:
+            id: 3310
+            title: The Hobbit
+            author: J. R. R. Tolkien
+            due: 2026-11-12
+            renewals: 0
+            standing: hold waiting
+  - say: So it renews, and is refused only after the call
+    outcome:
+      status: 409
+      detail: "library:renew is not offered now: A hold is waiting for this book, so it can't be renewed."
+    exchanges:
+      - request:
+          method: POST
+          url: /loans/3310/actions/renew
+          headers:
+            Accept: application/json
+            Content-Type: application/json
+          body: {}
+        response:
+          status: 409
+          content-type: application/problem+json
+          body:
+            type: https://w3id.org/heart-rise/problems/not-offered
+            title: The act is not offered in the resource's current state
+            status: 409
+            detail: "library:renew is not offered now: A hold is waiting for this book, so it can't be renewed."
+            rel: /profiles/library#renew
+  - say: "Opted in: the same answer, plus the link it now reads. The Hobbit allows return only"
+    outcome:
+      title: The Hobbit
+      standing: hold waiting
+      offered:
+        - Return
+      from: /affordance-sets/76c46cea7232ed43
+    exchanges:
+      - request:
+          method: GET
+          url: /loans/3310
+          headers:
+            Accept: application/json
+        response:
+          status: 200
+          content-type: application/json
+          link: </affordance-sets/76c46cea7232ed43>; rel="https://w3id.org/heart-rise/rels/forms"; type="application/hal+json";
+            integrity="sha256-dsRs6nIy7UNUPi6OIILLINPmCkhlW8yhxdwuxe7pDCI="
+          body:
+            id: 3310
+            title: The Hobbit
+            author: J. R. R. Tolkien
+            due: 2026-11-12
+            renewals: 0
+            standing: hold waiting
+      - request:
+          method: GET
+          url: /affordance-sets/76c46cea7232ed43
+          headers:
+            Accept: application/hal+json
+        response:
+          status: 200
+          content-type: application/hal+json
+          body:
+            _forms:
+              library:return:
+                _links:
+                  target:
+                    href: /loans/{id}/actions/return
+                    templated: true
+                contentType: application/json
+                description: Gives the book back to the library.
+                hr:integrity: sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+                hr:templatePointers:
+                  id: /id
+                method: POST
+                schema:
+                  $id: /schemas/efddc7bd8bbcef73
+                  properties: {}
+                  type: object
+                title: Return
+            _links:
+              curies:
+                - href: /profiles/library#{rel}
+                  name: library
+                  templated: true
+                - href: https://w3id.org/heart-rise/rels/{rel}
+                  name: hr
+                  templated: true
+              hr:unavailable:
+                href: /unavailable/61bc1cd6003e61f0
+                integrity: sha256-Ybwc1gA+YfAiY7ZpXlBplOiul6mouOPJFqTT74MgPzU=
+                type: application/json
+  - say: "Matilda, opted in: renew and return"
+    outcome:
+      title: Matilda
+      standing: renewable
+      offered:
+        - Renew
+        - Return
+      from: /affordance-sets/4e5d07820d8d6a99
+    exchanges:
+      - request:
+          method: GET
+          url: /loans/3311
+          headers:
+            Accept: application/json
+        response:
+          status: 200
+          content-type: application/json
+          link: </affordance-sets/4e5d07820d8d6a99>; rel="https://w3id.org/heart-rise/rels/forms"; type="application/hal+json";
+            integrity="sha256-Tl0Hgg2NapnYeDnz0WHQZPaOwA/X5ElIhyfsuYQVOLY="
+          body:
+            id: 3311
+            title: Matilda
+            author: Roald Dahl
+            due: 2026-11-12
+            renewals: 0
+            standing: renewable
+      - request:
+          method: GET
+          url: /affordance-sets/4e5d07820d8d6a99
+          headers:
+            Accept: application/hal+json
+        response:
+          status: 200
+          content-type: application/hal+json
+          body:
+            _forms:
+              library:renew:
+                _links:
+                  target:
+                    href: /loans/{id}/actions/renew
+                    templated: true
+                contentType: application/json
+                description: Keeps the book three weeks more.
+                hr:integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+                hr:templatePointers:
+                  id: /id
+                method: POST
+                schema:
+                  $id: /schemas/efddc7bd8bbcef73
+                  properties: {}
+                  type: object
+                title: Renew
+              library:return:
+                _links:
+                  target:
+                    href: /loans/{id}/actions/return
+                    templated: true
+                contentType: application/json
+                description: Gives the book back to the library.
+                hr:integrity: sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+                hr:templatePointers:
+                  id: /id
+                method: POST
+                schema:
+                  $id: /schemas/efddc7bd8bbcef73
+                  properties: {}
+                  type: object
+                title: Return
+            _links:
+              curies:
+                - href: /profiles/library#{rel}
+                  name: library
+                  templated: true
+                - href: https://w3id.org/heart-rise/rels/{rel}
+                  name: hr
+                  templated: true
+              hr:unavailable:
+                href: /unavailable/fc81f545088ea825
+                integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+                type: application/json
+  - say: "The Hobbit again: its set is held by address, so nothing more is fetched"
+    outcome:
+      title: The Hobbit
+      standing: hold waiting
+      offered:
+        - Return
+      from: /affordance-sets/76c46cea7232ed43
+    exchanges:
+      - request:
+          method: GET
+          url: /loans/3310
+          headers:
+            Accept: application/json
+        response:
+          status: 200
+          content-type: application/json
+          link: </affordance-sets/76c46cea7232ed43>; rel="https://w3id.org/heart-rise/rels/forms"; type="application/hal+json";
+            integrity="sha256-dsRs6nIy7UNUPi6OIILLINPmCkhlW8yhxdwuxe7pDCI="
+          body:
+            id: 3310
+            title: The Hobbit
+            author: J. R. R. Tolkien
+            due: 2026-11-12
+            renewals: 0
+            standing: hold waiting

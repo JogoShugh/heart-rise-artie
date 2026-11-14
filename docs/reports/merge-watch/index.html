@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>One Goal, Decided Once</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  --paper: #F7F3EA; --ink: #1D2128; --muted: #5B6370; --rule: #DDD5C6; --panel: #FFFDF8;
+  --accent: #A45F12; --accent-soft: #F6E3C2; --code: #EFE9DC;
+  --d-ink: var(--ink); --d-muted: var(--muted); --d-line: #C9C2B4; --d-panel: var(--panel);
+  --d-accent: #B86E12; --d-accent-soft: var(--accent-soft);
+  --d-font: 'IBM Plex Sans', system-ui, sans-serif; --d-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A;
+  --d-line: #3A434F; --d-accent: #E7A64A; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A;
+  --d-line: #3A434F; --d-accent: #E7A64A; color-scheme: dark }
+body { background: var(--paper); color: var(--ink); margin: 0;
+  font: 400 1.125rem/1.7 'Source Serif 4', Georgia, serif; }
+main { max-width: 44rem; margin: 0 auto; padding-block: 4rem 6rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.masthead { border-bottom: 1px solid var(--rule); padding-bottom: 2rem; margin-bottom: 1rem; }
+.kicker { font: 600 0.8rem/1 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent); margin: 0 0 1rem; }
+h1 { font: 600 clamp(2.4rem, 6vw, 3.6rem)/1.05 'IBM Plex Sans', system-ui, sans-serif; margin: 0 0 1rem;
+  text-wrap: balance; letter-spacing: -0.01em; }
+.dek { font-size: 1.3rem; line-height: 1.5; color: var(--muted); margin: 0; }
+h2 { font: 600 1.6rem/1.25 'IBM Plex Sans', system-ui, sans-serif; margin: 3.5rem 0 1rem; text-wrap: balance; }
+.num { display: inline-block; min-width: 2rem; color: var(--accent); }
+p { margin: 0 0 1.1rem; }
+em { font-style: italic; }
+blockquote { margin: 1.8rem 0; padding: 0.4rem 0 0.4rem 1.4rem; border-left: 3px solid var(--accent);
+  font-size: 1.3rem; line-height: 1.55; }
+code { font: 0.88em 'JetBrains Mono', ui-monospace, monospace; background: var(--code); padding: 0.1em 0.3em;
+  border-radius: 4px; }
+pre { background: var(--code); border-radius: 10px; padding: 1.1rem 1.3rem; overflow-x: auto; margin: 1.4rem 0;
+  font-size: 0.85rem; line-height: 1.55; }
+pre code { background: none; padding: 0; font-size: 0.85rem; line-height: 1.55; }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper);
+  border-bottom: 1px solid var(--rule); }
+.bar-in { max-width: 44rem; margin: 0 auto; display: flex; gap: 0.6rem; justify-content: flex-end; flex-wrap: wrap;
+  padding-block: 0.6rem; padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.bar button { font: 500 0.85rem 'IBM Plex Sans', system-ui, sans-serif; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--rule); border-radius: 999px; padding: 0.4rem 0.9rem; cursor: pointer; }
+.bar button:hover { border-color: var(--accent); }
+.howto { font: 400 0.92rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); margin-top: 1.2rem; }
+details.deep { margin: 1.2rem 0 1.6rem; border: 1px solid var(--rule); border-radius: 12px; background: var(--panel); }
+details.deep > summary { cursor: pointer; padding: 0.8rem 1.1rem; list-style: none;
+  font: 600 0.95rem/1.4 'IBM Plex Sans', system-ui, sans-serif; color: var(--accent); }
+details.deep > summary::-webkit-details-marker { display: none; }
+details.deep > summary::before { content: "+"; display: inline-block; width: 1.2rem; font-weight: 600; }
+details.deep[open] > summary::before { content: "−"; }
+details.deep > :not(summary) { margin-left: 1.1rem; margin-right: 1.1rem; }
+details.deep > :last-child { margin-bottom: 1.1rem; }
+details.deep p, details.deep li { font-size: 1rem; }
+details.deep pre { background: var(--code); }
+.table { overflow-x: auto; margin: 1rem 0; }
+table { border-collapse: collapse; width: 100%; font: 400 0.9rem/1.45 'IBM Plex Sans', system-ui, sans-serif; }
+th, td { text-align: left; vertical-align: top; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--rule); }
+th { font-weight: 600; color: var(--muted); }
+ul.obs { margin: 1.2rem 0 1.6rem; padding: 0; list-style: none; display: grid; gap: 0.55rem; }
+ul.obs li { position: relative; padding-left: 1.4rem; line-height: 1.55; }
+ul.obs li::before { content: ""; position: absolute; left: 0.2rem; top: 0.68em; width: 0.45rem; height: 0.45rem;
+  border-radius: 50%; background: var(--accent); }
+ul.obs b { font-weight: 600; }
+blockquote cite { display: block; margin-top: 0.6rem; font: 400 0.9rem 'IBM Plex Sans', system-ui, sans-serif;
+  font-style: normal; color: var(--muted); }
+figure { margin: 2.2rem 0; }
+figure .art { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px;
+  padding: 1rem; }
+figure svg { display: block; width: 100%; min-width: 560px; height: auto; }
+figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); margin-top: 0.6rem; }
+@media (min-width: 1100px) { figure { margin-left: -6rem; margin-right: -6rem; } }
+.sources { margin-top: 4rem; border-top: 1px solid var(--rule); padding-top: 1rem;
+  font: 400 0.92rem/1.6 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); }
+h3.step { font: 600 1.05rem/1.4 'IBM Plex Sans', system-ui, sans-serif; margin: 2.2rem 0 0.4rem; color: var(--accent); }
+.sources h2 { font-size: 1rem; margin: 1rem 0 0.5rem; }
+.sources ul { padding-left: 1.2rem; }
+</style>
+</head><body>
+<nav class="bar" aria-label="Page controls"><div class="bar-in">
+<button type="button" id="all">Show all detail</button>
+<button type="button" id="theme">Theme: auto</button>
+</div></nav>
+<main>
+<header class="masthead">
+<p class="kicker">HEART and ARTIE · a run report</p>
+<h1>One Goal, Decided Once</h1>
+<p class="dek">A merge watch written in fifteen lines of plain words: the model decides each step once, the steps run on as a script, and the model comes back only where the words say so.</p>
+<p class="howto">Each section is short. The technical detail sits under <b>Technical detail</b> at its end; <b>Show all detail</b> above opens every one.</p>
+</header>
+
+<section id="job">
+<h2><span class="num">1</span>The job</h2>
+<p>Dependency bumps pile up in a repository. A person wants them merged as soon as they can be, left alone when someone objects, and the author told plainly when a bump can’t go in.</p>
+<figure id="fig-lifecycle"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="lifecycle-title lifecycle-desc">
+<title id="lifecycle-title">What the person wants done with each dependency bump</title>
+<desc id="lifecycle-desc">A bump labelled hold is left, said once. Otherwise the watch waits up to three minutes for merge to be offered and merges it; if it never is, the server's reason goes to the model, which writes one sentence to the author.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="lifecycle-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="hl" x="20" y="170" width="150" height="64" rx="10"/>
+<text class="h" x="95" y="197" text-anchor="middle">A bump opens</text>
+<text class="s" x="95" y="217" text-anchor="middle">labelled dependencies</text>
+<path class="line" d="M170 202 L208 202" marker-end="url(#lifecycle-head)"/>
+<rect class="box" x="210" y="170" width="160" height="64" rx="10"/>
+<text class="h" x="290" y="207" text-anchor="middle">Labelled hold?</text>
+<path class="line" d="M290 170 L290 116" marker-end="url(#lifecycle-head)"/>
+<text class="s" x="304" y="148" text-anchor="start">yes</text>
+<rect class="box" x="210" y="50" width="160" height="64" rx="10"/>
+<text class="h" x="290" y="77" text-anchor="middle">Leave it</text>
+<text class="s" x="290" y="97" text-anchor="middle">say so once</text>
+<path class="line" d="M370 202 L408 202" marker-end="url(#lifecycle-head)"/>
+<text class="s" x="389" y="194" text-anchor="middle">no</text>
+<rect class="box" x="410" y="170" width="170" height="64" rx="10"/>
+<text class="h" x="495" y="197" text-anchor="middle">Merge offered?</text>
+<text class="s" x="495" y="217" text-anchor="middle">wait up to 3 minutes</text>
+<path class="line" d="M495 170 L495 116" marker-end="url(#lifecycle-head)"/>
+<text class="s" x="509" y="148" text-anchor="start">yes</text>
+<rect class="box" x="410" y="50" width="170" height="64" rx="10"/>
+<text class="h" x="495" y="77" text-anchor="middle">Merge it</text>
+<text class="s" x="495" y="97" text-anchor="middle">by squashing</text>
+<path class="line" d="M580 202 L618 202" marker-end="url(#lifecycle-head)"/>
+<text class="s" x="599" y="194" text-anchor="middle">no</text>
+<rect class="box" x="620" y="170" width="150" height="64" rx="10"/>
+<text class="h" x="695" y="197" text-anchor="middle">Give up</text>
+<text class="s" x="695" y="217" text-anchor="middle">the server says why</text>
+<path class="line" d="M770 202 L798 202" marker-end="url(#lifecycle-head)"/>
+<rect class="hl" x="800" y="170" width="140" height="64" rx="10"/>
+<text class="h" x="870" y="197" text-anchor="middle">The model</text>
+<text class="s" x="870" y="217" text-anchor="middle">one sentence</text>
+<path class="line" d="M870 234 L870 278" marker-end="url(#lifecycle-head)"/>
+<rect class="box" x="780" y="280" width="160" height="64" rx="10"/>
+<text class="h" x="860" y="307" text-anchor="middle">Comment</text>
+<text class="s" x="860" y="327" text-anchor="middle">to its author</text>
+<text class="s" x="400" y="320" text-anchor="middle">All of it again whenever a pull request changes,</text>
+<text class="s" x="400" y="342" text-anchor="middle">until someone closes the watch's issue.</text>
+</svg></div><figcaption>What the person wants done with each dependency bump</figcaption></figure>
+<ul class="obs">
+<li>Three outcomes for every bump: <b>merged</b>, <b>left</b> (labelled <code>hold</code>, said once), or <b>told why</b> (the wait gave up).</li>
+<li>The work never ends by itself. It runs until a person closes the watch’s issue.</li>
+<li>Only one part needs judgment: putting the server’s reason into a friendly sentence. The rest is rules.</li>
+<li>The aim: decide the rules once with a model, run them many times without one.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the stand-ins that made the bumps</summary>
+<p>A Dependabot stand-in, <code>exhibits/dependabot-sim/bump.kts</code>, opens real pull requests on a scratch repository (<code>JogoShugh/heart-github-test</code>): a branch, a one-line version file, a pull request into <code>deps-main</code>, and its labels.</p>
+<pre><code>artie run bump.kts owner=JogoShugh to=5.0.1 file=deps-501.txt label=dependencies,hold
+artie run bump.kts owner=JogoShugh to=5.0.2 file=deps-502.txt label=dependencies draft=true
+artie run bump.kts owner=JogoShugh to=5.0.3 file=deps-503.txt label=dependencies</code></pre>
+<ul class="obs">
+<li>Two bumps that write the same file conflict once one of them merges; that is how the conflicts in the hour run were made.</li>
+<li>A draft can’t be merged until someone marks it ready, so its wait gives up.</li>
+<li><code>person.kts close=yes</code> closes the watch’s issue at the end, as a person would.</li>
+</ul>
+</details>
+</section>
+
+<section id="history">
+<h2><span class="num">2</span>A short history of hypertext</h2>
+<p>Information that carries its own way forward is an old idea. For forty years each system came with its own reader; then the Web split the client from the content.</p>
+<figure id="fig-history"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 470" role="img" aria-labelledby="history-title history-desc">
+<title id="history-title">Hypertext, 1945 to now</title>
+<desc id="history-desc">Linked information is old: Bush's memex, Nelson's word, Engelbart's NLS and HyperCard each came with their own reader. The Web split the generic client from the content in 1991, Fielding named its architecture in 2000, APIs moved the rules into descriptions and training, and HEART puts the controls back in the answer.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="history-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<path class="line" d="M40 235 L920 235"/>
+<rect class="ghost" x="80" y="221" width="232" height="28" rx="14"/>
+<circle class="head" cx="100" cy="235" r="6"/>
+<path class="dash" d="M100 223 L100 185"/>
+<text class="h" x="100" y="125" text-anchor="middle">1945</text>
+<text class="s" x="100" y="144" text-anchor="middle">Bush: memex</text>
+<text class="s" x="100" y="163" text-anchor="middle">trails of documents</text>
+<circle class="head" cx="164" cy="235" r="6"/>
+<path class="dash" d="M164 247 L164 285"/>
+<text class="h" x="164" y="311" text-anchor="middle">1965</text>
+<text class="s" x="164" y="330" text-anchor="middle">Nelson coins</text>
+<text class="s" x="164" y="349" text-anchor="middle">“hypertext”</text>
+<circle class="head" cx="228" cy="235" r="6"/>
+<path class="dash" d="M228 223 L228 185"/>
+<text class="h" x="228" y="125" text-anchor="middle">1968</text>
+<text class="s" x="228" y="144" text-anchor="middle">Engelbart: NLS</text>
+<text class="s" x="228" y="163" text-anchor="middle">links, one system</text>
+<circle class="head" cx="292" cy="235" r="6"/>
+<path class="dash" d="M292 247 L292 285"/>
+<text class="h" x="292" y="311" text-anchor="middle">1987</text>
+<text class="s" x="292" y="330" text-anchor="middle">HyperCard</text>
+<text class="s" x="292" y="349" text-anchor="middle">stacks, one reader</text>
+<circle class="head" cx="356" cy="235" r="6"/>
+<path class="dash" d="M356 223 L356 185"/>
+<text class="h" x="356" y="125" text-anchor="middle">1989</text>
+<text class="s" x="356" y="144" text-anchor="middle">Berners-Lee</text>
+<text class="s" x="356" y="163" text-anchor="middle">proposal at CERN</text>
+<circle class="a" cx="420" cy="235" r="9"/>
+<path class="dash" d="M420 247 L420 285"/>
+<text class="h" x="420" y="311" text-anchor="middle">1991</text>
+<text class="s" x="420" y="330" text-anchor="middle">The Web, public</text>
+<text class="s" x="420" y="349" text-anchor="middle">URI, HTTP, HTML</text>
+<circle class="head" cx="484" cy="235" r="6"/>
+<path class="dash" d="M484 223 L484 185"/>
+<text class="h" x="484" y="125" text-anchor="middle">1993</text>
+<text class="s" x="484" y="144" text-anchor="middle">Mosaic, forms</text>
+<text class="s" x="484" y="163" text-anchor="middle">links and forms</text>
+<circle class="a" cx="548" cy="235" r="9"/>
+<path class="dash" d="M548 247 L548 285"/>
+<text class="h" x="548" y="311" text-anchor="middle">2000</text>
+<text class="s" x="548" y="330" text-anchor="middle">Fielding: REST</text>
+<text class="s" x="548" y="349" text-anchor="middle">dissertation</text>
+<circle class="head" cx="612" cy="235" r="6"/>
+<path class="dash" d="M612 223 L612 185"/>
+<text class="h" x="612" y="125" text-anchor="middle">2008</text>
+<text class="s" x="612" y="144" text-anchor="middle">“must be</text>
+<text class="s" x="612" y="163" text-anchor="middle">hypertext-driven”</text>
+<circle class="head" cx="676" cy="235" r="6"/>
+<path class="dash" d="M676 247 L676 285"/>
+<text class="h" x="676" y="311" text-anchor="middle">2012</text>
+<text class="s" x="676" y="330" text-anchor="middle">HAL draft</text>
+<text class="s" x="676" y="349" text-anchor="middle">links in JSON</text>
+<circle class="head" cx="740" cy="235" r="6"/>
+<path class="dash" d="M740 223 L740 185"/>
+<text class="h" x="740" y="125" text-anchor="middle">2017</text>
+<text class="s" x="740" y="144" text-anchor="middle">OpenAPI 3.0</text>
+<text class="s" x="740" y="163" text-anchor="middle">rules in a spec</text>
+<circle class="head" cx="804" cy="235" r="6"/>
+<path class="dash" d="M804 247 L804 285"/>
+<text class="h" x="804" y="311" text-anchor="middle">2023</text>
+<text class="s" x="804" y="330" text-anchor="middle">LLM agents</text>
+<text class="s" x="804" y="349" text-anchor="middle">rules in training</text>
+<circle class="a" cx="868" cy="235" r="9"/>
+<path class="dash" d="M868 223 L868 185"/>
+<text class="h" x="868" y="125" text-anchor="middle">2026</text>
+<text class="s" x="868" y="144" text-anchor="middle">HEART + ARTIE</text>
+<text class="s" x="868" y="163" text-anchor="middle">controls in answers</text>
+<text class="s" x="196" y="40" text-anchor="middle">Islands: each system its own reader</text>
+<text class="s" x="480" y="445" text-anchor="middle">The Web splits client from content; then APIs move the rules out of the answer again</text>
+</svg></div><figcaption>Hypertext, 1945 to now</figcaption></figure>
+<ul class="obs">
+<li><b>1945</b> Vannevar Bush’s memex, in “As We May Think”: a desk of documents and the trails a reader makes between them. Never built.</li>
+<li><b>1965</b> Ted Nelson coins “hypertext”. <b>1968</b> Douglas Engelbart demonstrates NLS: live, linked, editable, on NLS terminals only.</li>
+<li><b>1987</b> HyperCard: millions of linked stacks, readable only in HyperCard. Content and reader came as a pair.</li>
+<li><b>1989–1991</b> Tim Berners-Lee’s proposal at CERN, then the public Web: URIs name things, HTTP moves them, HTML describes them. Any browser, any site.</li>
+<li><b>1993</b> Mosaic, and forms: pages that say not only where to go but what can be <em>done</em>, with which fields.</li>
+<li><b>2000</b> Roy Fielding names the architecture REST. <b>2008</b> he complains that APIs have dropped its central constraint.</li>
+<li><b>2012–2023</b> HAL puts links into JSON; OpenAPI moves the rules into a description; agents carry them in training.</li>
+<li><b>2026</b> HEART puts the controls back in the answer, and ARTIE reads them, as a browser reads a page.</li>
+</ul>
+<details class="deep"><summary>Technical detail: what each step lacked, and what the Web added</summary>
+<div class="table"><table>
+<tr><th>System</th><th>Links</th><th>Actions</th><th>Generic reader</th></tr>
+<tr><td>Memex (1945)</td><td>trails, by hand</td><td>—</td><td>— (never built)</td></tr>
+<tr><td>NLS (1968)</td><td>yes</td><td>yes, in NLS</td><td>no: NLS terminals</td></tr>
+<tr><td>HyperCard (1987)</td><td>yes</td><td>scripts in the stack</td><td>no: HyperCard</td></tr>
+<tr><td>The Web (1991–1993)</td><td>yes</td><td>forms</td><td><b>yes: any browser</b></td></tr>
+<tr><td>JSON APIs (2000s)</td><td>URLs as data</td><td>in the docs</td><td>no: a client per API</td></tr>
+<tr><td>HEART (2026)</td><td>typed links</td><td>forms with JSON Schema, offered only when allowed</td><td><b>yes: ARTIE</b></td></tr>
+</table></div>
+</details>
+</section>
+
+<section id="fielding">
+<h2><span class="num">3</span>Fielding’s complaint</h2>
+<p>Fielding’s dissertation defined REST by four interface constraints. Eight years later he wrote, in so many words, that the APIs calling themselves REST had dropped the one that matters most.</p>
+<blockquote>REST is defined by four interface constraints: identification of resources; manipulation of resources through representations; self-descriptive messages; and, hypermedia as the engine of application state.<cite>Roy T. Fielding, dissertation, 2000, §5.1.5</cite></blockquote>
+<blockquote>I am getting frustrated by the number of people calling any HTTP-based interface a REST API. Today’s example is the SocialSite REST API. That is RPC. It screams RPC. There is so much coupling on display that it should be given an X rating.<cite>Roy T. Fielding, “REST APIs must be hypertext-driven”, 20 October 2008</cite></blockquote>
+<blockquote>What needs to be done to make the REST architectural style clear on the notion that hypertext is a constraint? In other words, if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period. Is there some broken manual somewhere that needs to be fixed?<cite>Roy T. Fielding, 2008</cite></blockquote>
+<figure id="fig-drift"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" role="img" aria-labelledby="drift-title drift-desc">
+<title id="drift-title">The rules move away from the server, and go stale</title>
+<desc id="drift-desc">Each row is an era, and the line runs from the server to where a client finds the rules. On the Web they are in the answer, true now. With RPC they are in an interface file, as of the release; with JSON APIs in documentation, as of the reading; with OpenAPI in a generated client, as of the last build; for LLM agents in the model, as of training. HEART puts them back in the answer, true now.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="drift-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="hl" x="250" y="86" width="56" height="380" rx="8"/>
+<text class="h" x="0" y="0" text-anchor="middle" transform="translate(284 276) rotate(-90)">The server, where the rules are true</text>
+<text class="t" x="380" y="44" text-anchor="middle">The answer</text>
+<text class="t" x="380" y="62" text-anchor="middle"></text>
+<path class="dash" d="M380 82 L380 466"/>
+<text class="t" x="500" y="44" text-anchor="middle">An interface</text>
+<text class="t" x="500" y="62" text-anchor="middle">file</text>
+<path class="dash" d="M500 82 L500 466"/>
+<text class="t" x="620" y="44" text-anchor="middle">The docs</text>
+<text class="t" x="620" y="62" text-anchor="middle"></text>
+<path class="dash" d="M620 82 L620 466"/>
+<text class="t" x="740" y="44" text-anchor="middle">A generated</text>
+<text class="t" x="740" y="62" text-anchor="middle">client</text>
+<path class="dash" d="M740 82 L740 466"/>
+<text class="t" x="860" y="44" text-anchor="middle">The model</text>
+<text class="t" x="860" y="62" text-anchor="middle"></text>
+<path class="dash" d="M860 82 L860 466"/>
+<text class="t" x="40" y="112" text-anchor="start">The Web</text>
+<text class="s" x="40" y="131" text-anchor="start">a form in the page</text>
+<path class="line" d="M306 107 L371 107" marker-end="url(#drift-head)"/>
+<circle class="a" cx="380" cy="107" r="7"/>
+<text class="s" x="380" y="131" text-anchor="middle">true now</text>
+<text class="t" x="40" y="174" text-anchor="start">RPC, SOAP</text>
+<text class="s" x="40" y="193" text-anchor="start">WSDL, compiled in</text>
+<path class="line" d="M306 169 L491 169" marker-end="url(#drift-head)"/>
+<circle class="a" cx="500" cy="169" r="7"/>
+<text class="s" x="500" y="193" text-anchor="middle">as of the release</text>
+<text class="t" x="40" y="236" text-anchor="start">JSON APIs</text>
+<text class="s" x="40" y="255" text-anchor="start">pages a developer reads</text>
+<path class="line" d="M306 231 L611 231" marker-end="url(#drift-head)"/>
+<circle class="a" cx="620" cy="231" r="7"/>
+<text class="s" x="620" y="255" text-anchor="middle">as of the reading</text>
+<text class="t" x="40" y="298" text-anchor="start">OpenAPI</text>
+<text class="s" x="40" y="317" text-anchor="start">SDKs generated from it</text>
+<path class="line" d="M306 293 L731 293" marker-end="url(#drift-head)"/>
+<circle class="a" cx="740" cy="293" r="7"/>
+<text class="s" x="740" y="317" text-anchor="middle">as of the last build</text>
+<text class="t" x="40" y="360" text-anchor="start">LLM agents</text>
+<text class="s" x="40" y="379" text-anchor="start">what training saw</text>
+<path class="line" d="M306 355 L851 355" marker-end="url(#drift-head)"/>
+<circle class="a" cx="860" cy="355" r="7"/>
+<text class="s" x="860" y="379" text-anchor="middle">as of training</text>
+<text class="h" x="40" y="422" text-anchor="start">HEART</text>
+<text class="s" x="40" y="441" text-anchor="start">back in the answer</text>
+<path class="accline" d="M306 417 L371 417" marker-end="url(#drift-head)"/>
+<circle class="a" cx="380" cy="417" r="9"/>
+<text class="s" x="380" y="441" text-anchor="middle">true now</text>
+</svg></div><figcaption>The rules move away from the server, and go stale</figcaption></figure>
+<ul class="obs">
+<li>His rules for a REST API, verbatim: “A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API).”</li>
+<li>“A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types.”</li>
+<li>“A REST API must not define fixed resource names or hierarchies (an obvious coupling of client and server). Servers must have the freedom to control their own namespace.”</li>
+<li>What he meant by hypertext, in his comments on that post: “When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.”</li>
+<li>And machines: “Machines can follow links when they understand the data format and relationship types.”</li>
+<li>The diagram shows where the rules went instead: an interface file, the docs, a generated client, the model’s training. Each copy is frozen earlier and drifts from the server.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the trade Fielding named, and HEART’s answer to each constraint</summary>
+<blockquote>The trade-off, though, is that a uniform interface degrades efficiency, since information is transferred in a standardized form rather than one which is specific to an application’s needs.<cite>Fielding, dissertation, §5.1.5</cite></blockquote>
+<blockquote>REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution. Many of the constraints are directly opposed to short-term efficiency.<cite>Fielding, comment on “REST APIs must be hypertext-driven”, 2008</cite></blockquote>
+<div class="table"><table>
+<tr><th>Constraint</th><th>In this run</th></tr>
+<tr><td>Identification of resources</td><td>Each pull request, issue and list has a URL the gateway handed over; the script never builds one.</td></tr>
+<tr><td>Manipulation through representations</td><td>Merge is a <code>PUT</code> to the merge form’s target with <code>{"merge_method": "squash"}</code>, as the form’s JSON Schema says.</td></tr>
+<tr><td>Self-descriptive messages</td><td><code>application/hal+json</code>, the HEART profile in <code>Link: rel="profile"</code>, a strong <code>ETag</code>, refusals as RFC 9457 problems.</td></tr>
+<tr><td>Hypermedia as the engine of application state</td><td>Merge is offered as a form only when GitHub would accept it; when not, the why-absent resource says why.</td></tr>
+</table></div>
+</details>
+</section>
+
+<section id="goal">
+<h2><span class="num">4</span>The goal in words</h2>
+<p>The whole job, as the person wrote it. No code, no API names: inputs, one sentence of context, and a list of steps in the words a person would use.</p>
+<pre><code>Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed.
+
+- In {owner}/{repo}
+  - Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+  - Whenever a pull request labelled {label} changes `as pr`
+    - If it's labelled {hold}, leave it, and say so once.
+    - Once it can be merged, merge it by squashing.
+      Or give up after 3 minutes.
+      Otherwise, tell its author in one friendly sentence why it wasn't merged and what to do next. `reasoned`
+- Until someone closes {watch}</code></pre>
+<figure id="fig-goalmap"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 470" role="img" aria-labelledby="goalmap-title goalmap-desc">
+<title id="goalmap-title">Each line of the goal, and what the run does with it</title>
+<desc id="goalmap-desc">Whenever visits pull requests new or changed; If leaves held ones, saying so once; Once waits for merge to be offered; Or give up ends the wait; Otherwise, marked reasoned, asks the model each time; Until ends the watch.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="goalmap-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="250" y="30" text-anchor="middle">The goal says</text>
+<text class="h" x="730" y="30" text-anchor="middle">The run does</text>
+<rect class="box" x="20" y="52" width="470" height="54" rx="10"/>
+<text class="m" x="36" y="84">Whenever a pull request labelled {label} changes</text>
+<path class="line" d="M492 79 L538 79" marker-end="url(#goalmap-head)"/>
+<rect class="box" x="540" y="52" width="400" height="54" rx="10"/>
+<text class="t" x="740" y="75" text-anchor="middle">Visit each one new or changed</text>
+<text class="s" x="740" y="94" text-anchor="middle">since the last look</text>
+<rect class="box" x="20" y="120" width="470" height="54" rx="10"/>
+<text class="m" x="36" y="152">If it's labelled {hold}, leave it, and say so once.</text>
+<path class="line" d="M492 147 L538 147" marker-end="url(#goalmap-head)"/>
+<rect class="box" x="540" y="120" width="400" height="54" rx="10"/>
+<text class="t" x="740" y="143" text-anchor="middle">A check: where it holds,</text>
+<text class="s" x="740" y="162" text-anchor="middle">leave the pull request, noted once</text>
+<rect class="box" x="20" y="188" width="470" height="54" rx="10"/>
+<text class="m" x="36" y="220">Once it can be merged, merge it by squashing.</text>
+<path class="line" d="M492 215 L538 215" marker-end="url(#goalmap-head)"/>
+<rect class="box" x="540" y="188" width="400" height="54" rx="10"/>
+<text class="t" x="740" y="211" text-anchor="middle">Wait until the server offers merge,</text>
+<text class="s" x="740" y="230" text-anchor="middle">then act on it</text>
+<rect class="box" x="20" y="256" width="470" height="54" rx="10"/>
+<text class="m" x="36" y="288">Or give up after 3 minutes.</text>
+<path class="line" d="M492 283 L538 283" marker-end="url(#goalmap-head)"/>
+<rect class="box" x="540" y="256" width="400" height="54" rx="10"/>
+<text class="t" x="740" y="279" text-anchor="middle">End that wait</text>
+<text class="s" x="740" y="298" text-anchor="middle">after 3 minutes</text>
+<rect class="hl" x="20" y="324" width="470" height="54" rx="10"/>
+<text class="m" x="36" y="356">Otherwise, tell its author … `reasoned`</text>
+<path class="line" d="M492 351 L538 351" marker-end="url(#goalmap-head)"/>
+<rect class="hl" x="540" y="324" width="400" height="54" rx="10"/>
+<text class="t" x="740" y="347" text-anchor="middle">Ask the model, each give-up,</text>
+<text class="s" x="740" y="366" text-anchor="middle">with the server's reason</text>
+<rect class="box" x="20" y="392" width="470" height="54" rx="10"/>
+<text class="m" x="36" y="424">Until someone closes {watch}</text>
+<path class="line" d="M492 419 L538 419" marker-end="url(#goalmap-head)"/>
+<rect class="box" x="540" y="392" width="400" height="54" rx="10"/>
+<text class="t" x="740" y="415" text-anchor="middle">Read the watch's issue each look;</text>
+<text class="s" x="740" y="434" text-anchor="middle">stop when it is closed</text>
+</svg></div><figcaption>Each line of the goal, and what the run does with it</figcaption></figure>
+<ul class="obs">
+<li>Six constructs: <b>Whenever</b>, <b>If</b>, <b>Once</b>, <b>Or give up</b>, <b>Otherwise</b>, <b>Until</b>. Each is a plain English word with one meaning.</li>
+<li><code>as watch</code> names the issue so the Until can read it again later, by the address the server gave.</li>
+<li><code>reasoned</code> is the only mark that keeps the model in the loop. Everything else is decided once.</li>
+<li>Nothing in it says GitHub, PUT, or <code>mergeable_state</code>. Those come from the server’s answers at run time.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the front matter</summary>
+<pre><code>---
+start: https://localhost:8392/
+inputs:
+  owner: { question: "Whose repository?" }
+  repo:  { default: heart-github-test, question: "Which repository?" }
+  label: { default: dependencies, question: "Which label marks a dependency bump?" }
+  hold:  { default: hold, question: "Which label means a person objects?" }
+---</code></pre>
+<ul class="obs">
+<li><code>start</code> is the bookmark: the gateway’s service index. Fielding’s “initial URI”.</li>
+<li>Inputs are asked for when not given, and become the script’s inputs later.</li>
+<li>The run: <code>artie run merge.goal.md owner=JogoShugh --reasoner claude --rung L2</code>.</li>
+</ul>
+</details>
+</section>
+
+<section id="once">
+<h2><span class="num">5</span>Decide once, replay forever</h2>
+<p>The first time a step is needed, the model reads the goal’s words against what the server offers right there, and decides. The decision is kept. Every later time, for every pull request, it is replayed with no model.</p>
+<figure id="fig-once"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="once-title once-desc">
+<title id="once-title">Decided once by the model, replayed with no model</title>
+<desc id="once-desc">The first time a step is needed, the model reads the goal's words against what the server offers and decides; the decision is kept. Every later time it is replayed, and the server's own offers say whether it applies.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="once-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="30" y="40" text-anchor="start">The first time a step is needed</text>
+<rect class="box" x="30" y="64" width="170" height="76" rx="10"/>
+<text class="h" x="115" y="97" text-anchor="middle">The goal's words</text>
+<text class="s" x="115" y="117" text-anchor="middle">“merge it by squashing”</text>
+<path class="line" d="M200 102 L248 102" marker-end="url(#once-head)"/>
+<rect class="hl" x="250" y="64" width="190" height="76" rx="10"/>
+<text class="h" x="345" y="97" text-anchor="middle">The model</text>
+<text class="s" x="345" y="117" text-anchor="middle">reads what is offered</text>
+<path class="line" d="M440 102 L488 102" marker-end="url(#once-head)"/>
+<rect class="box" x="490" y="64" width="210" height="76" rx="10"/>
+<text class="h" x="595" y="97" text-anchor="middle">A decision</text>
+<text class="s" x="595" y="117" text-anchor="middle">github:merge, squash</text>
+<path class="line" d="M700 102 L748 102" marker-end="url(#once-head)"/>
+<rect class="box" x="750" y="64" width="180" height="76" rx="10"/>
+<text class="h" x="840" y="97" text-anchor="middle">Kept</text>
+<text class="s" x="840" y="117" text-anchor="middle">in the run's capture</text>
+<text class="h" x="330" y="224" text-anchor="start">Every later time, for every pull request</text>
+<path class="dash" d="M840 140 L840 188 L300 188 L300 236" marker-end="url(#once-head)"/>
+<rect class="box" x="200" y="238" width="200" height="76" rx="10"/>
+<text class="h" x="300" y="271" text-anchor="middle">Replay</text>
+<text class="s" x="300" y="291" text-anchor="middle">the kept decision</text>
+<path class="line" d="M400 276 L448 276" marker-end="url(#once-head)"/>
+<rect class="box" x="450" y="238" width="210" height="76" rx="10"/>
+<text class="h" x="555" y="271" text-anchor="middle">The server</text>
+<text class="s" x="555" y="291" text-anchor="middle">still offers merge here?</text>
+<path class="line" d="M660 276 L708 276" marker-end="url(#once-head)"/>
+<rect class="box" x="710" y="238" width="220" height="76" rx="10"/>
+<text class="h" x="820" y="271" text-anchor="middle">Act</text>
+<text class="s" x="820" y="291" text-anchor="middle">or wait, or give up</text>
+<rect class="ghost" x="30" y="238" width="140" height="76" rx="10"/>
+<text class="t" x="100" y="270" text-anchor="middle">no model</text>
+<text class="s" x="100" y="290" text-anchor="middle">asked</text>
+<text class="s" x="480" y="380" text-anchor="middle">The server's offers check each replay: a decision is used only where its act is offered now.</text>
+</svg></div><figcaption>Decided once by the model, replayed with no model</figcaption></figure>
+<ul class="obs">
+<li>A decision is small: a relation (<code>github:merge</code>), a check as facts (<code>{"github:labels": ["hold"]}</code>), or fields (<code>squash</code>).</li>
+<li>It is made on a real resource, live, not from documentation.</li>
+<li>The replay is safe because the server checks it: a kept decision to merge acts only where the merge form is offered now.</li>
+<li>So the model is needed once per <em>kind</em> of step, not once per pull request or per look.</li>
+</ul>
+<details class="deep"><summary>Technical detail: what the model decided in run 2, with its own reasons</summary>
+<pre><code>why: The start offers github:pulls-list, which filters by labels, so I'll list the pull
+     requests in $owner/$repo narrowed to label $label.
+list pull requests … filtered by label dependencies: decided github:pulls-list
+
+why: The held pull request embeds github:labels including dependencies, so I'll check
+     that it matches the label.
+whenever: … decided the check {"github:labels":["dependencies"]}
+
+why: The condition is that the pull request is labelled $hold, so check that its labels
+     include hold.
+if: it's labelled hold: decided the check {"github:labels":["hold"]}
+
+why: … the PR is mergeable and clean and the github:merge form is offered, so wait on that form.
+once: waits for github:merge
+
+why: The PR is clean and mergeable and offers github:merge, so squash-merge it.
+merge it by squashing: decided github:merge
+
+why: The watch ends once issue 821 is closed, so check that its state is closed.
+until: … decided the check {"state":"closed"}</code></pre>
+<ul class="obs">
+<li>Each reason names what the server offered: “offers github:pulls-list”, “the github:merge form is offered”. The model chose among controls; it didn’t recall an API.</li>
+<li>Run 2 made 12 model calls in all: 6 to decide these steps, 6 for the reasoned comments.</li>
+</ul>
+</details>
+</section>
+
+<section id="offers">
+<h2><span class="num">6</span>The server says what is possible</h2>
+<p>“Once it can be merged” needs no rule about drafts, conflicts or checks. The gateway offers the merge form only when GitHub would accept it, and says why when it won’t.</p>
+<figure id="fig-offers"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="offers-title offers-desc">
+<title id="offers-title">The same resource, offering merge or saying why not</title>
+<desc id="offers-desc">A pull request that can merge carries a merge form. A draft carries none, and its why-absent resource says, in the server's words, that a draft can't be merged.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="offers-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="235" y="34" text-anchor="middle">A pull request that can merge</text>
+<text class="h" x="725" y="34" text-anchor="middle">A draft</text>
+<rect class="box" x="20" y="52" width="430" height="300" rx="10"/>
+<rect class="box" x="510" y="52" width="430" height="300" rx="10"/>
+<rect class="hl" x="34" y="98" width="400" height="28" rx="10"/>
+<text class="m" x="40" y="90">_forms:</text>
+<text class="m" x="40" y="116">  github:merge     PUT  merge_method</text>
+<text class="m" x="40" y="142">  github:comment   POST body</text>
+<text class="m" x="40" y="168">  github:close</text>
+<text class="m" x="40" y="194">  github:edit</text>
+<text class="m" x="530" y="90">_forms:</text>
+<text class="m" x="530" y="116">  github:comment   POST body</text>
+<text class="m" x="530" y="142">  github:close</text>
+<text class="m" x="530" y="168">  github:edit</text>
+<rect class="hl" x="524" y="212" width="400" height="112" rx="10"/>
+<text class="m" x="530" y="232">hr:unavailable:</text>
+<text class="m" x="530" y="258">  merge: “A draft can't be merged;</text>
+<text class="m" x="530" y="284">          mark it ready for review</text>
+<text class="m" x="530" y="310">          first.”</text>
+<text class="s" x="480" y="384" text-anchor="middle">Once waits for merge to appear among the forms; the reason is the server's, in its words.</text>
+</svg></div><figcaption>The same resource, offering merge or saying why not</figcaption></figure>
+<ul class="obs">
+<li>The wait is just this: look again until <code>github:merge</code> appears among the forms.</li>
+<li>When it never does, the reason is already there, in the server’s words, in <code>hr:unavailable</code>.</li>
+<li>This is Fielding’s “information becomes the affordance”: the client acts on what the representation offers, not on what it knows about GitHub.</li>
+<li>The client knows no rule for mergeability. If GitHub adds one tomorrow, the gateway’s answer changes and the script doesn’t.</li>
+</ul>
+<details class="deep"><summary>Technical detail: draft #823 as the gateway serves it</summary>
+<pre><code>GET /repos/JogoShugh/heart-github-test/pulls/823
+Accept: application/hal+json
+
+200 OK
+Content-Type: application/hal+json
+ETag: "seq-0.hsf.L0.a9a03feab6affc4e"
+Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile"
+
+"_forms": { "github:close": {…}, "github:comment": {…}, "github:edit": {…} }
+"_links": { "hr:unavailable": { "href": "/unavailable/ec82898fc179bc85", … }, … }</code></pre>
+<pre><code>GET /unavailable/ec82898fc179bc85
+
+{ "unavailable": [
+  { "rel": "/profiles/github#reopen", "title": "Reopen",
+    "reason": "The pull request is already open." },
+  { "rel": "/profiles/github#merge", "title": "Merge",
+    "reason": "A draft can't be merged; mark it ready for review first." } ] }</code></pre>
+<p>The comment form the model later chose, as offered:</p>
+<pre><code>"github:comment": {
+  "title": "Comment", "method": "POST", "contentType": "application/json",
+  "_links": { "target": { "href": "/repos/JogoShugh/heart-github-test/pulls/823/actions/comment" } },
+  "schema": { "type": "object", "required": ["body"], "additionalProperties": false,
+              "properties": { "body": { "type": "string", "description": "The contents of the comment." } } } }</code></pre>
+</details>
+</section>
+
+<section id="reasoned">
+<h2><span class="num">7</span>Where the model stays</h2>
+<p>One step changes every time: why this bump couldn’t merge, said kindly to this author. The goal marks it <code>reasoned</code>, so it is never replayed.</p>
+<figure id="fig-reasoned"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="reasoned-title reasoned-desc">
+<title id="reasoned-title">The one place the model stays: the reasoned Otherwise</title>
+<desc id="reasoned-desc">When a wait gives up, the server's own reason for withholding merge and the goal's words go to the model, which chooses the comment form the pull request offers and writes one sentence. It is asked every time.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="reasoned-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="box" x="20" y="40" width="200" height="80" rx="10"/>
+<text class="h" x="120" y="75" text-anchor="middle">The wait gives up</text>
+<text class="s" x="120" y="95" text-anchor="middle">3 minutes, no merge offered</text>
+<path class="line" d="M220 80 L268 80" marker-end="url(#reasoned-head)"/>
+<rect class="box" x="270" y="30" width="380" height="100" rx="10"/>
+<text class="h" x="460" y="60" text-anchor="middle">The server says why</text>
+<text class="m" x="290" y="92">hr:unavailable → merge:</text>
+<text class="m" x="290" y="114">“A draft can't be merged; mark it…”</text>
+<path class="line" d="M650 80 L698 80" marker-end="url(#reasoned-head)"/>
+<rect class="hl" x="700" y="40" width="240" height="80" rx="10"/>
+<text class="h" x="820" y="75" text-anchor="middle">The model</text>
+<text class="s" x="820" y="95" text-anchor="middle">the goal's words + the reason</text>
+<path class="line" d="M820 120 L820 178" marker-end="url(#reasoned-head)"/>
+<rect class="box" x="700" y="180" width="240" height="80" rx="10"/>
+<text class="h" x="820" y="215" text-anchor="middle">Picks a form</text>
+<text class="s" x="820" y="235" text-anchor="middle">comment, as offered</text>
+<path class="line" d="M700 220 L652 220" marker-end="url(#reasoned-head)"/>
+<rect class="hl" x="270" y="180" width="380" height="80" rx="10"/>
+<text class="s" x="460" y="212" text-anchor="middle">“…this pull request wasn't merged because it's</text>
+<text class="s" x="460" y="234" text-anchor="middle">still a draft, so please mark it ready for review…”</text>
+<text class="s" x="480" y="320" text-anchor="middle">Asked afresh at every give-up; nothing of it is kept or replayed.</text>
+</svg></div><figcaption>The one place the model stays: the reasoned Otherwise</figcaption></figure>
+<ul class="obs">
+<li>The model gets the goal’s words and the server’s reason, and picks a form the pull request offers.</li>
+<li>Nothing of it is kept: the next give-up asks again, with its own reason.</li>
+<li>The model writes words; it decides no rule. Whether to give up, and why, came from the server.</li>
+<li>One mark, one place. Everything else in the watch runs without inference.</li>
+</ul>
+<details class="deep"><summary>Technical detail: what the model is sent</summary>
+<pre><code>tell its author in one friendly sentence why it wasn't merged and what to do next.
+The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first.</code></pre>
+<ul class="obs">
+<li>The goal’s words, then the server’s reason from <code>hr:unavailable</code>, verbatim.</li>
+<li>With it, as with every reasoner call: the pull request’s state, its offered forms with their JSON Schemas, and its links by relation and title, never an address.</li>
+<li>The reasoner is told to write words a field takes exactly as the intent describes them: “one sentence” is one sentence.</li>
+</ul>
+</details>
+</section>
+
+<section id="run">
+<h2><span class="num">8</span>The run, step by step</h2>
+<p>Live run 2, 26 October 2026, 07:25 to 07:36 EDT, against GitHub through the gateway. Three bumps arrived during the run; eight pull requests were already open from earlier runs.</p>
+<figure id="fig-lanes"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" role="img" aria-labelledby="lanes-title lanes-desc">
+<title id="lanes-title">Live run 2, minute by minute: each pull request a lane</title>
+<desc id="lanes-desc">In ten and a half minutes the watch merged two bumps, left three held ones with one note each, and gave up on four drafts and two conflicts, each told why in one sentence. It ended when its issue was closed.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="lanes-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<path class="dash" d="M200 40 L200 470"/>
+<text class="s" x="200" y="30" text-anchor="middle">0m</text>
+<path class="dash" d="M266 40 L266 470"/>
+<text class="s" x="266" y="30" text-anchor="middle">1m</text>
+<path class="dash" d="M332 40 L332 470"/>
+<text class="s" x="332" y="30" text-anchor="middle">2m</text>
+<path class="dash" d="M398 40 L398 470"/>
+<text class="s" x="398" y="30" text-anchor="middle">3m</text>
+<path class="dash" d="M464 40 L464 470"/>
+<text class="s" x="464" y="30" text-anchor="middle">4m</text>
+<path class="dash" d="M530 40 L530 470"/>
+<text class="s" x="530" y="30" text-anchor="middle">5m</text>
+<path class="dash" d="M596 40 L596 470"/>
+<text class="s" x="596" y="30" text-anchor="middle">6m</text>
+<path class="dash" d="M662 40 L662 470"/>
+<text class="s" x="662" y="30" text-anchor="middle">7m</text>
+<path class="dash" d="M728 40 L728 470"/>
+<text class="s" x="728" y="30" text-anchor="middle">8m</text>
+<path class="dash" d="M794 40 L794 470"/>
+<text class="s" x="794" y="30" text-anchor="middle">9m</text>
+<path class="dash" d="M860 40 L860 470"/>
+<text class="s" x="860" y="30" text-anchor="middle">10m</text>
+<text class="t" x="20" y="65" text-anchor="start">#821</text>
+<text class="s" x="78" y="65" text-anchor="start">the watch's issue</text>
+<path class="line" d="M208 60 L891 60"/>
+<path class="line" d="M208 52 L208 68"/>
+<rect class="hl" x="884" y="53" width="14" height="14"/>
+<text class="t" x="20" y="99" text-anchor="start">#820</text>
+<text class="s" x="78" y="99" text-anchor="start">4.0.1, waiting</text>
+<path class="dash" d="M200 94 L237 94"/>
+<circle class="a" cx="237" cy="94" r="8"/>
+<text class="t" x="20" y="133" text-anchor="start">#805</text>
+<text class="s" x="78" y="133" text-anchor="start">held</text>
+<path class="dash" d="M200 128 L244 128"/>
+<circle class="hl" cx="244" cy="128" r="8"/>
+<text class="t" x="20" y="167" text-anchor="start">#810</text>
+<text class="s" x="78" y="167" text-anchor="start">held</text>
+<path class="dash" d="M200 162 L244 162"/>
+<circle class="hl" cx="244" cy="162" r="8"/>
+<text class="t" x="20" y="201" text-anchor="start">#822</text>
+<text class="s" x="78" y="201" text-anchor="start">5.0.1, held</text>
+<path class="line" d="M274 196 L285 196"/>
+<path class="line" d="M274 188 L274 204"/>
+<circle class="hl" cx="285" cy="196" r="8"/>
+<text class="t" x="20" y="235" text-anchor="start">#817</text>
+<text class="s" x="78" y="235" text-anchor="start">draft</text>
+<path class="dash" d="M200 230 L450 230"/>
+<rect class="a" x="443" y="223" width="14" height="14" rx="2"/>
+<text class="t" x="20" y="269" text-anchor="start">#813</text>
+<text class="s" x="78" y="269" text-anchor="start">conflict</text>
+<path class="dash" d="M200 264 L460 264"/>
+<rect class="a" x="453" y="257" width="14" height="14" rx="2"/>
+<text class="t" x="20" y="303" text-anchor="start">#811</text>
+<text class="s" x="78" y="303" text-anchor="start">draft</text>
+<path class="dash" d="M200 298 L472 298"/>
+<rect class="a" x="465" y="291" width="14" height="14" rx="2"/>
+<text class="t" x="20" y="337" text-anchor="start">#806</text>
+<text class="s" x="78" y="337" text-anchor="start">conflict</text>
+<path class="dash" d="M200 332 L484 332"/>
+<rect class="a" x="477" y="325" width="14" height="14" rx="2"/>
+<text class="t" x="20" y="371" text-anchor="start">#803</text>
+<text class="s" x="78" y="371" text-anchor="start">draft</text>
+<path class="dash" d="M200 366 L498 366"/>
+<rect class="a" x="491" y="359" width="14" height="14" rx="2"/>
+<text class="t" x="20" y="405" text-anchor="start">#823</text>
+<text class="s" x="78" y="405" text-anchor="start">5.0.2, draft</text>
+<path class="line" d="M349 400 L596 400"/>
+<path class="line" d="M349 392 L349 408"/>
+<rect class="a" x="589" y="393" width="14" height="14" rx="2"/>
+<text class="t" x="20" y="439" text-anchor="start">#824</text>
+<text class="s" x="78" y="439" text-anchor="start">5.0.3</text>
+<path class="line" d="M424 434 L524 434"/>
+<path class="line" d="M424 426 L424 442"/>
+<circle class="a" cx="524" cy="434" r="8"/>
+<circle class="a" cx="220" cy="496" r="7"/>
+<text class="s" x="232" y="501" text-anchor="start">merged</text>
+<circle class="hl" cx="330" cy="496" r="7"/>
+<text class="s" x="342" y="501" text-anchor="start">left, said once</text>
+<rect class="a" x="473" y="489" width="14" height="14" rx="2"/>
+<text class="s" x="494" y="501" text-anchor="start">gave up; the model told its author</text>
+<path class="line" d="M760 488 L760 504"/>
+<text class="s" x="770" y="501" text-anchor="start">opened during the run</text>
+</svg></div><figcaption>Live run 2, minute by minute: each pull request a lane</figcaption></figure>
+
+<h3 class="step">07:25:54 · The watch opens</h3>
+<ul class="obs">
+<li>The run enters at the bookmark, reaches the repository, and opens issue #821, “Merge watch”, kept as <code>watch</code>.</li>
+<li>The repository offers no list of pull requests, so the model goes back to the start, where <code>github:pulls-list</code> takes a <code>labels</code> filter.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the first steps</summary>
+<pre><code>1 enter https://localhost:8392/: done
+2 get repository JogoShugh/heart-github-test: done
+3 Open an issue titled "Merge watch" with the body "Close this issue to stop the watch.": new resource
+4 return to https://localhost:8392/repos/JogoShugh/heart-github-test: done
+5 return to https://localhost:8392/: done
+6 list pull requests of JogoShugh/heart-github-test filtered by label dependencies: done</code></pre>
+</details>
+
+<h3 class="step">07:26:28 · The first look: one merge, two held</h3>
+<ul class="obs">
+<li><b>#820</b> (4.0.1, open since an earlier check) offers merge. The model decides the label check, the hold check, the wait and the merge here, on this pull request. Merged.</li>
+<li><b>#805</b> and <b>#810</b> carry <code>hold</code>: left, one note each.</li>
+<li>Five more (#803, #806, #811, #813, #817) don’t offer merge. Their waits begin.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the notes</summary>
+<pre><code>11 merge it by squashing: done
+note: Left …/pulls/810: leave it, and say so once.
+note: Left …/pulls/805: leave it, and say so once.</code></pre>
+<ul class="obs">
+<li>A note is said once per pull request for the whole run, however often the pull request changes.</li>
+</ul>
+</details>
+
+<h3 class="step">07:27:02 · A held bump arrives</h3>
+<ul class="obs">
+<li><b>#822</b> (5.0.1) opens with <code>dependencies</code> and <code>hold</code>. The next look sees it as new, checks it with the kept hold check, and leaves it: one note. No model.</li>
+</ul>
+
+<h3 class="step">07:28:10 · A draft arrives</h3>
+<ul class="obs">
+<li><b>#823</b> (5.0.2) opens as a draft. The kept wait looks for the merge form at each look; it isn’t there.</li>
+</ul>
+
+<h3 class="step">07:29:18 · A mergeable bump arrives</h3>
+<ul class="obs">
+<li><b>#824</b> (5.0.3) opens. GitHub needs a moment to work out whether it can merge, so merge isn’t offered at first.</li>
+</ul>
+
+<h3 class="step">07:29:42 – 07:30:25 · Five waits give up</h3>
+<ul class="obs">
+<li>Three minutes after the first look, the waits on #817, #813, #811, #806 and #803 give up.</li>
+<li>Each goes to the model with its own reason: three drafts, two conflicts. Five comments, one sentence each.</li>
+</ul>
+<details class="deep"><summary>Technical detail: one give-up</summary>
+<pre><code>189 tell its author in one friendly sentence why it wasn't merged and what to do next.
+    The wait gave up, and the server says why: A draft can't be merged; mark it ready
+    for review first.: new resource</code></pre>
+<p>“new resource”: the comment form answered <code>201 Created</code>, with the comment’s address in <code>Location</code>.</p>
+</details>
+
+<h3 class="step">07:30:49 · The mergeable bump merges</h3>
+<ul class="obs">
+<li>#824 now offers merge. The kept decision replays: <code>github:merge</code> with <code>squash</code>. No model.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the replayed act</summary>
+<pre><code>218 act github:merge, merge_method squash: done</code></pre>
+<ul class="obs">
+<li>The act is sent with <code>If-Match</code> set to the ETag of the representation it was chosen from. Had the pull request changed in between, the gateway would answer <code>412</code> instead of merging a state nobody saw.</li>
+</ul>
+</details>
+
+<h3 class="step">07:31:54 · The draft gives up</h3>
+<ul class="obs">
+<li>Three minutes after #823 was first seen, its wait gives up. One more comment.</li>
+</ul>
+
+<h3 class="step">07:36:23 · The watch’s issue is closed</h3>
+<ul class="obs">
+<li>A person closes #821. The next look reads it by the kept name, finds it closed, and the watch ends: 538 steps.</li>
+<li>Held #805 was read 20 times and seen to change once, when GitHub first worked out that it could merge.</li>
+</ul>
+</section>
+
+<section id="said">
+<h2><span class="num">9</span>What the model wrote</h2>
+<p>Six give-ups, six comments. Each is the server’s reason, turned into a request to the author.</p>
+<div class="table"><table>
+<tr><th>Pull request</th><th>The server said</th><th>The model wrote</th></tr>
+<tr><td>#817</td><td>A draft can't be merged; mark it ready for review first.</td><td>Hi @JogoShugh, this wasn't merged because it's still a draft, so please mark it ready for review and then it can be merged!</td></tr>
+<tr><td>#813</td><td>The branch has conflicts with its base; resolve them first.</td><td>Hi @JogoShugh, this pull request wasn't merged because its branch has conflicts with the base branch, so please resolve those conflicts and we can try merging again!</td></tr>
+<tr><td>#811</td><td>A draft can't be merged; mark it ready for review first.</td><td>Hi @JogoShugh, this wasn't merged because it's still a draft, so please mark it ready for review and then it can be merged.</td></tr>
+<tr><td>#806</td><td>The branch has conflicts with its base; resolve them first.</td><td>Hi @JogoShugh, this pull request wasn't merged because its branch has conflicts with the base branch, so please resolve those conflicts and we can try merging again!</td></tr>
+<tr><td>#803</td><td>A draft can't be merged; mark it ready for review first.</td><td>Hi @JogoShugh, this wasn't merged because it's still a draft, so please mark it ready for review first and then it can be merged.</td></tr>
+<tr><td>#823</td><td>A draft can't be merged; mark it ready for review first.</td><td>Hi @JogoShugh, this pull request wasn't merged because it's still a draft, so please mark it ready for review and then it can be merged.</td></tr>
+</table></div>
+<ul class="obs">
+<li>Every comment is one sentence, as the goal asked.</li>
+<li>The facts in each come from the server; the model only phrased them.</li>
+<li>The author’s name comes from the pull request’s embedded <code>author</code>, not from the goal.</li>
+</ul>
+</section>
+
+<section id="script">
+<h2><span class="num">10</span>The script it became</h2>
+<p>From the run’s capture, <code>artie generate</code> writes the same watch as a Kotlin script: every decision named, nothing to ask a model except the one reasoned line.</p>
+<figure id="fig-mapping"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-labelledby="mapping-title mapping-desc">
+<title id="mapping-title">Each line of the goal, and the script line it became</title>
+<desc id="mapping-desc">The goal's lines map one to one onto the generated script: named relations, checks as facts, the wait with its give-up, and one act(intent = …) where the goal said reasoned.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="mapping-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="230" y="30" text-anchor="middle">merge.goal.md</text>
+<text class="h" x="715" y="30" text-anchor="middle">merge.kts, made from the run</text>
+<rect class="box" x="20" y="50" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="83">In {owner}/{repo}</text>
+<path class="line" d="M422 78 L488 78" marker-end="url(#mapping-head)"/>
+<rect class="box" x="490" y="50" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="83">act(&quot;github:repos-get&quot;, owner, repo)</text>
+<rect class="box" x="20" y="120" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="153">Open an issue … `as watch`</text>
+<path class="line" d="M422 148 L488 148" marker-end="url(#mapping-head)"/>
+<rect class="box" x="490" y="120" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="144">act(&quot;github:open-issue&quot;) {</text>
+<text class="m" x="506" y="164">  keepAs(&quot;watch&quot;) }</text>
+<rect class="box" x="20" y="190" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="223">Until someone closes {watch}</text>
+<path class="line" d="M422 218 L488 218" marker-end="url(#mapping-head)"/>
+<rect class="box" x="490" y="190" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="214">watch(until = { at(&quot;watch&quot;) {</text>
+<text class="m" x="506" y="234">  &quot;state&quot; eq &quot;closed&quot; } })</text>
+<rect class="box" x="20" y="260" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="293">Whenever … labelled {label} changes</text>
+<path class="line" d="M422 288 L488 288" marker-end="url(#mapping-head)"/>
+<rect class="box" x="490" y="260" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="284">act(&quot;github:pulls-list&quot;, labels) {</text>
+<text class="m" x="506" y="304">  whenever { has { labels has label }</text>
+<rect class="box" x="20" y="330" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="363">If it's labelled {hold}, leave it …</text>
+<path class="line" d="M422 358 L488 358" marker-end="url(#mapping-head)"/>
+<rect class="box" x="490" y="330" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="354">leaveWhere(&quot;…say so once.&quot;) {</text>
+<text class="m" x="506" y="374">  &quot;github:labels&quot; has hold }</text>
+<rect class="box" x="20" y="400" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="433">Once it can be merged, merge it …</text>
+<path class="line" d="M422 428 L488 428" marker-end="url(#mapping-head)"/>
+<rect class="box" x="490" y="400" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="424">once(&quot;github:merge&quot;, giveUp = 3.minutes)</text>
+<text class="m" x="506" y="444">  { act(&quot;github:merge&quot;, squash) }</text>
+<rect class="hl" x="20" y="470" width="400" height="56" rx="10"/>
+<text class="m" x="36" y="503">Otherwise, … `reasoned`</text>
+<path class="line" d="M422 498 L488 498" marker-end="url(#mapping-head)"/>
+<rect class="hl" x="490" y="470" width="450" height="56" rx="10"/>
+<text class="m" x="506" y="494">otherwise = { why -&gt;</text>
+<text class="m" x="506" y="514">  act(intent = &quot;…$why&quot;) }</text>
+</svg></div><figcaption>Each line of the goal, and the script line it became</figcaption></figure>
+<ul class="obs">
+<li>Each goal line becomes one script construct. The mapping is kept, line and column, in <code>merge.derivation.yaml</code>.</li>
+<li>Relations are named (<code>github:merge</code>), checks are facts (<code>"github:labels" has hold</code>), the give-up is a duration.</li>
+<li>What the run was offered is pinned in <code>merge.pins.yaml</code>: if the gateway changes a form, the script refuses to act rather than guess.</li>
+</ul>
+<details class="deep"><summary>Technical detail: merge.kts</summary>
+<pre><code>heart("https://localhost:8392/") {
+    act("github:repos-get", "owner" to owner, "repo" to repo, intent = "get repository $owner/$repo") {
+        act("github:open-issue", intent = """Open an issue titled "Merge watch" …""", fields = {
+            "title" to "Merge watch"
+            "body" to "Close this issue to stop the watch."
+        }) {
+            keepAs("watch")
+        }
+    }
+    watch(until = { at("watch") { "state" eq "closed" } }) {
+        act("github:pulls-list", "owner" to owner, "repo" to repo, "labels" to label) {
+            whenever {
+                has { "github:labels" has label }
+                leaveWhere("leave it, and say so once.") { "github:labels" has hold }
+                once("github:merge", giveUp = 3.minutes, otherwise = { why ->
+                    act(intent = "tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: ${why ?: "no reason given"}")
+                }) {
+                    act("github:merge", "merge_method" to "squash") {}
+                }
+            }
+        }
+    }
+}</code></pre>
+<pre><code># merge.pins.yaml (abridged)
+rung: L2
+forms:
+  github:merge:
+    integrity: sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk=
+    method: PUT
+  github:comment:
+    integrity: sha256-hBIa40tU8EJokuebe8npx54kItbP3z/jGbJW8FsL26c=
+    method: POST</code></pre>
+</details>
+</section>
+
+<section id="hour">
+<h2><span class="num">11</span>An hour on the script</h2>
+<p>The generated script ran for an hour against a stream of bumps: held, draft, twins that conflict, and plain ones.</p>
+<div class="table"><table>
+<tr><th>Steps</th><th>Model calls</th><th>Merged</th><th>Left (held)</th><th>Told why</th></tr>
+<tr><td>2,740</td><td><b>5</b>, all at the reasoned Otherwise</td><td>6</td><td>2</td><td>5 (3 drafts, 2 conflicts)</td></tr>
+</table></div>
+<ul class="obs">
+<li>2,735 of 2,740 steps (99.8%) ran with no model: the decisions made once in the goal run did the rest.</li>
+<li>The model was asked only where the words said <code>reasoned</code>, once per give-up.</li>
+</ul>
+</section>
+
+<section id="observations">
+<h2><span class="num">12</span>Observations</h2>
+<ul class="obs">
+<li><b>The controls carried the rules.</b> The goal never said what makes a pull request mergeable. The server said it, by offering merge or not, which is what Fielding meant by information that “becomes the affordance”.</li>
+<li><b>The reason came with the refusal.</b> “A draft can't be merged; mark it ready for review first” is the server’s sentence. The model turned it into a kind one; it didn’t have to work it out.</li>
+<li><b>Decide once is safe because the server re-checks.</b> A kept decision acts only where its form is offered now, under <code>If-Match</code>. Replay can’t act on a state the server no longer offers.</li>
+<li><b>A representation should change only when its resource does.</b> Each pull request used to embed its whole repository, including counts like <code>open_issues</code> that change whenever anything happens in the repository. Every pull request then looked changed every few minutes. The gateway now embeds a repository by what names it, with its counts one link away, and a held pull request is seen to change only when it does.</li>
+<li><b>The model stayed where judgment lives.</b> One marked line, one kind of question. Everything a rule can do, a rule did.</li>
+<li><b>Fielding’s bookmark rule held.</b> The run began at one URI and reached every resource by links and forms the server gave. Not one address was built by the client.</li>
+</ul>
+</section>
+
+<footer class="sources">
+<h2>Sources</h2>
+<ul>
+<li>Roy T. Fielding, <i>Architectural Styles and the Design of Network-based Software Architectures</i>, UC Irvine, 2000, §5.1.5 “Uniform Interface”.</li>
+<li>Roy T. Fielding, “REST APIs must be hypertext-driven”, Untangled, 20 October 2008, and his comments there.</li>
+<li>Vannevar Bush, “As We May Think”, <i>The Atlantic</i>, July 1945.</li>
+<li>Theodor H. Nelson, “Complex information processing: a file structure for the complex, the changing and the indeterminate”, ACM, 1965.</li>
+<li>Tim Berners-Lee, “Information Management: A Proposal”, CERN, March 1989.</li>
+<li>Mike Kelly, JSON Hypertext Application Language, draft-kelly-json-hal, IETF, 2012–2023.</li>
+<li>This repository: <code>exhibits/merge-watch/</code> (the goal, the script, run 2’s output and capture), <code>exhibits/dependabot-sim/</code> (the stand-ins), <code>heart/heart-gateway/connectors/github</code> (the gateway’s GitHub connector).</li>
+</ul>
+</footer>
+
+</main>
+<script>
+(function () {
+  var root = document.documentElement, all = document.getElementById('all'), theme = document.getElementById('theme');
+  var order = ['auto', 'light', 'dark'];
+  function setTheme(t) {
+    if (t === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t);
+    theme.textContent = 'Theme: ' + t;
+    try { localStorage.setItem('theme', t); } catch (e) {}
+  }
+  var saved = 'auto';
+  try { saved = localStorage.getItem('theme') || 'auto'; } catch (e) {}
+  setTheme(order.indexOf(saved) < 0 ? 'auto' : saved);
+  theme.addEventListener('click', function () {
+    var now = root.getAttribute('data-theme') || 'auto';
+    setTheme(order[(order.indexOf(now) + 1) % order.length]);
+  });
+  function details() { return Array.prototype.slice.call(document.querySelectorAll('details.deep')); }
+  function sync() { all.textContent = details().every(function (d) { return d.open; }) ? 'Hide all detail' : 'Show all detail'; }
+  all.addEventListener('click', function () {
+    var open = !details().every(function (d) { return d.open; });
+    details().forEach(function (d) { d.open = open; });
+    sync();
+  });
+  details().forEach(function (d) { d.addEventListener('toggle', sync); });
+})();
+</script>
+</body></html>

@@ -1,0 +1,20 @@
+# What renew.heart.yaml was recorded against, from renew.trace.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its
+# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
+# one offered in a set not recorded for it.
+rung: L2
+digest: sha256-XDzrMkZrDTnosldep8wEIt8luy6Eh8HYT1/3wADSO1c=
+forms:
+  library:get-account:
+    integrity: sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
+    act: sha256-KruEAjUF9OytsEfoyyqCjormTfGPvM76KLq9Lh4CCGs=
+    method: GET
+    sets: []
+  library:renew:
+    integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+    act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    method: POST
+    sets:
+      - sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
+links:
+  item: ''

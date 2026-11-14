@@ -1,0 +1,21 @@
+{
+  "name": "step-1-data",
+  "title": "Only data: what most APIs send today",
+  "part": "For real: two forges, one vocabulary",
+  "kicker": "Building it back up · Step 1 of 5 · HEART L0, simplified",
+  "tone": "light",
+  "number": 38,
+  "of": 59,
+  "html": "<h2>Only data: what most APIs send today</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr)\">\n  <pre># GET /repos/JogoShugh/heart-github-test/pulls/2325\n# Accept: application/json\nnumber: 2325\ntitle: \"Renewals: none during the audit\"\nbody: Variant 504 of the Riverside Public Library release.\nstate: open\nmerged: false\ndraft: false\nmergeable_state: clean\nhead:\n  ref: library/pr-504\n  sha: e266e3b53e0e04204c4f8eff6b14208ba53aafea\nbase:\n  ref: library/main\n# …and about 30 more fields</pre>\n  <div class=\"rows\">\n    <h3 style=\"font: 650 1.7rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--bad)\">And the controls?</h3>\n    <ul>\n      <li>Can it be merged now? By which methods? With what fields?</li>\n      <li>Can I comment? Reopen? Request a review?</li>\n      <li>Answered elsewhere: docs pages, an SDK, a 13.5 MB OpenAPI file, read by a developer and coded into a client.</li>\n    </ul>\n    <p class=\"cite\"><i>The same gap as AWS’s three docs pages, in the preview.</i></p>\n    <p class=\"refs\"><deck-ref name=\"rule-3\"></deck-ref> <deck-ref name=\"rule-6\"></deck-ref> <deck-ref name=\"p1\"></deck-ref></p>\n  </div>\n</div>\n",
+  "say": "Start where most APIs are. GitHub's pull request, as data only, shortened from about 40 fields. It says what the pull request is. It says nothing about what you can do with it. Those controls live out of band: docs pages, an SDK, a 13.5 MB OpenAPI file. Like AWS's three docs pages in the preview.",
+  "sources": [
+    {
+      "label": "GitHub REST: get a pull request",
+      "href": "https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request"
+    },
+    {
+      "label": "GitHub OpenAPI description",
+      "href": "https://github.com/github/rest-api-description"
+    }
+  ]
+}

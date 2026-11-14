@@ -1,0 +1,22 @@
+{
+  "name": "rule-4",
+  "kind": "rule",
+  "label": "R4 · NO-FIXED-URIS",
+  "title": "No fixed resource names or hierarchies",
+  "summary": "In brief: the server owns its namespace and tells the client how to build addresses: forms, URI templates.",
+  "quote": "<p>“A REST API must not define fixed resource names or hierarchies (an obvious coupling of client and server). Servers must have the freedom to control their own namespace. Instead, allow servers to instruct clients on how to construct appropriate URIs, such as is done in HTML forms and URI templates, by defining those instructions within media types and link relations. [Failure here implies that clients are assuming a resource structure due to out-of band information, such as a domain-specific standard, which is the data-oriented equivalent to RPC’s functional coupling].”</p>",
+  "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+  "date": "20 October 2008",
+  "_links": {
+    "describedby": {
+      "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+      "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+    },
+    "self": {
+      "href": "rule-4.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

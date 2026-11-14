@@ -1,0 +1,26 @@
+1 enter https://localhost:8392/: done
+2 act github:repos-get, owner JogoShugh, repo heart-github-test: done
+3 act github:open-issue, title Crash when a bed has no name (1022-135442), body a bed with a blank name crashes the garden: new resource
+4 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/500: done
+5 act github:label, labels [bug]: done
+6 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/500: done
+7 act github:assign, assignees [JogoShugh]: done
+8 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/500: done
+9 check: held
+10 return to https://localhost:8392/repos/JogoShugh/heart-github-test: done
+11 act github:open-issue, title Test blank bed names (1022-135442), body part of #500: new resource
+12 return to https://localhost:8392/repos/JogoShugh/heart-github-test: done
+13 act github:open-issue, title Garden crashes on an empty bed name (1022-135442), body seen on the demo garden: new resource
+14 return to https://localhost:8392/repos/JogoShugh/heart-github-test: done
+15 follow github:repos-list-branches: done
+16 follow item, titled main: done
+17 act github:branch-from-here, name fix-blank-names-1022-135442: new resource
+18 return to https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-135442: done
+19 act github:commit-file, path fix-1022-135442.md, message Refuse a bed with no name, content Bed names may not be blank.: done
+20 return to https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-135442: done
+21 act github:commit-file, path test-1022-135442.md, message Test that a blank bed name is refused, content A bed with a blank name is refused.: done
+22 return to https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-135442: done
+23 act github:open-pull-request, base main, title Refuse a bed with no name (1022-135442), body fixes #500: new resource
+24 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/503: done
+25 act github:edit, body fixes #500 and is tested by #501: refused
+stopped at step 17, "github:edit": guard, refused by the client: "github:edit is offered in another set: pinned sha256-h6MMpfeYJTsEkF5VbKXG0d1L+dUe526SPYy/c/4JI00=, offered sha256-SEkUvDDm26VvDpv2jdsfdBUxa7xoVdTvgNvxRB5DC8Q="

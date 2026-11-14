@@ -1,0 +1,405 @@
+---
+run:
+  inputs:
+    gateway:
+      value: http://localhost:8098
+      given: given
+      default: http://localhost:8098
+---
+at: '2026-11-02T15:18:15.148183Z'
+ms: 77
+mode: script
+say: enter {entry}
+line: 5
+params:
+  entry: http://localhost:8098/repos/acme/web/issues/7
+opens: true
+outcome: done
+address: http://localhost:8098/repos/acme/web/issues/7
+now:
+  state:
+    active_lock_reason: null
+    assignees: []
+    author_association: COLLABORATOR
+    body: ''
+    closed_at: null
+    comments: 0
+    created_at: '2011-04-22T13:33:48Z'
+    id: 2000007
+    locked: false
+    milestone: null
+    node_id: MDU6SXNzdWUx
+    number: 7
+    pinned_comment: null
+    state: open
+    state_reason: null
+    title: The nightly build is slow
+    updated_at: '2011-04-22T13:33:48Z'
+    hr:address:
+      owner: acme
+      repo: web
+      issue_number: '7'
+  forms:
+    - github:close
+    - github:close-not-planned
+    - github:close-duplicate
+    - github:edit
+    - github:lock
+    - github:label
+    - github:unlabel
+    - github:assign
+    - github:unassign
+    - github:set-milestone
+    - github:comment
+    - github:add-sub-issue
+    - github:remove-sub-issue
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:labels:
+      - null
+    github:repos-get:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignee:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:closed-by:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:labels:
+      - title: null
+        state:
+          name: ci
+keeps:
+  /title:
+    - 2
+    - 4
+---
+at: '2026-11-02T15:18:15.230973Z'
+ms: 66
+mode: script
+say: act {relation}, title {title}
+line: 7
+within: 6
+params:
+  relation: github:edit
+  title: The nightly build is slow (triaged)
+values:
+  title:
+    value: The nightly build is slow (triaged)
+    from:
+      - parts:
+          The nightly build is slow:
+            step: 1
+            pointer: /title
+chose:
+  kind: form
+  relation: github:edit
+  title: Edit
+  method: PATCH
+  target: http://localhost:8098/repos/acme/web/issues/7/actions/edit
+  address: http://localhost:8098/repos/acme/web/issues/7/actions/edit
+  picked: relation
+  not sent:
+    - body
+guard:
+  rung: L0
+  form: sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+  if-match: '"seq-0.hsf.L0.4c757d12a32cda9a"'
+offered:
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    - alternate
+    - github:events
+    - github:issues-list-comments
+    - github:issues-list-sub-issues
+    - github:labels
+    - github:repos-get
+    - hr:unavailable
+    - self
+outcome: refused
+address: http://localhost:8098/repos/acme/web/issues/7
+refused:
+  kind: stale
+  by: the client
+  detail: since it was read, someone else changed title, which this act writes; sending it again would overwrite theirs
+---
+at: '2026-11-02T15:18:15.300029Z'
+ms: 16
+mode: script
+say: return to {address}
+line: 6
+within: 5
+params:
+  address: http://localhost:8098/repos/acme/web/issues/7
+outcome: done
+address: http://localhost:8098/repos/acme/web/issues/7
+now:
+  state:
+    active_lock_reason: null
+    assignees: []
+    author_association: COLLABORATOR
+    body: ''
+    closed_at: null
+    comments: 0
+    created_at: '2011-04-22T13:33:48Z'
+    id: 2000007
+    locked: false
+    milestone: null
+    node_id: MDU6SXNzdWUx
+    number: 7
+    pinned_comment: null
+    state: closed
+    state_reason: not_planned
+    title: The nightly build is slow on Mondays
+    updated_at: '2011-04-22T13:33:48Z'
+    hr:address:
+      owner: acme
+      repo: web
+      issue_number: '7'
+  forms:
+    - github:reopen
+    - github:edit
+    - github:lock
+    - github:label
+    - github:unlabel
+    - github:assign
+    - github:unassign
+    - github:set-milestone
+    - github:comment
+    - github:add-sub-issue
+    - github:remove-sub-issue
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:labels:
+      - null
+    github:repos-get:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignee:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:closed-by:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:labels:
+      - title: null
+        state:
+          name: ci
+---
+at: '2026-11-02T15:18:15.316705Z'
+ms: 25
+mode: script
+say: act {relation}, title {title}
+line: 7
+within: 6
+params:
+  relation: github:edit
+  title: The nightly build is slow on Mondays (triaged)
+values:
+  title:
+    value: The nightly build is slow on Mondays (triaged)
+    from:
+      - parts:
+          The nightly build is slow:
+            step: 1
+            pointer: /title
+chose:
+  kind: form
+  relation: github:edit
+  title: Edit
+  method: PATCH
+  target: http://localhost:8098/repos/acme/web/issues/7/actions/edit
+  address: http://localhost:8098/repos/acme/web/issues/7/actions/edit
+  picked: relation
+  not sent:
+    - body
+guard:
+  rung: L0
+  form: sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+  if-match: '"seq-0.hsf.L0.6f54068cb1e13285"'
+offered:
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    - alternate
+    - github:events
+    - github:issues-list-comments
+    - github:issues-list-sub-issues
+    - github:labels
+    - github:repos-get
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8098/repos/acme/web/issues/7
+now:
+  state:
+    active_lock_reason: null
+    assignees: []
+    author_association: COLLABORATOR
+    body: ''
+    closed_at: null
+    comments: 0
+    created_at: '2011-04-22T13:33:48Z'
+    id: 2000007
+    locked: false
+    milestone: null
+    node_id: MDU6SXNzdWUx
+    number: 7
+    pinned_comment: null
+    state: closed
+    state_reason: not_planned
+    title: The nightly build is slow on Mondays (triaged)
+    updated_at: '2011-04-22T13:33:48Z'
+    hr:address:
+      owner: acme
+      repo: web
+      issue_number: '7'
+  forms:
+    - github:reopen
+    - github:edit
+    - github:lock
+    - github:label
+    - github:unlabel
+    - github:assign
+    - github:unassign
+    - github:set-milestone
+    - github:comment
+    - github:add-sub-issue
+    - github:remove-sub-issue
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:labels:
+      - null
+    github:repos-get:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignee:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:closed-by:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:labels:
+      - title: null
+        state:
+          name: ci

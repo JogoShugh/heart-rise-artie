@@ -1,0 +1,22 @@
+{
+  "name": "layered-system",
+  "kind": "constraint",
+  "label": "Layered system",
+  "title": "Layered system (§5.1.6)",
+  "summary": "Each component sees only the next layer; intermediaries can cache and enforce policy. A gateway in front of GitHub is this.",
+  "quote": "<p>“In order to further improve behavior for Internet-scale requirements, we add layered system constraints (Figure 5-7). As described in Section 3.4.2, the layered system style allows an architecture to be composed of hierarchical layers by constraining component behavior such that each component cannot \"see\" beyond the immediate layer with which they are interacting. By restricting knowledge of the system to a single layer, we place a bound on the overall system complexity and promote substrate independence. Layers can be used to encapsulate legacy services and to protect new services from legacy clients, simplifying components by moving infrequently used functionality to a shared intermediary. Intermediaries can also be used to improve system scalability by enabling load balancing of services across multiple networks and processors.”</p>",
+  "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.6",
+  "date": "2000",
+  "_links": {
+    "describedby": {
+      "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_6",
+      "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.6"
+    },
+    "self": {
+      "href": "layered-system.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

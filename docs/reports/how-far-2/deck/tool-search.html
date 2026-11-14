@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tool search: a smaller bag, still a bag · How far can one vision go · 2.0</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">The machine web · what agents got next</span></header>
+<h2>Tool search: a smaller bag, still a bag</h2>
+<div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)">
+  <div class="panel">
+    <span class="label">What it gives, and it’s real</span>
+    <p>Tool definitions marked <code>defer_loading: true</code> stay out of the model’s context until a search over their names and descriptions (regex or BM25) finds them.</p>
+    <div class="stats" style="margin-top: 0.4rem">
+      <div class="stat"><b>49 → 74%</b><span>Opus 4 on MCP evaluations with large tool libraries (Anthropic’s figures)</span></div>
+      <div class="stat"><b>79.5 → 88.1%</b><span>Opus 4.5, same evaluations</span></div>
+    </div>
+    <p class="cite">Claude Code uses it too. It solves context size; HEART’s L1 and L2 solve the same with caching.</p>
+  </div>
+  <div class="box">
+    <h3>What it finds is still RPC</h3>
+    <pre style="background: #0f1512; color: #dce7df; font-size: 0.74rem"># a tool definition, illustrative
+name: merge_pull_request
+description: Merge a pull request.
+input_schema:
+  owner, repo, pull_number,
+  merge_method: [merge, squash, rebase],
+  sha
+defer_loading: true</pre>
+    <p>A function and its parameters: the same for every pull request, in every state. Chosen by the words of the task, not the state of anything.</p>
+  </div>
+</div>
+<p class="verdict"><span class="yes">Finds:</span> the right functions to call. <span class="no">Never says:</span> which acts are open now, on which address, or why not. That still arrives as an error after the call.</p>
+<p class="cite">In fairness: MCP lets a server change its tool list during a session (<code>notifications/tools/list_changed</code>). That list belongs to the session, not to one resource’s representation.</p>
+<p class="refs"><a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754">IN-BAND</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">R6 · BOOKMARK</a></p>
+</article>
+<nav class="foot"><a href="deck/divorce.html" rel="prev"><small>Back</small><b>The divorce: data in the response, controls elsewhere</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#tool-search">with heart-ts</a></span>
+<a href="deck/frustration.html" rel="next"><small>Next</small><b>Our question: how far can we take his vision today?</b></a></nav>
+</main></div></body></html>

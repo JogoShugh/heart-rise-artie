@@ -1,0 +1,250 @@
+package heart.script
+
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+
+/*
+ * Each step of a script held as data, made through the function a Kotlin script calls for it
+ * (spec/PLAN-KEPT-SCRIPTS-AS-DATA.md, step 4). A maker names the keys its step may hold, and no others: the
+ * vocabulary of spec/schemas/heart-script.draft.schema.json, closed.
+ */
+
+private val WORDS = setOf("intent", "inferred", "from-intent")
+
+/** The steps in [step]'s [key], made where the script stands then, with the same reason, if any. */
+private fun Here.inner(step: Map<*, *>, key: String, reading: Reading) =
+    (step[key] as? List<*>)?.let { made(it, reading.why) }
+
+/**
+ * [acting], the act [rel]; with [expected], a refusal by its words (`stale`, kept-versions.feature), it must be refused
+ * so, and the script goes on where it was; done, or refused otherwise, the script stops, saying what it expected.
+ */
+private fun Here.refusedAs(rel: String, expected: String?, acting: Here.() -> Unit) {
+    if (expected == null) return acting()
+    val refused = try {
+        acting()
+        null
+    } catch (stopped: ScriptStopped) {
+        stopped.refused ?: throw stopped
+    }
+    if (refused?.kind?.words != expected) {
+        val was = refused?.let { "refused as ${it.kind.words}" } ?: "done"
+        throw ScriptStopped(run.step, "\"$rel\"", "\"expected refused as $expected, was $was\"")
+    }
+    // The trace says it was expected, so a report counts the refusal as planned.
+    run.trace.lastOrNull()?.takeIf { it.outcome == "refused" }?.expect = expected
+}
+
+/** A block of [step]'s [key], for a function that takes one; null when it has none. */
+private fun block(step: Map<*, *>, key: String, reading: Reading): (Here.() -> Unit)? =
+    (step[key] as? List<*>)?.let { steps -> { made(steps, reading.why) } }
+
+/** The values of [step]'s fields, each reference read where the script stands, before its act. */
+private fun values(step: Map<*, *>, reading: Reading): List<Pair<String, Any?>> =
+    (step["fields"] as? Map<*, *>).orEmpty().map { (k, v) -> k.toString() to reading.value(v) }
+
+/** A span of time, as data says one: `15s`, `3m`, `2h`. */
+private fun span(text: Any?): Duration? = text?.toString()?.let { said ->
+    val n = said.dropLast(1).toLongOrNull()
+    when (said.lastOrNull()) {
+        's' -> n?.seconds
+        'm' -> n?.minutes
+        'h' -> n?.hours
+        else -> null
+    } ?: stop("not a span of time: $said")
+}
+
+/** Facts as data, for a function that reads them: grouped by the resource kept they are read on, if any. */
+internal fun facts(list: Any?, reading: Reading): Facts.() -> Unit = {
+    val all = (list as? List<*>).orEmpty().map { it as? Map<*, *> ?: stop("a fact is not a map: $it") }
+    all.groupBy { it["at"]?.toString() }.forEach { (name, group) ->
+        // Named for what it does, never "hold": Facts.hold() would answer instead, and add no fact.
+        val wanted: Facts.() -> Unit = { group.forEach { fact(it, reading.at(here)) } }
+        if (name == null) wanted(this) else at(name, wanted)
+    }
+}
+
+private fun Facts.fact(fact: Map<*, *>, reading: Reading) {
+    val field = fact["field"]?.toString() ?: stop("a fact names no field: $fact")
+    if ("is" in fact) field eq reading.value(fact["is"]) else field has reading.value(fact["has"])
+}
+
+/** A check's facts, as Kotlin's `check("merged" eq true)` tests them. */
+private fun checked(list: Any?, reading: Reading): List<Fact> =
+    (list as? List<*>).orEmpty().map { it as? Map<*, *> ?: stop("a fact is not a map: $it") }.map { fact ->
+        val field = fact["field"].toString()
+        val matcher = when {
+            "is" in fact -> equalTo(reading.value(fact["is"]))
+            "is-not" in fact -> notEqualTo(reading.value(fact["is-not"]))
+            else -> contains(reading.value(fact["has"]))
+        }
+        Fact(field, matcher)
+    }
+
+/** A step with words and no relation: the reasoner chooses what is offered here, on every run. */
+internal val REASONED = Maker(WORDS + setOf("reasoned", "then")) { step, reading ->
+    val words = said(step, reading)
+    act(
+        intent = words.intent, inferred = words.inferred, fromIntent = words.fromIntent,
+        block = block(step, "then", reading),
+    )
+}
+
+/** The makers, by the key that names each step. */
+internal val MAKERS: Map<String, Maker> = linkedMapOf(
+    "act" to Maker(setOf("act", "fields", "then", "as-of", "refused-as") + WORDS) { step, reading ->
+        val values = values(step, reading)
+        val words = said(step, reading)
+        refusedAs(step["act"].toString(), step["refused-as"]?.toString()) {
+            act(
+                step["act"].toString(),
+                intent = words.intent, inferred = words.inferred, fromIntent = words.fromIntent,
+                fields = { values.forEach { (name, value) -> name to value } },
+                block = block(step, "then", reading),
+                asOf = step["as-of"]?.toString(),
+            )
+        }
+    },
+    "act-once" to Maker(setOf("act-once", "fields", "listed-in")) { step, reading ->
+        val values = values(step, reading)
+        actOnce(
+            step["act-once"].toString(),
+            listedIn = step["listed-in"].toString(),
+            fields = { values.forEach { (name, value) -> name to value } },
+            block = {},
+        )
+    },
+    "follow" to Maker(setOf("follow", "title", "then") + WORDS) { step, reading ->
+        val words = said(step, reading)
+        follow(
+            step["follow"].toString(), step["title"]?.let { reading.text(it.toString()) },
+            intent = words.intent, inferred = words.inferred, fromIntent = words.fromIntent,
+            block = block(step, "then", reading),
+        )
+    },
+    "ask" to Maker(setOf("ask", "fields", "reply")) { step, reading ->
+        ask(step["ask"].toString(), step["reply"].toString(), values(step, reading).toMap())
+    },
+    "once-answered" to Maker(setOf("once-answered")) { step, reading ->
+        val once = step["once-answered"] as? Map<*, *> ?: stop("once-answered holds the reply it waits on, and steps")
+        val otherwise = once["otherwise"] as? List<*>
+        onceAnswered(
+            once["reply"].toString(),
+            giveUp = span(once["give-up"]) ?: 30.minutes,
+            failed = block(once, "failed", reading),
+            otherwise = { why -> otherwise?.let { made(it, why) } },
+        ) { inner(once, "steps", reading) }
+    },
+    "enter" to Maker(setOf("enter", "steps")) { step, reading ->
+        enter(reading.text(step["enter"].toString())) { inner(step, "steps", reading) }
+    },
+    "scenario" to Maker(setOf("scenario", "steps")) { step, reading ->
+        scenario(reading.text(step["scenario"].toString())) { inner(step, "steps", reading) }
+    },
+    "run-script" to Maker(setOf("run-script", "title", "inputs", "as", "on-link")) { step, reading ->
+        // `on-link: REL`: the script runs on what the link REL here leads to, given as its input `deployed`.
+        val on = step["on-link"]?.toString()?.let { rel ->
+            "deployed" to (Links.of(navigator).href(rel, null) ?: stop("no $rel link to run the script on"))
+        }
+        val inputs = (step["inputs"] as? Map<*, *>).orEmpty()
+            .map { (name, value) -> name.toString() to reading.text(value.toString()) }.toMap() + listOfNotNull(on)
+        val named = step["as"]?.toString() ?: stop("run-script keeps its outcome as a name: as")
+        runScript(step["run-script"].toString(), inputs, named, step["title"]?.let { reading.text(it.toString()) })
+    },
+    "keep-as" to Maker(setOf("keep-as")) { step, _ -> keepAs(step["keep-as"].toString()) },
+    "sync" to Maker(setOf("sync")) { _, _ -> sync() },
+    "note" to Maker(setOf("note")) { step, reading -> note(reading.text(step["note"].toString())) },
+    "check" to Maker(setOf("check")) { step, reading -> checkFacts(checked(step["check"], reading)) },
+    "until" to Maker(setOf("until", "tries", "every")) { step, reading ->
+        val until = step["until"] as? Map<*, *> ?: stop("until holds a relation offered, or facts")
+        val tries = (step["tries"] as? Number)?.toInt() ?: UNTIL_TRIES
+        val offered = until["offered"]?.toString()
+        val waitingFor = offered?.let { "offers(${kotlinString(it, false)})" }
+        until(tries, span(step["every"]) ?: 1.seconds, waitingFor) {
+            if (offered != null) offers(offered) else holds(facts(until["facts"], reading))
+        }
+    },
+    "watch" to Maker(setOf("watch")) { step, reading ->
+        val watch = step["watch"] as? Map<*, *> ?: stop("a watch holds its steps")
+        watch(
+            every = span(watch["every"]) ?: 15.seconds,
+            atMost = span(watch["at-most"]) ?: 2.hours,
+            until = if ("until" in watch) facts(watch["until"], reading) else ({ that(false) }),
+        ) { inner(watch, "steps", reading) }
+    },
+    "at" to Maker(setOf("at", "steps")) { step, reading ->
+        at(reading.text(step["at"].toString())) { inner(step, "steps", reading) }
+    },
+    "listeners" to Maker(setOf("listeners")) { step, reading ->
+        val listeners = step["listeners"] as? Map<*, *> ?: stop("listeners hold what each listens for")
+        listeners(
+            every = span(listeners["every"]) ?: 15.seconds,
+            atMost = span(listeners["at-most"]) ?: 2.hours,
+            until = if ("until" in listeners) facts(listeners["until"], reading) else ({ that(false) }),
+        ) {
+            (listeners["listen"] as? List<*>).orEmpty().map { it as Map<*, *> }.forEach { listened ->
+                listen(reading.text(listened["match"].toString()), from = listened["from"]?.toString()) {
+                    inner(listened, "steps", reading)
+                }
+            }
+        }
+    },
+    "whenever" to Maker(setOf("whenever")) { step, reading -> whenever { inner(step, "whenever", reading) } },
+    "for-each" to Maker(setOf("for-each", "follow", "then")) { step, reading ->
+        each(step["for-each"].toString(), step["follow"]?.toString() ?: "item") { inner(step, "then", reading) }
+    },
+    "has" to Maker(setOf("has")) { step, reading -> has(facts(step["has"], reading)) },
+    "made-by" to Maker(setOf("made-by")) { step, reading -> madeBy(reading.text(step["made-by"].toString())) },
+    "saying" to Maker(setOf("saying")) { step, reading -> saying(reading.text(step["saying"].toString())) },
+    "leave-where" to Maker(setOf("leave-where")) { step, reading ->
+        val leave = step["leave-where"] as? Map<*, *> ?: stop("leave-where holds what to say, and facts")
+        leaveWhere(reading.text(leave["say"].toString()), facts(leave["facts"], reading))
+    },
+    "once" to Maker(setOf("once")) { step, reading ->
+        val once = step["once"] as? Map<*, *> ?: stop("once holds the relation it waits for, and steps")
+        val otherwise = once["otherwise"] as? List<*>
+        once(
+            once["offered"].toString(),
+            giveUp = span(once["give-up"]) ?: 10.minutes,
+            every = span(once["every"]) ?: 1.seconds,
+            otherwise = { why -> otherwise?.let { made(it, why) } },
+        ) { inner(once, "steps", reading) }
+    },
+    "given" to Maker(setOf("given", "then", "otherwise")) { step, reading ->
+        given(facts(step["given"], reading)) then { inner(step, "then", reading) } otherwise {
+            inner(step, "otherwise", reading)
+        }
+    },
+    "doing" to Maker(setOf("doing", "steps")) { step, reading ->
+        doing(reading.text(step["doing"].toString())) { inner(step, "steps", reading) }
+    },
+    "done-where" to Maker(setOf("done-where")) { step, reading -> doneWhere(facts(step["done-where"], reading)) },
+    // The first case whose act is offered here, else otherwise (spec/PLAN-COST-FOLLOWS-STATES.md), through Kotlin's
+    // whenOffered, so the two behave alike: a member that offers an act no case names is the step's words, where
+    // the run falls back to them (spec/ideas/branching-from-intent-runs.md); one that offers nothing, otherwise.
+    "when-offered" to Maker(setOf("when-offered", "otherwise") + WORDS) { step, reading ->
+        val cases = (step["when-offered"] as? List<*>).orEmpty()
+            .map { it as? Map<*, *> ?: stop("a case is not a map: $it") }
+        if (cases.isEmpty()) stop("when-offered names no case")
+        val words = said(step, reading)
+        whenOffered(words.intent, words.inferred, words.fromIntent, otherwise = { inner(step, "otherwise", reading) }) {
+            cases.forEach { offered ->
+                val rel = offered["act"]?.toString()
+                    ?: stop("a when-offered case is an act: ${offered.keys.joinToString()}")
+                case(rel) { made(listOf(offered), reading.why) }
+            }
+        }
+    },
+    "decide" to Maker(setOf("decide")) { step, reading ->
+        val decided = step["decide"] as? Map<*, *> ?: stop("decide holds its steps, and how many tries")
+        decide((decided["tries"] as? Number)?.toInt() ?: DECIDE_TRIES) { inner(decided, "steps", reading) }
+    },
+)
+
+/** How many times a decide runs its block, as Kotlin's `decide` does by default. */
+private const val DECIDE_TRIES = 3
+
+/** How many times a wait looks, as Kotlin's `until` does by default. */
+private const val UNTIL_TRIES = 10

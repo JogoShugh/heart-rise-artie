@@ -1,0 +1,25 @@
+{
+  "name": "heart-mcp-github",
+  "title": "The same model, given state instead of a catalogue",
+  "part": "Putting them back together",
+  "kicker": "Counterpoint · heart-mcp on real GitHub",
+  "tone": "light",
+  "number": 23,
+  "of": 59,
+  "html": "<h2>The same model, given state instead of a catalogue</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr)\">\n  <div class=\"rows\">\n    <div class=\"step\"><h3>Before · pull request #2344, open, mergeable</h3><p>Offered now: <code>scm:merge</code> <code>scm:close</code> <code>scm:comment</code> <code>scm:edit</code> <code>scm:label</code> <code>scm:request-review</code> <code>scm:update-branch</code></p></div>\n    <div class=\"step\"><h3>heart_act · scm:merge · method: squash</h3><p><b>acted</b>: “scm:merge was done.” Sent once, with the validator from the state it read. GitHub merged it: <code>66be32c</code>.</p></div>\n    <div class=\"step\"><h3>After · closed, merged</h3><p>Offered now: <code>scm:comment</code> <code>scm:edit</code> <code>scm:label</code></p></div>\n    <div class=\"step gap\"><h3>heart_act · scm:merge, again</h3><p><b>rejected-before-sending</b>: “scm:merge is not offered now. Offered: scm:comment, scm:edit, scm:label. Nothing was sent.”</p></div>\n    <div class=\"step\"><h3>heart_explain · scm:merge</h3><p>“A closed pull request can’t be merged; reopen it first.”</p></div>\n  </div>\n  <div class=\"rows\">\n    <div class=\"stats\">\n      <div class=\"stat\"><b>6</b><span>tools, never changing: look, act, follow, describe, explain, back</span></div>\n      <div class=\"stat\"><b>7</b><span>turns, 22.6 s, Claude Code headless</span></div>\n      <div class=\"stat\"><b>1</b><span>act sent to GitHub; the second never left the machine</span></div>\n      <div class=\"stat\"><b>0</b><span>addresses, methods or headers shown to the model</span></div>\n    </div>\n    <p class=\"punch\">Tool search found the six tools. The state came in every answer.</p>\n    <p class=\"refs\"><deck-fragment name=\"transcript\">transcript</deck-fragment> <deck-ref name=\"p5\"></deck-ref> <deck-fragment name=\"events\">ARTIE’s events</deck-fragment> <deck-ref name=\"in-band\"></deck-ref> <deck-ref name=\"ai-driven\"></deck-ref></p>\n  </div>\n</div>\n",
+  "say": "Here's the counterpoint to tool search, as promised in P5, run on real GitHub. Claude Code, headless, with one MCP server: heart-mcp, six tools that never change. Fun detail: Claude Code loaded those six tools with tool search. Tool search found the tools; the state came in every answer. The prompt: open pull request 2344 on the real GitHub test repository, merge it by squashing if it can be merged, then try to merge it again, and report exactly what the service said. Before the merge the service offered seven acts, merge among them. The merge was sent once, with the If-Match validator from the state it read: GitHub merged it, and you can open the pull request and see it. After the merge, three acts were offered. The second merge never left the machine: heart-mcp answered that merge is not offered now, and nothing was sent. Asked why, the service said: a closed pull request can't be merged; reopen it first. Seven turns, twenty-two seconds, and the model never saw an address.",
+  "sources": [
+    {
+      "label": "Pull request #2344, merged",
+      "href": "https://github.com/JogoShugh/heart-github-test/pull/2344"
+    },
+    {
+      "label": "The run, step by step (report)",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/how-far-2/heart-mcp-run/"
+    },
+    {
+      "label": "heart-mcp (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/mcp"
+    }
+  ]
+}

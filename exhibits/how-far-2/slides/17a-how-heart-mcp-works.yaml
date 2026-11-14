@@ -1,0 +1,33 @@
+name: how-heart-mcp-works
+part: "Putting them back together"
+title: "heart-mcp: six fixed tools, and the state in every answer"
+kicker: Counterpoint · how heart-mcp works
+say: "So what would an MCP server look like if it worked like a browser? That's heart-mcp. It gives the model six tools that never change, like a browser's buttons: look, act, follow, describe, explain, back. What changes is what each one answers: the resource's state, the acts offered right now, each with its name, title, description and schema, and the links. The model chooses. heart-mcp checks the choice against what was offered, and against the act's schema, before anything is sent. ARTIE, inside it, builds the request: the address, the method, the If-Match validator, the credential. The model never sees any of those. It can't build a request, and it can't call an act that isn't offered. And when something's off, the outcome says which: acted, rejected before sending, stale, not offered, invalid input, or refused by a rule, in the service's own words. Next, the same thing on real GitHub."
+sources:
+  - ["heart-mcp: README", "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/mcp/README.md"]
+  - ["heart-mcp: how it works", "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/mcp/docs/HOW-IT-WORKS.md"]
+html: |
+  <h2>heart-mcp: six fixed tools, and the state in every answer</h2>
+  <div class="flow" style="grid-template-columns: minmax(0, 0.8fr) auto minmax(0, 1.5fr) auto minmax(0, 1fr)">
+    <div class="box green"><h3>The model</h3><p>in any MCP host: Claude Code, Claude Desktop, your agent</p><p><b>chooses</b> the next move</p></div>
+    <span class="arrow" aria-hidden="true"></span>
+    <div class="panel">
+      <span class="label">heart-mcp · six tools that never change</span>
+      <table style="font-size: 0.86rem">
+        <tr><td><code>heart_look</code></td><td>go to a bookmark, or read this resource again</td></tr>
+        <tr><td><code>heart_act</code></td><td>take one <b>offered</b> act, by name, with fields</td></tr>
+        <tr><td><code>heart_follow</code></td><td>follow a link, by rel and title</td></tr>
+        <tr><td><code>heart_describe</code></td><td>the service’s fuller description of an act</td></tr>
+        <tr><td><code>heart_explain</code></td><td>why an act isn’t offered now; nothing is sent</td></tr>
+        <tr><td><code>heart_back</code></td><td>back one resource, read again</td></tr>
+      </table>
+      <span class="faint">checks the choice: is the act offered? do the fields fit its schema? If not, nothing is sent.</span>
+    </div>
+    <span class="arrow" aria-hidden="true"></span>
+    <div class="box"><h3>ARTIE, inside</h3><p><b>builds every request</b>: address, method, If-Match, credential, L2 forms with integrity checked</p><p>→ any HEART service, or the gateway in front of GitHub</p></div>
+  </div>
+  <div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin-top: 0.4rem">
+    <div class="panel"><span class="label">Every answer holds</span><p><b>state</b> · the resource’s fields<br><b>acts</b> · offered now: name, title, description, schema<br><b>links</b> · rel and title<br><b>outcome</b> · acted · rejected-before-sending · stale · not-offered · invalid-input · rule-refused</p></div>
+    <div class="panel"><span class="label">What the model never sees</span><p class="big" style="font-family: var(--body)">an address, a method, a header, a validator, a credential</p><span class="faint">It can’t build a request, and it can’t call an act that isn’t offered.</span></div>
+  </div>
+  <p class="refs"><deck-ref name="in-band"></deck-ref> <deck-ref name="think-of-the-web"></deck-ref></p>

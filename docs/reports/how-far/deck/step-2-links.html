@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Links: it names itself and its vocabulary · How far can one vision go</title>
+<base href="../">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Building it back up · Step 2 of 5 · HEART L0, simplified</span></header>
+<h2>Links: it names itself and its vocabulary</h2>
+<div class="split" style="grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr)">
+  <pre># GET http://gateway/repos/JogoShugh/heart-github-test/pulls/2325
+# Accept: application/hal+json
+number: 2325
+title: "Renewals: none during the audit"
+state: open
+mergeable_state: clean
+<span class="add">_links:
+  self:
+    href: /repos/JogoShugh/heart-github-test/pulls/2325
+  curies:
+    - name: scm
+      href: /profiles/scm#{rel}
+      templated: true
+  alternate:
+    href: https://github.com/JogoShugh/heart-github-test/pull/2325
+    type: text/html
+  scm:commits:
+    href: /repos/JogoShugh/heart-github-test/pulls/2325/commits
+  scm:diff:
+    href: https://github.com/JogoShugh/heart-github-test/pull/2325.diff
+    type: text/x-diff</span></pre>
+  <div class="rows">
+    <h3 style="font: 650 1.5rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--leaf)">Where it is, and what its words mean</h3>
+    <ul>
+      <li><b>self:</b> its own address, handed over, never built.</li>
+      <li><b>curies:</b> scm: names resolve to one shared vocabulary, for both forges.</li>
+      <li><b>alternate:</b> the forge’s own page, for people.</li>
+      <li><b>Typed links:</b> GitHub’s *_url members became links and left the data.</li>
+    </ul>
+    <p class="refs"><a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">Rule 4 · No fixed URIs</a></p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/step-1-data.html" rel="prev"><small>Back</small><b>Only data: what most APIs send today</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#step-2-links">with heart-ts</a></span>
+<a href="deck/step-3-forms.html" rel="next"><small>Next</small><b>Forms: what you can do now, and how</b></a></nav>
+</main></div></body></html>

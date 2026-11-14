@@ -1,0 +1,5 @@
+/* The door's one-letter permissions, those set to 1, as operationIds. */
+$map(
+  $keys($sift(perms, function($v) { $v = 1 })),
+  function($k) { $lookup({"o": "open", "c": "close", "l": "lock", "u": "unlock"}, $k) }
+)

@@ -1,0 +1,34 @@
+name: walk-the-dog
+part: Framing
+title: Walk the dog, ship the feature
+kicker: How this was built
+say: "The honest frame. Free time collapsed: family, a new dog. Typing code stopped being possible. What remained: Claude Code's Remote Control on a phone, a personal Max account, and a test-first discipline strong enough that the code can be trusted while I'm out on a walk. The humor is real: the messages really were that short."
+sources:
+  - ["bdd-gates skill", "https://github.com/JogoShugh/bdd-gates-skill"]
+fragments:
+  - name: hooks
+    label: The hooks that gate every change (core/hooks.json)
+    source: bdd-gates:core/hooks.json
+    lang: json
+html: |
+  <h2>Walk the dog, ship the feature</h2>
+  <div class="split">
+    <div class="rows">
+      <p class="lead">When there’s no time left to type code: family, a new dog, a phone in one hand and a leash in the other.</p>
+      <ul>
+        <li><b>Claude Code Remote Control</b> on the phone, a personal Max account at home.</li>
+        <li><b>Test first, every change:</b> Gherkin, a red run, the code, a green run, a gated commit.</li>
+        <li><b>Evidence, not trust:</b> the gates log every step, so what passed is on record when I get home.</li>
+        <li><b>The result:</b> repeatable, reliable RISE behaviour, built a few sentences at a time.</li>
+      </ul>
+      <p class="refs"><deck-fragment name="hooks">hooks.json</deck-fragment></p>
+    </div>
+    <div class="phone">
+      <p class="phone-head">Remote Control</p>
+      <p class="me">Please give me an update</p>
+      <p class="it">Red run logged. Writing the fix.</p>
+      <p class="me">How’s it going?</p>
+      <p class="it">Green. pre-commit: TDD ordering check passed.</p>
+      <p class="note">Illustrative, not a transcript. The two questions are the real ones, every evening.</p>
+    </div>
+  </div>

@@ -1,0 +1,30 @@
+# GitLab's REST API v4: merge requests, served as scm: pull requests, the profile GitHub's pull requests can share
+# (a relation names what a client may do, not who does it). Run the gateway with GATEWAY_CONNECTOR pointing here,
+# UPSTREAM_URL at GitLab's /api/v4, UPSTREAM_SPEC at upstream.openapi.yaml beside this file, and UPSTREAM_AUTH.
+profile: scm
+include:
+  - projects/get
+  - pulls/list
+  - pulls/get
+  - pulls/update
+  - pulls/merge
+  - notes/list
+  - notes/get
+  - notes/create
+resources:
+  - pull.resource.yaml
+  - note.resource.yaml
+readers:
+  - pull.reader.yaml
+  - note.reader.yaml
+# GitLab names its addresses web_url (a page for people) and, on a merge request, nothing for its API; the gateway
+# makes each resource's own address from its state (each resource file's pointers).
+links:
+  members: [web_url, avatar_url]
+  relations:
+    web_url: alternate
+    avatar_url: icon
+    author: author
+  types:
+    - { host: "*", type: text/html }
+  embed: [author, assignee, assignees, reviewers, merged_by, closed_by, merge_user, milestone]

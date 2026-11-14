@@ -1,0 +1,9 @@
+{
+  "search": {"rel": "garden:search-beds", "fields": {"name": "bed-1"}, "item": "bed-1"},
+  "maxSteps": 10,
+  "acts": {
+    "garden:sow-seed": [{"seedType": "basil", "depthCm": 2}],
+    "garden:water-cell": [{"milliliters": 500}],
+    "garden:harvest": [{}]
+  }
+}

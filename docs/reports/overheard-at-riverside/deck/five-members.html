@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The kept script, five members · Overheard at Riverside</title>
+<base href="../">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+</head><body>
+<header class="bar"><div class="bar-in"><div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · plain page</span></div></div></header>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Scene five · the next week</span><span class="fiction">Fiction</span></header>
+<h2>The kept script, five members</h2>
+<ul class="points"><li>Priya asks whether it only works for Ana. Sam runs the kept script for five members, one after another: Ana Torres, David Miller, Grace Okafor, Liam Chen and Sofia Rossi.</li><li>No model is called. Each run renews what each book offers, and notes why the rest can't be renewed.</li><li>The script names no member and no book: the name is an input, and the books come from each member's account.</li><li><b>What it shows:</b> the way Ana's run found works for anyone.</li></ul>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>Does it only work for Ana?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>It takes a name. Here are five, one after another. The model isn't called once.</p></div>
+</div>
+<div class="table-scroll"><table>
+  <thead><tr><th>Member</th><th>Renewed</th><th>Left, and why</th><th>Model calls</th><th>Time</th></tr></thead>
+  <tbody>
+    <tr><td>Ana Torres</td><td><i>Matilda</i></td><td><i>The Hobbit</i> (hold waiting), <i>Charlotte's Web</i> (renewed the most allowed)</td><td>0</td><td>965 ms</td></tr>
+    <tr><td>David Miller</td><td><i>The Secret Garden</i>, <i>Holes</i></td><td>—</td><td>0</td><td>855 ms</td></tr>
+    <tr><td>Grace Okafor</td><td><i>Hatchet</i></td><td><i>Wonder</i> (hold waiting)</td><td>0</td><td>847 ms</td></tr>
+    <tr><td>Liam Chen</td><td>—</td><td><i>Coraline</i> (renewed the most allowed)</td><td>0</td><td>816 ms</td></tr>
+    <tr><td>Sofia Rossi</td><td><i>The Giver</i>, <i>Number the Stars</i></td><td><i>Frindle</i> (hold waiting)</td><td>0</td><td>828 ms</td></tr>
+  </tbody>
+</table></div>
+<p class="note">Each renewed book is now due 2026-12-03. Each time is the whole run, most of it the client starting up.</p>
+<details class="more"><summary>How it was run</summary>
+  <ul>
+    <li><code>artie/five-members.mjs</code> runs <code>member.heart.yaml</code> once for each name against the running library, and reads each member's books before and after, as plain JSON.</li>
+    <li>Each run's trace is in <code>artie/runs/</code>; the table is <code>artie/five-members.yaml</code>.</li>
+  </ul>
+</details>
+</article>
+<nav class="foot"><a href="deck/next-week.html" rel="prev"><small>Back</small><b>Find the way once, then keep it</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#five-members">with heart-ts</a></span>
+<a href="deck/company.html" rel="next" data-rel="next"><small>Next</small><b>A release, found once, kept as loops</b></a></nav>
+</main></div></body></html>

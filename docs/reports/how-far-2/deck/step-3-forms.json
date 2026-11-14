@@ -1,0 +1,50 @@
+{
+  "name": "step-3-forms",
+  "title": "Forms: what you can do now, and how",
+  "part": "For real: two forges, one vocabulary",
+  "kicker": "Building it back up · Step 3 of 5 · HEART L0, simplified",
+  "tone": "light",
+  "number": 40,
+  "of": 59,
+  "html": "<h2>Forms: what you can do now, and how</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr)\">\n  <pre><b>_forms:</b>\n  scm:close: {…}\n  <span class=\"add\">scm:merge:</span>\n    title: Merge\n    description: Merge the pull request into its base branch.\n    _links:\n      target:\n        href: /repos/JogoShugh/heart-github-test/\n              pulls/2325/actions/merge\n    method: PUT\n    contentType: application/json\n    schema:\n      type: object\n      additionalProperties: false\n      required: [method]\n      properties:\n        method:\n          title: Merge method\n          enum: [merge, squash, rebase]\n        commit_title:\n          type: string\n        commit_message:\n          type: string</pre>\n  <pre>  <span class=\"add\">scm:comment:</span>\n    title: Comment\n    _links:\n      target:\n        href: /repos/JogoShugh/heart-github-test/\n              pulls/2325/actions/comment\n    method: POST\n    contentType: application/json\n    schema:\n      type: object\n      required: [body]\n      properties:\n        body:\n          type: string\n          description: The contents of the comment.\n  scm:label: {…}\n  scm:edit: {…}\n  scm:request-review: {…}\n  scm:update-branch: {…}\n# 7 forms, while open</pre>\n</div>\n",
+  "say": "The open pull request offers seven forms. scm:merge in full: its target, method, content type and JSON Schema, from GitHub's own description, with the merge method as scm's input. scm:comment needs one field, body. These are real, from the L0 run on GitHub.",
+  "sources": [
+    {
+      "label": "HAL Schema Forms",
+      "href": "https://github.com/jbadeau/hal-schema-forms"
+    },
+    {
+      "label": "JSON Schema 2020-12",
+      "href": "https://json-schema.org/draft/2020-12"
+    },
+    {
+      "label": "GitHub REST: merge a pull request",
+      "href": "https://docs.github.com/en/rest/pulls/pulls#merge-a-pull-request"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "step-3-forms.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "step-2-links.json",
+      "title": "Links: it names itself and its vocabulary"
+    },
+    "next": {
+      "href": "step-4-guards.json",
+      "title": "Guards, and why the other acts are absent"
+    },
+    "alternate": {
+      "href": "step-3-forms.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}
