@@ -4,8 +4,8 @@
   "part": "For real: two forges, one vocabulary",
   "kicker": "The question",
   "tone": "light",
-  "number": 28,
-  "of": 55,
+  "number": 32,
+  "of": 59,
   "html": "<h2>Can we make them interchangeable?</h2>\n<div class=\"table-scroll\"><table>\n  <thead><tr><th>The act</th><th>GitHub says</th><th>GitLab says</th><th>One typed relation?</th></tr></thead>\n  <tbody>\n    <tr><td>Read one</td><td><code>GET /repos/{o}/{r}/pulls/{n}</code></td><td><code>GET /projects/{id}/merge_requests/{iid}</code></td><td><code><b>scm:pulls-get</b></code></td></tr>\n    <tr><td>Merge, squashed</td><td><code>PUT …/merge {merge_method: squash}</code></td><td><code>PUT …/merge {squash: true}</code></td><td><code><b>scm:merge</b></code></td></tr>\n    <tr><td>Comment</td><td><code>POST /issues/{n}/comments</code></td><td><code>POST …/merge_requests/{iid}/notes</code></td><td><code><b>scm:comment</b></code></td></tr>\n    <tr><td>Can it merge?</td><td><code>mergeable_state: clean</code></td><td><code>detailed_merge_status: mergeable</code></td><td><code><b>mergeable_state</b></code></td></tr>\n  </tbody>\n</table></div>\n<div class=\"box\" style=\"margin-top: 0.4rem\"><p style=\"font-size: 1.2rem; line-height: 1.5; max-width: none\"><b style=\"color: #e3b341\">Callback:</b> AWS already names its acts, <code>clientcertificate:update</code>, and our preview turned them into forms. Here, one name per act, the same on both forges: <code><b>scm:</b></code> typed relations. One client, one script, either forge.</p></div>\n",
   "say": "The callback. AWS already names its acts as typed relations: clientcertificate:update. The preview turned them into forms. Can we do the same for two forges that never agreed: one name per act, the same on both, so one client and one script work on either? The answer the next slides show: yes, with the scm: prefix, one YAML connector per forge, and HEART on top.",
   "sources": [

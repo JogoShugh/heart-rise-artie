@@ -4,8 +4,8 @@
   "part": "Close",
   "kicker": "Foundations",
   "tone": "light",
-  "number": 55,
-  "of": 55,
+  "number": 59,
+  "of": 59,
   "html": "<h2>Standing on these shoulders</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);\">\n  <div class=\"card\">\n    <ul>\n      <li><a href=\"https://ics.uci.edu/~fielding/pubs/dissertation/top.htm\" target=\"_blank\" rel=\"noopener\"><b>Roy T. Fielding</b></a> the dissertation (2000)</li>\n      <li><a href=\"https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven\" target=\"_blank\" rel=\"noopener\"><b>Roy T. Fielding</b></a> “REST APIs must be hypertext-driven” (2008)</li>\n      <li><a href=\"https://datatracker.ietf.org/doc/html/draft-kelly-json-hal-11\" target=\"_blank\" rel=\"noopener\"><b>Mike Kelly</b></a> HAL</li>\n      <li><a href=\"https://rwcbook.github.io/hal-forms/\" target=\"_blank\" rel=\"noopener\"><b>Mike Amundsen</b></a> HAL-FORMS</li>\n      <li><a href=\"https://github.com/jbadeau/hal-schema-forms\" target=\"_blank\" rel=\"noopener\"><b>J. Badeau</b></a> HAL Schema Forms, the base of HEART’s media type</li>\n      <li><a href=\"https://github.com/jbadeau/hyperbench\" target=\"_blank\" rel=\"noopener\"><b>J. Badeau</b></a> HyperBench, a hypermedia-driven workbench</li>\n    </ul>\n  </div>\n  <div class=\"card\">\n    <ul>\n      <li><a href=\"https://apievangelist.com\" target=\"_blank\" rel=\"noopener\"><b>Kin Lane</b></a> API Evangelist</li>\n      <li><a href=\"https://2026.springio.net/sessions/rest-is-for-agents-rediscovering-spring-hateoas/\" target=\"_blank\" rel=\"noopener\"><b>Adib Saikali</b></a> “REST is for Agents”, Spring I/O 2026</li>\n      <li><a href=\"https://nofluffjuststuff.com/topics/from_rest_to_reasoning_agents_designing_apis_for_the_ai_era\" target=\"_blank\" rel=\"noopener\"><b>Rohit Bhardwaj</b></a> (Salesforce) “From REST to Reasoning Agents”</li>\n      <li><a href=\"https://nofluffjuststuff.com/topics/hypermedia_apis_and_the_future_of_ai_agentic_systems\" target=\"_blank\" rel=\"noopener\"><b>Michael Carducci</b></a> “Hypermedia APIs and the Future of AI Agentic Systems”</li>\n      <li><a href=\"https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture\" target=\"_blank\" rel=\"noopener\"><b>Kelsey Hightower</b></a> “ZTA: Zero Token Architecture”, WeAreDevelopers 2026: infer once, run everywhere</li>\n      <li><a href=\"https://www.w3.org/community/webagents/\" target=\"_blank\" rel=\"noopener\"><b>W3C</b></a> Autonomous Agents on the Web Community Group</li>\n      <li><a href=\"https://dblp.org/rec/conf/atal/CiorteaMGBRZ19\" target=\"_blank\" rel=\"noopener\"><b>Ciortea et al.</b></a> “A Decade in Hindsight”, AAMAS 2019: one of numerous papers</li>\n    </ul>\n  </div>\n</div>\n<p class=\"refs\"><deck-ref name=\"zta\"></deck-ref> <deck-ref name=\"hypertext\"></deck-ref> <deck-ref name=\"uniform-interface\"></deck-ref></p>\n",
   "say": "Links only. Fielding; Mike Kelly's HAL; Mike Amundsen's HAL-FORMS; J. Badeau's HAL Schema Forms, the base of HEART's media type, and HyperBench; Kin Lane; Adib Saikali; Rohit Bhardwaj and Michael Carducci on hypermedia and agents; Kelsey Hightower's Zero Token Architecture, an inspiration for this talk; the W3C Autonomous Agents on the Web Community Group; and one of numerous research papers, Ciortea et al. at AAMAS 2019.",
   "sources": [],
@@ -42,7 +42,7 @@
       {
         "name": "zta",
         "kind": "talk",
-        "label": "Hightower · ZTA",
+        "label": "ZTA",
         "title": "ZTA: Zero Token Architecture",
         "summary": "Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. (In my words, from the talk's page and Daniel Cranney's write-up.)",
         "quote": "<p>“You are all having way too much fun burning way too many tokens”</p><p class=\"note\">His opening line, as quoted in Daniel Cranney, <a href=\"https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture\">“Infer Once, Run Everywhere: Zero-Token Architecture”</a>, WeAreDevelopers, 13 October 2026.</p>",
@@ -51,7 +51,7 @@
         "_links": {
           "self": {
             "href": "../refs/zta.json",
-            "title": "Hightower · ZTA"
+            "title": "ZTA"
           },
           "describedby": {
             "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture",
@@ -62,7 +62,7 @@
       {
         "name": "hypertext",
         "kind": "comment",
-        "label": "“When I say hypertext…”",
+        "label": "HYPERTEXT",
         "title": "What hypertext means",
         "summary": "His definition: information and controls, presented together. Machines can follow links too.",
         "quote": "<p>“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions. Hypermedia is just an expansion on what text means to include temporal anchors within a media stream; most researchers have dropped the distinction.</p><p>Hypertext does not need to be HTML on a browser. Machines can follow links when they understand the data format and relationship types.”</p>",
@@ -71,7 +71,7 @@
         "_links": {
           "self": {
             "href": "../refs/hypertext.json",
-            "title": "“When I say hypertext…”"
+            "title": "HYPERTEXT"
           },
           "describedby": {
             "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-718",
@@ -82,7 +82,7 @@
       {
         "name": "uniform-interface",
         "kind": "constraint",
-        "label": "Uniform interface · HATEOAS",
+        "label": "UNIFORM · HATEOAS",
         "title": "Uniform interface (§5.1.5)",
         "summary": "One generic interface for every component; its fourth part is hypermedia as the engine of application state.",
         "quote": "<p>“The central feature that distinguishes the REST architectural style from other network-based styles is its emphasis on a uniform interface between components (Figure 5-6). By applying the software engineering principle of generality to the component interface, the overall system architecture is simplified and the visibility of interactions is improved. Implementations are decoupled from the services they provide, which encourages independent evolvability. The trade-off, though, is that a uniform interface degrades efficiency, since information is transferred in a standardized form rather than one which is specific to an application's needs. The REST interface is designed to be efficient for large-grain hypermedia data transfer, optimizing for the common case of the Web, but resulting in an interface that is not optimal for other forms of architectural interaction.</p><p>In order to obtain a uniform interface, multiple architectural constraints are needed to guide the behavior of components. REST is defined by four interface constraints: identification of resources; manipulation of resources through representations; self-descriptive messages; and, hypermedia as the engine of application state. These constraints will be discussed in Section 5.2.”</p>",
@@ -91,7 +91,7 @@
         "_links": {
           "self": {
             "href": "../refs/uniform-interface.json",
-            "title": "Uniform interface · HATEOAS"
+            "title": "UNIFORM · HATEOAS"
           },
           "describedby": {
             "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_5",

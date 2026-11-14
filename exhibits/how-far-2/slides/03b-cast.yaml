@@ -1,0 +1,24 @@
+name: cast
+part: "Why now"
+title: The cast, before any of it appears
+kicker: Names you'll hear · each one a pill
+say: "Before anything uses a name, here are the names. MCP is how agents call tools today: a list of named functions, called over JSON-RPC. HEART is our media type: every answer carries the data and the forms for the acts its state allows now. RISE is the asynchronous half: ask now, be told later. ARTIE is the generic client, coupled to HEART the way a browser is coupled to HTML. The gateway is a small server on a laptop that puts our controls in front of GitHub or GitLab. scm is the set of typed relations both forges answer to. L0, L1 and L2 are three ways to deliver the same forms, from all in one answer to cached by link. And heart-mcp is HEART behind six MCP tools that never change. Each is a pill; each comes back."
+sources:
+  - ["heart-rise-artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]
+  - ["Model Context Protocol: tools", "https://modelcontextprotocol.io/specification/2025-06-18/server/tools"]
+html: |
+  <h2>The cast, before any of it appears</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)">
+    <div class="rows">
+      <div><h3><deck-ref name="mcp"></deck-ref></h3><p>How agents call tools today: named functions, over JSON-RPC.</p></div>
+      <div><h3><deck-ref name="heart"></deck-ref></h3><p>Our media type: the data and the acts its state allows now, in one answer.</p></div>
+      <div><h3><deck-ref name="rise"></deck-ref></h3><p>The asynchronous half: ask now, be told later.</p></div>
+      <div><h3><deck-ref name="artie"></deck-ref></h3><p>The generic client: to APIs what a browser is to web pages.</p></div>
+    </div>
+    <div class="rows">
+      <div><h3><deck-ref name="gateway"></deck-ref></h3><p>Our controls, on a laptop, in front of GitHub or GitLab.</p></div>
+      <div><h3><deck-ref name="scm"></deck-ref></h3><p>One set of typed relations both forges answer to.</p></div>
+      <div><h3><deck-ref name="rungs"></deck-ref></h3><p>Three ways to deliver the same forms: all in one answer, or cached by link.</p></div>
+      <div><h3><deck-ref name="heart-mcp"></deck-ref></h3><p>HEART behind six MCP tools that never change.</p></div>
+    </div>
+  </div>

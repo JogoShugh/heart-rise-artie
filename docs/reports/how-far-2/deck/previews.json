@@ -1,0 +1,147 @@
+{
+  "name": "previews",
+  "title": "What you'll see, promised now",
+  "part": "Why now",
+  "kicker": "Five previews · each kept later",
+  "tone": "light",
+  "number": 8,
+  "of": 59,
+  "html": "<h2>What you'll see, promised now</h2>\n<div class=\"rows\">\n  <div><h3><deck-ref name=\"p1\"></deck-ref></h3><p>A real pull request on GitHub, through our gateway: data, links, forms, guards, merged.</p></div>\n  <div><h3><deck-ref name=\"p2\"></deck-ref></h3><p>The same kept script on a local GitLab, unchanged.</p></div>\n  <div><h3><deck-ref name=\"p3\"></deck-ref></h3><p>Think once with a model; every replay after, no model at all.</p></div>\n  <div><h3><deck-ref name=\"p4\"></deck-ref></h3><p>An API you know: AWS’s docs move into the answer as forms.</p></div>\n  <div><h3><deck-ref name=\"p5\"></deck-ref></h3><p>Claude Code through heart-mcp: one merge sent, the second refused before sending.</p></div>\n</div>\n<p class=\"punch\">A later slide that keeps a promise carries its pill.</p>\n",
+  "say": "Five promises, so you know what's coming. P1: a real merge on GitHub, through our gateway, step by step. P2: the same kept script on a local GitLab, unchanged. P3: zero tokens to replay. P4: AWS's docs moving into the answer as forms. P5: an agent, Claude Code, given state instead of a catalogue, through heart-mcp. When a later slide keeps one of these, it carries the same pill, so you can see which promise it keeps. First, though, how the Web solved this for people, long before agents.",
+  "sources": [
+    {
+      "label": "Report: Real GitHub, Local GitLab",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-real-github/"
+    },
+    {
+      "label": "Report: heart-mcp on real GitHub",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/how-far-2/heart-mcp-run/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "previews.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "map.json",
+      "title": "Think once. Look and act for free. Own the controls."
+    },
+    "next": {
+      "href": "remember.json",
+      "title": "Remember typing every field into one box, and picking GET or POST?"
+    },
+    "alternate": {
+      "href": "previews.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "p1",
+        "kind": "preview",
+        "label": "P1 · REAL MERGE",
+        "title": "P1: a real merge on GitHub",
+        "summary": "A pull request on real GitHub, walked step by step through our gateway: data only, then links, then forms, then guards, then merged, with only the acts its state allows.",
+        "cite": "Shown on: Only data, what most APIs send today",
+        "_links": {
+          "self": {
+            "href": "../refs/p1.json",
+            "title": "P1 · REAL MERGE"
+          },
+          "describedby": {
+            "href": "#step-1-data",
+            "title": "Shown on: Only data, what most APIs send today"
+          }
+        }
+      },
+      {
+        "name": "p2",
+        "kind": "preview",
+        "label": "P2 · TWO FORGES",
+        "title": "P2: the same script on a local GitLab",
+        "summary": "The release script kept from GitHub runs unchanged against a local GitLab, because both answer to the same scm: relations.",
+        "cite": "Shown on: One script, real GitHub and a local GitLab",
+        "_links": {
+          "self": {
+            "href": "../refs/p2.json",
+            "title": "P2 · TWO FORGES"
+          },
+          "describedby": {
+            "href": "#proof",
+            "title": "Shown on: One script, real GitHub and a local GitLab"
+          }
+        }
+      },
+      {
+        "name": "p3",
+        "kind": "preview",
+        "label": "P3 · ZERO TOKENS",
+        "title": "P3: zero tokens to replay",
+        "summary": "Claude captures the release once (20 model calls); every release after replays it with no model, and the L2 cache spares thousands of requests per 100 releases.",
+        "cite": "Shown on: Capture once with a model, replay with none",
+        "_links": {
+          "self": {
+            "href": "../refs/p3.json",
+            "title": "P3 · ZERO TOKENS"
+          },
+          "describedby": {
+            "href": "#tokenomics",
+            "title": "Shown on: Capture once with a model, replay with none"
+          }
+        }
+      },
+      {
+        "name": "p4",
+        "kind": "preview",
+        "label": "P4 · AWS FORMS",
+        "title": "P4: AWS's docs become forms",
+        "summary": "An API you know, AWS API Gateway: the method, address, content type and body its docs describe move into the answer as forms, under AWS's own relation names.",
+        "cite": "Shown on: Out of band, then in band",
+        "_links": {
+          "self": {
+            "href": "../refs/p4.json",
+            "title": "P4 · AWS FORMS"
+          },
+          "describedby": {
+            "href": "#aws-docs-into-forms",
+            "title": "Shown on: Out of band, then in band"
+          }
+        }
+      },
+      {
+        "name": "p5",
+        "kind": "preview",
+        "label": "P5 · AGENT ON STATE",
+        "title": "P5: an agent given state, not a catalogue",
+        "summary": "Claude Code with heart-mcp as its only MCP server merges a real pull request once, and its second try is refused before anything is sent, with the service's reason.",
+        "cite": "Shown on: The same model, given state instead of a catalogue",
+        "_links": {
+          "self": {
+            "href": "../refs/p5.json",
+            "title": "P5 · AGENT ON STATE"
+          },
+          "describedby": {
+            "href": "#heart-mcp-github",
+            "title": "Shown on: The same model, given state instead of a catalogue"
+          }
+        }
+      }
+    ]
+  }
+}

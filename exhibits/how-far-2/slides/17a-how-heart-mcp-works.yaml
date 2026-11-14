@@ -1,5 +1,5 @@
 name: how-heart-mcp-works
-part: "What the machine web did"
+part: "Putting them back together"
 title: "heart-mcp: six fixed tools, and the state in every answer"
 kicker: Counterpoint · how heart-mcp works
 say: "So what would an MCP server look like if it worked like a browser? That's heart-mcp. It gives the model six tools that never change, like a browser's buttons: look, act, follow, describe, explain, back. What changes is what each one answers: the resource's state, the acts offered right now, each with its name, title, description and schema, and the links. The model chooses. heart-mcp checks the choice against what was offered, and against the act's schema, before anything is sent. ARTIE, inside it, builds the request: the address, the method, the If-Match validator, the credential. The model never sees any of those. It can't build a request, and it can't call an act that isn't offered. And when something's off, the outcome says which: acted, rejected before sending, stale, not offered, invalid input, or refused by a rule, in the service's own words. Next, the same thing on real GitHub."

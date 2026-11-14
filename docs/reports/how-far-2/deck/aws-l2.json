@@ -4,8 +4,8 @@
   "part": "Preview: AWS as HEART",
   "kicker": "A preview of HEART · HEART L2",
   "tone": "light",
-  "number": 24,
-  "of": 55,
+  "number": 28,
+  "of": 59,
   "html": "<h2>L2: schemas linked too, and shared everywhere</h2>\n<div class=\"split\">\n<pre><code># GET /affordance-sets/{hash}\n# Prefer: forms=link, schema=link\n# Cache-Control: public, max-age=31536000, immutable\n_forms:\n  clientcertificate:update:\n    title: Update\n    _links:\n      target:\n        href: /clientcertificates/{id}\n        templated: true\n    hr:templatePointers:\n      id: /clientCertificateId\n    method: PATCH\n    contentType: application/json\n    hr:integrity: sha256-…\n<span class=\"add\">    schema:</span>\n<span class=\"add\">      $ref: /schemas/{hash}</span>\n<span class=\"add\">      hr:integrity: sha256-…</span>\n  clientcertificate:delete:\n    title: Delete\n    _links:\n      target:\n        href: /clientcertificates/{id}\n        templated: true\n    hr:templatePointers:\n      id: /clientCertificateId\n    method: DELETE</code></pre>\n<pre><code># GET /schemas/{hash}\n# Content-Type: application/schema+json\n# Cache-Control: public, max-age=31536000, immutable\n$schema: https://json-schema.org/draft/2020-12/schema\ntype: object\nrequired: [patchOperations]\nproperties:\n  patchOperations:\n    type: array\n    items:\n      type: object\n      properties:\n        op:\n          enum: [add, remove, replace,\n                 move, copy, test]\n        path:\n          type: string\n          examples: [/description]\n        value:\n          type: string\n        from:\n          type: string</code></pre>\n</div>\n<p class=\"cite\" style=\"display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center\"><span style=\"display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#b85c2c;color:#fff;letter-spacing:0.04em\">MOCKUP</span> <span style=\"display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)\">Today</span> <span style=\"display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)\">L0</span> <span style=\"display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:var(--leaf-bg);color:var(--muted)\">L1</span> <span style=\"display:inline-block;padding:0.2rem 1rem;border-radius:999px;font-weight:650;font-style:normal;background:#2f7d55;color:#fff\">L2</span> <i style=\"margin-left:0.6rem\">A second read: 304 for the certificate; set and schema from cache, no request.</i></p>\n<p class=\"refs\"><deck-ref name=\"cache\"></deck-ref></p>\n",
   "say": "Mockup. With Prefer: forms=link, schema=link, each form in the set references its schema by $ref, at a content address with an integrity hash. One schema, say for a patch of the description, is shared across forms, states and resources. This is the rung the release desk ran on GitHub and GitLab: from the second release on, about 50 set and schema reads per release never reached the network.",
   "sources": [
@@ -59,7 +59,7 @@
       {
         "name": "cache",
         "kind": "constraint",
-        "label": "Cache",
+        "label": "CACHE",
         "title": "Cache (§5.1.4)",
         "summary": "Label every response cacheable or not, so interactions can be skipped. HEART's L2 form sets are this.",
         "quote": "<p>“In order to improve network efficiency, we add cache constraints to form the client-cache-stateless-server style of Section 3.4.4 (Figure 5-4). Cache constraints require that the data within a response to a request be implicitly or explicitly labeled as cacheable or non-cacheable. If a response is cacheable, then a client cache is given the right to reuse that response data for later, equivalent requests.</p><p>The advantage of adding cache constraints is that they have the potential to partially or completely eliminate some interactions, improving efficiency, scalability, and user-perceived performance by reducing the average latency of a series of interactions. The trade-off, however, is that a cache can decrease reliability if stale data within the cache differs significantly from the data that would have been obtained had the request been sent directly to the server.”</p>",
@@ -68,7 +68,7 @@
         "_links": {
           "self": {
             "href": "../refs/cache.json",
-            "title": "Cache"
+            "title": "CACHE"
           },
           "describedby": {
             "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_4",

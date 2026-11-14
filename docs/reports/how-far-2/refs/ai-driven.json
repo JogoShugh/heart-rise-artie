@@ -1,7 +1,7 @@
 {
   "name": "ai-driven",
   "kind": "comment",
-  "label": "“…or some sort of AI-driven”",
+  "label": "JUST-IN-TIME",
   "title": "Instructions just before acting",
   "summary": "A client that acts only on the instructions it just received doesn't need to know how the resource is built. 2008, and he named AI.",
   "quote": "<p>“A distributed queue is an implementation choice. You can certainly implement some applications by having them interact with a queue-like resource in a RESTful manner. However, if your client relies on the resource being a queue, then it certainly isn’t a RESTful API. Do you see the difference? Encoding knowledge within clients and servers of the other side’s implementation mechanism is what we are trying to avoid.</p><p>If a client is receiving instructions on how to interact with a resource just before acting only on those instructions, then the client doesn’t care if the resource is a distributed queue. It simply doesn’t need to know how the resource is implemented. All it needs to know is the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of AI-driven.”</p>",

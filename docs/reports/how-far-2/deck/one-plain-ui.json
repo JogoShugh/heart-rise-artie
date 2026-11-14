@@ -4,8 +4,8 @@
   "part": "For real: two forges, one vocabulary",
   "kicker": "What typed relations buy · text/html",
   "tone": "light",
-  "number": 33,
-  "of": 55,
+  "number": 37,
+  "of": 59,
   "html": "<h2>One plain UI, rendered from the shared relations</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)\">\n  <figure><img src=\"media/hgh504.png\" alt=\"GitHub pull request #2337 through the gateway, rendered as text/html\"><figcaption>GitHub #2337 through the gateway, as text/html.</figcaption></figure>\n  <figure><img src=\"media/hgl504.png\" alt=\"GitLab merge request !504 through the gateway, rendered as text/html\"><figcaption>GitLab !504 through the gateway, as text/html.</figcaption></figure>\n</div>\n<p class=\"lead\"><b style=\"color: var(--leaf)\">Green:</b> offered now. <b>Grey:</b> not in this state (merged). One renderer, no forge-specific code: it reads the media type, as a browser reads HTML.</p>\n<p class=\"refs\"><deck-ref name=\"think-of-the-web\"></deck-ref></p>\n",
   "say": "The gateway serves each resource as text/html too. It's a plain, functional UI, rendered only from the data, the typed relations and the forms offered now. Nothing in the renderer knows GitHub or GitLab. Here, both merged: green buttons are the forms offered now, grey ones are not offered in this state. scm:comment is lit on both.",
   "sources": [
@@ -51,7 +51,7 @@
       {
         "name": "think-of-the-web",
         "kind": "comment",
-        "label": "“Think of it in terms of the Web”",
+        "label": "BROWSER-TEST",
         "title": "Browsers don't know resource types",
         "summary": "A browser knows the links and forms, not whether it's a bank or a wiki. Typed relations guide automated agents.",
         "quote": "<p>“A truly RESTful API looks like hypertext. Every addressable unit of information carries an address, either explicitly (e.g., link and id attributes) or implicitly (e.g., derived from the media type definition and representation structure). Query results are represented by a list of links with summary information, not by arrays of object representations (query is not a substitute for identification of resources). Resource representations are self-descriptive: the client does not need to know if a resource is OpenSocialist because it is just acting on the representations received.</p><p>Think of it in terms of the Web. How many Web browsers are aware of the distinction between an online-banking resource and a Wiki resource? None of them. They don’t need to be aware of the resource types. What they need to be aware of is the potential state transitions — the links and forms — and what semantics/actions are implied by traversing those links. A browser represents them as distinct UI controls so that a user can see potential transitions and anticipate the effect of chosen actions. A spider can follow them to the extent that the relationships are known to be safe. Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.”</p>",
@@ -60,7 +60,7 @@
         "_links": {
           "self": {
             "href": "../refs/think-of-the-web.json",
-            "title": "“Think of it in terms of the Web”"
+            "title": "BROWSER-TEST"
           },
           "describedby": {
             "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-720",

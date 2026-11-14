@@ -106,11 +106,17 @@ for (const r of refs.values()) {
   writeFileSync(join(out, "refs", `${r.name}.json`), json({ ...state, _links: { ...(_links.describedby ? { describedby: _links.describedby } : {}), self: { href: `${r.name}.json` }, profile: { href: PROFILE } } }));
 }
 
+// Every note in one resource, for the deck's "every pill, any time" overlay.
+writeFileSync(join(out, "refs", "index.json"), json({
+  title: "Every reference note", _links: { self: { href: "index.json" }, profile: { href: PROFILE } },
+  _embedded: { "deck:ref": [...refs.values()].map(refResource) },
+}));
+
 const link = (s, extra = {}) => ({ href: `${s.name}.json`, title: s.title, ...extra });
 
 // A slide as a plain page, for a reader with no client: the HTML, pills as their labels, fragments as code.
 const plainHtml = (s, embedded) => s.html
-  .replace(/<deck-ref name="([\w-]+)"[^>]*>(.*?)<\/deck-ref>/gs, (_, n, text) => `<a class="ref-plain" href="${esc(refs.get(n).href ?? "#")}">${text || esc(refs.get(n).label)}</a>`)
+  .replace(/<deck-ref name="([\w-]+)"[^>]*>(.*?)<\/deck-ref>/gs, (_, n, text) => `<a class="ref-plain" href="${esc(String(refs.get(n).href ?? "#").replace(/^#(.+)/, "deck/$1.html"))}">${text || esc(refs.get(n).label)}</a>`)
   .replace(/<deck-fragment name="([\w-]+)"[^>]*>(.*?)<\/deck-fragment>/gs, (_, n) => {
     const f = embedded["deck:fragment"].find((x) => x.name === n);
     return `<details class="fragment-plain"><summary>${esc(f.label)}</summary><pre><code>${esc(f.text)}</code></pre></details>`;

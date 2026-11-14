@@ -4,9 +4,9 @@
   "part": "Why now",
   "kicker": "Infer once. Then what?",
   "tone": "light",
-  "number": 3,
-  "of": 55,
-  "html": "<h2>When to think, and how “once” stays true</h2>\n<div class=\"split\">\n  <div class=\"card\">\n    <div class=\"step\"><h3>Hightower: when to think</h3><p>Once. Infer the task, then run it as plain, deterministic code. Zero tokens per run. <deck-ref name=\"zta\">ZTA</deck-ref></p></div>\n    <div class=\"step gap\"><h3>The gap</h3><p>“Everywhere” includes tomorrow. A script frozen against out-of-band URLs breaks, or pays tokens to re-learn.</p></div>\n    <div class=\"step\"><h3>Fielding: why it stays true</h3><p>Every answer carries its controls. The replay checks its act is still offered. That check is free.</p></div>\n    <p class=\"refs\"><deck-fragment name=\"goal\">goal</deck-fragment> <deck-fragment name=\"kept\">kept script</deck-fragment> <deck-fragment name=\"pins\">pins</deck-fragment></p>\n  </div>\n  <div class=\"card dark\" style=\"box-shadow: inset 0 0 0 1.5px rgba(227, 179, 65, 0.45);\">\n    <blockquote class=\"whole\">“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</blockquote>\n    <p class=\"cite\"><a href=\"https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven\" target=\"_blank\" rel=\"noopener\"><b>Roy T. Fielding</b></a>, “REST APIs must be hypertext-driven”, 20 Oct 2008</p>\n    <p class=\"refs\"><deck-ref name=\"rule-6\"></deck-ref> <deck-ref name=\"ai-driven\"></deck-ref> <deck-ref name=\"in-band\"></deck-ref> <deck-ref name=\"code-on-demand\"></deck-ref></p>\n  </div>\n</div>\n",
+  "number": 4,
+  "of": 59,
+  "html": "<h2>When to think, and how “once” stays true</h2>\n<div class=\"split\">\n  <div class=\"card\">\n    <div class=\"step\"><h3>Hightower: when to think</h3><p>Once. Infer the task, then run it as plain, deterministic code. Zero tokens per run. <deck-ref name=\"zta\"></deck-ref></p></div>\n    <div class=\"step gap\"><h3>The gap</h3><p>“Everywhere” includes tomorrow. A script frozen against out-of-band URLs breaks, or pays tokens to re-learn.</p></div>\n    <div class=\"step\"><h3>Fielding: why it stays true</h3><p>Every answer carries its controls. The replay checks its act is still offered. That check is free.</p></div>\n    <p class=\"refs\"><deck-fragment name=\"goal\">goal</deck-fragment> <deck-fragment name=\"kept\">kept script</deck-fragment> <deck-fragment name=\"pins\">pins</deck-fragment></p>\n  </div>\n  <div class=\"card dark\" style=\"box-shadow: inset 0 0 0 1.5px rgba(227, 179, 65, 0.45);\">\n    <blockquote class=\"whole\">“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</blockquote>\n    <p class=\"cite\"><a href=\"https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven\" target=\"_blank\" rel=\"noopener\"><b>Roy T. Fielding</b></a>, “REST APIs must be hypertext-driven”, 20 Oct 2008</p>\n    <p class=\"refs\"><deck-ref name=\"rule-6\"></deck-ref> <deck-ref name=\"ai-driven\"></deck-ref> <deck-ref name=\"in-band\"></deck-ref> <deck-ref name=\"code-on-demand\"></deck-ref></p>\n  </div>\n</div>\n",
   "say": "Infer once, run everywhere. But everywhere includes tomorrow, after the API changed. A script frozen against URLs and docs it learned out of band either breaks, or pays tokens to re-learn. Fielding wrote the answer down in 2008: enter with nothing but a bookmark and media types the client already understands, and from then on take every next step from the choices the server puts in the answer. Then a kept replay only has to check that the act it wants is still offered. That check costs no tokens. The model comes back only when the controls really changed, to repair. Hightower tells you to infer once; Fielding tells you how once stays true. The chips show the real thing: the goal in words, the script kept from one model run, and the pins it checks before every act.",
   "sources": [
     {
@@ -30,12 +30,12 @@
       "title": "Contents"
     },
     "prev": {
-      "href": "token-maxing.json",
-      "title": "From token maxing to tokenomics"
+      "href": "no-time.json",
+      "title": "No time to type"
     },
     "next": {
-      "href": "map.json",
-      "title": "Think once. Look and act for free. Own the controls."
+      "href": "rules.json",
+      "title": "The rules we hold to: Fielding, 2000 and 2008"
     },
     "alternate": {
       "href": "infer-once.html",
@@ -55,7 +55,7 @@
       {
         "name": "zta",
         "kind": "talk",
-        "label": "Hightower · ZTA",
+        "label": "ZTA",
         "title": "ZTA: Zero Token Architecture",
         "summary": "Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. (In my words, from the talk's page and Daniel Cranney's write-up.)",
         "quote": "<p>“You are all having way too much fun burning way too many tokens”</p><p class=\"note\">His opening line, as quoted in Daniel Cranney, <a href=\"https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture\">“Infer Once, Run Everywhere: Zero-Token Architecture”</a>, WeAreDevelopers, 13 October 2026.</p>",
@@ -64,7 +64,7 @@
         "_links": {
           "self": {
             "href": "../refs/zta.json",
-            "title": "Hightower · ZTA"
+            "title": "ZTA"
           },
           "describedby": {
             "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture",
@@ -75,7 +75,7 @@
       {
         "name": "rule-6",
         "kind": "rule",
-        "label": "Rule 6 · The bookmark",
+        "label": "R6 · BOOKMARK",
         "title": "Enter with a bookmark; follow what's offered",
         "summary": "In brief: one URI and known media types to start; every next step chosen from what the server put in the answer.",
         "quote": "<p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>",
@@ -84,7 +84,7 @@
         "_links": {
           "self": {
             "href": "../refs/rule-6.json",
-            "title": "Rule 6 · The bookmark"
+            "title": "R6 · BOOKMARK"
           },
           "describedby": {
             "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
@@ -95,7 +95,7 @@
       {
         "name": "ai-driven",
         "kind": "comment",
-        "label": "“…or some sort of AI-driven”",
+        "label": "JUST-IN-TIME",
         "title": "Instructions just before acting",
         "summary": "A client that acts only on the instructions it just received doesn't need to know how the resource is built. 2008, and he named AI.",
         "quote": "<p>“A distributed queue is an implementation choice. You can certainly implement some applications by having them interact with a queue-like resource in a RESTful manner. However, if your client relies on the resource being a queue, then it certainly isn’t a RESTful API. Do you see the difference? Encoding knowledge within clients and servers of the other side’s implementation mechanism is what we are trying to avoid.</p><p>If a client is receiving instructions on how to interact with a resource just before acting only on those instructions, then the client doesn’t care if the resource is a distributed queue. It simply doesn’t need to know how the resource is implemented. All it needs to know is the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of AI-driven.”</p>",
@@ -104,7 +104,7 @@
         "_links": {
           "self": {
             "href": "../refs/ai-driven.json",
-            "title": "“…or some sort of AI-driven”"
+            "title": "JUST-IN-TIME"
           },
           "describedby": {
             "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-842",
@@ -115,7 +115,7 @@
       {
         "name": "in-band",
         "kind": "comment",
-        "label": "“Provided in-band”",
+        "label": "IN-BAND",
         "title": "Instructions in every representation",
         "summary": "The media type is learned once; each representation carries the transitions available at that point.",
         "quote": "<p>“The media type identifies a specification that defines how a representation is to be processed. That is out-of-band information (all communication is dependent on some prior knowledge). What you are missing is that each representation contains the specific instructions for interfacing with a given service, provided in-band. The media type is a generic processing model that every agent can learn if there aren’t too many of them (hence the need for standards). The representation is specific to the application being performed by the agent. Each representation therefore provides the transitions that are available at that point in the application.</p><p>When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p>",
@@ -124,7 +124,7 @@
         "_links": {
           "self": {
             "href": "../refs/in-band.json",
-            "title": "“Provided in-band”"
+            "title": "IN-BAND"
           },
           "describedby": {
             "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754",
@@ -135,7 +135,7 @@
       {
         "name": "code-on-demand",
         "kind": "constraint",
-        "label": "Code on demand (optional)",
+        "label": "COD · optional",
         "title": "Code-on-demand (§5.1.7)",
         "summary": "Clients may be extended by code the server sends; optional, because it reduces visibility.",
         "quote": "<p>“The final addition to our constraint set for REST comes from the code-on-demand style of Section 3.5.3 (Figure 5-8). REST allows client functionality to be extended by downloading and executing code in the form of applets or scripts. This simplifies clients by reducing the number of features required to be pre-implemented. Allowing features to be downloaded after deployment improves system extensibility. However, it also reduces visibility, and thus is only an optional constraint within REST.”</p>",
@@ -144,7 +144,7 @@
         "_links": {
           "self": {
             "href": "../refs/code-on-demand.json",
-            "title": "Code on demand (optional)"
+            "title": "COD · optional"
           },
           "describedby": {
             "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_7",

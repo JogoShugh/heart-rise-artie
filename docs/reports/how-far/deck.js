@@ -127,7 +127,39 @@
     if (overlay.showModal) overlay.showModal(); else overlay.setAttribute("open", "");
     overlayBody.scrollTop = 0;
   }
-  overlay.addEventListener("click", function (event) { if (event.target === overlay) overlay.close(); });
+  overlay.addEventListener("click", function (event) {
+    if (event.target === overlay || event.target.closest("[data-close]")) overlay.close();
+    var pick = event.target.closest("[data-ref]");
+    if (pick && allRefs) openRef(allRefs.find(function (e) { return e.state.name === pick.dataset.ref; }));
+  });
+
+  // Every pill in the deck, at any time (K): the reference notes, one resource, grouped by kind.
+  var GROUPS = [["Grounds", ["talk", "ground"]], ["Fielding 2000 · constraints", ["constraint"]], ["Fielding 2008 · rules", ["rule"]],
+    ["Fielding 2008 · comments", ["comment"]], ["The parts", ["part"]], ["Previews: shown later", ["preview"]]];
+  var allRefs = null;
+  function asEmbedded(r) {
+    var state = {}; Object.keys(r).forEach(function (k) { if (k !== "_links") state[k] = r[k]; });
+    var links = Object.keys(r._links || {}).map(function (rel) { return { rel: rel, href: r._links[rel].href }; });
+    return { state: state, links: links };
+  }
+  function openAllRefs() {
+    var ready = allRefs ? Promise.resolve() : realFetch("refs/index.json").then(function (res) { return res.json(); })
+      .then(function (doc) { allRefs = doc._embedded["deck:ref"].map(asEmbedded); });
+    ready.then(function () {
+      var html = '<p class="kicker">Every pill, any time (K)</p><h2 id="overlay-title">Short forms</h2>';
+      GROUPS.forEach(function (g) {
+        var these = [];
+        g[1].forEach(function (kind) { these = these.concat(allRefs.filter(function (e) { return e.state.kind === kind; })); });
+        if (!these.length) return;
+        html += '<h3 class="refs-head">' + esc(g[0]) + "</h3>";
+        html += '<p class="refs">' + these.map(function (e) {
+          return '<button type="button" class="ref kind-' + esc(e.state.kind) + '" data-ref="' + esc(e.state.name) + '" title="' + esc(e.state.title) + '">' + esc(e.state.label) + "</button>";
+        }).join(" ") + "</p>";
+      });
+      open(html);
+    });
+  }
+  document.getElementById("refs-all").addEventListener("click", openAllRefs);
 
   function openRef(e) {
     var s = e.state, more = e.links.find(function (l) { return l.rel === "describedby"; });
@@ -135,7 +167,9 @@
       '<h2 id="overlay-title">' + esc(s.title) + "</h2>" +
       (s.summary ? '<p class="summary">' + esc(s.summary) + "</p>" : "") +
       (s.quote ? '<blockquote class="whole">' + s.quote + "</blockquote>" : "") +
-      '<p class="cite">' + (more ? '<a href="' + esc(more.href) + '" target="_blank" rel="noopener">' + esc(s.cite) + " ↗</a>" : esc(s.cite)) +
+      '<p class="cite">' + (more ? (more.href.charAt(0) === "#"
+        ? '<a href="' + esc(more.href) + '" data-close>' + esc(s.cite) + " →</a>"
+        : '<a href="' + esc(more.href) + '" target="_blank" rel="noopener">' + esc(s.cite) + " ↗</a>") : esc(s.cite)) +
       (s.date ? " · " + esc(s.date) : "") + "</p>");
   }
 
@@ -307,6 +341,7 @@
     if (event.key === "o" || event.key === "O") panel(root.dataset.panel === "hidden");
     if (event.key === "p" || event.key === "P") present(root.dataset.present !== "on");
     if (event.key === "n" || event.key === "N") notes(say.hidden);
+    if (event.key === "k" || event.key === "K") openAllRefs();
     if (event.key === "Escape" && root.dataset.present === "on") present(false);
   });
   window.addEventListener("hashchange", function () { goTo(decodeURIComponent(location.hash.slice(1))); });

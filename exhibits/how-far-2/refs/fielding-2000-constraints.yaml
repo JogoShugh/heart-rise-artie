@@ -1,7 +1,7 @@
 # REST's constraints, from Fielding's dissertation (2000), chapter 5: each section's defining paragraph, quoted whole.
 - name: client-server
   kind: constraint
-  label: "Client–server"
+  label: "C/S"
   title: "Client–server (§5.1.2)"
   summary: "Separate the user interface from the data; let each side evolve on its own."
   quote: "<p>“The first constraints added to our hybrid style are those of the client-server architectural style (Figure 5-2), described in Section 3.4.1. Separation of concerns is the principle behind the client-server constraints. By separating the user interface concerns from the data storage concerns, we improve the portability of the user interface across multiple platforms and improve scalability by simplifying the server components. Perhaps most significant to the Web, however, is that the separation allows the components to evolve independently, thus supporting the Internet-scale requirement of multiple organizational domains.”</p>"
@@ -10,7 +10,7 @@
   href: https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_2
 - name: stateless
   kind: constraint
-  label: "Stateless"
+  label: "STATELESS"
   title: "Stateless (§5.1.3)"
   summary: "Every request carries all it needs; session state lives on the client."
   quote: "<p>“We next add a constraint to the client-server interaction: communication must be stateless in nature, as in the client-stateless-server (CSS) style of Section 3.4.3 (Figure 5-3), such that each request from client to server must contain all of the information necessary to understand the request, and cannot take advantage of any stored context on the server. Session state is therefore kept entirely on the client.”</p>"
@@ -19,7 +19,7 @@
   href: https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_3
 - name: cache
   kind: constraint
-  label: "Cache"
+  label: "CACHE"
   title: "Cache (§5.1.4)"
   summary: "Label every response cacheable or not, so interactions can be skipped. HEART's L2 form sets are this."
   quote: "<p>“In order to improve network efficiency, we add cache constraints to form the client-cache-stateless-server style of Section 3.4.4 (Figure 5-4). Cache constraints require that the data within a response to a request be implicitly or explicitly labeled as cacheable or non-cacheable. If a response is cacheable, then a client cache is given the right to reuse that response data for later, equivalent requests.</p><p>The advantage of adding cache constraints is that they have the potential to partially or completely eliminate some interactions, improving efficiency, scalability, and user-perceived performance by reducing the average latency of a series of interactions. The trade-off, however, is that a cache can decrease reliability if stale data within the cache differs significantly from the data that would have been obtained had the request been sent directly to the server.”</p>"
@@ -28,7 +28,7 @@
   href: https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_4
 - name: uniform-interface
   kind: constraint
-  label: "Uniform interface · HATEOAS"
+  label: "UNIFORM · HATEOAS"
   title: "Uniform interface (§5.1.5)"
   summary: "One generic interface for every component; its fourth part is hypermedia as the engine of application state."
   quote: "<p>“The central feature that distinguishes the REST architectural style from other network-based styles is its emphasis on a uniform interface between components (Figure 5-6). By applying the software engineering principle of generality to the component interface, the overall system architecture is simplified and the visibility of interactions is improved. Implementations are decoupled from the services they provide, which encourages independent evolvability. The trade-off, though, is that a uniform interface degrades efficiency, since information is transferred in a standardized form rather than one which is specific to an application's needs. The REST interface is designed to be efficient for large-grain hypermedia data transfer, optimizing for the common case of the Web, but resulting in an interface that is not optimal for other forms of architectural interaction.</p><p>In order to obtain a uniform interface, multiple architectural constraints are needed to guide the behavior of components. REST is defined by four interface constraints: identification of resources; manipulation of resources through representations; self-descriptive messages; and, hypermedia as the engine of application state. These constraints will be discussed in Section 5.2.”</p>"
@@ -37,7 +37,7 @@
   href: https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_5
 - name: layered-system
   kind: constraint
-  label: "Layered system"
+  label: "LAYERED"
   title: "Layered system (§5.1.6)"
   summary: "Each component sees only the next layer; intermediaries can cache and enforce policy. A gateway in front of GitHub is this."
   quote: "<p>“In order to further improve behavior for Internet-scale requirements, we add layered system constraints (Figure 5-7). As described in Section 3.4.2, the layered system style allows an architecture to be composed of hierarchical layers by constraining component behavior such that each component cannot \"see\" beyond the immediate layer with which they are interacting. By restricting knowledge of the system to a single layer, we place a bound on the overall system complexity and promote substrate independence. Layers can be used to encapsulate legacy services and to protect new services from legacy clients, simplifying components by moving infrequently used functionality to a shared intermediary. Intermediaries can also be used to improve system scalability by enabling load balancing of services across multiple networks and processors.”</p>"
@@ -46,7 +46,7 @@
   href: https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_6
 - name: code-on-demand
   kind: constraint
-  label: "Code on demand (optional)"
+  label: "COD · optional"
   title: "Code-on-demand (§5.1.7)"
   summary: "Clients may be extended by code the server sends; optional, because it reduces visibility."
   quote: "<p>“The final addition to our constraint set for REST comes from the code-on-demand style of Section 3.5.3 (Figure 5-8). REST allows client functionality to be extended by downloading and executing code in the form of applets or scripts. This simplifies clients by reducing the number of features required to be pre-implemented. Allowing features to be downloaded after deployment improves system extensibility. However, it also reduces visibility, and thus is only an optional constraint within REST.”</p>"

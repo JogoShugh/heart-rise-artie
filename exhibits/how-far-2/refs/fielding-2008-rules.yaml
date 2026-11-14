@@ -1,7 +1,7 @@
 # Fielding's six rules from "REST APIs must be hypertext-driven", 20 October 2008: each quoted whole, as written.
 - name: rule-1
   kind: rule
-  label: "Rule 1 · Any protocol"
+  label: "R1 · ANY-PROTOCOL"
   title: Not tied to one communication protocol
   summary: "In brief: identification is separate from interaction; any URI scheme may identify."
   quote: "<p>“A REST API should not be dependent on any single communication protocol, though its successful mapping to a given protocol may be dependent on the availability of metadata, choice of methods, etc. In general, any protocol element that uses a URI for identification must allow any URI scheme to be used for the sake of that identification. [Failure here implies that identification is not separated from interaction.]”</p>"
@@ -10,7 +10,7 @@
   href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven
 - name: rule-2
   kind: rule
-  label: "Rule 2 · No protocol changes"
+  label: "R2 · PROTOCOL-AS-IS"
   title: Don't change the protocol
   summary: "In brief: fill in the protocol's underspecified bits; keep workarounds apart; interfaces stay generic."
   quote: "<p>“A REST API should not contain any changes to the communication protocols aside from filling-out or fixing the details of underspecified bits of standard protocols, such as HTTP’s PATCH method or Link header field. Workarounds for broken implementations (such as those browsers stupid enough to believe that HTML defines HTTP’s method set) should be defined separately, or at least in appendices, with an expectation that the workaround will eventually be obsolete. [Failure here implies that the resource interfaces are object-specific, not generic.]”</p>"
@@ -19,7 +19,7 @@
   href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven
 - name: rule-3
   kind: rule
-  label: "Rule 3 · Describe the media type"
+  label: "R3 · MEDIA-TYPES"
   title: Spend the effort on media types
   summary: "In brief: describe media types and relations, not which methods go to which URIs. This is what HEART's spec is."
   quote: "<p>“A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types. Any effort spent describing what methods to use on what URIs of interest should be entirely defined within the scope of the processing rules for a media type (and, in most cases, already defined by existing media types). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>"
@@ -28,7 +28,7 @@
   href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven
 - name: rule-4
   kind: rule
-  label: "Rule 4 · No fixed URIs"
+  label: "R4 · NO-FIXED-URIS"
   title: No fixed resource names or hierarchies
   summary: "In brief: the server owns its namespace and tells the client how to build addresses: forms, URI templates."
   quote: "<p>“A REST API must not define fixed resource names or hierarchies (an obvious coupling of client and server). Servers must have the freedom to control their own namespace. Instead, allow servers to instruct clients on how to construct appropriate URIs, such as is done in HTML forms and URI templates, by defining those instructions within media types and link relations. [Failure here implies that clients are assuming a resource structure due to out-of band information, such as a domain-specific standard, which is the data-oriented equivalent to RPC’s functional coupling].”</p>"
@@ -37,7 +37,7 @@
   href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven
 - name: rule-5
   kind: rule
-  label: "Rule 5 · No typed resources"
+  label: "R5 · NO-TYPES"
   title: No resource types the client depends on
   summary: "In brief: the client knows media types and relation names, nothing about what kind of thing is behind them."
   quote: "<p>“A REST API should never have “typed” resources that are significant to the client. Specification authors may use resource types for describing server implementation behind the interface, but those types must be irrelevant and invisible to the client. The only types that are significant to a client are the current representation’s media type and standardized relation names. [ditto]”</p>"
@@ -46,7 +46,7 @@
   href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven
 - name: rule-6
   kind: rule
-  label: "Rule 6 · The bookmark"
+  label: "R6 · BOOKMARK"
   title: Enter with a bookmark; follow what's offered
   summary: "In brief: one URI and known media types to start; every next step chosen from what the server put in the answer."
   quote: "<p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>"
@@ -55,7 +55,7 @@
   href: https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven
 - name: frustrated
   kind: rule
-  label: "The post's opening"
+  label: "FRUSTRATED"
   title: “I am getting frustrated…”
   summary: "Why he wrote the six rules."
   quote: "<p>“I am getting frustrated by the number of people calling any HTTP-based interface a REST API. Today’s example is the SocialSite REST API. That is RPC. It screams RPC. There is so much coupling on display that it should be given an X rating.</p><p>What needs to be done to make the REST architectural style clear on the notion that hypertext is a constraint? In other words, if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period. Is there some broken manual somewhere that needs to be fixed?”</p>"

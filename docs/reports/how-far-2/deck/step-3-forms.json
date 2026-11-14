@@ -4,8 +4,8 @@
   "part": "For real: two forges, one vocabulary",
   "kicker": "Building it back up · Step 3 of 5 · HEART L0, simplified",
   "tone": "light",
-  "number": 36,
-  "of": 55,
+  "number": 40,
+  "of": 59,
   "html": "<h2>Forms: what you can do now, and how</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr)\">\n  <pre><b>_forms:</b>\n  scm:close: {…}\n  <span class=\"add\">scm:merge:</span>\n    title: Merge\n    description: Merge the pull request into its base branch.\n    _links:\n      target:\n        href: /repos/JogoShugh/heart-github-test/\n              pulls/2325/actions/merge\n    method: PUT\n    contentType: application/json\n    schema:\n      type: object\n      additionalProperties: false\n      required: [method]\n      properties:\n        method:\n          title: Merge method\n          enum: [merge, squash, rebase]\n        commit_title:\n          type: string\n        commit_message:\n          type: string</pre>\n  <pre>  <span class=\"add\">scm:comment:</span>\n    title: Comment\n    _links:\n      target:\n        href: /repos/JogoShugh/heart-github-test/\n              pulls/2325/actions/comment\n    method: POST\n    contentType: application/json\n    schema:\n      type: object\n      required: [body]\n      properties:\n        body:\n          type: string\n          description: The contents of the comment.\n  scm:label: {…}\n  scm:edit: {…}\n  scm:request-review: {…}\n  scm:update-branch: {…}\n# 7 forms, while open</pre>\n</div>\n",
   "say": "The open pull request offers seven forms. scm:merge in full: its target, method, content type and JSON Schema, from GitHub's own description, with the merge method as scm's input. scm:comment needs one field, body. These are real, from the L0 run on GitHub.",
   "sources": [

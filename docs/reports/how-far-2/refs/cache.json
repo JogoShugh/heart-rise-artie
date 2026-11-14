@@ -1,7 +1,7 @@
 {
   "name": "cache",
   "kind": "constraint",
-  "label": "Cache",
+  "label": "CACHE",
   "title": "Cache (§5.1.4)",
   "summary": "Label every response cacheable or not, so interactions can be skipped. HEART's L2 form sets are this.",
   "quote": "<p>“In order to improve network efficiency, we add cache constraints to form the client-cache-stateless-server style of Section 3.4.4 (Figure 5-4). Cache constraints require that the data within a response to a request be implicitly or explicitly labeled as cacheable or non-cacheable. If a response is cacheable, then a client cache is given the right to reuse that response data for later, equivalent requests.</p><p>The advantage of adding cache constraints is that they have the potential to partially or completely eliminate some interactions, improving efficiency, scalability, and user-perceived performance by reducing the average latency of a series of interactions. The trade-off, however, is that a cache can decrease reliability if stale data within the cache differs significantly from the data that would have been obtained had the request been sent directly to the server.”</p>",

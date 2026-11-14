@@ -1,7 +1,7 @@
 {
   "name": "rule-2",
   "kind": "rule",
-  "label": "Rule 2 · No protocol changes",
+  "label": "R2 · PROTOCOL-AS-IS",
   "title": "Don't change the protocol",
   "summary": "In brief: fill in the protocol's underspecified bits; keep workarounds apart; interfaces stay generic.",
   "quote": "<p>“A REST API should not contain any changes to the communication protocols aside from filling-out or fixing the details of underspecified bits of standard protocols, such as HTTP’s PATCH method or Link header field. Workarounds for broken implementations (such as those browsers stupid enough to believe that HTML defines HTTP’s method set) should be defined separately, or at least in appendices, with an expectation that the workaround will eventually be obsolete. [Failure here implies that the resource interfaces are object-specific, not generic.]”</p>",
