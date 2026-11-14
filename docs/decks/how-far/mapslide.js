@@ -9,7 +9,7 @@ const line = (x, y, w, h, color, o = {}) => s.addShape(pres.shapes.LINE, { x, y,
 const num = (x, y, n) => { s.addShape(pres.shapes.OVAL, { x, y, w: 0.34, h: 0.34, fill: { color: GOLD }, line: { color: "17201B", width: 1.5 } }); T(String(n), { x, y, w: 0.34, h: 0.34, fontSize: 13, bold: true, color: "17201B", align: "center" }); };
 const pill = (x, y, w, t, fill, color = "17201B") => { box(x, y, w, 0.26, fill); T(t, { x, y, w, h: 0.26, fontSize: 9, bold: true, color, align: "center" }); };
 
-T(pathOnly ? "THE WHOLE STORY \u00B7 WHERE WE\u2019RE GOING" : "THE WHOLE STORY, ON ONE PAGE", { x: 0.4, y: 0.28, w: 8, h: 0.3, fontSize: 11, bold: true, color: GOLD, charSpacing: 3 });
+T(pathOnly || mode === "start" ? "THE WHOLE STORY \u00B7 WHERE WE\u2019RE GOING" : "THE WHOLE STORY \u00B7 WHAT YOU SAW", { x: 0.4, y: 0.28, w: 8, h: 0.3, fontSize: 11, bold: true, color: GOLD, charSpacing: 3 });
 T("Think once. Look and act for free. Own the controls.", { x: 0.4, y: 0.58, w: 12.5, h: 0.6, fontSize: 28, bold: true, fontFace: "Cambria" });
 
 const bands = [

@@ -485,3 +485,12 @@ function callouts(s, img, { x, y, w, pxW, pxH }, items, lx) {
   s.addNotes("The same page, now with everything you saw. Top to bottom: think once, look and act for free, one media type on the wire, our own controls in front of theirs. The dotted blue lines are RISE: the watcher and Jenkins answer later, back to ARTIE. The red loop is the only time tokens come back: a form changed, the replay stops, the model repairs. Left: how it was built, test first, gated by hooks, lint on every edit, architecture rules before the turn ends. Right: what it costs, measured: twenty model calls once, zero per replay, and at L2 thousands of requests never sent. Underneath it all, Fielding's constraints from 2000, with HATEOAS as the gold path and code on demand dashed, because it's the optional one.");
 }
 //@END
+
+//@MAPSTART
+// The whole story, on one page: where we're going
+{
+  const s = pres.addSlide(); n++; s.background = { color: "17201B" };
+  require("./mapslide.js")(pres, s, JSON.parse(require("fs").readFileSync(__dirname + "/icons.json", "utf8")), "start");
+  s.addNotes("Here's where we're going, on one page. Don't read it all now; follow the gold numbers. One: a goal in plain words. Two: Claude captures it once, twenty model calls. Three: what it found is kept as a YAML script with pins. Four: ARTIE, a generic client, replays it with no model. Five: our gateway, on a laptop, in front of GitHub, offers only the acts the state allows. Six: GitHub merges, or the local GitLab, through one set of scm typed relations; Jenkins builds and runs the smoke script it links; Dev gets the promotion. That gold line is hypermedia as the engine of application state: every step is a control the last answer offered. We'll come back to this slide at the end with everything lit.");
+}
+//@END
