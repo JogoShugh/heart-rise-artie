@@ -20,10 +20,13 @@ COPY . .
 RUN --mount=type=cache,target=/root/.gradle ./gradlew --no-daemon --quiet :heart-sims:installSims
 
 FROM eclipse-temurin:21.0.5_11-jre
+# The services run as a user of their own: they write nothing, and need no root.
+RUN useradd --system --no-create-home --shell /usr/sbin/nologin sims
 WORKDIR /sims
 COPY --from=build /src/heart-sims/build/sims/lib lib
 # The GitHub service is the gateway as shipped: its connector folder, found from the working directory.
 COPY heart-gateway/connectors/github heart-gateway/connectors/github
+USER sims
 EXPOSE 8099
 ENTRYPOINT ["java", "-cp", "lib/*", "com.artie.heart.sims.MainKt"]
 CMD ["8099"]

@@ -31,6 +31,8 @@ MOVES = [m.strip() for m in MOVES.split(",") if m.strip()]
 TOKEN = os.environ["GITHUB_TOKEN"]
 API = "https://api.github.com"
 R = "/repos/%s/%s" % (OWNER, REPO)
+ISSUE_PATH = "/issues/%d"
+PULL_PATH = "/pulls/%d"
 TITLES = {
     "crash": "Crash when a bed has no name (%s)" % STAMP,
     "test": "Test blank bed names (%s)" % STAMP,
@@ -89,14 +91,14 @@ def moved(move, landed, why, **more):
 
 
 def issue(n):
-    return call("GET", R + "/issues/%d" % n)[1]
+    return call("GET", R + ISSUE_PATH % n)[1]
 
 
 def m1(n):
     crash = issue(n["crash"])
     if crash["state"] != "open":
         return moved("M1", False, "the crash issue was already closed, as %s" % crash["state_reason"])
-    status, _ = call("PATCH", R + "/issues/%d" % n["crash"], {"state": "closed", "state_reason": "not_planned"})
+    status, _ = call("PATCH", R + ISSUE_PATH % n["crash"], {"state": "closed", "state_reason": "not_planned"})
     call("POST", R + "/issues/%d/comments" % n["crash"],
          {"body": "Closing here: this is tracked on the roadmap instead."})
     moved("M1", status == 200, "closed the crash issue as not planned (HTTP %d)" % status)
@@ -114,14 +116,14 @@ def m3(n):
     dup = issue(n["dup"])
     if dup["state"] != "open":
         return moved("M3", False, "the duplicate was already closed, as %s" % dup["state_reason"])
-    status, _ = call("PATCH", R + "/issues/%d" % n["dup"], {"state": "closed", "state_reason": "completed"})
+    status, _ = call("PATCH", R + ISSUE_PATH % n["dup"], {"state": "closed", "state_reason": "completed"})
     call("POST", R + "/issues/%d/comments" % n["dup"],
          {"body": "Not the same crash: this one comes from the demo garden's import. Fixed there."})
     moved("M3", status == 200, "closed the duplicate as completed (HTTP %d)" % status)
 
 
 def m4(n):
-    _, pull = call("GET", R + "/pulls/%d" % n["pr"])
+    _, pull = call("GET", R + PULL_PATH % n["pr"])
     if pull["merged"] or pull["state"] != "open":
         return moved("M4", False, "the pull request was already %s" % ("merged" if pull["merged"] else "closed"))
     query = "mutation($id: ID!) { convertPullRequestToDraft(input: {pullRequestId: $id}) { pullRequest { isDraft } } }"
@@ -132,11 +134,11 @@ def m4(n):
 
 
 def m5(n):
-    _, pull = call("GET", R + "/pulls/%d" % n["pr"])
+    _, pull = call("GET", R + PULL_PATH % n["pr"])
     body = pull.get("body") or ""
     if "tested by" in body or pull["merged"]:
         return moved("M5", False, "the run had already written the description")
-    status, _ = call("PATCH", R + "/pulls/%d" % n["pr"], {"body": body + "\n\n" + NOTE})
+    status, _ = call("PATCH", R + PULL_PATH % n["pr"], {"body": body + "\n\n" + NOTE})
     moved("M5", status == 200, "added a reviewer's note to the description (HTTP %d)" % status, before=body)
 
 
@@ -149,7 +151,7 @@ next_number = newest() + 1
 write_log()
 deadline = time.time() + GIVE_UP
 while time.time() < deadline and "pr" not in found:
-    status, item = call("GET", R + "/issues/%d" % next_number)
+    status, item = call("GET", R + ISSUE_PATH % next_number)
     if status != 200:
         time.sleep(POLL)
         continue

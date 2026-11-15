@@ -182,7 +182,10 @@ def main():
         uses = [b for b in content if b["type"] == "tool_use"]
         if not uses:
             last_words = words
-            ended = "done" if words.startswith("DONE:") else "stopped" if words.startswith("STOPPED:") else "answered"
+            if words.startswith("DONE:"):
+                ended = "done"
+            else:
+                ended = "stopped" if words.startswith("STOPPED:") else "answered"
             break
         results = []
         for use in uses:

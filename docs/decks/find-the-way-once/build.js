@@ -28,11 +28,11 @@ function head(s, eyebrow, title, dark) {
 }
 
 function text(s, body, o) {
-  s.addText(body, Object.assign({ fontFace: SERIF, fontSize: 16, color: C.ink, valign: "top", margin: 0 }, o));
+  s.addText(body, { fontFace: SERIF, fontSize: 16, color: C.ink, valign: "top", margin: 0, ...o });
 }
 
 function shape(s, kind, o) {
-  s.addShape(kind, Object.assign({ rectRadius: 0.08 }, o));
+  s.addShape(kind, { rectRadius: 0.08, ...o });
 }
 
 function box(s, x, y, w, h, fill, line) {
@@ -76,14 +76,17 @@ function code(s, x, y, w, h, lines, o = {}) {
     const comment = /^\s*(#|\/\/|<!--)/.test(ln);
     const request = /^(GET|POST|PUT|DELETE|PATCH|HTTP|\d{3} [A-Z])/.test(ln);
     // No-break spaces, so blank lines and indents survive every renderer.
-    const kept = ln === "" ? " " : ln.replace(/^ +| {2,}/g, (m) => " ".repeat(m.length));
+    const kept = ln === "" ? " " : ln.replace(/(?:^ +)| {2,}/g, (m) => " ".repeat(m.length));
     const parts = kept.split(/(⟦[^⟧]*⟧)/).filter((p) => p !== "");
     parts.forEach((p, j) => {
       const hl = p.startsWith("⟦");
+      let color = C.white;
+      if (hl) color = C.gold;
+      else if (comment) color = C.sage;
       runs.push({
         text: hl ? p.slice(1, -1) : p,
         options: {
-          color: hl ? C.gold : comment ? C.sage : C.white,
+          color,
           bold: hl || request, italic: comment && !hl,
           breakLine: j === parts.length - 1 && !last,
         },
@@ -127,21 +130,26 @@ function table(s, rows, o) {
     const c = typeof cell === "object" ? cell : { text: String(cell) };
     const header = i === 0;
     const first = j === 0 && !header;
+    let fill = c.fill || C.white;
+    if (header) fill = C.ink;
+    else if (first) fill = C.mist;
     return {
       text: c.text,
-      options: Object.assign({
-        fill: { color: header ? C.ink : first ? C.mist : c.fill || C.white },
+      options: {
+        fill: { color: fill },
         color: header ? C.white : c.color || C.ink,
         bold: header || first || !!c.bold,
         align: header || j > 0 ? "center" : "left",
         valign: "middle",
-      }, c.options || {}),
+        ...(c.options || {}),
+      },
     };
   }));
-  s.addTable(body, Object.assign({
+  s.addTable(body, {
     fontFace: SERIF, fontSize: 13, border: { type: "solid", pt: 0.75, color: C.pale },
     margin: [0.04, 0.08, 0.04, 0.08],
-  }, o));
+    ...o,
+  });
 }
 
 // ---------------------------------------------------------------- slides
@@ -622,7 +630,6 @@ add("CONTENT", (s) => {
     ["3  Act", "no model", "Send it with If-Match. A 412 reads again and decides again."],
   ];
   steps.forEach(([name, who, what], i) => {
-    const x = 0.6 + i * 2.2;
     const on = i === 1;
     box(s, 0.6, 1.65 + i * 1.5, 5.4, 1.3, on ? C.green : C.mist, on ? C.green : C.pale);
     text(s, [
@@ -630,7 +637,6 @@ add("CONTENT", (s) => {
       { text: who, options: { italic: true, fontSize: 13, color: on ? C.gold : C.sage, breakLine: true } },
       { text: what, options: { fontSize: 14, color: on ? C.white : C.ink, paraSpaceBefore: 4 } },
     ], { x: 0.8, y: 1.72 + i * 1.5, w: 5.0, h: 1.2 });
-    void x;
   });
   label(s, 6.4, 1.5, 6.3, "WHAT THE MODEL SAW, AND CHOSE (FROM THE TRACE)");
   code(s, 6.4, 1.85, 6.3, 4.1, [
@@ -1040,8 +1046,8 @@ function deck(which) {
   pptx.author = "Josh Gough";
   pptx.theme = { headFontFace: SERIF, bodyFontFace: SERIF };
   const number = { x: 12.2, y: 7.0, w: 0.6, h: 0.3, fontFace: SERIF, fontSize: 10, align: "right" };
-  pptx.defineSlideMaster({ title: "CONTENT", background: { color: C.white }, slideNumber: Object.assign({ color: C.sage }, number) });
-  pptx.defineSlideMaster({ title: "DARK", background: { color: C.ink }, slideNumber: Object.assign({ color: C.sage }, number) });
+  pptx.defineSlideMaster({ title: "CONTENT", background: { color: C.white }, slideNumber: { color: C.sage, ...number } });
+  pptx.defineSlideMaster({ title: "DARK", background: { color: C.ink }, slideNumber: { color: C.sage, ...number } });
   which.forEach(({ master, build }) => build(pptx.addSlide({ masterName: master })));
   return pptx;
 }

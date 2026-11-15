@@ -18,12 +18,12 @@ val cucumberVersion = "7.18.0"
 
 dependencies {
     implementation(project(":heart-script-test"))
-    // The client a script finds, by ServiceLoader.
-    runtimeOnly(project(":artie"))
     implementation(project(":heart-script-host"))
     implementation("org.yaml:snakeyaml:2.2")
     // A goal file's body, read as Markdown renders it (spec/PLAN-GOAL-MARKDOWN.md).
     implementation("org.commonmark:commonmark:0.21.0")
+    // The client a script finds, by ServiceLoader.
+    runtimeOnly(project(":artie"))
     // Californium logs through SLF4J 1.7; with no binding it warns on every run. A run's output is its steps.
     runtimeOnly("org.slf4j:slf4j-nop:1.7.36")
 

@@ -3,9 +3,11 @@
 #   docker build -t web-that-wasnt exhibits/the-web-that-wasnt/perl
 #   docker run --rm -d --name web-that-wasnt -p 8150:80 web-that-wasnt
 FROM httpd:2.4
-RUN apt-get update && apt-get install -y --no-install-recommends libcgi-pm-perl libyaml-libyaml-perl && rm -rf /var/lib/apt/lists/*
-# CGI on, and forms.html served by the script that writes it.
-RUN sed -i 's/^\s*#LoadModule cgid_module/LoadModule cgid_module/' conf/httpd.conf \
+# Perl's CGI.pm and YAML; then CGI on, and forms.html served by the script that writes it.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends libcgi-pm-perl libyaml-libyaml-perl \
+ && rm -rf /var/lib/apt/lists/* \
+ && sed -i 's/^\s*#LoadModule cgid_module/LoadModule cgid_module/' conf/httpd.conf \
  && echo 'ScriptAlias /forms.html /usr/local/apache2/cgi-bin/forms.cgi' >> conf/httpd.conf \
  && mkdir -p /data && chown www-data:www-data /data
 COPY forms.yaml /usr/local/apache2/forms.yaml

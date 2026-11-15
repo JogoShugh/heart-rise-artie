@@ -24,6 +24,10 @@ ARM_NAMES = {
     "artie-kept": "ARTIE kept script, no model",
     "artie-script": "ARTIE script, no model",
 }
+SAID_SO = "failed, said so"
+T1_NAME = "Hire, promote, dismiss"
+T2_NAME = "A dismissed employee"
+T3_NAME = "Someone else changes him"
 STATIC = ["fastmcp", "fastmcp-typical", "meta-tools"]
 HEART = ["heart-mcp", "heart-mcp-lean", "artie-goal", "artie-intent", "artie-kept", "artie-script"]
 CHANGES = ["moved", "renamed", "required", "method", "notice", "moved,renamed,required,method,notice"]
@@ -65,11 +69,13 @@ def outcome(run):
         return "done"
     if asked(run):
         return "asked"
-    return "failed, said so" if ADMITS.search(run.get("final_text") or "") else "failed, said it succeeded"
+    return SAID_SO if ADMITS.search(run.get("final_text") or "") else "failed, said it succeeded"
 
 
 def k(n):
-    return "—" if n is None else (f"{n / 1000:.1f}k" if n >= 1000 else str(n))
+    if n is None:
+        return "—"
+    return f"{n / 1000:.1f}k" if n >= 1000 else str(n)
 
 
 def esc(text):
@@ -89,7 +95,10 @@ def table(head, rows, cls=""):
 def score(group_runs):
     done = sum(r["check"]["done"] for r in group_runs)
     total = len(group_runs)
-    cls = "ok" if done == total else ("bad" if done == 0 else "mid")
+    if done == total:
+        cls = "ok"
+    else:
+        cls = "bad" if done == 0 else "mid"
     return f'<span class="{cls}">{done}/{total}</span>'
 
 
@@ -108,7 +117,7 @@ def baseline(runs):
         cells.append(str(median(r["model_calls"] for r in g)) if g else "—")
         cells.append(str(median(r["http"] for r in g)) if g else "—")
         rows.append(cells)
-    return table(["Arm", "Hire, promote, dismiss", "A dismissed employee", "Tool definitions",
+    return table(["Arm", T1_NAME, T2_NAME, "Tool definitions",
                   "Model calls (task 1)", "HTTP requests (task 1)"], rows)
 
 
@@ -122,7 +131,7 @@ def concurrent(runs):
         lost = sum(bool(r["check"].get("lost_update")) for r in g)
         noticed = sum("red book" in (r.get("final_text") or "").lower() for r in g)
         refused = sum(any(q["status"] == 412 for q in r["requests"]) for r in g)
-        stopped = sum(outcome(r) == "failed, said so" and not r["check"].get("lost_update") for r in g)
+        stopped = sum(outcome(r) == SAID_SO and not r["check"].get("lost_update") for r in g)
         rows.append([ARM_NAMES[arm], score(g), f'<span class="{"bad" if lost else "ok"}">{lost}/{len(g)}</span>',
                      f"{noticed}/{len(g)}", f"{refused}/{len(g)}", f"{stopped}/{len(g)}",
                      k(median(r["input_processed"] for r in g))])
@@ -142,7 +151,7 @@ def changes(runs, when, arms):
 
 def outcomes(runs, arms):
     by = group([r for r in runs if r.get("when") in ("start", "midway")], "arm")
-    kinds = ["done", "asked", "failed, said so", "failed, said it succeeded"]
+    kinds = ["done", "asked", SAID_SO, "failed, said it succeeded"]
     rows = []
     for arm in arms:
         g = by.get((arm,), [])
@@ -156,7 +165,7 @@ def outcomes(runs, arms):
 def lean(runs_before, runs_after):
     before, after = group(runs_before, "task"), group(runs_after, "task")
     rows = []
-    for task, name in (("t1", "Hire, promote, dismiss"), ("t2", "A dismissed employee"), ("t3", "Someone else changes him")):
+    for task, name in (("t1", T1_NAME), ("t2", T2_NAME), ("t3", T3_NAME)):
         b = median(r["input_processed"] for r in before.get((task,), []))
         a = median(r["input_processed"] for r in after.get((task,), []))
         cut = f"{round(100 * (a - b) / b)}%" if a and b else "—"
@@ -173,13 +182,13 @@ def models(runs):
             g = by.get((task, arm), [])
             cells.append(f"{score(g)} · {k(median(r['input_processed'] for r in g))}" if g else "—")
         rows.append(cells)
-    return table(["Arm", "Hire, promote, dismiss", "A dismissed employee", "Someone else changes him"], rows)
+    return table(["Arm", T1_NAME, T2_NAME, T3_NAME], rows)
 
 
 def fix(before, stale, toward):
     """The intent run before tonight's fixes, after deciding again on stale, and after acts toward the words."""
     rows = []
-    for name, pick in (("Someone else changes him", lambda r: r["task"] == "t3"),
+    for name, pick in ((T3_NAME, lambda r: r["task"] == "t3"),
                        ("Changed midway", lambda r: r.get("when") == "midway"),
                        ("Changed at start", lambda r: r.get("when") == "start")):
         b, m, a = ([r for r in runs if pick(r)] for runs in (before, stale, toward))

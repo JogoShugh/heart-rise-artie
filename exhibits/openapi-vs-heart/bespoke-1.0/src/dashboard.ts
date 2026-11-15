@@ -81,6 +81,7 @@ async function logged<T>(method: string, path: string, call: () => Promise<T>): 
 }
 
 function card(bed: Bed, message = "", refused = false): string {
+    const messageClass = refused ? "message refused" : "message";
     const buttons = buttonsFor(bed.status).map((b) => `
       <form class="act" hx-post="/beds/${bed.id}/${b.action}" hx-target="closest .card" hx-swap="outerHTML">
         ${b.fields}<button type="submit">${b.title}</button>
@@ -99,7 +100,7 @@ function card(bed: Bed, message = "", refused = false): string {
         <div><dt>Size</dt><dd>${bed.widthFt} × ${bed.lengthFt} ft</dd></div>
       </dl>
       <div class="buttons">${buttons}</div>
-      ${message ? `<p class="message${refused ? " refused" : ""}">${message}</p>` : ""}
+      ${message ? `<p class="${messageClass}">${message}</p>` : ""}
     </section>`;
 }
 
@@ -124,7 +125,7 @@ const mark = readFileSync(`${__dirname}/../../shared/mark.svg`, "utf8");
 
 http.createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", `http://localhost:${port}`);
-    const match = url.pathname.match(/^\/beds\/(\d+)(?:\/(card|water|sow|harvest))?$/);
+    const match = /^\/beds\/(\d+)(?:\/(card|water|sow|harvest))?$/.exec(url.pathname);
     const send = (status: number, type: string, body: string | Buffer) => {
         res.writeHead(status, { "Content-Type": type });
         res.end(body);

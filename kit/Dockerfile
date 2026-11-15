@@ -14,9 +14,11 @@ WORKDIR /src
 COPY heart heart
 COPY client client
 COPY docs/reports/assets docs/reports/assets
-RUN --mount=type=cache,target=/root/.gradle cd heart && \
+WORKDIR /src/heart
+RUN --mount=type=cache,target=/root/.gradle \
     ./gradlew --no-daemon --quiet :heart-gateway:installDist :heart-sims:installSims
-RUN --mount=type=cache,target=/root/.gradle cd client && \
+WORKDIR /src/client
+RUN --mount=type=cache,target=/root/.gradle \
     ./gradlew --no-daemon --quiet -Porg.gradle.java.installations.paths=/opt/jdk22 :artie-cli:installDist
 
 # GitHub's OpenAPI description (MIT, github/rest-api-description), which the gateway reads to learn GitHub's operations.

@@ -51,11 +51,18 @@ function pill(s, x, y, w, text, fill = GREEN, color = C.background1, h = 0.36) {
   s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius: 0.18, fill: { color: fill }, line: { color: fill } });
   s.addText(text, { x, y, w, h, fontSize: 12, bold: true, color, align: "center", valign: "middle", margin: 0, isTextBox: true });
 }
+function codeColor(style) {
+  if (style === "c") return SAGE;
+  if (style === "k") return GOLD;
+  if (style === "r") return "E07A5F";
+  if (style === "g") return "7BC79A";
+  return "E8EFEA";
+}
 function code(s, x, y, w, h, lines, size = 12) {
   s.addShape(pres.shapes.RECTANGLE, { x, y, w, h, fill: { color: C.text1 }, line: { color: C.text1 } });
   s.addText(lines.map(([style, t], i) => ({
     text: t,
-    options: { breakLine: i < lines.length - 1, color: style === "c" ? SAGE : style === "k" ? GOLD : style === "r" ? "E07A5F" : style === "g" ? "7BC79A" : "E8EFEA", italic: style === "c", bold: style === "k" },
+    options: { breakLine: i < lines.length - 1, color: codeColor(style), italic: style === "c", bold: style === "k" },
   })), { x: x + 0.2, y: y + 0.15, w: w - 0.4, h: h - 0.3, fontFace: "Courier New", fontSize: size, valign: "top", margin: 0, isTextBox: true });
 }
 function quote(s, x, y, w, h, text, cite, dark, size = 22) {
@@ -71,7 +78,7 @@ function shot(s, file, x, y, w, h, caption) {
 function bullets(s, items, o) {
   s.addText(items.map((t, i) => {
     const runs = Array.isArray(t) ? t : [{ text: t }];
-    return runs.map((r, j) => ({ text: r.text, options: { bullet: Array.isArray(t) ? undefined : (j === 0 ? { indent: 15 } : undefined), bold: r.b, color: r.color, breakLine: j === runs.length - 1 && i < items.length - 1, paraSpaceAfter: 8 } }));
+    return runs.map((r, j) => ({ text: r.text, options: { bullet: !Array.isArray(t) && j === 0 ? { indent: 15 } : undefined, bold: r.b, color: r.color, breakLine: j === runs.length - 1 && i < items.length - 1, paraSpaceAfter: 8 } }));
   }).flat(), { margin: 0, isTextBox: true, fontSize: 15, color: INK, valign: "top", ...o });
 }
 function stat(s, x, y, w, big, label, color = GREEN) {

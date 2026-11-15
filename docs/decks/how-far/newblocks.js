@@ -364,7 +364,10 @@ function callouts(s, img, { x, y, w, pxW, pxH }, items, lx) {
   ], 12);
   T(s, "Three facts, in order", { x: 8.3, y: 1.6, w: 4.4, h: 0.45, fontSize: 18, bold: true, fontFace: "Cambria", color: GREEN });
   ["FEATURE_WRITE", "BDD_RUN FAIL", "MAIN_WRITE …", "BDD_RUN PASS"].forEach((t, i) => {
-    pill(s, 8.3, 2.2 + i * 0.62, 3.2, t, i === 1 ? RUST : i === 3 ? GREEN : C.accent6, i === 0 || i === 2 ? INK : C.background1);
+    let fill = C.accent6;
+    if (i === 1) fill = RUST;
+    else if (i === 3) fill = GREEN;
+    pill(s, 8.3, 2.2 + i * 0.62, 3.2, t, fill, i === 0 || i === 2 ? INK : C.background1);
     if (i < 3) T(s, "↓", { x: 11.6, y: 2.25 + i * 0.62, w: 0.4, h: 0.4, fontSize: 16, color: SAGE });
   });
   T(s, "Works for a plain terminal git commit too. --no-verify and git commit -n are blocked for the model by protect-gate.sh.", { x: 8.3, y: 4.85, w: 4.4, h: 1.4, fontSize: 13 });

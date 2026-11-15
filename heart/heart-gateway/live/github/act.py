@@ -26,6 +26,9 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+ACTIONS = "/actions/"
+MERGE = "github:merge"
+MERGE_PATH = "/merge"
 KEPT = ("content-type", "etag", "content-location", "location", "cache-control")
 
 
@@ -78,7 +81,7 @@ class Client:
     @staticmethod
     def guess(read, key):
         """An act the read doesn't offer: a client that sends it anyway, by the path it was once told."""
-        return read["response"]["body"]["_links"]["self"]["href"] + "/actions/" + key.split(":")[1]
+        return read["response"]["body"]["_links"]["self"]["href"] + ACTIONS + key.split(":")[1]
 
 
 def push(repo, secret, branch, path, text, message):
@@ -102,10 +105,11 @@ def push(repo, secret, branch, path, text, message):
 
 def settled(client, path, tries=15):
     """Reads [path] again until GitHub has worked out mergeability: as the connector's reason says, shortly."""
+    read = None
     for _ in range(tries):
         read = client.read(path)
         if read["response"]["body"].get("mergeable") is not None:
-            return read
+            break
         time.sleep(2)
     return read
 
@@ -173,20 +177,20 @@ def main():
 
     read = client.read(pull(7))
     head = read["response"]["body"]["head"]["sha"]
-    merged = client.act(read, "github:merge", {"merge_method": "squash"})
-    step("Merge #7", {"method": "PUT", "path": pull(7) + "/merge", "body": {"merge_method": "squash", "sha": head}},
+    merged = client.act(read, MERGE, {"merge_method": "squash"})
+    step("Merge #7", {"method": "PUT", "path": pull(7) + MERGE_PATH, "body": {"merge_method": "squash", "sha": head}},
          read, merged, after=client.read(pull(7)))
 
     read = client.read(pull(1))
     pushed = push(repo, secret, "clean", "clean.txt", "Mulch the beds, twice.\n", "Another push to the branch")
-    stale = client.act(read, "github:merge", {"merge_method": "squash"})
+    stale = client.act(read, MERGE, {"merge_method": "squash"})
     step(f"Merge #1 after another push (GitHub answered the push {pushed})",
-         {"method": "PUT", "path": pull(1) + "/merge",
+         {"method": "PUT", "path": pull(1) + MERGE_PATH,
           "body": {"merge_method": "squash", "sha": read["response"]["body"]["head"]["sha"]}}, read, stale)
 
     read = client.read(pull(6))
-    refused = client.act(read, "github:merge", {"merge_method": "squash"})
-    step("Merge #6, which isn't offered", {"method": "PUT", "path": pull(6) + "/merge",
+    refused = client.act(read, MERGE, {"merge_method": "squash"})
+    step("Merge #6, which isn't offered", {"method": "PUT", "path": pull(6) + MERGE_PATH,
                                            "body": {"merge_method": "squash"}}, read, refused)
 
     write(out, steps, secret)
@@ -199,8 +203,8 @@ def run_trace(steps):
         act, read, plain = step["act"], step.get("read"), step.get("plain")
         url = act["request"]["url"]
         params = dict(act["request"].get("body") or {})
-        if "/actions/" in url:
-            params["relation"] = "github:" + url.rsplit("/actions/", 1)[1]
+        if ACTIONS in url:
+            params["relation"] = "github:" + url.rsplit(ACTIONS, 1)[1]
             fields = "".join(f", {name} {{{name}}}" for name in act["request"].get("body") or {})
             say = f"{step['name']}: act {{relation}}{fields}"
         else:

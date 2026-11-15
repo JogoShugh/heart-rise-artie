@@ -160,9 +160,9 @@ def offered(capture):
     return ", ".join(k.split(":")[1] for k in forms) or "nothing"
 
 
-def section(capture, report_dir):
+def section(capture):
     n = capture["number"]
-    github, heart = capture["github"], capture["heart"]
+    github = capture["github"]
     title = github["response"]["body"]["title"]
     shot = f"img/pr-{n}.png"
     reasons = (capture.get("explanation") or {}).get("response", {}).get("body", {}).get("unavailable", [])
@@ -192,7 +192,6 @@ def issues(report_dir):
         return ""
     read = json.load(open(path("issue-open.json")))
     steps = json.load(open(path("issues-acts.json")))
-    github, heart = read["github"], read["heart"]
     n = read["path"].rsplit("/", 1)[1]
     return f"""
   <section class="pull wide" id="issues">
@@ -219,7 +218,7 @@ def page(captures, report_dir, steps=None, more=None, unsettled=None):
         f"<td>{esc(offered(c))}</td></tr>"
         for c in captures
     )
-    sections = "".join(section(c, report_dir) for c in captures)
+    sections = "".join(section(c) for c in captures)
     with open(os.path.join(os.path.dirname(__file__), "report.css")) as css:
         style = css.read()
     return f"""<!doctype html>

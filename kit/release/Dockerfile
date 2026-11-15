@@ -12,15 +12,17 @@ WORKDIR /src
 COPY heart heart
 COPY client client
 COPY docs/reports/assets docs/reports/assets
-RUN --mount=type=cache,target=/root/.gradle cd heart && \
+WORKDIR /src/heart
+RUN --mount=type=cache,target=/root/.gradle \
     ./gradlew --no-daemon --quiet :heart-gateway:installDist :heart-sims:installSims
-RUN --mount=type=cache,target=/root/.gradle cd client && \
+WORKDIR /src/client
+RUN --mount=type=cache,target=/root/.gradle \
     ./gradlew --no-daemon --quiet -Porg.gradle.java.installations.paths=/opt/jdk22 :artie-release:installDist
 
 # The release's scripts need git, curl, node (seeding real GitHub), openssl and shasum (perl); docker's own client
 # reaches GitLab's Rails console when GitLab is seeded.
 FROM eclipse-temurin:25-jre
-RUN apt-get update && apt-get install -y --no-install-recommends git curl nodejs openssl perl ca-certificates \
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl git nodejs openssl perl \
     && rm -rf /var/lib/apt/lists/* && git config --system --add safe.directory "*"
 COPY --from=docker:27-cli /usr/local/bin/docker /usr/local/bin/docker
 # The repository's own layout, so the release's scripts find everything where they look on any other machine.

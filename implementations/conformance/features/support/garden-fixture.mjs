@@ -12,7 +12,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const fixtures = join(dirname(fileURLToPath(import.meta.url)), "../../fixtures/garden");
-const fixtureFile = (scenario) => join(fixtures, `${scenario.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.json`);
+const fixtureFile = (scenario) => join(fixtures, `${scenario.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(?:^-)|(?:-$)/g, "")}.json`);
 const dropped = new Set(["date", "connection", "keep-alive", "transfer-encoding", "set-cookie"]);
 
 async function bodyOf(req) {
