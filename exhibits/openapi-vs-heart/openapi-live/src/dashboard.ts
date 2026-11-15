@@ -89,6 +89,7 @@ function bodySchema(doc: Json, op: Json): Json {
 }
 
 function card(doc: Json, bed: Json, lookup: Operation, message = "", refused = false): string {
+    const messageClass = refused ? "message refused" : "message";
     const schema = deref(doc, deref(doc, lookup.op.responses?.["200"])?.content?.["application/json"]?.schema) ?? {};
     const properties: Json = schema.properties ?? {};
     const members = Object.entries(bed)
@@ -102,7 +103,7 @@ function card(doc: Json, bed: Json, lookup: Operation, message = "", refused = f
       <div class="card-head"><div><div class="kind">${esc(schema.title ?? lookup.path)}</div><h2>${esc(bed.label ?? bed.id)}</h2></div></div>
       <div class="facts">${members}</div>
       <div class="buttons">${forms}</div>
-      ${message ? `<p class="message${refused ? " refused" : ""}">${esc(message)}</p>` : ""}
+      ${message ? `<p class="${messageClass}">${esc(message)}</p>` : ""}
     </section>`;
 }
 
@@ -133,10 +134,12 @@ function input(name: string, schema: Json, required: boolean): string {
     if (Array.isArray(schema.enum)) {
         // The preset first, as a person would see it chosen.
         const options = [...schema.enum].sort((a, b) => Number(b === preset) - Number(a === preset));
-        return field(label, `<select${attrs}>${options.map((v) => `<option>${esc(String(v))}</option>`).join("")}</select>`);
+        const optionList = options.map((v) => `<option>${esc(String(v))}</option>`).join("");
+        return field(label, `<select${attrs}>${optionList}</select>`);
     }
     const numeric = schema.type === "integer" || schema.type === "number";
-    return field(label, `<input${numeric ? ` type="number"` : ""}${attrs}>`);
+    const typeAttr = numeric ? ' type="number"' : "";
+    return field(label, `<input${typeAttr}${attrs}>`);
 }
 
 /** The submitted form as the JSON the operation's schema asks for. */
@@ -182,7 +185,7 @@ const mark = readFileSync(`${__dirname}/../../shared/mark.svg`, "utf8");
 
 http.createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", `http://localhost:${port}`);
-    const match = url.pathname.match(/^\/beds\/(\d+)(?:\/(card)|\/act\/([^/]+))?$/);
+    const match = /^\/beds\/(\d+)(?:\/(card)|\/act\/([^/]+))?$/.exec(url.pathname);
     const send = (status: number, type: string, body: string | Buffer) => {
         res.writeHead(status, { "Content-Type": type });
         res.end(body);

@@ -56,7 +56,8 @@ let pressed = null;
 let answer = card;
 if (client === "claude") {
     pressed = "Ask: Water bed 2 with about 250 ml";
-    answer = await post(`${dashboard}/ask?at=${encodeURIComponent(`${garden}/beds/2`)}`, { intent: "Water bed 2 with about 250 ml" });
+    const bed2 = encodeURIComponent(`${garden}/beds/2`);
+    answer = await post(`${dashboard}/ask?at=${bed2}`, { intent: "Water bed 2 with about 250 ml" });
 } else {
     const form = forms(card).find((f) => WATERING.test(f.title));
     if (form) {

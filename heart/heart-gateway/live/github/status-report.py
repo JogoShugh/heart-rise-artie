@@ -14,6 +14,13 @@ import sys
 
 from jsonview import JsonView
 
+IN_CONFLICT = "in conflict"
+CHECKING = "still being checked"
+NO_PUSH = "no push permission"
+CLOSED_ANY = "closed (any)"
+ACTS_MORE = "acts-more.json"
+ACTS_UNSETTLED = "acts-more-unsettled.json"
+ISSUES_ACTS = "issues-acts.json"
 ACTS = ["close", "reopen", "merge", "edit", "request-review", "update-branch"]
 FAKE, REAL, NO = "fake", "real", "—"
 
@@ -30,13 +37,13 @@ CAPABILITIES = [
     ("Act", "merge, sha bound from /head/sha", "✓", "✓", "github-acts.feature; acts.json #7"),
     ("Act", "edit, title and body", "✓", "✓", "github-more-acts.feature; acts-more.json"),
     ("Act", "request-review, accepted", "✓", NO, "needs a second collaborator"),
-    ("Act", "request-review naming nobody: 422 by the form, GitHub not asked", "✓", "✓", "acts-more.json"),
-    ("Act", "request-review, non-collaborator: 422 in GitHub's words", "✓", "✓", "acts-more.json"),
-    ("Act", "update-branch, expected_head_sha bound", "✓", "✓", "acts-more.json"),
-    ("Act", "update-branch, up to date: 409 in GitHub's words", "✓", "✓", "acts-more.json"),
+    ("Act", "request-review naming nobody: 422 by the form, GitHub not asked", "✓", "✓", ACTS_MORE),
+    ("Act", "request-review, non-collaborator: 422 in GitHub's words", "✓", "✓", ACTS_MORE),
+    ("Act", "update-branch, expected_head_sha bound", "✓", "✓", ACTS_MORE),
+    ("Act", "update-branch, up to date: 409 in GitHub's words", "✓", "✓", ACTS_MORE),
     ("Guard", "428 without If-Match", "✓", NO, "conformance kit"),
     ("Guard", "422 body outside the form's schema; GitHub not asked", "✓", "✓", "conformance kit; acts-more.json"),
-    ("Guard", "412: ETag no longer matches (state changed since the read)", "✓", "✓", "acts-more-unsettled.json"),
+    ("Guard", "412: ETag no longer matches (state changed since the read)", "✓", "✓", ACTS_UNSETTLED),
     ("Guard", "412: gateway's re-read before acting finds the state changed", "✓", "✓", "acts.json #1"),
     ("Guard", "412: GitHub's own sha check (409) on merge", "✓", NO, "the re-read caught it first live"),
     ("Guard", "409: act not offered, with its reason; GitHub not asked", "✓", "✓", "acts.json #6"),
@@ -53,7 +60,7 @@ CAPABILITIES = [
      "github-open-issue.feature; issues-acts.json"),
     ("Issues", "open-issue absent when issues are off or the repository archived", "✓", NO, "github-open-issue.feature"),
     ("Issues", "close as completed, not planned, duplicate; reopen; edit", "✓", "✓", "github-issues.feature; issues-acts.json"),
-    ("Issues", "lock, unlock; lock again not offered: 409", "✓", "✓", "issues-acts.json"),
+    ("Issues", "lock, unlock; lock again not offered: 409", "✓", "✓", ISSUES_ACTS),
     ("Issues", "label, unlabel ({name} in the path), assign, unassign", "✓", "✓", "github-issue-people.feature; issues-acts.json"),
     ("Issues", "set-milestone", "✓", NO, "github-issue-people.feature"),
     ("Issues", "Who may: author or triage closes; push edits others' and locks", "✓", NO,
@@ -64,7 +71,7 @@ CAPABILITIES = [
     ("Issues", "Locked conversation: comment only with push", "✓", NO, "github-issue-comments.feature"),
     ("Issues", "Issue links its sub-issues, served as a list; add, remove by id", "✓", "✓",
      "github-sub-issues.feature; issues-acts.json"),
-    ("Issues", "412: the gateway's re-read finds the issue changed on GitHub", "✓", "✓", "issues-acts.json"),
+    ("Issues", "412: the gateway's re-read finds the issue changed on GitHub", "✓", "✓", ISSUES_ACTS),
     ("Issues", "Offers follow the user's permissions, not a narrower token's", "—", "✓",
      "token without Issues write: offered, then 403 from GitHub"),
 ]
@@ -115,42 +122,42 @@ ISSUE_REASONS = [
 STATES = [
     ("open, clean", "state open, mergeable true, mergeable_state clean", 1, "pull-1.json"),
     ("draft", "draft true (mergeable_state clean)", 2, "pull-2.json"),
-    ("in conflict", "mergeable false, mergeable_state dirty", 3, "pull-3.json"),
-    ("still being checked", "mergeable null, mergeable_state unknown", 3, "pull-3-still-checking.json"),
+    (IN_CONFLICT, "mergeable false, mergeable_state dirty", 3, "pull-3.json"),
+    (CHECKING, "mergeable null, mergeable_state unknown", 3, "pull-3-still-checking.json"),
     ("blocked", "mergeable_state blocked (required review)", 6, "pull-6.json"),
     ("behind", "mergeable_state behind (needs a required check)", None, None),
     ("merged", "state closed, merged true", 4, "pull-4.json"),
     ("closed", "state closed, merged false", 5, "pull-5.json"),
-    ("no push permission", "repository permissions.push false", None, None),
+    (NO_PUSH, "repository permissions.push false", None, None),
 ]
 
 # What the shipped connector allows in each state; the live column is checked against the captures.
 ALLOWED = {
     "open, clean": {"close", "merge", "edit", "request-review", "update-branch"},
     "draft": {"close", "edit", "request-review", "update-branch"},
-    "in conflict": {"close", "edit", "request-review"},
-    "still being checked": {"close", "edit", "request-review", "update-branch"},
+    IN_CONFLICT: {"close", "edit", "request-review"},
+    CHECKING: {"close", "edit", "request-review", "update-branch"},
     "blocked": {"close", "edit", "request-review", "update-branch"},
     "behind": {"close", "edit", "request-review", "update-branch"},
     "merged": {"edit"},
     "closed": {"reopen", "edit"},
-    "no push permission": set(),
+    NO_PUSH: set(),
 }
 
 REASONS = [
     ("open (any)", "reopen", "The pull request is already open."),
     ("draft", "merge", "A draft can't be merged; mark it ready for review first."),
-    ("in conflict", "merge", "The branch has conflicts with its base; resolve them first."),
-    ("in conflict", "update-branch", "The branch has conflicts with its base; resolve them first."),
-    ("still being checked", "merge", "GitHub is still checking whether it can be merged; read it again shortly."),
+    (IN_CONFLICT, "merge", "The branch has conflicts with its base; resolve them first."),
+    (IN_CONFLICT, "update-branch", "The branch has conflicts with its base; resolve them first."),
+    (CHECKING, "merge", "GitHub is still checking whether it can be merged; read it again shortly."),
     ("blocked", "merge", "Branch protection blocks the merge: a required check or review is missing."),
     ("behind", "merge", "The branch is behind its base; update it first."),
     ("merged", "reopen", "A merged pull request can't be reopened."),
-    ("closed (any)", "close", "The pull request is already closed."),
-    ("closed (any)", "merge", "A closed pull request can't be merged; reopen it first."),
-    ("closed (any)", "request-review", "A closed pull request can't have reviews requested; reopen it first."),
-    ("closed (any)", "update-branch", "A closed pull request's branch isn't updated; reopen it first."),
-    ("no push permission", "every act", "You can't push to this repository."),
+    (CLOSED_ANY, "close", "The pull request is already closed."),
+    (CLOSED_ANY, "merge", "A closed pull request can't be merged; reopen it first."),
+    (CLOSED_ANY, "request-review", "A closed pull request can't have reviews requested; reopen it first."),
+    (CLOSED_ANY, "update-branch", "A closed pull request's branch isn't updated; reopen it first."),
+    (NO_PUSH, "every act", "You can't push to this repository."),
 ]
 
 PHASES = [
@@ -220,13 +227,13 @@ def page(root):
     )
 
     act_details = []
-    for file in ("acts.json", "acts-more.json", "acts-more-unsettled.json"):
+    for file in ("acts.json", ACTS_MORE, ACTS_UNSETTLED):
         steps = load(os.path.join(acts_dir, file)) or []
         for step in steps:
             if step.get("plain") is None:
                 continue
             status = step["act"]["response"]["status"]
-            label = step["name"] + (" (first try, GitHub not yet settled)" if file == "acts-more-unsettled.json" else "")
+            label = step["name"] + (" (first try, GitHub not yet settled)" if file == ACTS_UNSETTLED else "")
             act_details.append(view.act(step, f'<span class="st s{status // 100}">{status}</span> {esc(label)}'))
 
     issue_rows, issue_details = [], []
@@ -260,7 +267,7 @@ def page(root):
             f'<b>{esc(capture_name)}</b> · {esc(capture["path"])} · offers {esc(offers)} · '
             f'<a href="captures/issue-{capture_name}.json">capture</a>',
         ))
-    for step in load(os.path.join(caps, "issues-acts.json")) or []:
+    for step in load(os.path.join(caps, ISSUES_ACTS)) or []:
         status = step["act"]["response"]["status"]
         issue_details.append(view.act(step, f'<span class="st s{status // 100}">{status}</span> {esc(step["name"])}'))
 

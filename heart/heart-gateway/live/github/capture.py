@@ -18,6 +18,7 @@ import sys
 import urllib.error
 import urllib.request
 
+HAL = "application/hal+json"
 KEPT_HEADERS = ("content-type", "etag", "link", "cache-control", "vary", "x-github-api-version-selected")
 
 
@@ -59,17 +60,17 @@ def main():
              "X-GitHub-Api-Version": "2022-11-28"},
             secret,
         )
-        heart = exchange(f"{gateway}{path}", {"Authorization": f"Bearer {secret}", "Accept": "application/hal+json"}, secret)
+        heart = exchange(f"{gateway}{path}", {"Authorization": f"Bearer {secret}", "Accept": HAL}, secret)
         unavailable = heart["response"]["body"].get("_links", {}).get("hr:unavailable", {}).get("href")
         explanation = exchange(f"{gateway}{unavailable}", {"Accept": "application/json"}, secret) if unavailable else None
         # The same read at L1 and L2: the forms by link to a shared, content-addressed affordance set,
         # and at L2 each form's schema by link too (HAL-SCHEMA-FORMS-HR).
         rungs = {}
         for rung, prefer in (("L1", "forms=link"), ("L2", "forms=link, schema=link")):
-            read = exchange(f"{gateway}{path}", {"Authorization": f"Bearer {secret}", "Accept": "application/hal+json",
+            read = exchange(f"{gateway}{path}", {"Authorization": f"Bearer {secret}", "Accept": HAL,
                                                  "Prefer": prefer}, secret)
             forms = read["response"]["body"].get("_links", {}).get("hr:forms", {}).get("href")
-            chain = {"read": read, "set": exchange(f"{gateway}{forms}", {"Accept": "application/hal+json"}, secret)}
+            chain = {"read": read, "set": exchange(f"{gateway}{forms}", {"Accept": HAL}, secret)}
             if rung == "L2":
                 refs = [f["schema"]["$ref"] for f in chain["set"]["response"]["body"].get("_forms", {}).values()
                         if "$ref" in f.get("schema", {})]

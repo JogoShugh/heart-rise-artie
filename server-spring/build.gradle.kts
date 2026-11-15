@@ -56,12 +56,13 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    runtimeOnly("org.postgresql:postgresql") // JDBC driver, only used by Flyway below
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
 
     // SPEC §6.0.1: HEART over CoAP (RFC 7252), a second front door beside HTTP.
     implementation("com.artie.heart:heart-coap")
+
+    runtimeOnly("org.postgresql:postgresql") // JDBC driver, only used by Flyway above
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")

@@ -23,6 +23,12 @@ SCRATCH = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().p
 esc = html.escape
 
 
+def status(failed, skipped):
+    if failed:
+        return "fail"
+    return "skip" if skipped else "pass"
+
+
 def junit(project, task="test"):
     cases = []
     for f in sorted(glob.glob(str(REPO / project / f"build/test-results/{task}/*.xml"))):
@@ -34,7 +40,7 @@ def junit(project, task="test"):
                 "cls": tc.get("classname", "").split(".")[-1],
                 "name": tc.get("name"),
                 "time": float(tc.get("time", 0)),
-                "status": "fail" if failed else "skip" if skipped else "pass",
+                "status": status(failed, skipped),
                 "ts": suite.get("timestamp", ""),
                 "suite": suite.get("name", ""),
             })

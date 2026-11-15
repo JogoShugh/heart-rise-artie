@@ -52,7 +52,11 @@ function lede(doc, id, first, items) {
 function code(doc, id, lines, size) {
   replaceShape(doc, id, (sp) => {
     const paras = sp.match(/<a:p>[\s\S]*?<\/a:p>/g);
-    const styleOf = (p) => (/ i="1"/.test(p) ? "I" : / b="1"/.test(p) ? "B" : "P");
+    const styleOf = (p) => {
+      if (/ i="1"/.test(p)) return "I";
+      if (/ b="1"/.test(p)) return "B";
+      return "P";
+    };
     const pick = (s) => paras.find((p) => styleOf(p) === s) ?? paras.find((p) => styleOf(p) === "P");
     const made = lines.map(([s, text]) => {
       let p = pick(s).replace(/<a:t>[^<]*<\/a:t>/, `<a:t>${esc(text)}</a:t>`);

@@ -34,7 +34,8 @@ BASE = os.environ.get("BENCH_BASE", "http://localhost:8099")
 TOKEN_VARIABLE = f"ARTIE_TOKEN_LOCALHOST_{BASE.rsplit(':', 1)[1]}"
 TOKEN = os.environ.get("BENCH_TOKEN") or os.environ["EMPLOYEES_TOKEN"]
 AUTH = {"Authorization": f"Bearer {TOKEN}"}
-PLAIN = {**AUTH, "Accept": "application/json"}
+JSON_TYPE = "application/json"
+PLAIN = {**AUTH, "Accept": JSON_TYPE}
 HERE = Path(__file__).parent
 HEART_MCP = Path(os.environ.get("HEART_MCP_BIN", HERE / "../../mcp/heart-mcp-server/build/install/heart-mcp/bin/heart-mcp"))
 OPENAPI_MCP = "@ivotoby/openapi-mcp-server@1.16.1"
@@ -85,10 +86,13 @@ FIRST_NAMES = (
     'Abby', 'Carl', 'Dora', 'Ethan', 'Faye', 'Glen', 'Holly', 'Ian', 'Joan', 'Kurt', 'Lena', 'Max',
     'Nina', 'Oscar', 'Pia', 'Reid', 'Sofia', 'Tess',
 )
-STEP_ON = {"working": "on notice", "on notice": "dismissed", "dismissed": "dismissed"}
+ON_NOTICE = "on notice"
+STEP_ON = {"working": ON_NOTICE, ON_NOTICE: "dismissed", "dismissed": "dismissed"}
 # The surname t5 is run for (--surname): the employees seeded share it, and the task names it.
 SURNAME = {"name": "Miller"}
 INTERFERED_ROLE = "keeper of the Red Book"
+RETIRED_ROLE = "ring bearer, retired"
+CHANGES_PATH = "/_sim/employees/changes"
 INTERFERED = {"t3", "t4"}
 
 # ---- GitHub through the owner's gateway (exhibits/own-controls): heart-sims' small GitHub, the gateway in front ----
@@ -116,6 +120,13 @@ GITHUB_PATHS = ["/repos/{owner}/{repo}/issues", "/repos/{owner}/{repo}/issues/{i
 
 def github(task):
     return task.startswith("g")
+
+
+def interference(interferer, meddled):
+    """What interfered with a run: the interferer's record, or the meddle when it is on and [meddled] says it applies."""
+    if interferer:
+        return interferer.fired
+    return {"by": "meddle"} if MEDDLE["on"] and meddled() else None
 
 
 # ---- the service: reset, setup, its log, and what it holds after ----
@@ -153,10 +164,10 @@ def setup(task):
 
 def seed_employees():
     """The notice release on, then the Millers hired, given notice and dismissed through the service's own acts."""
-    sim("PUT", "/_sim/employees/changes", content="notice").raise_for_status()
+    sim("PUT", CHANGES_PATH, content="notice").raise_for_status()
     SEEDED.clear()
     working, notice, dismissed = POPULATION["sizes"]
-    states = ["working"] * working + ["on notice"] * notice + ["dismissed"] * dismissed
+    states = ["working"] * working + [ON_NOTICE] * notice + ["dismissed"] * dismissed
     for n, state in enumerate(states, start=1):
         hired = sim("POST", "/actions/hire", headers=PLAIN,
                     json={"firstName": FIRST_NAMES[n - 1], "lastName": SURNAME["name"], "role": "clerk"})
@@ -223,14 +234,14 @@ def check(task, held, final_text):
         # and saying so, or writing it and saying whose change it replaced, are both open; done means said.
         # Said: the other value named, or the change said as ARTIE's guard says it, by the member.
         mentioned = bool(re.search(f"{INTERFERED_ROLE}|someone else changed role", final_text or "", re.I))
-        overwrote = role == "ring bearer, retired"
+        overwrote = role == RETIRED_ROLE
         return {"done": mentioned, "role": role, "overwrote": overwrote, "mentioned": mentioned,
                 "silent_overwrite": overwrote and not mentioned, "employees": len(held)}
     # In --sequence, a run with no teammate is right when his own role gets ", retired".
     teammate = not SEQUENCE["on"] or MEDDLE["on"]
-    expected = f"{INTERFERED_ROLE}, retired" if teammate else "ring bearer, retired"
+    expected = f"{INTERFERED_ROLE}, retired" if teammate else RETIRED_ROLE
     return {"done": role == expected, "role": role, "expected": expected,
-            "lost_update": teammate and role == "ring bearer, retired", "employees": len(held)}
+            "lost_update": teammate and role == RETIRED_ROLE, "employees": len(held)}
 
 
 class Interferer(threading.Thread):
@@ -268,7 +279,7 @@ class ChangeUnder(threading.Thread):
         self.offset, self.fired, self.stopped = offset, None, threading.Event()
 
     def apply(self):
-        sim("PUT", "/_sim/employees/changes", content=CHANGE["names"]).raise_for_status()
+        sim("PUT", CHANGES_PATH, content=CHANGE["names"]).raise_for_status()
         self.fired = now()
 
     def run(self):
@@ -396,7 +407,7 @@ def as_tool(tool):
 
 
 def result_text(result):
-    parts = [getattr(c, "text", None) or json.dumps(getattr(c, "model_dump", lambda: str(c))()) for c in result.content]
+    parts = [getattr(c, "text", None) or json.dumps(getattr(c, "model_dump", lambda c=c: str(c))()) for c in result.content]
     text = "\n".join(parts)
     if not text and getattr(result, "structured_content", None):
         text = json.dumps(result.structured_content)
@@ -417,7 +428,7 @@ async def run(model, arm, task, max_turns, api):
     started, calls, tools_used, final_text, error = time.time(), [], [], None, None
     if CHANGE["names"] and CHANGE["when"] == "before":
         # The control: changed before the MCP server builds its tools, as after a restart following a release.
-        sim("PUT", "/_sim/employees/changes", content=CHANGE["names"]).raise_for_status()
+        sim("PUT", CHANGES_PATH, content=CHANGE["names"]).raise_for_status()
     async with arm_client(arm) as client:
         tools = [as_tool(t) for t in await client.list_tools()]
         change = change_under(offset)
@@ -469,7 +480,7 @@ async def run(model, arm, task, max_turns, api):
         **totals(calls), "calls": calls,
         "tool_calls": len(tools_used), "tool_errors": sum(t["error"] for t in tools_used), "tools": tools_used,
         "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests), "requests": requests,
-        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and (task in INTERFERED or github(task)) else None),
+        "interfered": interference(interferer, lambda: task in INTERFERED or github(task)),
         "check": check(task, held, final_text), "final_text": final_text, "error": error,
     }
     return record
@@ -623,7 +634,7 @@ def api_library(spec):
             conditional = any(p.get("name") == "If-Match" for p in parameters)
             takes_body = "requestBody" in operation
             # The body's media type as the description gives it: JSON, or a JSON Merge Patch after the method release.
-            content_type = next(iter(operation["requestBody"]["content"])) if takes_body else "application/json"
+            content_type = next(iter(operation["requestBody"]["content"])) if takes_body else JSON_TYPE
             arguments = in_path + (["body"] if takes_body else []) + [f"{q}=None" for q in in_query] + \
                 (["if_match=None"] if conditional else [])
             pythonic = re.sub(r"\{(\w+)\}", r"{\1}", path)
@@ -638,7 +649,7 @@ def api_library(spec):
                 if "$ref" in schema:
                     schema = spec["components"]["schemas"][schema["$ref"].rsplit("/", 1)[1]]
                 body = f"\n    body: {json.dumps(schema.get('properties', {}))}, required {schema.get('required', [])}"
-                if content_type != "application/json":
+                if content_type != JSON_TYPE:
                     body += f", sent as {content_type}"
             prose = (operation.get("summary", "") + ". " + operation.get("description", "")).strip()
             conditional_doc = "\n    if_match: the etag you read; with it, refused 412 if the state moved since" \
@@ -669,7 +680,7 @@ def sandboxed(program, library):
             return 124, "", "the program ran past its time limit"
 
 
-def program_turns(model, api, task, library, system, opening, max_turns):
+def program_turns(model, api, library, system, opening, max_turns):
     """The model writing programs until it says it is done: its calls, the programs it ran, its last word."""
     messages = [{"role": "user", "content": opening}]
     tools = cached([RUN_PROGRAM if library else RUN_PLAIN_PROGRAM])
@@ -736,7 +747,7 @@ def run_code(model, arm, task, max_turns, api):
         if replayed:
             opening += (f"\n\nA program kept from an earlier run of this task failed this time (exit "
                         f"{replayed['exit']}):\n{replayed['stderr'] or replayed['stdout']}")
-        calls, programs_written, final_text, finished = program_turns(model, api, task, library, system, opening,
+        calls, programs_written, final_text, finished = program_turns(model, api, library, system, opening,
                                                                       max_turns)
         programs += programs_written
     if arm == "code-saved" and finished:
@@ -756,7 +767,7 @@ def run_code(model, arm, task, max_turns, api):
         **totals(calls), "calls": calls, "programs": programs, "replayed": replayed,
         "tool_calls": len(programs), "tool_errors": sum(p["exit"] != 0 for p in programs), "tools": None,
         "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests), "requests": requests,
-        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and task in INTERFERED else None),
+        "interfered": interference(interferer, lambda: task in INTERFERED),
         "check": check(task, held, final_text), "final_text": final_text, "error": None,
     }
 
@@ -922,8 +933,10 @@ def run_code_skill(model, task, max_turns, api, escalate=False):
     library, docs = api_library(openapi_spec())
     folder_of = SKILLS[arm]
     inputs = task_inputs(task) if escalate else {}
-    system = CODE_SYSTEM + docs + SKILL_TOLD + (SKILL_HARNESS_TOLD + (SKILL_INPUTS_TOLD if inputs else "")
-                                                if escalate else "")
+    harness_told = ""
+    if escalate:
+        harness_told = SKILL_HARNESS_TOLD + (SKILL_INPUTS_TOLD if inputs else "")
+    system = CODE_SYSTEM + docs + SKILL_TOLD + harness_told
     programs, skill_runs, skills_saved, plan_saved = [], [], [], {}
     by = {"who": "harness"}
 
@@ -1185,7 +1198,7 @@ def finished_record(model, arm, task, started, offset, interferer, change, calls
         "tools_offered": None, "tool_definition_tokens": None, **totals(calls), "calls": calls,
         "tools": None, "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests),
         "requests": requests,
-        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and task in INTERFERED else None),
+        "interfered": interference(interferer, lambda: task in INTERFERED),
         "check": check(task, held, final_text), "final_text": final_text, "error": None, **more,
     }
 
@@ -1242,7 +1255,7 @@ def run_artie(model, arm, task):
         **totals(calls), "model_calls": usage.get("calls", 0), "calls": None,
         "tool_calls": len(re.findall(r"^\d+ ", output, re.M)), "tool_errors": None, "tools": None,
         "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests), "requests": requests,
-        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and (task in INTERFERED or github(task)) else None),
+        "interfered": interference(interferer, lambda: task in INTERFERED or github(task)),
         "check": check(task, held, output), "final_text": output[-3000:], "trace": str(trace.relative_to(HERE)),
         "error": None if done.returncode == 0 else f"exit {done.returncode}",
     }

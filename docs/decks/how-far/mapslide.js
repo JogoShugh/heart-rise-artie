@@ -59,9 +59,9 @@ sub(4.1, "acts offered only when the state allows; refusals explained \u00B7 run
 // 5 Not ours
 y = 5.05 + 0.1;
 chip(4.25, y, 0.9, "preview", { size: 8, color: SAGE, icon: "awsA9B8AE", isz: 0.24 }); chip(5.24, y, 0.85, "Dev", { size: 11, icon: "serverEDF2EE" });
-chip(6.17, y, 0.88, "Jenkins", { size: 11, icon: "jenkinsE8735F", isz: 0.22, size: 10 }); chip(7.2, 5.33, 1.12, "GitLab", { h: 0.4, size: 11, icon: "gitlabFC6D26", isz: 0.26 });
+chip(6.17, y, 0.88, "Jenkins", { icon: "jenkinsE8735F", isz: 0.22, size: 10 }); chip(7.2, 5.33, 1.12, "GitLab", { h: 0.4, size: 11, icon: "gitlabFC6D26", isz: 0.26 });
 chip(8.65, 5.33, 1.95, "GitHub", { h: 0.4, size: 13, bold: true, icon: "githubFFFFFF", isz: 0.28 }); num(10.42, 5.22, 6);
- (() => 0)(5.05, "merge · build · smoke test · promote, each by its own native API");
+// sub(5.05, "merge · build · smoke test · promote, each by its own native API");
 
 // The smoke script Jenkins links: code on demand, dashed as the constraint is optional
 s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 5.95, y: 5.68, w: 1.32, h: 0.21, rectRadius: 0.05, fill: { color: "0F1512" }, line: { color: "6FA8DC", width: 1, dashType: "dash" } });
@@ -84,7 +84,10 @@ T("BUILDING", { x: 0.55, y: 1.35, w: 1.7, h: 0.3, fontSize: 11, bold: true, colo
 T("bdd-gates hooks", { x: 0.55, y: 1.62, w: 1.7, h: 0.25, fontSize: 9, italic: true, color: SAGE });
 [["Gherkin", "the behaviour, first"], ["red run", "fails on behaviour"], ["code", "complexity lint, every edit"], ["green run", "+ architecture rules"], ["gated commit", "order checked: test, then code"]].forEach(([t, note], i) => {
   const yy = 1.95 + i * 0.66;
-  box(0.6, yy, 1.55, 0.36, i === 1 ? "8A3C1E" : i === 3 ? "2F7D55" : "33443A");
+  let fill = "33443A";
+  if (i === 1) fill = "8A3C1E";
+  else if (i === 3) fill = "2F7D55";
+  box(0.6, yy, 1.55, 0.36, fill);
   s.addImage({ data: I[["cucumber8FD694", "xFFFFFF", "codeFFFFFF", "checkFFFFFF", "commitFFFFFF"][i]], x: 0.7, y: yy + 0.08, w: 0.2, h: 0.2 });
   T(t, { x: 0.92, y: yy, w: 1.2, h: 0.36, fontSize: 11, bold: true, align: "center" });
   T(note, { x: 0.6, y: yy + 0.37, w: 1.55, h: 0.22, fontSize: 8, italic: true, color: i === 2 || i === 3 ? GOLD : SAGE, align: "center" });

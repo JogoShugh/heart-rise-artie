@@ -14,7 +14,9 @@ const rows = readFileSync(`${dir}/results.txt`, "utf8").trim().split("\n").filte
   const attempts = Number(field(/^attempts=/).replace("attempts=", "") || 1);
   const out = existsSync(`${dir}/${name}.out`) ? readFileSync(`${dir}/${name}.out`, "utf8") : "";
   const gz = `${dir}/${name}.trace.yaml.gz`, plain = `${dir}/${name}.trace.yaml`;
-  const trace = existsSync(plain) ? readFileSync(plain, "utf8") : existsSync(gz) ? gunzipSync(readFileSync(gz)).toString("utf8") : "";
+  let trace = "";
+  if (existsSync(plain)) trace = readFileSync(plain, "utf8");
+  else if (existsSync(gz)) trace = gunzipSync(readFileSync(gz)).toString("utf8");
   const usage = trace.match(/^ {2}usage:\n((?: {4}\w+: \d+\n)+)/m);
   const u = Object.fromEntries((usage?.[1] ?? "").trim().split("\n").filter(Boolean).map((l) => l.trim().split(": ")).map(([k, v]) => [k, Number(v)]));
   const finished = out.match(/^finished, (\d+) steps; acted: (.*)$/m);

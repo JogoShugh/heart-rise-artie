@@ -25,11 +25,13 @@ const range = (rs, key) => {
   return lo === hi ? n(lo) : `${n(lo)}–${n(hi)}`;
 };
 const passed = (rs) => rs.filter((r) => r.merged && r.told).length;
+const times = (k) => (k === 1 ? "once" : `${k} times`);
+const notes = (r) => [r.stale ? `${r.stale} refused stale` : "", r.unclear ? `asked a question ${times(r.unclear)}` : ""].filter(Boolean).join("; ") || "none";
 
 const rows = runs.map((r) => `<tr><th scope="row">${esc(builds[r.model] ?? r.model)}, ${r.run.startsWith("kept") ? "kept" : "intent"}</th>` +
   `<td class="${r.merged ? "pass" : "fail"}">${r.merged ? "yes" : "no"}</td><td class="${r.told ? "pass" : "fail"}">${r.told ? "yes" : "no"}</td>` +
   `<td>${r.calls ?? "?"}</td><td>${r.output != null ? n(r.output) : "?"}</td><td>${n(r.seconds)}</td>` +
-  `<td>${[r.stale ? `${r.stale} refused stale` : "", r.unclear ? `asked a question ${r.unclear === 1 ? "once" : `${r.unclear} times`}` : ""].filter(Boolean).join("; ") || "none"}</td></tr>`).join("\n");
+  `<td>${notes(r)}</td></tr>`).join("\n");
 
 const instruct = of("intent-instruct"), thinking = of("intent-thinking"), kept = of("kept");
 const page = `<!doctype html>

@@ -1,4 +1,4 @@
-{
+SOURCES = {
 2:'src(s, [["Claude Code Remote Control", "https://code.claude.com/docs/en/remote-control"], ["Claude Code hooks", "https://code.claude.com/docs/en/hooks"], ["bdd-gates skill", "https://github.com/JogoShugh/bdd-gates-skill"]]);',
 3:'src(s, [["Fielding, REST APIs must be hypertext-driven (2008)", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]], true);',
 4:'src(s, [["Fielding, dissertation, ch. 5: REST", "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"]]);',

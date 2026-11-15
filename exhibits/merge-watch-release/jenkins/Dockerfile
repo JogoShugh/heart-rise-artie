@@ -11,9 +11,10 @@ RUN jenkins-plugin-cli --plugins notification junit token-macro
 # that. Every repository mounted there is trusted.
 USER root
 RUN git config --system --add safe.directory "*"
-USER jenkins
-COPY --chown=jenkins:jenkins init.groovy.d/ /usr/share/jenkins/ref/init.groovy.d/
-COPY --chown=jenkins:jenkins jobs/ /usr/share/jenkins/ref/jobs/
+# The reference files stay root's, readable but not writable by jenkins: at start Jenkins copies them into
+# JENKINS_HOME as its own, where it may change them.
+COPY init.groovy.d/ /usr/share/jenkins/ref/init.groovy.d/
+COPY jobs/ /usr/share/jenkins/ref/jobs/
 # run.sh writes the job's config.xml before building. The kit (kit/release) builds from this folder as it is and
 # names the hook here instead.
 ARG HOOK_URL=
@@ -21,3 +22,4 @@ RUN app=/usr/share/jenkins/ref/jobs/app; \
     if [ -n "$HOOK_URL" ] && [ ! -f "$app/config.xml" ]; then \
       sed "s#@@HOOK_URL@@#$HOOK_URL#" "$app/config.xml.template" > "$app/config.xml"; \
     fi
+USER jenkins

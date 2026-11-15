@@ -23,6 +23,7 @@ import re
 from pathlib import Path
 
 RUN = Path("run")
+SET_URL = "01-set-url.txt"
 
 # ---------------------------------------------------------------- yaml emitter
 # Pure stdlib, no PyYAML dependency -- same approach used earlier tonight.
@@ -165,8 +166,8 @@ def check_l0_collapsed() -> tuple[bool, str]:
 
 def check_l2_linked() -> tuple[bool, str]:
     doc = read_json("01-bed1-empty.json")
-    return ("_forms" not in doc and read_text("01-set-url.txt").startswith("/affordance-sets/sha256-"),
-            read_text("01-set-url.txt"))
+    return ("_forms" not in doc and read_text(SET_URL).startswith("/affordance-sets/sha256-"),
+            read_text(SET_URL))
 
 
 def check_profile_link() -> tuple[bool, str]:
@@ -218,7 +219,7 @@ SQL</pre></div>
 
 
 def entry_01() -> str:
-    set_url = esc(read_text("01-set-url.txt"))
+    set_url = esc(read_text(SET_URL))
     schema_url = esc(read_text("01-schema-url.txt"))
     l1_url = esc(read_text("01-set-l1-url.txt"))
     l0_ok, l0_fields = check_l0_collapsed()
@@ -300,8 +301,8 @@ def entry_04() -> str:
       <div class="hash-chip"><div class="label">bed-1 forms href</div><div class="value">{esc(bed1)}</div></div>
       <div class="hash-chip"><div class="label">bed-3 forms href</div><div class="value">{esc(bed3)}</div></div>
     </div>
-    {f"""<div class="seal-row"><div class="seal">verified<br>match</div><div class="seal-text"><h3>Identical, not merely similar.</h3><p>Two independently-arrived-at beds, one shared, cached resource.</p></div></div>""" if match else
-    f'''<div class="verdict bug"><span class="verdict-mark">FAIL — no sharing occurred</span><p>Bed-1 and bed-3 are both READY_TO_HARVEST but point at DIFFERENT affordance-set URLs. The content-addressing scheme is broken — check GardenBedStatus-to-hash mapping.</p></div>'''}
+    {"""<div class="seal-row"><div class="seal">verified<br>match</div><div class="seal-text"><h3>Identical, not merely similar.</h3><p>Two independently-arrived-at beds, one shared, cached resource.</p></div></div>""" if match else
+    '''<div class="verdict bug"><span class="verdict-mark">FAIL — no sharing occurred</span><p>Bed-1 and bed-3 are both READY_TO_HARVEST but point at DIFFERENT affordance-set URLs. The content-addressing scheme is broken — check GardenBedStatus-to-hash mapping.</p></div>'''}
   </section>'''
 
 

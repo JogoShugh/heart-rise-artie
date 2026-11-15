@@ -33,18 +33,21 @@ app.get("/allowed-now/repos/:owner/:repo/pulls/:number", async (req, res) => {
 });
 
 // Everything else goes to GitHub as it is; a pull request comes back with the extra link.
+const addAllowedNow = responseInterceptor(async (body, _proxyRes, req, res) => {
+  if (req.method === "GET" && PULL.test(req.url ?? "")) {
+    res.setHeader("Link", `</allowed-now${req.url}>; rel="${ALLOWED_NOW}"`);
+  }
+  return body;
+});
 app.use(createProxyMiddleware({
   target: "https://api.github.com",
   changeOrigin: true,
   headers: TOKEN ? { authorization: `Bearer ${TOKEN}` } : {},
   selfHandleResponse: true,
   on: {
-    proxyRes: responseInterceptor(async (body, _proxyRes, req, res) => {
-      if (req.method === "GET" && PULL.test(req.url ?? "")) {
-        res.setHeader("Link", `</allowed-now${req.url}>; rel="${ALLOWED_NOW}"`);
-      }
-      return body;
-    }),
+    proxyRes: (proxyRes, req, res) => {
+      void addAllowedNow(proxyRes, req, res);
+    },
   },
 }));
 

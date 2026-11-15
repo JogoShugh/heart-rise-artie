@@ -8,7 +8,7 @@ head=head.replace("const arrow = (s, x, y) =>", new['HELPERS']+"const arrow = (s
 body,tail=('// 1. Title'+rest).split('(async () => {',1)
 blocks=re.findall(r'(// (\d+)\. [^\n]*\n\{.*?\n\})\n', body, re.S)
 B={int(n):b for b,n in blocks}
-S=eval(open('sources.py').read())
+from sources import SOURCES as S
 def withsrc(n):
     b=B[n]
     if n in S: b=b[:-1]+'  '+S[n]+'\n}'

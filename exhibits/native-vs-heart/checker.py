@@ -254,7 +254,7 @@ if __name__ == "__main__":
     if len(sys.argv) not in (5, 7) or sys.argv[1] not in ("check", "clean", "respect"):
         sys.exit(__doc__)
     what, owner, repo, stamp = sys.argv[1:5]
-    if not re.fullmatch(r"[0-9]{4}-[0-9]{6}", stamp):
+    if not re.fullmatch(r"\d{4}-\d{6}", stamp, re.ASCII):
         sys.exit("a stamp is MMdd-HHmmss")
     if owner != "JogoShugh" or repo != "heart-github-test":
         sys.exit("the scratch repository only: JogoShugh/heart-github-test")

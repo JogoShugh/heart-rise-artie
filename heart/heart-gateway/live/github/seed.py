@@ -35,6 +35,7 @@ import urllib.error
 import urllib.request
 
 API = "https://api.github.com"
+GARDEN = "garden.txt"
 
 
 def token():
@@ -108,7 +109,7 @@ class GitHub:
 
 def seed(github):
     print("bases")
-    github.put("garden.txt", "tomatoes: water daily\nbeans: water weekly\n", "A garden to change", "main")
+    github.put(GARDEN, "tomatoes: water daily\nbeans: water weekly\n", "A garden to change", "main")
     for base in ("protected-review", "protected-strict"):
         github.branch(base, "main")
 
@@ -124,9 +125,9 @@ def seed(github):
 
     print("conflict")
     github.branch("conflict", "main")
-    github.put("garden.txt", "tomatoes: water twice daily\nbeans: water weekly\n", "Water the tomatoes more", "conflict")
+    github.put(GARDEN, "tomatoes: water twice daily\nbeans: water weekly\n", "Water the tomatoes more", "conflict")
     github.pull("Water the tomatoes more", "conflict", "main")
-    github.put("garden.txt", "tomatoes: water every other day\nbeans: water weekly\n", "Water the tomatoes less", "main")
+    github.put(GARDEN, "tomatoes: water every other day\nbeans: water weekly\n", "Water the tomatoes less", "main")
 
     print("merged")
     github.branch("merged", "main")
