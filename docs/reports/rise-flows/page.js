@@ -13,7 +13,9 @@
   const isAnswer = (line) => /^\d{3} /.test(line);
   const tone = (line) => {
     const status = Number(line.slice(0, 3));
-    return status >= 400 ? "bad" : status >= 300 ? "safe" : "good";
+    if (status >= 400) return "bad";
+    if (status >= 300) return "safe";
+    return "good";
   };
   const amqpStatus = (step) => step.body && step.body.properties && step.body.properties.headers && step.body.properties.headers["heart-status"];
   const lane = (flow, key) => ({ ...LANES[key], ...((flow.names || {})[key] || {}) });
@@ -204,7 +206,10 @@
     item.append(pre);
     if (step.note) item.append(el("p", "note", step.note));
     if (step.body !== undefined) {
-      const what = step.kind === "amqp" ? "Frame" : step.kind === "call" ? "Call" : isAnswer(step.line) ? "Answer body" : "Request body";
+      let what = "Request body";
+      if (step.kind === "amqp") what = "Frame";
+      else if (step.kind === "call") what = "Call";
+      else if (isAnswer(step.line)) what = "Answer body";
       const plain = typeof step.body === "string";
       let box;
       if (step.diff && keys[step.diff]) {

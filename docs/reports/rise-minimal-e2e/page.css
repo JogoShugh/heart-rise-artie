@@ -15,7 +15,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .tag-thesis { color: var(--safe); background: color-mix(in srgb, var(--safe) 14%, transparent); }
 .tag-ours { color: var(--muted); background: var(--quiet-bg); border: 1px solid var(--rule); }
 ul.legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-ul.legend li { font-size: 14px; }
 ul.points { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 84ch; }
 ul.points li { font-size: 15px; }
 code { font: 12.5px var(--mono); overflow-wrap: anywhere; }

@@ -27,7 +27,9 @@ const header = (headers, name) => {
 };
 const said = (step) => String(step.say || "").replace(/\{(\w+)\}/g, (_, k) => {
   const v = step.params?.[k];
-  return v == null ? `{${k}}` : typeof v === "object" ? "…" : cut(v, 40);
+  if (v == null) return `{${k}}`;
+  if (typeof v === "object") return "…";
+  return cut(v, 40);
 });
 
 /** The request and answer lines a person reads: method and path, the headers that carry the constraints, status. */
@@ -132,7 +134,9 @@ function messages(trace) {
           own("jenkins", "ci", "QUEUED, STARTED", "Jenkins tells the wrapper, by its Notification plugin.");
         }
         if ((before !== key && by && body.state !== "awaiting") || (before && before !== key && by)) {
-          const rel = body.state === "completed" ? "hr:completed" : body.state === "failed" ? "hr:failed" : "hr:progress";
+          let rel = "hr:progress";
+          if (body.state === "completed") rel = "hr:completed";
+          else if (body.state === "failed") rel = "hr:failed";
           if (rel === "hr:completed" && port(by) === "8170") {
             own("jenkins", "preview", "starts the app", "Jenkins deploys the preview at the commit.");
             own("jenkins", "ci", "COMPLETED: SUCCESS", "Jenkins tells the wrapper the build is done, with its artifacts.");

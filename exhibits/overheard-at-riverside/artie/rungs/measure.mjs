@@ -16,7 +16,10 @@ const kind = (url) => {
   if (path.startsWith("/unavailable/")) return "why absent";
   return "resource";
 };
-const bytes = (body) => (body === undefined || body === null ? 0 : Buffer.byteLength(typeof body === "string" ? body : JSON.stringify(body)));
+const bytes = (body) => {
+  if (body === undefined || body === null) return 0;
+  return Buffer.byteLength(typeof body === "string" ? body : JSON.stringify(body));
+};
 
 const measured = {};
 const fragments = {};

@@ -24,7 +24,9 @@ const words = (text) => String(text).replace(/`/g, "").replace(/"/g, "'");
 const STATUS = { 200: "200 OK", 201: "201 Created", 204: "204 No Content", 412: "412 Precondition Failed" };
 const said = (step) => words(String(step.say || "").replace(/\{(\w+)\}/g, (_, k) => {
   const v = step.params?.[k];
-  return v == null ? `{${k}}` : typeof v === "object" ? "…" : String(v).slice(0, 60);
+  if (v == null) return `{${k}}`;
+  if (typeof v === "object") return "…";
+  return String(v).slice(0, 60);
 }));
 
 const lines = [
@@ -110,7 +112,9 @@ steps.forEach((step, i) => {
         own("P8171", "P8170", "POST /hooks/jenkins\\nQUEUED, STARTED (Notification plugin)");
       }
       if (before !== key && by && body.state !== "awaiting" || (before && before !== key && by)) {
-        const rel = body.state === "completed" ? "hr:completed" : body.state === "failed" ? "hr:failed" : "hr:progress";
+        let rel = "hr:progress";
+        if (body.state === "completed") rel = "hr:completed";
+        else if (body.state === "failed") rel = "hr:failed";
         if (rel === "hr:completed" && portOf(by) === "8170") {
           own("P8171", "P8180", "starts the library at the commit");
           own("P8171", "P8170", "POST /hooks/jenkins\\nCOMPLETED, FINALIZED: SUCCESS, with its artifacts");

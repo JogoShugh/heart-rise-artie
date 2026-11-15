@@ -8,15 +8,15 @@
 // reduced motion it changes stills without movement, and waits for a cycle to be chosen.
 (function () {
   "use strict";
-  var me = document.currentScript && document.currentScript.src;
-  var HOLD = { start: 2800, end: 6000, again: 1500 };
-  var MOVE = 1500, STAGGER = 70, FADE = 500;
+  const me = document.currentScript && document.currentScript.src;
+  const HOLD = { start: 2800, end: 6000, again: 1500 };
+  const MOVE = 1500, STAGGER = 70, FADE = 500;
   // What a carried value keeps of the place it left, so its ghost looks the same outside it.
-  var KEPT = ["display", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "textIndent", "overflowWrap",
+  const KEPT = ["display", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "textIndent", "overflowWrap",
     "fontFamily", "fontSize", "fontWeight", "fontStyle", "lineHeight", "letterSpacing", "color", "backgroundColor",
     "borderRadius", "borderTop", "borderRight", "borderBottom", "borderLeft", "boxShadow", "textAlign"];
 
-  var STYLE = [
+  const STYLE = [
     ".morph.mo-live .mo-stage { position: relative; gap: 0; }",
     ".morph.mo-live .mo-scene { grid-area: 1 / 1; opacity: 0; visibility: hidden; }",
     ".morph.mo-live .mo-scene.on { opacity: 1; visibility: visible; }",
@@ -34,19 +34,19 @@
 
   function ensureStyle() {
     if (document.getElementById("mo-style")) return;
-    var style = document.createElement("style");
+    const style = document.createElement("style");
     style.id = "mo-style";
     style.textContent = STYLE;
     document.head.append(style);
   }
 
   function box(node, base) {
-    var r = node.getBoundingClientRect();
+    const r = node.getBoundingClientRect();
     return { x: r.left - base.left, y: r.top - base.top, w: r.width, h: r.height };
   }
 
   function ghost(node, at) {
-    var copy = node.cloneNode(true), seen = getComputedStyle(node);
+    const copy = node.cloneNode(true), seen = getComputedStyle(node);
     copy.removeAttribute("data-token");
     copy.classList.remove("mo-carried");
     copy.classList.add("mo-ghost");
@@ -56,33 +56,33 @@
     return copy;
   }
 
-  var settled = function (runs) { return Promise.all(runs.map(function (run) { return run.finished; })); };
+  const settled = function (runs) { return Promise.all(runs.map(function (run) { return run.finished; })); };
 
   function mount(slide) {
-    var root = slide.querySelector(".morph");
+    const root = slide.querySelector(".morph");
     if (!root || !root.animate) return null;
-    var cycles;
+    let cycles;
     try { cycles = JSON.parse(root.dataset.cycles); } catch (e) { return null; }
     ensureStyle();
-    var stage = root.querySelector(".mo-stage");
-    var scenes = {};
+    const stage = root.querySelector(".mo-stage");
+    const scenes = {};
     stage.querySelectorAll(".mo-scene").forEach(function (scene) { scenes[scene.dataset.scene] = scene; });
-    var start = root.dataset.start;
-    var heading = slide.querySelector("h2"), named = heading.textContent;
-    var layer = document.createElement("div");
+    const start = root.dataset.start;
+    const heading = slide.querySelector("h2"), named = heading.textContent;
+    const layer = document.createElement("div");
     layer.className = "mo-layer";
     stage.append(layer);
 
-    var calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var at = start, cycle = 0, playing = !calm, busy = false, timer = 0, runs = [], stopped = false;
-    var wait = function (ms) { return new Promise(function (done) { timer = setTimeout(done, ms); }); };
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let at = start, cycle = 0, playing = !calm, busy = false, timer = 0, runs = [], stopped = false;
+    const wait = function (ms) { return new Promise(function (done) { timer = setTimeout(done, ms); }); };
 
-    var bar = document.createElement("div");
+    const bar = document.createElement("div");
     bar.className = "mo-bar";
     bar.setAttribute("role", "group");
     bar.setAttribute("aria-label", "The animation");
     cycles.forEach(function (one, i) {
-      var button = document.createElement("button");
+      const button = document.createElement("button");
       button.type = "button";
       button.dataset.cycle = String(i);
       button.textContent = one.label;
@@ -93,7 +93,7 @@
       });
       bar.append(button);
     });
-    var toggle = document.createElement("button");
+    const toggle = document.createElement("button");
     toggle.type = "button";
     toggle.className = "mo-play";
     toggle.addEventListener("click", function () {
@@ -113,7 +113,7 @@
     function head(text) {
       if (!text || heading.textContent === text) return;
       if (calm) { heading.textContent = text; return; }
-      var out = heading.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 180, fill: "forwards" });
+      const out = heading.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 180, fill: "forwards" });
       out.finished.then(function () {
         if (stopped) return;
         heading.textContent = text;
@@ -124,7 +124,7 @@
 
     // Back to the start, with no value carried: the end of one cycle, before the next.
     function fade(to) {
-      var from = scenes[at], into = scenes[to];
+      const from = scenes[at], into = scenes[to];
       if (from === into) return Promise.resolve();
       into.classList.add("on");
       if (calm) { from.classList.remove("on"); at = to; return Promise.resolve(); }
@@ -141,25 +141,26 @@
     // From the start to a still: the frames cross-fade, and each value flies from where it was to where it will be,
     // its old form fading out as its new one sharpens in.
     function morph(to) {
-      var from = scenes[at], into = scenes[to];
+      const from = scenes[at], into = scenes[to];
       if (calm) { into.classList.add("on"); from.classList.remove("on"); at = to; return Promise.resolve(); }
-      var base = stage.getBoundingClientRect(), order = 0;
+      const base = stage.getBoundingClientRect();
+      let order = 0;
       into.classList.add("on");
       root.classList.add("mo-moving");
       runs = [from.animate([{ opacity: 1 }, { opacity: 0 }], { duration: MOVE * 0.5, fill: "forwards", easing: "ease-out" }),
         into.animate([{ opacity: 0 }, { opacity: 0, offset: 0.45 }, { opacity: 1 }], { duration: MOVE + 300, fill: "both" })];
       from.querySelectorAll("[data-token]").forEach(function (a) {
-        var b = into.querySelector('[data-token="' + a.dataset.token + '"]');
+        const b = into.querySelector('[data-token="' + a.dataset.token + '"]');
         if (!b) return;  // a value with nowhere to go fades with its still
-        var ra = box(a, base), rb = box(b, base);
+        const ra = box(a, base), rb = box(b, base);
         a.classList.add("mo-carried");
         b.classList.add("mo-carried");
-        var fly = document.createElement("div"), old = ghost(a, ra), fresh = ghost(b, rb);
+        const fly = document.createElement("div"), old = ghost(a, ra), fresh = ghost(b, rb);
         fly.className = "mo-fly";
         fly.append(old, fresh);
         layer.append(fly);
-        var sx = rb.w / ra.w, sy = rb.h / ra.h;
-        var timing = { duration: MOVE, delay: order++ * STAGGER, easing: "cubic-bezier(0.65, 0, 0.35, 1)", fill: "both" };
+        const sx = rb.w / ra.w, sy = rb.h / ra.h;
+        const timing = { duration: MOVE, delay: order++ * STAGGER, easing: "cubic-bezier(0.65, 0, 0.35, 1)", fill: "both" };
         runs.push(fly.animate([{ transform: "translate(" + ra.x + "px, " + ra.y + "px)" },
           { transform: "translate(" + rb.x + "px, " + rb.y + "px)" }], timing));
         runs.push(old.animate([{ transform: "scale(1, 1)" }, { transform: "scale(" + sx + ", " + sy + ")" }], timing));
@@ -186,7 +187,7 @@
       cycle = i;
       mark();
       head(cycles[i].head);
-      var ready = at === start ? Promise.resolve() : fade(start).then(function () { return wait(HOLD.again); });
+      const ready = at === start ? Promise.resolve() : fade(start).then(function () { return wait(HOLD.again); });
       return ready.then(function () { return stopped ? null : morph(cycles[i].to); }).then(function () {
         busy = false;
         if (playing && !stopped) next(HOLD.end);
@@ -220,5 +221,6 @@
     };
   }
 
-  (window.deckCode = window.deckCode || {})[me] = mount;
+  window.deckCode = window.deckCode || {};
+  window.deckCode[me] = mount;
 })();
