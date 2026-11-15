@@ -17,7 +17,7 @@ Use WSL 2 with Ubuntu, and do everything below inside Ubuntu, not in PowerShell:
 - **Clone inside Ubuntu**, in your home folder (`cd ~`), with Ubuntu's own git. A clone under `/mnt/c` is slow to
   build from, and one made by Git for Windows may not run.
 - **Docker:** either Docker Desktop with WSL integration turned on for your Ubuntu (Settings, Resources, WSL
-  integration), or Docker inside Ubuntu: `sudo apt install docker.io docker-buildx`, then
+  integration), or Docker inside Ubuntu: `sudo apt install docker.io docker-buildx docker-compose-v2`, then
   `sudo usermod -aG docker $USER` and open a new terminal. Without `docker-buildx` the build stops with "the
   --mount option requires BuildKit".
 - **Memory** for WSL is set in `%UserProfile%\.wslconfig` (`[wsl2]`, `memory=8GB`), not in Docker Desktop.
@@ -104,6 +104,35 @@ with HTML: its state, a button for each act it offers now, and a greyed one, say
 addresses are printed. `KIT_PORTS="18392 18400 18401 18402"` moves them (gateway, workspace, build, deploy). A browser
 has to send each system its credential as `Authorization: Bearer …`: your GitHub token to the gateway,
 `build-token` and `deploy-token` to the build and deploy services.
+
+## The release: GitHub or GitLab, Jenkins, and Dev
+
+A larger trial, beside the goals above. A pull request for Riverside Public Library's renewal policy is watched until
+it can merge, merged, built by a real Jenkins, smoke-tested at the preview Jenkins deployed, and promoted to Dev, or,
+when the smoke test fails, left out of Dev with a comment on the pull request saying why. One kept script does it
+every time, with no model; only the pull request changes. The forge is GitHub or GitLab: the script asks for `scm:`
+relations, which the gateway serves over either. Every party speaks HEART.
+
+```sh
+kit/release.sh up              # builds the parties and Jenkins, and starts them (the first time, a few minutes)
+kit/release.sh run github      # five pull requests at a small GitHub inside the kit
+kit/release.sh up gitlab       # GitLab too: about 4 GB more memory, several minutes the first time
+kit/release.sh run gitlab      # the same five as GitLab merge requests
+kit/release.sh run github-live # the same five at OWNER/REPO on real GitHub
+kit/release.sh down
+```
+
+Of the five, four are promoted to Dev. The fifth, "Renewals: none during the audit", fails the smoke test's
+renewal scenario and stays out. `run github-live` pushes `library/main` and `library/pr-501` to `library/pr-505` to
+your repository and opens, merges and comments on pull requests between them; your own `main` is never touched. It
+needs `OWNER`, `REPO` and `GITHUB_TOKEN` in `kit/.env`. Each release's trace is in `work/runs/SCM/pr-N.yaml`.
+
+While it is up, Jenkins answers a browser on this machine on http://localhost:8171/ (user `artie`, the password in
+`exhibits/merge-watch-release/jenkins/jenkins.env.example`), and GitLab on http://localhost:8929/. The release desk
+(http://localhost:8160/) and Dev (http://localhost:8190/) answer while a release runs: each release starts its parties
+afresh.
+
+On Linux and in WSL, Docker needs its Compose plugin: `sudo apt install docker-compose-v2`.
 
 ## Write your own
 

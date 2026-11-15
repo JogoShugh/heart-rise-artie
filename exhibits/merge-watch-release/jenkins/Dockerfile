@@ -14,3 +14,10 @@ RUN git config --system --add safe.directory "*"
 USER jenkins
 COPY --chown=jenkins:jenkins init.groovy.d/ /usr/share/jenkins/ref/init.groovy.d/
 COPY --chown=jenkins:jenkins jobs/ /usr/share/jenkins/ref/jobs/
+# run.sh writes the job's config.xml before building. The kit (kit/release) builds from this folder as it is and
+# names the hook here instead.
+ARG HOOK_URL=
+RUN app=/usr/share/jenkins/ref/jobs/app; \
+    if [ -n "$HOOK_URL" ] && [ ! -f "$app/config.xml" ]; then \
+      sed "s#@@HOOK_URL@@#$HOOK_URL#" "$app/config.xml.template" > "$app/config.xml"; \
+    fi
