@@ -27,7 +27,7 @@ globalThis.fetch = async (input, init = {}) => {
   const text = await response.clone().text();
   const asked = {};
   headers.forEach((value, name) => { if (name !== "x-sim-host" && name !== "authorization") asked[name] = value; });
-  let body = text;
+  let body;
   try { body = JSON.parse(text); } catch { body = text.length > 160 ? `${text.slice(0, 160)}…` : text; }
   exchanges.push({
     request: { method: init.method ?? "GET", url: `${url.pathname}${url.search}`, headers: asked },

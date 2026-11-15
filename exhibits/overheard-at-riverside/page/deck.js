@@ -6,23 +6,23 @@
 // deck/plain/{name}.json, and find Back and Next by counting, as a client of forms.yaml would.
 (function () {
   "use strict";
-  var slide = document.getElementById("slide");
-  var list = document.getElementById("outline-list");
-  var source = document.getElementById("source");
-  var modeNote = document.getElementById("mode-note");
-  var items = [];          // the slides, in story order: { name, title, part, fiction, href }
-  var atContents = false;  // whether the client holds the contents now, or a slide
-  var shown = null;        // the slide on the stage
-  var client, way;
+  const slide = document.getElementById("slide");
+  const list = document.getElementById("outline-list");
+  const source = document.getElementById("source");
+  const modeNote = document.getElementById("mode-note");
+  let items = [];          // the slides, in story order: { name, title, part, fiction, href }
+  let atContents = false;  // whether the client holds the contents now, or a slide
+  let shown = null;        // the slide on the stage
+  let client, way;
 
   // What the client asked and what came back, by address, to show a slide's own resource as it was read.
-  var exchanges = new Map();
-  var realFetch = window.fetch.bind(window);
+  const exchanges = new Map();
+  const realFetch = window.fetch.bind(window);
   window.fetch = function (input, init) {
-    var url = new URL(typeof input === "string" ? input : input.url, document.baseURI).toString();
+    const url = new URL(typeof input === "string" ? input : input.url, document.baseURI).toString();
     return realFetch(input, init).then(function (response) {
       exchanges.set(url, response.clone().text().then(function (text) {
-        var asked = [];
+        const asked = [];
         new Headers((init && init.headers) || {}).forEach(function (value, name) { asked.push(name + ": " + value); });
         return { asked: asked, status: response.status, etag: response.headers.get("ETag"), text: text };
       }));
@@ -30,16 +30,16 @@
     });
   };
 
-  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
-  var address = function (path) { return new URL(path, document.baseURI).toString(); };
-  var itemNamed = function (name) { return items.find(function (i) { return i.name === name; }); };
-  var linkOf = function (rep, rel) { return rep.links.find(function (l) { return l.rel === rel; }); };
-  var withContents = function (step) {
-    var there = atContents ? Promise.resolve() : client.follow("contents").then(readContents);
+  const esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  const address = function (path) { return new URL(path, document.baseURI).toString(); };
+  const itemNamed = function (name) { return items.find(function (i) { return i.name === name; }); };
+  const linkOf = function (rep, rel) { return rep.links.find(function (l) { return l.rel === rel; }); };
+  const withContents = function (step) {
+    const there = atContents ? Promise.resolve() : client.follow("contents").then(readContents);
     return there.then(step);
   };
 
-  var WAYS = {
+  const WAYS = {
     heart: {
       bookmark: address("deck/contents.json"),
       client: function () { return new HeartTs.HeartClient(); },
@@ -51,7 +51,7 @@
       first: function () { return client.follow("first"); },
       to: function (item) { return withContents(function () { return client.follow("item", item.title); }); },
       neighbor: function (rep, rel) {
-        var link = linkOf(rep, rel), href = link && new URL(link.href, rep.url).toString();
+        const link = linkOf(rep, rel), href = link && new URL(link.href, rep.url).toString();
         return link && (items.find(function (i) { return i.href === href; }) || { name: "", title: link.title });
       },
       step: function (rel) { return client.follow(rel); },
@@ -61,12 +61,12 @@
     plain: {
       bookmark: address("deck/plain/contents.json"),
       client: function () { return new HeartTs.HeartClient({ dialect: "json" }); },
-      items: function (rep) { return rep.state.items.map(function (i) { return Object.assign({}, i); }); },
+      items: function (rep) { return rep.state.items.map(function (i) { return { ...i }; }); },
       first: function () { return WAYS.plain.to(items[0]); },
       // No link came with it: the page builds the address from a pattern it knows.
       to: function (item) { return client.enter(address("deck/plain/" + encodeURIComponent(item.name) + ".json")); },
       neighbor: function (rep, rel) {
-        var at = items.findIndex(function (i) { return i.name === rep.state.name; });
+        const at = items.findIndex(function (i) { return i.name === rep.state.name; });
         return items[at + (rel === "next" ? 1 : -1)];
       },
       step: function (rel) { return WAYS.plain.to(WAYS.plain.neighbor(shown, rel)); },
@@ -80,7 +80,7 @@
   function readContents(rep) {
     atContents = true;
     items = way.items(rep);
-    var html = "", part = null;
+    let html = "", part = null;
     items.forEach(function (item, i) {
       if (item.part !== part) { part = item.part; html += '<li class="group">' + esc(part) + "</li>"; }
       html += '<li><a href="#' + esc(item.name) + '" data-name="' + esc(item.name) + '"><span class="n">' + (i + 1) + "</span>" +
@@ -90,7 +90,7 @@
   }
 
   function footLink(rep, rel, label) {
-    var to = way.neighbor(rep, rel);
+    const to = way.neighbor(rep, rel);
     if (!to) return '<span class="off" data-rel="' + rel + '"><small>' + label + "</small><b>—</b></span>";
     return '<a href="#' + esc(to.name) + '" data-rel="' + rel + '"><small>' + label + "</small><b>" + titled(to) + "</b></a>";
   }
@@ -102,19 +102,19 @@
   // Code on demand: a slide may link a script that extends this client (deck:code), with its digest. The page loads
   // it once, the browser checks the bytes against the digest, and the script registers how to start on a slide and
   // how to stop. A slide that links none, or a way that offers no links, is shown as written.
-  var running = null;
+  let running = null;
   function runCode(rep) {
     if (running) { running(); running = null; }
-    var link = linkOf(rep, "deck:code");
+    const link = linkOf(rep, "deck:code");
     if (!link) return;
-    var src = new URL(link.href, rep.url).toString();
+    const src = new URL(link.href, rep.url).toString();
     window.deckCode = window.deckCode || {};
-    var start = function () {
-      var mount = window.deckCode[src];
+    const start = function () {
+      const mount = window.deckCode[src];
       if (mount && shown === rep) running = mount(slide) || null;
     };
     if (window.deckCode[src]) return start();
-    var script = document.createElement("script");
+    const script = document.createElement("script");
     script.src = src;
     if (link.integrity) script.integrity = link.integrity;
     script.onload = start;
@@ -130,14 +130,14 @@
   }
 
   function drawSource(rep, seen) {
-    var alternate = linkOf(rep, "alternate");
+    const alternate = linkOf(rep, "alternate");
     if (seen) {
-      var lead = document.createElement("div");
-      var asked = document.createElement("pre");
+      const lead = document.createElement("div");
+      const asked = document.createElement("pre");
       asked.className = "asked";
       asked.textContent = "GET " + new URL(rep.url).pathname.split("/").slice(-3).join("/") + "\n" + seen.asked.join("\n") +
         "\n\n" + seen.status + (seen.etag ? "   ETag: " + seen.etag : "");
-      var how = document.createElement("p");
+      const how = document.createElement("p");
       how.className = "note";
       how.textContent = way.read + " heart-ts read it as " + (rep.dialect === "json" ? "data only." : rep.dialect + ".");
       lead.append(how, asked);
@@ -145,7 +145,7 @@
         summary: "This slide's resource <small>· what heart-ts asked, and read</small>" }));
     }
     if (alternate) {
-      var plain = document.createElement("a");
+      const plain = document.createElement("a");
       plain.className = "plain";
       plain.href = new URL(alternate.href, rep.url).toString();
       plain.textContent = (alternate.title || "Plain page") + " ↗";
@@ -156,7 +156,7 @@
   function render(rep) {
     atContents = false;
     shown = rep;
-    var s = rep.state;
+    const s = rep.state;
     slide.innerHTML = '<header><span class="part">' + esc(s.part) + "</span>" + (s.fiction ? '<span class="fiction">Fiction</span>' : "") +
       "</header>" + s.html;
     document.querySelector(".foot").innerHTML = footLink(rep, "prev", "Back") +
@@ -174,10 +174,10 @@
     slide.classList.add("loading");
     return step().then(function (rep) {
       render(rep);
-      var hash = "#" + rep.state.name;
+      const hash = "#" + rep.state.name;
       if (how === "push") history.pushState(null, "", hash);
       else if (how === "replace") history.replaceState(null, "", hash);
-      var top = document.querySelector(".stage").getBoundingClientRect().top;
+      const top = document.querySelector(".stage").getBoundingClientRect().top;
       if (top < 0) window.scrollTo({ top: window.scrollY + top - 70 });
     }).catch(function (error) {
       slide.innerHTML = '<h2>That could not be read</h2><p class="note">' + esc(error.message) + "</p>";
@@ -185,7 +185,7 @@
   }
 
   function goTo(name, how) {
-    var item = itemNamed(name);
+    const item = itemNamed(name);
     if (!item || (shown && shown.state.name === name)) return Promise.resolve();
     return move(function () { return way.to(item); }, how);
   }
@@ -215,7 +215,7 @@
   }
 
   document.querySelector(".foot").addEventListener("click", function (event) {
-    var a = event.target.closest("a[data-rel]");
+    const a = event.target.closest("a[data-rel]");
     if (!a) return;
     event.preventDefault();
     follow(a.dataset.rel);
@@ -234,9 +234,9 @@
     });
   });
 
-  var toggle = document.getElementById("outline-toggle"), outline = document.getElementById("outline");
+  const toggle = document.getElementById("outline-toggle"), outline = document.getElementById("outline");
   toggle.addEventListener("click", function () {
-    var open = outline.classList.toggle("open");
+    const open = outline.classList.toggle("open");
     toggle.setAttribute("aria-expanded", String(open));
   });
   list.addEventListener("click", function () { outline.classList.remove("open"); toggle.setAttribute("aria-expanded", "false"); });
@@ -253,11 +253,11 @@
   document.querySelectorAll("button[data-voice]").forEach(function (button) {
     button.addEventListener("click", function () { voice(button.dataset.voice); });
   });
-  var told = "talk";
+  let told = "talk";
   try { told = localStorage.getItem("overheard-voice") === "points" ? "points" : "talk"; } catch (e) { /* the conversation, then */ }
   voice(told);
 
-  var kept = "heart";
+  let kept = "heart";
   try { kept = localStorage.getItem("overheard-mode") === "plain" ? "plain" : "heart"; } catch (e) { /* HEART, then */ }
   start(kept, decodeURIComponent(location.hash.slice(1)));
 })();

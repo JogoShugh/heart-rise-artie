@@ -35,7 +35,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible, label:focus-visibl
 
 /* The bar */
 .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--bg); border-bottom: 1px solid var(--rule); }
-.bar-in { max-width: 78rem; margin: 0 auto; display: flex; align-items: center; gap: 0.8rem; padding-block: 0.55rem; }
+.bar-in { max-width: 78rem; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem; padding-block: 0.55rem; }
 .brand { display: grid; line-height: 1.2; min-width: 0; margin-right: auto; }
 .brand b { font: 650 1.05rem var(--display); }
 .brand span { font: 600 0.68rem var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--hold); }
@@ -81,7 +81,7 @@ figcaption { font-size: 0.84rem; color: var(--muted); }
 .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1rem; align-items: start; }
 .pair > * { min-width: 0; }
 .label { font: 600 0.7rem/1.2 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-details.more { border-top: 1px solid var(--rule); padding-top: 0.6rem; }
+details.more { border-top: 1px solid var(--rule); padding-top: 0.6rem; min-width: 0; }
 details.more > summary { cursor: pointer; color: var(--link); font-size: 0.88rem; font-weight: 600; }
 details.more[open] > summary { margin-bottom: 0.6rem; }
 details.more > :not(summary) + :not(summary) { margin-top: 0.6rem; }
@@ -92,7 +92,7 @@ details.more > :not(summary) + :not(summary) { margin-top: 0.6rem; }
 
 /* The conversations, set as a script */
 .setting { font: italic 500 1rem/1.5 var(--display); color: var(--muted); }
-.script { display: grid; gap: 0.55rem; }
+.script { display: grid; gap: 0.55rem; min-width: 0; }
 /* A scene told as points: its topic in plain bullets, in place of the conversation and its setting. */
 .slide .points { display: none; gap: 0.5rem; font: 500 1.08rem/1.5 var(--display); }
 .slide .points li::marker { color: var(--leaf); }
@@ -159,11 +159,11 @@ blockquote.said { border-left: 3px solid var(--rule); padding: 0.3rem 0.9rem; co
 
 /* Steps, figures, stats */
 .steps { counter-reset: step; list-style: none; padding: 0 !important; }
-.steps > li { counter-increment: step; display: grid; gap: 0.4rem; padding: 0.6rem 0.8rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); }
+.steps > li { counter-increment: step; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.4rem; padding: 0.6rem 0.8rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); }
 .steps > li > b::before { content: counter(step) " · "; color: var(--leaf); }
 .steps details > summary { cursor: pointer; font-size: 0.84rem; color: var(--link); font-weight: 600; }
 .steps details[open] > summary { margin-bottom: 0.4rem; }
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.6rem; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.6rem; }
 .stat { background: var(--paper); border: 1px solid var(--rule); border-radius: 10px; padding: 0.7rem 0.9rem; }
 .stat b { display: block; font: 650 1.8rem/1.2 var(--display); }
 .stat span { font-size: 0.85rem; color: var(--muted); }
@@ -209,7 +209,6 @@ blockquote.said { border-left: 3px solid var(--rule); padding: 0.3rem 0.9rem; co
 .source pre.asked { margin: 0 0 0.5rem; font-size: 0.74rem; }
 
 /* What the deck is served as: plain JSON, or HEART */
-.bar-in { flex-wrap: wrap; }
 .mode { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; background: var(--surface); }
 .mode button { font: 600 0.78rem var(--mono); color: var(--muted); background: transparent; border: 0; padding: 0.35rem 0.75rem; cursor: pointer; }
 .mode button[aria-pressed="true"] { color: var(--fg); background: var(--leaf-bg); }
@@ -239,9 +238,6 @@ blockquote.said { border-left: 3px solid var(--rule); padding: 0.3rem 0.9rem; co
 .timeline li::before { content: ""; position: absolute; left: -0.42rem; top: 0.45rem; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--surface); border: 2px solid var(--leaf); }
 .timeline b { font-family: var(--display); }
 .timeline .y { font: 600 0.8rem var(--mono); color: var(--muted); margin-right: 0.4rem; }
-details.more { min-width: 0; }
-.script { min-width: 0; }
-.steps > li { grid-template-columns: minmax(0, 1fr); }
 .steps details, .steps li > * { min-width: 0; }
 .pair > div, .split > * { min-width: 0; }
 
@@ -251,7 +247,6 @@ details.more { min-width: 0; }
 .table-scroll th, .table-scroll td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
 .table-scroll tr:last-child td { border-bottom: 0; }
 .table-scroll thead th { font: 600 0.68rem var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-.stats { grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); }
 
 /* Stills that become one another (code/morph.js animates them, when a slide links it): each token (data-token) is
    the same value in each still, styled by its own class so the script can carry it from one still to the next.

@@ -12,7 +12,10 @@ const yaml = context.jsyaml;
 const modes = ['L0, a fresh desk each release', 'L2, a fresh desk each release', 'L2, one desk for all five'];
 const shared = /\/affordance-sets\/|\/schemas\//;
 
-const size = (body) => (body == null ? 0 : Buffer.byteLength(typeof body === 'string' ? body : JSON.stringify(body)));
+const size = (body) => {
+  if (body == null) return 0;
+  return Buffer.byteLength(typeof body === 'string' ? body : JSON.stringify(body));
+};
 const count = (file) => {
   const steps = yaml.loadAll(fs.readFileSync(file, 'utf8')).filter(Boolean).slice(1);
   const sent = steps.flatMap((step) => step.exchanges || []);
@@ -23,7 +26,11 @@ const count = (file) => {
 
 const rows = [];
 const savings = [];
-const size2 = (b) => (b >= 1e9 ? `${(b / 1e9).toFixed(1)} GB` : b >= 1e6 ? `${(b / 1e6).toFixed(1)} MB` : `${Math.round(b / 1e3)} KB`);
+const size2 = (b) => {
+  if (b >= 1e9) return `${(b / 1e9).toFixed(1)} GB`;
+  if (b >= 1e6) return `${(b / 1e6).toFixed(1)} MB`;
+  return `${Math.round(b / 1e3)} KB`;
+};
 for (const forge of ['github', 'gitlab']) {
   dirs.forEach((dir, m) => {
     const runs = [501, 502, 503, 504, 505].map((v) => count(`${dir}/${forge}/pr-${v}.yaml`));

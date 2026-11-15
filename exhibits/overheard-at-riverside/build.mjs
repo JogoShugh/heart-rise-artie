@@ -51,7 +51,8 @@ const shaped = (s) => {
     html = `${html.slice(0, end)}\n${aside}${html.slice(end)}`;
   }
   if (s.points) {
-    const list = `<ul class="points">${s.points.map((p) => `<li>${p}</li>`).join("")}</ul>\n`;
+    const points = s.points.map((p) => `<li>${p}</li>`).join("");
+    const list = `<ul class="points">${points}</ul>\n`;
     const at = html.indexOf('<div class="script">');
     html = at < 0 ? html + list : html.slice(0, at) + list + html.slice(at);
   }
@@ -123,7 +124,8 @@ slides.forEach((s, i) => {
   writeFileSync(join(out, "deck", `${s.name}.json`), json(resource));
   writeFileSync(join(out, "deck", `${s.name}.html`), plainPage(s, prev, next));
   // The same slide as an old-school JSON API serves it: the data, and no links, no profile.
-  const { _links: _, ...data } = resource;
+  const data = { ...resource };
+  delete data._links;
   writeFileSync(join(out, "deck/plain", `${s.name}.json`), json(data));
 });
 
@@ -158,7 +160,11 @@ const asDocument = (page, lang = "en") => {
 {
   let part = null;
   const toc = slides.map((s, i) => {
-    const group = s.part !== part ? `<li class="group">${esc((part = s.part))}</li>` : "";
+    let group = "";
+    if (s.part !== part) {
+      part = s.part;
+      group = `<li class="group">${esc(part)}</li>`;
+    }
     return `${group}<li><a href="#${s.name}"><span class="n">${i + 1}</span><span>${esc(s.title)}</span>` +
       `${s.fiction ? '<span class="f">Fiction</span>' : ""}</a></li>`;
   }).join("");

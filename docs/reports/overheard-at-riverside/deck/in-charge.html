@@ -87,13 +87,13 @@ return answer('409 Conflict', 'Cannot renew', p("It has been renewed $MOST_RENEW
     Loan.RENEWABLE -&gt; listOf("renew", "report-problem", "return")
     Loan.RETURNED -&gt; emptyList()
     else -&gt; listOf("report-problem", "return")
-}</code></pre><p class="source-at"><code>heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/HeartLibrary.kt</code>, lines 173–177</p>
+}</code></pre><p class="source-at"><code>heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/HeartLibrary.kt</code>, lines 275–279</p>
     <pre class="source"><code>private val WHY = mapOf(
     Loan.RENEWABLE to "It can be renewed and returned.",
     Loan.ON_HOLD to "A hold is waiting for this book, so it can't be renewed.",
     Loan.AT_LIMIT to "It has been renewed ${Loan.MOST_RENEWALS} times, the most allowed.",
     Loan.RETURNED to "It was returned.",
-)</code></pre><p class="source-at"><code>heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/HeartLibrary.kt</code>, lines 245–250</p></div>
+)</code></pre><p class="source-at"><code>heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/HeartLibrary.kt</code>, lines 392–397</p></div>
   </div>
   <p class="note">The same three rules. The CGI finds out after the request; the declaration says, for each standing, what is offered and why the rest isn't, so every answer carries it before the request. heart-core still refuses an act it didn't offer, 409, as the CGI did.</p>
 </details>
