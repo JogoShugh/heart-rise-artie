@@ -8,6 +8,7 @@
 # The client and heart-mcp compile for Java 22, so build and run on 22.
 FROM eclipse-temurin:22.0.2_9-jdk AS build
 WORKDIR /src
+COPY heart heart
 COPY client client
 COPY mcp mcp
 WORKDIR /src/mcp
@@ -15,4 +16,6 @@ RUN ./gradlew --no-daemon --quiet :heart-mcp-server:installDist
 
 FROM eclipse-temurin:22.0.2_9-jre
 COPY --from=build /src/mcp/heart-mcp-server/build/install/heart-mcp /opt/heart-mcp
+RUN useradd --system --create-home heart
+USER heart
 ENTRYPOINT ["/opt/heart-mcp/bin/heart-mcp"]

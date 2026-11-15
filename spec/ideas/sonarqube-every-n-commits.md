@@ -237,3 +237,20 @@ given to the scanner (`sonar.java.binaries`, `sonar.java.libraries` in `scan.sh`
 
 - **What stays real:** S899 at `DeskReplies.kt:39` and `Time.kt:102` (the loop checks its condition again, so
   ignoring the Boolean is deliberate: a review call), S1192 (11, mostly the `DataSteps.kt` table).
+
+## After the second round, 2026-11-15
+
+34 issues on SonarQube 26.10 with the "artie trial" Kotlin profile (from 1,095 at the first scan).
+
+- **Waiting on refactor mode:** `heart-forms.js` (`isNaN`, one template regex).
+- **Blocked:** `implementations/heart-ts` (`template.ts` regex, `json.ts` reduce): its conformance run cannot
+  be logged while one gate hook requires the wrapper and another blocks naming it.
+- **The author's call:** S899 (2 ignored `await` results), S1192 (11, mostly the `DataSteps.kt` table),
+  S6514 (`Trace.kt`), S6508 (`Mono<Void>` is Spring's signature).
+- **Safe as they are:** S5332 (`http://x`, a parsing base), S1523 (5: `vm` loading the vendored js-yaml),
+  S2703 (`newblocks.js`, a fragment of `build.js`), S1313 (`Main.kt`, an overridable private-range default),
+  S6418 (a TCK test token's hash), S6471 for `kit` and `kit/release` (Docker socket, bind mounts) and the perl
+  image (port 80), `kotlin-view.js` and `build_report.py` regexes (our own text only).
+- **Fixed alongside:** the `mcp` image did not build (the client build includes `../heart`, which its
+  Dockerfile and ignore file left out); it builds now, runs as a non-root user, and answers an MCP
+  `initialize`.
