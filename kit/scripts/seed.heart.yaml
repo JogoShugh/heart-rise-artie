@@ -4,7 +4,7 @@
 #   artie run seed.heart.yaml owner=JogoShugh repo=heart-github-test
 heart: 1
 kind: kept
-start: https://localhost:8393/
+start: http://localhost:8392/
 
 inputs:
   owner:
@@ -17,7 +17,7 @@ steps:
     fields:
       owner: ${owner}
       repo: ${repo}
-    inferred: get repository ${owner}/${repo}
+    inferred: get the repository ${owner}/${repo}
     from-intent: In ${owner}/${repo}
     then:
       - act: github:open-issue
