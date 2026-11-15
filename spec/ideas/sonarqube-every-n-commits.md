@@ -212,3 +212,28 @@ given to the scanner (`sonar.java.binaries`, `sonar.java.libraries` in `scan.sh`
 
 1. The author reviews the false positives above and marks them in SonarQube (or asks for it).
 2. Step 5 of the plan: ESLint `no-var` in the commit checks, then the every-N-commits scan.
+
+## The Kotlin false positives, settled, 2026-11-15
+
+- **Cause:** SonarQube 25.1 bundled the Kotlin analyzer 2.22.0 (December 2024); the code is Kotlin 2.3.0. With
+  partial semantics, a local whose initializer is unresolved reads as unused. Sonar fixed this in sonar-kotlin
+  3.12.0 (SONARKT-269 "FP in rule S1481 in case of incomplete semantics", SONARKT-798; PR #800), released
+  2026-10-06. Sources: https://github.com/SonarSource/sonar-kotlin/pull/800,
+  https://github.com/SonarSource/sonar-kotlin/releases,
+  https://community.sonarsource.com/t/sonars-kotlin-analysis-is-now-based-on-k2-and-supports-kotlin-2-1/137215
+- **Server now:** SonarQube Community Build 26.10 (sonar-kotlin 3.12.0), fresh data; the 25.1 server and its
+  data are gone. The scanner runs natively on the Mac with Java 21 (`~/.artie/sonar/scan.sh`); the Docker
+  scanner image is amd64 only and Java 21 crashes under emulation.
+- **Same rules, same code:** the new default "Sonar way" no longer activates S1481, S6531, S6519, S1192, S899
+  and others, so a profile "artie trial" (Sonar way plus those 11 rules) was used for the comparison.
+
+| Kotlin rule | Analyzer 2.22.0 | Analyzer 3.12.0 |
+|---|---|---|
+| S1481 unused local | 32 | 0 |
+| S6531 useless cast | 7 | 1 (an exhibit) |
+| S6519 `equals` to `==` | 4 | 0 |
+| S1862 repeated condition (`ArtieClient.kt:219`) | 1 | 0 |
+| S899 ignored `await` result | 2 | 2 |
+
+- **What stays real:** S899 at `DeskReplies.kt:39` and `Time.kt:102` (the loop checks its condition again, so
+  ignoring the Boolean is deliberate: a review call), S1192 (11, mostly the `DataSteps.kt` table).
