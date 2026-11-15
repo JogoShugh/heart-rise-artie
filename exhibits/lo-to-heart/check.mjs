@@ -1,14 +1,16 @@
 // Load the dashboard in headless Chrome, print what it shows, click Merge on each offered bump, print again.
 // Every exchange the page has with its server is written to runs/, in YAML, with GitHub's answers as they came.
 import puppeteer from "puppeteer-core";
-import { writeFileSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { stringify } from "yaml";
 
 const browser = await puppeteer.launch({
   executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   headless: true,
   args: ["--use-mock-keychain"],
-  userDataDir: process.env.CHROME_PROFILE ?? "/tmp/lo-to-heart-chrome",
+  userDataDir: process.env.CHROME_PROFILE ?? mkdtempSync(join(tmpdir(), "lo-to-heart-chrome-")),
 });
 const page = await browser.newPage();
 await page.setViewport({ width: 760, height: 400, deviceScaleFactor: 2 });

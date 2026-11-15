@@ -48,7 +48,7 @@ for (const r of Object.values(roots)) r.dir = r.dir.replace(/^~/, process.env.HO
 const refs = new Map();
 const refsDir = join(deckDir, "refs");
 if (existsSync(refsDir)) {
-  for (const f of readdirSync(refsDir).filter((f) => f.endsWith(".yaml")).sort()) {
+  for (const f of readdirSync(refsDir).filter((f) => f.endsWith(".yaml")).sort((a, b) => a.localeCompare(b))) {
     for (const r of [parse(readFileSync(join(refsDir, f), "utf8"))].flat()) {
       if (refs.has(r.name)) throw new Error(`two refs are named ${r.name}`);
       refs.set(r.name, r);
@@ -84,7 +84,7 @@ const fragment = (slide, f) => {
 
 const named = (html, tag) => [...new Set([...html.matchAll(new RegExp(`<${tag} name="([\\w-]+)"`, "g"))].map((m) => m[1]))];
 
-const slides = readdirSync(join(deckDir, "slides")).filter((f) => f.endsWith(".yaml")).sort()
+const slides = readdirSync(join(deckDir, "slides")).filter((f) => f.endsWith(".yaml")).sort((a, b) => a.localeCompare(b))
   .map((f) => parse(readFileSync(join(deckDir, "slides", f), "utf8")));
 if (new Set(slides.map((s) => s.name)).size !== slides.length) throw new Error("two slides share a name");
 // heart-ts picks an embedded item by its title, so titles are unique too.

@@ -39,13 +39,13 @@ const description = (await send("GET", "/openapi.json")).json;
 const operations = Object.entries(description.paths).flatMap(([path, methods]) =>
   Object.entries(methods).map(([method, op]) => ({ method: method.toUpperCase(), path, summary: op.summary })));
 const doneTo = (resource) => operations.filter((op) => op.path.startsWith(`${resource}/`) && op.method !== "GET");
-const matches = (template, href) => new RegExp(`^${template.replace(/\{[^}]+\}/g, "[^/]+")}$`).test(href);
+const matches = (template, href) => new RegExp(`^${template.replace(/\{[^{}]+\}/g, "[^/]+")}$`).test(href);
 
 // The opt-in: the link the description documents, the set it names, and the operations the set's forms match.
 const sets = new Map();
 const affordance = description["x-heart-affordances"];
 const linked = (header) => (header ?? "").split(/,\s*(?=<)/).map((part) => ({
-  href: /<([^>]+)>/.exec(part)?.[1], rel: /rel="([^"]+)"/.exec(part)?.[1],
+  href: /<([^<>]+)>/.exec(part)?.[1], rel: /rel="([^"]+)"/.exec(part)?.[1],
   type: /type="([^"]+)"/.exec(part)?.[1], integrity: /integrity="([^"]+)"/.exec(part)?.[1],
 })).find((link) => link.rel === affordance.rel);
 

@@ -31,6 +31,7 @@ WORKDIR /app
 
 COPY server.py ./
 COPY --from=fixtures /build/fixtures ./fixtures
+USER nobody
 
 EXPOSE 8080
 CMD ["python3", "server.py", "8080"]

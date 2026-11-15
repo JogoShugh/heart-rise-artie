@@ -4,6 +4,7 @@ import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
 
 const app = express();
+app.disable("x-powered-by");
 
 app.use(express.static("public"));
 app.use("/github", createProxyMiddleware({

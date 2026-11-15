@@ -157,7 +157,7 @@
         }).join(" ") + "</p>";
       });
       open(html);
-    });
+    }).catch(function (e) { console.error(e); });
   }
   document.getElementById("refs-all").addEventListener("click", openAllRefs);
 

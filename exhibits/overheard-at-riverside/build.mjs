@@ -58,7 +58,7 @@ const shaped = (s) => {
   }
   return { ...s, html };
 };
-const slides = readdirSync(join(here, "slides")).filter((f) => f.endsWith(".yaml")).sort()
+const slides = readdirSync(join(here, "slides")).filter((f) => f.endsWith(".yaml")).sort((a, b) => a.localeCompare(b))
   .map((f) => shaped(parse(readFileSync(join(here, "slides", f), "utf8"))));
 const names = new Set(slides.map((s) => s.name));
 if (names.size !== slides.length) throw new Error("two slides share a name");

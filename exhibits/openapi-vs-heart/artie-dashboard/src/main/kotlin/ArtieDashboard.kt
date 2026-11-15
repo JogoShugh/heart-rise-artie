@@ -16,7 +16,6 @@ import heart.HeartResponse
 import heart.HttpTransport
 import heart.IntegrityCheck
 import heart.Rung
-import heart.Selection
 import heart.Transport
 import heart.UserAgentTransport
 import kotlinx.serialization.json.JsonObject
@@ -110,7 +109,7 @@ private fun ask(client: ArtieClient, at: String, intent: String): String {
         ?: return Render.card(client.enter(at), "No Anthropic API key is set.")
     val decision = ArtieAgent(client, ClaudeReasoner(HttpTransport(), key)).handle(intent, at)
     val said = when (decision) {
-        is Decision.Acted -> "ARTIE did ${(decision.selection as Selection.Act).affordance}."
+        is Decision.Acted -> "ARTIE did ${decision.selection.affordance}."
         else -> decision.toString()
     }
     return Render.card(client.current ?: client.enter(at), said)

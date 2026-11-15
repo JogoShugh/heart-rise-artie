@@ -77,7 +77,7 @@ function code(s, x, y, w, h, lines, o = {}) {
     const request = /^(GET|POST|PUT|DELETE|PATCH|HTTP|\d{3} [A-Z])/.test(ln);
     // No-break spaces, so blank lines and indents survive every renderer.
     const kept = ln === "" ? " " : ln.replace(/(?:^ +)| {2,}/g, (m) => " ".repeat(m.length));
-    const parts = kept.split(/(⟦[^⟧]*⟧)/).filter((p) => p !== "");
+    const parts = kept.split(/(⟦[^⟦⟧]*⟧)/).filter((p) => p !== "");
     parts.forEach((p, j) => {
       const hl = p.startsWith("⟦");
       let color = C.white;

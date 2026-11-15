@@ -62,7 +62,7 @@ function operations(doc: Json): Operation[] {
 }
 
 function fill(template: string, values: Record<string, unknown>): string {
-    return template.replace(/\{([^}]+)\}/g, (_, name) => encodeURIComponent(String(values[name])));
+    return template.replace(/\{([^{}]+)\}/g, (_, name) => encodeURIComponent(String(values[name])));
 }
 
 async function call(method: string, path: string, body?: unknown): Promise<{ status: number; json: Json; link: string | null }> {
@@ -84,7 +84,7 @@ async function allowed(doc: Json, link: string | null): Promise<Allowed> {
     const rel = doc["x-heart-affordances"]?.rel;
     const found = rel && link?.split(/,(?=\s*<)/).find((l) => l.includes(`rel="${rel}"`));
     if (!found) return null;
-    const href = found.match(/<([^>]+)>/)![1];
+    const href = found.match(/<([^<>]+)>/)![1];
     if (!sets.has(href)) {
         const answer = await fetch(garden + href, { headers: { ...auth, Accept: "application/hal+json" } });
         calls.push({ method: "GET", path: href, status: answer.status });
@@ -101,7 +101,7 @@ async function allowed(doc: Json, link: string | null): Promise<Allowed> {
 }
 
 /** A path template with its variable names dropped: `/beds/{id}/x` and `/beds/{bedId}/x` match. */
-const shape = (template: string) => template.replace(/\{[^}]+\}/g, "{}");
+const shape = (template: string) => template.replace(/\{[^{}]+\}/g, "{}");
 
 /** The bed, by the lookup operation the dashboard was given. */
 async function readBed(doc: Json, id: number): Promise<{ bed: Json; lookup: Operation; link: string | null }> {

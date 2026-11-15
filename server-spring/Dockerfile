@@ -34,5 +34,7 @@ RUN --mount=type=cache,target=/root/.gradle \
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/server-spring/build/libs/*.jar app.jar
+RUN addgroup -S app && adduser -S -G app app
+USER app
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

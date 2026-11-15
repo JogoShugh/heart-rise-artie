@@ -89,7 +89,7 @@
       button.addEventListener("click", function () {
         if (busy) return;
         playing = false; mark(); clearTimeout(timer);
-        play(i);
+        void play(i);
       });
       bar.append(button);
     });
@@ -199,7 +199,7 @@
       timer = setTimeout(function () {
         if (stopped || !playing) return;
         if (document.hidden) return next(hold);
-        play(at === start ? cycle : (cycle + 1) % cycles.length);
+        void play(at === start ? cycle : (cycle + 1) % cycles.length);
       }, hold);
     }
 
@@ -207,7 +207,7 @@
     scenes[start].classList.add("on");
     if (cycles[0].head) heading.textContent = cycles[0].head;
     mark();
-    if (playing) timer = setTimeout(function () { play(0); }, HOLD.start);
+    if (playing) timer = setTimeout(function () { void play(0); }, HOLD.start);
 
     return function stop() {
       stopped = true;

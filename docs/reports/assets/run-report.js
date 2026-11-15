@@ -321,7 +321,7 @@
     if (known.has(path) || known.has(path.split("?")[0])) return true;
     // A templated target (RFC 6570, as forms use them) fits when the URL fills it.
     return [...known].some((t) => t.includes("{") && new RegExp("^" + t.replace(/[.*+^$()|[\]\\]/g, "\\$&")
-      .replace(/\{\?[^}]*\}/g, "(\\?.*)?").replace(/\{[^}]*\}/g, "[^/?]+") + "$").test(path));
+      .replace(/\{\?[^{}]*\}/g, "(\\?.*)?").replace(/\{[^{}]*\}/g, "[^/?]+") + "$").test(path));
   };
   // Which steps' requests came from the server (a link, a form, a Location), and which addresses the run
   // knew beforehand: its entry points.
@@ -433,7 +433,7 @@
     const byStatus = {};
     steps.forEach((s) => { byStatus[answerKey(s)] = (byStatus[answerKey(s)] || 0) + 1; });
     const bar = el("span", "rr-bar"), legend = el("span", "rr-tile-note");
-    const order = ([a], [b]) => (isNaN(a) || isNaN(b) ? a.localeCompare(b) : a - b);
+    const order = ([a], [b]) => (Number.isNaN(Number(a)) || Number.isNaN(Number(b)) ? a.localeCompare(b) : a - b);
     Object.entries(byStatus).sort(order).forEach(([status, count]) => {
       const sameKey = (s) => answerKey(s) === status;
       const fine = steps.every((st) => !sameKey(st) || expected(st));

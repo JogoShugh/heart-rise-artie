@@ -10,6 +10,7 @@ const PULL = /^\/repos\/[^/]+\/[^/]+\/pulls\/\d+$/;
 const TOKEN = process.env.GITHUB_TOKEN;
 
 const app = express();
+app.disable("x-powered-by");
 
 // What may be done to a pull request now, as GitHub operation names, and why not the rest.
 app.get("/allowed-now/repos/:owner/:repo/pulls/:number", async (req, res) => {

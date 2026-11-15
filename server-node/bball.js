@@ -103,7 +103,7 @@ const server = http.createServer((req, res) => {
             const data = JSON.parse(body || '{}');
             
             if (url.pathname === '/game/score') {
-                const pts = parseInt(data.points);
+                const pts = Number.parseInt(data.points);
                 if (game.possession === "HOME") game.score.home += pts;
                 else game.score.away += pts;
                 game.lastAction = `${teams[game.possession]} player #${data.playerNumber} scores ${pts} points!`;

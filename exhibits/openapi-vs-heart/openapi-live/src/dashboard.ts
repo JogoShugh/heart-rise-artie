@@ -56,7 +56,7 @@ function operations(doc: Json): Operation[] {
 }
 
 function fill(template: string, values: Record<string, unknown>): string {
-    return template.replace(/\{([^}]+)\}/g, (_, name) => encodeURIComponent(String(values[name])));
+    return template.replace(/\{([^{}]+)\}/g, (_, name) => encodeURIComponent(String(values[name])));
 }
 
 async function call(method: string, path: string, body?: unknown): Promise<{ status: number; json: Json }> {

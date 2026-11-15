@@ -13,4 +13,4 @@ const NEED = [["md","EDF2EE"],["claude","D97757"],["yaml","EDF2EE"],["globe","ED
 await Promise.all(NEED.map(([k, c]) => iconPng(k, c)));
 fs.writeFileSync(process.argv[2] || "icons.json", JSON.stringify(I));
 console.log(Object.keys(I).length, "icons");
-})();
+})().catch((e) => { console.error(e); process.exitCode = 1; });

@@ -54,15 +54,16 @@
   const yamlLine = (line) => {
     const m = line.match(/^(\s*)([^:\s][^:]*):(.*)$/);
     if (!m) return esc(line);
-    const value = m[3].replace(/^(\s*)(.*)$/, (_, sp, v) => {
+    const v = m[3].trimStart();
+    const value = ((sp) => {
       if (!v) return sp;
       if (/^https?:\/\//.test(v)) return `${sp}<span class="y-u">${esc(v)}</span>`;
       if (/^\{.*\}$/.test(v)) {
-        return sp + esc(v).replace(/(\w+):/g, '<span class="y-k">$1</span>:')
+        return sp + esc(v).replace(/\b(\w+):/g, '<span class="y-k">$1</span>:')
           .replace(/: ([^,}]+)/g, ': <span class="y-s">$1</span>');
       }
       return `${sp}<span class="y-s">${esc(v)}</span>`;
-    });
+    })(m[3].slice(0, m[3].length - v.length));
     return `${m[1]}<span class="y-k">${esc(m[2])}</span>:${value}`;
   };
   const source = document.createElement("pre");

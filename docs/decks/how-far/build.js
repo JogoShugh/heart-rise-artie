@@ -442,4 +442,4 @@ const arrow = (s, x, y) => s.addShape(pres.shapes.RIGHT_ARROW, { x, y, w: 0.4, h
   await pres.writeFile({ fileName: out });
   await applyTheme(out, THEME);
   console.log("wrote", out, n, "slides");
-})();
+})().catch((e) => { console.error(e); process.exitCode = 1; });

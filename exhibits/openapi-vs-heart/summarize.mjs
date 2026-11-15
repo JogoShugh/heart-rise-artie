@@ -4,7 +4,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const dir = process.argv[2];
-const runs = readdirSync(dir).filter((f) => f.includes("--") && f.endsWith(".json")).sort().map((file) => {
+const runs = readdirSync(dir).filter((f) => f.includes("--") && f.endsWith(".json")).sort((a, b) => a.localeCompare(b)).map((file) => {
     const [release, client] = file.replace(".json", "").split("--");
     const scenarios = JSON.parse(readFileSync(join(dir, file), "utf8")).flatMap((feature) =>
         feature.elements.map((scenario) => {
