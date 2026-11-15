@@ -6,5 +6,11 @@ ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.security.csrf.Glo
 # Notification reads test results through the JUnit plugin's classes and expands its messages with Token Macro, so
 # it needs both beside it.
 RUN jenkins-plugin-cli --plugins notification junit token-macro
+# The library app is mounted from the host read-only at /repos. On Linux its files belong to the host user, not to
+# jenkins, and git refuses a repository another user owns ("dubious ownership"); Docker Desktop on a Mac hides
+# that. Every repository mounted there is trusted.
+USER root
+RUN git config --system --add safe.directory "*"
+USER jenkins
 COPY --chown=jenkins:jenkins init.groovy.d/ /usr/share/jenkins/ref/init.groovy.d/
 COPY --chown=jenkins:jenkins jobs/ /usr/share/jenkins/ref/jobs/
