@@ -9,7 +9,14 @@ here=$(cd "$(dirname "$0")" && pwd)
 root=$(cd "$here/../../.." && pwd)
 connector="$root/heart/heart-gateway/connectors/github-scm"
 spec=${GITHUB_SPEC:-$HOME/.cache/artie/ghdesc/api.github.com.json}
-[ -f "$spec" ] || { echo "no GitHub description at $spec (github/rest-api-description, api.github.com.json)"; exit 1; }
+# GitHub's description as the release's pins were made against (github/rest-api-description, MIT), fetched once.
+ref=${GITHUB_DESCRIPTION_REF:-bb754941722779d8a5b3a2f25a5fbb7ce794e1ea}
+if [ ! -f "$spec" ]; then
+  mkdir -p "$(dirname "$spec")"
+  curl -fsSL -o "$spec" \
+    "https://raw.githubusercontent.com/github/rest-api-description/$ref/descriptions/api.github.com/api.github.com.json" \
+    || { rm -f "$spec"; echo "couldn't fetch GitHub's description to $spec"; exit 1; }
+fi
 UPSTREAM_TOKEN=$(awk '/\[https:\/\/api.github.com\]/{f=1} f&&/bearer/{print $3; exit}' "$HOME/.artie/credentials")
 [ -n "$UPSTREAM_TOKEN" ] || { echo "no GitHub token in ~/.artie/credentials"; exit 1; }
 HEART_AUTH_BEARER_TOKENS=$(printf '%s' github-token | shasum -a 256 | cut -d' ' -f1)
