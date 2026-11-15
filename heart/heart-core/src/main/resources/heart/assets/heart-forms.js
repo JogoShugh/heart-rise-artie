@@ -94,7 +94,7 @@
 
   function typed(text, type) {
     if (type === 'integer') return /^-?\d+$/.test(text) ? Number(text) : text;
-    if (type === 'number') return isNaN(Number(text)) ? text : Number(text);
+    if (type === 'number') return Number.isNaN(Number(text)) ? text : Number(text);
     if (type === 'boolean') return text === 'true' ? true : text === 'false' ? false : text;
     return text;
   }
@@ -278,7 +278,7 @@
   // A safe act goes to an address: its target's template, filled from the form's fields (RFC 6570, the simple
   // expressions HEART's targets use: {name} in a path, {?a,b} and {&a} in a query).
   function expand(template, data) {
-    return template.replace(/\{([?&]?)([^}]+)\}/g, function (_, operator, names) {
+    return template.replace(/\{([?&]?)([^{}]+)\}/g, function (_, operator, names) {
       const parts = names.split(',').map(function (name) {
         const values = data.getAll(name).filter(function (v) { return v !== ''; });
         if (!operator) return values.map(encodeURIComponent).join(',');
