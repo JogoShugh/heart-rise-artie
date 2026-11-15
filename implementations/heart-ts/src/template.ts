@@ -6,7 +6,7 @@ import { GET, HAL_FORMS } from "./vocabulary";
 /** Where a template's variables are found. */
 interface TemplateScope { pointers: Record<string, string>; state: JsonObject; fields: JsonObject }
 
-const VARIABLE = /\{([^}]+)\}/g;
+const VARIABLE = /\{([^{}]+)\}/g;
 
 function queryPairs(key: string, scope: TemplateScope): string[] {
     const pointer = scope.pointers[key];

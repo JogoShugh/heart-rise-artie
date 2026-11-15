@@ -42,5 +42,5 @@ function step(node: Json | undefined, token: string): Json | undefined {
 export function resolve(value: Json, pointer: string): Json | undefined {
     if (pointer === "") return value;
     return pointer.slice(1).split("/").map((t) => t.replace(/~1/g, "/").replace(/~0/g, "~"))
-        .reduce<Json | undefined>(step, value);
+        .reduce<Json | undefined>((node, token) => step(node, token), value);
 }
