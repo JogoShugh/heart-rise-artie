@@ -138,7 +138,7 @@ class ScriptYaml(
             inScenario = outer
             named to steps
         }
-        return keeps(block).filter { it["keep-as"] !in inside } + scenarios(made)
+        return keeps(block).filter { it[KEEP_AS] !in inside } + scenarios(made)
     }
 
     /** The scenario the steps being written are in, so a scenario's own acts are not wrapped in it again. */
@@ -163,7 +163,7 @@ class ScriptYaml(
     }
 
     private fun keeps(block: Block): List<Map<String, Any?>> =
-        (block.keeps.map { it.keptAs }.distinct() + listOfNotNull(block.watched)).map { mapOf("keep-as" to it) }
+        (block.keeps.map { it.keptAs }.distinct() + listOfNotNull(block.watched)).map { mapOf(KEEP_AS to it) }
 
     private fun step(walked: Walked): List<Map<String, Any?>> = when (walked) {
         is Walked.Selection -> selection(walked)
@@ -218,13 +218,13 @@ class ScriptYaml(
         // envelope is the ask's to make, and what it led to is held after it.
         val reply = marks["ask"]?.toString()
         // What the step named, kept by that name where a later step acts as of it or reads it.
-        val named = marks["as"]?.toString()?.takeIf { it in readByName }?.let { mapOf("keep-as" to it) }
+        val named = marks["as"]?.toString()?.takeIf { it in readByName }?.let { mapOf(KEEP_AS to it) }
         return when {
             reply != null -> asked(made, reply, namedAddresses(capture, step.number), step.params) +
                 steps(selection.block)
             // A step that opens none holds no block: what it led to is kept where it stands.
             !step.opens -> listOf(made) +
-                (listOfNotNull(named) + selection.block.keeps.map { mapOf("keep-as" to it.keptAs) }).distinct()
+                (listOfNotNull(named) + selection.block.keeps.map { mapOf(KEEP_AS to it.keptAs) }).distinct()
             else -> {
                 // A resource made new is read again first; then what the act changed is checked, then the steps in it.
                 made["then"] = (listOfNotNull(mapOf("sync" to true).takeIf { selection.fresh }, named) +
@@ -348,3 +348,6 @@ private fun fact(step: Step, fact: Map<*, *>): Map<String, Any?> {
 }
 
 private val OFFERS = Regex("""offers\("([^"]+)"\)""")
+
+/** The step that keeps what a block led to by a name. */
+private const val KEEP_AS = "keep-as"

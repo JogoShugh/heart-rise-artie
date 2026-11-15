@@ -73,7 +73,7 @@ internal fun Here.reasoned(
 ) {
     val intent = checkNotNull(said.words)
     if (!run.reasoning) {
-        throw ScriptStopped(step, "\"intent\"", "\"act(intent = …) needs a reasoner, and this run has none\"")
+        throw ScriptStopped(step, INTENT, "\"act(intent = …) needs a reasoner, and this run has none\"")
     }
     // A goal's planner keeps its own decisions, and its capture each move as it was reasoned: only a script's.
     val key = Triple(intent, held.address, held.offered).takeIf { run.goal == null && asOf == null && with.isEmpty() }
@@ -91,7 +91,7 @@ internal fun Here.reasoned(
     // A model's words are kept as inferred on the reason step the client traced, so a script made from the run
     // says whose they were; a client that traces none is left as it is.
     if (said.intent == null && run.trace.size > before) run.trace[before].inferred = intent
-    go(step, "\"intent\"", answer, block)
+    go(step, INTENT, answer, block)
 }
 
 /** What an intent step came to: the reasoner's last decision, and how many acts it made toward the words first. */
@@ -123,7 +123,7 @@ private fun Here.decided(step: Int, intent: String): Decided {
             refused?.kind == Refusal.NotOffered && toward < TOWARD_ACTS && run.goal == null -> {
                 val first = told(intent, towardIt(refused))
                 if (first.answer is Answer.Refused) return Decided(first, toward)
-                held = arrived(step, "\"intent\"", first.answer)
+                held = arrived(step, INTENT, first.answer)
                 toward++
                 reasoned = navigator.reason(intent)
             }
@@ -177,6 +177,9 @@ private const val STALE_DECISIONS = 3
 
 /** How many acts an intent step makes toward what its words ask, when that is not offered, before it stops. */
 private const val TOWARD_ACTS = 3
+
+/** How an intent step names itself in a trace: the word, quoted. */
+private const val INTENT = "\"intent\""
 
 /** [chosen], what the reasoner chose before on these words here, made again as step [step], with no model. */
 private fun Here.again(step: Int, chosen: Choice, said: Said, block: (Here.() -> Unit)?) {

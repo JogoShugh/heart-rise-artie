@@ -21,7 +21,7 @@ fun generate(args: List<String>, folder: Path, out: PrintStream, builder: Path? 
     }
     val format = format(options, report)
     val capture = Capture(captureName, Files.readString(existing(folder, captureName, "capture")))
-    if ("--bare" in options) return bare(capture, options, folder, script, out)
+    if (BARE in options) return bare(capture, options, folder, script, out)
     // A script as data is NAME.heart.yaml; its lock file is NAME.pins.yaml, as a Kotlin script's is.
     val pins = heart.cli.scriptName(script) + ".pins.yaml"
     // A goal run's steps stand for the lines of the script its moves amount to, which its capture keeps.
@@ -78,7 +78,9 @@ const val GENERATE_USAGE =
         " [--inputs a,b]" +
         " [--report <dir>] [--format kts|yaml]"
 
-private val VALUED = setOf("--out", "--script", "--inputs", "--report", "--bare", "--through", "--format")
+private const val BARE = "--bare"
+
+private val VALUED = setOf("--out", "--script", "--inputs", "--report", BARE, "--through", "--format")
 
 /**
  * `--bare UPSTREAM.yaml` (spec/ideas/bare-runs.md): the run as the calls the gateway made to the service, from its
@@ -87,7 +89,7 @@ private val VALUED = setOf("--out", "--script", "--inputs", "--report", "--bare"
  * it sends every call to the gateway there instead, asking it to pass each through.
  */
 private fun bare(capture: Capture, options: Map<String, String>, folder: Path, script: String, out: PrintStream) {
-    val upstream = options.getValue("--bare")
+    val upstream = options.getValue(BARE)
     if (capture.watchScript != null) return rails(capture, upstream, folder, script, out)
     val run = BareRun(capture, Files.readString(existing(folder, upstream, "upstream record")))
     val writer = BareWriter(run, upstream, BareWriter.Wire("--validators" in options, options["--through"]))

@@ -39,8 +39,8 @@ class Published(layers: List<Layers<*, *>>, private val document: OpenApiDocumen
     /** A client fetches a profile only when it wants more than a form's inline text, and may cache it a day. */
     fun profile(name: String): Response {
         val body = profiles[name] ?: return Response(Status.NOT_FOUND)
-        return Response(Status.OK).header("Content-Type", Profile.ALPS_MEDIA_TYPE)
-            .header("Cache-Control", "public, max-age=86400")
+        return Response(Status.OK).header(CONTENT_TYPE, Profile.ALPS_MEDIA_TYPE)
+            .header(CACHE_CONTROL, "public, max-age=86400")
             .header("ETag", "\"alps-${ContentAddress.address(body)}\"")
             .body(body)
     }
@@ -60,8 +60,8 @@ class Published(layers: List<Layers<*, *>>, private val document: OpenApiDocumen
         if (body == null) {
             Response(Status.NOT_FOUND)
         } else {
-            Response(Status.OK).header("Content-Type", type)
-                .header("Cache-Control", IMMUTABLE)
+            Response(Status.OK).header(CONTENT_TYPE, type)
+                .header(CACHE_CONTROL, IMMUTABLE)
                 .header("Repr-Digest", ContentAddress.reprDigest(body))
                 .body(body)
         }
@@ -70,13 +70,15 @@ class Published(layers: List<Layers<*, *>>, private val document: OpenApiDocumen
         const val SCHEMA_JSON = "application/schema+json"
         const val JSON = "application/json"
         const val IMMUTABLE = "public, max-age=31536000, immutable"
+        private const val CONTENT_TYPE = "Content-Type"
+        private const val CACHE_CONTROL = "Cache-Control"
 
         /** A 304 when If-None-Match already names [etag]; otherwise [body], always no-cache. */
         fun revalidated(request: Request, etag: String, type: String, body: () -> String): Response {
             val unchanged = request.header("If-None-Match")?.let { Validators.notModified(it, etag) } == true
             val headers = Response(if (unchanged) Status.NOT_MODIFIED else Status.OK)
-                .header("ETag", etag).header("Cache-Control", "no-cache")
-            return if (unchanged) headers else headers.header("Content-Type", type).body(body())
+                .header("ETag", etag).header(CACHE_CONTROL, "no-cache")
+            return if (unchanged) headers else headers.header(CONTENT_TYPE, type).body(body())
         }
     }
 }

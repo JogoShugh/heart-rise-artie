@@ -74,7 +74,7 @@ internal fun expression(value: Bound): String {
     val whole = value.whole
     val template = value.template
     return when {
-        items != null -> "listOf(" + items.joinToString(", ") { expression(it) } + ")"
+        items != null -> items.joinToString(", ", LIST_OF, ")") { expression(it) }
         whole != null -> source(whole) ?: literal(value.kept)
         template != null -> filled(template, value.keys) ?: literal(value.kept)
         else -> literal(value.kept)
@@ -100,8 +100,8 @@ private fun filled(template: String, keys: List<String>): String? {
 internal fun literal(value: Any?): String = when (value) {
     null -> "null"
     is JsonPrimitive -> if (value.isString) kotlinString(value.content, slots = false) else value.content
-    is JsonArray -> "listOf(" + value.joinToString(", ") { literal(it) } + ")"
-    is List<*> -> "listOf(" + value.joinToString(", ") { literal(it) } + ")"
+    is JsonArray -> value.joinToString(", ", LIST_OF, ")") { literal(it) }
+    is List<*> -> value.joinToString(", ", LIST_OF, ")") { literal(it) }
     is Number, is Boolean -> value.toString()
     else -> kotlinString(value.toString(), slots = false)
 }
@@ -115,3 +115,4 @@ internal fun duration(duration: Duration): String =
     }
 
 private const val SECONDS_A_MINUTE = 60L
+private const val LIST_OF = "listOf("

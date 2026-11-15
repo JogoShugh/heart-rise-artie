@@ -41,7 +41,7 @@ sealed interface Selection {
  * A reasoner that keeps each call it makes to its model, for a run's record (spec/PLAN-LINE-BY-LINE-REPORT.md):
  * [taken] hands them over and forgets them.
  */
-interface KeepsModelCalls {
+fun interface KeepsModelCalls {
     fun taken(): List<heart.script.ModelCall>
 }
 

@@ -4,15 +4,12 @@ import com.artie.heart.Act
 import com.artie.heart.Acted
 import com.artie.heart.AlpsType
 import com.artie.heart.ConcurrentWriteException
-import com.artie.heart.ContentAddress
-import com.artie.heart.ContentAddress.canonical
 import com.artie.heart.Finding
 import com.artie.heart.Found
 import com.artie.heart.HEART_RISE_PROFILE
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
 import com.artie.heart.Named
-import com.artie.heart.Offers
 import com.artie.heart.Profile
 import com.artie.heart.Relation
 import com.artie.heart.ResourceType
@@ -26,7 +23,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 import org.http4k.core.HttpHandler
 import org.http4k.core.then
 import java.net.URLEncoder
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * A service that only publishes OpenAPI, presented to HEART clients as a

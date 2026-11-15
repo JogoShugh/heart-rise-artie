@@ -11,7 +11,6 @@ import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
 import com.artie.heart.ItemActs
 import com.artie.heart.Negotiation
-import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.Rung
 import com.artie.heart.ServiceIndex
 import com.artie.heart.ServingLimits

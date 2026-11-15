@@ -9,14 +9,15 @@ package com.artie.heart
 object HtmlAssets {
     const val PATH = "/heart/assets/"
     const val CACHE_CONTROL = "public, max-age=31536000, immutable"
+    private const val JAVASCRIPT = "text/javascript; charset=utf-8"
 
     /** One file: its published name, media type and bytes. */
     class Asset(val name: String, val mediaType: String, val text: String)
 
     private val files = listOf(
-        "htmx-2.0.4.min.js" to "text/javascript; charset=utf-8",
-        "ajv2020-8.17.1.min.js" to "text/javascript; charset=utf-8",
-        "heart-forms.js" to "text/javascript; charset=utf-8",
+        "htmx-2.0.4.min.js" to JAVASCRIPT,
+        "ajv2020-8.17.1.min.js" to JAVASCRIPT,
+        "heart-forms.js" to JAVASCRIPT,
         "heart.css" to "text/css; charset=utf-8",
     )
 

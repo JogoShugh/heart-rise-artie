@@ -7,8 +7,8 @@ package heart
  */
 enum class Rung(val prefer: String?) {
     L0(null),
-    L1("forms=link"),
-    L2("forms=link, schema=link"),
+    L1(FORMS_LINK),
+    L2("$FORMS_LINK, $SCHEMA_LINK"),
     ;
 
     companion object {
@@ -22,10 +22,13 @@ enum class Rung(val prefer: String?) {
                 .map { it.substringBefore(';').trim().lowercase().replace(" ", "") }
                 .toSet()
             return when {
-                "forms=link" in honoured && "schema=link" in honoured -> L2
-                "forms=link" in honoured -> L1
+                FORMS_LINK in honoured && SCHEMA_LINK in honoured -> L2
+                FORMS_LINK in honoured -> L1
                 else -> L0
             }
         }
     }
 }
+
+private const val FORMS_LINK = "forms=link"
+private const val SCHEMA_LINK = "schema=link"

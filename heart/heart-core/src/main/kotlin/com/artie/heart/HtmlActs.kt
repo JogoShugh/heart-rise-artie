@@ -26,10 +26,10 @@ internal object HtmlActs {
         "<div class=\"acts\" role=\"toolbar\" aria-label=\"Acts\">" + entries.joinToString("") { entry ->
             val id = Html.token(entry.key)
             if (entry.form != null) {
-                "<button type=\"button\" class=\"act\"${Html.attr("data-rel", entry.key)}" +
+                "<button type=\"button\" class=\"act\"${Html.attr(DATA_REL, entry.key)}" +
                     "${Html.attr("data-dialog", "act-$id")}>${Html.text(entry.title)}</button>"
             } else {
-                "<button type=\"button\" class=\"act\"${Html.attr("data-rel", entry.key)} aria-disabled=\"true\"" +
+                "<button type=\"button\" class=\"act\"${Html.attr(DATA_REL, entry.key)} aria-disabled=\"true\"" +
                     "${Html.attr("aria-describedby", "why-$id")}>${Html.text(entry.title)}</button>" +
                     "<span class=\"why\" id=\"why-$id\" hidden>${Html.text(entry.reason)}</span>"
             }
@@ -68,16 +68,19 @@ internal object HtmlActs {
         val target = template.substringBefore("{?")
         // A safe act goes to an address: heart-forms.js fills the template, path and query alike.
         if (method == "GET") {
-            return Html.attr("data-rel", key) + " method=\"get\"" + Html.attr("action", target) +
+            return Html.attr(DATA_REL, key) + " method=\"get\"" + Html.attr("action", target) +
                 Html.attr("data-template", template)
         }
         val headers = MAPPER.writeValueAsString(mapOf("If-Match" to etag, "Accept" to "text/html"))
-        return Html.attr("data-rel", key) + Html.attr("hx-${method.lowercase()}", target) +
+        return Html.attr(DATA_REL, key) + Html.attr("hx-${method.lowercase()}", target) +
             Html.attr("hx-headers", headers) +
             " hx-target=\"#resource\" hx-select=\"#resource\" hx-swap=\"outerHTML\""
     }
 
     private val MAPPER = ObjectMapper()
+
+    /** The attribute that names an act's relation on its button and its form. */
+    private const val DATA_REL = "data-rel"
 }
 
 /**

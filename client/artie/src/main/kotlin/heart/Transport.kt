@@ -53,6 +53,6 @@ class HeartResponse(
 }
 
 /** ARTIE's only way to the network (guarded by ArchitectureBoundaryTest). */
-interface Transport {
+fun interface Transport {
     fun send(request: HeartRequest): HeartResponse
 }

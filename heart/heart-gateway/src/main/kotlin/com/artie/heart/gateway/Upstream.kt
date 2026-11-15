@@ -82,7 +82,7 @@ class Upstream(
     fun get(path: String): Answer = send(Request(Method.GET, path))
 
     fun post(path: String, body: String): Answer =
-        send(Request(Method.POST, path).header("Content-Type", JSON).body(body))
+        send(Request(Method.POST, path).header(CONTENT_TYPE, JSON).body(body))
 
     /**
      * An act's call, by its operation's [method]. The upstream's [statuses]
@@ -92,7 +92,7 @@ class Upstream(
     fun act(method: String, path: String, body: String, statuses: RefusalStatuses): Answer {
         // A DELETE with nothing to say sends no body, as GitHub's unlock and remove-label expect.
         val request = Request(Method.valueOf(method), path)
-        val sent = if (method == "DELETE" && body == "{}") request else request.header("Content-Type", JSON).body(body)
+        val sent = if (method == "DELETE" && body == "{}") request else request.header(CONTENT_TYPE, JSON).body(body)
         return send(sent, statuses)
     }
 
@@ -118,7 +118,7 @@ class Upstream(
             return held.answer.also { copies.keep(authorization, at, held.etag, it) }
         }
         if (!response.status.successful) throw refusal(request, response, statuses)
-        val mediaType = response.header("Content-Type")?.substringBefore(';')?.trim()?.lowercase()
+        val mediaType = response.header(CONTENT_TYPE)?.substringBefore(';')?.trim()?.lowercase()
         val answer = Answer(mapper.readTree(response.bodyString()), Header.LINK(response), request.uri.path, mediaType)
         if (reading) {
             response.header("ETag")?.let { copies.keep(authorization, at, it, answer) }
@@ -169,6 +169,7 @@ class Upstream(
 
     private companion object {
         const val JSON = "application/json"
+        const val CONTENT_TYPE = "Content-Type"
 
         /** How many times a read from a copy that is behind is asked again, and how long apart. */
         const val CATCH_UP_TRIES = 3

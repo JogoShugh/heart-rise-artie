@@ -175,14 +175,14 @@ internal class StepWatch(
             }
         }
         val holds = facts.passes(sources(here, null), here.held)
-        if (holds && intent.leaves) {
-            // Said once for each member it leaves.
-            val first = here.run.watching.leave(here.held.address)
-            if (first) here.note("Left ${here.held.address}: ${host.fill(intent.words)}")
-        } else if (holds && intent.reasoned) {
-            judged(listOf(host.fill(intent.words)), here, host, moves, "")
-        } else if (holds) {
-            perform(intent, ACT, here, null)
+        when {
+            holds && intent.leaves -> {
+                // Said once for each member it leaves.
+                val first = here.run.watching.leave(here.held.address)
+                if (first) here.note("Left ${here.held.address}: ${host.fill(intent.words)}")
+            }
+            holds && intent.reasoned -> judged(listOf(host.fill(intent.words)), here, host, moves, "")
+            holds -> perform(intent, ACT, here, null)
         }
         return !(holds && intent.leaves)
     }

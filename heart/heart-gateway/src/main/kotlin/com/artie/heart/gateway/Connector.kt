@@ -8,6 +8,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import java.nio.file.Files
 import java.nio.file.Path
 
+/** A `{name}` parameter in one segment of a path template. */
+private val PATH_PARAMETER = Regex("\\{[^}/]+}")
+
 /**
  * What a reader recognizes in an upstream answer. Every test it has must
  * hold; a reader with none recognizes every answer, and is its API's default.
@@ -21,7 +24,7 @@ class Match(
     private val mediaType: MediaType? = null,
     val path: PathTemplate? = null,
 ) {
-    private val pathPattern = path?.let { Regex("^" + it.replace(Regex("\\{[^}/]+}"), "[^/]+") + "$") }
+    private val pathPattern = path?.let { Regex("^" + it.replace(PATH_PARAMETER, "[^/]+") + "$") }
 
     fun holds(answer: Answer): Boolean =
         body.all { (pointer, value) -> has(answer.body.at(pointer), value) } &&
@@ -101,10 +104,10 @@ class Connector(
         val operations = spec.types.flatMap { it.acts + it.bookmarkActs }.map { it.operation.name }.toSet() +
             resources.flatMap { resource -> resource.acts.map { it.name } }
         val paths = spec.types.map { "/${it.collection}/{id}" }.toSet() +
-            resources.map { spec.route(it.read).path.replace(Regex("\\{[^}/]+}"), "{id}") }
+            resources.map { spec.route(it.read).path.replace(PATH_PARAMETER, "{id}") }
         readers.forEach { reader ->
             reader.match.path?.let { path ->
-                check(path.replace(Regex("\\{[^}/]+}"), "{id}") in paths) {
+                check(path.replace(PATH_PARAMETER, "{id}") in paths) {
                     "${reader.file}: the upstream's description serves no $path"
                 }
             }

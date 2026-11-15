@@ -29,6 +29,7 @@ import org.http4k.core.Status
  */
 object Refusals {
     const val PROBLEM_JSON = "application/problem+json"
+    private const val CONTENT_TYPE = "Content-Type"
 
     /**
      * Answers each refusal heart-core raises; anything else is thrown again.
@@ -42,7 +43,7 @@ object Refusals {
             } catch (failure: RuntimeException) {
                 val refused = of(failure, mapper, realm) ?: throw failure
                 // A problem links the resource it was refused on (ProblemLinks); a plain error stays as it is.
-                if (refused.header("Content-Type") == PROBLEM_JSON) {
+                if (refused.header(CONTENT_TYPE) == PROBLEM_JSON) {
                     refused.body(ProblemLinks.into(refused.bodyString(), request.uri.path))
                 } else {
                     refused
@@ -114,10 +115,10 @@ object Refusals {
         failure: Throwable,
         mapper: ObjectMapper,
         members: Map<String, Any> = emptyMap(),
-    ): Response = Response(status).header("Content-Type", PROBLEM_JSON)
+    ): Response = Response(status).header(CONTENT_TYPE, PROBLEM_JSON)
         .body(mapper.writeValueAsString(problem(status, type, title, failure.message, members)))
 
     private fun error(status: Status, failure: Throwable, mapper: ObjectMapper): Response =
-        Response(status).header("Content-Type", "application/json")
+        Response(status).header(CONTENT_TYPE, "application/json")
             .body(mapper.writeValueAsString(mapOf("error" to (failure.message ?: status.description))))
 }

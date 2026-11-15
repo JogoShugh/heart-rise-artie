@@ -11,23 +11,23 @@ internal class DecisionLog(private val events: EventLog) {
     fun rung(url: String, preferenceApplied: String?, applied: Rung) =
         events.emit(
             "rung.applied", "took rung $applied from Preference-Applied", url,
-            mapOf("heart.preference_applied" to preferenceApplied.orEmpty(), "heart.rung" to applied.name),
+            mapOf("heart.preference_applied" to preferenceApplied.orEmpty(), RUNG to applied.name),
         )
 
     /** Whether the forms link was followed, and why not when it was not. */
     fun forms(url: String, href: String?, applied: Rung) = when {
         href == null && applied != Rung.L0 -> events.emit(
             "forms.missing", "the response is at $applied but links no affordance set it can name", url,
-            mapOf("heart.rung" to applied.name),
+            mapOf(RUNG to applied.name),
         )
         href == null -> Unit
         applied == Rung.L0 -> events.emit(
             "forms.skipped", "did not follow the forms link: no Preference-Applied means L0", url,
-            mapOf("heart.forms.href" to href, "heart.rung" to applied.name),
+            mapOf("heart.forms.href" to href, RUNG to applied.name),
         )
         else -> events.emit(
             "forms.followed", "followed the forms link at $applied", url,
-            mapOf("heart.forms.href" to href, "heart.rung" to applied.name),
+            mapOf("heart.forms.href" to href, RUNG to applied.name),
         )
     }
 
@@ -49,7 +49,7 @@ internal class DecisionLog(private val events: EventLog) {
         events.emit(
             "act.sent", "sent $rel with " + (act.validator?.let { "validator $it" } ?: "no validator"), act.url,
             mapOf(
-                "heart.rel" to rel,
+                REL to rel,
                 "heart.method" to act.method,
                 "heart.if_match" to act.validator,
                 "heart.resource" to owner,
@@ -62,7 +62,7 @@ internal class DecisionLog(private val events: EventLog) {
         events.emit(
             "act.refused", "$rel was refused (${outcome.code}); $handled", target,
             mapOf(
-                "heart.rel" to rel,
+                REL to rel,
                 "heart.code" to outcome.code,
                 "heart.problem.type" to outcome.problemType,
                 "heart.outcome" to handled,
@@ -73,12 +73,17 @@ internal class DecisionLog(private val events: EventLog) {
     fun schemaUncompiled(rel: String, schema: String, url: String, reason: String?) =
         events.emit(
             "schema.uncompiled", "could not compile the schema of $rel; its acts are sent unchecked", url,
-            mapOf("heart.rel" to rel, "heart.schema" to schema, "heart.schema.error" to reason),
+            mapOf(REL to rel, "heart.schema" to schema, "heart.schema.error" to reason),
         )
 
     /** An act or link the representation does not offer: refused before any request. */
     fun absent(kind: String, rel: String, url: String) =
-        events.emit("$kind.absent", "$rel is not offered in $url; nothing was sent", url, mapOf("heart.rel" to rel))
+        events.emit("$kind.absent", "$rel is not offered in $url; nothing was sent", url, mapOf(REL to rel))
 
     fun done() = events.emit("client.done", "the client has finished", null)
+
+    private companion object {
+        const val RUNG = "heart.rung"
+        const val REL = "heart.rel"
+    }
 }
