@@ -1,6 +1,7 @@
 # Idea: a Dockerized SonarQube in the bdd-gates flow, scanning every N commits
 
-Noted 2026-11-13. A first manual scan ran 2026-11-15 (below); the every-N-commits hook is not started. It adds a hook to the bdd-gates skill, and changing the gates is the author's call.
+Noted 2026-11-13. A first manual scan ran 2026-11-15 (below), and its first fixes are in (steps 1, 2 and part of
+3 of the plan); the every-N-commits hook is not started. It adds a hook to the bdd-gates skill, and changing the gates is the author's call.
 
 ## Why
 
@@ -152,3 +153,62 @@ In order: the cheap ones that remove the most noise first, then real bugs, then 
 
 **D?** Steps 1 and 2 are mechanical and touch no `src/main`; steps 3 and 5 touch the gate or `src/main` and are
 the author's call.
+
+## Where it stands, 2026-11-15
+
+A scan of `claude/auth-branch-4bnmhc` at `84a3b7cc`, with the compiled classes and the Gradle cache's jars
+given to the scanner (`sonar.java.binaries`, `sonar.java.libraries` in `scan.sh`).
+
+| Measure | First scan | Now |
+|---|---|---|
+| Issues | 1,095 | 244 |
+| Bugs | 9 | 3, all false positives |
+| Code smells | 1,086 | 241 |
+| Security hotspots | 32 | 29 |
+| Duplicated lines | 7.4% | 4.3% |
+
+- **By language:** Kotlin 133, JS 90, Python 14, TS 6, Dockerfile 1.
+- **In production code:** 76 (`src/main` and `heart-forms.js`).
+
+### What the fixes covered
+
+- **Outside production code:** one copy of each deck script in `docs/reports/assets`; `var` to `let`/`const`
+  by ESLint; CSS selectors merged; nested ternaries untangled; Python constants and single returns; Dockerfiles
+  (Jenkins job files root-owned, heart-sims as a non-root user); Gradle dependencies grouped.
+- **Production code, in refactor mode:** repeated literals as constants, unused imports, two if-chains as
+  `when`, `Transport` and `KeepsModelCalls` as `fun interface`, `heart-forms.js` declared with `let` and
+  `const` (checked old against new in headless Chrome).
+
+### Left for the author's review
+
+<details><summary>False positives in production code (about 50)</summary>
+
+- **`kotlin:S1481` unused local (32):** every one is used; types from the compiled classes did not change it.
+- **`kotlin:S6531` useless cast (7):** each cast narrows `Any?` from YAML or JSON and is needed.
+- **`kotlin:S6519` `equals` to `==` (4):** each is `equals(…, ignoreCase = true)`, which `==` cannot say.
+- **`kotlin:S6508` `Void` to `Unit` (2):** `Mono<Void>` is Spring's `WebFilter` signature.
+- **The three bugs:** `ArtieClient.kt:219` (a Kotlin 2 `when` guard read as a repeated condition);
+  `DeskReplies.kt:39` and `Time.kt:102` (`await` inside a loop that checks its condition again).
+
+</details>
+
+<details><summary>Left on purpose</summary>
+
+- **`DataSteps.kt` literals (9):** the script vocabulary table reads best with each key written out.
+- **`Trace.kt` delegation (2):** the class wraps only some calls; `by` would change which it overrides.
+- **Complexity:** `Watch.kt` (S3776), `Heart.kt` (S107, nine parameters), two nestings in `heart-forms.js`.
+- **`heart-forms.js` nested ternaries (3).**
+- **`heart-tck` `HtmlSteps.kt`:** step code; its `data-rel` literal stays.
+- **`implementations/heart-ts/src/client.ts` (4):** not changed. The conformance suite must run through the
+  gate's wrapper to be logged, and the hook that protects the gate blocks naming it, so a refactor there
+  cannot show green. The gate's two rules need reconciling first.
+- **Separate builds:** `exhibits/*`, `server-spring`, `domains/tickets`.
+- **Outside production code:** about 60 `kotlin:S6624` version literals (a version catalog), the regex
+  hotspots, and images that still run as root because they use the Docker socket, bind mounts or port 80.
+
+</details>
+
+### Next
+
+1. The author reviews the false positives above and marks them in SonarQube (or asks for it).
+2. Step 5 of the plan: ESLint `no-var` in the commit checks, then the every-N-commits scan.
