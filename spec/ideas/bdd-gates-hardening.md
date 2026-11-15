@@ -87,6 +87,40 @@ in node-typescript) for node, Stryker.NET for dotnet. It catches steps that asse
 Each one is built gate-first, like everything else: a `scripts/selftest.sh` case that commits the shortcut and
 expects the refusal, red before the check is written.
 
+## Optional add-ins for the gradle-kotlin stack
+
+Deterministic checks a project can switch on beside the gates. Artie already runs Detekt and Konsist; none of
+the rest are in its builds yet. Each tool's config file joins `protectedFiles`, as `detekt.yml` is today, so the
+agent can't loosen its own rules.
+
+### First picks
+
+| # | Add-in | Where it runs | What it catches |
+|---|---|---|---|
+| A | **Cucumber strict**: undefined and pending steps fail the run | the BDD run | A scenario counted red or green whose steps were never written |
+| B | **Konsist rule: every `@Then` step asserts** | `check` | Then-steps that assert nothing, the most direct fake test |
+| C | **Detekt `ForbiddenMethodCall`** for `Instant.now()`, `UUID.randomUUID()` and `Random` outside an injected `Clock` or id source | lint, on each edit | Nondeterminism in production code: green today, red tomorrow |
+| D | **Kover with diff coverage**: lines changed in the commit must be covered | `check` | New code no scenario reaches; cheaper than mutation testing |
+| E | **PIT (pitest)** on changed classes | `check`, or every N commits | Tests that run the code but would pass if it were wrong (improvement 6) |
+
+**D?** Recommendation: A, B and C first. They are cheap, fully deterministic, and aimed at fake tests.
+
+### Also worth having
+
+- **Spotless with ktlint or ktfmt**: deterministic formatting, applied automatically, so diffs carry no
+  formatting noise.
+- **Detekt with type resolution** (`detektMain`): stricter rules, such as unsafe casts and ignored results.
+- **Compiler**: `allWarningsAsErrors = true`; `explicitApi()` in the `heart` library modules.
+- **Gherkin lint**: every scenario has a `Then`, no empty scenarios, and near-identical repeated scenarios
+  flagged as candidates for one table.
+- **Random scenario order** (`cucumber.execution.order=random`): catches scenarios that depend on run order.
+- **gitleaks in pre-commit**: no secrets in commits.
+- **Dependencies**: Gradle dependency locking and verification metadata for reproducible builds; the
+  `dependency-analysis` plugin for unused or undeclared dependencies; `osv-scanner` for known vulnerabilities.
+- **CPD** (PMD's copy-paste detector, which reads Kotlin): duplicated blocks.
+- **Later**: the binary-compatibility validator on `heart`'s public API. Pre-release, it would only make API
+  changes visible, not block them.
+
 ## What stays the same
 
 - The event log stays append-only and out of Claude's reach.
