@@ -75,3 +75,48 @@ Desktop needs a paid subscription in large companies). This Mac is an M3 Max, 36
 | **A Windows VM in the cloud** with nested virtualization (Azure Dv5 or Ev5, for instance), by the hour | The real thing, on x86 like most Windows users | A few dollars for an afternoon |
 
 **D?** Recommendation: the Linux VM now; one cloud Windows afternoon once kit 2.0 exists.
+
+## Done, 2026-11-15: tested in an Ubuntu VM on the Mac
+
+The multi-system release now runs on a machine with only Docker. It was tested in an OrbStack Ubuntu 24.04 VM on the
+Mac, which is the same setup as WSL. On a fresh clone: `kit/release.sh up gitlab`, then `kit/release.sh run github`,
+`run gitlab` or `run github-live`. No JDK, node or Gradle is needed on the machine.
+
+At all three forges (the small simulated GitHub, GitLab, and real GitHub), all five pull requests ended as expected:
+501, 502, 503 and 505 were promoted to Dev, and 504 was not, because its smoke scenario S3 failed. The real-GitHub
+runs opened PRs #2363–2367 in `JogoShugh/heart-github-test`, on `library/*` branches only.
+
+### What broke on Linux, and the fixes
+
+| Problem | Fix | Commit |
+|---|---|---|
+| Windows line endings break every script | `.gitattributes` | `d0dac2ec` |
+| Ubuntu's own Docker has no BuildKit or Compose | README: `docker.io docker-buildx docker-compose-v2` | `77790f4f`, `a6db86e9` |
+| The kit's kept seed script was out of date for everyone, the Mac included | Walked again, kept, strict replay passes | `54bfe4e0` |
+| The release scripts pointed at this Mac's sdkman JDK, and GitLab at `192.168.1.18` | That JDK used only where it exists; GitLab at `localhost` | `9e16798e` |
+| Jenkins refused the mounted repo on Linux ("dubious ownership"), so every build failed | The Jenkins image trusts the mounted repos | `6eff810f` |
+| The real-GitHub gateway needed GitHub's API description in a Mac-only cache | Fetched when missing, at the exact version the pins were made against (`bb75494`) | `2aad674a` |
+
+### How kit 2.0 is built (`a6db86e9`)
+
+- One image holds the release services and both gateways (`kit/release/Dockerfile`).
+- Jenkins and GitLab share that container's network (`kit/release/compose.yaml`), so the scripts' `localhost`
+  addresses work unchanged. Jenkins listens on 8171, since GitLab's Puma takes 8080.
+- GitLab is optional (a Compose profile), since it needs about 4 GB more memory.
+- The kit README has a new section, "The release: GitHub or GitLab, Jenkins, and Dev".
+
+### Things to know
+
+- **Docker socket:** the release container gets access to Docker itself, because seeding GitLab runs its Rails
+  console through Docker. That's fine for a local demo, but it means the container has full control of Docker on
+  that machine.
+- **When things answer:** the release desk and Dev answer only while a release is running; each release starts its
+  services afresh. Jenkins and GitLab stay up until `kit/release.sh down`.
+- **GitLab on Apple Silicon:** its image is amd64 only, so on the Mac it runs emulated. It's slower but works. On a
+  normal Windows PC it runs natively.
+- **Not yet tested:** Docker Desktop on real Windows. That still needs one real Windows box (the cloud VM above).
+
+### Next
+
+- CI on an Ubuntu runner that replays the kit's kept scripts and runs kit 2.0, to catch pin drift like the seed's.
+- One afternoon on a cloud Windows VM, for Docker Desktop's own behaviour.
