@@ -5,7 +5,7 @@
 #   gitlab/run.sh
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
-host=${RELEASE_HOST:-192.168.1.18}
+host=${RELEASE_HOST:-localhost}
 env_file="$here/gitlab.env"
 if [ ! -f "$env_file" ]; then
   umask 077

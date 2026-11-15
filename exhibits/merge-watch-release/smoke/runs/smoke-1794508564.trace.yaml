@@ -1,0 +1,1318 @@
+---
+run:
+  inputs:
+    deployed:
+      value: http://localhost:8186/
+      given: given
+      question: Which deployment of the library?
+    book:
+      value: The Hobbit
+      given: default
+      default: The Hobbit
+    author:
+      value: J. R. R. Tolkien
+      given: default
+      default: J. R. R. Tolkien
+    renewable:
+      value: Matilda
+      given: default
+      default: Matilda
+    problem:
+      value: missing-pages
+      given: default
+      default: missing-pages
+    comment:
+      value: Pages 12 to 14.
+      given: default
+      default: Pages 12 to 14.
+---
+at: '2026-11-12T18:36:04.471433Z'
+ms: 55
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8186/
+opens: true
+outcome: done
+address: http://localhost:8186/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        hr:cancel:
+          - sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=
+        library:get-account:
+          - sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4=
+        library:get-loan:
+          - sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y=
+        library:get-member:
+          - sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y=
+        library:get-watch:
+          - sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI=
+        library:search-loans:
+          - sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+        library:search-members:
+          - sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18=
+        library:search-watches:
+          - sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno=
+        library:tell-me-when-renewable:
+          - sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=
+      digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+    - library:search-watches
+    - library:get-watch
+    - library:tell-me-when-renewable
+  links:
+    self:
+      - null
+    alternate:
+      - null
+      - null
+      - null
+      - null
+    service-desc:
+      - null
+    hr:keys:
+      - null
+    hr:affordances:
+      - null
+---
+at: '2026-11-12T18:36:04.534441Z'
+ms: 44
+mode: script
+say: act {relation}, name {name}
+inferred: search the loans for "The Hobbit"
+fromIntent: Search the loans for "The Hobbit", and open The Hobbit
+params:
+  relation: library:search-loans
+  name: The Hobbit
+values:
+  name:
+    value: The Hobbit
+    type: string
+    from:
+      - input: book
+opens: true
+chose:
+  kind: form
+  relation: library:search-loans
+  title: Find loans by title
+  method: GET
+  target: /loans{?name}
+  address: http://localhost:8186/loans?name=The%20Hobbit
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+  act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:get-watch
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+    - library:search-watches
+    - library:tell-me-when-renewable
+  links:
+    - alternate
+    - hr:affordances
+    - hr:keys
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8186/loans?name=The+Hobbit
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - The Hobbit
+---
+at: '2026-11-12T18:36:04.581849Z'
+ms: 5
+mode: script
+say: follow {relation}, titled {title}
+intent: Search the loans for "The Hobbit", and open The Hobbit
+params:
+  relation: item
+  title: The Hobbit
+values:
+  title:
+    value: The Hobbit
+    from:
+      - input: book
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: The Hobbit
+  method: GET
+  target: http://localhost:8186/loans/3310
+  address: http://localhost:8186/loans/3310
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8186/loans/3310
+now:
+  state:
+    id: 3310
+    title: The Hobbit
+    author: J. R. R. Tolkien
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /title:
+    - 6
+    - 7
+    - 21
+    - 22
+---
+at: '2026-11-12T18:36:04.588980Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8186/loans?name=The+Hobbit
+outcome: done
+address: http://localhost:8186/loans?name=The+Hobbit
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - The Hobbit
+---
+at: '2026-11-12T18:36:04.592248Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8186/
+outcome: done
+address: http://localhost:8186/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        hr:cancel:
+          - sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=
+        library:get-account:
+          - sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4=
+        library:get-loan:
+          - sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y=
+        library:get-member:
+          - sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y=
+        library:get-watch:
+          - sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI=
+        library:search-loans:
+          - sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+        library:search-members:
+          - sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18=
+        library:search-watches:
+          - sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno=
+        library:tell-me-when-renewable:
+          - sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=
+      digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+    - library:search-watches
+    - library:get-watch
+    - library:tell-me-when-renewable
+  links:
+    self:
+      - null
+    alternate:
+      - null
+      - null
+      - null
+      - null
+    service-desc:
+      - null
+    hr:keys:
+      - null
+    hr:affordances:
+      - null
+---
+at: '2026-11-12T18:36:04.595326Z'
+ms: 2
+mode: script
+say: act {relation}, name {name}
+inferred: search the loans for "The Hobbit"
+fromIntent: Search the loans for "The Hobbit", and open The Hobbit
+params:
+  relation: library:search-loans
+  name: The Hobbit
+values:
+  name:
+    value: The Hobbit
+    type: string
+    from:
+      - input: book
+      - step: 3
+        pointer: /title
+opens: true
+chose:
+  kind: form
+  relation: library:search-loans
+  title: Find loans by title
+  method: GET
+  target: /loans{?name}
+  address: http://localhost:8186/loans?name=The%20Hobbit
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+  act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:get-watch
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+    - library:search-watches
+    - library:tell-me-when-renewable
+  links:
+    - alternate
+    - hr:affordances
+    - hr:keys
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8186/loans?name=The+Hobbit
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - The Hobbit
+---
+at: '2026-11-12T18:36:04.599085Z'
+ms: 4
+mode: script
+say: follow {relation}, titled {title}
+intent: Search the loans for "The Hobbit", and open The Hobbit
+params:
+  relation: item
+  title: The Hobbit
+values:
+  title:
+    value: The Hobbit
+    from:
+      - input: book
+      - step: 3
+        pointer: /title
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: The Hobbit
+  method: GET
+  target: http://localhost:8186/loans/3310
+  address: http://localhost:8186/loans/3310
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8186/loans/3310
+now:
+  state:
+    id: 3310
+    title: The Hobbit
+    author: J. R. R. Tolkien
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /title:
+    - 21
+    - 22
+---
+at: '2026-11-12T18:36:04.606983Z'
+ms: 0
+mode: script
+say: check
+params:
+  facts:
+    - member: author
+      test: eq J. R. R. Tolkien
+      held: J. R. R. Tolkien
+      holds: true
+outcome: held
+address: http://localhost:8186/loans/3310
+now:
+  state:
+    id: 3310
+    title: The Hobbit
+    author: J. R. R. Tolkien
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T18:36:04.607251Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8186/loans?name=The+Hobbit
+outcome: done
+address: http://localhost:8186/loans?name=The+Hobbit
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - The Hobbit
+---
+at: '2026-11-12T18:36:04.610261Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8186/
+outcome: done
+address: http://localhost:8186/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        hr:cancel:
+          - sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=
+        library:get-account:
+          - sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4=
+        library:get-loan:
+          - sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y=
+        library:get-member:
+          - sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y=
+        library:get-watch:
+          - sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI=
+        library:search-loans:
+          - sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+        library:search-members:
+          - sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18=
+        library:search-watches:
+          - sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno=
+        library:tell-me-when-renewable:
+          - sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=
+      digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+    - library:search-watches
+    - library:get-watch
+    - library:tell-me-when-renewable
+  links:
+    self:
+      - null
+    alternate:
+      - null
+      - null
+      - null
+      - null
+    service-desc:
+      - null
+    hr:keys:
+      - null
+    hr:affordances:
+      - null
+---
+at: '2026-11-12T18:36:04.612625Z'
+ms: 5
+mode: script
+say: act {relation}, name {name}
+inferred: search the loans for "Matilda"
+fromIntent: Search the loans for "Matilda", and open Matilda
+params:
+  relation: library:search-loans
+  name: Matilda
+values:
+  name:
+    value: Matilda
+    type: string
+    from:
+      - input: renewable
+opens: true
+chose:
+  kind: form
+  relation: library:search-loans
+  title: Find loans by title
+  method: GET
+  target: /loans{?name}
+  address: http://localhost:8186/loans?name=Matilda
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+  act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:get-watch
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+    - library:search-watches
+    - library:tell-me-when-renewable
+  links:
+    - alternate
+    - hr:affordances
+    - hr:keys
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8186/loans?name=Matilda
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Matilda
+---
+at: '2026-11-12T18:36:04.619344Z'
+ms: 5
+mode: script
+say: follow {relation}, titled {title}
+intent: Search the loans for "Matilda", and open Matilda
+params:
+  relation: item
+  title: Matilda
+values:
+  title:
+    value: Matilda
+    from:
+      - input: renewable
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: Matilda
+  method: GET
+  target: http://localhost:8186/loans/3311
+  address: http://localhost:8186/loans/3311
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8186/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-11-12'
+    renewals: 2
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /title:
+    - 17
+    - 18
+---
+at: '2026-11-12T18:36:04.625840Z'
+ms: 8
+mode: script
+say: act {relation}
+intent: Renew it
+params:
+  relation: library:renew
+opens: true
+chose:
+  kind: form
+  relation: library:renew
+  title: Renew
+  method: POST
+  target: http://localhost:8186/loans/3311/actions/renew
+  address: http://localhost:8186/loans/3311/actions/renew
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-mKB6rkhzosKiuPOCcy+AO/8TOYuWyeVQhs5BrzlmKho=
+  if-match: '"seq-3.hsf.L0.5e02aebaa7e1acdf"'
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8186/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /title:
+    - 17
+    - 18
+---
+at: '2026-11-12T18:36:04.634403Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8186/loans/3311
+outcome: done
+address: http://localhost:8186/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T18:36:04.640198Z'
+ms: 0
+mode: script
+say: check
+params:
+  facts:
+    - member: due
+      test: isNot 2026-11-12
+      held: '2026-11-12'
+      holds: false
+outcome: failed
+address: http://localhost:8186/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T18:36:04.640695Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8186/
+outcome: done
+address: http://localhost:8186/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        hr:cancel:
+          - sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=
+        library:get-account:
+          - sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4=
+        library:get-loan:
+          - sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y=
+        library:get-member:
+          - sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y=
+        library:get-watch:
+          - sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI=
+        library:search-loans:
+          - sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+        library:search-members:
+          - sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18=
+        library:search-watches:
+          - sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno=
+        library:tell-me-when-renewable:
+          - sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=
+      digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+    - library:search-watches
+    - library:get-watch
+    - library:tell-me-when-renewable
+  links:
+    self:
+      - null
+    alternate:
+      - null
+      - null
+      - null
+      - null
+    service-desc:
+      - null
+    hr:keys:
+      - null
+    hr:affordances:
+      - null
+---
+at: '2026-11-12T18:36:04.642909Z'
+ms: 2
+mode: script
+say: act {relation}, name {name}
+inferred: search the loans for "Matilda"
+fromIntent: Search the loans for "Matilda", and open Matilda
+params:
+  relation: library:search-loans
+  name: Matilda
+values:
+  name:
+    value: Matilda
+    type: string
+    from:
+      - input: renewable
+      - step: 12
+        pointer: /title
+      - step: 13
+        pointer: /title
+opens: true
+chose:
+  kind: form
+  relation: library:search-loans
+  title: Find loans by title
+  method: GET
+  target: /loans{?name}
+  address: http://localhost:8186/loans?name=Matilda
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+  act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:get-watch
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+    - library:search-watches
+    - library:tell-me-when-renewable
+  links:
+    - alternate
+    - hr:affordances
+    - hr:keys
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8186/loans?name=Matilda
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Matilda
+---
+at: '2026-11-12T18:36:04.646244Z'
+ms: 4
+mode: script
+say: follow {relation}, titled {title}
+intent: Search the loans for "Matilda", and open Matilda
+params:
+  relation: item
+  title: Matilda
+values:
+  title:
+    value: Matilda
+    from:
+      - input: renewable
+      - step: 12
+        pointer: /title
+      - step: 13
+        pointer: /title
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: Matilda
+  method: GET
+  target: http://localhost:8186/loans/3311
+  address: http://localhost:8186/loans/3311
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8186/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T18:36:04.655130Z'
+ms: 0
+mode: script
+say: act {relation}
+intent: Renew it
+params:
+  relation: library:renew
+outcome: refused
+address: http://localhost:8186/loans/3311
+refused:
+  kind: not offered
+  by: the client
+  detail: It has been renewed 3 times, the most allowed.
+---
+at: '2026-11-12T18:36:04.655662Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8186/
+outcome: done
+address: http://localhost:8186/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        hr:cancel:
+          - sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=
+        library:get-account:
+          - sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4=
+        library:get-loan:
+          - sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y=
+        library:get-member:
+          - sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y=
+        library:get-watch:
+          - sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI=
+        library:search-loans:
+          - sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+        library:search-members:
+          - sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18=
+        library:search-watches:
+          - sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno=
+        library:tell-me-when-renewable:
+          - sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=
+      digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+    - library:search-watches
+    - library:get-watch
+    - library:tell-me-when-renewable
+  links:
+    self:
+      - null
+    alternate:
+      - null
+      - null
+      - null
+      - null
+    service-desc:
+      - null
+    hr:keys:
+      - null
+    hr:affordances:
+      - null
+---
+at: '2026-11-12T18:36:04.657973Z'
+ms: 2
+mode: script
+say: act {relation}, name {name}
+inferred: search the loans for "The Hobbit"
+fromIntent: Search the loans for "The Hobbit", and open The Hobbit
+params:
+  relation: library:search-loans
+  name: The Hobbit
+values:
+  name:
+    value: The Hobbit
+    type: string
+    from:
+      - input: book
+      - step: 3
+        pointer: /title
+      - step: 7
+        pointer: /title
+opens: true
+chose:
+  kind: form
+  relation: library:search-loans
+  title: Find loans by title
+  method: GET
+  target: /loans{?name}
+  address: http://localhost:8186/loans?name=The%20Hobbit
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+  act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:get-watch
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+    - library:search-watches
+    - library:tell-me-when-renewable
+  links:
+    - alternate
+    - hr:affordances
+    - hr:keys
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8186/loans?name=The+Hobbit
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - The Hobbit
+---
+at: '2026-11-12T18:36:04.661197Z'
+ms: 4
+mode: script
+say: follow {relation}, titled {title}
+intent: Search the loans for "The Hobbit", and open The Hobbit
+params:
+  relation: item
+  title: The Hobbit
+values:
+  title:
+    value: The Hobbit
+    from:
+      - input: book
+      - step: 3
+        pointer: /title
+      - step: 7
+        pointer: /title
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: The Hobbit
+  method: GET
+  target: http://localhost:8186/loans/3310
+  address: http://localhost:8186/loans/3310
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8186/loans/3310
+now:
+  state:
+    id: 3310
+    title: The Hobbit
+    author: J. R. R. Tolkien
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T18:36:04.666234Z'
+ms: 16
+mode: script
+say: act {relation}, problem {problem}, comment {comment}
+intent: Report missing-pages on it, saying "Pages 12 to 14."
+params:
+  relation: library:report-problem
+  problem: missing-pages
+  comment: Pages 12 to 14.
+values:
+  problem:
+    value: missing-pages
+    type: string
+    from:
+      - input: problem
+  comment:
+    value: Pages 12 to 14.
+    type: string
+    from:
+      - input: comment
+opens: true
+chose:
+  kind: form
+  relation: library:report-problem
+  title: Report a problem
+  method: POST
+  target: http://localhost:8186/loans/3310/actions/report-problem
+  address: http://localhost:8186/loans/3310/actions/report-problem
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+  act: sha256-M7uvJU9wvS8gI9X3f9Fh2oELWtan92UFPWZES08rYYo=
+  if-match: '"seq-1.hsf.L0.a58d803458b418b3"'
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8186/loans/3310
+now:
+  state:
+    id: 3310
+    title: The Hobbit
+    author: J. R. R. Tolkien
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+    reported:
+      problem: missing-pages
+      comment: Pages 12 to 14.
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T18:36:04.684210Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8186/loans/3310
+outcome: done
+address: http://localhost:8186/loans/3310
+now:
+  state:
+    id: 3310
+    title: The Hobbit
+    author: J. R. R. Tolkien
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+    reported:
+      problem: missing-pages
+      comment: Pages 12 to 14.
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T18:36:04.689317Z'
+ms: 0
+mode: script
+say: check
+params:
+  facts:
+    - member: /reported/problem
+      test: eq missing-pages
+      held: missing-pages
+      holds: true
+outcome: held
+address: http://localhost:8186/loans/3310
+now:
+  state:
+    id: 3310
+    title: The Hobbit
+    author: J. R. R. Tolkien
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+    reported:
+      problem: missing-pages
+      comment: Pages 12 to 14.
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T18:36:04.689421Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8186/loans?name=The+Hobbit
+outcome: done
+address: http://localhost:8186/loans?name=The+Hobbit
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - The Hobbit
+---
+at: '2026-11-12T18:36:04.691561Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8186/
+outcome: done
+address: http://localhost:8186/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        hr:cancel:
+          - sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=
+        library:get-account:
+          - sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4=
+        library:get-loan:
+          - sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y=
+        library:get-member:
+          - sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y=
+        library:get-watch:
+          - sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI=
+        library:search-loans:
+          - sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+        library:search-members:
+          - sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18=
+        library:search-watches:
+          - sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno=
+        library:tell-me-when-renewable:
+          - sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=
+      digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+    - library:search-watches
+    - library:get-watch
+    - library:tell-me-when-renewable
+  links:
+    self:
+      - null
+    alternate:
+      - null
+      - null
+      - null
+      - null
+    service-desc:
+      - null
+    hr:keys:
+      - null
+    hr:affordances:
+      - null

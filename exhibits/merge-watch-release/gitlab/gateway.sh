@@ -15,5 +15,7 @@ export UPSTREAM_URL="http://$host:8929/api/v4" UPSTREAM_AUTH=bearer UPSTREAM_TOK
 # The gateway keeps only each client token's SHA-256.
 HEART_AUTH_BEARER_TOKENS=$(printf '%s' gitlab-token | shasum -a 256 | cut -d' ' -f1)
 export HEART_AUTH_BEARER_TOKENS PORT=8094
-export JAVA_HOME=${JAVA_HOME:-$HOME/.sdkman/candidates/java/25.3.4+1.r25-graal}
+# The JDK this Mac runs with, when it is there; elsewhere, JAVA_HOME as set, or the java on the PATH (22 or newer).
+mac_java=$HOME/.sdkman/candidates/java/25.3.4+1.r25-graal
+[ -n "${JAVA_HOME:-}" ] || [ ! -d "$mac_java" ] || export JAVA_HOME="$mac_java"
 exec "$root/heart/heart-gateway/build/install/heart-gateway/bin/heart-gateway"

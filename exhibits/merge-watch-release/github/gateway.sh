@@ -16,5 +16,7 @@ HEART_AUTH_BEARER_TOKENS=$(printf '%s' github-token | shasum -a 256 | cut -d' ' 
 export UPSTREAM_TOKEN HEART_AUTH_BEARER_TOKENS PORT=8093
 export GATEWAY_CONNECTOR="$connector" UPSTREAM_SPEC="$spec" UPSTREAM_URL=https://api.github.com UPSTREAM_AUTH=bearer
 export GATEWAY_RECORD=${GATEWAY_RECORD:-$here/../work/github-upstream.yaml}
-export JAVA_HOME=${JAVA_HOME:-$HOME/.sdkman/candidates/java/25.3.4+1.r25-graal}
+# The JDK this Mac runs with, when it is there; elsewhere, JAVA_HOME as set, or the java on the PATH (22 or newer).
+mac_java=$HOME/.sdkman/candidates/java/25.3.4+1.r25-graal
+[ -n "${JAVA_HOME:-}" ] || [ ! -d "$mac_java" ] || export JAVA_HOME="$mac_java"
 exec "$root/heart/heart-gateway/build/install/heart-gateway/bin/heart-gateway"
