@@ -10,6 +10,18 @@ Docker container on your machine, on an empty GitHub repository of yours, with y
 - A GitHub account.
 - An Anthropic API key (console.anthropic.com).
 
+### On Windows
+
+Use WSL 2 with Ubuntu, and do everything below inside Ubuntu, not in PowerShell:
+
+- **Clone inside Ubuntu**, in your home folder (`cd ~`), with Ubuntu's own git. A clone under `/mnt/c` is slow to
+  build from, and one made by Git for Windows may not run.
+- **Docker:** either Docker Desktop with WSL integration turned on for your Ubuntu (Settings, Resources, WSL
+  integration), or Docker inside Ubuntu: `sudo apt install docker.io docker-buildx`, then
+  `sudo usermod -aG docker $USER` and open a new terminal. Without `docker-buildx` the build stops with "the
+  --mount option requires BuildKit".
+- **Memory** for WSL is set in `%UserProfile%\.wslconfig` (`[wsl2]`, `memory=8GB`), not in Docker Desktop.
+
 ## Set up, once
 
 1. **On GitHub, create an empty repository**, named `kit-trial` say. Leave everything as it is: no README, no
@@ -114,7 +126,7 @@ first, since a new fork has them off. With both unset, the bootstrap takes your 
 - `stopped … by its guard`: the replay found a form that differs from the pins, and sent nothing. Walk the goal
   again and keep it, or replay with `--guard lenient`.
 - `GITHUB_TOKEN can't read …`: check `OWNER`, `REPO`, and that the token was given that repository.
-- The build is killed: give Docker more memory, in Docker Desktop's Settings, under Resources.
+- The build is killed: give Docker more memory, in Docker Desktop's Settings, under Resources (on Windows, in `.wslconfig`).
 - The gateway's log is `work/runs/gateway.log`.
 
 ## Known limits
