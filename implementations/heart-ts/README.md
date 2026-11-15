@@ -1,12 +1,12 @@
 # heart-ts
 
 A small HEART client in TypeScript. Give it one address, and it finds out what a
-service offers and how to act on it, with no generated code and no knowledge of
-the service ahead of time.
+service offers and how to act on it:
 
-It was written from the specification (`spec/SPEC.md`), so it shows that the
-specification is enough to write a client from. It is by the same author as
-ARTIE, so it is not an independent implementation.
+- No generated code, and no knowledge of the service ahead of time.
+- It was written from the specification (`spec/SPEC.md`), so it shows that the specification is enough to write a
+  client from.
+- It is by the same author as ARTIE, so it is not an independent implementation.
 
 ## A first run
 
@@ -37,8 +37,33 @@ try {
 }
 ```
 
-Nothing there names an address beyond the bookmark. Each act comes from a form the
-last answer offered, and the client fills in the target, the method and `If-Match`.
+- Nothing there names an address beyond the bookmark.
+- Each act comes from a form the last answer offered.
+- The client fills in the target, the method and `If-Match`.
+
+<details>
+<summary>Diagram: an act, from the form offered to the answer</summary>
+
+```mermaid
+flowchart TD
+    A["act(name, fields)"] --> O{"Is the form offered now?"}
+    O -- no --> N1["Error, nothing sent"]
+    O -- yes --> C{"Is every value among its choices (hr:options)?"}
+    C -- no --> N2["Refused not-a-choice, nothing sent"]
+    C -- yes --> S{"Do the fields fit the declared schema?"}
+    S -- no --> N3["Refused outside-schema, nothing sent"]
+    S -- yes --> T["Fill the target from the form"]
+    T --> G{"Is the form's method GET?"}
+    G -- yes --> R["Read the filled target"]
+    G -- no --> M["Send the form's method with If-Match, the ETag held"]
+    M --> K{"2xx?"}
+    K -- yes --> H["Hold the answer (if empty, read the resource, or after DELETE hold it as gone)"]
+    K -- no --> P{"409 or 412?"}
+    P -- yes --> RR["Read the resource again, then refuse"]
+    P -- no --> RF["Refuse by status and problem type"]
+```
+
+</details>
 
 ## What it does
 
@@ -52,8 +77,8 @@ last answer offered, and the client fills in the target, the method and `If-Matc
 
 ## Rungs and dialects
 
-Ask for a rung, and the client takes the real one from each answer. If a service
-ignores the request, the client carries on at the rung the service gave.
+- Ask for a rung, and the client takes the real one from each answer.
+- If a service ignores the request, the client carries on at the rung the service gave.
 
 | Rung | The client asks for | What comes back |
 |---|---|---|
@@ -64,8 +89,35 @@ ignores the request, the client carries on at the rung the service gave.
 Shared layers are immutable. The client checks each against its integrity value,
 and never reads the same one twice.
 
-Two dialects are spoken. `hal-schema-forms` is the default and works at every rung.
-`hal-forms` is the L0 on-ramp, and it is what Spring HATEOAS produces:
+<details>
+<summary>Diagram: a read at L2, with its shared layers</summary>
+
+```mermaid
+sequenceDiagram
+    participant Client as heart-ts
+    participant Service
+    Client->>Service: GET the resource, Accept-Profile and Prefer forms=link, schema=link
+    Service-->>Client: state, links, the hr:forms link with its integrity, Preference-Applied
+    Note over Client: the rung is what Preference-Applied says, not what was asked
+    alt affordance set not yet held for that integrity
+        Client->>Service: GET the affordance set
+        Service-->>Client: the set's bytes
+        Note over Client: bytes must match the link's integrity, or IntegrityFailure
+    end
+    loop each form whose schema is a $ref with hr:integrity
+        alt schema not yet held for that integrity
+            Client->>Service: GET the schema
+            Service-->>Client: the schema's bytes, checked the same way
+        end
+    end
+```
+
+</details>
+
+Two dialects are spoken:
+
+- `hal-schema-forms` is the default and works at every rung.
+- `hal-forms` is the L0 on-ramp, and it is what Spring HATEOAS produces:
 
 ```ts
 const client = new HeartClient({ dialect: "hal-forms" });
@@ -73,11 +125,12 @@ const client = new HeartClient({ dialect: "hal-forms" });
 
 Whichever one you ask for, the client reads the dialect the answer is in.
 
-An answer that names no HEART profile, such as plain `application/json`, is read
-as data only: its state, and no forms, links or embedded resources. Ask for plain
-JSON with `dialect: "json"`. When a service later names its profile, the same
-client takes the controls it offers, with no change of its own: the upgrade is the
-service's, and optional.
+An answer that names no HEART profile, such as plain `application/json`:
+
+- It is read as data only: its state, and no forms, links or embedded resources.
+- Ask for plain JSON with `dialect: "json"`.
+- When a service later names its profile, the same client takes the controls it offers, with no change of its own:
+  the upgrade is the service's, and optional.
 
 ## When an act is refused
 
@@ -98,10 +151,12 @@ Every refusal is a `Refused`, with a `kind`, a `status`, a `message` and any
 
 A shared layer whose bytes do not match its link throws `IntegrityFailure`.
 
-The check before sending refuses only what a schema disallows. Undeclared
-properties pass, and nothing is coerced or defaulted. If a schema cannot be
-compiled, the act goes to the service anyway, and the failure is noted once in
-`schemaFailures`. The service stays the authority.
+The check before sending refuses only what a schema disallows:
+
+- Undeclared properties pass, and nothing is coerced or defaulted.
+- If a schema cannot be compiled, the act goes to the service anyway, and the failure is noted once in
+  `schemaFailures`.
+- The service stays the authority.
 
 ## Options
 
@@ -114,21 +169,21 @@ compiled, the act goes to the service anyway, and the failure is noted once in
 | `schemaFailures` | An array that collects schemas that could not be compiled |
 | `setCache` | Anything with `get` and `set`, to share shared layers between clients |
 
-Give clients one `setCache` only if they may all read the same layers: a client
-finds what another read, and sends no request. A `Map` never shrinks, so a
-long-running process that meets many services should pass something with a limit.
+- Give clients one `setCache` only if they may all read the same layers: a client finds what another read, and
+  sends no request.
+- A `Map` never shrinks, so a long-running process that meets many services should pass something with a limit.
 
 ## Tests
 
-The tests are the scenarios in `../conformance/features`, which drive this client
-through its public interface. They replay exchanges recorded from a real garden,
-so they run offline. In this folder:
+- The tests are the scenarios in `../conformance/features`, which drive this client through its public interface.
+- They replay exchanges recorded from a real garden, so they run offline.
+
+In this folder:
 
 ```bash
 npm run lint       # ESLint, tsc, dependency-cruiser, Knip
 npm run mutation   # Stryker, which edits src/ while it runs
 ```
 
-To run the same scenarios against a live garden, use `../conformance/run.sh`.
-When the garden's representations change, record them again with
-`../conformance/record.sh`.
+- To run the same scenarios against a live garden, use `../conformance/run.sh`.
+- When the garden's representations change, record them again with `../conformance/record.sh`.

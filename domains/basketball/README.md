@@ -4,9 +4,10 @@ A HEART domain server (spec/PLAN-HEART-LIBRARY-DOMAINS-EVAL.md, B2): its domain
 code and one declaration. The HEART library (`heart/`) serves it over HTTP and
 CoAP; it has no controllers.
 
-A game is one resource, `/games/{id}`. Its state is the score, the period,
-possession, every player's points and fouls, each team's fouls this half,
-and the scoring plays. What may be recorded depends on the game's phase:
+- A game is one resource, `/games/{id}`.
+- Its state is the score, the period, possession, every player's points and fouls, each team's fouls this half,
+  and the scoring plays.
+- What may be recorded depends on the game's phase:
 
 | Phase | Offered |
 |---|---|
@@ -17,10 +18,32 @@ and the scoring plays. What may be recorded depends on the game's phase:
 | `FULL_TIME` | final-whistle |
 | `FINAL` | nothing |
 
-Youth rules: four periods; a player fouls out at 5 personal fouls; a team is
-in the bonus once the other team has 7 fouls in the half (team fouls reset at
-half time). A player not on the roster, or fouled out, is refused with 422 at
-`/playerNumber`; only a scoring play can be taken back, once.
+<details>
+<summary>Diagram: how acts move a game through its phases</summary>
+
+```mermaid
+flowchart TD
+    SCHEDULED -- tip-off --> LIVE
+    LIVE -- call-timeout --> TIMEOUT
+    TIMEOUT -- resume-play --> LIVE
+    LIVE -- end-period --> P{"Fourth period played?"}
+    P -- no --> BREAK
+    BREAK -- start-period --> LIVE
+    P -- yes --> FULL_TIME
+    FULL_TIME -- final-whistle --> FINAL
+```
+
+The other acts offered in `LIVE` and `TIMEOUT` leave the phase as it is.
+
+</details>
+
+Youth rules:
+
+- Four periods.
+- A player fouls out at 5 personal fouls.
+- A team is in the bonus once the other team has 7 fouls in the half (team fouls reset at half time).
+- A player not on the roster, or fouled out, is refused with 422 at `/playerNumber`.
+- Only a scoring play can be taken back, once.
 
 ## Code
 
@@ -45,6 +68,9 @@ set -a; . ./.env; set +a           # the service admits only that token, and wil
 Every state, act and the bookmark need the credential (SPEC §6.13). ARTIE and
 heart-mcp find it in `~/.artie/credentials`.
 
-Tests: `./gradlew test` runs the game rules (`game.feature`), the HEART
-conformance features (`RunHeartTckTest`), the architecture rules, and the
-whole server on Postgres in Testcontainers.
+Tests: `./gradlew test` runs:
+
+- the game rules (`game.feature`);
+- the HEART conformance features (`RunHeartTckTest`);
+- the architecture rules;
+- the whole server on Postgres in Testcontainers.

@@ -1,9 +1,11 @@
 # The merge watch, rerun on heart-sims' GitHub
 
-`merge.goal.md`, the merge watch's goal, pointed at heart-sims' small GitHub (`http://localhost:8098/`, run as
-`docker run -p 8098:8099 heart-sims 8099 github.test`), rerun on 2026-11-02 so its capture keeps the watch as data
-(spec/PLAN-KEPT-SCRIPTS-AS-DATA.md). Pull request 482 was labelled `dependencies` first; the watch's issue was closed
-by hand once 482 was merged, as a person would.
+`merge.goal.md`, the merge watch's goal, pointed at heart-sims' small GitHub:
+
+- The small GitHub is at `http://localhost:8098/`, run as `docker run -p 8098:8099 heart-sims 8099 github.test`.
+- Rerun on 2026-11-02 so its capture keeps the watch as data (spec/PLAN-KEPT-SCRIPTS-AS-DATA.md).
+- Pull request 482 was labelled `dependencies` first.
+- The watch's issue was closed by hand once 482 was merged, as a person would.
 
 | File | What |
 |---|---|

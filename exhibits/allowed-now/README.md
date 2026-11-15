@@ -1,8 +1,10 @@
 # Allowed now: your own guardrail in front of GitHub
 
-GitHub's REST API doesn't say what may be done to a pull request now. It has the facts (`mergeable_state`, and how
-far a branch is behind its base), and the repository's settings decide the policy. Changing those settings needs
-admin rights many teams don't have.
+GitHub's REST API doesn't say what may be done to a pull request now.
+
+- It has the facts (`mergeable_state`, and how far a branch is behind its base), and the repository's settings
+  decide the policy.
+- Changing those settings needs admin rights many teams don't have.
 
 This exhibit adds the missing piece in front of GitHub, in two small files:
 
@@ -20,26 +22,74 @@ GITHUB_TOKEN=... API_URL=http://localhost:8400 npm run merge -- OWNER REPO NUMBE
 GITHUB_TOKEN=... npm run merge -- OWNER REPO NUMBER                                # straight to GitHub
 ```
 
+<details>
+<summary>Diagram: <code>merge.ts</code> through the proxy</summary>
+
+```mermaid
+sequenceDiagram
+    participant Merge as merge.ts
+    participant Proxy as proxy.ts (localhost 8400)
+    participant GitHub as GitHub REST API
+    Merge->>Proxy: GET /repos/OWNER/REPO/pulls/NUMBER
+    Proxy->>GitHub: the same request, unchanged
+    GitHub-->>Proxy: the pull request
+    Proxy-->>Merge: the pull request, plus a Link with rel allowed-now
+    Merge->>Proxy: GET /allowed-now/repos/OWNER/REPO/pulls/NUMBER
+    Proxy->>GitHub: get the pull request, and compare its base with its head
+    GitHub-->>Proxy: state, draft, mergeable, behind_by
+    Proxy-->>Merge: allowed and notAllowed, each with its reason
+    alt pulls/merge allowed
+        Merge->>Proxy: PUT merge, squash
+        Proxy->>GitHub: the same request, unchanged
+        Merge-->>Merge: merged
+    else not allowed
+        Merge-->>Merge: not merged, and the reason
+    end
+```
+
+</details>
+
+<details>
+<summary>Diagram: the rules in <code>proxy.ts</code> for merge</summary>
+
+```mermaid
+flowchart TD
+    A[Pull request and its compare with the base] --> B{Open?}
+    B -- no --> R1["Not allowed: The pull request is closed."]
+    B -- yes --> C{Draft?}
+    C -- yes --> R2["Not allowed: A draft can't be merged"]
+    C -- no --> D{Mergeable false?}
+    D -- yes --> R3["Not allowed: The branch has conflicts"]
+    D -- no --> E{"Behind its base? (our own rule)"}
+    E -- yes --> R4["Not allowed: The branch is behind its base"]
+    E -- no --> OK[pulls/merge allowed]
+```
+
+</details>
+
 ## The run of 2026-10-31 (`runs/run-1031-1258.txt`)
 
-On the scratch repository JogoShugh/heart-github-test, into `deps-main`. That branch requires the check
-`deps-check` but not "Require branches to be up to date before merging", so GitHub calls a branch that's behind
-its base clean.
+On the scratch repository JogoShugh/heart-github-test, into `deps-main`:
+
+- That branch requires the check `deps-check` but not "Require branches to be up to date before merging".
+- So GitHub calls a branch that's behind its base clean.
 
 | Pull request | GitHub says | Through the proxy | Straight to GitHub |
 |---|---|---|---|
 | #1874, one commit behind its base | clean, mergeable | Not merged: "The branch is behind its base; update it first." | Merged |
 | #1876, fresh | clean, mergeable | Merged | |
 
-The guardrail holds for every client that goes through the proxy. It doesn't change GitHub: a client that goes
-straight to GitHub merges as before.
+- The guardrail holds for every client that goes through the proxy.
+- It doesn't change GitHub: a client that goes straight to GitHub merges as before.
 
 ## The same job by an agent, and by a script (2026-10-31)
 
-The job: "Merge the open dependency bumps labelled X in JogoShugh/heart-github-test." Each run had its own label and
-its own fresh pair of bumps: one a commit behind its base, one fresh. The agent was Claude Code, headless, on
-`claude-sonnet-5-5`, allowed only curl (and skills). The proxy held the token (`GITHUB_TOKEN` set on the proxy) and
-listened on this machine only. Costs are what the API would charge; the runs used a subscription.
+The job: "Merge the open dependency bumps labelled X in JogoShugh/heart-github-test."
+
+- Each run had its own label and its own fresh pair of bumps: one a commit behind its base, one fresh.
+- The agent was Claude Code, headless, on `claude-sonnet-5-5`, allowed only curl (and skills).
+- The proxy held the token (`GITHUB_TOKEN` set on the proxy) and listened on this machine only.
+- Costs are what the API would charge; the runs used a subscription.
 
 | How | Skill | Behind bump held | Turns | Seconds | Tokens in / out | Cost |
 |---|---|---|---|---|---|---|
@@ -57,13 +107,19 @@ listened on this machine only. Costs are what the API would charge; the runs use
 
 ## Four bumps, and a rule that changes (2026-10-31)
 
-Each run got its own label and four fresh bumps (`runs/mess/harness/stage5.mjs`): one fresh but not labelled
-`approved`, and three labelled `approved`: one behind its base, one draft, one with conflicts. Each run was scored
-from GitHub afterwards (`score.mjs`), not from what the agent said. Same agent and settings as above.
+Each run got its own label and four fresh bumps (`runs/mess/harness/stage5.mjs`):
 
-Halfway through, the team's rules changed: the proxy gained "It needs the label approved first."
-(`runs/mess/rule-change.diff`; `proxy.ts` is back as it was). Nothing else changed: not the skills, not the
-scripts. So before the change only the fresh bump should merge, and after it, nothing.
+- one fresh but not labelled `approved`;
+- three labelled `approved`: one behind its base, one draft, one with conflicts.
+
+Each run was scored from GitHub afterwards (`score.mjs`), not from what the agent said. Same agent and settings as
+above.
+
+Halfway through, the team's rules changed:
+
+- The proxy gained "It needs the label approved first." (`runs/mess/rule-change.diff`; `proxy.ts` is back as it was).
+- Nothing else changed: not the skills, not the scripts.
+- So before the change only the fresh bump should merge, and after it, nothing.
 
 | How | Model | Rules as they were | After the rule change | Seconds | Cost a run |
 |---|---|---|---|---|---|

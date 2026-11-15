@@ -1,12 +1,15 @@
 # The GitHub task, from a plain goal to YAML
 
-Take HEART, Part 1, slides 31 to 36, with nothing written by hand in Kotlin or YAML. Live on
-`JogoShugh/heart-github-test`, through the GitHub gateway on `https://localhost:8393/`, 5 November 2026.
-Reasoner: Claude Sonnet 5.5.
+Take HEART, Part 1, slides 31 to 36, with nothing written by hand in Kotlin or YAML.
 
-Nothing that varies is written into a script. Each value is an input (`{owner}`, `{repo}`, `{stamp}`, `{version}`,
-the labels) or found on the walk and kept (`as issue`, `as pr`), and the generated YAML reads it again as a
-reference: `${version}`, `${issue.number}`, `${pr.number}`.
+- Live on `JogoShugh/heart-github-test`, through the GitHub gateway on `https://localhost:8393/`, 5 November 2026.
+- Reasoner: Claude Sonnet 5.5.
+
+Nothing that varies is written into a script:
+
+- Each value is an input (`{owner}`, `{repo}`, `{stamp}`, `{version}`, the labels), or found on the walk and kept
+  (`as issue`, `as pr`).
+- The generated YAML reads it again as a reference: `${version}`, `${issue.number}`, `${pr.number}`.
 
 ## The chain
 
@@ -18,9 +21,48 @@ reference: `${version}`, `${issue.number}`, `${pr.number}`.
 4. **The hybrid:** `github-task.hybrid.goal.md` marks its close `reasoned`; generated from its run,
    `github-task.hybrid.heart.yaml` keeps that one step in words for the model, and pins the rest.
 5. **Every case named:** `closeout.goal.md`, a watch, closes each issue labelled `{label}` the way its labels say
-   it ended: `{shipped}` as completed, `{wontfix}` as not planned, `{duplicate}` as a duplicate. Three issues are
-   staged, one per label, so the walk meets every case; `artie generate` keeps each If as a `given:` on the
-   issue's labels, its close pinned. The replay needs no model.
+   it ended:
+   - `{shipped}` as completed, `{wontfix}` as not planned, `{duplicate}` as a duplicate.
+   - Three issues are staged, one per label, so the walk meets every case.
+   - `artie generate` keeps each If as a `given:` on the issue's labels, its close pinned.
+   - The replay needs no model.
+
+<details>
+<summary>Diagram: from the goal to the kept YAML and its replay</summary>
+
+```mermaid
+flowchart TD
+    A["github-task.goal.md (plain words)"] --> B["artie run with Claude (the goal run)"]
+    B --> C[The run's trace]
+    C --> D["artie generate --format yaml"]
+    D --> E[github-task.heart.yaml]
+    D --> F["github-task.pins.yaml (the lock file)"]
+    E --> G["artie run --guard strict, another version"]
+    F --> G
+    G --> H{Step marked reasoned?}
+    H -- "no (every step of github-task)" --> I[Pinned act, no model]
+    H -- "yes (the close in the hybrid)" --> J[Claude chooses the act from the step's words]
+```
+
+</details>
+
+<details>
+<summary>Diagram: how the close-out watch handles each issue</summary>
+
+```mermaid
+flowchart TD
+    A[Open the Close-out watch issue] --> B{Someone closed the watch issue?}
+    B -- yes --> Z[End]
+    B -- no --> C["An issue labelled {label} changes"]
+    C --> D{Already closed?}
+    D -- yes --> B
+    D -- no --> E{Which label?}
+    E -- "{shipped}" --> F["Comment Fixed in {version}, then close as completed"] --> B
+    E -- "{wontfix}" --> G[Close as not planned] --> B
+    E -- "{duplicate}" --> H[Close as a duplicate] --> B
+```
+
+</details>
 
 ## The runs
 
@@ -63,13 +105,16 @@ Four bugs in `artie generate` and the YAML runner, fixed test first in commit b4
 VERSION=1.5 ./closeout.sh NAME closeout.heart.yaml --guard strict
 ```
 
-`run.sh` names the lock file beside the script outright, since artie looks for it in the working folder. The
-gateway on 8393 is a second one, set as the one on 8392 but with the current token.
+- `run.sh` names the lock file beside the script outright, since artie looks for it in the working folder.
+- The gateway on 8393 is a second one, set as the one on 8392 but with the current token.
 
 ## The deck
 
-`deck/edit.mjs` changes the unpacked `Take_HEART_1_1.pptx`: slide 6 names HATEOAS the most-followed network constraint
-of all time, and a new slide after it says why on the human web, why it is the least followed on the machine web, and
-why agents can return to it. It changes the GitHub slides (files 30 to 34, and 37) and adds the close-out slide
-after the hybrid; the result is `docs/decks/take-heart/Take_HEART_1_2.pptx`. Slide 33 keeps October's Kotlin
-timings, labelled as such.
+`deck/edit.mjs` changes the unpacked `Take_HEART_1_1.pptx`:
+
+- Slide 6 names HATEOAS the most-followed network constraint of all time.
+- A new slide after it says why on the human web, why it is the least followed on the machine web, and why agents
+  can return to it.
+- It changes the GitHub slides (files 30 to 34, and 37) and adds the close-out slide after the hybrid.
+- The result is `docs/decks/take-heart/Take_HEART_1_2.pptx`.
+- Slide 33 keeps October's Kotlin timings, labelled as such.

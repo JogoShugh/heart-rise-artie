@@ -1,9 +1,11 @@
 # heart-coap
 
-HEART over CoAP (RFC 7252, SPEC §6.0.1) on Eclipse Californium. A Spring Boot
-auto-configuration (`HeartCoapAutoConfiguration`) starts a CoAP server on UDP
-that serves the same `HeartResource` beans as `heart-spring`, at the same
-paths, in HAL Schema Forms only.
+HEART over CoAP (RFC 7252, SPEC §6.0.1) on Eclipse Californium:
+
+- A Spring Boot auto-configuration (`HeartCoapAutoConfiguration`) starts a CoAP
+  server on UDP.
+- It serves the same `HeartResource` beans as `heart-spring`, at the same paths,
+  in HAL Schema Forms only.
 
 ## How HTTP maps to CoAP
 

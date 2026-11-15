@@ -1,16 +1,18 @@
 # The seed bench
 
 A greenhouse bench, played on the scratch repository `JogoShugh/heart-github-test` through the HEART gateway
-(spec/PLAN-SEED-BENCH.md). The goal file, `../goal-syntax/goals/seed-bench.goal.md`, says in plain words what a
-watch over the bench should do:
+(spec/PLAN-SEED-BENCH.md).
+
+The goal file, `../goal-syntax/goals/seed-bench.goal.md`, says in plain words what a watch over the bench should do:
 
 - answer each alert from the bench sensors once, and hand it to the grower on duty;
 - merge each sowing plan once it passes the bench check, and say why when it can't;
 - close each tray once it is transplanted;
 - leave alone anything a person labels `hold`.
 
-ARTIE runs it with Claude deciding each part once, the first time it comes up. `artie generate` writes those
-decisions as a script, `generated/seed-bench.kts`, and the script then does the same work alone, with no model.
+- ARTIE runs it with Claude deciding each part once, the first time it comes up.
+- `artie generate` writes those decisions as a script, `generated/seed-bench.kts`.
+- The script then does the same work alone, with no model.
 
 ## The pieces
 

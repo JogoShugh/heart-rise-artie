@@ -1,10 +1,12 @@
 # Local model spike
 
-Phase 0 of `spec/PLAN-LOCAL-MODEL.md`, run 2026-10-30. Three models on this laptop were asked the reasoner's and
-the planner's prompts, in exactly the shape `ClaudeReasoner` and `ClaudePlanner` send them, through Ollama's
-Anthropic-compatible `/v1/messages`. Nothing in artie was changed or run: the point was to learn whether a local
-model answers the tool at all before touching code. The answers are in `captures.yaml`; what they taught is in the
-plan.
+Phase 0 of `spec/PLAN-LOCAL-MODEL.md`, run 2026-10-30.
+
+- Three models on this laptop were asked the reasoner's and the planner's prompts, in exactly the shape
+  `ClaudeReasoner` and `ClaudePlanner` send them, through Ollama's Anthropic-compatible `/v1/messages`.
+- Nothing in artie was changed or run: the point was to learn whether a local model answers the tool at all before
+  touching code.
+- The answers are in `captures.yaml`; what they taught is in the plan.
 
 ## What is here
 
@@ -12,8 +14,10 @@ plan.
   `ClaudeReasoner.kt`.
 - `planner-system.txt`, `planner-tool.json`: the planner's, from `ClaudePlanner.kt`, with every move allowed.
 - `turn-repo.txt`, `turn-merge.txt`, `turn-comment.txt`: three real reasoner turns taken from the goal run's trace
-  (`runs/first.yaml` of the README quick start): the first step at the bookmark, the merge of pull request 1781,
-  and the reasoned comment on the draft 1782.
+  (`runs/first.yaml` of the README quick start):
+  - the first step at the bookmark;
+  - the merge of pull request 1781;
+  - the reasoned comment on the draft 1782.
 - `turn-plan.txt`: one planner turn, built by hand in the planner's turn shape from the goal file and the pull
   request held at the merge step. The trace keeps the reasoner's turns, not the planner's, so this one is a
   reconstruction.
@@ -23,10 +27,36 @@ plan.
 - `wait-run.sh MODEL`: waits for `ollama list` to show the model, then runs all four.
 - `captures.yaml`: the requests, with the model name blanked, and every answer with its status and wall time.
 
+<details>
+<summary>Diagram: what <code>wait-run.sh</code> does</summary>
+
+```mermaid
+sequenceDiagram
+    participant Wait as wait-run.sh
+    participant Mk as mk.sh
+    participant Ask as ask.sh
+    participant Ollama as Ollama (localhost:11434)
+    loop every 15 s, until ollama list shows the model
+        Wait->>Ollama: ollama list
+    end
+    Wait->>Mk: MODEL
+    Mk-->>Wait: req-repo, req-merge, req-comment (reasoner), req-plan (planner)
+    loop repo, merge, comment, plan
+        Wait->>Ask: MODEL KIND
+        Ask->>Ollama: POST /v1/messages with req-KIND.json
+        Ollama-->>Ask: the answer and its status
+        Ask-->>Wait: status, wall time and the gist
+    end
+```
+
+</details>
+
 ## Running it again
 
-Ollama's Homebrew formula does not build on macOS 14 (it needs `python@3.15` from source, which fails on the
-Command Line Tools here), so the CLI tarball was used, with no application and no dialog:
+Ollama's Homebrew formula does not build on macOS 14:
+
+- It needs `python@3.15` from source, which fails on the Command Line Tools here.
+- So the CLI tarball was used, with no application and no dialog:
 
 ```
 mkdir -p ~/.local/ollama && cd ~/.local/ollama

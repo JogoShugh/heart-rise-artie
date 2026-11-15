@@ -3,10 +3,49 @@
 heart-mcp lets any MCP host, such as Claude Code, Claude Desktop or your own
 agent, work any HEART service.
 
-An MCP server usually hands the model a catalogue of what it can do in
-principle. heart-mcp hands it what is legal right now, for one resource in its
-current state. The model chooses. ARTIE, the HEART client, checks the choice
-and builds and sends every request.
+- An MCP server usually hands the model a catalogue of what it can do in
+  principle.
+- heart-mcp hands it what is legal right now, for one resource in its current
+  state.
+- The model chooses. ARTIE, the HEART client, checks the choice and builds and
+  sends every request.
+
+<details>
+<summary>Diagram: one act through heart-mcp</summary>
+
+```mermaid
+sequenceDiagram
+    participant Model as Model (in the MCP host)
+    participant MCP as heart-mcp
+    participant ARTIE
+    participant Service as HEART service
+    Model->>MCP: heart_look, then heart_follow
+    MCP->>ARTIE: enter bookmark, follow link
+    ARTIE->>Service: GET the resource, GET its forms
+    Service-->>ARTIE: state and ETag, offered acts and schemas
+    MCP-->>Model: state, acts, links (no URLs, no ETag)
+    Model->>MCP: heart_act with an act name and fields
+    MCP->>MCP: act offered? fields fit its schema?
+    alt not offered, or fields break the schema
+        MCP-->>Model: rejected-before-sending, nothing sent
+    else checks pass
+        MCP->>ARTIE: act
+        ARTIE->>Service: the act, with If-Match set to the ETag the model saw
+        alt 200
+            MCP-->>Model: acted, with the new state and acts
+        else 412, someone changed it first
+            ARTIE->>Service: GET it again
+            MCP-->>Model: stale, with the fresh resource
+        else 409, no longer legal
+            ARTIE->>Service: GET it again
+            MCP-->>Model: not-offered, with the fresh resource
+        else 422
+            MCP-->>Model: rule-refused or invalid-input
+        end
+    end
+```
+
+</details>
 
 - [docs/HOW-IT-WORKS.md](docs/HOW-IT-WORKS.md): how it works, with diagrams.
 - [PROOF.md](PROOF.md): the evidence from real runs against the garden,
@@ -99,10 +138,12 @@ claude mcp add heart -e HEART_BOOKMARKS=garden=http://localhost:8080/ \
 
 ### Credentials
 
-Every HEART service requires a credential (SPEC §6.13). heart-mcp reads it as
-ARTIE does, and the host's model never sees it: no tool takes one, and no result,
-error or event shows one. ARTIE adds it just above the wire, for the service's
-own origin only. In order, it reads:
+- Every HEART service requires a credential (SPEC §6.13).
+- heart-mcp reads it as ARTIE does, and the host's model never sees it: no tool
+  takes one, and no result, error or event shows one.
+- ARTIE adds it just above the wire, for the service's own origin only.
+
+In order, it reads:
 
 1. **Environment variables, named by origin.** `http://localhost:8080` reads
    `ARTIE_TOKEN_LOCALHOST_8080` (Bearer), or `ARTIE_USER_LOCALHOST_8080` and
@@ -124,6 +165,25 @@ own origin only. In order, it reads:
    logs in with `VAULT_TOKEN`, `~/.vault-token`, or an AppRole
    (`ARTIE_VAULT_ROLE_ID` and `ARTIE_VAULT_SECRET_ID_FILE`).
 
+<details>
+<summary>Diagram: where ARTIE finds the credential for an origin</summary>
+
+```mermaid
+flowchart TD
+    A[Request to a service origin] --> B{"Environment variables for the origin (ARTIE_TOKEN_ or ARTIE_USER_)?"}
+    B -- yes --> U[Use it]
+    B -- no --> C{"Section for the origin in the credentials file (ARTIE_HOME or ~/.artie)?"}
+    C -- yes --> U
+    C -- no --> D{ARTIE_VAULT_ADDR set?}
+    D -- no --> N[No credential]
+    D -- yes --> E{"Secret at secret/artie/host_port?"}
+    E -- yes --> U
+    E -- no --> N
+    U --> W[Added just above the wire, for that origin only]
+```
+
+</details>
+
 For the services in this repo, `scripts/dev-credentials.sh` makes one token per
 service and writes it to `~/.artie/credentials`. It never prints a token.
 
@@ -135,10 +195,12 @@ claude mcp add heart -- docker run -i --rm -v "$HOME/.artie-docker:/root/.artie:
   -e HEART_BOOKMARKS=garden=http://host.docker.internal:8080/ heart-mcp
 ```
 
-ARTIE's promise covers what passes through ARTIE. A host that also gives its
-model a shell on the same machine, as Claude Code does, lets that model read your
-environment and your files directly. Deny it reads of `~/.artie` and of the
-environment in the host's own settings, or keep credentials in Vault.
+ARTIE's promise covers what passes through ARTIE:
+
+- A host that also gives its model a shell on the same machine, as Claude Code
+  does, lets that model read your environment and your files directly.
+- Deny it reads of `~/.artie` and of the environment in the host's own settings,
+  or keep credentials in Vault.
 
 ## Use it from your own JVM code
 

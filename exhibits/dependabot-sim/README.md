@@ -1,10 +1,12 @@
 # A Dependabot stand-in, and a watch that merges its pull requests
 
 This is the Dependabot goal (`exhibits/goal-syntax/goals/dependabot.goal.md`), simulated on the scratch repository
-JogoShugh/heart-github-test with the author's own account. No Dependabot is involved: `bump.kts` opens pull requests
-the way Dependabot would, and labels them `dependabot`. `watch.kts` is the goal written by hand in heart-script,
-because the goal words Whenever, Until, Once, Otherwise and Give up don't exist yet. Each word is the loop or branch
-it will come down to (see the comment at the top of `watch.kts`).
+JogoShugh/heart-github-test with the author's own account.
+
+- No Dependabot is involved: `bump.kts` opens pull requests the way Dependabot would, and labels them `dependabot`.
+- `watch.kts` is the goal written by hand in heart-script, because the goal words Whenever, Until, Once, Otherwise and
+  Give up don't exist yet.
+- Each word is the loop or branch it will come down to (see the comment at the top of `watch.kts`).
 
 | Script | What it does | Through |
 |---|---|---|
@@ -21,10 +23,79 @@ artie run bump.kts owner=JogoShugh from=1.0.2 to=1.0.3 draft=true
 artie run watch.kts owner=JogoShugh gateway=https://localhost:8392/ every=10 giveUp=2 --rung L2
 ```
 
+<details>
+<summary>Diagram: who talks to whom</summary>
+
+```mermaid
+sequenceDiagram
+    actor Person as person.kts
+    participant Bump as bump.kts
+    participant Watch as watch.kts
+    participant Gateway as HEART gateway
+    participant GitHub
+    Bump->>GitHub: branch that bumps left-pad, pull request labelled dependabot (bare)
+    Watch->>Gateway: open the watch's issue
+    Gateway->>GitHub: create the issue
+    loop each look, every few seconds
+        Watch->>Gateway: open pull requests, newest updated first
+        Gateway->>GitHub: conditional requests with its copy's ETag
+        Gateway-->>Watch: each pull request, its labels, and github:merge offered or not
+        alt merge offered
+            Watch->>Gateway: github:merge by squashing
+        else gave up waiting
+            Watch->>Gateway: github:comment with the hr:unavailable reason
+        end
+        Watch->>Gateway: read the watch's issue (Until)
+    end
+    Person->>GitHub: add or remove hold, or close the watch's issue (bare)
+```
+
+</details>
+
+<details>
+<summary>Diagram: one look of <code>watch.kts</code></summary>
+
+```mermaid
+flowchart TD
+    A[Next open pull request, newest updated first] --> B{"None left, or older than the last look?"}
+    B -- yes --> W
+    B -- no --> C{"Labelled dependabot, not finished?"}
+    C -- no --> A
+    C -- yes --> D{Labelled hold?}
+    D -- yes --> E["Leave it alone, say so once"]
+    D -- no --> F[Taken up: waiting since now]
+    E --> A
+    F --> A
+    W[Next one waiting, read it again] --> G{Still open?}
+    G -- no --> X["Finished: closed or merged by someone else"]
+    G -- yes --> H{Labelled hold?}
+    H -- yes --> E2["Leave it alone, say so once"]
+    H -- no --> I{"Offers github:merge? (Once)"}
+    I -- yes --> J[Merge by squashing]
+    I -- no --> K{"Waited giveUp minutes, reason not passing? (Give up)"}
+    K -- no --> L[Wait for the next look]
+    K -- yes --> M{Already said by a watch?}
+    M -- no --> N["Comment the gateway's reason (Otherwise)"]
+    M -- yes --> O[Say nothing again]
+    J --> V
+    N --> V
+    O --> V
+    X --> V
+    E2 --> V
+    L --> V
+    V{More waiting?} -- yes --> W
+    V -- no --> P
+    P["Read the watch's issue (Until)"] --> Q{Still open?}
+    Q -- yes --> R[Sleep every seconds, look again]
+    Q -- no --> S[End]
+```
+
+</details>
+
 ## The run of 2026-10-23 (`runs/watch-1023-watch2.out`)
 
-The watch ran for about six minutes, looking every 10 seconds and giving up after 2 minutes. It ran 307 steps over
-23 looks.
+- The watch ran for about six minutes, looking every 10 seconds and giving up after 2 minutes.
+- It ran 307 steps over 23 looks.
 
 | Pull request | What happened to it | What the watch did |
 |---|---|---|
@@ -40,9 +111,11 @@ The reasons in the comments are the gateway's own (`hr:unavailable`), not writte
 
 ## The run with checks, and the rival (`runs/watch-1023-watch3.out`)
 
-`checks.kts` added the required check `deps-check`, which fails when a `.txt` file says "broken", and protected
-`deps-main` with it, for admins too. It also added the rival: an Actions workflow that runs `gh pr merge --auto`
-when a pull request is labelled `dependabot-actions`. Each bump wrote its own file, so the bumps didn't conflict.
+- `checks.kts` added the required check `deps-check`, which fails when a `.txt` file says "broken", and protected
+  `deps-main` with it, for admins too.
+- It also added the rival: an Actions workflow that runs `gh pr merge --auto` when a pull request is labelled
+  `dependabot-actions`.
+- Each bump wrote its own file, so the bumps didn't conflict.
 
 | Pull request | Labelled | What happened | Who merged it |
 |---|---|---|---|
@@ -52,20 +125,23 @@ when a pull request is labelled `dependabot-actions`. Each bump wrote its own fi
 | #690 | `dependabot-actions` | Auto-merge was turned on; GitHub merged it once the check passed | github-actions[bot] |
 | #691 | `dependabot-actions`, then `hold` | Auto-merge was on 10 seconds after the label. A person added `hold` at 16:52:36, but GitHub merged it anyway at 16:53:02 | github-actions[bot] |
 
-**The rival can't be told "no".** Once auto-merge is on, GitHub merges as soon as the check passes, and the
-person's `hold` counts for nothing. The watch reads the pull request again on each look, and acts only on what it
-holds now.
+**The rival can't be told "no".**
 
-**The watch had a fault, now fixed (`runs/watch-1023-watch4.out`).** When restarted, it took up the old pull
-requests again and commented on #682, #683 and #685 a second time. Now, before it comments, it reads the pull
-request's comments and says nothing that any watch has already said. It also no longer gives up on a passing
-reason ("GitHub is still checking… read it again shortly"), which once told #683 something untrue. A fourth watch,
-with a give-up time of 1 minute, said nothing new on any of them.
+- Once auto-merge is on, GitHub merges as soon as the check passes, and the person's `hold` counts for nothing.
+- The watch reads the pull request again on each look, and acts only on what it holds now.
+
+**The watch had a fault, now fixed (`runs/watch-1023-watch4.out`).**
+
+- When restarted, it took up the old pull requests again and commented on #682, #683 and #685 a second time.
+- Now, before it comments, it reads the pull request's comments and says nothing that any watch has already said.
+- It also no longer gives up on a passing reason ("GitHub is still checking… read it again shortly"), which once told
+  #683 something untrue.
+- A fourth watch, with a give-up time of 1 minute, said nothing new on any of them.
 
 ## The same watch in heart-script's own words (`watch-dsl.kts`, `runs/watch-dsl-1023-dsl2.out`)
 
-Since then heart-script has `watch`, `whenever` and `once` (`client/heart-script/.../Watching.kt`). `watch-dsl.kts`
-is the same goal written with them, with no loop, maps or clock of its own.
+Since then heart-script has `watch`, `whenever` and `once` (`client/heart-script/.../Watching.kt`).
+`watch-dsl.kts` is the same goal written with them, with no loop, maps or clock of its own.
 
 - **The first run was wrong, and only a note said so.** It checked Until from the pull request list, which doesn't
   offer `github:issues-get`. Each check was refused and noted, nobody saw the notes, and the watch kept going after
@@ -132,10 +208,12 @@ Each of the next live runs found something, and each was fixed with a test first
 
 ## Two Whenevers at once: Dependabot, and a security scan (`runs/goal-1024-g12.out` to `g18.out`)
 
-`dependabot-scan.goal.md` puts a second Whenever beside the Dependabot one: each issue a security scan opens,
-labelled `scan`, is answered once. `finding.kts` opens such an issue, as a veracode-bot would. Whenevers side by side
-are one watch, each a listener on a thread of its own with a client of its own (spec/PLAN-LISTENERS.md, slice 1).
-Each one's first look is made in turn, in the goal's order, and every look after replays.
+- `dependabot-scan.goal.md` puts a second Whenever beside the Dependabot one: each issue a security scan opens,
+  labelled `scan`, is answered once.
+- `finding.kts` opens such an issue, as a veracode-bot would.
+- Whenevers side by side are one watch, each a listener on a thread of its own with a client of its own
+  (spec/PLAN-LISTENERS.md, slice 1).
+- Each one's first look is made in turn, in the goal's order, and every look after replays.
 
 - **g12** stopped before its first look. The planner reached each list from the start, and Whenevers side by side
   were refused that. **Fixed:** each listener looks from where its own list is reached.

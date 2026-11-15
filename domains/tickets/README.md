@@ -4,11 +4,12 @@ A HEART domain server (spec/PLAN-HEART-LIBRARY-DOMAINS-EVAL.md, B5): its domain
 code and one declaration. The HEART library (`heart/`) serves it over HTTP and
 CoAP; it has no controllers.
 
-A ticket is one resource, `/tickets/{id}`. Its state is the subject, the
-customer, the description, the priority, the assigned agent, and the
-conversation in order. A ticket comes into being by `open-ticket`, an act the
-service index offers at `/actions/open-ticket`; there is no create operation.
-The answer is `201 Created` with the new ticket.
+- A ticket is one resource, `/tickets/{id}`.
+- Its state is the subject, the customer, the description, the priority, the assigned agent, and the conversation
+  in order.
+- A ticket comes into being by `open-ticket`, an act the service index offers at `/actions/open-ticket`; there is no
+  create operation.
+- The answer is `201 Created` with the new ticket.
 
 What may be done depends on the ticket's status:
 
@@ -20,11 +21,32 @@ What may be done depends on the ticket's status:
 | `RESOLVED` | reopen, close, change-priority |
 | `CLOSED` | nothing |
 
-Agents are fixed values: `priya`, `marco`, `lena`, `tom`. Priority is `low`,
-`normal`, `high` or `urgent`. Every text field is 1 to 2000 characters. Two
-rules a schema cannot say are refused with 422: assigning the ticket to the
-agent who already has it (`/agent`), and changing the priority to the one it
-already has (`/priority`).
+<details>
+<summary>Diagram: how each act moves a ticket's status</summary>
+
+```mermaid
+flowchart TD
+    O["open-ticket at /actions/open-ticket"] --> NEW
+    NEW -- assign --> ASSIGNED
+    ASSIGNED -- "assign (another agent)" --> ASSIGNED
+    ASSIGNED -- ask-customer --> WAITING_ON_CUSTOMER
+    WAITING_ON_CUSTOMER -- customer-replies --> ASSIGNED
+    ASSIGNED -- resolve --> RESOLVED
+    WAITING_ON_CUSTOMER -- resolve --> RESOLVED
+    RESOLVED -- reopen --> ASSIGNED
+    RESOLVED -- close --> CLOSED
+```
+
+comment and change-priority leave the status as it is.
+
+</details>
+
+- Agents are fixed values: `priya`, `marco`, `lena`, `tom`.
+- Priority is `low`, `normal`, `high` or `urgent`.
+- Every text field is 1 to 2000 characters.
+- Two rules a schema cannot say are refused with 422:
+  - assigning the ticket to the agent who already has it (`/agent`);
+  - changing the priority to the one it already has (`/priority`).
 
 ## Code
 
@@ -49,9 +71,13 @@ set -a; . ./.env; set +a           # the service admits only that token, and wil
 Every state, act and the bookmark need the credential (SPEC §6.13). ARTIE and
 heart-mcp find it in `~/.artie/credentials`.
 
-Tests: `./gradlew test` runs the ticket rules (`tickets.feature`), the HEART
-conformance features (`RunHeartTckTest`, the bookmark act included), the
-architecture rules, and the whole server on Postgres in Testcontainers.
+Tests: `./gradlew test` runs:
+
+- the ticket rules (`tickets.feature`);
+- the HEART conformance features (`RunHeartTckTest`, the bookmark act included);
+- the architecture rules;
+- the whole server on Postgres in Testcontainers.
+
 `tickets.feature` holds only the ticket's own rules; what every HEART server
 does is the conformance features' business.
 

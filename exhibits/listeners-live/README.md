@@ -1,9 +1,12 @@
 # Listeners, live
 
-The last slice of spec/PLAN-LISTENERS.md: one watch over the scratch repository `JogoShugh/heart-github-test`,
-through the HEART gateway, run twice on the same timeline. Once as three listeners, each on its own. Once as
-today's single loop, the same handlers in turn at each look. How long each takes to react is read from GitHub's
-own times.
+The last slice of spec/PLAN-LISTENERS.md:
+
+- One watch over the scratch repository `JogoShugh/heart-github-test`, through the HEART gateway, run twice on the
+  same timeline.
+- Once as three listeners, each on its own.
+- Once as today's single loop, the same handlers in turn at each look.
+- How long each takes to react is read from GitHub's own times.
 
 The watch (`watch.kts`) has three handlers:
 
@@ -11,6 +14,26 @@ The watch (`watch.kts`) has three handlers:
   so, once;
 - **alerts**: answer each issue labelled `live-alert` once;
 - **triage**: handle each new comment on the triage issue slowly (15 seconds), as a model call is slow.
+
+<details>
+<summary>Diagram: three listeners, or one loop</summary>
+
+```mermaid
+flowchart TD
+    A[Read the watch's issue, keep it as watch] --> B{mode}
+    B -- listeners --> L1[veracode listener, every 10 s, on its own]
+    B -- listeners --> L2[alerts listener, every 10 s, on its own]
+    B -- listeners --> L3["triage listener, every 10 s, on its own (15 s per new comment)"]
+    L1 --> E{Watch's issue closed?}
+    L2 --> E
+    L3 --> E
+    B -- loop --> S[Each look, every 10 s: scans] --> T[then alerts] --> U["then triage (15 s per new comment)"] --> F{Watch's issue closed?}
+    F -- no --> S
+    F -- yes --> Z[End]
+    E -- yes --> Z
+```
+
+</details>
 
 ## The pieces
 
@@ -26,6 +49,32 @@ The watch (`watch.kts`) has three handlers:
 - `reactions.kts` reads, for each event, when GitHub says the watch answered it.
 - `runs/`: each run's output, trace, timeline and reactions. `l` runs are listeners; `g` runs are the single loop.
 
+<details>
+<summary>Diagram: one run, from staging to reactions</summary>
+
+```mermaid
+sequenceDiagram
+    participant Stage as stage.kts
+    participant Watch as watch.kts
+    participant Gateway as HEART gateway (8392)
+    participant Play as play.kts
+    participant GitHub
+    participant React as reactions.kts
+    Stage->>GitHub: open the watch, scan and triage issues
+    loop every 10 s, until the watch's issue is closed
+        Watch->>Gateway: look at the scan issue, the alerts, the triage issue
+        Gateway-->>Watch: 304 while nothing changed
+    end
+    Play->>GitHub: scan comments, alerts and triage comments at their seconds
+    Watch->>Gateway: label security-hold and comment, answer each alert
+    Play->>GitHub: close the watch's issue at 200 s
+    Play-->>Play: write the events with GitHub's times
+    React->>GitHub: read when each answer was made
+    React-->>React: write the reactions
+```
+
+</details>
+
 ## Running it
 
 From this folder, with `artie` on the path (`. ../../client/scripts/.env`), the gateway on `localhost:8392`, and
@@ -38,8 +87,10 @@ artie run play.kts owner=JogoShugh watch=W scan=S triage=T out=runs/play-l1.yaml
 artie run reactions.kts owner=JogoShugh play=runs/play-l1.yaml out=runs/reactions-l1.yaml
 ```
 
-GitHub can't reach a laptop, so the gateway's hub (webhooks waking held reads, slice 6) is off here: every poll
-is a read the gateway answers at once, a 304 while nothing changed.
+GitHub can't reach a laptop, so the gateway's hub (webhooks waking held reads, slice 6) is off here:
+
+- Every poll is a read the gateway answers at once.
+- It answers a 304 while nothing changed.
 
 ## The runs of 2026-10-25
 
@@ -51,7 +102,7 @@ is a read the gateway answers at once, a 304 while nothing changed.
 | A passed scan, at 80 s | left alone | left alone |
 | A failed scan again, at 140 s | already held: said nothing again | already held: said nothing again |
 
-In the loop each slow triage held up the scan and the alerts behind it; as a listener it held up only itself.
-Neither run said anything twice (the guard checked as they ran). One run each, over a phone's hotspot: a first
-look, not a benchmark. The page: `docs/reports/listeners-live/index.html`, made by `report.kts` from
-`results.yaml`.
+- In the loop each slow triage held up the scan and the alerts behind it; as a listener it held up only itself.
+- Neither run said anything twice (the guard checked as they ran).
+- One run each, over a phone's hotspot: a first look, not a benchmark.
+- The report: `docs/reports/listeners-live/index.html`, made by `report.kts` from `results.yaml`.

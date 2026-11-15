@@ -5,12 +5,15 @@ with a pull request in each state, read through the gateway as its owner.
 
 ## Seeding
 
-`seed.py OWNER/REPO` shows what it would do; `--write` does it. It reads
-the token from `~/.artie/credentials` (`[https://api.github.com]`,
-`bearer`), never prints it, writes only to the repository it is given, and
-leaves alone a pull request whose title is already there. It needs a
-fine-grained token for that repository alone: Contents and Pull requests
-read and write, and Administration read and write for the protected bases.
+`seed.py OWNER/REPO` shows what it would do; `--write` does it.
+
+- It reads the token from `~/.artie/credentials` (`[https://api.github.com]`,
+  `bearer`), and never prints it.
+- It writes only to the repository it is given, and leaves alone a pull request
+  whose title is already there.
+- It needs a fine-grained token for that repository alone: Contents and Pull
+  requests read and write, and Administration read and write for the protected
+  bases.
 
 ## Running the gateway against GitHub
 
@@ -22,6 +25,30 @@ read and write, and Administration read and write for the protected bases.
 
 Each caller sends their own GitHub token as a Bearer credential; the
 gateway forwards it.
+
+<details>
+<summary>Diagram: a read through the gateway, as the caller</summary>
+
+```mermaid
+sequenceDiagram
+    actor Caller
+    participant Gateway as Gateway (port 8392)
+    participant GitHub as api.github.com
+    Caller->>Gateway: GET, no credential
+    Gateway-->>Caller: 401, GitHub never asked
+    Caller->>Gateway: GET, Bearer with their own GitHub token
+    Gateway->>GitHub: GET, the same token, If-None-Match from the copy held for that caller
+    alt GitHub says nothing changed
+        GitHub-->>Gateway: 304, no cost to the rate limit
+        Gateway->>Gateway: answer from its copy for that caller
+    else first read or changed
+        GitHub-->>Gateway: 200 and an ETag
+        Gateway->>Gateway: keep the copy for that caller
+    end
+    Gateway-->>Caller: the pull request, with the acts offered now
+```
+
+</details>
 
 ## Phase 9, read-only: 2026-10-16, JogoShugh/heart-github-test
 
@@ -37,32 +64,38 @@ Every pull request read through the gateway, GET only, as the owner:
 | 6 | Build a greenhouse | open, mergeable, blocked (review required) | close | merge: Branch protection blocks the merge: a required check or review is missing. |
 | 7 | Add a compost bin | open, mergeable, clean | close, merge | reopen: already open. |
 
-Each matches what GitHub's own page says of it: #1 and #7 can be merged,
-#2 is a draft, #3 has conflicts, #4 is merged, #5 can be reopened, #6
-waits for a review. #7 was meant to be behind its base, but GitHub says
-behind only when the base's protection names a required check; with none,
-it is clean, and so is the gateway's answer.
+- Each matches what GitHub's own page says of it: #1 and #7 can be merged,
+  #2 is a draft, #3 has conflicts, #4 is merged, #5 can be reopened, #6 waits
+  for a review.
+- #7 was meant to be behind its base, but GitHub says behind only when the
+  base's protection names a required check; with none, it is clean, and so is
+  the gateway's answer.
+- The bookmark offered `github:pulls-list` and `github:pulls-get`; the search
+  listed all seven at their own paths, titled.
+- A request with no credential was refused 401 before GitHub was asked.
+- Five reads of #1 in a row cost nothing of GitHub's rate limit: each was a
+  conditional request, answered 304 from the gateway's copy for that caller.
 
-The bookmark offered `github:pulls-list` and `github:pulls-get`; the search
-listed all seven at their own paths, titled. A request with no credential
-was refused 401 before GitHub was asked.
+Seen live, and now how the tests' fake GitHub answers:
 
-Five reads of #1 in a row cost nothing of GitHub's rate limit: each was a
-conditional request, answered 304 from the gateway's copy for that caller.
-
-Seen live, and now how the tests' fake GitHub answers: an open pull
-request's first read is `mergeable: null, unknown` until GitHub has worked
-it out, seconds later; a draft's mergeable state is `clean`; a closed or
-merged one stays `null, unknown`.
+- an open pull request's first read is `mergeable: null, unknown` until GitHub
+  has worked it out, seconds later;
+- a draft's mergeable state is `clean`;
+- a closed or merged one stays `null, unknown`.
 
 ## Issues: 2026-10-17, JogoShugh/heart-github-test
 
 `issues.py OWNER/REPO GATEWAY_URL OUT_FILE` acts on issues through the
-gateway's forms, writing only to the repository it is given: it opens two
-issues from the repository's `open-issue` form and comments on one (each
-201 with Location), follows the issue's comments and sub-issues links,
-and sends every issue act, each after reading until GitHub settles. The
-token needs Issues read and write. `capture-issues.py OWNER/REPO
-GATEWAY_URL OUT_DIR NAME=PATH...` reads each path both ways, GET only.
-The captures are in `docs/reports/github-gateway-status/captures`
-(`issue-*.json`, `issues-acts.json`).
+gateway's forms, writing only to the repository it is given:
+
+1. It opens two issues from the repository's `open-issue` form and comments on
+   one (each 201 with Location).
+2. It follows the issue's comments and sub-issues links.
+3. It sends every issue act, each after reading until GitHub settles.
+
+The token needs Issues read and write.
+
+- `capture-issues.py OWNER/REPO GATEWAY_URL OUT_DIR NAME=PATH...` reads each
+  path both ways, GET only.
+- The captures are in `docs/reports/github-gateway-status/captures`
+  (`issue-*.json`, `issues-acts.json`).

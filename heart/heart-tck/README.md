@@ -1,8 +1,9 @@
 # heart-tck
 
-The HEART conformance features (TCK: technology compatibility kit). Written
-once, run by every server against itself. If they pass, the server is HEART
-compliant over HTTP.
+The HEART conformance features (TCK: technology compatibility kit):
+
+- Written once, run by every server against itself.
+- If they pass, the server is HEART compliant over HTTP.
 
 ## Run it against your server
 
@@ -32,22 +33,29 @@ compliant over HTTP.
 
 ## What the 18 scenarios check
 
-L0 with inline schemas and concrete targets; L1 and L2 behind
-integrity-checked `hr:forms` links with templated targets; 304; the absence
-explanation and its reason; a successful act (`Content-Location`, new ETag);
-428, 412, 409 and 422 as problems that change nothing; an act performed on
-the state its ETag matched, refused as stale when another client's act
-landed after the check (the domain's `perform` called directly, since the
-gap cannot be timed over HTTP); the same targets in
-HAL-FORMS and HAL Schema Forms; the index, search and JSON Home; every form
-relation described in the ALPS profile. The four `@bookmark-act` scenarios: the
-index offers the act as a form on its own `/actions/{path}`; it answers 201
-with the new resource in `Location`, `Content-Location` and `self`, readable
-at that location; and 428, 412 and 422 refuse it as problems that add no
-resource.
+- L0 with inline schemas and concrete targets.
+- L1 and L2 behind integrity-checked `hr:forms` links with templated targets.
+- 304.
+- The absence explanation and its reason.
+- A successful act (`Content-Location`, new ETag).
+- 428, 412, 409 and 422 as problems that change nothing.
+- An act performed on the state its ETag matched, refused as stale when another
+  client's act landed after the check (the domain's `perform` called directly,
+  since the gap cannot be timed over HTTP).
+- The same targets in HAL-FORMS and HAL Schema Forms.
+- The index, search and JSON Home.
+- Every form relation described in the ALPS profile.
+
+The four `@bookmark-act` scenarios:
+
+- the index offers the act as a form on its own `/actions/{path}`;
+- it answers 201 with the new resource in `Location`, `Content-Location` and
+  `self`, readable at that location;
+- 428, 412 and 422 refuse it as problems that add no resource.
 
 ## Who runs it
 
-The lamp (`src/test`, a server that declares one type and writes no HTTP
-code) passes all 18. The garden (`server-spring`) and basketball
-(`domains/basketball`) have no act on the bookmark, and pass the other 14.
+- The lamp (`src/test`, a server that declares one type and writes no HTTP
+  code) passes all 18.
+- The garden (`server-spring`) and basketball (`domains/basketball`) have no act
+  on the bookmark, and pass the other 14.

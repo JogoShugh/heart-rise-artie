@@ -1,10 +1,32 @@
 # The kit, tried end to end
 
-`kit/` run from a clone, live on `JogoShugh/heart-kit-test`, 6 November 2026, as a coworker runs it: an empty
-repository of its own, a fine-grained token for it alone, the keys in `kit/.env`, then `kit/try.sh up`, a bootstrap,
-and each goal walked by Claude (Sonnet 5.5), kept as YAML, and replayed. GitHub was called through the gateway in the
-kit, with that token; the build and deploy services are the simulated ones in the same kit. Each state was
-screenshotted in each system as it happened: the report is `docs/reports/kit-trial/`.
+`kit/` run from a clone, live on `JogoShugh/heart-kit-test`, 6 November 2026, as a coworker runs it:
+
+1. An empty repository of its own, and a fine-grained token for it alone.
+2. The keys in `kit/.env`.
+3. `kit/try.sh up`, then a bootstrap.
+4. Each goal walked by Claude (Sonnet 5.5), kept as YAML, and replayed.
+
+- GitHub was called through the gateway in the kit, with that token.
+- The build and deploy services are the simulated ones in the same kit.
+- Each state was screenshotted in each system as it happened: the report is `docs/reports/kit-trial/`.
+
+<details>
+<summary>Diagram: the order of the trial</summary>
+
+```mermaid
+flowchart TD
+    A["kit/bootstrap.sh (01): six issues"] --> B["hello: plan, walk, keep, replay (02 to 05)"]
+    B --> C["triage: walk, keep (06, 07)"]
+    C --> D["closeout version=1.0: walk, keep (08, 09)"]
+    D --> E["kit/bootstrap.sh again (10): six more issues"]
+    E --> F["replay triage (11), replay closeout version=1.1 (12)"]
+    F --> G["release: plan, walk version=1.1, keep (13 to 15)"]
+    G --> H["replay release version=1.0 (16): the same three systems"]
+    G --> I["replay release version=1.2 (17): refused before the deploy"]
+```
+
+</details>
 
 ## The runs
 
@@ -43,6 +65,7 @@ screenshotted in each system as it happened: the report is `docs/reports/kit-tri
 ## Files
 
 - `runs/NN-*.out`: what each command printed; `runs/*.watch`: when the watch issue was closed.
-- `runs/*.trace.yaml.gz`: each goal walk and each kept replay, step by step, with every request and answer. The
-  seed's is the second bootstrap's; `release-kept`'s is the 1.2 replay's.
+- `runs/*.trace.yaml.gz`: each goal walk and each kept replay, step by step, with every request and answer.
+  - The seed's is the second bootstrap's.
+  - `release-kept`'s is the 1.2 replay's.
 - `kept/`: the four kept scripts and their lock files, as `artie generate` wrote them.

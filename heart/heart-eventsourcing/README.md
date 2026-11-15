@@ -27,17 +27,38 @@ Then use an `EventStore`:
 | `history(spec, id)` | Every event, as `Recorded` (number, time, event) |
 | `forget(stream)` | Deletes a stream; for tests and demos |
 
-Events are plain data; the store records which resource, which number and
-when. A snapshot is kept every `snapshotEvery` events (5 by default) and
-never changes an answer.
+- Events are plain data; the store records which resource, which number and
+  when.
+- A snapshot is kept every `snapshotEvery` events (5 by default) and never
+  changes an answer.
+
+<details>
+<summary>Diagram: two acts checked at the same version</summary>
+
+```mermaid
+sequenceDiagram
+    participant A as perform, act A
+    participant B as perform, act B
+    participant Store as EventStore
+    Note over A,B: both checked against version 4
+    A->>Store: append at sequence number 5
+    Store-->>A: stored, version is now 5
+    B->>Store: append at sequence number 5
+    Store-->>B: ConcurrentWriteException, number taken
+    Note over B: heart-core answers 412
+```
+
+</details>
 
 ## Stores
 
 - `InMemoryEventStore`: for tests and demos.
-- `PostgresEventStore(DatabaseClient)`: R2DBC. The UNIQUE constraint on
-  `(stream, stream_id, sequence_no)` is the concurrency control. Tables are in
-  `src/main/resources/com/artie/heart/eventsourcing/schema.sql`; apply them in
-  your own migration (see the garden's `V2__heart_event_store.sql`).
+- `PostgresEventStore(DatabaseClient)`: R2DBC.
+  - The UNIQUE constraint on `(stream, stream_id, sequence_no)` is the
+    concurrency control.
+  - Tables are in `src/main/resources/com/artie/heart/eventsourcing/schema.sql`;
+    apply them in your own migration (see the garden's
+    `V2__heart_event_store.sql`).
 
 ## Tests
 

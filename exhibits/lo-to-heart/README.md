@@ -15,5 +15,6 @@ GITHUB_TOKEN=... npm start      # http://localhost:8500/bumps.html
 npm run check                    # headless Chrome: show, click Merge, show again
 ```
 
-GitHub's API allows calls from any page (CORS), so the server isn't there for that. It's there for the token, and
-for the rate limit: 60 requests an hour without one. The run of 2026-11-01 is in `runs/`.
+- GitHub's API allows calls from any page (CORS), so the server isn't there for that.
+- It's there for the token, and for the rate limit: 60 requests an hour without one.
+- The run of 2026-11-01 is in `runs/`.

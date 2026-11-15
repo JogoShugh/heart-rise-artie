@@ -19,6 +19,9 @@ The whole of it in diagrams: [HEART and ARTIE](https://jogoshugh.github.io/heart
 
 ## The chain
 
+<details>
+<summary>Diagram: walk once with a model, keep, replay with none</summary>
+
 ```mermaid
 sequenceDiagram
     actor P as You
@@ -37,6 +40,8 @@ sequenceDiagram
     P->>A: artie run NAME.heart.yaml, another day, other inputs
     A->>S: the same acts, held to NAME.pins.yaml, with no model
 ```
+
+</details>
 
 | File | Written by | What it is |
 |---|---|---|
@@ -102,10 +107,13 @@ Fix the blank-bed-name crash, start to finish.
     - its reason is completed
 ```
 
-**Front matter.** `start` is the one address the run begins from. Each input is `name: value`, `name:`,
-`name: { default, question }`, or `default: { now: PATTERN }` for the time now in a `java.time` pattern. A missing
-input stops the run before its first request, unless `--interactive` lets it ask. `limits: { moves: N, step: N }`
-caps how many moves the model may make in the run and in one step.
+**Front matter.**
+
+- `start` is the one address the run begins from.
+- Each input is `name: value`, `name:`, `name: { default, question }`, or `default: { now: PATTERN }` for the time
+  now in a `java.time` pattern.
+- A missing input stops the run before its first request, unless `--interactive` lets it ask.
+- `limits: { moves: N, step: N }` caps how many moves the model may make in the run and in one step.
 
 **Steps.**
 
@@ -144,8 +152,9 @@ read when the step runs. `{{` and `}}` are literal braces.
 | `- Once …, … Or give up after 3 minutes. Otherwise, …` | An act when it's offered, a deadline, and what to do instead. |
 | `- Until …` | When the watch ends. |
 
-Write one `If` per act. A case the walk never meets stays in words in the kept script, for the model, so stage every
-case you mean to keep: `exhibits/github-task-yaml/closeout.sh` stages one issue per case before the walk.
+- Write one `If` per act.
+- A case the walk never meets stays in words in the kept script, for the model, so stage every case you mean to
+  keep: `exhibits/github-task-yaml/closeout.sh` stages one issue per case before the walk.
 
 `artie run NAME.goal.md --plan-only` reads, checks and prints a goal, and sends nothing.
 
@@ -182,9 +191,11 @@ steps:
           - keep-as: issue
 ```
 
-`${owner}` is an input, `${issue.number}` a member of a kept resource. Each act keeps its words: `intent`, a
-person's; `inferred`, the model's, for a step the goal didn't say in so many words; and `from-intent`, the person's
-words that inferred words serve.
+`${owner}` is an input, `${issue.number}` a member of a kept resource. Each act keeps its words:
+
+- `intent`, a person's;
+- `inferred`, the model's, for a step the goal didn't say in so many words;
+- `from-intent`, the person's words that inferred words serve.
 
 | Key | What it does |
 |---|---|
@@ -202,9 +213,10 @@ words that inferred words serve.
 | `whenever` | For each member that changed: which members (`has`), which to leave (`leave-where`), and acts by facts (`given`, `then`). |
 | `once` | An act when it's `offered`, a `give-up` deadline, and steps `otherwise`. |
 
-After each act, a kept script checks what the act changed, as the walk recorded it, leaving out values that differ on
-every run, such as times and hashes. `artie generate --intents --format yaml` writes the walk in words only
-(`kind: intent`), for the model to choose every act again on every run.
+- After each act, a kept script checks what the act changed, as the walk recorded it, leaving out values that differ
+  on every run, such as times and hashes.
+- `artie generate --intents --format yaml` writes the walk in words only (`kind: intent`), for the model to choose
+  every act again on every run.
 
 **The hybrid.** A goal step marked `` `reasoned` `` stays a reason step in the kept script, and everything else is
 pinned. `artie generate` says so (`1 reason step kept`), and a run of the script needs `--reasoner`.
@@ -236,6 +248,32 @@ the run holds the form it is about to use to the lock file, as `--guard` says:
 
 A refusal stops the run before anything is sent for that act.
 
+<details>
+<summary>Diagram: how strict and lenient hold a form to its pin</summary>
+
+```mermaid
+flowchart TD
+    A[The form the act is about to use] --> B{Pinned in the lock file?}
+    B -- no --> B1{strict?}
+    B1 -- yes --> R[Refused, nothing sent]
+    B1 -- no --> OK[Act, marked unpinned]
+    B -- yes --> C{Same integrity as pinned?}
+    C -- yes --> D{strict, and offered in a set not recorded for it?}
+    D -- yes --> R
+    D -- no --> GO[Act]
+    C -- no --> E{strict?}
+    E -- yes --> R
+    E -- no --> F{Only its target changed?}
+    F -- yes --> GO
+    F -- no --> G{"on-change: values?"}
+    G -- no --> R
+    G -- yes --> H{Same method as pinned, and every value sent fits the new schema?}
+    H -- yes --> GO
+    H -- no --> R
+```
+
+</details>
+
 **The config**, `NAME.config.yaml` beside the script, says what a lenient run does when a form it uses changed:
 
 ```yaml
@@ -248,9 +286,11 @@ look: used              # used or everything: what look-then-leap compares
 validators: last        # last, or none: a blind write, which a HEART service refuses unless set to allow it
 ```
 
-`keep: auto` keeps a repair only when the run finished, the repair made the act the script was making, and every
-value it sent is the script's own, written as the script wrote it, so an input stays an input. A flag on the command
-line wins over the config.
+- `keep: auto` keeps a repair only when:
+  - the run finished;
+  - the repair made the act the script was making;
+  - every value it sent is the script's own, written as the script wrote it, so an input stays an input.
+- A flag on the command line wins over the config.
 
 ## Levels of care
 
@@ -267,9 +307,11 @@ the script says more.
 
 ## Kotlin scripts
 
-Scripts can also be written, or generated, in Kotlin: `artie generate` writes Kotlin unless `--format yaml` is
-given, and a person who wants code beyond the vocabulary writes `.kts` by hand. The guard and the lock file are the
-same.
+Scripts can also be written, or generated, in Kotlin:
+
+- `artie generate` writes Kotlin unless `--format yaml` is given.
+- A person who wants code beyond the vocabulary writes `.kts` by hand.
+- The guard and the lock file are the same.
 
 ```kotlin
 val owner by input()
@@ -317,8 +359,9 @@ A credential goes over plain HTTP only to this machine.
 export JAVA_OPTS="-Djavax.net.ssl.trustStore=$HOME/.cache/artie/tls/trust.p12 -Djavax.net.ssl.trustStorePassword=changeit"
 ```
 
-Without it, a run against `https://localhost:8392` stops with "PKIX path building failed". The kit (`kit/`) runs the
-gateway on plain HTTP inside its container instead, beside `artie`, so it needs no certificate.
+- Without it, a run against `https://localhost:8392` stops with "PKIX path building failed".
+- The kit (`kit/`) runs the gateway on plain HTTP inside its container instead, beside `artie`, so it needs no
+  certificate.
 
 **The GitHub gateway**, from `heart/`, reads GitHub's OpenAPI description and the connector in
 `heart/heart-gateway/connectors/github`, and calls GitHub with each caller's own token:
@@ -336,10 +379,12 @@ GATEWAY_TLS_KEYSTORE=… GATEWAY_TLS_PASSWORD=… PORT=8392 \
 
 GitHub's description is MIT licensed, from `github/rest-api-description`.
 
-**The model**, for `--reasoner claude`, reads `ANTHROPIC_API_KEY`, or else the bearer entry for
-`https://api.anthropic.com` in the credentials. A model on this machine takes the same prompts:
-`--model-url http://localhost:11434 --model qwen3:30b-a3b-instruct-2507-q4_K_M` asks Ollama's Messages API instead of
-Anthropic's (`spec/PLAN-LOCAL-MODEL.md`).
+**The model**, for `--reasoner claude`:
+
+- It reads `ANTHROPIC_API_KEY`, or else the bearer entry for `https://api.anthropic.com` in the credentials.
+- A model on this machine takes the same prompts:
+  `--model-url http://localhost:11434 --model qwen3:30b-a3b-instruct-2507-q4_K_M` asks Ollama's Messages API instead
+  of Anthropic's (`spec/PLAN-LOCAL-MODEL.md`).
 
 ## `artie run`
 

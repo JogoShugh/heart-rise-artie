@@ -1,15 +1,19 @@
 # HEART server library
 
-Build a HEART server (`spec/SPEC.md`) by declaring your resources. You write
-the domain code and one declaration; the library serves HAL Schema Forms at
-every rung (and HAL-FORMS, the L0 on-ramp), checks every act, and answers over
-HTTP and CoAP.
-You write no controllers.
+Build a HEART server (`spec/SPEC.md`) by declaring your resources:
 
-**How it works:** [ARCHITECTURE.md](ARCHITECTURE.md) explains HEART with diagrams:
-REST and Fielding's rules in summary, the three layers, every rung from L0 to
-L6, negotiation, acts and refusals, and the bindings. How HEART measures
-against Fielding's rules, in detail: [spec/FIELDING-REVIEW.md](../spec/FIELDING-REVIEW.md).
+- You write the domain code and one declaration.
+- The library serves HAL Schema Forms at every rung (and HAL-FORMS, the L0
+  on-ramp), checks every act, and answers over HTTP and CoAP.
+- You write no controllers.
+
+**How it works:**
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) explains HEART with diagrams: REST and
+  Fielding's rules in summary, the three layers, every rung from L0 to L6,
+  negotiation, acts and refusals, and the bindings.
+- How HEART measures against Fielding's rules, in detail:
+  [spec/FIELDING-REVIEW.md](../spec/FIELDING-REVIEW.md).
 
 ## Modules
 
@@ -91,13 +95,41 @@ fun lampResource(store: LampStore): HeartResource<*, *> = HeartResource(
 )
 ```
 
-`perform` runs only after the checks pass. It is given the state the
-client's If-Match was checked against, and acts on that state, never on one
-read again: record the act only if the resource is still at that state
-(an event store's append at the next sequence number does this), and throw
-`ConcurrentWriteException` if another write landed first. It becomes 412.
-`input.bind(Dim::class.java)` gives the body, already valid against the
-act's schema. Every domain proves this with the conformance features.
+- `perform` runs only after the checks pass.
+- It is given the state the client's If-Match was checked against, and acts on
+  that state, never on one read again:
+  - record the act only if the resource is still at that state (an event
+    store's append at the next sequence number does this);
+  - throw `ConcurrentWriteException` if another write landed first. It becomes
+    412.
+- `input.bind(Dim::class.java)` gives the body, already valid against the act's
+  schema.
+- Every domain proves this with the conformance features.
+
+<details>
+<summary>Diagram: the checks before an act, and the act</summary>
+
+```mermaid
+flowchart TD
+    A[POST an act] --> B{Validator sent in If-Match?}
+    B -- no --> R428[428 precondition-required]
+    B -- yes --> C{Matches the current one?}
+    C -- no --> R412[412 stale]
+    C -- yes --> D{Act offered by the current state key?}
+    D -- no --> R409[409 not-offered]
+    D -- yes --> E{"Body JSON, and fits the act's schema and choices?"}
+    E -- "not JSON" --> R400[400]
+    E -- no --> R422[422 invalid-input]
+    E -- yes --> F[perform on the state checked]
+    F --> G{Outcome}
+    G -- "ConcurrentWriteException" --> R412
+    G -- "RuleRefusedException" --> R422R[422 rule-refused]
+    G -- Acted --> OK[New Layer 1 and Content-Location]
+```
+
+The first failure wins, and nothing is performed after a refusal.
+
+</details>
 
 ## What is then served
 
@@ -110,11 +142,12 @@ act's schema. Every domain proves this with the conformance features.
 | `GET /affordance-sets/{address}`, `/schemas/{address}`, `/unavailable/{address}` | Shared layers, immutable, named by SHA-256 |
 | `GET /profiles/home` | ALPS profile |
 
-Refusals are RFC 9457 problems (`precondition-required`, `stale`,
-`not-offered`, `invalid-input`, `rule-refused`). Over CoAP the same paths
-answer on UDP. A rule of your own that a schema cannot say refuses with
-`RuleRefusedException.at("/field", "why")`: a 422 of type `rule-refused`,
-so a client never mistakes it for a body it built wrong.
+- Refusals are RFC 9457 problems (`precondition-required`, `stale`,
+  `not-offered`, `invalid-input`, `rule-refused`).
+- Over CoAP the same paths answer on UDP.
+- A rule of your own that a schema cannot say refuses with
+  `RuleRefusedException.at("/field", "why")`: a 422 of type `rule-refused`, so
+  a client never mistakes it for a body it built wrong.
 
 ## Optional
 
@@ -123,30 +156,35 @@ so a client never mistakes it for a body it built wrong.
   forms, and `GET /lamps?name=` returns pages of `item` links.
 - **Acts on the bookmark**: some acts belong to no resource yet, because
   their result is a new one (installing a lamp, a customer reporting a
-  problem). Add `bookmarkActs = listOf(Act.of("installLamp", "install-lamp",
-  InstallLamp::class.java))` to the type (it needs `finding` too) and
-  `performAtBookmark = { act, input -> Acted(newLamp) }` to the resource. The
-  index offers each as a form on `/actions/install-lamp`. A client sends the
-  index's ETag, as for any act; the answer is `201` with `Location`.
-- **Past**: add `past = ...` to the resource. Then
-  `GET /lamps/{id}?asOf=<instant>` and `GET /lamps/{id}/history` are served.
-  With `heart-eventsourcing`, build it from the type's `EventSourcing`, which
-  names each event by the type stored with it:
-  `past = LAMPS.past(at = { id, t -> store.state(LAMPS, id, asOf = t) }, history = { id -> store.history(LAMPS, id) })`.
-  Without it, give `Past(at = ..., history = ...)` directly, where `history`
-  returns `PastEvent`s.
+  problem).
+  - Add `bookmarkActs = listOf(Act.of("installLamp", "install-lamp",
+    InstallLamp::class.java))` to the type (it needs `finding` too).
+  - Add `performAtBookmark = { act, input -> Acted(newLamp) }` to the resource.
+  - The index offers each as a form on `/actions/install-lamp`.
+  - A client sends the index's ETag, as for any act; the answer is `201` with
+    `Location`.
+- **Past**: add `past = ...` to the resource.
+  - Then `GET /lamps/{id}?asOf=<instant>` and `GET /lamps/{id}/history` are
+    served.
+  - With `heart-eventsourcing`, build it from the type's `EventSourcing`, which
+    names each event by the type stored with it:
+    `past = LAMPS.past(at = { id, t -> store.state(LAMPS, id, asOf = t) }, history = { id -> store.history(LAMPS, id) })`.
+  - Without it, give `Past(at = ..., history = ...)` directly, where `history`
+    returns `PastEvent`s.
 
 ## Prove it
 
-Add `testImplementation("com.artie.heart:heart-tck")`, register a
-`TckFixture` bean (a resource, an act it offers, an act it does not, a valid
-and an invalid body, a search term), and run the features at
-`classpath:heart/tck` with glue `com.artie.heart.tck`. Fourteen scenarios
-cover the layers, revalidation, every refusal, a write that lands after the
-If-Match check, both dialects, the index and the profile; four more, tagged
-`@bookmark-act`, cover an act the bookmark
-offers. A server whose bookmark offers none filters them out with
-`not @bookmark-act`.
+1. Add `testImplementation("com.artie.heart:heart-tck")`.
+2. Register a `TckFixture` bean (a resource, an act it offers, an act it does
+   not, a valid and an invalid body, a search term).
+3. Run the features at `classpath:heart/tck` with glue `com.artie.heart.tck`.
+
+What they cover:
+
+- Fourteen scenarios cover the layers, revalidation, every refusal, a write that
+  lands after the If-Match check, both dialects, the index and the profile.
+- Four more, tagged `@bookmark-act`, cover an act the bookmark offers. A server
+  whose bookmark offers none filters them out with `not @bookmark-act`.
 
 ## Configuration
 

@@ -1,8 +1,11 @@
 # heart-spring
 
-HEART over HTTP on Spring WebFlux. A Spring Boot auto-configuration
-(`HeartAutoConfiguration`): add the dependency, register `HeartResource`
-beans, and every route below is served. The server writes no controllers.
+HEART over HTTP on Spring WebFlux, as a Spring Boot auto-configuration
+(`HeartAutoConfiguration`):
+
+- Add the dependency, register `HeartResource` beans, and every route below is
+  served.
+- The server writes no controllers.
 
 ## Routes, per declared collection
 

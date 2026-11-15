@@ -1,8 +1,10 @@
 # heart-core
 
-HEART with no protocol in it: no Spring, no HTTP, no CoAP types. Every
-binding (`heart-spring`, `heart-coap`) calls this module, so all bindings
-behave the same.
+HEART with no protocol in it:
+
+- No Spring, no HTTP, no CoAP types.
+- Every binding (`heart-spring`, `heart-coap`) calls this module, so all
+  bindings behave the same.
 
 ## What is in it
 
@@ -23,12 +25,13 @@ behave the same.
 
 ## Rule to know
 
-The acts offered must depend on the state key alone (`Offers.offered(key)`),
-so every resource in one state shares one affordance set (SPEC §6.9). Sets,
-schemas and explanations are computed once, from the declaration.
+- The acts offered must depend on the state key alone (`Offers.offered(key)`),
+  so every resource in one state shares one affordance set (SPEC §6.9).
+- Sets, schemas and explanations are computed once, from the declaration.
 
 ## Tests
 
-`src/test/resources/features`: content addressing, negotiation, layers,
-generated schemas, the act checks, the index. The lamp in
-`src/testFixtures` is the shared example every module tests against.
+- `src/test/resources/features`: content addressing, negotiation, layers,
+  generated schemas, the act checks, the index.
+- The lamp in `src/testFixtures` is the shared example every module tests
+  against.
