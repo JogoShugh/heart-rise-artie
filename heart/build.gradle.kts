@@ -5,7 +5,17 @@ plugins {
     kotlin("jvm") version "2.0.20" apply false
     kotlin("plugin.spring") version "2.0.20" apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.8" apply false
-    id("org.jetbrains.kotlinx.kover") version "0.9.1" apply false
+    id("org.jetbrains.kotlinx.kover") version "0.9.1"
+}
+
+// One merged coverage report for the whole build (build/reports/kover/report.xml here): a line counts as
+// covered whichever module's tests ran it, so code other modules exercise (the TCK, the sims) is credited.
+repositories { mavenCentral() }
+dependencies {
+    listOf(
+        "heart-core", "heart-http4k", "heart-gateway", "heart-spring", "heart-tck",
+        "heart-eventsourcing", "heart-sims", "heart-coap",
+    ).forEach { kover(project(":$it")) }
 }
 
 subprojects {
