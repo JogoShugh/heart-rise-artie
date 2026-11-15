@@ -6,30 +6,30 @@
 // nothing embedded, a pill is only its label.
 (function () {
   "use strict";
-  var KEY = (document.querySelector('meta[name="heart-deck"]') || {}).content || "deck";
-  var BRAND = document.title;
-  var root = document.documentElement;
-  var slide = document.getElementById("slide");
-  var frame = document.getElementById("frame");
-  var list = document.getElementById("outline-list");
-  var source = document.getElementById("source");
-  var say = document.getElementById("say");
-  var modeNote = document.getElementById("mode-note");
-  var overlay = document.getElementById("overlay");
-  var overlayBody = document.getElementById("overlay-body");
-  var items = [], atContents = false, shown = null, client, way;
+  const KEY = (document.querySelector('meta[name="heart-deck"]') || {}).content || "deck";
+  const BRAND = document.title;
+  const root = document.documentElement;
+  const slide = document.getElementById("slide");
+  const frame = document.getElementById("frame");
+  const list = document.getElementById("outline-list");
+  const source = document.getElementById("source");
+  const say = document.getElementById("say");
+  const modeNote = document.getElementById("mode-note");
+  const overlay = document.getElementById("overlay");
+  const overlayBody = document.getElementById("overlay-body");
+  let items = [], atContents = false, shown = null, client, way;
 
-  var remember = function (name, value) { try { localStorage.setItem(KEY + "-" + name, value); } catch (e) { /* this visit only */ } };
-  var recall = function (name) { try { return localStorage.getItem(KEY + "-" + name); } catch (e) { return null; } };
+  const remember = function (name, value) { try { localStorage.setItem(KEY + "-" + name, value); } catch (e) { /* this visit only */ } };
+  const recall = function (name) { try { return localStorage.getItem(KEY + "-" + name); } catch (e) { return null; } };
 
   // What the client asked and what came back, by address, to show a slide's own resource as it was read.
-  var exchanges = new Map();
-  var realFetch = window.fetch.bind(window);
+  const exchanges = new Map();
+  const realFetch = window.fetch.bind(window);
   window.fetch = function (input, init) {
-    var url = new URL(typeof input === "string" ? input : input.url, document.baseURI).toString();
+    const url = new URL(typeof input === "string" ? input : input.url, document.baseURI).toString();
     return realFetch(input, init).then(function (response) {
       exchanges.set(url, response.clone().text().then(function (text) {
-        var asked = [];
+        const asked = [];
         new Headers((init && init.headers) || {}).forEach(function (value, name) { asked.push(name + ": " + value); });
         return { asked: asked, status: response.status, etag: response.headers.get("ETag"), text: text };
       }));
@@ -37,13 +37,13 @@
     });
   };
 
-  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
-  var address = function (path) { return new URL(path, document.baseURI).toString(); };
-  var itemNamed = function (name) { return items.find(function (i) { return i.name === name; }); };
-  var linkOf = function (rep, rel) { return rep.links.find(function (l) { return l.rel === rel; }); };
-  var withContents = function (step) { return (atContents ? Promise.resolve() : client.follow("contents").then(readContents)).then(step); };
+  const esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  const address = function (path) { return new URL(path, document.baseURI).toString(); };
+  const itemNamed = function (name) { return items.find(function (i) { return i.name === name; }); };
+  const linkOf = function (rep, rel) { return rep.links.find(function (l) { return l.rel === rel; }); };
+  const withContents = function (step) { return (atContents ? Promise.resolve() : client.follow("contents").then(readContents)).then(step); };
 
-  var WAYS = {
+  const WAYS = {
     heart: {
       bookmark: address("deck/contents.json"),
       client: function () { return new HeartTs.HeartClient(); },
@@ -55,7 +55,7 @@
       first: function () { return client.follow("first"); },
       to: function (item) { return withContents(function () { return client.follow("item", item.title); }); },
       neighbor: function (rep, rel) {
-        var link = linkOf(rep, rel), href = link && new URL(link.href, rep.url).toString();
+        const link = linkOf(rep, rel), href = link && new URL(link.href, rep.url).toString();
         return link && (items.find(function (i) { return i.href === href; }) || { name: "", title: link.title });
       },
       step: function (rel) { return client.follow(rel); },
@@ -65,11 +65,11 @@
     plain: {
       bookmark: address("deck/plain/contents.json"),
       client: function () { return new HeartTs.HeartClient({ dialect: "json" }); },
-      items: function (rep) { return rep.state.items.map(function (i) { return Object.assign({}, i); }); },
+      items: function (rep) { return rep.state.items.map(function (i) { return { ...i }; }); },
       first: function () { return WAYS.plain.to(items[0]); },
       to: function (item) { return client.enter(address("deck/plain/" + encodeURIComponent(item.name) + ".json")); },
       neighbor: function (rep, rel) {
-        var at = items.findIndex(function (i) { return i.name === rep.state.name; });
+        const at = items.findIndex(function (i) { return i.name === rep.state.name; });
         return items[at + (rel === "next" ? 1 : -1)];
       },
       step: function (rel) { return WAYS.plain.to(WAYS.plain.neighbor(shown, rel)); },
@@ -81,7 +81,7 @@
   function readContents(rep) {
     atContents = true;
     items = way.items(rep);
-    var html = "", part = null;
+    let html = "", part = null;
     items.forEach(function (item, i) {
       if (item.part !== part) { part = item.part; html += '<li class="group">' + esc(part) + "</li>"; }
       html += '<li><a href="#' + esc(item.name) + '" data-name="' + esc(item.name) + '"><span class="n">' + (i + 1) + "</span><span>" +
@@ -91,7 +91,7 @@
   }
 
   function footLink(rep, rel, label) {
-    var to = way.neighbor(rep, rel);
+    const to = way.neighbor(rep, rel);
     if (!to) return '<span class="off" data-rel="' + rel + '"><small>' + label + "</small><b>—</b></span>";
     return '<a href="#' + esc(to.name) + '" data-rel="' + rel + '"><small>' + label + "</small><b>" + esc(to.title || to.name) + "</b></a>";
   }
@@ -104,17 +104,17 @@
   // The slide's pills and code chips: each a button over what came embedded, or only its label when nothing did.
   function wire(rep) {
     slide.querySelectorAll("deck-ref").forEach(function (el) {
-      var e = embeddedNamed(rep, "deck:ref", el.getAttribute("name"));
-      var label = el.textContent.trim() || (e && e.state.label) || el.getAttribute("name");
-      var b = document.createElement(e ? "button" : "span");
+      const e = embeddedNamed(rep, "deck:ref", el.getAttribute("name"));
+      const label = el.textContent.trim() || (e && e.state.label) || el.getAttribute("name");
+      const b = document.createElement(e ? "button" : "span");
       b.className = "ref " + (e ? "kind-" + esc(e.state.kind) : "off");
       b.textContent = label;
       if (e) { b.type = "button"; b.title = e.state.title; b.addEventListener("click", function () { openRef(e); }); }
       el.replaceWith(b);
     });
     slide.querySelectorAll("deck-fragment").forEach(function (el) {
-      var e = embeddedNamed(rep, "deck:fragment", el.getAttribute("name"));
-      var b = document.createElement(e ? "button" : "span");
+      const e = embeddedNamed(rep, "deck:fragment", el.getAttribute("name"));
+      const b = document.createElement(e ? "button" : "span");
       b.className = "chip" + (e ? "" : " off");
       b.innerHTML = '<span class="chip-code">&lt;/&gt;</span>' + esc(el.textContent.trim() || (e && e.state.label) || el.getAttribute("name"));
       if (e) { b.type = "button"; b.addEventListener("click", function () { openFragment(e); }); }
@@ -129,26 +129,26 @@
   }
   overlay.addEventListener("click", function (event) {
     if (event.target === overlay || event.target.closest("[data-close]")) overlay.close();
-    var pick = event.target.closest("[data-ref]");
+    const pick = event.target.closest("[data-ref]");
     if (pick && allRefs) openRef(allRefs.find(function (e) { return e.state.name === pick.dataset.ref; }));
   });
 
   // Every pill in the deck, at any time (K): the reference notes, one resource, grouped by kind.
-  var GROUPS = [["Grounds", ["talk", "ground"]], ["Reliability, risk, the three R’s, and the hype", ["umbrella", "measure", "hype"]], ["Who owns the loop", ["loop"]], ["Fielding 2000 · constraints", ["constraint"]], ["Fielding 2008 · rules", ["rule"]],
+  const GROUPS = [["Grounds", ["talk", "ground"]], ["Reliability, risk, the three R’s, and the hype", ["umbrella", "measure", "hype"]], ["Who owns the loop", ["loop"]], ["Fielding 2000 · constraints", ["constraint"]], ["Fielding 2008 · rules", ["rule"]],
     ["Fielding 2008 · comments", ["comment"]], ["The parts", ["part"]], ["Previews: shown later", ["preview"]]];
-  var allRefs = null;
+  let allRefs = null;
   function asEmbedded(r) {
-    var state = {}; Object.keys(r).forEach(function (k) { if (k !== "_links") state[k] = r[k]; });
-    var links = Object.keys(r._links || {}).map(function (rel) { return { rel: rel, href: r._links[rel].href }; });
+    const state = {}; Object.keys(r).forEach(function (k) { if (k !== "_links") state[k] = r[k]; });
+    const links = Object.keys(r._links || {}).map(function (rel) { return { rel: rel, href: r._links[rel].href }; });
     return { state: state, links: links };
   }
   function openAllRefs() {
-    var ready = allRefs ? Promise.resolve() : realFetch("refs/index.json").then(function (res) { return res.json(); })
+    const ready = allRefs ? Promise.resolve() : realFetch("refs/index.json").then(function (res) { return res.json(); })
       .then(function (doc) { allRefs = doc._embedded["deck:ref"].map(asEmbedded); });
     ready.then(function () {
-      var html = '<p class="kicker">Every pill, any time (K)</p><h2 id="overlay-title">Short forms</h2>';
+      let html = '<p class="kicker">Every pill, any time (K)</p><h2 id="overlay-title">Short forms</h2>';
       GROUPS.forEach(function (g) {
-        var these = [];
+        let these = [];
         g[1].forEach(function (kind) { these = these.concat(allRefs.filter(function (e) { return e.state.kind === kind; })); });
         if (!these.length) return;
         html += '<h3 class="refs-head">' + esc(g[0]) + "</h3>";
@@ -162,19 +162,23 @@
   document.getElementById("refs-all").addEventListener("click", openAllRefs);
 
   function openRef(e) {
-    var s = e.state, more = e.links.find(function (l) { return l.rel === "describedby"; });
+    const s = e.state, more = e.links.find(function (l) { return l.rel === "describedby"; });
+    let cite = esc(s.cite);
+    if (more) {
+      cite = more.href.charAt(0) === "#"
+        ? '<a href="' + esc(more.href) + '" data-close>' + esc(s.cite) + " →</a>"
+        : '<a href="' + esc(more.href) + '" target="_blank" rel="noopener">' + esc(s.cite) + " ↗</a>";
+    }
     open('<p class="kicker kind-' + esc(s.kind) + '">' + esc(s.label) + "</p>" +
       '<h2 id="overlay-title">' + esc(s.title) + "</h2>" +
       (s.summary ? '<p class="summary">' + esc(s.summary) + "</p>" : "") +
       (s.quote ? '<blockquote class="whole">' + s.quote + "</blockquote>" : "") +
-      '<p class="cite">' + (more ? (more.href.charAt(0) === "#"
-        ? '<a href="' + esc(more.href) + '" data-close>' + esc(s.cite) + " →</a>"
-        : '<a href="' + esc(more.href) + '" target="_blank" rel="noopener">' + esc(s.cite) + " ↗</a>") : esc(s.cite)) +
+      '<p class="cite">' + cite +
       (s.date ? " · " + esc(s.date) : "") + "</p>");
   }
 
   function openFragment(e) {
-    var s = e.state, via = e.links.find(function (l) { return l.rel === "via"; });
+    const s = e.state, via = e.links.find(function (l) { return l.rel === "via"; });
     open('<p class="kicker">Code · ' + esc(s.lang) + "</p>" +
       '<h2 id="overlay-title">' + esc(s.label) + "</h2>" +
       '<pre class="fragment"><code>' + esc(s.text) + "</code></pre>" +
@@ -183,16 +187,16 @@
   }
 
   // Code on demand (deck:code), as in Overheard at Riverside: a script the slide links, run only if its digest matches.
-  var running = null;
+  let running = null;
   function runCode(rep) {
     if (running) { running(); running = null; }
-    var link = linkOf(rep, "deck:code");
+    const link = linkOf(rep, "deck:code");
     if (!link) return;
-    var src = new URL(link.href, rep.url).toString();
+    const src = new URL(link.href, rep.url).toString();
     window.deckCode = window.deckCode || {};
-    var start = function () { var mount = window.deckCode[src]; if (mount && shown === rep) running = mount(slide) || null; };
+    const start = function () { const mount = window.deckCode[src]; if (mount && shown === rep) running = mount(slide) || null; };
     if (window.deckCode[src]) return start();
-    var script = document.createElement("script");
+    const script = document.createElement("script");
     script.src = src;
     if (link.integrity) script.integrity = link.integrity;
     script.onload = start;
@@ -203,20 +207,20 @@
     source.innerHTML = "";
     (exchanges.get(rep.url) || Promise.resolve(null)).then(function (seen) {
       if (shown !== rep || !seen) return;
-      var lead = document.createElement("div");
-      var asked = document.createElement("pre");
+      const lead = document.createElement("div");
+      const asked = document.createElement("pre");
       asked.className = "asked";
       asked.textContent = "GET " + new URL(rep.url).pathname.split("/").slice(-2).join("/") + "\n" + seen.asked.join("\n") +
         "\n\n" + seen.status + (seen.etag ? "   ETag: " + seen.etag : "");
-      var how = document.createElement("p");
+      const how = document.createElement("p");
       how.className = "note";
       how.textContent = way.read + " heart-ts read it as " + (rep.dialect === "json" ? "data only." : rep.dialect + ".");
       lead.append(how, asked);
       source.append(JsonView.box({ a: JSON.parse(seen.text), labelA: "the answer's body", lead: lead,
         summary: "This slide's resource <small>· what heart-ts asked, and read</small>" }));
-      var alternate = linkOf(rep, "alternate");
+      const alternate = linkOf(rep, "alternate");
       if (alternate) {
-        var plain = document.createElement("a");
+        const plain = document.createElement("a");
         plain.className = "plain";
         plain.href = new URL(alternate.href, rep.url).toString();
         plain.textContent = (alternate.title || "Plain page") + " ↗";
@@ -228,9 +232,9 @@
   function render(rep) {
     atContents = false;
     shown = rep;
-    var s = rep.state;
+    const s = rep.state;
     slide.dataset.tone = s.tone || "light";
-    var sources = (s.sources || []).map(function (x) { return '<a href="' + esc(x.href) + '" target="_blank" rel="noopener">' + esc(x.label) + "</a>"; });
+    const sources = (s.sources || []).map(function (x) { return '<a href="' + esc(x.href) + '" target="_blank" rel="noopener">' + esc(x.label) + "</a>"; });
     slide.innerHTML = (s.kicker ? '<header><span class="part">' + esc(s.kicker) + "</span></header>" : "") + s.html +
       (sources.length ? '<p class="sources"><b>Sources</b> ' + sources.join(" · ") + "</p>" : "") +
       '<span class="num">' + s.number + "</span>";
@@ -251,7 +255,7 @@
     slide.classList.add("loading");
     return step().then(function (rep) {
       render(rep);
-      var hash = "#" + rep.state.name;
+      const hash = "#" + rep.state.name;
       if (how === "push") history.pushState(null, "", hash);
       else if (how === "replace") history.replaceState(null, "", hash);
     }).catch(function (error) {
@@ -260,7 +264,7 @@
   }
 
   function goTo(name, how) {
-    var item = itemNamed(name);
+    const item = itemNamed(name);
     if (!item || (shown && shown.state.name === name)) return Promise.resolve();
     return move(function () { return way.to(item); }, how);
   }
@@ -289,7 +293,7 @@
   }
 
   // The outline: shown or hidden, remembered. Hidden, the slide takes the page.
-  var panelToggle = document.getElementById("panel-toggle");
+  const panelToggle = document.getElementById("panel-toggle");
   function panel(shownNow) {
     root.dataset.panel = shownNow ? "shown" : "hidden";
     panelToggle.setAttribute("aria-expanded", String(shownNow));
@@ -299,7 +303,7 @@
   panelToggle.addEventListener("click", function () { panel(root.dataset.panel === "hidden"); });
 
   // Present: the slide alone, on a 16:9 canvas scaled to the window, as a slide deck shows it.
-  var presentButton = document.getElementById("present");
+  const presentButton = document.getElementById("present");
   function present(on) {
     if (on) { root.dataset.present = "on"; if (root.requestFullscreen) root.requestFullscreen().catch(function () {}); }
     else { delete root.dataset.present; if (document.fullscreenElement) document.exitFullscreen().catch(function () {}); }
@@ -311,27 +315,27 @@
     b.addEventListener("click", function () { follow(b.dataset.go); });
   });
   document.querySelector(".present-exit").addEventListener("click", function () { present(false); });
-  var touchX = null, touchY = null;
+  let touchX = null, touchY = null;
   frame.addEventListener("touchstart", function (e) { if (e.touches.length === 1) { touchX = e.touches[0].clientX; touchY = e.touches[0].clientY; } }, { passive: true });
   frame.addEventListener("touchend", function (e) {
     if (root.dataset.present !== "on" || touchX === null) return;
-    var dx = e.changedTouches[0].clientX - touchX, dy = e.changedTouches[0].clientY - touchY;
+    const dx = e.changedTouches[0].clientX - touchX, dy = e.changedTouches[0].clientY - touchY;
     touchX = null;
     if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy)) follow(dx < 0 ? "next" : "prev");
   }, { passive: true });
   document.addEventListener("fullscreenchange", function () { if (!document.fullscreenElement && root.dataset.present === "on") present(false); });
 
-  var CANVAS_W = 1280, CANVAS_H = 720;
+  const CANVAS_W = 1280, CANVAS_H = 720;
   function fit() {
     if (root.dataset.present !== "on") { slide.style.transform = ""; frame.style.height = ""; return; }
     slide.style.transform = "none";
-    var tall = Math.max(CANVAS_H, slide.scrollHeight);
-    var scale = Math.min(window.innerWidth / CANVAS_W, window.innerHeight / tall);
+    const tall = Math.max(CANVAS_H, slide.scrollHeight);
+    const scale = Math.min(window.innerWidth / CANVAS_W, window.innerHeight / tall);
     slide.style.transform = "translate(-50%, -50%) scale(" + scale + ")";
   }
   window.addEventListener("resize", fit);
 
-  var notesToggle = document.getElementById("notes-toggle");
+  const notesToggle = document.getElementById("notes-toggle");
   function notes(on) {
     say.hidden = !on;
     notesToggle.setAttribute("aria-pressed", String(on));
@@ -340,7 +344,7 @@
   notesToggle.addEventListener("click", function () { notes(say.hidden); });
 
   document.querySelector(".foot").addEventListener("click", function (event) {
-    var a = event.target.closest("a[data-rel]");
+    const a = event.target.closest("a[data-rel]");
     if (!a) return;
     event.preventDefault();
     follow(a.dataset.rel);

@@ -27,9 +27,9 @@
   // The sentence, each {name} replaced by its value, marked.
   const sentence = (step) => {
     const out = el("span", "rr-say");
-    const parts = (step.say || "").split(/(\{[A-Za-z0-9_]+\})/);
+    const parts = (step.say || "").split(/(\{\w+\})/);
     parts.forEach((part) => {
-      const name = /^\{([A-Za-z0-9_]+)\}$/.exec(part);
+      const name = /^\{(\w+)\}$/.exec(part);
       if (name && step.params && name[1] in step.params) {
         const value = step.params[name[1]];
         const mark = el("mark", "rr-param", typeof value === "string" ? value : JSON.stringify(value));

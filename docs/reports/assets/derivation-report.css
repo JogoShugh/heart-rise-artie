@@ -72,7 +72,7 @@ h1 { font: 650 1.9rem/1.15 var(--display); margin: 0; text-wrap: balance; }
 .file .about { color: var(--muted); font-size: .86rem; }
 .file pre { margin: 0; padding: .6rem .9rem; border-top: 1px solid var(--rule); font: .78rem/1.6 var(--mono);
   white-space: pre; overflow-x: auto; max-height: 36rem; overflow-y: auto; }
-.toggles { display: flex; gap: .6rem; flex-wrap: wrap; }
+.toggles { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
 :root[data-detail="brief"] .full { display: none; }
 :root:not([data-detail="brief"]) .brief { display: none; }
 .goal { margin: 1rem 0 0; } .goal h2 { font: 600 .8rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 .4rem; }
@@ -83,7 +83,6 @@ h1 { font: 650 1.9rem/1.15 var(--display); margin: 0; text-wrap: balance; }
 .goal pre.cmd { font: .78rem/1.6 var(--mono); white-space: pre; padding: .6rem .9rem; }
 .y-k { color: var(--kt-kw); } .y-s { color: var(--kt-str); } .y-u { color: var(--kt-fn); } .y-v { color: var(--kt-tpl); font-weight: 600; } .y-p { color: var(--kt-cm); }
 .more { max-width: 68ch; color: var(--muted); font-size: .92rem; line-height: 1.55; margin: .2rem 0 0; }
-.toggles { align-items: center; }
 .seg { display: flex; align-items: center; gap: .4rem; }
 .seg-label { font: 600 .7rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .goal-rendered { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: .7rem 1rem; margin: 0 0 .6rem; max-width: 72rem; }

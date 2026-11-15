@@ -20,7 +20,7 @@
 import { build } from "esbuild";
 import { createHash } from "node:crypto";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
 
@@ -31,6 +31,9 @@ const deck = parse(readFileSync(join(deckDir, "deck.yaml"), "utf8"));
 const out = join(repo, deck.out);
 const PROFILE = "https://w3id.org/heart-rise/hal-schema-forms";
 const BRAND = deck.brand;
+// heart-deck's shared page script, styles and animation live once in docs/reports/assets; a deck links them there.
+const assetsDir = join(repo, "docs/reports/assets");
+const assets = relative(out, assetsDir).split("\\").join("/");
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
@@ -61,8 +64,9 @@ const fragment = (slide, f) => {
   const lines = readFileSync(join(root.dir, path), "utf8").replace(/\n$/, "").split("\n");
   const start = f.from ? lines.findIndex((line) => line.includes(f.from)) : 0;
   if (start < 0) throw new Error(`${slide.name}/${f.name}: ${path} has no line holding "${f.from}"`);
-  const end = f.count ? start + Number(f.count) - 1
-    : f.to ? lines.findIndex((line, i) => i > start && line.trimStart().startsWith(f.to)) : lines.length - 1;
+  let end = lines.length - 1;
+  if (f.count) end = start + Number(f.count) - 1;
+  else if (f.to) end = lines.findIndex((line, i) => i > start && line.trimStart().startsWith(f.to));
   if (end < start) throw new Error(`${slide.name}/${f.name}: ${path} has no end after "${f.from}"`);
   const taken = lines.slice(start, end + 1);
   const indent = Math.min(...taken.filter((l) => l.trim()).map((l) => l.match(/^ */)[0].length));
@@ -126,7 +130,7 @@ const plainPage = (s, html, prev, next) => `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(s.title)} · ${esc(BRAND)}</title>
 <base href="../">
-<link rel="stylesheet" href="deck.css">${existsSync(join(deckDir, "deck.css")) ? '\n<link rel="stylesheet" href="deck-extra.css">' : ""}
+<link rel="stylesheet" href="${assets}/deck.css">${existsSync(join(deckDir, "deck.css")) ? '\n<link rel="stylesheet" href="deck-extra.css">' : ""}
 </head><body>
 <div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
 <article class="slide">${s.kicker ? `<header><span class="part">${esc(s.kicker)}</span></header>` : ""}
@@ -141,17 +145,22 @@ const CURIES = [{ name: "deck", href: "../rels.html#{rel}", templated: true }];
 
 // Code on demand (Fielding, dissertation §5.1.7): a slide may link a script that extends the client, an animation.
 // The link carries the script's digest; the browser runs it only if the bytes match. The script is the deck's own
-// (code/ in the deck directory) or heart-deck's shared one (code/ here). A client that skips the link shows the slide
-// as written.
+// (code/ in the deck directory, copied to code/ beside the deck) or heart-deck's shared one (docs/reports/assets,
+// linked where it is). A client that skips the link shows the slide as written.
 rmSync(join(out, "code"), { recursive: true, force: true });
-mkdirSync(join(out, "code"), { recursive: true });
 const codeLink = (s) => {
   if (!s.code) return {};
-  const from = [join(deckDir, "code", s.code.file), join(here, "code", s.code.file)].find((f) => existsSync(f));
+  const own = join(deckDir, "code", s.code.file), shared = join(assetsDir, s.code.file);
+  const from = [own, shared].find((f) => existsSync(f));
   if (!from) throw new Error(`${s.name}: no code file ${s.code.file}`);
   const bytes = readFileSync(from);
-  copyFileSync(from, join(out, "code", s.code.file));
-  return { "deck:code": { href: `../code/${s.code.file}`, type: "text/javascript", title: s.code.title, integrity: integrity(bytes) } };
+  let href = `../${assets}/${s.code.file}`;
+  if (from === own) {
+    mkdirSync(join(out, "code"), { recursive: true });
+    copyFileSync(from, join(out, "code", s.code.file));
+    href = `../code/${s.code.file}`;
+  }
+  return { "deck:code": { href, type: "text/javascript", title: s.code.title, integrity: integrity(bytes) } };
 };
 slides.forEach((s, i) => {
   const prev = slides[i - 1], next = slides[i + 1];
@@ -183,7 +192,9 @@ slides.forEach((s, i) => {
   };
   writeFileSync(join(out, "deck", `${s.name}.json`), json(resource));
   writeFileSync(join(out, "deck", `${s.name}.html`), plainPage(s, plainHtml(s, embedded), prev, next));
-  const { _links: _l, _embedded: _e, ...data } = resource;
+  const data = { ...resource };
+  delete data._links;
+  delete data._embedded;
   writeFileSync(join(out, "deck/plain", `${s.name}.json`), json(data));
 });
 
@@ -200,7 +211,7 @@ writeFileSync(join(out, "deck/contents.json"), json({
 }));
 writeFileSync(join(out, "deck/contents.html"), `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contents · ${esc(BRAND)}</title><base href="../"><link rel="stylesheet" href="deck.css"></head><body>
+<title>Contents · ${esc(BRAND)}</title><base href="../"><link rel="stylesheet" href="${assets}/deck.css"></head><body>
 <div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage"><article class="slide">
 <h1>${esc(BRAND)}</h1><p class="dek">${esc(deck.tagline)}. As plain pages; <a href="index.html">read it with heart-ts</a>.</p>
 <ol>${slides.map((s) => `<li><a href="deck/${s.name}.html">${esc(s.title)}</a> <span class="note">${esc(s.part)}</span></li>`).join("")}</ol>
@@ -209,7 +220,7 @@ writeFileSync(join(out, "deck/contents.html"), `<!doctype html>
 
 writeFileSync(join(out, "rels.html"), `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Relations · ${esc(BRAND)}</title><link rel="stylesheet" href="deck.css"></head><body>
+<title>Relations · ${esc(BRAND)}</title><link rel="stylesheet" href="${assets}/deck.css"></head><body>
 <div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage"><article class="slide">
 <h1>The deck's relations</h1>
 <h2 id="ref">deck:ref</h2>
@@ -231,12 +242,10 @@ await build({
 
 const page = readFileSync(join(here, "page/index.html"), "utf8")
   .replaceAll("{{brand}}", esc(BRAND)).replaceAll("{{tagline}}", esc(deck.tagline)).replaceAll("{{description}}", esc(deck.description))
-  .replaceAll("{{key}}", esc(deck.name))
+  .replaceAll("{{key}}", esc(deck.name)).replaceAll("{{assets}}", assets)
   .replaceAll("{{extraCss}}", existsSync(join(deckDir, "deck.css")) ? '<link rel="stylesheet" href="deck-extra.css">' : "");
 if (existsSync(join(deckDir, "deck.css"))) copyFileSync(join(deckDir, "deck.css"), join(out, "deck-extra.css"));
 writeFileSync(join(out, "index.html"), page);
-for (const f of ["deck.css", "deck.js"]) copyFileSync(join(here, "page", f), join(out, f));
-for (const f of ["json-view.js", "json-view.css", "theme-switch.js"]) copyFileSync(join(repo, "docs/reports/assets", f), join(out, f));
 
 const mediaDirs = (deck.media ?? ["media"]).map((d) => resolve(deckDir, d));
 const used = new Set(slides.flatMap((s) => [...s.html.matchAll(/media\/([\w.-]+)/g)].map((m) => m[1])));

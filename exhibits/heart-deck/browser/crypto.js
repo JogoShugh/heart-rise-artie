@@ -57,7 +57,7 @@ export function createHash(algorithm) {
     },
     digest(encoding) {
       const all = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
-      parts.reduce((at, p) => (all.set(p, at), at + p.length), 0);
+      parts.reduce((at, p) => { all.set(p, at); return at + p.length; }, 0);
       const digest = sha256(all);
       if (encoding !== "base64") throw new Error(`digest(${encoding}) is not available in the browser build`);
       return base64(digest);

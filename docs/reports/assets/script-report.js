@@ -14,9 +14,18 @@
   const script = text("script-text").replace(/\n$/, "").split("\n");
   const upstream = all("upstream-record");
   const byTrace = {};
-  upstream.forEach((call) => { if (call.traceparent) (byTrace[call.traceparent] = byTrace[call.traceparent] || []).push(call); });
+  upstream.forEach((call) => {
+    if (!call.traceparent) return;
+    if (!byTrace[call.traceparent]) byTrace[call.traceparent] = [];
+    byTrace[call.traceparent].push(call);
+  });
 
-  const el = (tag, cls, content) => { const n = document.createElement(tag); if (cls) n.className = cls; if (content !== undefined) n.textContent = content; return n; };
+  const el = (tag, cls, content) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (content !== undefined) n.textContent = content;
+    return n;
+  };
   const kotlin = (t) => el("code", "kotlin", t);
   const fmt = (v) => (typeof v === "string" ? v : JSON.stringify(v));
   const short = (u) => String(u || "").replace(/^[a-z]+:\/\/[^/]+/, "") || "/";
@@ -62,7 +71,11 @@
 
   // The script, each line that ran marked with its steps.
   const byLine = {};
-  steps.forEach((s, i) => { if (s.line) (byLine[s.line] = byLine[s.line] || []).push(i + 1); });
+  steps.forEach((s, i) => {
+    if (!s.line) return;
+    if (!byLine[s.line]) byLine[s.line] = [];
+    byLine[s.line].push(i + 1);
+  });
   const code = document.getElementById("code");
   script.forEach((t, i) => {
     const row = el("div", "ln" + (byLine[i + 1] ? " ran" : ""));
@@ -182,7 +195,8 @@
     const deep = el("div", "deep"); deep.hidden = true; body.append(deep);
     let filled = false;
     const fill = () => {
-      if (filled) return; filled = true;
+      if (filled) return;
+      filled = true;
       if (s.mode === "intent") { const p = el("div", "said"); p.append(el("span", "who", "Claude was asked"), document.createTextNode(`“${s.say}”`)); deep.append(p); }
       const kv = el("dl", "kv");
       const row = (k, v) => { if (v !== undefined && v !== null && v !== "") kv.append(el("dt", "", k), el("dd", "", fmt(v))); };
@@ -226,7 +240,11 @@
       if (altHref) { const p = el("div", "left"); const a = el("a", "", altHref); a.href = altHref; p.append(document.createTextNode("on the upstream: "), a); more.append(p); }
       if (more.childElementCount) deep.append(more);
     };
-    card.open = (on) => { if (on) fill(); deep.hidden = !on; t.textContent = tally + (on ? "  ▾" : "  ▸"); };
+    card.open = (on) => {
+      if (on) fill();
+      deep.hidden = !on;
+      t.textContent = tally + (on ? "  ▾" : "  ▸");
+    };
     t.addEventListener("click", () => card.open(deep.hidden));
     root.append(card);
   });

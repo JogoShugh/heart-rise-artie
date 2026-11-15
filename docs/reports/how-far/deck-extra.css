@@ -43,7 +43,6 @@
 .map .legend .n.red { background: var(--rust); color: #fff; }
 .map .smoke { align-self: center; font: italic 0.66rem var(--body); color: #9fc3e6; border: 1px dashed var(--blue); border-radius: 6px; background: #0f1512; padding: 0.2rem 0.45rem; }
 .map .cell b { font: inherit; font-weight: 700; text-transform: none; letter-spacing: 0; }
-.map .uniform { flex: 1 1 32rem; }
 .map .rise-from { box-shadow: inset 0 -3px 0 0 var(--blue); }
 .map .scm { border: 1px solid var(--gold); border-radius: 9px; padding: 0.2rem 0.4rem 0.4rem; display: flex; flex-wrap: wrap; gap: 0.4rem; background: #26332b; }
 .map .scm p { flex-basis: 100%; margin: 0; font: italic 0.7rem var(--body); color: var(--pale); }
@@ -58,7 +57,7 @@
 /* REST, underneath */
 .map .rest { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; background: #0f1512; border: 1px solid #2d3a31; border-radius: 10px; padding: 0.6rem; }
 .map .rest h4 { margin-right: 0.4rem; }
-.map .uniform { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; border: 1px solid #2e6a9e; background: #163b5c; border-radius: 9px; padding: 0.35rem 0.45rem; }
+.map .uniform { flex: 1 1 32rem; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; border: 1px solid #2e6a9e; background: #163b5c; border-radius: 9px; padding: 0.35rem 0.45rem; }
 .map .uniform p { flex-basis: 100%; margin: 0; color: #9fc3e6; font-size: 0.72rem; max-width: none; }
 .map .uniform > span { font-size: 0.7rem; font-weight: 600; color: #dcebfa; background: #1d4f78; border-radius: 6px; padding: 0.25rem 0.5rem; }
 .map .uniform .ref:last-child { background: var(--gold); color: #17201b; }
