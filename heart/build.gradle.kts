@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "2.0.20" apply false
     kotlin("plugin.spring") version "2.0.20" apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.8" apply false
+    id("org.jetbrains.kotlinx.kover") version "0.9.1" apply false
 }
 
 subprojects {
@@ -13,6 +14,22 @@ subprojects {
 
     repositories {
         mavenCentral()
+    }
+
+    // Kover measures each Kotlin module's tests; koverXmlReport writes build/reports/kover/report.xml,
+    // in JaCoCo's XML format, which SonarQube reads (sonar.coverage.jacoco.xmlReportPaths).
+    // Only the plain test task: Kover would otherwise run every Test task for its report and check.
+    plugins.withId("org.jetbrains.kotlin.jvm") {
+        apply(plugin = "org.jetbrains.kotlinx.kover")
+        afterEvaluate {
+            extensions.configure<kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension> {
+                currentProject {
+                    instrumentation {
+                        disabledForTestTasks.addAll(tasks.withType<Test>().names.filter { it != "test" })
+                    }
+                }
+            }
+        }
     }
 
     // Every module publishes as com.artie.heart:<module>, so a server outside

@@ -4,6 +4,26 @@ plugins {
     kotlin("jvm") version "2.3.0" apply false
     kotlin("plugin.serialization") version "2.3.0" apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.8" apply false
+    id("org.jetbrains.kotlinx.kover") version "0.9.1" apply false
+}
+
+// Kover measures each Kotlin module's tests; koverXmlReport writes build/reports/kover/report.xml,
+// in JaCoCo's XML format, which SonarQube reads (sonar.coverage.jacoco.xmlReportPaths).
+// Only the plain test task: Kover would otherwise run every Test task for its report and check,
+// the live ones too (authLiveTest needs scripts/auth-check.sh's services).
+subprojects {
+    plugins.withId("org.jetbrains.kotlin.jvm") {
+        apply(plugin = "org.jetbrains.kotlinx.kover")
+        afterEvaluate {
+            extensions.configure<kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension> {
+                currentProject {
+                    instrumentation {
+                        disabledForTestTasks.addAll(tasks.withType<Test>().names.filter { it != "test" })
+                    }
+                }
+            }
+        }
+    }
 }
 
 // bdd-gates: the script modules record "BDD_RUN PASS|FAIL" after every test run, as client/artie does,

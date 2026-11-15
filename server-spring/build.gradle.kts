@@ -8,6 +8,8 @@ plugins {
     kotlin("jvm") version "2.0.20"
     kotlin("plugin.spring") version "2.0.20"
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    // Kover: koverXmlReport writes build/reports/kover/report.xml (JaCoCo's format) for SonarQube.
+    id("org.jetbrains.kotlinx.kover") version "0.9.1"
 }
 
 group = "com.artie"
