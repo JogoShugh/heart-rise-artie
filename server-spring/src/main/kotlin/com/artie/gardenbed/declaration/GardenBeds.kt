@@ -32,6 +32,9 @@ import com.artie.heart.StateView
  */
 object GardenBeds {
 
+    /** The water act's relation, and its path until a change moves it. */
+    private const val WATER_CELL = "water-cell"
+
     fun type(frost: Boolean = false, change: GardenChange? = null) = ResourceType(
         collection = "beds",
         profile = GardenProfile.profile(frost, change),
@@ -91,15 +94,15 @@ object GardenBeds {
     /** The water act as Monday declares it, or as one Wednesday change alters it. */
     private fun water(change: GardenChange?): Act = Act.of(
         name = "waterCell",
-        relation = if (change == GardenChange.RENAME_ACT) "irrigate" else "water-cell",
+        relation = if (change == GardenChange.RENAME_ACT) "irrigate" else WATER_CELL,
         input = when (change) {
             GardenChange.TIGHTER_LIMIT -> WaterCellLimitedRequest::class.java
             GardenChange.NEW_REQUIRED_INPUT -> WaterCellMethodRequest::class.java
             GardenChange.NEW_OPTIONAL_INPUT -> WaterCellOptionalMethodRequest::class.java
             else -> WaterCellRequest::class.java
         },
-        path = if (change == GardenChange.MOVE_URL || change == GardenChange.MOVE_URL_KEPT) "water" else "water-cell",
-        formerPaths = if (change == GardenChange.MOVE_URL_KEPT) listOf("water-cell") else emptyList(),
+        path = if (change == GardenChange.MOVE_URL || change == GardenChange.MOVE_URL_KEPT) "water" else WATER_CELL,
+        formerPaths = if (change == GardenChange.MOVE_URL_KEPT) listOf(WATER_CELL) else emptyList(),
     )
 
     /** The moisture member as Monday names it, renamed, or under both names while the old one is deprecated. */

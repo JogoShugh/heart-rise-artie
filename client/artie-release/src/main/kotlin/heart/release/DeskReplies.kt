@@ -36,7 +36,8 @@ class DeskReplies(private val service: ReplyService, private val origin: String)
         return lock.withLock {
             val before = changes[reference] ?: 0
             while ((changes[reference] ?: 0) == before && end > System.currentTimeMillis()) {
-                changed.await(end - System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                // False: the time ran out, and there is nothing more to wait for.
+                if (!changed.await(end - System.currentTimeMillis(), TimeUnit.MILLISECONDS)) break
             }
             (changes[reference] ?: 0) != before
         }

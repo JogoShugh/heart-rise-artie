@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.http.HttpHeaders
 
+/** The attribute that names an act's relation on its button and its form. */
+private const val DATA_REL = "data-rel"
+
 /** A resource's HTML as a binding serves it to a browser (html.feature). */
 class HtmlSteps(private val http: HttpWorld) {
 
@@ -22,7 +25,7 @@ class HtmlSteps(private val http: HttpWorld) {
         assertTrue(forms.isNotEmpty())
         forms.forEach { form ->
             val sent = ObjectMapper().readTree(form.attr("hx-headers")).path("If-Match").asText()
-            assertEquals(etag, sent, form.attr("data-rel"))
+            assertEquals(etag, sent, form.attr(DATA_REL))
         }
     }
 
@@ -30,8 +33,8 @@ class HtmlSteps(private val http: HttpWorld) {
     fun agrees(path: String) {
         val json = http.json(http.get(path, mapOf(HttpHeaders.ACCEPT to accept("hal-schema-forms"))))
         val html = Jsoup.parse(String(http.get(path, mapOf(HttpHeaders.ACCEPT to accept("html"))).responseBody!!))
-        val offered = html.select(".acts button.act:not([aria-disabled=true])").map { it.attr("data-rel") }.toSet()
-        val dialogs = html.select("dialog form[data-rel]").map { it.attr("data-rel") }.toSet()
+        val offered = html.select(".acts button.act:not([aria-disabled=true])").map { it.attr(DATA_REL) }.toSet()
+        val dialogs = html.select("dialog form[data-rel]").map { it.attr(DATA_REL) }.toSet()
         val forms = json.path("_forms").fieldNames().asSequence().toSet()
         assertEquals(forms, offered)
         assertEquals(forms, dialogs)
