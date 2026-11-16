@@ -16,7 +16,6 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 
 /**
@@ -53,37 +52,9 @@ class ClaudePlanner(
         return move(message)
     }
 
-    private fun request(view: PlanView): JsonObject = buildJsonObject {
-        put("model", model)
-        put("max_tokens", maxTokens)
-        // A goal in steps offers only the moves the step now allows: a cached prefix for each kind of step.
-        putJsonArray("tools") { add(tool(view.allowed.toList().ifEmpty { MOVES })) }
-        putJsonObject("tool_choice") { put("type", "auto") }
-        putJsonArray("system") {
-            add(
-                buildJsonObject {
-                    put("type", "text")
-                    put("text", SYSTEM)
-                    putJsonObject("cache_control") { put("type", "ephemeral") }
-                },
-            )
-        }
-        putJsonArray("messages") {
-            add(
-                buildJsonObject {
-                    put("role", "user")
-                    putJsonArray("content") {
-                        add(
-                            buildJsonObject {
-                                put("type", "text")
-                                put("text", turn(view))
-                            }
-                        )
-                    }
-                },
-            )
-        }
-    }
+    // A goal in steps offers only the moves the step now allows: a cached prefix for each kind of step.
+    private fun request(view: PlanView): JsonObject =
+        claudeRequest(model, maxTokens, tool(view.allowed.toList().ifEmpty { MOVES }), SYSTEM, turn(view))
 
     /**
      * What changes from move to move, in tagged parts: the goal by sentence, or, for a goal in steps, its context,

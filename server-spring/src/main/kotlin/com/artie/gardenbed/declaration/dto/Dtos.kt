@@ -110,6 +110,8 @@ class ThawRequest
  * OpenAPI description's Bed schema is generated. Its status is a closed
  * enum of the statuses this garden declares.
  */
+// CPD-OFF: Bed and its two Wednesday variants repeat their members on purpose. Each is one version of the
+// published OpenAPI schema, generated from its own annotations; sharing them would change what is published.
 @Schema(title = "Bed")
 data class Bed(
     @field:NotNull @field:Schema(title = "Bed id", description = "The bed's number")
@@ -173,6 +175,7 @@ data class BedWithBothMoistures(
     @field:Schema(title = "Moisture", description = "The same as soilMoisture, kept for old clients", deprecated = true)
     val moistureLevel: Int? = null,
 )
+// CPD-ON
 
 /** What the water act binds, under any change: the millilitres, and a method where one is required. */
 data class WaterCellInput(val milliliters: Int = 0, val method: WaterMethod? = null)

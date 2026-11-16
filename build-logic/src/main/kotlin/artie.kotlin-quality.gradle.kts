@@ -1,7 +1,7 @@
 // artie.kotlin-quality: what every Kotlin module in this repo is checked with, in one place.
 //   detekt  complexity and style, at its defaults (buildUponDefaultConfig); a module may add a baseline.
 //   Kover   coverage of the plain test task: build/reports/kover/report.xml, JaCoCo's XML, read by SonarQube.
-//   CPD     PMD's copy-paste detector over the module's Kotlin: cpdCheck, run by check.
+//   CPD     PMD's copy-paste detector over the module's Kotlin: cpdCheck, run by check, fails the build on a duplicate.
 plugins {
     id("io.gitlab.arturbosch.detekt")
     id("org.jetbrains.kotlinx.kover")
@@ -36,8 +36,6 @@ cpd {
     language = "kotlin"
     toolVersion = pmdVersion
     minimumTokenCount = 100
-    // Reported for now; the build fails on a duplicate once the existing ones are gone.
-    isIgnoreFailures = true
 }
 
 tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {

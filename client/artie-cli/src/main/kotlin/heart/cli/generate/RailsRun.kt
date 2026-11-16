@@ -117,12 +117,6 @@ internal class Templates(inputs: Map<String, Map<*, *>>) {
             ?.let { at -> source.name + at.split('/').drop(1).joinToString("") { "[\"$it\"]" } }
     }
 
-    private fun leaves(node: Any?, at: String): List<Pair<String, Any?>> = when (node) {
-        is Map<*, *> -> node.entries.flatMap { (k, v) -> leaves(v, "$at/$k") }
-        is List<*> -> node.flatMapIndexed { i, v -> leaves(v, "$at/$i") }
-        else -> listOf(at to node)
-    }
-
     private companion object {
         val NUMBERS = listOf("""(?<=/)\d+(?=/|$|\?)""", """(?<=#)\d+""")
         val SHA = Regex("""^[0-9a-f]{40}$""")

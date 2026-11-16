@@ -9,7 +9,6 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 
 /**
@@ -77,36 +76,7 @@ class ClaudeReasoner(
         state: JsonObject,
         offers: List<Offer>,
         links: List<LinkOffer>,
-    ): JsonObject = buildJsonObject {
-        put("model", model)
-        put("max_tokens", maxTokens)
-        putJsonArray("tools") { add(TOOL) }
-        putJsonObject("tool_choice") { put("type", "auto") }
-        putJsonArray("system") {
-            add(
-                buildJsonObject {
-                    put("type", "text")
-                    put("text", SYSTEM)
-                    putJsonObject("cache_control") { put("type", "ephemeral") }
-                },
-            )
-        }
-        putJsonArray("messages") {
-            add(
-                buildJsonObject {
-                    put("role", "user")
-                    putJsonArray("content") {
-                        add(
-                            buildJsonObject {
-                                put("type", "text")
-                                put("text", turn(intent, state, offers, links))
-                            },
-                        )
-                    }
-                },
-            )
-        }
-    }
+    ): JsonObject = claudeRequest(model, maxTokens, TOOL, SYSTEM, turn(intent, state, offers, links))
 
     private fun turn(intent: String, state: JsonObject, offers: List<Offer>, links: List<LinkOffer>): String {
         val offered = buildJsonObject {

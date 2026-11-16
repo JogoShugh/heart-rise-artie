@@ -26,12 +26,6 @@ internal class UpstreamCall(val number: Int, val span: String, doc: Map<*, *>) {
             leaves(answer, "").filter { (_, leaf) -> leaf !is Boolean && leaf?.toString() == value }.map { it.first }
         }
 
-    private fun leaves(node: Any?, at: String): List<Pair<String, Any?>> = when (node) {
-        is Map<*, *> -> node.entries.flatMap { (k, v) -> leaves(v, "$at/$k") }
-        is List<*> -> node.flatMapIndexed { i, v -> leaves(v, "$at/$i") }
-        else -> listOf(at to node)
-    }
-
     private companion object {
         val TAKEN = 200..299
     }
