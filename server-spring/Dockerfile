@@ -24,6 +24,7 @@
 # server includes the HEART library build from ../heart.
 FROM gradle:8.10-jdk21 AS build
 WORKDIR /app
+COPY build-logic ./build-logic
 COPY heart ./heart
 COPY server-spring/build.gradle.kts server-spring/settings.gradle.kts ./server-spring/
 COPY server-spring/src ./server-spring/src

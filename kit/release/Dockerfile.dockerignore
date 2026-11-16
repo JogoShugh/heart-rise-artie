@@ -1,10 +1,12 @@
 # The release's image needs the heart library, ARTIE, the report assets, the release exhibit and this folder.
 *
+!build-logic
 !heart
 !client
 !docs/reports/assets
 !exhibits/merge-watch-release
 !kit/release
+build-logic/build
 heart/build
 heart/*/build
 client/build

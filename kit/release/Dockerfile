@@ -9,6 +9,7 @@
 FROM eclipse-temurin:21-jdk AS build
 COPY --from=eclipse-temurin:22-jdk /opt/java/openjdk /opt/jdk22
 WORKDIR /src
+COPY build-logic build-logic
 COPY heart heart
 COPY client client
 COPY docs/reports/assets docs/reports/assets

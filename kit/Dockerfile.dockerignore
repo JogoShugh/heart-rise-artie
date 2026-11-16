@@ -1,10 +1,12 @@
 # The kit's image needs the heart library, ARTIE, the report assets and the kit itself; nothing else is sent.
 # Gradle's output is left out by module, not as every folder named build: a source package may be named build too.
 *
+!build-logic
 !heart
 !client
 !docs/reports/assets
 !kit
+build-logic/build
 heart/build
 heart/*/build
 client/build

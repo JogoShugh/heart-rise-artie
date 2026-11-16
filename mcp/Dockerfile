@@ -8,6 +8,7 @@
 # The client and heart-mcp compile for Java 22, so build and run on 22.
 FROM eclipse-temurin:22.0.2_9-jdk AS build
 WORKDIR /src
+COPY build-logic build-logic
 COPY heart heart
 COPY client client
 COPY mcp mcp
