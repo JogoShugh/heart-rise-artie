@@ -1,3 +1,6 @@
+// The quality plugins (artie.kotlin-quality, artie.coverage-merge), defined once for every Kotlin build here.
+pluginManagement { includeBuild("../build-logic") }
+
 rootProject.name = "heart"
 
 // ARTIE, the client (heart:artie); the root project holds its tests.

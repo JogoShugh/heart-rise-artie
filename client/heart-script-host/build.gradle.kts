@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // heart-script-host: the Kotlin script engine a HEART script runs in, for artie run and the features
@@ -26,10 +26,6 @@ dependencies {
     runtimeOnly("org.jetbrains.kotlin:kotlin-power-assert-compiler-plugin-embeddable:$kotlinVersion") {
         isTransitive = false
     }
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }
 
 kotlin {

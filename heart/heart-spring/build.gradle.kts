@@ -2,7 +2,7 @@ plugins {
     `java-library`
     kotlin("jvm")
     kotlin("plugin.spring")
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // heart-spring: the HTTP binding of HEART on Spring WebFlux. Its routes are
@@ -40,8 +40,4 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }

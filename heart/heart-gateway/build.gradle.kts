@@ -3,7 +3,7 @@ plugins {
     `java-test-fixtures`
     application
     kotlin("jvm")
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // heart-gateway: presents a service that only publishes OpenAPI to HEART
@@ -59,8 +59,4 @@ distributions {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }

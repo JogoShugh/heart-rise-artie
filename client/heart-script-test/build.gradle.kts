@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // heart-script-test: expect, for scripts that provoke outcomes and refusals on purpose (conformance and
@@ -25,10 +25,6 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }
 
 kotlin {

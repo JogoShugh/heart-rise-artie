@@ -4,7 +4,7 @@ import java.time.temporal.ChronoUnit
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // ARTIE: the HEART client (SPEC §6.3, §6.8), its features and its tests.
@@ -65,7 +65,6 @@ tasks.named("compileKotlin") { finalizedBy("logBddRun") }
 tasks.named("compileTestKotlin") { finalizedBy("logBddRun") }
 
 detekt {
-    buildUponDefaultConfig = true
     // Existing code predates the gate; the baseline freezes its findings so
     // only new violations fail. Shrink it as code is touched; never grow it.
     baseline = file("detekt-baseline.xml")

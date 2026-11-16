@@ -2,7 +2,7 @@ plugins {
     `java-library`
     `java-test-fixtures`
     kotlin("jvm")
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // heart-sims: narrow simulated HEART services, a build service and a deploy
@@ -45,8 +45,4 @@ val installSims by tasks.registering(Sync::class) {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }

@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // artie-minecraft: a HEART resource as a Minecraft dialog (docs/reports/minecraft-plan). ARTIE reads the resource;
@@ -33,10 +33,6 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }
 
 // Detekt 1.23 knows Java up to 22; it reads the source, so the newest it knows will do.

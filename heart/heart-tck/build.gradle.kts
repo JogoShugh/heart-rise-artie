@@ -2,7 +2,7 @@ plugins {
     `java-library`
     kotlin("jvm")
     kotlin("plugin.spring")
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // heart-tck: HEART's conformance features, written once and run by every
@@ -45,8 +45,4 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }

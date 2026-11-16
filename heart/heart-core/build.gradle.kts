@@ -2,7 +2,7 @@ plugins {
     `java-library`
     `java-test-fixtures`
     kotlin("jvm")
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // heart-core: the protocol-neutral part of HEART (SPEC §6.0). No Spring,
@@ -48,8 +48,4 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }

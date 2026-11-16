@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     kotlin("jvm")
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // heart-http4k: the HTTP binding of HEART on http4k, a second binding beside
@@ -36,8 +36,4 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }

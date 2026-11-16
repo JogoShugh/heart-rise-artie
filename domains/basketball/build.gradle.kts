@@ -7,7 +7,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
     kotlin("jvm") version "2.0.20"
     kotlin("plugin.spring") version "2.0.20"
-    id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    id("artie.kotlin-quality")
 }
 
 group = "com.artie"
@@ -65,10 +65,6 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }
 
 // detekt 1.23.8 is built against Kotlin 2.0.21; keep Spring's BOM off its classpath.

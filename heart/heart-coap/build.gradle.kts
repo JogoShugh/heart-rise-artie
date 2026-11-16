@@ -2,7 +2,7 @@ plugins {
     `java-library`
     kotlin("jvm")
     kotlin("plugin.spring")
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // heart-coap: the CoAP binding of HEART (SPEC §6.0.1), on Eclipse Californium.
@@ -32,8 +32,4 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }

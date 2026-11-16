@@ -4,7 +4,7 @@ import java.time.temporal.ChronoUnit
 plugins {
     kotlin("jvm")
     `java-library`
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 val cucumberVersion = "7.18.0"
@@ -27,10 +27,6 @@ dependencies {
 
 kotlin {
     jvmToolchain(22)
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }
 
 tasks.test {

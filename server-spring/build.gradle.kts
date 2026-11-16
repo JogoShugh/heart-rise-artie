@@ -7,9 +7,8 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
     kotlin("jvm") version "2.0.20"
     kotlin("plugin.spring") version "2.0.20"
-    id("io.gitlab.arturbosch.detekt") version "1.23.8"
-    // Kover: koverXmlReport writes build/reports/kover/report.xml (JaCoCo's format) for SonarQube.
-    id("org.jetbrains.kotlinx.kover") version "0.9.1"
+    // detekt, Kover and CPD, as every Kotlin build here is checked (build-logic).
+    id("artie.kotlin-quality")
 }
 
 group = "com.artie"
@@ -121,7 +120,6 @@ tasks.withType<Test> {
 }
 
 detekt {
-    buildUponDefaultConfig = true
     // Existing code predates the gate; the baseline freezes its findings so
     // only new violations fail. Shrink it as code is touched; never grow it.
     baseline = file("detekt-baseline.xml")

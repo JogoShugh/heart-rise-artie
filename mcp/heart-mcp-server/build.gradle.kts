@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm")
     application
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 dependencies {
@@ -12,10 +12,6 @@ dependencies {
 
 kotlin {
     jvmToolchain(22)
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }
 
 application {

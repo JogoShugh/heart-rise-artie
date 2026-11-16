@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     kotlin("jvm")
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // heart-eventsourcing: an optional event store for declared resource types.
@@ -34,8 +34,4 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }

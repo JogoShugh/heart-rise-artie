@@ -2,7 +2,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     `java-test-fixtures`
-    id("io.gitlab.arturbosch.detekt")
+    id("artie.kotlin-quality")
 }
 
 // heart-script: the HEART script DSL (spec/PLAN-ARTIE-SCRIPTS.md, "The DSL") and the contract any
@@ -36,10 +36,6 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
-}
-
-detekt {
-    buildUponDefaultConfig = true
 }
 
 kotlin {

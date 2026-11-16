@@ -1,3 +1,6 @@
+// The quality plugins (artie.kotlin-quality, artie.coverage-merge), defined once for every Kotlin build here.
+pluginManagement { includeBuild("../build-logic") }
+
 rootProject.name = "heart"
 
 // The HEART server library (spec/PLAN-HEART-LIBRARY-DOMAINS-EVAL.md, Part A).
