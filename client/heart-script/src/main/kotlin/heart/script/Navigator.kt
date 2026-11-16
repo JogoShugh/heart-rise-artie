@@ -172,7 +172,7 @@ class Used(
  * address the client already holds; the client does the rest: target,
  * method, validator, binding.
  */
-interface Navigator {
+interface Navigator : Explains {
     /** The entry's representation: the only address a script knows. */
     fun enter(entry: String): Answer
 
@@ -207,12 +207,6 @@ interface Navigator {
      */
     val awaiting: (address: String, atMost: kotlin.time.Duration) -> Answer get() = { address, _ -> visit(address) }
 
-    /** Why the act [rel] is not offered, as the server says (SPEC §6.12); null when it says nothing. */
-    fun why(rel: String): String?
-
-    /** What the relation [rel] means, from its profile; null when it says nothing. */
-    fun describe(rel: String): String?
-
     /**
      * The exchanges the client made since it was last asked, when it keeps them for a run's capture
      * (spec/PLAN-LINE-BY-LINE-REPORT.md): each request as sent and its answer, credentials never in them.
@@ -239,6 +233,15 @@ interface Navigator {
      */
     fun reason(intent: String, asOf: String? = null, with: Map<String, Any?> = emptyMap()): Reasoned =
         Reasoned(null, Answer.Refused(Refusal.NoReasoner, Side.CLIENT, "this client has no reasoner"))
+}
+
+/** What a client says about the acts it holds: why one is not offered, and what a relation means. */
+interface Explains {
+    /** Why the act [rel] is not offered, as the server says (SPEC §6.12); null when it says nothing. */
+    fun why(rel: String): String?
+
+    /** What the relation [rel] means, from its profile; null when it says nothing. */
+    fun describe(rel: String): String?
 }
 
 /**

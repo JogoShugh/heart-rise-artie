@@ -1,6 +1,5 @@
 package heart.script
 
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.time.Duration
@@ -99,7 +98,8 @@ class VirtualTime(start: java.time.Instant, private val grace: Duration = 1.seco
         try {
             while (!until() && now.isBefore(ends)) {
                 if (idle()) move()
-                if (!until() && now.isBefore(ends)) changed.await(grace.inWholeMilliseconds, TimeUnit.MILLISECONDS)
+                // A real pause of at most grace, for the other threads to move; what's left of it doesn't matter.
+                if (!until() && now.isBefore(ends)) changed.awaitNanos(grace.inWholeNanoseconds)
             }
             until()
         } finally {
