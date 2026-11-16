@@ -89,7 +89,7 @@ koog = junit("exhibits/koog-first-pass")
 client_live = [c for c in junit("client", "liveTest") if c["status"] != "skip" and "Cucumber" in c["suite"]]
 
 cache_log = (SCRATCH / "cache-demo.log").read_text()
-cache_checks = [(m.group(1), m.group(2).strip()) for m in re.finditer(r"^[ \t]+(PASS|FAIL)[ \t]+(.*)$", cache_log, re.M)]
+cache_checks = [(m.group(1), m.group(2).strip()) for m in re.finditer(r"^[ \t]+(PASS|FAIL)[ \t](.*)$", cache_log, re.M)]
 cache_final = next((l for l in cache_log.splitlines() if "CHECKS PASSED" in l or "FAILED" in l), "")
 
 live = [l.split() for l in (SCRATCH / "live-hash.txt").read_text().splitlines() if l.strip()]

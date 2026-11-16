@@ -5,14 +5,10 @@
 // are added where the trace shows their effect: a reply read in a new state was answered since, by the party its
 // hr:in-reply-to names.
 import fs from "node:fs";
-import vm from "node:vm";
-import path from "node:path";
+import { createRequire } from "node:module";
 
 const [out, ...runs] = process.argv.slice(2);
-const here = path.dirname(new URL(import.meta.url).pathname);
-const sandbox = {};
-vm.createContext(sandbox);
-vm.runInContext(fs.readFileSync(path.join(here, "../assets/js-yaml.min.js"), "utf8"), sandbox);
+const jsyaml = createRequire(import.meta.url)("../assets/js-yaml.min.js");
 
 const PARTY = { 8160: "replies", 8098: "github", 8099: "watch", 8170: "ci", 8171: "jenkins", 8180: "preview", 8190: "dev" };
 const BEHIND = { 8098: "the GitHub API", 8170: "Jenkins" };
@@ -109,7 +105,7 @@ function offered(held, rel, url, base) {
 }
 
 function messages(trace) {
-  const steps = sandbox.jsyaml.loadAll(fs.readFileSync(trace, "utf8")).slice(1);
+  const steps = jsyaml.loadAll(fs.readFileSync(trace, "utf8")).slice(1);
   const all = [], replyState = new Map();
   // The last representation of each address, as ARTIE holds it: a 304 keeps the one held before.
   const bodies = new Map();

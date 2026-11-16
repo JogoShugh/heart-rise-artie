@@ -5,15 +5,11 @@
 // replies, read from each reply's change of state between two reads; the watch's looks; Jenkins' part, from the CI
 // wrapper's log of what Jenkins told it.
 import fs from "node:fs";
-import vm from "node:vm";
-import path from "node:path";
+import { createRequire } from "node:module";
 
 const [trace, out, title] = process.argv.slice(2);
-const here = path.dirname(new URL(import.meta.url).pathname);
-const sandbox = {};
-vm.createContext(sandbox);
-vm.runInContext(fs.readFileSync(path.join(here, "../assets/js-yaml.min.js"), "utf8"), sandbox);
-const steps = sandbox.jsyaml.loadAll(fs.readFileSync(trace, "utf8")).slice(1);
+const jsyaml = createRequire(import.meta.url)("../assets/js-yaml.min.js");
+const steps = jsyaml.loadAll(fs.readFileSync(trace, "utf8")).slice(1);
 
 // The kinds of message, each its own colour, as the legend says.
 const HEART = "#A80036", RISE = "#1B7F3B", OWN = "#1F4FB8";

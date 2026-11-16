@@ -3,12 +3,11 @@
 // records only what reached the network: a form set or schema answered from ARTIE's cache is in none of them.
 //   node cache.mjs JS_YAML L0_RUNS FRESH_RUNS ONE_DESK_RUNS
 import fs from 'fs';
-import vm from 'vm';
+import { createRequire } from 'module';
 
 const [lib, ...dirs] = process.argv.slice(2);
-const context = {};
-vm.runInNewContext(fs.readFileSync(lib, 'utf8'), context);
-const yaml = context.jsyaml;
+// The vendored js-yaml, a CommonJS module.
+const yaml = createRequire(import.meta.url)(fs.realpathSync(lib));
 const modes = ['L0, a fresh desk each release', 'L2, a fresh desk each release', 'L2, one desk for all five'];
 const shared = /\/affordance-sets\/|\/schemas\//;
 

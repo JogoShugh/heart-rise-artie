@@ -1,12 +1,11 @@
 // Prints, as YAML, the merge step of a release trace: what ARTIE sent, and what the pull request said after.
 //   node merge-step.mjs JS_YAML TRACE
 import fs from 'fs';
-import vm from 'vm';
+import { createRequire } from 'module';
 
 const [lib, trace] = process.argv.slice(2);
-const context = {};
-vm.runInNewContext(fs.readFileSync(lib, 'utf8'), context);
-const yaml = context.jsyaml;
+// The vendored js-yaml, a CommonJS module.
+const yaml = createRequire(import.meta.url)(fs.realpathSync(lib));
 const step = yaml.loadAll(fs.readFileSync(trace, 'utf8'))
   .find((doc) => doc && doc.params && doc.params.relation === 'scm:merge');
 const exchange = step.exchanges[0];

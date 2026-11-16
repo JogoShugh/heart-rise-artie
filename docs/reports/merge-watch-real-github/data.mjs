@@ -3,13 +3,12 @@
 // native calls, from the gateway's record, joined by the traceparent each carries); and how each release ended.
 //   node data.mjs JS_YAML RUNS_DIR
 import fs from 'fs';
-import vm from 'vm';
+import { createRequire } from 'module';
 import path from 'path';
 
 const [lib, runs] = process.argv.slice(2);
-const context = {};
-vm.runInNewContext(fs.readFileSync(lib, 'utf8'), context);
-const yaml = context.jsyaml;
+// The vendored js-yaml, a CommonJS module.
+const yaml = createRequire(import.meta.url)(fs.realpathSync(lib));
 const read = (file) => yaml.loadAll(fs.readFileSync(file, 'utf8')).filter(Boolean);
 const json = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
 const time = (at) => new Date(at).getTime();

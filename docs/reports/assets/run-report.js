@@ -292,7 +292,7 @@
   bar.append(unfold);
 
   // ---- Summary tiles: the run at a glance; a tile that can filters the rows to its steps. ----
-  const pathOf = (url) => { try { const u = new URL(url, "http://x"); return u.pathname + u.search; } catch { return url; } };
+  const pathOf = (url) => { try { const u = new URL(url, "https://x"); return u.pathname + u.search; } catch { return url; } };
   function expected(step) {
     if (neutral(step)) return neutralMet(step);
     return step.expect === undefined || step.expect === "2xx"
