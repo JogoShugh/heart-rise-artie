@@ -80,9 +80,11 @@ class ScriptYaml(
         val start = capture.inputGiven(capture.entry)?.let { "\${$it}" } ?: capture.entry
         val document = linkedMapOf<String, Any?>("heart" to 1, "kind" to kind, "start" to start)
         val inputs = capture.inputs.mapValues { (name, input) -> declared(input, bindings.inputTypes[name]) }
-        return (header() + YamlText.lines(document) + "" +
-            (if (inputs.isEmpty()) emptyList() else YamlText.lines(mapOf("inputs" to inputs)) + "") +
-            YamlText.lines(mapOf("steps" to steps))).joinToString("\n", postfix = "\n")
+        return (
+            header() + YamlText.lines(document) + "" +
+                (if (inputs.isEmpty()) emptyList() else YamlText.lines(mapOf("inputs" to inputs)) + "") +
+                YamlText.lines(mapOf("steps" to steps))
+            ).joinToString("\n", postfix = "\n")
     }
 
     private fun header(): List<String> = listOfNotNull(
@@ -95,8 +97,9 @@ class ScriptYaml(
             kept == 0 ->
                 "# Every selection as that run made it, nested as it nested; " +
                     "an act it left to the model stays in words."
-            else -> "# Every selection as that run made it, nested as it nested; " +
-                "where the reasoner chose a value, its reason step is kept."
+            else ->
+                "# Every selection as that run made it, nested as it nested; " +
+                    "where the reasoner chose a value, its reason step is kept."
         },
         "# The members of a list the run visited one by one are each acted on by what they offer (when-offered)."
             .takeIf { looped },
@@ -227,8 +230,10 @@ class ScriptYaml(
                 (listOfNotNull(named) + selection.block.keeps.map { mapOf(KEEP_AS to it.keptAs) }).distinct()
             else -> {
                 // A resource made new is read again first; then what the act changed is checked, then the steps in it.
-                made["then"] = (listOfNotNull(mapOf("sync" to true).takeIf { selection.fresh }, named) +
-                    (made["then"] as? List<*>).orEmpty() + steps(selection.block)).distinct()
+                made["then"] = (
+                    listOfNotNull(mapOf("sync" to true).takeIf { selection.fresh }, named) +
+                        (made["then"] as? List<*>).orEmpty() + steps(selection.block)
+                    ).distinct()
                 listOf(made)
             }
         }

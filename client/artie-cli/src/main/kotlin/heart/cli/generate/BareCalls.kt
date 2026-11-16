@@ -20,8 +20,11 @@ internal class UpstreamCall(val number: Int, val span: String, doc: Map<*, *>) {
 
     /** Where [value] stands in the answer, by JSON Pointer, each one this call answered with and wasn't sent. */
     fun pointers(value: String): List<String> =
-        if (!taken || value in url || value in body.toString()) emptyList()
-        else leaves(answer, "").filter { (_, leaf) -> leaf !is Boolean && leaf?.toString() == value }.map { it.first }
+        if (!taken || value in url || value in body.toString()) {
+            emptyList()
+        } else {
+            leaves(answer, "").filter { (_, leaf) -> leaf !is Boolean && leaf?.toString() == value }.map { it.first }
+        }
 
     private fun leaves(node: Any?, at: String): List<Pair<String, Any?>> = when (node) {
         is Map<*, *> -> node.entries.flatMap { (k, v) -> leaves(v, "$at/$k") }
@@ -64,6 +67,11 @@ internal class BareRun(val capture: Capture, upstream: String) {
     /** Where [value] can be read from before the call [before]: an earlier answer and a pointer, the best first. */
     fun source(value: String, before: Int): Pair<UpstreamCall, String>? = calls.take(before - 1)
         .flatMap { call -> call.pointers(value).map { call to it } }
-        .minWithOrNull(compareBy({ (_, at) -> at.split('/').any { it.isNotEmpty() && it.all(Char::isDigit) } },
-            { (call, _) -> !call.writes }, { (call, _) -> call.number }))
+        .minWithOrNull(
+            compareBy(
+                { (_, at) -> at.split('/').any { it.isNotEmpty() && it.all(Char::isDigit) } },
+                { (call, _) -> !call.writes },
+                { (call, _) -> call.number }
+            )
+        )
 }

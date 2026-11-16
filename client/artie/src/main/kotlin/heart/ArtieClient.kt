@@ -110,6 +110,7 @@ class ArtieClient(
     override fun follow(rel: String, title: String?): HeartRepresentation {
         var held = current ?: error("enter a service before following a link")
         fun matches(candidate: String?) = title == null || candidate == title
+
         // SPEC §6.1: an embedded resource is followed like a link; following fetches it.
         fun found(page: HeartRepresentation) = page.links(rel).firstOrNull { matches(it.title) }
             ?: page.embedded(rel).firstOrNull { matches(it.title) }?.self

@@ -61,7 +61,10 @@ internal class Written(source: List<String>?, step: Step) {
             when {
                 c == '\\' -> i++
                 depth == 0 && c == '"' -> return call.substring(from, i + 1)
-                call.startsWith("\${", i) -> { depth++; i++ }
+                call.startsWith("\${", i) -> {
+                    depth++
+                    i++
+                }
                 depth > 0 && c == '}' -> depth--
             }
             i++

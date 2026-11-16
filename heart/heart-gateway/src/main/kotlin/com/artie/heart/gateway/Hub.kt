@@ -38,7 +38,8 @@ class Hub(
 
     /** Reads held, and webhooks taken, before [handler]. */
     fun filter(): Filter = Filter { next ->
-        { request ->
+        {
+                request ->
             when {
                 request.method == Method.POST && request.uri.path == PATH -> webhook(request)
                 waitFor(request) > 0 -> held(request, next)

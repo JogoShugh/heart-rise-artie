@@ -153,8 +153,10 @@ internal sealed class VaultLogin {
             }
             val response = transport.send(
                 HeartRequest(
-                    "POST", "$address/v1/auth/approle/login",
-                    mapOf("Content-Type" to "application/json", VaultCredentials.ACCEPT), body.toString(),
+                    "POST",
+                    "$address/v1/auth/approle/login",
+                    mapOf("Content-Type" to "application/json", VaultCredentials.ACCEPT),
+                    body.toString(),
                 ),
             )
             if (response.status != OK) {

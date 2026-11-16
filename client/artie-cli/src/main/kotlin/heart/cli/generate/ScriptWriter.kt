@@ -135,6 +135,7 @@ class ScriptWriter(
     private fun block(block: Block, depth: Int): List<String> {
         val pad = INDENT.repeat(depth)
         val watched = block.watched?.let { listOf("${pad}keepAs(\"$it\")") }.orEmpty()
+
         // A list the run went through: a whenever, each member acted on by what it offers, or its own list in turn
         // (Members.kt), as the script held as data writes it.
         fun over(loop: Loop, at: Int): List<String> {
@@ -199,7 +200,10 @@ class ScriptWriter(
             Call.Reasoned -> listOf(pad + bindings.kept(step))
             is Call.Words -> listOf("${pad}act(${how.words})")
             Call.Follow -> listOf(pad + follow(step))
-            Call.Act -> act(step, pad).let { (lines, checked) -> facts = checked; lines }
+            Call.Act -> act(step, pad).let { (lines, checked) ->
+                facts = checked
+                lines
+            }
         }
         // A resource made new is read again first; then what the act changed is checked, then the steps in it.
         val checks = listOfNotNull(facts?.let { "${INDENT.repeat(depth + 1)}check($it)" })
@@ -240,8 +244,10 @@ class ScriptWriter(
             val value = (it.value as? String)?.let(KotlinText::quoted) ?: "${it.value}"
             KotlinText.quoted(it.field) + " eq " + if (it.sent) sent.getValue(it.field) else value
         }?.also { checked++ }
-        val oneLine = "${pad}act(" + (listOf(relation) + arguments.map { "\"${it.field}\" to ${it.expression}" } +
-            listOfNotNull(intent)).joinToString(", ") + ")"
+        val oneLine = "${pad}act(" + (
+            listOf(relation) + arguments.map { "\"${it.field}\" to ${it.expression}" } +
+                listOfNotNull(intent)
+            ).joinToString(", ") + ")"
         // An act that sends nothing has no values to set out a line each: one line, however long.
         val long = arguments.isNotEmpty() &&
             (arguments.any { it.review != null } || Derivations.visible(oneLine) > WIDTH)
@@ -413,8 +419,11 @@ private fun acts(step: Step): Boolean = !step.follows && (step.relation != null 
     step.chose["method"]?.toString()?.uppercase() != "GET"
 
 /** [value] as one shell word. */
-internal fun shell(value: String): String = if (value.matches(Regex("[A-Za-z0-9._/:@=+-]+"))) value else
+internal fun shell(value: String): String = if (value.matches(Regex("[A-Za-z0-9._/:@=+-]+"))) {
+    value
+} else {
     "'" + value.replace("'", "'\\''") + "'"
+}
 
 /** An input as the capture kept its declaration: required, or with its default or its question. */
 private fun declared(name: String, input: Map<*, *>): String {

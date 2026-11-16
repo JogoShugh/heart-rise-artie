@@ -33,7 +33,8 @@ object HtmlList {
         }.joinToString("")
         val nav = if (paging.isEmpty()) "" else "<nav class=\"paging\" aria-label=\"Pages\">$paging</nav>"
         return HtmlView.document(
-            title, "",
+            title,
+            "",
             "<h1>${Html.text(title)}</h1>$count<div class=\"grid\"><table><thead>$head</thead><tbody>$rows</tbody>" +
                 "</table></div>$nav",
         )

@@ -18,15 +18,20 @@ internal class NamedFacts(
             FACT.matchEntire(said.trim())?.takeIf { SLOT in it.value } ?: return false
         }
         val line = script.written("check(${step.facts.joinToString("; ")})", opener)
-        marks.facts(line, facts.map { fact ->
-            val (member, not, value) = fact.destructured
-            mapOf("field" to pointer(member), (if (not.isBlank()) "is" else "is-not") to slots(value.trim()))
-        })
-        here.checkFacts(facts.map { fact ->
-            val (member, not, value) = fact.destructured
-            val filled = fill(value.trim()).removeSurrounding("\"")
-            Fact(pointer(member), if (not.isBlank()) equalTo(filled) else notEqualTo(filled))
-        })
+        marks.facts(
+            line,
+            facts.map { fact ->
+                val (member, not, value) = fact.destructured
+                mapOf("field" to pointer(member), (if (not.isBlank()) "is" else "is-not") to slots(value.trim()))
+            }
+        )
+        here.checkFacts(
+            facts.map { fact ->
+                val (member, not, value) = fact.destructured
+                val filled = fill(value.trim()).removeSurrounding("\"")
+                Fact(pointer(member), if (not.isBlank()) equalTo(filled) else notEqualTo(filled))
+            }
+        )
         moves += "checked: ${fill(step.facts.joinToString("; "))}"
         return true
     }

@@ -23,11 +23,20 @@ object SupportProfile {
             act("reopen", "Reopen", "Hands a resolved ticket back to its agent, because the problem is not solved."),
             act("close", "Close", "Ends a resolved ticket for good."),
             act("change-priority", "Change the priority", "Makes the ticket more or less urgent."),
-            Relation("search-tickets", AlpsType.SAFE, "Find tickets by subject",
+            Relation(
+                "search-tickets",
+                AlpsType.SAFE,
+                "Find tickets by subject",
                 "Lists the tickets whose subject has the text.",
-                "A safe search; each result links to the ticket, titled with its subject."),
-            Relation("get-ticket", AlpsType.SAFE, "Get a ticket by its number", "Goes to one ticket, given its number.",
-                "A safe lookup; the result is the ticket, with what may be done now."),
+                "A safe search; each result links to the ticket, titled with its subject."
+            ),
+            Relation(
+                "get-ticket",
+                AlpsType.SAFE,
+                "Get a ticket by its number",
+                "Goes to one ticket, given its number.",
+                "A safe lookup; the result is the ticket, with what may be done now."
+            ),
         ),
     )
 

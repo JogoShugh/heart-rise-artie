@@ -17,6 +17,7 @@ data class ServerOffer(val dialects: Set<Dialect>, val rung: Rung)
  */
 object HomeDocument {
     const val MEDIA_TYPE = "application/json-home"
+
     /** The offer in [outcome], or null when it is not a home document. */
     fun offer(outcome: Outcome): ServerOffer? {
         val received = (outcome as? Outcome.Done)?.received?.takeIf { it.mediaType == MEDIA_TYPE }

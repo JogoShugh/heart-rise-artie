@@ -40,48 +40,48 @@ object InputSchemas {
 
     private val generator: SchemaGenerator =
         SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2020_12, OptionPreset.PLAIN_JSON)
-        .with(Option.SCHEMA_VERSION_INDICATOR)
-        .with(
-            JakartaValidationModule(
-                JakartaValidationOption.NOT_NULLABLE_FIELD_IS_REQUIRED,
-                JakartaValidationOption.INCLUDE_PATTERN_EXPRESSIONS,
-            ),
-        )
-        .with(Swagger2Module())
-        .apply {
-            // @Schema(examples = [...]) as JSON values: "50" is the number 50, "basil" stays text.
-            forFields().withInstanceAttributeOverride { node, field, _ ->
-                val examples = field.getAnnotationConsideringFieldAndGetter(Schema::class.java)?.examples.orEmpty()
-                if (examples.isNotEmpty()) node.putArray("examples").addAll(examples.map(::exampleValue))
-            }
-            // @NotBlank is at least one character that is not white space. The Jakarta module
-            // says only minLength 1, which lets "   " through, so a pattern says the rest.
-            // A field with its own @Pattern keeps it, and the not-blank rule goes beside it.
-            forFields().withInstanceAttributeOverride { node, field, _ ->
-                if (field.getAnnotationConsideringFieldAndGetter(NotBlank::class.java) != null) {
-                    if (node.has("pattern")) {
-                        node.putArray("allOf").addObject().put("pattern", NOT_BLANK)
-                    } else {
-                        node.put("pattern", NOT_BLANK)
+            .with(Option.SCHEMA_VERSION_INDICATOR)
+            .with(
+                JakartaValidationModule(
+                    JakartaValidationOption.NOT_NULLABLE_FIELD_IS_REQUIRED,
+                    JakartaValidationOption.INCLUDE_PATTERN_EXPRESSIONS,
+                ),
+            )
+            .with(Swagger2Module())
+            .apply {
+                // @Schema(examples = [...]) as JSON values: "50" is the number 50, "basil" stays text.
+                forFields().withInstanceAttributeOverride { node, field, _ ->
+                    val examples = field.getAnnotationConsideringFieldAndGetter(Schema::class.java)?.examples.orEmpty()
+                    if (examples.isNotEmpty()) node.putArray("examples").addAll(examples.map(::exampleValue))
+                }
+                // @NotBlank is at least one character that is not white space. The Jakarta module
+                // says only minLength 1, which lets "   " through, so a pattern says the rest.
+                // A field with its own @Pattern keeps it, and the not-blank rule goes beside it.
+                forFields().withInstanceAttributeOverride { node, field, _ ->
+                    if (field.getAnnotationConsideringFieldAndGetter(NotBlank::class.java) != null) {
+                        if (node.has("pattern")) {
+                            node.putArray("allOf").addObject().put("pattern", NOT_BLANK)
+                        } else {
+                            node.put("pattern", NOT_BLANK)
+                        }
                     }
                 }
-            }
-            // @Schema(deprecated = true): a field kept for old clients, which new ones should leave alone.
-            forFields().withInstanceAttributeOverride { node, field, _ ->
-                if (field.getAnnotationConsideringFieldAndGetter(Schema::class.java)?.deprecated == true) {
-                    node.put("deprecated", true)
+                // @Schema(deprecated = true): a field kept for old clients, which new ones should leave alone.
+                forFields().withInstanceAttributeOverride { node, field, _ ->
+                    if (field.getAnnotationConsideringFieldAndGetter(Schema::class.java)?.deprecated == true) {
+                        node.put("deprecated", true)
+                    }
                 }
+                // An input with no fields still says it takes an object with no properties.
+                forTypesInGeneral().withTypeAttributeOverride { node, _, _ ->
+                    if (node.path("type").asText() == "object" && !node.has("properties")) node.putObject("properties")
+                }
+                // Properties in the order the input declares them, not by name: the forms for people ask in that
+                // order, the team before its players. The canonical schema still lists them by name.
+                forTypesInGeneral().withPropertySorter { _, _ -> 0 }
             }
-            // An input with no fields still says it takes an object with no properties.
-            forTypesInGeneral().withTypeAttributeOverride { node, _, _ ->
-                if (node.path("type").asText() == "object" && !node.has("properties")) node.putObject("properties")
-            }
-            // Properties in the order the input declares them, not by name: the forms for people ask in that
-            // order, the team before its players. The canonical schema still lists them by name.
-            forTypesInGeneral().withPropertySorter { _, _ -> 0 }
-        }
-        .build()
-        .let(::SchemaGenerator)
+            .build()
+            .let(::SchemaGenerator)
 
     /** The schema of [type], as JSON text. */
     fun of(type: Class<*>): String = generator.generateSchema(type).also(::requiredByName).toString()

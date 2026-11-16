@@ -192,8 +192,10 @@ internal class OpenApiType(
         val declared = type.state.bodyClass?.let { JsonTrees.plain(InputSchemas.of(it)) as Map<String, Any?> }
             ?: mapOf("type" to "object", "properties" to mapOf("id" to OpenApiShapes.ID), "required" to listOf("id"))
         val field = type.state.keyField ?: return declared
+
         @Suppress("UNCHECKED_CAST")
         val properties = declared["properties"] as? Map<String, Any?> ?: emptyMap()
+
         @Suppress("UNCHECKED_CAST")
         val key = (properties[field] as? Map<String, Any?>).orEmpty() +
             mapOf("type" to "string", "enum" to offers.keys.map { it.toString() })

@@ -141,5 +141,4 @@ class Bindings(byScheme: Map<String, Binding>) {
 
     /** Whether there is a binding for [url]'s scheme. */
     fun reaches(url: String): Boolean = runCatching { URI(url).scheme }.getOrNull()?.lowercase() in byScheme
-
 }

@@ -38,8 +38,14 @@ internal object Tools {
                 "fields that satisfy its schema. Acts not offered now cannot be taken. The result is the " +
                 "resource after the act, with its new acts, and an `outcome`.",
             schema(required = listOf("act")) {
-                putJsonObject("act") { put("type", "string"); put("description", "An offered act's name.") }
-                putJsonObject("fields") { put("type", "object"); put("description", "The act's fields.") }
+                putJsonObject("act") {
+                    put("type", "string")
+                    put("description", "An offered act's name.")
+                }
+                putJsonObject("fields") {
+                    put("type", "object")
+                    put("description", "The act's fields.")
+                }
             },
         ),
         Verb(

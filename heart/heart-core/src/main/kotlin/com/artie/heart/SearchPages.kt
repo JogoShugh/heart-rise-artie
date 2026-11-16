@@ -73,5 +73,4 @@ object SearchPages {
     /** RFC 6573: a match as an `item` link, at its item path, titled. */
     private fun item(search: Search, found: Found): Map<String, String> =
         mapOf("href" to ItemPath.fill(search.item, found.variables), "title" to found.title)
-
 }

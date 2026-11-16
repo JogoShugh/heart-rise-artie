@@ -62,12 +62,18 @@ class ArtiePlugin : JavaPlugin() {
      * failure, of either, is a notice.
      */
     private fun later(player: Player, session: DialogSession, work: () -> Dialog) {
-        server.scheduler.runTaskAsynchronously(this, Runnable {
-            val dialog = runCatching(work).getOrElse(::failure)
-            server.scheduler.runTask(this, Runnable {
-                runCatching { show(player, session, dialog) }.getOrElse { show(player, session, failure(it)) }
-            })
-        })
+        server.scheduler.runTaskAsynchronously(
+            this,
+            Runnable {
+                val dialog = runCatching(work).getOrElse(::failure)
+                server.scheduler.runTask(
+                    this,
+                    Runnable {
+                        runCatching { show(player, session, dialog) }.getOrElse { show(player, session, failure(it)) }
+                    }
+                )
+            }
+        )
     }
 
     /** [dialog] before [player]: a written book when there is nothing to fill in, else a dialog of inputs. */
@@ -101,8 +107,11 @@ class ArtiePlugin : JavaPlugin() {
                     .canCloseWithEscape(true)
                     // Every button's answer is the next dialog: the player waits for it, rather than see the world.
                     .afterAction(
-                        if (dialog.buttons.isEmpty()) DialogBase.DialogAfterAction.CLOSE
-                        else DialogBase.DialogAfterAction.WAIT_FOR_RESPONSE,
+                        if (dialog.buttons.isEmpty()) {
+                            DialogBase.DialogAfterAction.CLOSE
+                        } else {
+                            DialogBase.DialogAfterAction.WAIT_FOR_RESPONSE
+                        },
                     )
                     .body(Look.body(dialog).map { DialogBody.plainMessage(it, WIDTH) })
                     .inputs(dialog.inputs.map(::input))

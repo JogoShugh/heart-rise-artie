@@ -38,7 +38,10 @@ class PostgresEventStore(
             .bind("stream", stream).bind("id", id).bind("after", after)
             .map { row ->
                 StoredEvent(
-                    int(row, "sequence_no"), text(row, "event_type"), json(row, "payload"), at(row, "occurred_at"),
+                    int(row, "sequence_no"),
+                    text(row, "event_type"),
+                    json(row, "payload"),
+                    at(row, "occurred_at"),
                 )
             }
             .flow().toList()

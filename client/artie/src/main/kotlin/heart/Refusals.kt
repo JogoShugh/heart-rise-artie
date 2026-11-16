@@ -66,8 +66,11 @@ class NotAuthenticated(val origin: String, val schemes: List<String>, val sent: 
 
 /** 403: the service knows who is asking, and does not allow this. */
 class Forbidden(val origin: String, val sent: String?) : AccessRefused(
-    if (sent == null) "$origin does not allow this, and ARTIE sent no credential"
-    else "$origin does not allow this with the $sent credential ARTIE sent",
+    if (sent == null) {
+        "$origin does not allow this, and ARTIE sent no credential"
+    } else {
+        "$origin does not allow this with the $sent credential ARTIE sent"
+    },
 )
 
 /**

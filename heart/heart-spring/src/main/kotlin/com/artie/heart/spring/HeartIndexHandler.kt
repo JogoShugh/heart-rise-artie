@@ -119,10 +119,16 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
     ): ServerResponse {
         val ifNoneMatch = request.headers().firstHeader(HttpHeaders.IF_NONE_MATCH)
         return if (ifNoneMatch != null && Validators.notModified(ifNoneMatch, etag)) {
-            ServerResponse.status(HttpStatus.NOT_MODIFIED).headers { it.eTag = etag; headers(it) }.buildAndAwait()
+            ServerResponse.status(HttpStatus.NOT_MODIFIED).headers {
+                it.eTag = etag
+                headers(it)
+            }.buildAndAwait()
         } else {
             ServerResponse.ok().contentType(MediaType.parseMediaType(type))
-                .headers { it.eTag = etag; headers(it) }
+                .headers {
+                    it.eTag = etag
+                    headers(it)
+                }
                 .bodyValueAndAwait(body)
         }
     }

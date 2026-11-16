@@ -58,8 +58,11 @@ object GardenBedProjector {
             is GardenBedEvent.CellWatered -> {
                 val newGrowth = (state.growthPoints + event.milliliters / 5)
                     .coerceAtMost(GardenBedState.HARVEST_THRESHOLD)
-                val newStatus = if (newGrowth >= GardenBedState.HARVEST_THRESHOLD)
-                    GardenBedStatus.READY_TO_HARVEST else state.status
+                val newStatus = if (newGrowth >= GardenBedState.HARVEST_THRESHOLD) {
+                    GardenBedStatus.READY_TO_HARVEST
+                } else {
+                    state.status
+                }
 
                 state.copy(
                     growthPoints = newGrowth,

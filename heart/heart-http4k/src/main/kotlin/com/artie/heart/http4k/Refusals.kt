@@ -37,7 +37,8 @@ object Refusals {
      */
     @Suppress("TooGenericExceptionCaught")
     fun filter(mapper: ObjectMapper, realm: String) = Filter { next ->
-        { request ->
+        {
+                request ->
             try {
                 next(request)
             } catch (failure: RuntimeException) {
@@ -68,7 +69,11 @@ object Refusals {
         is ResourceNotFoundException -> error(Status.NOT_FOUND, failure, mapper)
         // RFC 9110 §15.5.7: a 406 lists the formats the resource is served in.
         is NotAcceptableException -> problem(
-            Status.NOT_ACCEPTABLE, "not-acceptable", "Accept names no format this server produces", failure, mapper,
+            Status.NOT_ACCEPTABLE,
+            "not-acceptable",
+            "Accept names no format this server produces",
+            failure,
+            mapper,
             mapOf("alternates" to Alternates.FORMATS),
         )
         is MalformedActBodyException, is BadRequestException -> error(Status.BAD_REQUEST, failure, mapper)
@@ -78,25 +83,45 @@ object Refusals {
     /** The answer for an act [failure] refuses for what it asks or sends, or null when it is no such refusal. */
     private fun ofAct(failure: Throwable, mapper: ObjectMapper): Response? = when (failure) {
         is NotOfferedException -> problem(
-            Status.CONFLICT, "not-offered", "The act is not offered in the resource's current state", failure, mapper,
+            Status.CONFLICT,
+            "not-offered",
+            "The act is not offered in the resource's current state",
+            failure,
+            mapper,
             listOfNotNull(failure.rel?.let { "rel" to it }).toMap(),
         )
         is UnprocessableContentException -> problem(
-            Status.UNPROCESSABLE_ENTITY, "invalid-input", "The body does not match the form's schema", failure, mapper,
+            Status.UNPROCESSABLE_ENTITY,
+            "invalid-input",
+            "The body does not match the form's schema",
+            failure,
+            mapper,
             mapOf("violations" to failure.violations),
         )
         is RuleRefusedException -> problem(
-            Status.UNPROCESSABLE_ENTITY, "rule-refused", "A rule of the resource refuses the act", failure, mapper,
+            Status.UNPROCESSABLE_ENTITY,
+            "rule-refused",
+            "A rule of the resource refuses the act",
+            failure,
+            mapper,
             mapOf("violations" to failure.violations),
         )
         is LinkConflictException -> problem(
-            Status.CONFLICT, "link-conflict", "The act names another resource than the state keeps", failure, mapper,
+            Status.CONFLICT,
+            "link-conflict",
+            "The act names another resource than the state keeps",
+            failure,
+            mapper,
             mapOf("rel" to failure.rel),
         )
         // RFC 5789 §2.2: a 415 to a PATCH says, in Accept-Patch, the types the resource takes.
         is UnsupportedMediaTypeException -> problem(
-            Status.UNSUPPORTED_MEDIA_TYPE, "unsupported-media-type", "The body is not of a type the act takes",
-            failure, mapper, mapOf("accepted" to failure.accepted),
+            Status.UNSUPPORTED_MEDIA_TYPE,
+            "unsupported-media-type",
+            "The body is not of a type the act takes",
+            failure,
+            mapper,
+            mapOf("accepted" to failure.accepted),
         ).header(if (failure.method == "PATCH") "Accept-Patch" else "Accept-Post", failure.accepted.joinToString(", "))
         else -> null
     }

@@ -62,8 +62,12 @@ internal class HtmlAnswer<S, K>(
             .header(HX_TRIGGER, mapper.writeValueAsString(mapOf(DONE to "$title: done.")))
         val created = done.created
         return respond(
-            if (created == null) answered else answered.status(Status.CREATED).header(LOCATION, created)
-                .header(HX_REDIRECT, created),
+            if (created == null) {
+                answered
+            } else {
+                answered.status(Status.CREATED).header(LOCATION, created)
+                    .header(HX_REDIRECT, created)
+            },
             done.state,
         )
     }
@@ -125,7 +129,8 @@ internal fun htmlAsset(request: Request): Response {
 
 /** A refusal, for a browser, as HTML: the same problem, the same status, in the dialog that asked. */
 internal val htmlRefusals = Filter { next ->
-    { request ->
+    {
+            request ->
         val response = next(request)
         if (Negotiation.wantsHtml(request.header(ACCEPT)) && response.header(CONTENT_TYPE) == Refusals.PROBLEM_JSON) {
             response.replaceHeader(CONTENT_TYPE, HtmlProblem.MEDIA_TYPE).body(HtmlProblem.of(response.bodyString()))

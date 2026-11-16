@@ -45,11 +45,15 @@ class HttpBinding(private val transport: Transport) : Binding {
         val said = ProblemDetails.said(response.body)
         return when (response.status) {
             CREATED -> Outcome.Done(
-                received(response), code, resolved(response, "Location", requested),
+                received(response),
+                code,
+                resolved(response, "Location", requested),
                 represents = resolved(response, "Content-Location", requested),
             )
             in SUCCESS -> Outcome.Done(
-                received(response), code, represents = resolved(response, "Content-Location", requested),
+                received(response),
+                code,
+                represents = resolved(response, "Content-Location", requested),
             )
             PRECONDITION_REQUIRED -> Outcome.PreconditionRequired(code, problem, said)
             PRECONDITION_FAILED -> Outcome.Stale(code, problem, said)

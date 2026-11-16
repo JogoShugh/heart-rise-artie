@@ -10,8 +10,11 @@ class UserAgentTransport(private val agent: String = DEFAULT, private val next: 
 
     override fun send(request: HeartRequest): HeartResponse =
         next.send(
-            if (request.header(USER_AGENT) != null) request
-            else request.copy(headers = request.headers + (USER_AGENT to agent)),
+            if (request.header(USER_AGENT) != null) {
+                request
+            } else {
+                request.copy(headers = request.headers + (USER_AGENT to agent))
+            },
         )
 
     companion object {

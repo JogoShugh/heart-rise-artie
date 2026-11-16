@@ -49,8 +49,11 @@ fun capture(goal: Path, out: Path, inputs: Map<String, String>, replies: DeskRep
     }
     val reasoner = ClaudeReasoner(HttpTransport(), key.value, ClaudeReasoner.DEFAULT_MODEL)
     val hosted = Hosted(
-        PartyCredentials, SigningKey(ArtieKey.KEY_ID, ArtieKey.pair.private), name = "desk",
-        plainHttp = masks, replies = replies,
+        PartyCredentials,
+        SigningKey(ArtieKey.KEY_ID, ArtieKey.pair.private),
+        name = "desk",
+        plainHttp = masks,
+        replies = replies,
     ).also {
         it.reasoner = reasoner
         it.rung = rung

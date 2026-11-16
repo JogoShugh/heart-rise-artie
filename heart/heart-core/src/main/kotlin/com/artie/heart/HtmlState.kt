@@ -33,8 +33,11 @@ internal object HtmlState {
         val members = body.filterKeys { key -> key.toString().let { !it.startsWith("_") && !it.startsWith("hr:") } }
         val shown = members.entries.take(SHOWN)
         val folded = members.entries.drop(SHOWN)
-        val more = if (folded.isEmpty()) "" else
+        val more = if (folded.isEmpty()) {
+            ""
+        } else {
             "<details class=\"more\"><summary>${folded.size} more</summary>${list(folded)}</details>"
+        }
         return if (members.isEmpty()) "" else list(shown) + more
     }
 

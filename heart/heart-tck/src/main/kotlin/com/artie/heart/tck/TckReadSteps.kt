@@ -65,5 +65,4 @@ class TckReadSteps(private val fixture: TckFixture, private val world: TckWorld)
         val pointers = form.path("hr:templatePointers").properties().associate { it.key to it.value.asText() }
         assertEquals(fixture.pointers, pointers)
     }
-
 }

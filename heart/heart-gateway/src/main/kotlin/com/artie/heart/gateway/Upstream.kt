@@ -10,14 +10,12 @@ import com.artie.heart.RuleRefusedException
 import com.artie.heart.StaleWriteConflict
 import com.artie.heart.UnprocessableContentException
 import com.artie.heart.Violation
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
-import org.http4k.core.Uri
 import org.http4k.lens.Header
 import java.util.Base64
 

@@ -45,6 +45,7 @@ class HeartResourceHandler<S, K>(
     private val type = resource.layers.type
     private val pipeline = ActPipeline(type, mapper)
     private val targets = ActTargets(resource.layers)
+
     /** This type as HTML, for people (spec/PLAN-HTML-DIALECT.md); its bookmark acts too. */
     internal val html = HtmlAnswer(resource, pipeline, mapper)
 

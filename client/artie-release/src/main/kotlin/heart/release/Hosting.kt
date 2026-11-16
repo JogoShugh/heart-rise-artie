@@ -40,8 +40,11 @@ fun hosting(
             replies = DeskReplies(service, "http://$host:${Release.REPLIES_PORT}").also(kept),
             artie = { kept ->
                 Hosted(
-                    PartyCredentials, SigningKey(ArtieKey.KEY_ID, ArtieKey.pair.private), name = "desk",
-                    plainHttp = masks, replies = kept,
+                    PartyCredentials,
+                    SigningKey(ArtieKey.KEY_ID, ArtieKey.pair.private),
+                    name = "desk",
+                    plainHttp = masks,
+                    replies = kept,
                 ).also {
                     it.rung = rung
                     it.cache = cache

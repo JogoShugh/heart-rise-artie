@@ -34,7 +34,6 @@ internal class StepWatch(
         fun unfilled(text: String): String
     }
 
-
     // Whenevers side by side look on threads of their own; each decides only its own steps' parts.
     val decided = Decisions()
 
@@ -223,7 +222,10 @@ internal class StepWatch(
      * [meant] name first, as a value more than one input holds is the one the words say.
      */
     private fun sources(here: Here, why: String?, meant: String = "") = Bound.sources(
-        here.held, synchronized(named) { named.toMap() }, here.run, why,
+        here.held,
+        synchronized(named) { named.toMap() },
+        here.run,
+        why,
         BRACE.findAll(meant).map { it.groupValues[1] }.toSet(),
     )
 
@@ -544,8 +546,9 @@ private fun unfinished(words: String, chain: Chain, failing: Boolean): String? =
     UNLESS.containsMatchIn(words) && chain.parts.none { it is Chain.Check } ->
         "done: refused, the step says unless, and no check keeps its act from being done yet: read what it is to be " +
             "checked on, then check it"
-    failing -> "done: refused, the last check fails here, and nothing was done after it: do what it keeps from " +
-        "being done, or make the check that holds where it is done already"
+    failing ->
+        "done: refused, the last check fails here, and nothing was done after it: do what it keeps from " +
+            "being done, or make the check that holds where it is done already"
     else -> null
 }
 
@@ -566,9 +569,11 @@ private fun refusal(facts: Map<String, Any?>, on: Representation, failsAfter: Bo
         unheld.isNotEmpty() -> "check: refused, ${unheld.joinToString(", ")} is neither a member of ${on.address} " +
             "nor a relation it embeds or links to: it holds ${readable(on)}" +
             example(on)?.let { "; a fact names one of those, as $it does" }.orEmpty()
-        failsAfter -> "check: refused, it fails here, right after the acts it is to keep from being done again, so " +
-            "a replay would do them again: it is made on ${on.address}, which holds ${readable(on)}; a fact names a " +
-            "member of that state, or a relation it links to, its value words a link's title says"
+        failsAfter ->
+            "check: refused, it fails here, right after the acts it is to keep from being done again, so " +
+                "a replay would do them again: it is made on ${on.address}, " +
+                "which holds ${readable(on)}; a fact names a " +
+                "member of that state, or a relation it links to, its value words a link's title says"
         else -> null
     }
 }

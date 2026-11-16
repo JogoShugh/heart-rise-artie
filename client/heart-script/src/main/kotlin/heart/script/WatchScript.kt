@@ -255,11 +255,14 @@ internal class ChainScript(
                 out.open(depth, reach(part.chosen, said)) { parts(parts.drop(at + 1), it, said) }
                 return
             }
-            out.line(depth, when {
-                part is Chain.Check -> "doneWhere { ${facts(part.facts)} }"
-                next != null -> "${reach((part as Chain.Act).chosen, said)} { doneWhere { ${facts(next.facts)} } }"
-                else -> "${reach((part as Chain.Act).chosen, said)} {}"
-            })
+            out.line(
+                depth,
+                when {
+                    part is Chain.Check -> "doneWhere { ${facts(part.facts)} }"
+                    next != null -> "${reach((part as Chain.Act).chosen, said)} { doneWhere { ${facts(next.facts)} } }"
+                    else -> "${reach((part as Chain.Act).chosen, said)} {}"
+                }
+            )
             at += if (part is Chain.Act && next != null) 2 else 1
         }
     }

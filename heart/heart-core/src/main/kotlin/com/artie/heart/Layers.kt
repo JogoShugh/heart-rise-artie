@@ -211,6 +211,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
     private fun resolved(form: Any?, item: String): Map<String, Any?> {
         @Suppress("UNCHECKED_CAST")
         val entry = form as Map<String, Any?>
+
         @Suppress("UNCHECKED_CAST")
         val target = (entry.getValue("_links") as Map<String, Map<String, Any?>>).getValue("target")
         val href = (target.getValue("href") as String).replace(type.itemPath.template, item)

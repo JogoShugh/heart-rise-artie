@@ -201,7 +201,9 @@ internal class CoapRoutes(
 
         /** The HTTP ETag of [state]'s representation at [rung], which the CoAP validator is taken from. */
         private fun etagOf(state: Any?, rung: Rung): String = StateETag.of(
-            resource.layers.type.state.versionOf(state), Dialect.JSONSCHEMA.etagTag, rung,
+            resource.layers.type.state.versionOf(state),
+            Dialect.JSONSCHEMA.etagTag,
+            rung,
             resource.layers.layer1(state, rung),
         )
     }

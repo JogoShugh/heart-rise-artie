@@ -51,5 +51,4 @@ class TckHeaderSteps(private val world: TckWorld) {
     @Then("Preference-Applied is {string}")
     fun preferenceApplied(value: String) =
         assertEquals(value, world.last.responseHeaders.getFirst("Preference-Applied"))
-
 }

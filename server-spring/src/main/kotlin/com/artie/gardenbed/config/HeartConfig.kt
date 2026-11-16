@@ -1,12 +1,12 @@
 package com.artie.gardenbed.config
 
-import com.artie.gardenbed.domain.GardenBedAggregate
-import com.artie.gardenbed.domain.GardenBedState
-import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.declaration.BedActs
 import com.artie.gardenbed.declaration.GardenBeds
 import com.artie.gardenbed.declaration.GardenChange
 import com.artie.gardenbed.domain.GARDEN_BEDS
+import com.artie.gardenbed.domain.GardenBedAggregate
+import com.artie.gardenbed.domain.GardenBedState
+import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.service.GardenBedService
 import com.artie.heart.Acted
 import com.artie.heart.Found
@@ -38,6 +38,7 @@ class HeartConfig(
     @Bean
     fun gardenBeds(service: GardenBedService, acts: BedActs): HeartResource<GardenBedState, GardenBedStatus> {
         val layers = GardenBeds.layers(frost, change)
+
         // SPEC §6.11: each bed found carries its state, which the search page embeds beside its link.
         suspend fun found(bed: GardenBedAggregate): Found {
             val id = checkNotNull(bed.id)

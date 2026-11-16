@@ -50,9 +50,13 @@ class Profile(
 
     /** The vocabulary relation [id] is in: this one, or the borrowed one that has it. */
     private fun owner(id: String): Profile =
-        if (id in byId) this else borrowed.firstOrNull { id in it.byId } ?: throw IllegalArgumentException(
-            "no relation $id in $name",
-        )
+        if (id in byId) {
+            this
+        } else {
+            borrowed.firstOrNull { id in it.byId } ?: throw IllegalArgumentException(
+                "no relation $id in $name",
+            )
+        }
 
     fun relation(id: String): Relation = owner(id).byId.getValue(id)
 

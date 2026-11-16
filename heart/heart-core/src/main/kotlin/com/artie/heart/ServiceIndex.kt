@@ -110,22 +110,26 @@ class ServiceIndex(
         "_templates" to found.flatMap { type ->
             val finding = checkNotNull(type.finding)
             // A HAL-FORMS target cannot be templated, so a declared collection path has no template here.
-            val searches = if (FindingForms(type).declared) emptyList() else listOf(
-                finding.search.name to halFormsTemplate(
-                    type, finding.search.relation,
-                    mapOf(
-                        "name" to "name", "type" to "search", "required" to true, "minLength" to 1,
-                        "prompt" to finding.nameDescription,
+            val searches = if (FindingForms(type).declared) {
+                emptyList()
+            } else {
+                listOf(
+                    finding.search.name to halFormsTemplate(
+                        type, finding.search.relation,
+                        mapOf(
+                            "name" to "name", "type" to "search", "required" to true, "minLength" to 1,
+                            "prompt" to finding.nameDescription,
+                        ),
                     ),
-                ),
-                finding.lookup.name to halFormsTemplate(
-                    type, finding.lookup.relation,
-                    mapOf(
-                        "name" to "id", "type" to "number", "required" to true, "min" to 1,
-                        "prompt" to finding.idTitle,
+                    finding.lookup.name to halFormsTemplate(
+                        type, finding.lookup.relation,
+                        mapOf(
+                            "name" to "id", "type" to "number", "required" to true, "min" to 1,
+                            "prompt" to finding.idTitle,
+                        ),
                     ),
-                ),
-            )
+                )
+            }
             searches + type.bookmarkActs.map { act ->
                 act.name to mapOf(
                     "title" to type.profile.relation(act.relation).title,
@@ -146,7 +150,6 @@ class ServiceIndex(
             "target" to "/${type.collection}",
             "properties" to listOf(property),
         )
-
 }
 
 /**
@@ -312,8 +315,10 @@ private const val MANIFEST = "hr:manifest"
  * form does. All of it is known from the declarations, with nothing read.
  */
 private fun manifest(forms: Map<String, Map<String, Any>>, types: List<ResourceType<*, *>>): Map<String, Any> {
-    val listed = (forms.map { (rel, form) -> rel to form.getValue(FORM_INTEGRITY) as String } +
-        types.flatMap { Layers(it).formIntegrities.toList() })
+    val listed = (
+        forms.map { (rel, form) -> rel to form.getValue(FORM_INTEGRITY) as String } +
+            types.flatMap { Layers(it).formIntegrities.toList() }
+        )
         .groupBy({ it.first }, { it.second })
         .mapValues { (_, integrities) -> integrities.distinct().sorted() }
         .toSortedMap()

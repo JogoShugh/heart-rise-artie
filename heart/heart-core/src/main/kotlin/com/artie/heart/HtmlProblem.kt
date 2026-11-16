@@ -12,9 +12,13 @@ object HtmlProblem {
     fun of(problem: Map<*, *>): String {
         val detail = problem["detail"]?.let { "<p>${Html.text(it)}</p>" }.orEmpty()
         val violations = (problem["violations"] as? List<*>).orEmpty().filterIsInstance<Map<*, *>>()
-        val list = if (violations.isEmpty()) "" else "<ul>" + violations.joinToString("") {
-            "<li${Html.attr("data-pointer", it["pointer"])}>${Html.text(it["message"])}</li>"
-        } + "</ul>"
+        val list = if (violations.isEmpty()) {
+            ""
+        } else {
+            "<ul>" + violations.joinToString("") {
+                "<li${Html.attr("data-pointer", it["pointer"])}>${Html.text(it["message"])}</li>"
+            } + "</ul>"
+        }
         return "<div class=\"problem\" role=\"alert\"><strong>${Html.text(problem["title"] ?: "Refused")}</strong>" +
             "$detail$list</div>\n"
     }
@@ -30,7 +34,8 @@ object HtmlProblem {
         val detail = (JsonTrees.plain(problem) as? Map<*, *>)?.get("detail")
         val title = "Sign in to $realm"
         return HtmlView.document(
-            title, "",
+            title,
+            "",
             "<h1>${Html.text(title)}</h1>" + (detail?.let { "<p>${Html.text(it)}</p>" }.orEmpty()) +
                 "<p class=\"hint\">Your browser asks for a user name and a password; a token can be the password.</p>" +
                 "<p><a class=\"sign-in\" href=\"\">Sign in</a></p>",

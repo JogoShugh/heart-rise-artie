@@ -34,7 +34,9 @@ object ScriptHost {
             compilerOptions.append("-Xplugin=${plugin()}", "-P", DRAW)
         }
         return KotlinJsr223ScriptEngineImpl(
-            kotlin.factory, compilation, KotlinJsr223DefaultScriptEvaluationConfiguration,
+            kotlin.factory,
+            compilation,
+            KotlinJsr223DefaultScriptEvaluationConfiguration,
         ) { null }
     }
 

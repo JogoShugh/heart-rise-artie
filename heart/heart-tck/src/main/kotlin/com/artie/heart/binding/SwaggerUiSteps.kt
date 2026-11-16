@@ -41,6 +41,7 @@ class SwaggerUiSteps(client: WebTestClient, private val http: HttpWorld) {
 
     private companion object {
         val SRC = Regex("""(?:src|href)="([^"]+)"""")
+
         /** 8 MiB. */
         const val BUNDLE_BYTES = 8_388_608
     }

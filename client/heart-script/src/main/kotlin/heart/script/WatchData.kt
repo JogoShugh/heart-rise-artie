@@ -73,8 +73,11 @@ internal class WatchData(
 
     /** What a step does at a member: its chain of acts, as decided; or, marked reasoned, its words, for the model. */
     private fun acted(intent: Step.Intent): List<DataStep> =
-        if (intent.reasoned) listOf(mapOf("intent" to words.spoken(intent.words), "reasoned" to true))
-        else chains.chain(intent, ACTED)
+        if (intent.reasoned) {
+            listOf(mapOf("intent" to words.spoken(intent.words), "reasoned" to true))
+        } else {
+            chains.chain(intent, ACTED)
+        }
 
     private fun left(intent: Step.Intent, check: Chain.Check): DataStep =
         mapOf("leave-where" to mapOf("say" to words.fill(intent.words), "facts" to factData(check.facts)))
@@ -98,7 +101,6 @@ internal class WatchData(
         val waits = mapOf("offered" to relation) + giveUp + ("steps" to chains.chain(intent, ACTED))
         return listOf(mapOf("once" to waits + after.named("otherwise")))
     }
-
 }
 
 /** A Whenever's guards: who made the member and what it says, an input where the words name one; what it holds. */

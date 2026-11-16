@@ -4,9 +4,9 @@ import com.artie.heart.Acted
 import com.artie.heart.Found
 import com.artie.heart.HeartResource
 import com.artie.heart.Listing
-import com.artie.tickets.domain.Agents
 import com.artie.tickets.declaration.TicketActs
 import com.artie.tickets.declaration.Tickets
+import com.artie.tickets.domain.Agents
 import com.artie.tickets.domain.Status
 import com.artie.tickets.domain.TICKETS
 import com.artie.tickets.domain.TicketService

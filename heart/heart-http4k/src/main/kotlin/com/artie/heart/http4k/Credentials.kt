@@ -74,7 +74,8 @@ class Credentials private constructor(
      * in [realm]; a wrong credential is answered exactly as a missing one.
      */
     fun filter(realm: String) = Filter { next ->
-        { request ->
+        {
+                request ->
             if (open(request) || admits(request.header("Authorization"))) {
                 next(request)
             } else {

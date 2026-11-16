@@ -8,17 +8,17 @@ import heart.CachingTransport
 import heart.CoapBinding
 import heart.CredentialSource
 import heart.CredentialsUnavailable
-import heart.Forbidden
-import heart.NotAuthenticated
 import heart.Dialect
 import heart.EventLog
 import heart.EventSink
+import heart.Forbidden
 import heart.HeartRepresentation
 import heart.HeartRiseClient
 import heart.HttpTransport
 import heart.IllegalTransition
 import heart.IntegrityCheck
 import heart.InvalidPayload
+import heart.NotAuthenticated
 import heart.RuleRefused
 import heart.Rung
 import heart.SchemaCheck
@@ -40,7 +40,6 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 

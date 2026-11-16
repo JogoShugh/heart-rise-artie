@@ -12,6 +12,8 @@ val pmdVersion = "7.29.0"
 
 dependencies {
     "cpd"("net.sourceforge.pmd:pmd-kotlin:$pmdVersion")
+    // ktlint's rules, run by detekt: one linter, one report, formatting checked on every edit.
+    "detektPlugins"("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.8")
 }
 
 detekt {

@@ -79,13 +79,18 @@ private fun outcome(scenarios: List<Scenario>, stopped: ScriptStopped?): JsonObj
     put("failed", JsonPrimitive(failed.joinToString(", ")))
     put("passing", JsonPrimitive(scenarios.size - failed.size))
     put("of", JsonPrimitive(scenarios.size))
-    put("scenarios", JsonArray(scenarios.map { scenario ->
-        buildJsonObject {
-            put("name", JsonPrimitive(scenario.name))
-            put("passed", JsonPrimitive(scenario.passed))
-            scenario.why?.let { put("why", JsonPrimitive(it)) }
-        }
-    }))
+    put(
+        "scenarios",
+        JsonArray(
+            scenarios.map { scenario ->
+                buildJsonObject {
+                    put("name", JsonPrimitive(scenario.name))
+                    put("passed", JsonPrimitive(scenario.passed))
+                    scenario.why?.let { put("why", JsonPrimitive(it)) }
+                }
+            }
+        )
+    )
     stopped?.let { put("stopped", JsonPrimitive(it.message)) }
 }
 

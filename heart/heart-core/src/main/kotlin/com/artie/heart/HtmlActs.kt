@@ -22,7 +22,9 @@ internal object HtmlActs {
         val fields: DialogFields = DialogFields(),
     )
 
-    fun buttons(entries: List<Entry>): String = if (entries.isEmpty()) "" else
+    fun buttons(entries: List<Entry>): String = if (entries.isEmpty()) {
+        ""
+    } else {
         "<div class=\"acts\" role=\"toolbar\" aria-label=\"Acts\">" + entries.joinToString("") { entry ->
             val id = Html.token(entry.key)
             if (entry.form != null) {
@@ -34,6 +36,7 @@ internal object HtmlActs {
                     "<span class=\"why\" id=\"why-$id\" hidden>${Html.text(entry.reason)}</span>"
             }
         } + "</div>"
+    }
 
     fun dialogs(entries: List<Entry>, etag: String): String =
         entries.filter { it.form != null }.joinToString("") { dialog(it, checkNotNull(it.form), etag) }

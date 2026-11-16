@@ -54,7 +54,7 @@ val Step.subSteps: List<Step>
  * the same list of steps, with no other step between (spec/PLAN-LISTENERS.md, slice 1).
  */
 internal fun Goal.beside(whenever: Step.Whenever): List<Step.Whenever> {
-    val lists = generateSequence(listOf(steps)) { level -> 
+    val lists = generateSequence(listOf(steps)) { level ->
         level.flatten().map { it.subSteps }.filter { it.isNotEmpty() }.ifEmpty { null }
     }
     val list = lists.flatten().first { siblings -> siblings.any { it === whenever } }

@@ -74,6 +74,7 @@ class ActDeclaration(
         fun of(label: String, name: String, node: JsonNode): ActDeclaration {
             fun text(field: String): String =
                 checkNotNull(node.path(field).asText(null)) { "$label: act $name has no $field" }
+
             @Suppress("UNCHECKED_CAST")
             val fixed = MAPPER.convertValue(node.path("body"), Map::class.java) as Map<String, Any?>? ?: emptyMap()
             return ActDeclaration(

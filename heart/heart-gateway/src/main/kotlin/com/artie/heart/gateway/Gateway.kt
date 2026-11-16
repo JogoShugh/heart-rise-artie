@@ -17,9 +17,9 @@ import com.artie.heart.StateView
 import com.artie.heart.http4k.Credentials
 import com.artie.heart.http4k.HeartHttp
 import com.artie.heart.http4k.HeartSettings
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.core.type.TypeReference
 import org.http4k.core.HttpHandler
 import org.http4k.core.then
 import java.net.URLEncoder
@@ -284,9 +284,13 @@ internal class GatewayResource(
             Acted(state(sent(act, "/${spec.collection}/${checked.id}/actions/${act.path}", input.json)))
         },
         find = if (spec.search == null) null else { name, id -> find(name, id) },
-        performAtBookmark = if (bookmarkActs.isEmpty()) null else { name, input ->
-            val path = bookmarkActs.first { it.name == name }.path
-            Acted(state(calls.post("/actions/$path", input.json.toString())))
+        performAtBookmark = if (bookmarkActs.isEmpty()) {
+            null
+        } else {
+            { name, input ->
+                val path = bookmarkActs.first { it.name == name }.path
+                Acted(state(calls.post("/actions/$path", input.json.toString())))
+            }
         },
     )
 

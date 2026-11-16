@@ -214,6 +214,7 @@ class Run(
             "steps" to kotlinx.serialization.json.JsonArray(withKeeps(trace.map { it.json() })),
         ),
     ).toString()
+
     /** Each input's value, once read. */
     internal val values = mutableMapOf<String, String>()
 
@@ -257,19 +258,22 @@ class Run(
         val trace = kotlinx.serialization.json.Json.parseToJsonElement(traceJson())
             as kotlinx.serialization.json.JsonObject
         val run = kotlinx.serialization.json.buildJsonObject {
-            put("run", kotlinx.serialization.json.buildJsonObject {
-                put("inputs", trace.getValue("inputs"))
-                // A goal run's moves, as the script they amount to: its steps' lines are this text's.
-                if (place != null) source?.let { put("source", kotlinx.serialization.json.JsonPrimitive(it)) }
-                if (marks.isNotEmpty()) put("marks", element(marks.mapKeys { "${it.key}" }))
-                if (planned.isNotEmpty()) put("moves", element(planned))
-                if (model.isNotEmpty()) put("model", element(model))
-                if (usage.isNotEmpty()) put("usage", element(usage))
-                watchScript?.let { script ->
-                    val steps = watchSteps?.invoke()
-                    put("watch", element(mapOf("from" to watchFrom, "script" to script(), "steps" to steps)))
+            put(
+                "run",
+                kotlinx.serialization.json.buildJsonObject {
+                    put("inputs", trace.getValue("inputs"))
+                    // A goal run's moves, as the script they amount to: its steps' lines are this text's.
+                    if (place != null) source?.let { put("source", kotlinx.serialization.json.JsonPrimitive(it)) }
+                    if (marks.isNotEmpty()) put("marks", element(marks.mapKeys { "${it.key}" }))
+                    if (planned.isNotEmpty()) put("moves", element(planned))
+                    if (model.isNotEmpty()) put("model", element(model))
+                    if (usage.isNotEmpty()) put("usage", element(usage))
+                    watchScript?.let { script ->
+                        val steps = watchSteps?.invoke()
+                        put("watch", element(mapOf("from" to watchFrom, "script" to script(), "steps" to steps)))
+                    }
                 }
-            })
+            )
         }
         return Yaml.stream(listOf(run) + (trace.getValue("steps") as kotlinx.serialization.json.JsonArray))
     }

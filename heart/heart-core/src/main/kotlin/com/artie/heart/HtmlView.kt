@@ -43,7 +43,8 @@ object HtmlView {
         val title = HtmlState.title(body)
         // On a wide screen the acts stand in a column beside the information; a small one stacks them below it.
         return document(
-            title, etag,
+            title,
+            etag,
             HtmlState.links(body) + "<h1>${Html.text(title)}</h1>" +
                 "<div class=\"layout\"><div class=\"info\">${HtmlState.state(body)}${HtmlState.embedded(body)}</div>" +
                 "<aside class=\"side\" aria-label=\"Acts\">${HtmlActs.buttons(acts)}</aside></div>" +
@@ -54,7 +55,10 @@ object HtmlView {
     /** The bookmark's page: its forms as dialogs, a search's sent as an address to go to (SPEC §6.11). */
     fun index(index: ServiceIndex, etag: String): String =
         render(
-            JsonTrees.plain(index.body(Dialect.JSONSCHEMA)) as Map<*, *>, etag, emptyList(), emptyList(),
+            JsonTrees.plain(index.body(Dialect.JSONSCHEMA)) as Map<*, *>,
+            etag,
+            emptyList(),
+            emptyList(),
             fields(index.types),
         )
 

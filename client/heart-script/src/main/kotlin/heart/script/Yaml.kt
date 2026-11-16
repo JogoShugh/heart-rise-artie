@@ -79,6 +79,7 @@ internal object Yaml {
     private const val SPECIAL = "-?:,[]{}#&*!|>'\"%@`"
     private val PLAIN_KEY = Regex("^[A-Za-z_/][\\w /.:-]*$")
     private val RESERVED = Regex("^(?i:true|false|yes|no|on|off|null|~|y|n)$")
+
     /** What YAML 1.1 readers take for something else: a timestamp (2026-10-18…), a base-60 number (12:30). */
     private val READ_AS_OTHER = Regex("^\\d{4}-\\d\\d?-\\d\\d?([Tt ]|$)|^[-+]?\\d+(:[0-5]?\\d)+(\\.\\d*)?$")
     private val NUMBER = Regex("^[-+]?(\\d[\\d_]*(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$|^0x[0-9a-fA-F]+$|^\\.(inf|nan)$")

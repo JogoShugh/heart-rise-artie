@@ -104,41 +104,55 @@ object Replies {
         doc = "A caller's reply: the answers to its request, while it awaits them.",
         relations = listOf(
             Relation(
-                "progress", AlpsType.UNSAFE, "Report progress",
+                "progress",
+                AlpsType.UNSAFE,
+                "Report progress",
                 "Tells the caller how far the work has got.",
                 "Offered while the reply is awaiting. A JSON Merge Patch of the reply: a note left out stays, a " +
                     "null note is cleared.",
             ),
             Relation(
-                "completed", AlpsType.UNSAFE, "Report completed",
+                "completed",
+                AlpsType.UNSAFE,
+                "Report completed",
                 "Sends the result: the work is done.",
                 "Offered while the reply is awaiting; the reply is answered after, at 100 percent. The same result " +
                     "again is answered as the first was; a different one is not offered.",
             ),
             Relation(
-                "failed", AlpsType.UNSAFE, "Report failed",
+                "failed",
+                AlpsType.UNSAFE,
+                "Report failed",
                 "Says the work failed, with a problem document.",
                 "Offered while the reply is awaiting; the reply is answered after, and keeps the problem.",
             ),
             // Not a reply's: the request's own, which a service that takes requests borrows (Profile.borrowed).
             Relation(
-                "cancel", AlpsType.UNSAFE, "Cancel the request",
+                "cancel",
+                AlpsType.UNSAFE,
+                "Cancel the request",
                 "Withdraws a request before it is answered: no answer will come.",
                 "Offered while the request awaits its answer; after it, the request says why it can't be cancelled.",
             ),
             // The links a request and its answers carry: safe to follow, never acted on.
             Relation(
-                "reply-to", AlpsType.SAFE, "Reply to",
+                "reply-to",
+                AlpsType.SAFE,
+                "Reply to",
                 "In a request's envelope: the caller's own reply, where the service answers it.",
                 "On a request, and on the watch it brings into being.",
             ),
             Relation(
-                "keys", AlpsType.SAFE, "Keys",
+                "keys",
+                AlpsType.SAFE,
+                "Keys",
                 "The JWK Set of keys the linking party signs with, by key id.",
                 "On a service's index and its watches, and in a request's envelope; read with no credential.",
             ),
             Relation(
-                "in-reply-to", AlpsType.SAFE, "In reply to",
+                "in-reply-to",
+                AlpsType.SAFE,
+                "In reply to",
                 "From an answer, and the reply it lands on, to the request it answers: its watch.",
                 "In every answer's links; the reply keeps the first one, and refuses another.",
             ),

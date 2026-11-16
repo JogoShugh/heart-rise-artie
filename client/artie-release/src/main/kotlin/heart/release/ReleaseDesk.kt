@@ -70,7 +70,11 @@ class ReleaseDesk(
             versionOf = { it.version },
             bodyOf = {
                 linkedMapOf(
-                    "id" to it.id, "pull" to it.pull, "inputs" to it.inputs, "state" to it.state, "notes" to it.notes,
+                    "id" to it.id,
+                    "pull" to it.pull,
+                    "inputs" to it.inputs,
+                    "state" to it.state,
+                    "notes" to it.notes,
                 )
                     .also { body -> it.stopped?.let { why -> body["stopped"] = why } }
             },
@@ -182,14 +186,19 @@ class ReleaseDesk(
             doc = "Releases pull requests, by a kept script ARTIE runs.",
             relations = listOf(
                 Relation(
-                    "release", AlpsType.UNSAFE, "Release a pull request",
+                    "release",
+                    AlpsType.UNSAFE,
+                    "Release a pull request",
                     "Starts a release: watched, merged, built, smoke tested, promoted or stopped.",
                     "Offered at the entry.",
                 ),
                 Relation("search-releases", AlpsType.SAFE, "Find releases", "Lists the releases.", "Always."),
                 Relation("get-release", AlpsType.SAFE, "Get a release", "One release, by its number.", "Always."),
                 Relation(
-                    "trace", AlpsType.SAFE, "Trace", "The release run's trace, step by step, once it is over.",
+                    "trace",
+                    AlpsType.SAFE,
+                    "Trace",
+                    "The release run's trace, step by step, once it is over.",
                     "Once the run is over.",
                 ),
             ),

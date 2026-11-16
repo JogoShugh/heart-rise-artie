@@ -97,19 +97,28 @@ class TraceStep(
         expect?.let { put("expect", it) }
         put("address", address)
         now?.let { held ->
-            put("now", buildJsonObject {
-                put("state", held.state)
-                put("forms", JsonArray(held.offered.map { JsonPrimitive(it) }))
-                put("links", JsonObject(held.links.mapValues { (_, titles) -> JsonArray(titles.map { element(it) }) }))
-                if (held.embedded.isNotEmpty()) put("embedded", embedded(held.embedded))
-            })
+            put(
+                "now",
+                buildJsonObject {
+                    put("state", held.state)
+                    put("forms", JsonArray(held.offered.map { JsonPrimitive(it) }))
+                    put(
+                        "links",
+                        JsonObject(held.links.mapValues { (_, titles) -> JsonArray(titles.map { element(it) }) })
+                    )
+                    if (held.embedded.isNotEmpty()) put("embedded", embedded(held.embedded))
+                }
+            )
         }
         refused?.let { r ->
-            put("refused", buildJsonObject {
-                put("kind", r.kind.words)
-                put("by", r.by.words)
-                put("detail", r.detail)
-            })
+            put(
+                "refused",
+                buildJsonObject {
+                    put("kind", r.kind.words)
+                    put("by", r.by.words)
+                    put("detail", r.detail)
+                }
+            )
         }
     }
 }
@@ -117,7 +126,14 @@ class TraceStep(
 /** What a step held embedded (SPEC §6.1): by relation, each resource's title and state. */
 internal fun embedded(byRel: Map<String, List<Embedded>>): JsonObject = JsonObject(
     byRel.mapValues { (_, resources) ->
-        JsonArray(resources.map { buildJsonObject { put("title", element(it.title)); put("state", it.state) } })
+        JsonArray(
+            resources.map {
+                buildJsonObject {
+                    put("title", element(it.title))
+                    put("state", it.state)
+                }
+            }
+        )
     },
 )
 
@@ -196,8 +212,11 @@ internal class TracingNavigator(private val inner: Navigator, private val run: R
 
     /** A refusal of [address] when neither the server nor the run's host handed it over; null when one did. */
     private fun unhanded(address: String): Answer.Refused? =
-        if (address in handed || run.replied.values.any { it.address == address }) null else
-        Answer.Refused(Refusal.NotOffered, Side.CLIENT, "$address is no address the server handed over in this run")
+        if (address in handed || run.replied.values.any { it.address == address }) {
+            null
+        } else {
+            Answer.Refused(Refusal.NotOffered, Side.CLIENT, "$address is no address the server handed over in this run")
+        }
 
     override fun why(rel: String): String? = inner.why(rel)
 
@@ -227,8 +246,14 @@ internal class TracingNavigator(private val inner: Navigator, private val run: R
             is Answer.Refused -> null
         }
         val from = held
-        now?.let { at = it.address; held = it }
-        now?.let { handed += it.address; handed += it.embedded.values.flatten().map { embedded -> embedded.address } }
+        now?.let {
+            at = it.address
+            held = it
+        }
+        now?.let {
+            handed += it.address
+            handed += it.embedded.values.flatten().map { embedded -> embedded.address }
+        }
         val ms = (System.nanoTime() - started) / NANOS_PER_MILLI
         val step = TraceStep(TraceStep.Began(began, ms), asked(), outcomeOf(answer), at, now, answer as? Answer.Refused)
         step.used = answer.used

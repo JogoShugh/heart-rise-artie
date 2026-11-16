@@ -71,27 +71,36 @@ class CoapBinding(
         }
 
     override fun read(url: String, rendering: Rendering): Outcome =
-        send(url, Request.newGet().apply {
-            ask(rendering)
-            options.addOption(Option(NO_CACHE))
-        })
+        send(
+            url,
+            Request.newGet().apply {
+                ask(rendering)
+                options.addOption(Option(NO_CACHE))
+            }
+        )
 
     override fun fetch(url: String, accept: List<String>, integrity: String?): Outcome =
-        send(url, Request.newGet().apply {
-            // CoAP's Accept takes one Content-Format; with several, the server picks.
-            accept.mapNotNull { FORMATS[it] }.singleOrNull()?.let { options.accept = it }
-        })
+        send(
+            url,
+            Request.newGet().apply {
+                // CoAP's Accept takes one Content-Format; with several, the server picks.
+                accept.mapNotNull { FORMATS[it] }.singleOrNull()?.let { options.accept = it }
+            }
+        )
 
     /** An act by its form's method: POST, PUT, PATCH or DELETE, the last with no payload (SPEC §6.2). */
     override fun act(act: Act, rendering: Rendering): Outcome =
-        send(act.url, Request(CoAP.Code.valueOf(act.method)).apply {
-            ask(rendering)
-            act.validator?.let { options.addIfMatch(hexBytes(it)) }
-            act.body?.let {
-                options.contentFormat = FORMATS[act.contentType] ?: JSON
-                setPayload(it)
+        send(
+            act.url,
+            Request(CoAP.Code.valueOf(act.method)).apply {
+                ask(rendering)
+                act.validator?.let { options.addIfMatch(hexBytes(it)) }
+                act.body?.let {
+                    options.contentFormat = FORMATS[act.contentType] ?: JSON
+                    setPayload(it)
+                }
             }
-        })
+        )
 
     private fun Request.ask(rendering: Rendering) {
         FORMATS[rendering.dialect.mediaType]?.let { options.accept = it }
@@ -144,7 +153,12 @@ class CoapBinding(
         val TRACEPARENT = StringOptionDefinition(65_020, "traceparent", true, 1, TEXT_MAX)
         val REGISTRY = MapBasedOptionRegistry(
             StandardOptionRegistry.getDefaultOptionRegistry(),
-            ACCEPT_PROFILE, NO_CACHE, PREFER, PROFILE, PREFERENCE_APPLIED, TRACEPARENT,
+            ACCEPT_PROFILE,
+            NO_CACHE,
+            PREFER,
+            PROFILE,
+            PREFERENCE_APPLIED,
+            TRACEPARENT,
         )
 
         /** SPEC §6.0.1: experimental Content-Formats, and application/json's registered 50. */

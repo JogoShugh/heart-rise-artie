@@ -9,6 +9,7 @@ package heart.script
 internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val maxMoves: Int) {
     private val script = MoveLines(run)
     private val marks = StepMarks(run) { GoalText.spoken(it, inputs) }
+
     // Whenevers side by side look on threads of their own: what they tell the planner, and name, is shared.
     private val moves = java.util.concurrent.CopyOnWriteArrayList<String>()
     private val path = mutableListOf<String>()
@@ -28,24 +29,39 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
 
     /** A Whenever and what is under it, decided once and replayed (spec/PLAN-WATCH-GOALS.md). */
     private val watch by lazy {
-        StepWatch(goal, run, named, moves, object : StepWatch.Host {
-            // One decision at a time, whichever Whenever's thread asks.
-            override fun ask(step: Step, here: Here, allowed: Set<String>, current: String): Move = synchronized(this) {
-                if (now !== step) stepCount = 0
-                now = step
-                next(here, allowed, current)
+        StepWatch(
+            goal,
+            run,
+            named,
+            moves,
+            object : StepWatch.Host {
+                // One decision at a time, whichever Whenever's thread asks.
+                override fun ask(
+                    step: Step,
+                    here: Here,
+                    allowed: Set<String>,
+                    current: String
+                ): Move = synchronized(this) {
+                    if (now !== step) stepCount = 0
+                    now = step
+                    next(here, allowed, current)
+                }
+
+                override fun start(): Here = checkNotNull(start).let { begun ->
+                    Here(
+                        begun.navigator,
+                        run,
+                        arrived(++run.step, "\"back\"", begun.navigator.recall(begun.held.address))
+                    )
+                }
+
+                override fun fill(text: String) = this@StepRun.fill(text)
+
+                override fun spoken(text: String) = GoalText.spoken(text, inputs)
+
+                override fun unfilled(text: String) = GoalText.unfilled(text, inputs.associateWith(run::value))
             }
-
-            override fun start(): Here = checkNotNull(start).let { begun ->
-                Here(begun.navigator, run, arrived(++run.step, "\"back\"", begun.navigator.recall(begun.held.address)))
-            }
-
-            override fun fill(text: String) = this@StepRun.fill(text)
-
-            override fun spoken(text: String) = GoalText.spoken(text, inputs)
-
-            override fun unfilled(text: String) = GoalText.unfilled(text, inputs.associateWith(run::value))
-        })
+        )
     }
 
     fun start() {
@@ -69,8 +85,15 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 if (every.every(fact, this)) return@forEach
                 val name = BRACE.findAll(fact.facts.joinToString(" ")).map { it.groupValues[1] }
                     .firstOrNull { it in named }
-                val at = Here(navigator, run, arrived(++run.step, "\"done when\"",
-                    navigator.recall(name?.let { named.getValue(it).address } ?: held.address)))
+                val at = Here(
+                    navigator,
+                    run,
+                    arrived(
+                        ++run.step,
+                        "\"done when\"",
+                        navigator.recall(name?.let { named.getValue(it).address } ?: held.address)
+                    )
+                )
                 // A fact no resource's members say may be left unchecked: done, saying why.
                 val told = "done when: ${fill(fact.facts.joinToString("; "))}: check it only when members of the " +
                     "resource held say it; otherwise done, saying why"
@@ -96,7 +119,10 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 val outer = scenario
                 scenario = step.scenario ?: outer
                 // At another party, or once a reply is answered, then its words (goal-rise.feature).
-                val done = { said: Step.Intent, at: Here, within: Int? -> intent(said, at, within); Unit }
+                val done = { said: Step.Intent, at: Here, within: Int? ->
+                    intent(said, at, within)
+                    Unit
+                }
                 // A branch's words may cross parties too: `If {smoke.passed}, at {dev}, promote …`.
                 val crossing = { said: Step.Intent, at: Here, within: Int? -> crossParty.done(said, at, within, done) }
                 if (!branch.done(step, here, opener, crossing)) crossParty.done(step, here, opener, done)
@@ -233,8 +259,10 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 }
                 // A fact of Done when no member of one resource says, the planner leaves unchecked, and says so.
                 move is Move.Done && step is Step.Verify && step in goal.done -> {
-                    here.note("Not checked: ${fill(step.facts.joinToString("; "))}" +
-                        (move.reason?.let { ": $it" } ?: ""))
+                    here.note(
+                        "Not checked: ${fill(step.facts.joinToString("; "))}" +
+                            (move.reason?.let { ": $it" } ?: "")
+                    )
                     true
                 }
                 else -> false.also { other(move, step) }

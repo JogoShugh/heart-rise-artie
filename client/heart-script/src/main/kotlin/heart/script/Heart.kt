@@ -51,6 +51,7 @@ class Here internal constructor(
 
     /** The titles of the links under [rel] (null for a link with none). */
     fun links(rel: String): List<String?> = held.links[rel].orEmpty()
+
     /** Why [rel] is not offered, as the server says; null when it says nothing. */
     fun why(rel: String): String? = navigator.why(rel)
 
@@ -119,13 +120,17 @@ class Here internal constructor(
         }
         when {
             rel != null -> acted(
-                step, rel, values.toMap() + Fields().also { fields?.invoke(it) }.values, said, block, version,
+                step,
+                rel,
+                values.toMap() + Fields().also { fields?.invoke(it) }.values,
+                said,
+                block,
+                version,
             )
             said.words != null -> reasoned(step, said, block, version, with)
             else -> throw ScriptStopped(step, "\"act\"", "\"act needs a relation, or an intent\"")
         }
     }
-
 
     /**
      * Select the link [rel] titled [title], or the resource embedded under [rel] with that title, which

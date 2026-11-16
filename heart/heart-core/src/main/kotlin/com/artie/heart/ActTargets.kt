@@ -20,6 +20,7 @@ class ActTargets<S, K>(private val layers: Layers<S, K>) {
         val set = layers.affordanceSet(type.state.keyOf(state), rung.setRendering ?: SetRendering.EMBEDDED_SCHEMAS)
         val key = type.profile.key(act.relation)
         val pointer = "/_forms/" + key.replace("~", "~0").replace("/", "~1")
+
         @Suppress("UNCHECKED_CAST")
         val form = ((JsonTrees.plain(set) as Map<String, Any?>)["_forms"] as Map<String, Map<String, Any?>>)
             .getValue(key)
@@ -44,6 +45,7 @@ class ActTargets<S, K>(private val layers: Layers<S, K>) {
     /** [act]'s target on [state] in HAL-FORMS, the L0 on-ramp: its one template, as the owner renders it. */
     fun halForms(state: S, act: Act, ownerETag: String): Map<String, Any?> {
         val owner = layers.halForms(state)
+
         @Suppress("UNCHECKED_CAST")
         val template = (owner["_templates"] as Map<String, Any?>?)?.get(act.name)
         val item = type.itemPath.expand(type.state.bodyOf(state))

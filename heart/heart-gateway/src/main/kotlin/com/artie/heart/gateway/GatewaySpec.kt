@@ -65,7 +65,14 @@ class SpecRoute(
  */
 class GatewaySpec(text: String, include: Set<OperationId>? = null) {
     private val api: OpenAPI = OpenAPIV3Parser()
-        .readContents(Slice.of(text, include), null, ParseOptions().apply { isResolve = true; isResolveFully = true })
+        .readContents(
+            Slice.of(text, include),
+            null,
+            ParseOptions().apply {
+                isResolve = true
+                isResolveFully = true
+            }
+        )
         .let { read -> checkNotNull(read.openAPI) { "the upstream's description is unreadable: ${read.messages}" } }
 
     val title: String = api.info?.title ?: "Upstream"

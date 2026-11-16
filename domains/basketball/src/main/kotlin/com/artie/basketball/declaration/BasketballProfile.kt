@@ -25,10 +25,20 @@ object BasketballProfile {
             act("start-period", "Start the next period", "Starts the next period after a break."),
             act("final-whistle", "Final whistle", "Ends the game once every period is played."),
             act("correct-score", "Take back a scoring play", "Removes a basket or free throw recorded by mistake."),
-            Relation("search-games", AlpsType.SAFE, "Find games by name", "Lists the games whose name has the text.",
-                "A safe search; each result links to the game, titled with its name."),
-            Relation("get-game", AlpsType.SAFE, "Get a game by its id", "Goes to one game, given its id.",
-                "A safe lookup; the result is the game, with what may be recorded now."),
+            Relation(
+                "search-games",
+                AlpsType.SAFE,
+                "Find games by name",
+                "Lists the games whose name has the text.",
+                "A safe search; each result links to the game, titled with its name."
+            ),
+            Relation(
+                "get-game",
+                AlpsType.SAFE,
+                "Get a game by its id",
+                "Goes to one game, given its id.",
+                "A safe lookup; the result is the game, with what may be recorded now."
+            ),
         ),
     )
 

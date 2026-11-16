@@ -104,7 +104,6 @@ internal object OpenApiShapes {
         "schema" to mapOf("type" to "string"),
     )
 
-
     fun ref(name: String): Map<String, Any> = mapOf("\$ref" to "#/components/schemas/$name")
 
     fun response(name: String): Map<String, Any> = mapOf("\$ref" to "#/components/responses/$name")
@@ -122,6 +121,7 @@ internal object OpenApiShapes {
         if (act.queryFields.isEmpty()) return emptyList()
         @Suppress("UNCHECKED_CAST")
         val schema = JsonTrees.plain(act.schema) as Map<String, Any?>
+
         @Suppress("UNCHECKED_CAST")
         val properties = schema["properties"] as Map<String, Map<String, Any>>
         val required = (schema["required"] as? List<*>).orEmpty()

@@ -29,7 +29,13 @@ object Games {
     )
 
     private val inPlay = listOf(
-        "scoreBasket", "freeThrow", "recordFoul", "turnover", "callTimeout", "endPeriod", "correctScore",
+        "scoreBasket",
+        "freeThrow",
+        "recordFoul",
+        "turnover",
+        "callTimeout",
+        "endPeriod",
+        "correctScore",
     )
 
     val type = ResourceType(

@@ -4,12 +4,12 @@ import com.artie.gardenbed.declaration.dto.Bed
 import com.artie.gardenbed.declaration.dto.BedWithBothMoistures
 import com.artie.gardenbed.declaration.dto.BedWithSoilMoisture
 import com.artie.gardenbed.declaration.dto.BuildBedRequest
-import com.artie.gardenbed.declaration.dto.WaterCellLimitedRequest
-import com.artie.gardenbed.declaration.dto.WaterCellMethodRequest
-import com.artie.gardenbed.declaration.dto.WaterCellOptionalMethodRequest
 import com.artie.gardenbed.declaration.dto.HarvestRequest
 import com.artie.gardenbed.declaration.dto.SowSeedRequest
 import com.artie.gardenbed.declaration.dto.ThawRequest
+import com.artie.gardenbed.declaration.dto.WaterCellLimitedRequest
+import com.artie.gardenbed.declaration.dto.WaterCellMethodRequest
+import com.artie.gardenbed.declaration.dto.WaterCellOptionalMethodRequest
 import com.artie.gardenbed.declaration.dto.WaterCellRequest
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus

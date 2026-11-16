@@ -22,13 +22,16 @@ internal object Sources {
         val words = step.asked.say.takeIf { step.asked.mode == "intent" }
         val cited = Citations(step, run)
         step.asked.params.filterKeys { it !in SELECTION }.forEach { (name, value) ->
-            put(name, buildJsonObject {
-                put("value", element(value))
-                // Its type, as the form's schema says: a generator writes "91" sent for an integer as 91.
-                step.used?.types?.get(name)?.let { put("type", it) }
-                put("from", JsonArray(cited.whole(text(value)) + of(text(value), run, earlier, words)))
-                cited.members(text(value)).takeIf { it.isNotEmpty() }?.let { put("cited", JsonObject(it)) }
-            })
+            put(
+                name,
+                buildJsonObject {
+                    put("value", element(value))
+                    // Its type, as the form's schema says: a generator writes "91" sent for an integer as 91.
+                    step.used?.types?.get(name)?.let { put("type", it) }
+                    put("from", JsonArray(cited.whole(text(value)) + of(text(value), run, earlier, words)))
+                    cited.members(text(value)).takeIf { it.isNotEmpty() }?.let { put("cited", JsonObject(it)) }
+                }
+            )
         }
     }
 
@@ -42,16 +45,22 @@ internal object Sources {
         val values = template.match(words) ?: emptyMap()
         return buildJsonObject {
             put("template", template.text)
-            put("slots", buildJsonObject {
-                values.forEach { (slot, value) ->
-                    put(slot, buildJsonObject {
-                        put("value", value)
-                        val input = slot.takeIf { name -> run.declared.any { it.name == name } }
-                        val from = input?.let { listOf(input(it)) } ?: of(value, run, earlier, words = null)
-                        put("from", JsonArray(from))
-                    })
+            put(
+                "slots",
+                buildJsonObject {
+                    values.forEach { (slot, value) ->
+                        put(
+                            slot,
+                            buildJsonObject {
+                                put("value", value)
+                                val input = slot.takeIf { name -> run.declared.any { it.name == name } }
+                                val from = input?.let { listOf(input(it)) } ?: of(value, run, earlier, words = null)
+                                put("from", JsonArray(from))
+                            }
+                        )
+                    }
                 }
-            })
+            )
         }
     }
 
@@ -158,14 +167,23 @@ internal class Template private constructor(val text: String, private val parts:
             while (i < line.length && !closes(line, i, raw)) {
                 val slot = slot(line, i)
                 when {
-                    !raw && line[i] == '\\' && i + 1 < line.length -> { plain.append(line[i + 1]); i += 2 }
-                    line.startsWith(DOLLAR, i) -> { plain.append('$'); i += DOLLAR.length }
+                    !raw && line[i] == '\\' && i + 1 < line.length -> {
+                        plain.append(line[i + 1])
+                        i += 2
+                    }
+                    line.startsWith(DOLLAR, i) -> {
+                        plain.append('$')
+                        i += DOLLAR.length
+                    }
                     slot != null -> {
                         parts.flush(plain)
                         parts += true to slot.first
                         i = slot.second
                     }
-                    else -> { plain.append(line[i]); i++ }
+                    else -> {
+                        plain.append(line[i])
+                        i++
+                    }
                 }
             }
             parts.flush(plain)

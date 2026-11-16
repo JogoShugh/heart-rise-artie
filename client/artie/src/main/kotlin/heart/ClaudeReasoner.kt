@@ -173,6 +173,7 @@ class ClaudeReasoner(
         fun words(content: List<JsonObject>): String =
             content.mapNotNull { block -> block["text"]?.jsonPrimitive?.content }.joinToString(" ").trim()
                 .ifEmpty { "Could you say more?" }
+
         /** The most an answer may run to unless a run says otherwise: enough for a tool call and a few words. */
         const val MAX_TOKENS = 1024
         private const val ERROR_EXCERPT = 300

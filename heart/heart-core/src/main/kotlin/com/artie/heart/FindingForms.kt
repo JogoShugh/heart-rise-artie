@@ -60,12 +60,18 @@ internal class FindingForms(private val type: ResourceType<*, *>) {
 
     /** The search form's one field by default: part of a resource's name. */
     private fun nameProperty(): Map<String, Any> = mapOf(
-        "type" to "string", "minLength" to 1, "title" to "Name", "description" to finding.nameDescription,
+        "type" to "string",
+        "minLength" to 1,
+        "title" to "Name",
+        "description" to finding.nameDescription,
     )
 
     /** The lookup form's one field by default: a resource's id. */
     private fun idProperty(): Map<String, Any> = mapOf(
-        "type" to "integer", "minimum" to 1, "title" to finding.idTitle, "description" to finding.idDescription,
+        "type" to "integer",
+        "minimum" to 1,
+        "title" to finding.idTitle,
+        "description" to finding.idDescription,
     )
 
     private companion object {

@@ -4,7 +4,6 @@ import heart.CredentialSources
 import heart.EventSinks
 import heart.HttpTransport
 import heart.mcp.HeartMcp
-import java.nio.file.Path
 import io.modelcontextprotocol.kotlin.sdk.server.Server
 import io.modelcontextprotocol.kotlin.sdk.server.StdioServerTransport
 import io.modelcontextprotocol.kotlin.sdk.types.Implementation
@@ -13,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.io.asSink
 import kotlinx.io.asSource
 import kotlinx.io.buffered
+import java.nio.file.Path
 import kotlin.system.exitProcess
 
 /**

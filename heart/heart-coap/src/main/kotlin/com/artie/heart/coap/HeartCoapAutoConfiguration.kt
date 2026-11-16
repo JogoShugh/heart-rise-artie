@@ -44,8 +44,12 @@ class HeartCoapAutoConfiguration {
         mapper: ObjectProvider<ObjectMapper>,
         listeners: CoapListeners,
     ): CoapFrontDoor = CoapFrontDoor(
-        resources, index, limits, mapper.getIfAvailable { ObjectMapper().findAndRegisterModules() },
-        listeners.port, listeners.secure,
+        resources,
+        index,
+        limits,
+        mapper.getIfAvailable { ObjectMapper().findAndRegisterModules() },
+        listeners.port,
+        listeners.secure,
     )
 
     /**

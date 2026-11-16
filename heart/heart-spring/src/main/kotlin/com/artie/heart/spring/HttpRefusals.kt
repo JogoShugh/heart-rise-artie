@@ -1,11 +1,11 @@
 package com.artie.heart.spring
 
+import com.artie.heart.Alternates
 import com.artie.heart.BadRequestException
 import com.artie.heart.CallerForbiddenException
 import com.artie.heart.CallerUnauthorizedException
 import com.artie.heart.HtmlProblem
 import com.artie.heart.MalformedActBodyException
-import com.artie.heart.Alternates
 import com.artie.heart.NotAcceptableException
 import com.artie.heart.NotOfferedException
 import com.artie.heart.PROBLEM_TYPES
@@ -78,20 +78,28 @@ object HttpRefusals {
         is StaleWriteConflict ->
             Refusal(HttpStatus.PRECONDITION_FAILED, "stale", "The act is stale: the state has changed")
         is NotOfferedException -> Refusal(
-            HttpStatus.CONFLICT, "not-offered", "The act is not offered in the resource's current state",
+            HttpStatus.CONFLICT,
+            "not-offered",
+            "The act is not offered in the resource's current state",
             listOfNotNull(failure.rel?.let { "rel" to it }).toMap(),
         )
         is UnprocessableContentException -> Refusal(
-            HttpStatus.UNPROCESSABLE_ENTITY, "invalid-input", "The body does not match the form's schema",
+            HttpStatus.UNPROCESSABLE_ENTITY,
+            "invalid-input",
+            "The body does not match the form's schema",
             mapOf("violations" to failure.violations),
         )
         is RuleRefusedException -> Refusal(
-            HttpStatus.UNPROCESSABLE_ENTITY, "rule-refused", "A rule of the resource refuses the act",
+            HttpStatus.UNPROCESSABLE_ENTITY,
+            "rule-refused",
+            "A rule of the resource refuses the act",
             mapOf("violations" to failure.violations),
         )
         // RFC 9110 §15.5.7: a 406 lists the formats the resource is served in.
         is NotAcceptableException -> Refusal(
-            HttpStatus.NOT_ACCEPTABLE, "not-acceptable", "Accept names no format this server produces",
+            HttpStatus.NOT_ACCEPTABLE,
+            "not-acceptable",
+            "Accept names no format this server produces",
             mapOf("alternates" to Alternates.FORMATS),
         )
         else -> null

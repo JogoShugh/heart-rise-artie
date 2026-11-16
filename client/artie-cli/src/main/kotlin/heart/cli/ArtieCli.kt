@@ -8,6 +8,7 @@ import heart.script.Refusal
 import heart.script.Run
 import heart.script.ScriptStopped
 import heart.script.TraceStep
+import heart.script.host.ScriptHost
 import heart.script.test.ExpectationNotMet
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -15,7 +16,6 @@ import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Instant
-import heart.script.host.ScriptHost
 import javax.script.ScriptException
 
 /**
@@ -74,9 +74,15 @@ class ArtieCli(
             ClientSettings(lock.rung, asked.reasoner, asked.exchanges, lock.pins, guarding, model, asked.dialect)
         val made = lazy { navigator(settings) }
         val client by made
-        val run = Run(given, asked.interactive, ::ask, listing = asked.inputsOf, navigator = clients(made) {
-            navigator(settings)
-        })
+        val run = Run(
+            given,
+            asked.interactive,
+            ::ask,
+            listing = asked.inputsOf,
+            navigator = clients(made) {
+                navigator(settings)
+            }
+        )
         run.reasoning = asked.reasoner != null
         run.fallsBack = config.onChange == "intent"
         run.entry = asked.entry

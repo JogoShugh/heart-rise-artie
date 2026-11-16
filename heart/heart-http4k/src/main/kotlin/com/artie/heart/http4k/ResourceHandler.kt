@@ -4,8 +4,8 @@ import com.artie.heart.Act
 import com.artie.heart.ActPipeline
 import com.artie.heart.ActRequests
 import com.artie.heart.ActTargets
-import com.artie.heart.Alternates
 import com.artie.heart.Acted
+import com.artie.heart.Alternates
 import com.artie.heart.BadRequestException
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
@@ -45,6 +45,7 @@ class ResourceHandler<S, K>(
     private val type = resource.layers.type
     private val pipeline = ActPipeline(type, mapper, limits.validatorRequired)
     private val targets = ActTargets(resource.layers)
+
     /** This type as HTML, for people (spec/PLAN-HTML-DIALECT.md); its bookmark acts too. */
     internal val html = HtmlAnswer(resource, pipeline, mapper)
 

@@ -36,8 +36,9 @@ internal object HtmlFields {
                 val selected = if (value == schema["default"]?.toString()) " selected" else ""
                 "<option value=\"${Html.attr(value)}\"$selected>${Html.text(prompt)}</option>"
             } + "</select>"
-            type(schema) == "array" -> "<div class=\"list\" data-list><input type=\"text\"$control></div>" +
-                "<button type=\"button\" class=\"add\" data-add>Add another</button>"
+            type(schema) == "array" ->
+                "<div class=\"list\" data-list><input type=\"text\"$control></div>" +
+                    "<button type=\"button\" class=\"add\" data-add>Add another</button>"
             type(schema) in NUMBERS -> "<input type=\"number\"$control${value(schema)}>"
             type(schema) == "string" && name in LONG_TEXT ->
                 "<textarea$control>${Html.text(schema["default"] ?: "")}</textarea>"

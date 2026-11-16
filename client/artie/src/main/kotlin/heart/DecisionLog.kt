@@ -10,23 +10,31 @@ internal class DecisionLog(private val events: EventLog) {
     /** SPEC §6.11.1: the rung a response is at, from Preference-Applied. */
     fun rung(url: String, preferenceApplied: String?, applied: Rung) =
         events.emit(
-            "rung.applied", "took rung $applied from Preference-Applied", url,
+            "rung.applied",
+            "took rung $applied from Preference-Applied",
+            url,
             mapOf("heart.preference_applied" to preferenceApplied.orEmpty(), RUNG to applied.name),
         )
 
     /** Whether the forms link was followed, and why not when it was not. */
     fun forms(url: String, href: String?, applied: Rung) = when {
         href == null && applied != Rung.L0 -> events.emit(
-            "forms.missing", "the response is at $applied but links no affordance set it can name", url,
+            "forms.missing",
+            "the response is at $applied but links no affordance set it can name",
+            url,
             mapOf(RUNG to applied.name),
         )
         href == null -> Unit
         applied == Rung.L0 -> events.emit(
-            "forms.skipped", "did not follow the forms link: no Preference-Applied means L0", url,
+            "forms.skipped",
+            "did not follow the forms link: no Preference-Applied means L0",
+            url,
             mapOf("heart.forms.href" to href, RUNG to applied.name),
         )
         else -> events.emit(
-            "forms.followed", "followed the forms link at $applied", url,
+            "forms.followed",
+            "followed the forms link at $applied",
+            url,
             mapOf("heart.forms.href" to href, RUNG to applied.name),
         )
     }
@@ -34,20 +42,26 @@ internal class DecisionLog(private val events: EventLog) {
     /** HAL-SCHEMA-FORMS-HR Rule 2: bytes refused, never parsed or cached. */
     fun integrityRefused(url: String, expected: String?, reason: String?) =
         events.emit(
-            "integrity.refused", "refused the response: ${reason ?: "integrity check failed"}", url,
+            "integrity.refused",
+            "refused the response: ${reason ?: "integrity check failed"}",
+            url,
             mapOf("heart.integrity.expected" to expected),
         )
 
     fun integrityChecked(url: String, expected: String?) =
         events.emit(
-            "integrity.ok", "the bytes match the link's integrity", url,
+            "integrity.ok",
+            "the bytes match the link's integrity",
+            url,
             mapOf("heart.integrity.expected" to expected),
         )
 
     /** An act sent, with the validator it carried and the resource it was derived from. */
     fun actSent(rel: String, act: Act, owner: String, outcome: Outcome) =
         events.emit(
-            "act.sent", "sent $rel with " + (act.validator?.let { "validator $it" } ?: "no validator"), act.url,
+            "act.sent",
+            "sent $rel with " + (act.validator?.let { "validator $it" } ?: "no validator"),
+            act.url,
             mapOf(
                 REL to rel,
                 "heart.method" to act.method,
@@ -60,7 +74,9 @@ internal class DecisionLog(private val events: EventLog) {
     /** SPEC §6.2, §6.3: a refusal, its problem type, and what ARTIE did about it. */
     fun actRefused(rel: String, target: String, outcome: Outcome, handled: String) =
         events.emit(
-            "act.refused", "$rel was refused (${outcome.code}); $handled", target,
+            "act.refused",
+            "$rel was refused (${outcome.code}); $handled",
+            target,
             mapOf(
                 REL to rel,
                 "heart.code" to outcome.code,
@@ -72,7 +88,9 @@ internal class DecisionLog(private val events: EventLog) {
     /** A form's schema that could not be compiled: its acts are sent unchecked. Never names a field value. */
     fun schemaUncompiled(rel: String, schema: String, url: String, reason: String?) =
         events.emit(
-            "schema.uncompiled", "could not compile the schema of $rel; its acts are sent unchecked", url,
+            "schema.uncompiled",
+            "could not compile the schema of $rel; its acts are sent unchecked",
+            url,
             mapOf(REL to rel, "heart.schema" to schema, "heart.schema.error" to reason),
         )
 

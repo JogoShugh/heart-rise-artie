@@ -119,7 +119,9 @@ class Bindings(
             input != null ->
                 Argument(field, marked.input(input, inputAs(input, type)), value = inputReference(input, type))
             field in asInputs -> Argument(
-                field, marked.madeInput(field, text, inputAs(field, type)), value = inputReference(field, type),
+                field,
+                marked.madeInput(field, text, inputAs(field, type)),
+                value = inputReference(field, type),
             )
             // A goal run's step words are the planner's: what the person said is the goal, its "words" source.
             if (capture.source != null) "words" in from else literal(step, field, text) ->

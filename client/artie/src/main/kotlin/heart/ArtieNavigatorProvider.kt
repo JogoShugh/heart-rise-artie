@@ -20,6 +20,7 @@ class ArtieNavigatorProvider : NavigatorProvider {
     companion object {
         private const val NO_KEY =
             "no model key: set ANTHROPIC_API_KEY, or add one for https://api.anthropic.com to ~/.artie/credentials"
+
         /**
          * ARTIE with the credentials [env] and [userHome] hold: over HTTP and HTTPS, plain CoAP, and coaps,
          * whose pre-shared keys stay inside its DTLS connector, as [settings] ask. With the reasoner `claude`, its
@@ -29,8 +30,7 @@ class ArtieNavigatorProvider : NavigatorProvider {
          * are kept for the run's capture. With pins, each act is held to the script's lock file first. A bare
          * script's calls (spec/ideas/bare-runs.md) go out with the same credentials, trace and log, and nothing else.
          */
-        fun standard(env: Map<String, String>, userHome: Path, settings: ClientSettings = ClientSettings()):
-            Navigator {
+        fun standard(env: Map<String, String>, userHome: Path, settings: ClientSettings = ClientSettings()): Navigator {
             val rung = settings.rung?.let(Rung::valueOf) ?: Rung.L0
             val guarding = settings.guarding
             val guard = settings.pins?.let {

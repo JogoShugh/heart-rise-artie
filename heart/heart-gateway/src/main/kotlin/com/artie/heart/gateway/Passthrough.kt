@@ -3,7 +3,6 @@ package com.artie.heart.gateway
 import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
 import com.fasterxml.jackson.core.JsonPointer
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import org.http4k.core.Method
@@ -58,11 +57,14 @@ internal class Passthrough(
             mapOf("href" to self) + (title?.let { mapOf("title" to item.at(it).asText()) } ?: emptyMap())
         }
         return buildMap {
-            put("_links", buildMap {
-                put("self", mapOf("href" to asked))
-                next?.let { put("next", mapOf("href" to writer.address(it))) }
-                put("item", links)
-            })
+            put(
+                "_links",
+                buildMap {
+                    put("self", mapOf("href" to asked))
+                    next?.let { put("next", mapOf("href" to writer.address(it))) }
+                    put("item", links)
+                }
+            )
             if (members.isNotEmpty()) put("_embedded", mapOf("item" to members.map { it.second }))
         }
     }

@@ -41,7 +41,11 @@ object CoapOptions {
     /** CoAP's standard options and these. */
     val registry: OptionRegistry = MapBasedOptionRegistry(
         StandardOptionRegistry.getDefaultOptionRegistry(),
-        ACCEPT_PROFILE, NO_CACHE, PREFER, PROFILE, PREFERENCE_APPLIED,
+        ACCEPT_PROFILE,
+        NO_CACHE,
+        PREFER,
+        PROFILE,
+        PREFERENCE_APPLIED,
     )
 
     /** A CoAP ETag holds at most 8 bytes: the first 8 of SHA-256 over the HTTP binding's ETag value. */

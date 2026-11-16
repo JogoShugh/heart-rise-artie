@@ -60,19 +60,31 @@ internal class CoapReplies(private val objectMapper: ObjectMapper) {
         is PreconditionRequiredException ->
             problem(ResponseCode.BAD_REQUEST, "precondition-required", "If-Match is required", failure.message)
         is StaleWriteConflict -> problem(
-            ResponseCode.PRECONDITION_FAILED, "stale", "The act is stale: the state has changed", failure.message,
+            ResponseCode.PRECONDITION_FAILED,
+            "stale",
+            "The act is stale: the state has changed",
+            failure.message,
         )
         is NotOfferedException -> problem(
-            ResponseCode.CONFLICT, "not-offered", "The act is not offered in the resource's current state",
-            failure.message, listOfNotNull(failure.rel?.let { "rel" to it }).toMap(),
+            ResponseCode.CONFLICT,
+            "not-offered",
+            "The act is not offered in the resource's current state",
+            failure.message,
+            listOfNotNull(failure.rel?.let { "rel" to it }).toMap(),
         )
         is UnprocessableContentException -> problem(
-            ResponseCode.UNPROCESSABLE_ENTITY, "invalid-input", "The body does not match the form's schema",
-            failure.message, mapOf("violations" to failure.violations),
+            ResponseCode.UNPROCESSABLE_ENTITY,
+            "invalid-input",
+            "The body does not match the form's schema",
+            failure.message,
+            mapOf("violations" to failure.violations),
         )
         is RuleRefusedException -> problem(
-            ResponseCode.UNPROCESSABLE_ENTITY, "rule-refused", "A rule of the resource refuses the act",
-            failure.message, mapOf("violations" to failure.violations),
+            ResponseCode.UNPROCESSABLE_ENTITY,
+            "rule-refused",
+            "A rule of the resource refuses the act",
+            failure.message,
+            mapOf("violations" to failure.violations),
         )
         is MalformedActBodyException -> error(ResponseCode.BAD_REQUEST, failure.message)
         is ResourceNotFoundException -> error(ResponseCode.NOT_FOUND, failure.message)

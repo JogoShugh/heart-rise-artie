@@ -29,6 +29,10 @@ class ModelUsage {
 
     @Synchronized
     fun counts(): Map<String, Long> = linkedMapOf(
-        "calls" to calls, "input" to input, "output" to output, "cache_read" to cacheRead, "cache_write" to cacheWrite,
+        "calls" to calls,
+        "input" to input,
+        "output" to output,
+        "cache_read" to cacheRead,
+        "cache_write" to cacheWrite,
     )
 }

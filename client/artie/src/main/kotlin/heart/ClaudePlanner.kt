@@ -73,7 +73,12 @@ class ClaudePlanner(
                 buildJsonObject {
                     put("role", "user")
                     putJsonArray("content") {
-                        add(buildJsonObject { put("type", "text"); put("text", turn(view)) })
+                        add(
+                            buildJsonObject {
+                                put("type", "text")
+                                put("text", turn(view))
+                            }
+                        )
                     }
                 },
             )
@@ -127,7 +132,10 @@ class ClaudePlanner(
         val why = text("why")
         return when (text("move")) {
             "act" -> Move.Act(
-                text("words").orEmpty(), sentence, input["opens"]?.jsonPrimitive?.booleanOrNull == true, why,
+                text("words").orEmpty(),
+                sentence,
+                input["opens"]?.jsonPrimitive?.booleanOrNull == true,
+                why,
                 asOf = text("as_of")?.takeIf { it.isNotBlank() },
                 refusedAs = text("refused")?.takeIf { it.isNotBlank() },
             )

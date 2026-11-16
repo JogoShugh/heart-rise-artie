@@ -30,8 +30,12 @@ data class GatewayCare(
         const val HEADER = "X-Gateway-Care"
 
         private const val OFF_THE_RAILS_TRUST = 60L
-        private val OFF_THE_RAILS = GatewayCare(offers = false, race = false, reread = false,
-            trustCopies = Duration.ofSeconds(OFF_THE_RAILS_TRUST))
+        private val OFF_THE_RAILS = GatewayCare(
+            offers = false,
+            race = false,
+            reread = false,
+            trustCopies = Duration.ofSeconds(OFF_THE_RAILS_TRUST)
+        )
 
         /** The care that [words] name, comma separated; a word it doesn't know is refused, naming it. */
         fun parse(words: String): GatewayCare = words.split(',').map { it.trim() }.filter { it.isNotEmpty() }

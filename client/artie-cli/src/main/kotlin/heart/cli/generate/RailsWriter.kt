@@ -64,7 +64,10 @@ internal class RailsWriter(private val evidence: RailsRun, private val names: Pa
             val once = ONCE.matchEntire(line)
             val act = ACT.matchEntire(line)
             when {
-                line == "}" -> closes.removeLast()?.let { depth--; emit(depth, it) }
+                line == "}" -> closes.removeLast()?.let {
+                    depth--
+                    emit(depth, it)
+                }
                 until != null -> looks(until.groupValues[1], until.groupValues[2])
                 line == "whenever {" -> whenever()
                 has != null -> emit(depth, "has(${condition(has.groupValues[1], MEMBER)})")

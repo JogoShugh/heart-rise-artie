@@ -22,13 +22,18 @@ internal fun TraceStep.shape(): Map<String, JsonElement> = buildMap {
     // A reason step chose a value its words didn't give: the reasoner's judgement, not the words'.
     if (asked.mode == "intent") put("judgement", JsonPrimitive(Shape.chose(step.values)))
     if (model.isNotEmpty()) {
-        put("model", JsonArray(model.map { call ->
-            buildJsonObject {
-                call.model?.let { put("model", it) }
-                put("asked", call.asked)
-                put("answered", call.answered)
-            }
-        }))
+        put(
+            "model",
+            JsonArray(
+                model.map { call ->
+                    buildJsonObject {
+                        call.model?.let { put("model", it) }
+                        put("asked", call.asked)
+                        put("answered", call.answered)
+                    }
+                }
+            )
+        )
     }
     used?.let { used ->
         put("chose", chose(used))
@@ -36,10 +41,13 @@ internal fun TraceStep.shape(): Map<String, JsonElement> = buildMap {
     }
     if (exchanges.isNotEmpty()) put("exchanges", JsonArray(exchanges.map(::exchange)))
     offered?.let { from ->
-        put("offered", buildJsonObject {
-            put("forms", JsonArray(from.offered.sorted().map { JsonPrimitive(it) }))
-            put("links", JsonArray(from.links.keys.sorted().map { JsonPrimitive(it) }))
-        })
+        put(
+            "offered",
+            buildJsonObject {
+                put("forms", JsonArray(from.offered.sorted().map { JsonPrimitive(it) }))
+                put("links", JsonArray(from.links.keys.sorted().map { JsonPrimitive(it) }))
+            }
+        )
     }
 }
 
@@ -61,17 +69,23 @@ private fun TraceStep.chose(used: Used): JsonObject = buildJsonObject {
 private fun exchange(exchange: Exchange): JsonObject = buildJsonObject {
     put("at", exchange.at.toString())
     put("ms", exchange.ms)
-    put("request", buildJsonObject {
-        put("method", exchange.sent.method)
-        put("url", exchange.sent.url)
-        put("headers", JsonObject(exchange.sent.headers.mapValues { JsonPrimitive(it.value) }))
-        exchange.sent.body?.let { put("body", body(it)) }
-    })
-    put("response", buildJsonObject {
-        put("status", exchange.received.status)
-        put("headers", JsonObject(exchange.received.headers.mapValues { JsonPrimitive(it.value) }))
-        exchange.received.body?.takeIf { it.isNotEmpty() }?.let { put("body", body(it)) }
-    })
+    put(
+        "request",
+        buildJsonObject {
+            put("method", exchange.sent.method)
+            put("url", exchange.sent.url)
+            put("headers", JsonObject(exchange.sent.headers.mapValues { JsonPrimitive(it.value) }))
+            exchange.sent.body?.let { put("body", body(it)) }
+        }
+    )
+    put(
+        "response",
+        buildJsonObject {
+            put("status", exchange.received.status)
+            put("headers", JsonObject(exchange.received.headers.mapValues { JsonPrimitive(it.value) }))
+            exchange.received.body?.takeIf { it.isNotEmpty() }?.let { put("body", body(it)) }
+        }
+    )
 }
 
 private fun body(text: String): JsonElement =
@@ -116,8 +130,12 @@ internal object Shape {
             sourcesIn(step).forEach { source ->
                 val from = (source["step"] as? JsonPrimitive)?.content?.toIntOrNull()
                 val pointer = (source["pointer"] as? JsonPrimitive)?.content
-                val readers = if (from == null || pointer == null) null else keeps.getOrNull(from - 1)
-                    ?.getOrPut(pointer) { mutableListOf() }
+                val readers = if (from == null || pointer == null) {
+                    null
+                } else {
+                    keeps.getOrNull(from - 1)
+                        ?.getOrPut(pointer) { mutableListOf() }
+                }
                 if (readers != null && i + 1 !in readers) readers += i + 1
             }
         }

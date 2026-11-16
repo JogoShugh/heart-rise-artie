@@ -48,7 +48,7 @@ private const val LIMITED_ML = 500L
 private const val MONDAY_ML = 1000L
 
 /** How water reaches the soil (Wednesday, new-required-input). */
-@Suppress("EnumNaming")
+@Suppress("EnumNaming", "EnumEntryNameCase")
 enum class WaterMethod { drip, spray }
 
 /** Wednesday, new-required-input: watering also requires a method. */

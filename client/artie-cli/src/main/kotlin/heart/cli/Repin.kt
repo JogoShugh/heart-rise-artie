@@ -64,7 +64,11 @@ private fun found(step: Step, pin: FormPin): Found? {
     return when {
         step.outcome !in DONE -> null
         held in setOf("values", "act") && form != null -> Found(
-            step.relation.orEmpty(), set, form, step.chose["method"]?.toString(), step.guard["act"]?.toString(),
+            step.relation.orEmpty(),
+            set,
+            form,
+            step.chose["method"]?.toString(),
+            step.guard["act"]?.toString(),
             moved = held == "act",
         )
         form == pin.integrity && set != null && set !in pin.sets -> Found(step.relation.orEmpty(), set)

@@ -31,7 +31,8 @@ class UpstreamRecord(private val file: Path, private val mapper: ObjectMapper, p
 
     /** Around the gateway's handler: notes the traceparent of the request being served, while it is. */
     val servingFilter = Filter { next ->
-        { request: Request ->
+        {
+                request: Request ->
             serving.set(request.header(TRACEPARENT))
             try {
                 next(request)

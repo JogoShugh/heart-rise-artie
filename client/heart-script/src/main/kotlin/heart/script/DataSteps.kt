@@ -98,7 +98,9 @@ private fun checked(list: Any?, reading: Reading): List<Fact> =
 internal val REASONED = Maker(WORDS + setOf("reasoned", "then")) { step, reading ->
     val words = said(step, reading)
     act(
-        intent = words.intent, inferred = words.inferred, fromIntent = words.fromIntent,
+        intent = words.intent,
+        inferred = words.inferred,
+        fromIntent = words.fromIntent,
         block = block(step, "then", reading),
     )
 }
