@@ -15,8 +15,10 @@ class ArchitectureTest {
     @Test
     fun `no tickets code touches HTTP, hypermedia rendering or CoAP`() {
         val wire = listOf(
-            "org.springframework.web", "org.springframework.http",
-            "org.springframework.hateoas", "org.eclipse.californium",
+            "org.springframework.web",
+            "org.springframework.http",
+            "org.springframework.hateoas",
+            "org.eclipse.californium",
         )
         Konsist.scopeFromProduction().files
             .assertFalse { file -> file.hasImport { import -> wire.any { import.name.startsWith(it) } } }
@@ -25,7 +27,9 @@ class ArchitectureTest {
     @Test
     fun `the domain knows nothing of the declaration or the storage`() {
         val outside = listOf(
-            "com.artie.tickets.declaration", "com.artie.tickets.store", "com.artie.tickets.config",
+            "com.artie.tickets.declaration",
+            "com.artie.tickets.store",
+            "com.artie.tickets.config",
         )
         Konsist.scopeFromProduction().files
             .filter { it.hasPackage("com.artie.tickets.domain..") }

@@ -37,8 +37,12 @@ class CatchUpSteps(
         val bookmark = read(entry.getValue("href").jsonPrimitive.content).getValue("_forms").jsonObject
             .mapValues { (_, offered) -> offered.jsonObject.getValue("hr:integrity").jsonPrimitive.content to entrySet }
         ctx.guard = guard
-        ctx.pins = bookmark + (relation to (form.getValue("hr:integrity").jsonPrimitive.content to
-            link.getValue("integrity").jsonPrimitive.content))
+        ctx.pins = bookmark + (
+            relation to (
+                form.getValue("hr:integrity").jsonPrimitive.content to
+                    link.getValue("integrity").jsonPrimitive.content
+                )
+            )
     }
 
     @Given(
@@ -47,12 +51,18 @@ class CatchUpSteps(
     )
     fun settles(number: Long) {
         pending(number)
-        gateway.github.afterNextRead[number] = { it.mergeable = true; it.mergeableState = "clean" }
+        gateway.github.afterNextRead[number] = {
+            it.mergeable = true
+            it.mergeableState = "clean"
+        }
     }
 
     @Given("GitHub is still working out whether pull request {long} can be merged, and never works it out")
     fun pending(number: Long) {
-        gateway.github.pulls.first { it.number == number }.apply { mergeable = null; mergeableState = "unknown" }
+        gateway.github.pulls.first { it.number == number }.apply {
+            mergeable = null
+            mergeableState = "unknown"
+        }
     }
 
     @Then("the run was stopped at step {int}, as not offered")
@@ -64,8 +74,10 @@ class CatchUpSteps(
     private fun read(path: String): JsonObject {
         val url = if (path.startsWith("http")) path else "https://github.gateway.test$path"
         val headers = mapOf(
-            "Authorization" to "Bearer ada-token", "Accept" to "application/hal+json",
-            "Prefer" to "forms=link, schema=link", "Accept-Profile" to "<https://w3id.org/heart-rise/hal-schema-forms>",
+            "Authorization" to "Bearer ada-token",
+            "Accept" to "application/hal+json",
+            "Prefer" to "forms=link, schema=link",
+            "Accept-Profile" to "<https://w3id.org/heart-rise/hal-schema-forms>",
         )
         val body = checkNotNull(ctx.inProcess).send(HeartRequest("GET", url, headers)).body
         return Json.parseToJsonElement(body).jsonObject

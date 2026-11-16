@@ -9,7 +9,6 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import java.nio.file.Files
-import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals

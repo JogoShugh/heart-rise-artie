@@ -59,7 +59,10 @@ class MailSteps(private val ctx: ClientContext) {
         val loaded = Connector.load(FOLDER, mapper)
         val description = checkNotNull(javaClass.getResource("/mail/openapi.json")).readText()
         val gateway = Gateway(
-            GatewaySpec(description, loaded.reads), upstream, loaded.profile, UpstreamAuth.Forwarded,
+            GatewaySpec(description, loaded.reads),
+            upstream,
+            loaded.profile,
+            UpstreamAuth.Forwarded,
             connector = loaded,
         ).handler(Credentials.forwarded(), HeartSettings())
         val host = URI(origin).host

@@ -91,47 +91,126 @@ private class RiseRun(private val prefer: String?, private val live: Boolean) {
     /** Ana's first request: progress, refusals, the result, its replay, and a cancel after the answer. */
     private fun answered(entry: JsonNode) {
         ask(entry, "r-7f3", null, 401, "Ana asks to be told when loan {loan} can be renewed, unsigned")
-        val watch = ask(entry, "r-7f3", AnaKey.signer, 201,
-            "Ana asks to be told when loan {loan} can be renewed, with reply {reply}, signed with her key")
+        val watch = ask(
+            entry,
+            "r-7f3",
+            AnaKey.signer,
+            201,
+            "Ana asks to be told when loan {loan} can be renewed, with reply {reply}, signed with her key"
+        )
         val reply = href(readWatch(watch, "Ana reads her watch: its keys, its reply, and her cancel"), "hr:reply-to")
         read(theLibrary, reply, "The library reads Ana's reply {reply}, linked from the watch, for its forms", "r-7f3")
-        answer(reply, "progress", watch, mapOf("state" to "awaiting", "percent" to 0,
-            "note" to "one ahead in the hold queue"), LibraryKey.signer, 200,
-            "The library reports progress of {percent} percent, naming the watch it answers for")
-        answer(reply, "progress", "${HeartLibrary.ORIGIN}/watches/99", mapOf("state" to "awaiting", "percent" to 50),
-            LibraryKey.signer, 409, "An answer that names another watch, {watch}, is sent")
-        answer(reply, "completed", watch, RESULT_2026_12_03, LibraryKey.otherSigner, 401,
-            "A result signed with another key, claiming the library's keyid, is sent")
+        answer(
+            reply,
+            "progress",
+            watch,
+            mapOf(
+                "state" to "awaiting",
+                "percent" to 0,
+                "note" to "one ahead in the hold queue"
+            ),
+            LibraryKey.signer,
+            200,
+            "The library reports progress of {percent} percent, naming the watch it answers for"
+        )
+        answer(
+            reply,
+            "progress",
+            "${HeartLibrary.ORIGIN}/watches/99",
+            mapOf("state" to "awaiting", "percent" to 50),
+            LibraryKey.signer,
+            409,
+            "An answer that names another watch, {watch}, is sent"
+        )
+        answer(
+            reply,
+            "completed",
+            watch,
+            RESULT_2026_12_03,
+            LibraryKey.otherSigner,
+            401,
+            "A result signed with another key, claiming the library's keyid, is sent"
+        )
+        result(watch, reply)
+    }
+
+    /** The result: unsigned first, then signed once the hold is returned, sent again, and changed after. */
+    private fun result(watch: String, reply: String) {
         answer(reply, "completed", watch, RESULT_2026_12_03, null, 401, "An unsigned result is sent")
         control("/_sim/library/holds/3310/release") { library.releaseHold(LOAN) }
-        answer(reply, "completed", watch, RESULT_2026_12_03, LibraryKey.signer, 200,
-            "The hold is returned, and the library sends the result, signed")
+        answer(
+            reply,
+            "completed",
+            watch,
+            RESULT_2026_12_03,
+            LibraryKey.signer,
+            200,
+            "The hold is returned, and the library sends the result, signed"
+        )
         answered(watch)
-        answer(reply, "completed", watch, RESULT_2026_12_03, LibraryKey.signer, 200,
-            "The same result is sent again, and is answered as the first was")
-        answer(reply, "completed", watch, RESULT_2026_12_10, LibraryKey.signer, 409,
-            "A different result is sent, after the answer")
+        answer(
+            reply,
+            "completed",
+            watch,
+            RESULT_2026_12_03,
+            LibraryKey.signer,
+            200,
+            "The same result is sent again, and is answered as the first was"
+        )
+        answer(
+            reply,
+            "completed",
+            watch,
+            RESULT_2026_12_10,
+            LibraryKey.signer,
+            409,
+            "A different result is sent, after the answer"
+        )
         val after = readWatch(watch, "Ana reads her watch after the answer: no cancel, and why")
         val why = after["_links"]?.get("hr:unavailable")?.let { href(after, "hr:unavailable") }
             ?: href(sets.getValue(watch), "hr:unavailable")
         send(ana, "Ana reads why the watch offers no cancel", 200, get(why))
         cancel(watch, after, 409, "Ana cancels anyway, by the form she read before")
-        send(theLibrary, "The library reads the reply's history, by the link its last answer gave", 200,
-            get(href(held.getValue(reply), "version-history")), mapOf("relation" to "version-history"))
+        send(
+            theLibrary,
+            "The library reads the reply's history, by the link its last answer gave",
+            200,
+            get(href(held.getValue(reply), "version-history")),
+            mapOf("relation" to "version-history")
+        )
     }
 
     /** Ana's second request: the library has no record of the hold, and says so as a failure. */
     private fun failed(entry: JsonNode) {
-        val watch = ask(entry, "r-b04", AnaKey.signer, 201,
-            "Ana asks again, with reply {reply}, on the entry's ETag she already holds")
+        val watch = ask(
+            entry,
+            "r-b04",
+            AnaKey.signer,
+            201,
+            "Ana asks again, with reply {reply}, on the entry's ETag she already holds"
+        )
         val reply = href(readWatch(watch, "Ana reads her second watch"), "hr:reply-to")
         read(theLibrary, reply, "The library reads Ana's reply {reply} for its forms", "r-b04")
         val problem = mapOf("state" to "failed", "type" to NO_HOLD_RECORD, "title" to "No hold record for loan 3310")
-        answer(reply, "failed", watch, problem, LibraryKey.signer, 415,
+        answer(
+            reply,
+            "failed",
+            watch,
+            problem,
+            LibraryKey.signer,
+            415,
             "The failure is sent as a merge patch, not the problem document its form asks for",
-            contentType = "application/merge-patch+json")
-        answer(reply, "failed", watch, problem, LibraryKey.signer, 200,
-            "The library has no record of the hold, and sends the failure as a problem document")
+            contentType = "application/merge-patch+json"
+        )
+        answer(
+            reply,
+            "failed",
+            watch,
+            problem,
+            LibraryKey.signer,
+            200,
+            "The library has no record of the hold, and sends the failure as a problem document"
+        )
         answered(watch)
     }
 
@@ -142,10 +221,20 @@ private class RiseRun(private val prefer: String?, private val live: Boolean) {
         cancel(watch, read, 200, "Ana cancels the request, by the watch's form")
         val reply = href(read, "hr:reply-to")
         send(theLibrary, "Ana's reply {reply}, read as HTML", 200, get(reply, accept = HTML), mapOf("reply" to "r-c21"))
-        send(theLibrary, "Ana's reply {reply}, read as HAL-FORMS", 200, get(reply, accept = HAL_FORMS, profile = null),
-            mapOf("reply" to "r-c21"))
-        send(theLibrary, "Ana's reply {reply}, asked for as XML, which it is not served in", 406,
-            get(reply, accept = "application/xml", profile = null), mapOf("reply" to "r-c21"))
+        send(
+            theLibrary,
+            "Ana's reply {reply}, read as HAL-FORMS",
+            200,
+            get(reply, accept = HAL_FORMS, profile = null),
+            mapOf("reply" to "r-c21")
+        )
+        send(
+            theLibrary,
+            "Ana's reply {reply}, asked for as XML, which it is not served in",
+            406,
+            get(reply, accept = "application/xml", profile = null),
+            mapOf("reply" to "r-c21")
+        )
     }
 
     /** Ana asks the entry's form for news of loan 3310 on [reply], signed by [signer]; the watch's address, if made. */
@@ -156,8 +245,10 @@ private class RiseRun(private val prefer: String?, private val live: Boolean) {
             mapOf(
                 "loan" to LOAN,
                 "_links" to mapOf(
-                    "hr:reply-to" to mapOf("href" to "${CallerService.ORIGIN}/replies/$reply", "type" to HAL,
-                        "profile" to HSF_PROFILE),
+                    "hr:reply-to" to mapOf(
+                        "href" to "${CallerService.ORIGIN}/replies/$reply", "type" to HAL,
+                        "profile" to HSF_PROFILE
+                    ),
                     "hr:keys" to mapOf(
                         "href" to "${CallerService.ORIGIN}${Signatures.KEYS}",
                         "type" to Signatures.JWK_SET,
@@ -169,7 +260,9 @@ private class RiseRun(private val prefer: String?, private val live: Boolean) {
             hal(Request(Method.valueOf(form["method"].asText()), target(form, entry)))
                 .header("If-Match", etags.getValue("/"))
                 .header("Content-Type", form["contentType"].asText()),
-            HeartLibrary.ORIGIN, body, signer,
+            HeartLibrary.ORIGIN,
+            body,
+            signer,
         )
         val answer = send(ana, say, expect, request, mapOf("loan" to LOAN, "reply" to reply))
         val location = answer.header("Location") ?: return ""
@@ -227,7 +320,9 @@ private class RiseRun(private val prefer: String?, private val live: Boolean) {
                 .header("Authorization", REPLY_AUTH)
                 .header("If-Match", etags.getValue(reply))
                 .header("Content-Type", contentType ?: form["contentType"].asText()),
-            CallerService.ORIGIN, body, signer,
+            CallerService.ORIGIN,
+            body,
+            signer,
         )
         val params = mapOf("relation" to "hr:$relation", "watch" to watch) + fields.filterKeys { it == "percent" }
         send(theLibrary, say, expect, request, params).also { if (it.status.successful) hold(theLibrary, reply, it) }
@@ -434,8 +529,14 @@ private class RiseRun(private val prefer: String?, private val live: Boolean) {
             "Content-Digest", "Signature-Input", "Signature",
         )
         val SHOWN_ON_ANSWER = listOf(
-            "Location", "ETag", "Content-Type", "Content-Profile", "Preference-Applied", "WWW-Authenticate",
-            "Accept-Signature", "Accept-Patch",
+            "Location",
+            "ETag",
+            "Content-Type",
+            "Content-Profile",
+            "Preference-Applied",
+            "WWW-Authenticate",
+            "Accept-Signature",
+            "Accept-Patch",
         )
 
         fun basic(card: String, pin: String) = "Basic " + Base64.getEncoder().encodeToString("$card:$pin".toByteArray())

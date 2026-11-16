@@ -4,10 +4,10 @@ import com.artie.heart.ActRequests
 import com.artie.heart.HtmlAssets
 import com.artie.heart.HtmlFields
 import com.artie.heart.HtmlList
-import com.artie.heart.ServiceIndex
 import com.artie.heart.HtmlProblem
 import com.artie.heart.HtmlView
 import com.artie.heart.JsonTrees
+import com.artie.heart.ServiceIndex
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
@@ -291,16 +291,24 @@ class HtmlSteps(private val world: LampWorld) {
     private fun constraints(control: Element): Map<String, String> {
         val bounds = CONSTRAINTS.filter { control.hasAttr(it) }.associateWith { control.attr(it) }
         val options = control.select("option")
-        val choices = if (options.isEmpty()) emptyMap() else mapOf(
-            "options" to options.joinToString(",") { it.attr("value") },
-            "selected" to options.first { it.hasAttr("selected") }.attr("value"),
-        )
+        val choices = if (options.isEmpty()) {
+            emptyMap()
+        } else {
+            mapOf(
+                "options" to options.joinToString(",") { it.attr("value") },
+                "selected" to options.first { it.hasAttr("selected") }.attr("value"),
+            )
+        }
         return bounds + choices
     }
 
     private fun parsed(constraints: String): Map<String, String> =
-        if (constraints == "none") emptyMap() else PAIR.findAll(constraints).associate {
-            it.groupValues[1] to it.groupValues[2]
+        if (constraints == "none") {
+            emptyMap()
+        } else {
+            PAIR.findAll(constraints).associate {
+                it.groupValues[1] to it.groupValues[2]
+            }
         }
 
     private companion object {

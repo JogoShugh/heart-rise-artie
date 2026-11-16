@@ -7,15 +7,13 @@ import heart.EnvironmentCredentials
 import heart.EventSinks
 import heart.Origin
 import heart.mcp.HeartMcp
-import io.modelcontextprotocol.kotlin.sdk.types.CallToolResult
-import java.nio.file.Files
-import java.nio.file.Path
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.Before
 import io.cucumber.java.Scenario
-import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import io.modelcontextprotocol.kotlin.sdk.types.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.types.TextContent
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -28,6 +26,8 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import java.nio.file.Files
+import java.nio.file.Path
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -80,8 +80,9 @@ class McpSteps(private val host: McpHost) {
         val file = Path.of(System.getenv("ARTIE_HOME") ?: "${System.getProperty("user.home")}/.artie", "credentials")
         var section: String? = null
         Files.readAllLines(file).map { it.trim() }.forEach { line ->
-            if (line.startsWith("[")) section = line.removeSurrounding("[", "]")
-            else if (section?.let { Origin.ofOrNull(it) } == origin && line.startsWith("bearer")) {
+            if (line.startsWith("[")) {
+                section = line.removeSurrounding("[", "]")
+            } else if (section?.let { Origin.ofOrNull(it) } == origin && line.startsWith("bearer")) {
                 return line.substringAfter('=').trim()
             }
         }
@@ -118,13 +119,25 @@ class McpSteps(private val host: McpHost) {
         look("garden")
         act("garden:search-beds", """{"name": "$label"}""")
         ok()
-        host.call("heart_follow", buildJsonObject { put("rel", "item"); put("title", label) })
+        host.call(
+            "heart_follow",
+            buildJsonObject {
+                put("rel", "item")
+                put("title", label)
+            }
+        )
         ok()
     }
 
     @When("the host calls heart_act {string} with {}")
     fun act(act: String, fields: String) {
-        host.call("heart_act", buildJsonObject { put("act", act); put("fields", Json.parseToJsonElement(fields)) })
+        host.call(
+            "heart_act",
+            buildJsonObject {
+                put("act", act)
+                put("fields", Json.parseToJsonElement(fields))
+            }
+        )
     }
 
     @When("the host calls heart_explain {string}")

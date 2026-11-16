@@ -3,11 +3,11 @@ package com.artie.tickets.tck
 import com.artie.heart.coap.HeartCoapAutoConfiguration
 import com.artie.heart.eventsourcing.InMemoryEventStore
 import com.artie.heart.spring.HeartAutoConfiguration
-import com.artie.tickets.bdd.TestCredentials
 import com.artie.heart.tck.TckAct
 import com.artie.heart.tck.TckFixture
 import com.artie.heart.tck.TckWorld
 import com.artie.tickets.bdd.InMemoryTickets
+import com.artie.tickets.bdd.TestCredentials
 import com.artie.tickets.config.HeartConfig
 import com.artie.tickets.domain.TICKETS
 import com.artie.tickets.domain.TicketEvent
@@ -82,8 +82,12 @@ class TicketFixture {
 @CucumberContextConfiguration
 @WebFluxTest
 @Import(
-    InMemoryTickets::class, TicketFixture::class, TckWorld::class,
-    HeartConfig::class, HeartAutoConfiguration::class, HeartCoapAutoConfiguration::class,
+    InMemoryTickets::class,
+    TicketFixture::class,
+    TckWorld::class,
+    HeartConfig::class,
+    HeartAutoConfiguration::class,
+    HeartCoapAutoConfiguration::class,
     TestCredentials::class,
 )
 @TestPropertySource(properties = ["heart.coap.port=-1"])

@@ -93,6 +93,6 @@ class NormalSteps(private val github: GitHubSteps) {
             "its act {string} taking {string} as"
         const val ADDRESSED = "the GitHub gateway reads GitHub's description with the shipped connector, " +
             "its pulls addressed by {string} as {string}"
-        const val SAYING ="the GitHub gateway reads GitHub's description with the shipped connector, its pulls saying"
+        const val SAYING = "the GitHub gateway reads GitHub's description with the shipped connector, its pulls saying"
     }
 }

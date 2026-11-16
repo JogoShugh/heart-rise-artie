@@ -38,7 +38,10 @@ class CiSteps {
     private val mapper = ObjectMapper()
     private val jenkins = FakeJenkins()
     private val replies = ReplyService(
-        origin = REPLIES, realm = "ARTIE's replies", tokens = listOf(REPLY_TOKEN), result = CiWrapper.RESULT,
+        origin = REPLIES,
+        realm = "ARTIE's replies",
+        tokens = listOf(REPLY_TOKEN),
+        result = CiWrapper.RESULT,
         ownKeys = mapOf(ArtieKey.KEY_ID to ArtieKey.pair.public),
         requestKeys = { mapOf(CiKey.KEY_ID to CiKey.pair.public) },
     )
@@ -133,7 +136,9 @@ class CiSteps {
     @When("^Jenkins notifies the wrapper that build (\\d+) is (\\w+) ?(\\w*), with (the secret|no secret)$")
     fun notifies(id: Int, phase: String, status: String, secret: String) {
         val build = linkedMapOf<String, Any>(
-            "number" to id + JENKINS_OFFSET, "phase" to phase, "url" to "job/app/${id + JENKINS_OFFSET}/",
+            "number" to id + JENKINS_OFFSET,
+            "phase" to phase,
+            "url" to "job/app/${id + JENKINS_OFFSET}/",
             "parameters" to mapOf("SHA" to "9b1e2d4", "RELEASE_BUILD" to id.toString(), "PREVIEW_PORT" to "8180"),
         )
         if (status.isNotEmpty()) build["status"] = status

@@ -1,8 +1,6 @@
 package conformance
 
-import com.artie.heart.Rung as ServedRung
 import com.artie.heart.sims.SetLink
-import com.artie.heart.sims.Simulator
 import heart.CachingTransport
 import heart.Dialect
 import heart.HeartRequest
@@ -15,6 +13,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import com.artie.heart.Rung as ServedRung
 
 /** Steps for rungs.feature: what a client asks for, what it is told, and the shared layers it reads. */
 class RungSteps(private val world: World) {

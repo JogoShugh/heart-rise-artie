@@ -88,7 +88,9 @@ class LinkAndActSteps(private val world: World) {
 
     @Given("the {word} service sends {string} to another origin")
     fun toAnotherOrigin(service: String, form: String) = reshape(
-        service, form, """{"_links": {"target": {"href": "http://${Simulator.ELSEWHERE}/comments"}}}""",
+        service,
+        form,
+        """{"_links": {"target": {"href": "http://${Simulator.ELSEWHERE}/comments"}}}""",
     )
 
     @Given("the {word} service's form {string} names no method or content type")

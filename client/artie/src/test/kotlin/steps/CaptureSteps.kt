@@ -68,8 +68,10 @@ class CaptureSteps(private val ctx: ClientContext) {
     fun typed(step: Int, table: DataTable) {
         val values = step(step)["values"]?.jsonObject
         val read = table.asMaps().map { row ->
-            mapOf("field" to row.getValue("field"),
-                "type" to values?.get(row.getValue("field"))?.jsonObject?.get("type")?.jsonPrimitive?.content)
+            mapOf(
+                "field" to row.getValue("field"),
+                "type" to values?.get(row.getValue("field"))?.jsonObject?.get("type")?.jsonPrimitive?.content
+            )
         }
         assertEquals(table.asMaps(), read)
     }
@@ -83,8 +85,11 @@ class CaptureSteps(private val ctx: ClientContext) {
     fun keptExchange(step: Int, method: String, url: String, status: Int) {
         val kept = exchanges(traced()[step - 1]).map { exchange ->
             val request = exchange.getValue("request").jsonObject
-            Triple(request.getValue("method").jsonPrimitive.content, request.getValue("url").jsonPrimitive.content,
-                exchange.getValue("response").jsonObject.getValue("status").jsonPrimitive.content.toInt())
+            Triple(
+                request.getValue("method").jsonPrimitive.content,
+                request.getValue("url").jsonPrimitive.content,
+                exchange.getValue("response").jsonObject.getValue("status").jsonPrimitive.content.toInt()
+            )
         }
         assertTrue(Triple(method, url, status) in kept, "kept: $kept")
     }
@@ -95,9 +100,12 @@ class CaptureSteps(private val ctx: ClientContext) {
         traced().flatMapIndexed { i, step ->
             exchanges(step).map { exchange ->
                 val request = exchange.getValue("request").jsonObject
-                listOf("${i + 1}", request.getValue("method").jsonPrimitive.content,
+                listOf(
+                    "${i + 1}",
+                    request.getValue("method").jsonPrimitive.content,
                     request.getValue("url").jsonPrimitive.content,
-                    exchange.getValue("response").jsonObject.getValue("status").jsonPrimitive.content)
+                    exchange.getValue("response").jsonObject.getValue("status").jsonPrimitive.content
+                )
             }
         },
     )

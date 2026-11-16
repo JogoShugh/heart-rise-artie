@@ -2,10 +2,10 @@ package com.artie.heart.bdd
 
 import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
+import com.artie.heart.JsonTrees
 import com.artie.heart.Negotiation
 import com.artie.heart.NotAcceptableException
 import com.artie.heart.Rung
-import com.artie.heart.JsonTrees
 import com.artie.heart.StateETag
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then

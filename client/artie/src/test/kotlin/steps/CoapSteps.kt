@@ -88,7 +88,9 @@ class CoapSteps(private val ctx: ClientContext) {
     @Then("the {string} event names the span of the CoAP act")
     fun eventNamesSpan(event: String) {
         val act = coap.requests.first { it.code.name == "POST" }
-        val span = act.options.others.single { it.number == FakeCoapServer.TRACEPARENT.number }.stringValue.split('-')[2]
+        val span = act.options.others.single { it.number == FakeCoapServer.TRACEPARENT.number }.stringValue.split(
+            '-'
+        )[2]
         val lines = (ctx.eventSink as MemoryEventSink).lines.map { Json.parseToJsonElement(it).jsonObject }
         val spans = lines.filter { it["event_name"]?.jsonPrimitive?.content == event }
             .map { it["span_id"]?.jsonPrimitive?.content }

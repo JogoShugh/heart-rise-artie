@@ -7,12 +7,18 @@ import io.cucumber.java.en.When
 class VolatileSteps(private val github: GitHubSteps) {
     @When("after the gateway's next read of pull request {long}, GitHub works out that it can be merged cleanly")
     fun mergeable(number: Long) {
-        github.upstream.afterNextRead[number] = { it.mergeable = true; it.mergeableState = "clean" }
+        github.upstream.afterNextRead[number] = {
+            it.mergeable = true
+            it.mergeableState = "clean"
+        }
     }
 
     @When("after the gateway's next read of pull request {long}, GitHub works out that it is in conflict")
     fun conflict(number: Long) {
-        github.upstream.afterNextRead[number] = { it.mergeable = false; it.mergeableState = "dirty" }
+        github.upstream.afterNextRead[number] = {
+            it.mergeable = false
+            it.mergeableState = "dirty"
+        }
     }
 
     @Given("GitHub answers the read after the next write to pull request {long} from a copy behind it")

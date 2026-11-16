@@ -35,8 +35,10 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
     @Then("the run finished, step {int} held by its act")
     fun heldByAct(step: Int) {
         finished()
-        val steps = (Json.parseToJsonElement(Run.current.traceJson()).jsonObject.getValue("steps")
-            as kotlinx.serialization.json.JsonArray).map { it.jsonObject }
+        val steps = (
+            Json.parseToJsonElement(Run.current.traceJson()).jsonObject.getValue("steps")
+                as kotlinx.serialization.json.JsonArray
+            ).map { it.jsonObject }
         val guard = steps[step - 1]["guard"] as? JsonObject
         assertEquals("act", guard?.get("held")?.jsonPrimitive?.content, "guard: $guard")
     }
@@ -136,8 +138,10 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
     @Then("the run finished, step {int} marked unpinned")
     fun unpinned(step: Int) {
         finished()
-        val steps = (Json.parseToJsonElement(Run.current.traceJson()).jsonObject.getValue("steps")
-            as kotlinx.serialization.json.JsonArray).map { it.jsonObject }
+        val steps = (
+            Json.parseToJsonElement(Run.current.traceJson()).jsonObject.getValue("steps")
+                as kotlinx.serialization.json.JsonArray
+            ).map { it.jsonObject }
         val guard = steps[step - 1]["guard"] as? JsonObject
         assertEquals("true", guard?.get("unpinned")?.jsonPrimitive?.content, "guard: $guard")
     }
@@ -145,8 +149,10 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
     @Then("the run finished, step {int} warned that the set holding {string} is not the one pinned")
     fun warned(step: Int, relation: String) {
         finished()
-        val steps = (Json.parseToJsonElement(Run.current.traceJson()).jsonObject.getValue("steps")
-            as kotlinx.serialization.json.JsonArray).map { it.jsonObject }
+        val steps = (
+            Json.parseToJsonElement(Run.current.traceJson()).jsonObject.getValue("steps")
+                as kotlinx.serialization.json.JsonArray
+            ).map { it.jsonObject }
         val guard = steps[step - 1]["guard"] as? JsonObject
         assertEquals(
             "the set holding $relation changed: pinned $CHANGED, offered $offeredSet",
@@ -167,8 +173,10 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
     private fun read(path: String): JsonObject {
         val url = if (path.startsWith("http")) path else "https://github.gateway.test$path"
         val headers = mapOf(
-            "Authorization" to "Bearer ada-token", "Accept" to "application/hal+json",
-            "Prefer" to "forms=link, schema=link", "Accept-Profile" to "<https://w3id.org/heart-rise/hal-schema-forms>",
+            "Authorization" to "Bearer ada-token",
+            "Accept" to "application/hal+json",
+            "Prefer" to "forms=link, schema=link",
+            "Accept-Profile" to "<https://w3id.org/heart-rise/hal-schema-forms>",
         )
         val body = checkNotNull(ctx.inProcess).send(HeartRequest("GET", url, headers)).body
         return Json.parseToJsonElement(body).jsonObject

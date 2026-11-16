@@ -14,8 +14,8 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import java.net.URLEncoder
-import java.security.PublicKey
 import java.nio.charset.StandardCharsets.UTF_8
+import java.security.PublicKey
 import java.time.LocalDate
 import java.util.Base64
 import kotlin.test.assertEquals
@@ -325,8 +325,12 @@ class LibrarySteps {
 
     @When("the library reports progress of {int} percent on reply {word}, for the watch {string}")
     fun progressForWatch(percent: Int, reply: String, watch: String) =
-        libraryAnswers(reply, "progress", mapper.writeValueAsString(mapOf("state" to "awaiting", "percent" to percent)),
-            watch = watch)
+        libraryAnswers(
+            reply,
+            "progress",
+            mapper.writeValueAsString(mapOf("state" to "awaiting", "percent" to percent)),
+            watch = watch
+        )
 
     @Then("reply {word} links {string} to Ana's watch")
     fun linksAnaWatch(reply: String, rel: String) {

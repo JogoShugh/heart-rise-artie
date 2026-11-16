@@ -8,11 +8,11 @@ import heart.Rung
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import java.security.MessageDigest
+import java.util.Base64
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import java.security.MessageDigest
-import java.util.Base64
 
 /** Steps for SPEC §6.5-6.7: content-addressed layers, the rung, and the cache. */
 class LayerSteps(private val ctx: ClientContext) {

@@ -112,7 +112,6 @@ class DialogSteps(private val play: Play) {
         shown.buttons.map { listOf(it.label, if (it.greyed) "greyed" else "offered", it.hover.orEmpty()) },
     )
 
-
     @Then("its inputs are")
     fun inputs(table: DataTable) = assertEquals(
         table.asMaps(),

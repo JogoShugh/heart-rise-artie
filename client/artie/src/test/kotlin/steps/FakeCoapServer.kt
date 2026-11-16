@@ -92,7 +92,10 @@ class FakeCoapServer(var status: String, private val secure: Pair<String, ByteAr
             refused != null -> problem(refused.first, refused.second)
             request.options.ifMatch.none { it.contentEquals(validator) } -> Response(ResponseCode.PRECONDITION_FAILED)
             createsNext != null -> {
-                val at = checkNotNull(createsNext).also { createsNext = null; made += it }
+                val at = checkNotNull(createsNext).also {
+                    createsNext = null
+                    made += it
+                }
                 representation(ResponseCode.CREATED).apply { options.setLocationPath(at) }
             }
             else -> {
@@ -175,7 +178,12 @@ class FakeCoapServer(var status: String, private val secure: Pair<String, ByteAr
         val TRACEPARENT = StringOptionDefinition(65_020, "traceparent", true, 1, TEXT_MAX)
         val REGISTRY = MapBasedOptionRegistry(
             StandardOptionRegistry.getDefaultOptionRegistry(),
-            ACCEPT_PROFILE, NO_CACHE, PREFER, PROFILE, PREFERENCE_APPLIED, TRACEPARENT,
+            ACCEPT_PROFILE,
+            NO_CACHE,
+            PREFER,
+            PROFILE,
+            PREFERENCE_APPLIED,
+            TRACEPARENT,
         )
     }
 }

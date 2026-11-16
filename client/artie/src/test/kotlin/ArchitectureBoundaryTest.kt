@@ -12,7 +12,12 @@ class ArchitectureBoundaryTest {
 
     // java.net.URI is plain data (resolving targets); the protocol clients are I/O.
     private val forbiddenPrefixes = listOf(
-        "java.net.http", "java.net.Socket", "java.net.URL", "io.ktor", "okhttp3", "org.apache.hc",
+        "java.net.http",
+        "java.net.Socket",
+        "java.net.URL",
+        "io.ktor",
+        "okhttp3",
+        "org.apache.hc",
         "org.eclipse.californium",
     )
 

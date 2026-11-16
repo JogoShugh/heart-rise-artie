@@ -4,7 +4,6 @@ import com.artie.heart.gateway.Connector
 import com.artie.heart.gateway.Gateway
 import com.artie.heart.gateway.GatewaySpec
 import com.artie.heart.http4k.Credentials
-import com.artie.heart.http4k.HeartSettings
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.datatable.DataTable

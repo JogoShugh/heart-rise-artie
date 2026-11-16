@@ -12,9 +12,9 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -167,8 +167,9 @@ class PlannerSteps(private val ctx: ClientContext) {
 
     /** A move as the feature says it. */
     private fun words(move: Move): String = when (move) {
-        is Move.Act -> "act \"${move.words}\" for sentence ${move.sentence}" +
-            if (move.opens) ", opening a block" else ""
+        is Move.Act ->
+            "act \"${move.words}\" for sentence ${move.sentence}" +
+                if (move.opens) ", opening a block" else ""
         is Move.Back -> "back to \"${move.to}\""
         is Move.Wait -> "wait until \"${move.relation}\" is offered"
         is Move.Check -> "check ${move.facts}"

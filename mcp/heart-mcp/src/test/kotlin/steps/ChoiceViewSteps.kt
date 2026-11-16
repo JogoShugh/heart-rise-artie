@@ -49,14 +49,17 @@ class ChoiceViewSteps(private val shown: HeldView) {
     @Given("the agents resource lists")
     fun agents(table: DataTable) {
         shown.readable[AGENTS] = buildJsonObject {
-            put("agents", buildJsonArray {
-                table.asMaps().forEach { row ->
-                    addJsonObject {
-                        put("name", row.getValue("name"))
-                        put("onDuty", row.getValue("onDuty").toBoolean())
+            put(
+                "agents",
+                buildJsonArray {
+                    table.asMaps().forEach { row ->
+                        addJsonObject {
+                            put("name", row.getValue("name"))
+                            put("onDuty", row.getValue("onDuty").toBoolean())
+                        }
                     }
                 }
-            })
+            )
         }
     }
 

@@ -1,6 +1,7 @@
 package com.artie.basketball.tck
 
 import com.artie.basketball.bdd.InMemoryGames
+import com.artie.basketball.bdd.TestCredentials
 import com.artie.basketball.config.HeartConfig
 import com.artie.basketball.domain.GAMES
 import com.artie.basketball.domain.GameEvent
@@ -10,7 +11,6 @@ import com.artie.basketball.store.InMemoryGameDirectory
 import com.artie.heart.coap.HeartCoapAutoConfiguration
 import com.artie.heart.eventsourcing.InMemoryEventStore
 import com.artie.heart.spring.HeartAutoConfiguration
-import com.artie.basketball.bdd.TestCredentials
 import com.artie.heart.tck.TckAct
 import com.artie.heart.tck.TckFixture
 import com.artie.heart.tck.TckWorld
@@ -65,7 +65,8 @@ class GameFixture {
             events.forget(GAMES.stream)
             games.add(
                 GameSetup(
-                    1, "Eagles v Marauders",
+                    1,
+                    "Eagles v Marauders",
                     Team("Eagles", mapOf(4 to "Avery", 23 to "Riley")),
                     Team("Marauders", mapOf(3 to "Taylor", 7 to "Morgan")),
                 ),
@@ -79,8 +80,12 @@ class GameFixture {
 @CucumberContextConfiguration
 @WebFluxTest
 @Import(
-    InMemoryGames::class, GameFixture::class, TckWorld::class,
-    HeartConfig::class, HeartAutoConfiguration::class, HeartCoapAutoConfiguration::class,
+    InMemoryGames::class,
+    GameFixture::class,
+    TckWorld::class,
+    HeartConfig::class,
+    HeartAutoConfiguration::class,
+    HeartCoapAutoConfiguration::class,
     TestCredentials::class,
 )
 @TestPropertySource(properties = ["heart.coap.port=-1"])

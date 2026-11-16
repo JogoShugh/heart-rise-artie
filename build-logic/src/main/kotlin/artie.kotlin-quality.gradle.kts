@@ -45,3 +45,11 @@ tasks.named<de.aaschmid.gradle.plugins.cpd.Cpd>("cpdCheck") {
         text.required.set(true)
     }
 }
+
+// -Pformat.only=main|test narrows detekt to one source tree, so a formatting pass
+// (detekt --auto-correct) can fix test code and production code in separate commits.
+providers.gradleProperty("format.only").orNull?.let { only ->
+    tasks.named<io.gitlab.arturbosch.detekt.Detekt>("detekt") {
+        setSource(files("src/$only/kotlin", "src/$only/java"))
+    }
+}

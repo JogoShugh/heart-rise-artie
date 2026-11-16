@@ -11,7 +11,6 @@ import io.cucumber.java.en.When
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.nio.file.Files
@@ -283,8 +282,11 @@ class CliSteps(private val script: ScriptSteps) {
         val derivations = (derivation(name)["derivations"] as List<*>).map { it as Map<*, *> }
         val found = derivations.map {
             mapOf(
-                "n" to it["n"].toString(), "kind" to it["kind"].toString(), "rule" to it["rule"].toString(),
-                "title" to it["title"].toString(), "source" to spans(it["source"]),
+                "n" to it["n"].toString(),
+                "kind" to it["kind"].toString(),
+                "rule" to it["rule"].toString(),
+                "title" to it["title"].toString(),
+                "source" to spans(it["source"]),
                 "generated" to spans(it["generated"]),
             )
         }
@@ -295,8 +297,13 @@ class CliSteps(private val script: ScriptSteps) {
     @Then("the derivation {string} lines up these rows")
     fun rows(name: String, table: DataTable) {
         val found = (derivation(name)["rows"] as List<*>).map { it as Map<*, *> }
-            .map { mapOf("at" to it["at"].toString(), "source" to it["source"].toString(),
-                "generated" to it["generated"].toString()) }
+            .map {
+                mapOf(
+                    "at" to it["at"].toString(),
+                    "source" to it["source"].toString(),
+                    "generated" to it["generated"].toString()
+                )
+            }
         assertEquals(table.asMaps(), found)
     }
 

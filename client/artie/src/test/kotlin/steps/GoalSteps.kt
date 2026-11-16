@@ -336,8 +336,11 @@ class GoalSteps(
         val sentence = row["sentence"]?.takeIf { it.isNotBlank() }?.toInt()
         return when (val kind = row.getValue("move")) {
             "act" -> Move.Act(
-                row.getValue("words"), sentence, row["opens"] == "yes",
-                asOf = row["as of"]?.takeIf { it.isNotBlank() }, refusedAs = row["refused"]?.takeIf { it.isNotBlank() },
+                row.getValue("words"),
+                sentence,
+                row["opens"] == "yes",
+                asOf = row["as of"]?.takeIf { it.isNotBlank() },
+                refusedAs = row["refused"]?.takeIf { it.isNotBlank() },
             )
             // A goal in steps' done is for the step now, whatever sentence it names.
             "done" -> Move.Done(sentence ?: 0)
@@ -357,8 +360,12 @@ class GoalSteps(
             // A list of values: in a match, every item must be among the member's.
             if (value is kotlinx.serialization.json.JsonArray) return@mapValues value.map { it.jsonPrimitive.content }
             val primitive = value.jsonPrimitive
-            if (primitive.isString) primitive.content else primitive.booleanOrNull ?: primitive.longOrNull
-                ?: primitive.doubleOrNull
+            if (primitive.isString) {
+                primitive.content
+            } else {
+                primitive.booleanOrNull ?: primitive.longOrNull
+                    ?: primitive.doubleOrNull
+            }
         }
 
     private companion object {

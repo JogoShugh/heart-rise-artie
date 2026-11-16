@@ -1,14 +1,11 @@
 package conformance
 
-import com.artie.heart.sims.Simulator
 import heart.ActRefused
 import heart.ArtieClient
 import heart.AuthTransport
 import heart.Credential
 import heart.CredentialSources
-import heart.CachingTransport
 import heart.InvalidPayload
-import heart.IntegrityCheck
 import heart.RuleRefused
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then

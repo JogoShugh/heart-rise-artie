@@ -1,22 +1,22 @@
 package steps
 
 import heart.ArtieClient
-import heart.Care
+import heart.AuthTransport
 import heart.Binding
 import heart.CachingTransport
-import heart.AuthTransport
+import heart.Care
 import heart.CoapBinding
 import heart.CredentialSource
 import heart.CredentialSources
+import heart.Dialect
 import heart.EventLog
 import heart.EventSink
 import heart.EventSinks
-import heart.IntegrityCheck
-import heart.OFF_THE_RAILS
-import heart.Dialect
 import heart.HeartRepresentation
 import heart.HeartRiseClient
 import heart.HttpTransport
+import heart.IntegrityCheck
+import heart.OFF_THE_RAILS
 import heart.Rung
 import heart.Trace
 import heart.TraceContextTransport
@@ -68,6 +68,7 @@ class ClientContext {
             override fun send(request: heart.HeartRequest) = (inProcess ?: live ?: transport).send(request)
         })
     }
+
     /** The exchanges kept for a run's capture, next to the wire, when the scenario asks for them. */
     val exchangeLog: heart.ExchangeLog? by lazy { if (keepExchanges) heart.ExchangeLog(wireLog) else null }
     private val wire: Transport get() = exchangeLog ?: wireLog
@@ -92,8 +93,10 @@ class ClientContext {
 
     /** A bare script's way out (bare-script.feature): ARTIE's name, trace and credentials, no cache, no check. */
     val bare: Transport by lazy {
-        UserAgentTransport("${UserAgentTransport.DEFAULT} ($scenario; bare)",
-            TraceContextTransport(Trace(), AuthTransport(credentials, wire)))
+        UserAgentTransport(
+            "${UserAgentTransport.DEFAULT} ($scenario; bare)",
+            TraceContextTransport(Trace(), AuthTransport(credentials, wire))
+        )
     }
     val client: HeartRiseClient by lazy { build("first", cache, rung, dialect) }
 
@@ -169,8 +172,11 @@ class ClientContext {
 
     /** A path like "/beds/1" is resolved against the live server; absolute URLs pass through. */
     fun url(pathOrUrl: String): String =
-        if (pathOrUrl.startsWith("/")) checkNotNull(baseUrl) { "relative URL outside a @live scenario" } + pathOrUrl
-        else pathOrUrl
+        if (pathOrUrl.startsWith("/")) {
+            checkNotNull(baseUrl) { "relative URL outside a @live scenario" } + pathOrUrl
+        } else {
+            pathOrUrl
+        }
 
     companion object {
         /** A live run's credentials: the environment, ~/.artie, then Vault, as production reads them. */

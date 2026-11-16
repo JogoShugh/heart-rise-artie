@@ -3,8 +3,8 @@ package steps
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 /** Steps for forms named by link relations and their ALPS descriptors (SPEC §6.1, §8.5). */
 class FormRelationSteps(private val ctx: ClientContext) {

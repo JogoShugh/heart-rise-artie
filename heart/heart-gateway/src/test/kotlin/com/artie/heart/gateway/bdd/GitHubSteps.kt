@@ -19,8 +19,6 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
-import java.nio.file.Path
-import java.security.MessageDigest
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -29,6 +27,8 @@ import org.http4k.server.asServer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import java.nio.file.Path
+import java.security.MessageDigest
 
 /** The gateway in front of a small GitHub, known by a slice of GitHub's own description. */
 class GitHubSteps {
@@ -97,9 +97,18 @@ class GitHubSteps {
             "a draft" -> pull.draft = true
             "behind its base" -> pull.mergeableState = "behind"
             "blocked" -> pull.mergeableState = "blocked"
-            "still being checked" -> pull.apply { mergeable = null; mergeableState = "unknown" }
-            "in conflict" -> pull.apply { mergeable = false; mergeableState = "dirty" }
-            "merged" -> pull.apply { this.state = "closed"; merged = true }
+            "still being checked" -> pull.apply {
+                mergeable = null
+                mergeableState = "unknown"
+            }
+            "in conflict" -> pull.apply {
+                mergeable = false
+                mergeableState = "dirty"
+            }
+            "merged" -> pull.apply {
+                this.state = "closed"
+                merged = true
+            }
             "closed" -> pull.state = "closed"
             else -> error("no state $state")
         }
@@ -296,17 +305,26 @@ class GitHubSteps {
 
     @Given("pull request {long} was merged")
     fun merged(number: Long) {
-        pull(number).apply { state = "closed"; merged = true }
+        pull(number).apply {
+            state = "closed"
+            merged = true
+        }
     }
 
     @Given("GitHub hasn't yet worked out whether pull request {long} can be merged")
     fun unknown(number: Long) {
-        pull(number).apply { mergeable = null; mergeableState = "unknown" }
+        pull(number).apply {
+            mergeable = null
+            mergeableState = "unknown"
+        }
     }
 
     @Given("GitHub has worked out that pull request {long} can be merged cleanly")
     fun known(number: Long) {
-        pull(number).apply { mergeable = true; mergeableState = "clean" }
+        pull(number).apply {
+            mergeable = true
+            mergeableState = "clean"
+        }
     }
 
     @Given("GitHub says pull request {long} is {string}")
@@ -655,8 +673,13 @@ class GitHubSteps {
         val upstreamUrl = "https://api.github.com"
         val keeping = record?.let { UpstreamRecord(it, mapper, upstreamUrl) }
         Gateway(
-            spec, github.handler, loaded.profile, auth,
-            connector = loaded, upstreamUrl = upstreamUrl, record = keeping,
+            spec,
+            github.handler,
+            loaded.profile,
+            auth,
+            connector = loaded,
+            upstreamUrl = upstreamUrl,
+            record = keeping,
         ).handler(
             credentials,
             HeartSettings(limits = ServingLimits(validatorRequired = validatorRequired)),

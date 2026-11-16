@@ -91,9 +91,12 @@ private class ReleaseRun(private val host: String, private val pull: Long) {
         openReply(reply)
         val watcher = read("ARTIE reads the offer watch's entry", at(Release.WATCHER_PORT) + "/", entry = true)
         val watch = ask(
-            "ARTIE asks to be told when {pr} offers {offers}, on reply {reply} `as watch`", watcher,
-            "watcher:watch", at(Release.WATCHER_PORT),
-            mapOf("resource" to prHref, "offers" to MERGE, "looks" to MAX_LOOKS), reply,
+            "ARTIE asks to be told when {pr} offers {offers}, on reply {reply} `as watch`",
+            watcher,
+            "watcher:watch",
+            at(Release.WATCHER_PORT),
+            mapOf("resource" to prHref, "offers" to MERGE, "looks" to MAX_LOOKS),
+            reply,
             mapOf("pr" to prHref, "offers" to MERGE, "reply" to reply),
         )
         // GitHub works its mergeability out a few seconds later, on its own time.
@@ -118,8 +121,13 @@ private class ReleaseRun(private val host: String, private val pull: Long) {
         openReply(reply)
         val ci = read("ARTIE reads the CI wrapper's entry", at(Release.CI_PORT) + "/", entry = true)
         val build = ask(
-            "ARTIE builds commit {commit}, asking to be told how it goes, on reply {reply} `as build`", ci,
-            "ci:build", at(Release.CI_PORT), mapOf("commit" to sha), reply, mapOf("commit" to sha, "reply" to reply),
+            "ARTIE builds commit {commit}, asking to be told how it goes, on reply {reply} `as build`",
+            ci,
+            "ci:build",
+            at(Release.CI_PORT),
+            mapOf("commit" to sha),
+            reply,
+            mapOf("commit" to sha, "reply" to reply),
         )
         return await(reply, "Once {build} has succeeded, or failed", mapOf("build" to build))
     }
@@ -128,12 +136,20 @@ private class ReleaseRun(private val host: String, private val pull: Long) {
 
     private fun smoke(made: JsonNode): List<String> {
         val script = made[CiWrapper.SMOKE_TEST]["href"].asText()
-        send("ARTIE reads the smoke script {build} links as ci:smoke-test", 200, Request(Method.GET, script),
-            mapOf("relation" to CiWrapper.SMOKE_TEST))
+        send(
+            "ARTIE reads the smoke script {build} links as ci:smoke-test",
+            200,
+            Request(Method.GET, script),
+            mapOf("relation" to CiWrapper.SMOKE_TEST)
+        )
         val deployed = made[CiWrapper.DEPLOYMENT]["href"].asText()
         val passed = mutableListOf<String>()
-        val entry = read("S1: ARTIE reads the preview {preview} the build deployed `as preview`", deployed,
-            mapOf("preview" to deployed), entry = false)
+        val entry = read(
+            "S1: ARTIE reads the preview {preview} the build deployed `as preview`",
+            deployed,
+            mapOf("preview" to deployed),
+            entry = false
+        )
         val search = fill(entry["_forms"]["library:search-loans"], mapOf("name" to "Matilda"))
         val found = read("S1: search the loans for {name}", absolute(deployed, search), mapOf("name" to "Matilda"))
         val item = found["_links"]["item"].firstOrNull { it["title"].asText() == "Matilda" }
@@ -141,32 +157,64 @@ private class ReleaseRun(private val host: String, private val pull: Long) {
         val loanHref = absolute(deployed, checkNotNull(item) { "S1: Matilda not listed: $found" }["href"].asText())
         val loan = read("S2: open the loan {loan}", loanHref, mapOf("loan" to loanHref))
         if (loan["author"].asText() == "Roald Dahl" && loan["_forms"].has("library:renew")) passed += "S2"
+        renew(loan, loanHref, passed)
+        report(deployed, loanHref, passed)
+        note("Smoke: ${passed.size} of $SCENARIOS passed (${passed.joinToString()})")
+        return passed
+    }
+
+    /** S3 and S4: renew the loan, then renew it again with the version read before, and be refused as stale. */
+    private fun renew(loan: JsonNode, loanHref: String, passed: MutableList<String>) {
         val before = etags.getValue(loanHref)
         val due = LocalDate.parse(loan["due"].asText())
-        act("S3: renew it", loanHref, loan["_forms"]["library:renew"], emptyMap<String, Any>(), 200,
-            mapOf("relation" to "library:renew"))
+        act(
+            "S3: renew it",
+            loanHref,
+            loan["_forms"]["library:renew"],
+            emptyMap<String, Any>(),
+            200,
+            mapOf("relation" to "library:renew")
+        )
         val expected = due.plusWeeks(3).toString()
         val renewed = read("S3: read it again: due {expected}?", loanHref, mapOf("expected" to expected))
         val s3 = LocalDate.parse(renewed["due"].asText()) == due.plusWeeks(3)
         if (s3) passed += "S3" else note("S3 failed: due ${renewed["due"].asText()}, not ${due.plusWeeks(3)}")
         val stale = act(
-            "S4: renew it again, with the version read before the renewal", loanHref, loan["_forms"]["library:renew"],
-            emptyMap<String, Any>(), STALE, mapOf("relation" to "library:renew"), ifMatch = before,
+            "S4: renew it again, with the version read before the renewal",
+            loanHref,
+            loan["_forms"]["library:renew"],
+            emptyMap<String, Any>(),
+            STALE,
+            mapOf("relation" to "library:renew"),
+            ifMatch = before,
         )
         val linksBack = mapper.readTree(stale.bodyString())["_links"]?.get("about") != null
         if (stale.status.code == STALE && linksBack) passed += "S4"
+    }
+
+    /** S5: report a problem on the loan, of a kind the library lists, and see it shown. */
+    private fun report(deployed: String, loanHref: String, passed: MutableList<String>) {
         val current = read("S5: read the loan, for its form to report a problem", loanHref)
         val report = current["_forms"]["library:report-problem"]
-        val kinds = read("S5: read the kinds of problem the library lists", absolute(deployed,
-            report["schema"]["properties"]["problem"]["hr:options"]["link"]["href"].asText()))
+        val kinds = read(
+            "S5: read the kinds of problem the library lists",
+            absolute(
+                deployed,
+                report["schema"]["properties"]["problem"]["hr:options"]["link"]["href"].asText()
+            )
+        )
         val kind = kinds["kinds"].first { it["value"].asText() == "missing-pages" }["value"].asText()
         val reporting = mapOf("problem" to kind, "comment" to "Pages 12 to 14.")
-        act("S5: report {problem} on the loan", loanHref, report, reporting, OK,
-            mapOf("problem" to kind, "relation" to "library:report-problem"))
+        act(
+            "S5: report {problem} on the loan",
+            loanHref,
+            report,
+            reporting,
+            OK,
+            mapOf("problem" to kind, "relation" to "library:report-problem")
+        )
         val reported = read("S5: the loan shows the problem reported", loanHref)
         if (reported["reported"]?.get("problem")?.asText() == kind) passed += "S5"
-        note("Smoke: ${passed.size} of $SCENARIOS passed (${passed.joinToString()})")
-        return passed
     }
 
     // ---- Dev: promote the merged commit, citing the smoke run; or say on the pull request why not ----
@@ -177,13 +225,16 @@ private class ReleaseRun(private val host: String, private val pull: Long) {
         val dev = read("ARTIE opens Dev", absolute(at(Release.DEV_PORT), lookup))
         val devHref = absolute(at(Release.DEV_PORT), dev["_links"]["self"]["href"].asText())
         act(
-            "ARTIE promotes commit {commit} to Dev, citing the smoke run `as promotion`", devHref,
+            "ARTIE promotes commit {commit} to Dev, citing the smoke run `as promotion`",
+            devHref,
             dev["_forms"]["env:promote"],
             mapOf(
-                "commit" to sha, "smoke" to mapOf("passed" to SCENARIOS, "of" to SCENARIOS),
+                "commit" to sha,
+                "smoke" to mapOf("passed" to SCENARIOS, "of" to SCENARIOS),
                 "_links" to mapOf("env:smoke-run" to mapOf("href" to "/reports/merge-watch-release/#pass")),
             ),
-            200, mapOf("commit" to sha, "relation" to "env:promote"),
+            200,
+            mapOf("commit" to sha, "relation" to "env:promote"),
         )
         read("ARTIE reads Dev: it serves {commit}", devHref, mapOf("commit" to sha))
     }
@@ -193,16 +244,25 @@ private class ReleaseRun(private val host: String, private val pull: Long) {
         val now = read("ARTIE reads {pr}, for its form to comment", prHref, mapOf("pr" to prHref))
         val failed = (1..SCENARIOS).map { "S$it" } - passed.toSet()
         val body = "Not promoted to Dev: smoke scenarios ${failed.joinToString()} failed. See the release report."
-        act("ARTIE comments on {pr} with the scenarios that failed", prHref, now["_forms"]["github:comment"],
-            mapOf("body" to body), 201, mapOf("pr" to prHref, "relation" to "github:comment"))
+        act(
+            "ARTIE comments on {pr} with the scenarios that failed",
+            prHref,
+            now["_forms"]["github:comment"],
+            mapOf("body" to body),
+            201,
+            mapOf("pr" to prHref, "relation" to "github:comment")
+        )
     }
 
     // ---- RISE: ARTIE's replies, made before each request, and read until answered ----
 
     private fun openReply(reply: String) =
         control(
-            Release.REPLIES_PORT, "/_release/replies/$reply", "",
-            say = "ARTIE makes its reply {reply}, before asking", params = mapOf("reply" to reply),
+            Release.REPLIES_PORT,
+            "/_release/replies/$reply",
+            "",
+            say = "ARTIE makes its reply {reply}, before asking",
+            params = mapOf("reply" to reply),
         )
 
     /** Asks [relation]'s form on [entry] at [origin] with [fields], naming [reply], signed; the request's address. */
@@ -220,15 +280,18 @@ private class ReleaseRun(private val host: String, private val pull: Long) {
         val form = entry["_forms"][relation]
         val target = absolute(origin, form["_links"]["target"]["href"].asText())
         val body = mapper.writeValueAsString(
-            fields + ("_links" to mapOf(
-                "hr:reply-to" to mapOf("href" to at(Release.REPLIES_PORT) + "/replies/$reply"),
-                "hr:keys" to mapOf("href" to at(Release.REPLIES_PORT) + Signatures.KEYS),
-            )),
+            fields + (
+                "_links" to mapOf(
+                    "hr:reply-to" to mapOf("href" to at(Release.REPLIES_PORT) + "/replies/$reply"),
+                    "hr:keys" to mapOf("href" to at(Release.REPLIES_PORT) + Signatures.KEYS),
+                )
+                ),
         )
         val etag = etags.getValue("$origin/")
         val signed = ArtieKey.signer.sign("POST", target, body, etag, System.currentTimeMillis() / MILLIS)
         val made = send(
-            say, 201,
+            say,
+            201,
             Request(Method.POST, target).header("Content-Type", form["contentType"].asText()).header("If-Match", etag)
                 .header("Content-Digest", signed.contentDigest).header("Signature-Input", "sig1=${signed.params}")
                 .header("Signature", "sig1=:${signed.signature}:").body(body),
@@ -386,7 +449,13 @@ private class ReleaseRun(private val host: String, private val pull: Long) {
         const val SHORT = 7
         const val NANOS_PER_MILLI = 1_000_000L
         val SHOWN_ON_REQUEST = listOf(
-            "Authorization", "Accept", "If-Match", "Content-Type", "Content-Digest", "Signature-Input", "Signature",
+            "Authorization",
+            "Accept",
+            "If-Match",
+            "Content-Type",
+            "Content-Digest",
+            "Signature-Input",
+            "Signature",
         )
         val SHOWN_ON_ANSWER = listOf("Location", "ETag", "Content-Type", "Content-Profile", "WWW-Authenticate")
     }

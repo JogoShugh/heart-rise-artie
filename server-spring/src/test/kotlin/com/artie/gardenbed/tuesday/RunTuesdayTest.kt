@@ -36,8 +36,13 @@ class RunTuesdayTest
 @CucumberContextConfiguration
 @WebFluxTest
 @Import(
-    InMemoryGardenBedsConfig::class, HttpWorld::class, BedActs::class,
-    HeartConfig::class, HeartAutoConfiguration::class, HeartCoapAutoConfiguration::class, GardenWeather::class,
+    InMemoryGardenBedsConfig::class,
+    HttpWorld::class,
+    BedActs::class,
+    HeartConfig::class,
+    HeartAutoConfiguration::class,
+    HeartCoapAutoConfiguration::class,
+    GardenWeather::class,
 )
 // Served over CoAP too, as on Monday, on a free UDP port.
 @TestPropertySource(properties = ["garden.frost.enabled=true", "heart.coap.port=0"])

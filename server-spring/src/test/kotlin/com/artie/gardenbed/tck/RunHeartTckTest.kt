@@ -1,6 +1,7 @@
 package com.artie.gardenbed.tck
 
 import com.artie.gardenbed.bdd.BedEventLog
+import com.artie.gardenbed.bdd.HttpWorld
 import com.artie.gardenbed.bdd.InMemoryBeds
 import com.artie.gardenbed.bdd.InMemoryGardenBedsConfig
 import com.artie.gardenbed.bdd.putBed
@@ -9,7 +10,6 @@ import com.artie.gardenbed.declaration.BedActs
 import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.heart.coap.HeartCoapAutoConfiguration
 import com.artie.heart.spring.HeartAutoConfiguration
-import com.artie.gardenbed.bdd.HttpWorld
 import com.artie.heart.tck.TckAct
 import com.artie.heart.tck.TckFixture
 import com.artie.heart.tck.TckWorld
@@ -79,8 +79,13 @@ class GardenFixture {
 @CucumberContextConfiguration
 @WebFluxTest
 @Import(
-    InMemoryGardenBedsConfig::class, BedActs::class, GardenFixture::class, TckWorld::class,
-    HeartConfig::class, HeartAutoConfiguration::class, HeartCoapAutoConfiguration::class,
+    InMemoryGardenBedsConfig::class,
+    BedActs::class,
+    GardenFixture::class,
+    TckWorld::class,
+    HeartConfig::class,
+    HeartAutoConfiguration::class,
+    HeartCoapAutoConfiguration::class,
 )
 @TestPropertySource(properties = ["heart.coap.port=0"])
 class GardenTckContext

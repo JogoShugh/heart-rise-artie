@@ -31,8 +31,10 @@ class AuthLiveSteps(private val ctx: ClientContext) {
         ctx.baseUrl = bookmark("garden").trimEnd('/')
     }
 
-    @Given("^ARTIE's only credential source is (the environment|the credentials file|Vault), " +
-        "holding the (garden|basketball)'s (Bearer|Basic) credential$")
+    @Given(
+        "^ARTIE's only credential source is (the environment|the credentials file|Vault), " +
+            "holding the (garden|basketball)'s (Bearer|Basic) credential$"
+    )
     fun onlySource(source: String, service: String, scheme: String) {
         val origin = Origin.of(bookmark(service))
         ctx.credentials = when (source) {
@@ -81,13 +83,19 @@ class AuthLiveSteps(private val ctx: ClientContext) {
 
     private fun variables(origin: Origin, service: String, scheme: String): Map<String, String> {
         val names = EnvironmentCredentials.namesFor(origin)
-        return if (scheme == "Bearer") mapOf(names.token to check(service, "TOKEN"))
-        else mapOf(names.user to check(service, "USER"), names.password to check(service, "PASSWORD"))
+        return if (scheme == "Bearer") {
+            mapOf(names.token to check(service, "TOKEN"))
+        } else {
+            mapOf(names.user to check(service, "USER"), names.password to check(service, "PASSWORD"))
+        }
     }
 
     private fun file(origin: Origin, service: String, scheme: String): Path {
-        val lines = if (scheme == "Bearer") listOf("bearer = ${check(service, "TOKEN")}")
-        else listOf("user = ${check(service, "USER")}", "password = ${check(service, "PASSWORD")}")
+        val lines = if (scheme == "Bearer") {
+            listOf("bearer = ${check(service, "TOKEN")}")
+        } else {
+            listOf("user = ${check(service, "USER")}", "password = ${check(service, "PASSWORD")}")
+        }
         val file = Files.createTempDirectory("artie-auth-live").resolve("credentials")
         Files.writeString(file, (listOf("[$origin]") + lines).joinToString("\n"))
         Files.setPosixFilePermissions(file, PosixFilePermissions.fromString("rw-------"))

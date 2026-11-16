@@ -82,7 +82,9 @@ class HostedSteps(private val ctx: ClientContext) {
                 .joinToString(" ")
             step.exchanges.map { exchange ->
                 mapOf(
-                    "step" to said, "method" to exchange.sent.method, "url" to exchange.sent.url,
+                    "step" to said,
+                    "method" to exchange.sent.method,
+                    "url" to exchange.sent.url,
                     "status" to "${exchange.received.status}",
                     "Authorization" to exchange.sent.headers.entries
                         .firstOrNull { it.key.equals("Authorization", ignoreCase = true) }?.value.orEmpty(),

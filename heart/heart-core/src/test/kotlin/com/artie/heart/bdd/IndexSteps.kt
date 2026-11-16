@@ -215,8 +215,11 @@ class IndexSteps(private val world: LampWorld) {
     @Then("it offers these POST templates")
     fun postTemplates(table: DataTable) = table.asMaps().forEach {
         postTemplate(
-            it.getValue("template"), it.getValue("target"), it.getValue("required property"),
-            it.getValue("min").toInt(), it.getValue("max").toInt(),
+            it.getValue("template"),
+            it.getValue("target"),
+            it.getValue("required property"),
+            it.getValue("min").toInt(),
+            it.getValue("max").toInt(),
         )
     }
 

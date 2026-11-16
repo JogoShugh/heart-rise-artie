@@ -66,18 +66,23 @@ private class CloneRun(private val real: String, private val clone: String) {
     private fun acts() {
         send(
             "Act {relation} on the entry: hire {firstName}, by POST, answered with no body",
-            json(Method.POST, "/employees", SAMWISE), mapOf("relation" to "default", "firstName" to "Samwise"), 204,
+            json(Method.POST, "/employees", SAMWISE),
+            mapOf("relation" to "default", "firstName" to "Samwise"),
+            204,
         )
         get("The entry again: {count} employees", "/employees", HAL_FORMS, mapOf("count" to 3))
         send(
             "Act {relation} on employee {id}: {role}, by PUT, with an If-Match that matches nothing, taken anyway",
             json(Method.PUT, "/employees/1", FRODO_RETIRED).header("If-Match", "\"stale\""),
-            mapOf("relation" to "default", "id" to 1, "role" to "ring bearer, retired"), 204,
+            mapOf("relation" to "default", "id" to 1, "role" to "ring bearer, retired"),
+            204,
         )
         get("Employee {id}, as changed", "/employees/1", HAL_FORMS, mapOf("id" to 1))
         send(
             "Act {relation} on employee {id}, by DELETE, answered with no body",
-            Request(Method.DELETE, "/employees/1"), mapOf("relation" to "deleteEmployee", "id" to 1), 204,
+            Request(Method.DELETE, "/employees/1"),
+            mapOf("relation" to "deleteEmployee", "id" to 1),
+            204,
         )
         get("Employee {id}, gone", "/employees/1", HAL_FORMS, mapOf("id" to 1), expect = 404)
         get("The entry at the end", "/employees", HAL_FORMS)

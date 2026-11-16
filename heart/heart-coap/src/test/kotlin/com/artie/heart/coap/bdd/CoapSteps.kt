@@ -4,6 +4,7 @@ import com.artie.heart.ContentAddress
 import com.artie.heart.JsonTrees
 import com.artie.heart.coap.CoapFrontDoor
 import com.artie.heart.coap.CoapOptions
+import com.artie.heart.coap.CoapsSettings
 import com.artie.heart.fixtures.Lamp
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -11,13 +12,7 @@ import io.cucumber.java.After
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
-import com.artie.heart.coap.CoapsSettings
 import org.eclipse.californium.core.CoapClient
-import org.eclipse.californium.scandium.DTLSConnector
-import org.eclipse.californium.scandium.config.DtlsConfig
-import org.eclipse.californium.scandium.config.DtlsConnectorConfig
-import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
-import org.eclipse.californium.scandium.dtls.pskstore.AdvancedSinglePskStore
 import org.eclipse.californium.core.coap.Option
 import org.eclipse.californium.core.coap.Request
 import org.eclipse.californium.core.coap.Response
@@ -25,6 +20,11 @@ import org.eclipse.californium.core.config.CoapConfig
 import org.eclipse.californium.core.network.CoapEndpoint
 import org.eclipse.californium.elements.config.Configuration
 import org.eclipse.californium.elements.config.UdpConfig
+import org.eclipse.californium.scandium.DTLSConnector
+import org.eclipse.californium.scandium.config.DtlsConfig
+import org.eclipse.californium.scandium.config.DtlsConnectorConfig
+import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
+import org.eclipse.californium.scandium.dtls.pskstore.AdvancedSinglePskStore
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue

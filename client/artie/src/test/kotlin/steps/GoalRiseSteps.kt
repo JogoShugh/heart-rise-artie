@@ -45,7 +45,9 @@ class GoalRiseSteps(
     @Given("the offer watch and the desk's replies run in this process, the watch answering through ARTIE")
     fun parties() {
         val service = ReplyService(
-            origin = DESK, realm = "The desk's replies", tokens = listOf(REPLY_TOKEN),
+            origin = DESK,
+            realm = "The desk's replies",
+            tokens = listOf(REPLY_TOKEN),
             result = """{"type": "object", "additionalProperties": true}""",
             ownKeys = mapOf(ArtieKey.KEY_ID to ArtieKey.pair.public),
             requestKeys = { mapOf(WatcherKey.KEY_ID to WatcherKey.pair.public) },

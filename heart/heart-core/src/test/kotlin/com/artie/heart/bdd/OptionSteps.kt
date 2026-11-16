@@ -20,10 +20,10 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 
 /** Steps for options.feature: choices from state, rendered and enforced by heart-core. */
 class OptionSteps {

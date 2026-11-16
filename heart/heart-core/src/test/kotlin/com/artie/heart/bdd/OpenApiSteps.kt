@@ -3,8 +3,8 @@ package com.artie.heart.bdd
 import com.artie.heart.Acted
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
-import com.artie.heart.OpenApiDocument
 import com.artie.heart.Offers
+import com.artie.heart.OpenApiDocument
 import com.artie.heart.Past
 import com.artie.heart.ResourceType
 import com.artie.heart.fixtures.Lamp

@@ -34,7 +34,10 @@ class MemoryBinding(private val url: String, var status: String) : Binding {
     override fun act(act: Act, rendering: Rendering): Outcome = when {
         act.validator != validator -> Outcome.Stale("stale", null)
         act.method != "POST" -> Outcome.Failed("no such method", null)
-        act.url == "$url/sow" && status == "EMPTY" -> { sow(); Outcome.Done(received(), "done") }
+        act.url == "$url/sow" && status == "EMPTY" -> {
+            sow()
+            Outcome.Done(received(), "done")
+        }
         else -> Outcome.NotOffered("not offered", null)
     }
 

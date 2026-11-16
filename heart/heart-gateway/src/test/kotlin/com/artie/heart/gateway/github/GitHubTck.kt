@@ -13,7 +13,6 @@ import com.artie.heart.tck.TckFixture
 import com.artie.heart.tck.TckWorld
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.spring.CucumberContextConfiguration
-import java.nio.file.Path
 import org.http4k.server.Http4kServer
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
@@ -22,6 +21,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
+import java.nio.file.Path
 
 /**
  * HEART's conformance features through the gateway in front of a small

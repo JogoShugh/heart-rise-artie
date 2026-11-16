@@ -21,7 +21,9 @@ class OfferWatchSteps {
     private val mapper = ObjectMapper()
     private val github = GitHubService().apply { reset() }
     private val replies = ReplyService(
-        origin = REPLIES, realm = "ARTIE's replies", tokens = listOf(REPLY_TOKEN),
+        origin = REPLIES,
+        realm = "ARTIE's replies",
+        tokens = listOf(REPLY_TOKEN),
         result = """{"type": "object", "additionalProperties": true}""",
         ownKeys = mapOf(ArtieKey.KEY_ID to ArtieKey.pair.public),
         requestKeys = { mapOf(WatcherKey.KEY_ID to WatcherKey.pair.public) },
