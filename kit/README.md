@@ -47,7 +47,20 @@ sequenceDiagram
 - A GitHub account.
 - An Anthropic API key (console.anthropic.com).
 
-### On Windows
+### The quick way: one script
+
+It does every step below, saying what it does, and asks for your GitHub user, repository, token and Anthropic key.
+
+- **Windows**, in PowerShell (it installs WSL and Ubuntu if need be, clones this repository inside Ubuntu, and
+  carries on there):
+  ```powershell
+  irm https://raw.githubusercontent.com/JogoShugh/heart-rise-artie/claude/auth-branch-4bnmhc/kit/windows/setup.ps1 | iex
+  ```
+- **Ubuntu or macOS**, in a clone of this repository: `kit/setup.sh`
+
+Create the empty repository and the token first (Set up, once, steps 1 and 2); the script asks for them.
+
+### On Windows, by hand
 
 Use WSL 2 with Ubuntu, and do everything below inside Ubuntu, not in PowerShell:
 
