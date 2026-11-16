@@ -295,7 +295,6 @@ ul.plain { margin: 0; padding-left: 18px; font-size: 0.95rem; }
     <li>HAL-FORMS is served at L0 only. Its Layer 2/3 addressing needs a SPEC decision first; see <code>spec/CONFORMANCE-GAPS.md</code>.</li>
     <li>The cache-demo exhibit still uses its own 0.3-era fixtures (<code>{bedId}</code>, no <code>Prefer</code>). It demonstrates the caching mechanism, not 0.4 conformance.</li>
     <li>The Docker build of <code>Dockerfile.origin</code> was verified on 3 Oct, before the fixed random seed. The cache-demo run above used the local <code>server.py</code> with the regenerated fixtures.</li>
-    <li><code>server-node</code> has no tests.</li>
     <li>The bdd-gates pre-commit check runs only after <code>git config core.hooksPath .githooks</code>. Until then, commits in this pass ran it by hand first.</li>
   </ul>
 </section>

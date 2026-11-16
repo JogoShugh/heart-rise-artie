@@ -267,7 +267,7 @@ Every domain is delivered with the same list:
 
 ### B2. Youth basketball scoring
 
-Rebuilt in Kotlin on the library, from `server-node/bball.js`. That file has
+Rebuilt in Kotlin on the library, from `server-node/bball.js` (the early prototype, since removed). That file has
 a score, a period, possession, pause and turnover, and nothing else.
 
 **Resources**
