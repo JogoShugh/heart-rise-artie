@@ -152,9 +152,9 @@ say "Build the kit and seed $OWNER/$REPO"
 note "The first build takes several minutes; later ones are quick."
 if [ "$docker_cmd" != docker ]; then
   # Docker through sudo, until the next login makes this user one of its group.
-  sudo --preserve-env=OWNER,REPO,GITHUB_TOKEN,ANTHROPIC_API_KEY sh "$here/bootstrap.sh"
+  sudo --preserve-env=OWNER,REPO,GITHUB_TOKEN,ANTHROPIC_API_KEY sh "$here/bootstrap.sh" < /dev/null
 else
-  sh "$here/bootstrap.sh"
+  sh "$here/bootstrap.sh" < /dev/null
 fi
 
 say "Done"
