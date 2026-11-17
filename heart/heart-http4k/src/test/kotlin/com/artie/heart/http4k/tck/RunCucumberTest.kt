@@ -16,5 +16,5 @@ import org.junit.platform.suite.api.Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("heart/tck")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.tck,com.artie.heart.http4k.tck")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary, message:build/cucumber/RunCucumberTest.ndjson")
 class RunCucumberTest

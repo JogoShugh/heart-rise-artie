@@ -15,5 +15,5 @@ import org.junit.platform.suite.api.Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("heart/binding")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.binding,com.artie.heart.http4k.binding")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary, message:build/cucumber/RunBindingTest.ndjson")
 class RunBindingTest

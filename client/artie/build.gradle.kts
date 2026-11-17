@@ -1,6 +1,3 @@
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
@@ -56,56 +53,13 @@ tasks.test {
     // A watch that runs to its time limit keeps every look in its trace: room for it to end and fail its assertions,
     // rather than run out of memory first.
     maxHeapSize = "2g"
-    finalizedBy("logBddRun")
 }
-
-// Red includes "does not compile": finalize the compile tasks too, so that
-// failure is logged. Gradle runs logBddRun once, after whichever ran.
-tasks.named("compileKotlin") { finalizedBy("logBddRun") }
-tasks.named("compileTestKotlin") { finalizedBy("logBddRun") }
 
 detekt {
     // Existing code predates the gate; the baseline freezes its findings so
     // only new violations fail. Shrink it as code is touched; never grow it.
     baseline = file("detekt-baseline.xml")
 }
-
-// bdd-gates: records "BDD_RUN PASS|FAIL" after every test run, including failed ones, of
-// ARTIE's own features (test) and of the shared conformance features (conformanceTest).
-// The log lives at the repo root, one level up from this build. The Cucumber engine
-// is discovered through junit-platform.properties, so its XML carries the engine's name.
-fun registerBddRunLog(name: String, results: String) = tasks.register(name) {
-    group = "verification"
-    description = "Appends a BDD_RUN fact for $results to ../../.claude/tdd-events.log for the pre-commit check."
-    doLast {
-        val resultFile = file("build/test-results/$results/TEST-io.cucumber.junit.platform.engine.CucumberTestEngine.xml")
-        val logFile = file("../../.claude/tdd-events.log")
-        val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)
-        logFile.parentFile.mkdirs()
-        // A compile failure stops the build before tests run, which leaves the
-        // previous run's XML in place. Log it as red instead of reading stale results.
-        val compileFailed = listOf("compileKotlin", "compileTestKotlin")
-            .any { tasks.named(it).get().state.failure != null }
-        if (compileFailed) {
-            logFile.appendText("$timestamp BDD_RUN FAIL module=client reason=compile\n")
-            return@doLast
-        }
-        if (!resultFile.exists()) {
-            // No result file means compilation or discovery failed: still red.
-            logFile.appendText("$timestamp BDD_RUN FAIL module=client reason=no-results\n")
-            return@doLast
-        }
-        val xml = resultFile.readText()
-        fun attr(name: String) = Regex("""$name="(\d+)"""").find(xml)?.groupValues?.get(1) ?: "0"
-        val status = if (attr("failures") == "0" && attr("errors") == "0") "PASS" else "FAIL"
-        logFile.appendText(
-            "$timestamp BDD_RUN $status module=client total=${attr("tests")} failures=${attr("failures")} errors=${attr("errors")}\n",
-        )
-    }
-}
-
-registerBddRunLog("logBddRun", "test")
-registerBddRunLog("logConformanceRun", "conformanceTest")
 
 kotlin {
     jvmToolchain(22)
@@ -207,7 +161,6 @@ val conformanceTest by tasks.registering(Test::class) {
     systemProperty("cucumber.filter.tags", "not @none")
     systemProperty("conformance.fixtures", file("$conformance/fixtures/garden").path)
     outputs.upToDateWhen { false }
-    finalizedBy("logConformanceRun")
 }
 
 // The conformance features are offline and pass in full, so check holds ARTIE to them.

@@ -1,6 +1,4 @@
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 plugins {
     id("org.springframework.boot") version "3.3.4"
@@ -9,6 +7,7 @@ plugins {
     kotlin("plugin.spring") version "2.0.20"
     // detekt, Kover and CPD, as every Kotlin build here is checked (build-logic).
     id("artie.kotlin-quality")
+    id("bddgates.bdd-log")
 }
 
 group = "com.artie"
@@ -134,49 +133,6 @@ configurations.matching { it.name == "detekt" }.all {
     }
 }
 
-// bdd-gates: records "BDD_RUN PASS|FAIL" after every test run, including failed ones.
-// The log lives at the repo root, one level up from this build.
-val logBddRun by tasks.registering {
-    group = "verification"
-    description = "Appends a BDD_RUN fact to ../.claude/tdd-events.log for the pre-commit TDD-ordering check."
-    doLast {
-        // Monday's runner and Tuesday's (the garden with frost): both are the garden's features.
-        val resultFiles = listOf("bdd.RunCucumberTest", "tuesday.RunTuesdayTest")
-            .map { file("build/test-results/test/TEST-com.artie.gardenbed.$it.xml") }
-        val logFile = file("../.claude/tdd-events.log")
-        val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)
-        logFile.parentFile.mkdirs()
-        // A compile failure stops the build before tests run, which leaves the
-        // previous run's XML in place. Log it as red instead of reading stale results.
-        val compileFailed = listOf("compileKotlin", "compileTestKotlin")
-            .any { tasks.named(it).get().state.failure != null }
-        if (compileFailed) {
-            logFile.appendText("$timestamp BDD_RUN FAIL module=server-spring reason=compile\n")
-            return@doLast
-        }
-        // A build that stopped before the tests ran leaves an older run's result file.
-        if (!tasks.test.get().state.executed) return@doLast
-        if (resultFiles.any { !it.exists() }) {
-            // No result file means compilation or discovery failed: still red.
-            logFile.appendText("$timestamp BDD_RUN FAIL module=server-spring reason=no-results\n")
-            return@doLast
-        }
-        val xmls = resultFiles.map { it.readText() }
-        fun attr(name: String) = xmls.sumOf { xml ->
-            Regex("""$name="(\d+)"""").find(xml)?.groupValues?.get(1)?.toInt() ?: 0
-        }
-        val status = if (attr("failures") == 0 && attr("errors") == 0) "PASS" else "FAIL"
-        logFile.appendText(
-            "$timestamp BDD_RUN $status module=server-spring total=${attr("tests")} failures=${attr("failures")} errors=${attr("errors")}\n",
-        )
-    }
-}
-
 tasks.test {
-    finalizedBy(logBddRun)
 }
 
-// Red includes "does not compile": finalize the compile tasks too, so that
-// failure is logged. Gradle runs logBddRun once, after whichever ran.
-tasks.named("compileKotlin") { finalizedBy(logBddRun) }
-tasks.named("compileTestKotlin") { finalizedBy(logBddRun) }

@@ -33,7 +33,7 @@ import org.springframework.test.context.TestPropertySource
 @IncludeEngines("cucumber")
 @SelectClasspathResource("heart/tck")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.tck,com.artie.basketball.tck")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary, message:build/cucumber/RunHeartTckTest.ndjson")
 // The bookmark offers no act here, so the @bookmark-act scenarios do not apply.
 @ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "not @bookmark-act")
 class RunHeartTckTest

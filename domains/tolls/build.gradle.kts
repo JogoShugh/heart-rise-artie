@@ -1,6 +1,4 @@
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 plugins {
     id("org.springframework.boot") version "3.3.4"
@@ -8,6 +6,7 @@ plugins {
     kotlin("jvm") version "2.0.20"
     kotlin("plugin.spring") version "2.0.20"
     id("artie.kotlin-quality")
+    id("bddgates.bdd-log")
 }
 
 group = "com.artie"
@@ -74,35 +73,3 @@ configurations.matching { it.name == "detekt" }.all {
     }
 }
 
-// bdd-gates: records "BDD_RUN PASS|FAIL" after the domain's own features run.
-val logBddRun by tasks.registering {
-    group = "verification"
-    description = "Appends a BDD_RUN fact to ../../.claude/tdd-events.log for the pre-commit TDD-ordering check."
-    doLast {
-        val logFile = file("../../.claude/tdd-events.log")
-        val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)
-        val compileFailed = listOf("compileKotlin", "compileTestKotlin")
-            .any { tasks.named(it).get().state.failure != null }
-        if (compileFailed) {
-            logFile.appendText("$timestamp BDD_RUN FAIL module=tolls reason=compile\n")
-            return@doLast
-        }
-        if (!tasks.test.get().state.executed) return@doLast
-        val resultFile = file("build/test-results/test/TEST-com.artie.tolls.bdd.RunCucumberTest.xml")
-        if (!resultFile.exists()) {
-            logFile.appendText("$timestamp BDD_RUN FAIL module=tolls reason=no-results\n")
-            return@doLast
-        }
-        val xml = resultFile.readText()
-        fun attr(name: String) = Regex("""$name="(\d+)"""").find(xml)?.groupValues?.get(1) ?: "0"
-        val status = if (attr("failures") == "0" && attr("errors") == "0") "PASS" else "FAIL"
-        logFile.appendText(
-            "$timestamp BDD_RUN $status module=tolls total=${attr("tests")} " +
-                "failures=${attr("failures")} errors=${attr("errors")}\n",
-        )
-    }
-}
-
-tasks.test { finalizedBy(logBddRun) }
-tasks.named("compileKotlin") { finalizedBy(logBddRun) }
-tasks.named("compileTestKotlin") { finalizedBy(logBddRun) }

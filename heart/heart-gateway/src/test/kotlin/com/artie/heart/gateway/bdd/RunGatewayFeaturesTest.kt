@@ -16,5 +16,8 @@ import org.junit.platform.suite.api.Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.gateway.bdd,com.artie.heart.gateway.tck")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
+@ConfigurationParameter(
+    key = PLUGIN_PROPERTY_NAME,
+    value = "summary, message:build/cucumber/RunGatewayFeaturesTest.ndjson",
+)
 class RunGatewayFeaturesTest

@@ -24,7 +24,7 @@ import org.springframework.test.context.TestPropertySource
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.tickets.bdd")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary, message:build/cucumber/RunCucumberTest.ndjson")
 class RunCucumberTest
 
 /** Tickets and their events in memory: the real rules and the real HEART library, no Postgres. */

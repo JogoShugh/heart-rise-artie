@@ -19,5 +19,5 @@ import org.junit.platform.suite.api.Suite
 @SelectClasspathResource("heart/tck")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.tck,com.artie.heart.gateway.github")
 @ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "not @bookmark-act")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary, message:build/cucumber/RunGitHubTckTest.ndjson")
 class RunGitHubTckTest

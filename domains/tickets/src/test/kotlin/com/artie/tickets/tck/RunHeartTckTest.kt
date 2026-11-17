@@ -31,7 +31,7 @@ import org.springframework.test.context.TestPropertySource
 @IncludeEngines("cucumber")
 @SelectClasspathResource("heart/tck")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.tck,com.artie.tickets.tck")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary, message:build/cucumber/RunHeartTckTest.ndjson")
 class RunHeartTckTest
 
 /** Ticket 1, new: assigning is offered, resolving is not; the bookmark offers opening a ticket. */

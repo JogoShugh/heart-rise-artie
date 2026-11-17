@@ -19,5 +19,5 @@ import org.junit.platform.suite.api.Suite
 @SelectClasspathResource("features")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.gardenbed.bdd,com.artie.gardenbed.monday")
 @ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "not @tuesday")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary, message:build/cucumber/RunCucumberTest.ndjson")
 class RunCucumberTest

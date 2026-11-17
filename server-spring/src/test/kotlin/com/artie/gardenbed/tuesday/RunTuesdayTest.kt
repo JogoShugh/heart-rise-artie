@@ -29,7 +29,7 @@ import org.springframework.test.context.TestPropertySource
 @SelectClasspathResource("features")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.gardenbed.bdd,com.artie.gardenbed.tuesday")
 @ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "@tuesday")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary, message:build/cucumber/RunTuesdayTest.ndjson")
 class RunTuesdayTest
 
 /** The garden with frost, served over HTTP and CoAP by the HEART library, and the weather its operator reports. */

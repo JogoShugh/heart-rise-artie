@@ -35,7 +35,7 @@ import org.springframework.test.context.TestPropertySource
 @IncludeEngines("cucumber")
 @SelectClasspathResource("heart/tck")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.tck,com.artie.gardenbed.tck")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary, message:build/cucumber/RunHeartTckTest.ndjson")
 class RunHeartTckTest
 
 /** Bed 2, planted: watering is offered, sowing is not; the bookmark offers building a bed. */

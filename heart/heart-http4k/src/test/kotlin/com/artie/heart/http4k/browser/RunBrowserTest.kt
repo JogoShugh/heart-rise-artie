@@ -12,5 +12,5 @@ import org.junit.platform.suite.api.Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features/browser")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.http4k.browser")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary, message:build/cucumber/RunBrowserTest.ndjson")
 class RunBrowserTest
