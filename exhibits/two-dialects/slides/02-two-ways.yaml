@@ -1,0 +1,94 @@
+name: two-ways
+part: "The goal"
+title: "One Pull Request, Two Dialects"
+kicker: Pull request 501, just before the merge
+code:
+  file: morph.js
+  title: Turns one offer into the other, as the slide's HTML says
+say: "Here's pull request 501, a moment before the merge, as each dialect offers it. HAL Schema Forms puts the act under _forms, with a JSON Schema for its fields and a hash of the whole form. HAL-FORMS puts it under _templates, with a list of properties, each an HTML input type. Watch what carries over: the name, scm:merge; the method, PUT; and the pull request's own address. And what ARTIE sends is the same in both: method squash. Same relation, same act, two shapes."
+sources:
+  - ["HAL-FORMS (mamund/hal-forms)", "https://github.com/mamund/hal-forms"]
+  - ["HAL Schema Forms", "https://github.com/jbadeau/hal-schema-forms"]
+html: |
+  <h2>One Pull Request, Two Dialects</h2>
+  <div class="morph" data-start="hsf" data-cycles='[{"to": "hf", "label": "HAL-FORMS", "head": "One Pull Request, Two Dialects"}]'>
+    <div class="mo-stage">
+      <section class="mo-scene" data-scene="hsf">
+        <h3 class="mo-title">HAL Schema Forms: _forms</h3>
+        <pre class="offer">offered as: application/hal+json
+  '_forms: <span class="tk" data-token="rel">scm:merge</span>':
+    title: Merge
+    description: Merge the pull request into its base branch.
+    _links:
+      target:
+        href: <span class="tk" data-token="target">/repos/acme/web/pulls/501/actions/merge</span>
+    method: <span class="tk aw-m" data-token="method">PUT</span>
+    contentType: application/json
+    hr:integrity: sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pweUa6ioBBwF8=
+    schema:
+      required:
+        - method
+      properties:
+        commit_message:
+          description: Extra detail to append to automatic commit message.
+          title: Commit message
+          type: string
+        commit_title:
+          description: Title for the automatic commit message.
+          title: Commit title
+          type: string
+        method:
+          description: The merge method to use.
+          enum:
+            - merge
+            - squash
+            - rebase
+          title: Merge method
+          type: string
+  ARTIE sent:
+    method: PUT
+    path: /repos/acme/web/pulls/501/actions/merge
+    body:
+      method: squash
+  answered: 200</pre>
+      </section>
+      <section class="mo-scene" data-scene="hf">
+        <h3 class="mo-title">HAL-FORMS: _templates</h3>
+        <pre class="offer">offered as: application/prs.hal-forms+json
+  '_templates: <span class="tk" data-token="rel">scm:merge</span>':
+    title: Merge
+    method: <span class="tk aw-m" data-token="method">PUT</span>
+    contentType: application/json
+    target: <span class="tk" data-token="target">/repos/acme/web/pulls/501/actions/merge</span>
+    properties:
+      - name: method
+        prompt: Merge method
+        required: true
+        type: text
+        options:
+          inline:
+            - merge
+            - squash
+            - rebase
+          minItems: 1
+          maxItems: 1
+      - name: commit_title
+        prompt: Commit title
+        required: false
+        type: text
+      - name: commit_message
+        prompt: Commit message
+        required: false
+        type: text
+  ARTIE sent:
+    method: PUT
+    path: /repos/acme/web/pulls/501/actions/merge
+    body:
+      method: squash
+  answered: 200</pre>
+      </section>
+    </div>
+    <p class="mo-still note">Two stills. Read as HEART, this slide links a script that turns one into the other (<code>deck:code</code>).</p>
+  </div>
+  <p class="lead">Same name, same method, same address, and the same act sent: <code>{method: squash}</code>.</p>
+  <p class="refs"><deck-ref name="scm"></deck-ref> <deck-ref name="heart"></deck-ref></p>

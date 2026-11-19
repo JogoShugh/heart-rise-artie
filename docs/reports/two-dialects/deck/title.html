@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Goal, Two Dialects · One Goal, Two Dialects</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">The release, in HAL Schema Forms and in HAL-FORMS</span></header>
+<h1>One Goal, Two Dialects</h1>
+<div class="goal-hero">
+  <p class="goal-line">Release a pull request to Dev once it can be merged and its build passes its smoke test.</p>
+  <p class="refs"><details class="fragment-plain"><summary>The goal, whole (release.goal.md)</summary><pre><code>Release a pull request to Dev once it can be merged and its build passes its smoke test.
+
+- Open pull request {pull} of {owner}/{repo} `as pr`
+- At {watcher}, ask to be told when {pr} offers scm:merge `as watch`
+- Once {watch} is answered, at {pr}, merge it by squashing `as merged`
+- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`
+- Once {build} is answered, follow its in-reply-to link to the build `as built`
+  - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`
+- If {smoke.passed}, at {dev}, open environment {environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed `as promotion`
+  Otherwise, at {pr}, act scm:comment with body = &quot;Not promoted to Dev: smoke scenarios {smoke.failed} failed.&quot;</code></pre></details></p>
+</div>
+<p class="lead">Walked once with Claude, kept as a script, and released with no model, in both of HEART's dialects: HAL Schema Forms, and HAL-FORMS.</p>
+<div class="four" style="grid-template-columns: repeat(3, minmax(0, 1fr))">
+  <div><b>HAL Schema Forms</b><span>4 of 5 promoted, 0 model calls per release</span></div>
+  <div><b>HAL-FORMS</b><span>4 of 5 promoted, 0 model calls per release</span></div>
+  <div><b>504 stopped</b><span>by its smoke test, in both, as it should be</span></div>
+</div>
+</article>
+<nav class="foot"><span class="off"><small>Back</small><b>—</b></span>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#title">with heart-ts</a></span>
+<a href="deck/two-ways.html" rel="next"><small>Next</small><b>One Pull Request, Two Dialects</b></a></nav>
+</main></div></body></html>

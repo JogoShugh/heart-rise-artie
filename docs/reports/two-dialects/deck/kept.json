@@ -1,0 +1,110 @@
+{
+  "name": "kept",
+  "title": "Kept by the Generator Alone",
+  "part": "HAL-FORMS",
+  "kicker": "Two scripts, one vocabulary",
+  "tone": "light",
+  "number": 5,
+  "of": 11,
+  "html": "<h2>Kept by the Generator Alone</h2>\n<div class=\"tiles\" style=\"grid-template-columns: repeat(4, minmax(0, 1fr))\">\n  <div><code>scm:pulls-get</code></div><div><code>watcher:watch</code></div><div><code>scm:merge</code></div><div><code>ci:build</code></div>\n  <div><code>hr:in-reply-to</code></div><div><code>ci:smoke-test</code></div><div><code>env:promote</code></div><div><code>scm:comment</code></div>\n</div>\n<p class=\"lead\">Both scripts name the same relations, among them these. The promote's <code>smoke</code>, the one value the reasoner chose, is kept as an object, each count read from the smoke run, marked for review.</p>\n<p class=\"refs\"><deck-fragment name=\"hf-smoke\">the promote, HAL-FORMS</deck-fragment> <deck-fragment name=\"hf\">HAL-FORMS script, whole</deck-fragment> <deck-fragment name=\"hsf\">HAL Schema Forms script, whole</deck-fragment></p>\n",
+  "say": "artie generate kept the HAL-FORMS walk as a script with no hand edits. Line them up with the HAL Schema Forms script: the same relations, in the same order. The one value the reasoner chose, the smoke counts on the promote, is kept as an object, each count read from the smoke run as the goal's words say, and marked for review. HAL-FORMS says only that the field is text; the goal's own words say what goes in it.",
+  "sources": [
+    {
+      "label": "release.heart.yaml",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.heart.yaml"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "kept.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "walk.json",
+      "title": "Walk Once with Claude, in HAL-FORMS"
+    },
+    "next": {
+      "href": "gaps.json",
+      "title": "What HAL-FORMS Doesn't Carry Today"
+    },
+    "alternate": {
+      "href": "kept.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:fragment": [
+      {
+        "name": "hsf",
+        "label": "Kept from the HAL Schema Forms walk (release.heart.yaml)",
+        "lang": "yaml",
+        "path": "exhibits/merge-watch-release/release.heart.yaml",
+        "lines": "41–125",
+        "of": 125,
+        "text": "steps:\n  - act: scm:pulls-get\n    fields:\n      owner: ${owner}\n      repo: ${repo}\n      pull_number: ${pull}\n    intent: Open pull request ${pull} of ${owner}/${repo}\n    then:\n      - keep-as: pr\n  - enter: ${watcher}\n    steps:\n      - ask: watcher:watch\n        fields:\n          resource: ${pr.@self}\n          offers: scm:merge\n        reply: watch\n  - once-answered:\n      reply: watch\n      steps:\n        - enter: ${pr.@self}\n          steps:\n            - act: scm:merge\n              fields:\n                method: squash\n              intent: merge it by squashing\n              then:\n                - check:\n                    - field: state\n                      is: closed\n                    - field: merged\n                      is: true\n                    - field: mergeable_state\n                      is: unknown\n                - keep-as: merged\n  - enter: ${jenkins}\n    steps:\n      - ask: ci:build\n        fields:\n          commit: ${merged.merge_commit_sha}\n        reply: build\n  - once-answered:\n      reply: build\n      steps:\n        - follow: hr:in-reply-to\n          intent: follow its in-reply-to link to the build\n          then:\n            - run-script: ci:smoke-test\n              on-link: ci:deployment\n              inputs:\n                book: ${book}\n                author: ${author}\n                renewable: ${renewable}\n                problem: ${problem}\n                comment: ${comment}\n              as: smoke\n  - given:\n      - at: smoke\n        field: passed\n        is: true\n    then:\n      - enter: ${dev}\n        steps:\n          - act: env:get-environment\n            fields:\n              id: ${environment}\n            inferred: get environment ${environment}\n            from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n            then:\n              - act: env:promote\n                fields:\n                  commit: ${merged.merge_commit_sha}\n                  smoke: # review: the reasoner chose it, asked \"promote commit 30a0fa96e3eed2ae20b2b5fa7613a115d56312a3, citing 5 of 5 scenarios passed\"\n                    passed: ${smoke.passing}\n                    of: ${smoke.of}\n                intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n                then:\n                  - check:\n                      - field: commit\n                        is: ${merged.merge_commit_sha}\n    otherwise:\n      - at: ${pr.@self}\n        steps:\n          - act: scm:comment\n            fields:\n              body: \"Not promoted to Dev: smoke scenarios ${smoke.failed} failed.\"",
+        "_links": {
+          "self": {
+            "href": "fragments/kept--hsf.json",
+            "title": "Kept from the HAL Schema Forms walk (release.heart.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.heart.yaml#L41-L125",
+            "title": "exhibits/merge-watch-release/release.heart.yaml, lines 41–125"
+          }
+        }
+      },
+      {
+        "name": "hf",
+        "label": "Kept from the HAL-FORMS walk (hal-forms/release.heart.yaml)",
+        "lang": "yaml",
+        "path": "exhibits/merge-watch-release/hal-forms/release.heart.yaml",
+        "lines": "40–130",
+        "of": 130,
+        "text": "steps:\n  - act: scm:pulls-get\n    fields:\n      owner: ${owner}\n      repo: ${repo}\n      pull_number: ${pull}\n    intent: Open pull request ${pull} of ${owner}/${repo}\n    then:\n      - keep-as: pr\n  - enter: ${watcher}\n    steps:\n      - ask: watcher:watch\n        fields:\n          resource: ${pr.@self}\n          offers: scm:merge\n        reply: watch\n  - once-answered:\n      reply: watch\n      steps:\n        - enter: ${pr.@self}\n          steps:\n            - act: scm:merge\n              fields:\n                method: squash\n              intent: merge it by squashing\n              then:\n                - check:\n                    - field: mergeable_state\n                      is: unknown\n                    - field: merged\n                      is: true\n                    - field: state\n                      is: closed\n                - keep-as: merged\n  - enter: ${jenkins}\n    steps:\n      - ask: ci:build\n        fields:\n          commit: ${merged.merge_commit_sha}\n        reply: build\n  - once-answered:\n      reply: build\n      steps:\n        - follow: hr:in-reply-to\n          intent: follow its in-reply-to link to the build\n          then:\n            - run-script: ci:smoke-test\n              on-link: ci:deployment\n              inputs:\n                book: ${book}\n                author: ${author}\n                renewable: ${renewable}\n                problem: ${problem}\n                comment: ${comment}\n              as: smoke\n  - given:\n      - at: smoke\n        field: passed\n        is: true\n    then:\n      - enter: ${dev}\n        steps:\n          - act: env:get-environment\n            fields:\n              id: ${environment}\n            inferred: open environment ${environment}\n            from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n            then:\n              - for-each: environment\n                then:\n                  - when-offered:\n                      - act: env:promote\n                        fields:\n                          commit: ${merged.merge_commit_sha}\n                          smoke: # review: the reasoner chose it, asked \"promote commit 39590c7cd6242a278c59c230eb17f387161f38be, with the smoke field as an object: {\"passed\": 5, \"of\": 5} (5 of 5 scenarios passed)\"\n                            passed: ${smoke.passing}\n                            of: ${smoke.of}\n                        intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n                        then:\n                          - check:\n                              - field: commit\n                                is: ${merged.merge_commit_sha}\n                    intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n                    otherwise:\n                      - note: none of these acts is offered here\n    otherwise:\n      - at: ${pr.@self}\n        steps:\n          - act: scm:comment\n            fields:\n              body: \"Not promoted to Dev: smoke scenarios ${smoke.failed} failed.\"",
+        "_links": {
+          "self": {
+            "href": "fragments/kept--hf.json",
+            "title": "Kept from the HAL-FORMS walk (hal-forms/release.heart.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/hal-forms/release.heart.yaml#L40-L130",
+            "title": "exhibits/merge-watch-release/hal-forms/release.heart.yaml, lines 40–130"
+          }
+        }
+      },
+      {
+        "name": "hf-smoke",
+        "label": "The promote, kept from the HAL-FORMS walk",
+        "lang": "yaml",
+        "path": "exhibits/merge-watch-release/hal-forms/release.heart.yaml",
+        "lines": "111–116",
+        "of": 130,
+        "text": "- act: env:promote\n  fields:\n    commit: ${merged.merge_commit_sha}\n    smoke: # review: the reasoner chose it, asked \"promote commit 39590c7cd6242a278c59c230eb17f387161f38be, with the smoke field as an object: {\"passed\": 5, \"of\": 5} (5 of 5 scenarios passed)\"\n      passed: ${smoke.passing}\n      of: ${smoke.of}",
+        "_links": {
+          "self": {
+            "href": "fragments/kept--hf-smoke.json",
+            "title": "The promote, kept from the HAL-FORMS walk"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/hal-forms/release.heart.yaml#L111-L116",
+            "title": "exhibits/merge-watch-release/hal-forms/release.heart.yaml, lines 111–116"
+          }
+        }
+      }
+    ]
+  }
+}
