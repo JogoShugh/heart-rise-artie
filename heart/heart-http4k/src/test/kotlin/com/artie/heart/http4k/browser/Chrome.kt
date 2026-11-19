@@ -47,6 +47,10 @@ object Chrome {
             "--use-mock-keychain",
             "--no-first-run",
             "--disable-gpu",
+            // Each scenario's tab is opened behind the others: Chrome must not throttle or freeze it for that.
+            "--disable-background-timer-throttling",
+            "--disable-backgrounding-occluded-windows",
+            "--disable-renderer-backgrounding",
             "--remote-debugging-port=0",
             "--user-data-dir=$profile",
             "about:blank",
@@ -69,6 +73,11 @@ object Chrome {
             HttpResponse.BodyHandlers.ofString(),
         )
         val target = mapper.readTree(created.body())
+        // Brought to the front, so a busy machine's Chrome does not leave it waiting behind the tab before it.
+        http.send(
+            HttpRequest.newBuilder(URI("http://127.0.0.1:$port/json/activate/${target["id"].asText()}")).build(),
+            HttpResponse.BodyHandlers.discarding(),
+        )
         return Tab(target["id"].asText(), target["webSocketDebuggerUrl"].asText())
     }
 
