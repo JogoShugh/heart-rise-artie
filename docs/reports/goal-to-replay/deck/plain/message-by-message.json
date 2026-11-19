@@ -1,0 +1,21 @@
+{
+  "name": "message-by-message",
+  "title": "The Release, Message by Message",
+  "part": "The release",
+  "kicker": "A replay, from the desk's own trace",
+  "tone": "light",
+  "number": 10,
+  "of": 17,
+  "html": "<h2>The Release, Message by Message</h2>\n<div class=\"seqx\" data-runs=\"gh501,gh504,gl501\" data-labels='{\"gh501\": \"GitHub · 501, promoted\", \"gh504\": \"GitHub · 504, stopped\", \"gl501\": \"GitLab · 501, promoted\"}'>\n  <p class=\"note\">Read as HEART, this slide links a script (<code>deck:code</code>) that plays the release from the desk’s trace: 68 messages between ARTIE, the forge, the watcher, CI, Jenkins, the preview and Dev. Plain JSON carries no links, so no code arrives.</p>\n</div>\n<p class=\"sq-key\"><span><b class=\"k-clock\">◷</b> waiting for an answer</span><span><b class=\"k-mail\">✉</b> answering its reply</span><span><b class=\"k-gear\">⚙</b> building</span><span><b class=\"k-zzz\">zZ</b> a reply, resting</span></p>\n<p class=\"refs\"><deck-ref name=\"rise\"></deck-ref> <deck-ref name=\"hypertext\"></deck-ref> <deck-ref name=\"stateless\"></deck-ref> <deck-ref name=\"layered-system\"></deck-ref></p>\n",
+  "say": "Here's one release, played from the desk's own trace of it, one message at a time. Press play. ARTIE enters the forge by its bookmark and opens pull request 501. Then it asks the watcher to say when the pull request offers scm:merge. Before it asks, the desk makes a reply resource for the answer to come back to. Watch the watcher's clock: it's waiting. Watch the reply: Zzz. It's resting, in the REST sense too: a resource with a state, doing nothing until someone changes it. When the pull request can be merged, the watcher's clock becomes an envelope, and the envelope travels the arrow to the reply. Signed, by its own key. The same again for Jenkins: the CI wrapper waits, Jenkins works, the reply rests. Each link ARTIE follows lifts out of the answer it held and onto the arrow. Pick the GitLab run at the top: same messages, same words, a different forge behind the gateway.",
+  "sources": [
+    {
+      "label": "Merge Watch, two forges (traces)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/tree/main/docs/reports/merge-watch-two-forges/runs"
+    },
+    {
+      "label": "Fielding: dissertation, chapter 5 (2000)",
+      "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"
+    }
+  ]
+}

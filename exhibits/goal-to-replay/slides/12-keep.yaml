@@ -1,0 +1,53 @@
+name: keep
+part: "Goal to script"
+title: "Keep: Plain Words Become a Script"
+kicker: release.goal.md → release.heart.yaml
+say: "Here's what artie generate kept, next to the words it came from. Once the watch is answered, merge it by squashing: that became once-answered, an act on scm:merge with method squash, and a check that it really merged. Build it and smoke-test what the build links: an ask on ci:build with a reply, a follow of the reply's in-reply-to link, and a run-script on the smoke test the build links, on the deployment it links. And the if-otherwise line became given, then, otherwise. Notice the one review mark. Citing N of M scenarios passed took judgment once; Claude shaped it into the form's smoke field, and the script says so, so a person checks it before it's kept."
+sources:
+  - ["release.heart.yaml", "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.heart.yaml"]
+fragments:
+  - name: kept
+    label: The kept script, whole (release.heart.yaml)
+    source: exhibits/merge-watch-release/release.heart.yaml
+    from: "steps:"
+    lang: yaml
+html: |
+  <h2>Keep: Plain Words Become a Script</h2>
+  <div class="pairs">
+    <div class="pair"><pre class="said">Once {watch} is answered,
+    at {pr}, merge it by
+    squashing `as merged`</pre><span class="to" aria-hidden="true">➜</span><pre class="kept"><b>- once-answered:</b>
+      reply: watch
+      steps:
+        <b>- act:</b> scm:merge
+          fields: { method: squash }
+          then:
+            - check: merged is true
+            - keep-as: merged</pre></div>
+    <div class="pair"><pre class="said">At {jenkins}, build commit
+    {merged.merge_commit_sha} `as build`
+  Once {build} is answered,
+    follow its in-reply-to link
+    Run the smoke script it
+    links as ci:smoke-test …</pre><span class="to" aria-hidden="true">➜</span><pre class="kept"><b>- ask:</b> ci:build
+    fields: { commit: ${merged.merge_commit_sha} }
+    reply: build
+  <b>- once-answered:</b> { reply: build }
+    <b>- follow:</b> hr:in-reply-to
+      <b>- run-script:</b> ci:smoke-test
+        on-link: ci:deployment</pre></div>
+    <div class="pair"><pre class="said">If {smoke.passed}, at {dev},
+    … promote commit …, citing
+    {smoke.passing} of {smoke.of}
+  Otherwise, at {pr}, act
+    scm:comment …</pre><span class="to" aria-hidden="true">➜</span><pre class="kept"><b>- given:</b> smoke.passed is true
+    <b>then:</b>
+      - act: env:promote
+        fields:
+          commit: ${merged.merge_commit_sha}
+          smoke: <i># review: the reasoner chose it</i>
+    <b>otherwise:</b>
+      - act: scm:comment</pre></div>
+  </div>
+  <p class="note">Shortened to fit; the whole script is one click away. Inputs stay inputs: the pull request, the addresses, the book to renew.</p>
+  <p class="refs"><deck-fragment name="kept">the kept script, whole</deck-fragment></p>

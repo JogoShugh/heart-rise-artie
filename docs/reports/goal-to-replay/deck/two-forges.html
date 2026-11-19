@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Script, Two Forges · One Goal, Walked Once, Replayed Free</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">The scm: vocabulary</span></header>
+<h2>One Script, Two Forges</h2>
+<div class="forges2">
+  <div class="f-col">
+    <b class="f-name gh">GitHub</b>
+    <span>pull request · <code>#501</code> · base branch · comment</span>
+    <span class="f-api">GitHub REST API</span>
+  </div>
+  <div class="f-mid">
+    <span class="f-gw">gateway, at <code>{scm}</code></span>
+    <span class="f-words"><code>scm:pulls-get</code><code>scm:merge</code><code>scm:comment</code></span>
+    <span class="f-one">one kept script · one set of pins</span>
+  </div>
+  <div class="f-col">
+    <b class="f-name gl">GitLab</b>
+    <span>merge request · <code>!501</code> · target branch · note</span>
+    <span class="f-api">GitLab REST API</span>
+  </div>
+</div>
+<div class="table-scroll"><table>
+  <thead><tr><th></th><th>GitHub</th><th>GitLab</th></tr></thead>
+  <tbody>
+    <tr><td>The walk</td><td>once, with Claude: 20 calls</td><td>none needed</td></tr>
+    <tr><td>Replays</td><td>5, with 0 model calls</td><td>5, with 0 model calls, same script, unchanged</td></tr>
+    <tr><td>Promoted</td><td>501, 502, 503, 505</td><td>501, 502, 503, 505</td></tr>
+    <tr><td>Stopped by the smoke test</td><td>504</td><td>504</td></tr>
+    <tr><td>Each release</td><td>56 to 61 steps, 18 to 22 s</td><td>56 to 61 steps, 16 to 18 s</td></tr>
+  </tbody>
+</table></div>
+<p class="punch">The only input that differs: <code>scm</code>, the gateway’s address.</p>
+<p class="refs"><a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors">scm:</a> <a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors">GATEWAY</a> <a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_6">LAYERED</a></p>
+</article>
+<nav class="foot"><a href="deck/replay.html" rel="prev"><small>Back</small><b>Replay: Every Pull Request, No Model</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#two-forges">with heart-ts</a></span>
+<a href="deck/run-it.html" rel="next"><small>Next</small><b>Run It Yourself</b></a></nav>
+</main></div></body></html>

@@ -1,0 +1,72 @@
+{
+  "name": "keep",
+  "title": "Keep: Plain Words Become a Script",
+  "part": "Goal to script",
+  "kicker": "release.goal.md → release.heart.yaml",
+  "tone": "light",
+  "number": 12,
+  "of": 17,
+  "html": "<h2>Keep: Plain Words Become a Script</h2>\n<div class=\"pairs\">\n  <div class=\"pair\"><pre class=\"said\">Once {watch} is answered,\n  at {pr}, merge it by\n  squashing `as merged`</pre><span class=\"to\" aria-hidden=\"true\">➜</span><pre class=\"kept\"><b>- once-answered:</b>\n    reply: watch\n    steps:\n      <b>- act:</b> scm:merge\n        fields: { method: squash }\n        then:\n          - check: merged is true\n          - keep-as: merged</pre></div>\n  <div class=\"pair\"><pre class=\"said\">At {jenkins}, build commit\n  {merged.merge_commit_sha} `as build`\nOnce {build} is answered,\n  follow its in-reply-to link\n  Run the smoke script it\n  links as ci:smoke-test …</pre><span class=\"to\" aria-hidden=\"true\">➜</span><pre class=\"kept\"><b>- ask:</b> ci:build\n  fields: { commit: ${merged.merge_commit_sha} }\n  reply: build\n<b>- once-answered:</b> { reply: build }\n  <b>- follow:</b> hr:in-reply-to\n    <b>- run-script:</b> ci:smoke-test\n      on-link: ci:deployment</pre></div>\n  <div class=\"pair\"><pre class=\"said\">If {smoke.passed}, at {dev},\n  … promote commit …, citing\n  {smoke.passing} of {smoke.of}\nOtherwise, at {pr}, act\n  scm:comment …</pre><span class=\"to\" aria-hidden=\"true\">➜</span><pre class=\"kept\"><b>- given:</b> smoke.passed is true\n  <b>then:</b>\n    - act: env:promote\n      fields:\n        commit: ${merged.merge_commit_sha}\n        smoke: <i># review: the reasoner chose it</i>\n  <b>otherwise:</b>\n    - act: scm:comment</pre></div>\n</div>\n<p class=\"note\">Shortened to fit; the whole script is one click away. Inputs stay inputs: the pull request, the addresses, the book to renew.</p>\n<p class=\"refs\"><deck-fragment name=\"kept\">the kept script, whole</deck-fragment></p>\n",
+  "say": "Here's what artie generate kept, next to the words it came from. Once the watch is answered, merge it by squashing: that became once-answered, an act on scm:merge with method squash, and a check that it really merged. Build it and smoke-test what the build links: an ask on ci:build with a reply, a follow of the reply's in-reply-to link, and a run-script on the smoke test the build links, on the deployment it links. And the if-otherwise line became given, then, otherwise. Notice the one review mark. Citing N of M scenarios passed took judgment once; Claude shaped it into the form's smoke field, and the script says so, so a person checks it before it's kept.",
+  "sources": [
+    {
+      "label": "release.heart.yaml",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.heart.yaml"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "keep.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "walk-once.json",
+      "title": "Walk Once, with Claude"
+    },
+    "next": {
+      "href": "pins.json",
+      "title": "Pins: What Each Act Was Offered"
+    },
+    "alternate": {
+      "href": "keep.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:fragment": [
+      {
+        "name": "kept",
+        "label": "The kept script, whole (release.heart.yaml)",
+        "lang": "yaml",
+        "path": "exhibits/merge-watch-release/release.heart.yaml",
+        "lines": "41–125",
+        "of": 125,
+        "text": "steps:\n  - act: scm:pulls-get\n    fields:\n      owner: ${owner}\n      repo: ${repo}\n      pull_number: ${pull}\n    intent: Open pull request ${pull} of ${owner}/${repo}\n    then:\n      - keep-as: pr\n  - enter: ${watcher}\n    steps:\n      - ask: watcher:watch\n        fields:\n          resource: ${pr.@self}\n          offers: scm:merge\n        reply: watch\n  - once-answered:\n      reply: watch\n      steps:\n        - enter: ${pr.@self}\n          steps:\n            - act: scm:merge\n              fields:\n                method: squash\n              intent: merge it by squashing\n              then:\n                - check:\n                    - field: state\n                      is: closed\n                    - field: merged\n                      is: true\n                    - field: mergeable_state\n                      is: unknown\n                - keep-as: merged\n  - enter: ${jenkins}\n    steps:\n      - ask: ci:build\n        fields:\n          commit: ${merged.merge_commit_sha}\n        reply: build\n  - once-answered:\n      reply: build\n      steps:\n        - follow: hr:in-reply-to\n          intent: follow its in-reply-to link to the build\n          then:\n            - run-script: ci:smoke-test\n              on-link: ci:deployment\n              inputs:\n                book: ${book}\n                author: ${author}\n                renewable: ${renewable}\n                problem: ${problem}\n                comment: ${comment}\n              as: smoke\n  - given:\n      - at: smoke\n        field: passed\n        is: true\n    then:\n      - enter: ${dev}\n        steps:\n          - act: env:get-environment\n            fields:\n              id: ${environment}\n            inferred: get environment ${environment}\n            from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n            then:\n              - act: env:promote\n                fields:\n                  commit: ${merged.merge_commit_sha}\n                  smoke: # review: the reasoner chose it, asked \"promote commit 30a0fa96e3eed2ae20b2b5fa7613a115d56312a3, citing 5 of 5 scenarios passed\"\n                    passed: ${smoke.passing}\n                    of: ${smoke.of}\n                intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n                then:\n                  - check:\n                      - field: commit\n                        is: ${merged.merge_commit_sha}\n    otherwise:\n      - at: ${pr.@self}\n        steps:\n          - act: scm:comment\n            fields:\n              body: \"Not promoted to Dev: smoke scenarios ${smoke.failed} failed.\"",
+        "_links": {
+          "self": {
+            "href": "fragments/keep--kept.json",
+            "title": "The kept script, whole (release.heart.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.heart.yaml#L41-L125",
+            "title": "exhibits/merge-watch-release/release.heart.yaml, lines 41–125"
+          }
+        }
+      }
+    ]
+  }
+}

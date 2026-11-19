@@ -1,0 +1,125 @@
+{
+  "name": "close",
+  "title": "Walked Once. Replayed Free.",
+  "part": "Zero-token replay",
+  "kicker": "What's next",
+  "tone": "dark",
+  "number": 17,
+  "of": 17,
+  "html": "<h1>Walked Once. Replayed Free.</h1>\n<div class=\"trip\">\n  <span>Plain words</span><i aria-hidden=\"true\">➜</i><span>Walk once, with Claude</span><i aria-hidden=\"true\">➜</i><span>Kept script + pins</span><i aria-hidden=\"true\">➜</i><span class=\"free\">Replay, 0 tokens, any forge</span>\n</div>\n<p class=\"lead\">It works because every answer carries its controls, the way every web page always has.</p>\n<div class=\"next\">\n  <span class=\"label\">Next time</span>\n  <ul>\n    <li>How the gateway turns an OpenAPI description into forms</li>\n    <li>How RISE signs a reply, and how the desk checks it</li>\n    <li>When a form really changes: the model comes back, once, to repair</li>\n  </ul>\n</div>\n<p class=\"refs\"><deck-ref name=\"rule-6\"></deck-ref> <deck-ref name=\"zta\"></deck-ref> <deck-ref name=\"heart\"></deck-ref> <deck-ref name=\"rise\"></deck-ref></p>\n",
+  "say": "So that's the whole trip: eight lines of plain words, walked once with Claude, kept as a script with its pins, and replayed with no model, on two forges that agree on almost nothing. It works because every answer carries its controls, the way every web page always has. Next time I'll open up the pieces we skipped: how the gateway turns an OpenAPI description into forms, how RISE signs and checks a reply, and what happens when a form really does change and the model comes back to repair the script.",
+  "sources": [
+    {
+      "label": "artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "close.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "run-it.json",
+      "title": "Run It Yourself"
+    },
+    "alternate": {
+      "href": "close.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "rule-6",
+        "kind": "rule",
+        "label": "BOOKMARK",
+        "title": "Enter with a bookmark; follow what's offered",
+        "summary": "In brief: one URI and known media types to start; every next step chosen from what the server put in the answer.",
+        "quote": "<p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>",
+        "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/rule-6.json",
+            "title": "BOOKMARK"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+            "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "zta",
+        "kind": "talk",
+        "label": "ZTA",
+        "title": "ZTA: Zero Token Architecture",
+        "summary": "Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. (In my words, from the talk's page and Daniel Cranney's write-up.)",
+        "quote": "<p>“You are all having way too much fun burning way too many tokens”</p><p class=\"note\">His opening line, as quoted in Daniel Cranney, <a href=\"https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture\">“Infer Once, Run Everywhere: Zero-Token Architecture”</a>, WeAreDevelopers, 13 October 2026.</p>",
+        "cite": "Kelsey Hightower, WeAreDevelopers World Congress North America",
+        "date": "26 September 2026",
+        "_links": {
+          "self": {
+            "href": "../refs/zta.json",
+            "title": "ZTA"
+          },
+          "describedby": {
+            "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture",
+            "title": "Kelsey Hightower, WeAreDevelopers World Congress North America"
+          }
+        }
+      },
+      {
+        "name": "heart",
+        "kind": "part",
+        "label": "HEART",
+        "title": "HEART: one media type, information and controls together",
+        "summary": "Hypermedia Enforced Agentic Reliable Transactions. HAL with HAL Schema Forms, plus a small profile. Every answer carries the resource's data and the forms for the acts its state allows now, each with a method, an address and a JSON Schema; an act that isn't offered can say why (hr:unavailable).",
+        "cite": "HAL Schema Forms, the HEART profile",
+        "_links": {
+          "self": {
+            "href": "../refs/heart.json",
+            "title": "HEART"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/spec/HAL-SCHEMA-FORMS-HR.md",
+            "title": "HAL Schema Forms, the HEART profile"
+          }
+        }
+      },
+      {
+        "name": "rise",
+        "kind": "part",
+        "label": "RISE",
+        "title": "RISE: tell me when it's done",
+        "summary": "Reciprocal Interface for State Exchange. Replies for asynchronous work: ask now, be told later. A watcher or a build answers back when it is ready, as Jenkins does in the release.",
+        "cite": "heart-rise-artie (repository)",
+        "_links": {
+          "self": {
+            "href": "../refs/rise.json",
+            "title": "RISE"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc",
+            "title": "heart-rise-artie (repository)"
+          }
+        }
+      }
+    ]
+  }
+}

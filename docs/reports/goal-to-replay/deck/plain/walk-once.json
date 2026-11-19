@@ -1,0 +1,21 @@
+{
+  "name": "walk-once",
+  "title": "Walk Once, with Claude",
+  "part": "Goal to script",
+  "kicker": "The only run that costs tokens",
+  "tone": "light",
+  "number": 11,
+  "of": 17,
+  "html": "<h2>Walk Once, with Claude</h2>\n<div class=\"walk\">\n  <div class=\"w-col\">\n    <span class=\"label\">At each line of the goal</span>\n    <ol class=\"w-steps\">\n      <li><b>Sync</b> ARTIE fetches the system’s current resource: its state and the forms it offers now</li>\n      <li><b>Reason</b> Claude reads the line and the forms, and picks one, with its values</li>\n      <li><b>Act</b> ARTIE sends it; the system checks the values against its own form</li>\n    </ol>\n    <p class=\"note\">Claude chooses only among forms on offer. It cannot invent a call.</p>\n  </div>\n  <div class=\"w-col\">\n    <span class=\"label\">The one run</span>\n    <div class=\"stats\" style=\"grid-template-columns: 1fr 1fr\">\n      <div class=\"stat\"><b>20</b><span>model calls, claude-sonnet-5-5</span></div>\n      <div class=\"stat\"><b>33,876</b><span>input tokens; 29,424 read from cache</span></div>\n      <div class=\"stat\"><b>3,040</b><span>output tokens</span></div>\n      <div class=\"stat\"><b>61</b><span>steps, in 58 s</span></div>\n    </div>\n  </div>\n</div>\n<pre class=\"cmd\">exhibits/merge-watch-release/capture-release.sh 501   <span># needs a model key and Jenkins</span>\n<span># walks release.goal.md once, then artie generate keeps it:</span>\n<span>#   release.heart.yaml   the script</span>\n<span>#   release.pins.yaml    a fingerprint of every form it used</span></pre>\n",
+  "say": "That replay had no model in it. The model ran once, before it. ARTIE took the goal line by line. At each system it fetched the current resource, showed Claude the line and the forms on offer, and sent what Claude picked. Claude can only choose among forms a system offers at that moment; it cannot invent a call, and each system checks the values against its own form, the way it would for any client. One run: 20 model calls, about 34 thousand input tokens, most of them read from cache, 61 steps in under a minute. Then artie generate wrote down what happened as a script, and a fingerprint of every form it used.",
+  "sources": [
+    {
+      "label": "capture-release.sh",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/capture-release.sh"
+    },
+    {
+      "label": "One Script, Two Forges (report)",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-two-forges/"
+    }
+  ]
+}

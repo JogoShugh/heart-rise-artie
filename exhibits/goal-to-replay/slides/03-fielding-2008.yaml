@@ -1,0 +1,20 @@
+name: fielding-2008
+part: "Why it works"
+tone: dark
+title: "REST APIs Must Be Hypertext-Driven"
+kicker: 20 October 2008 · Roy T. Fielding
+say: "In 2008 Roy Fielding, who named REST in his dissertation, got frustrated. Here it is in his words. Notice the last part: if the API isn't driven by hypertext, it cannot be a REST API. Period. Not a little less RESTful. Not REST level two. Not REST. Everything in this talk hangs on that one sentence. The release you're about to see is driven by hypertext end to end: every address ARTIE uses after the first one, and every act it sends, came from the answer before it."
+sources:
+  - ["Fielding: REST APIs must be hypertext-driven (2008)", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]
+  - ["Fielding: dissertation, chapter 5 (2000)", "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"]
+html: |
+  <h2>REST APIs Must Be Hypertext-Driven</h2>
+  <div class="split">
+    <div class="rows">
+      <blockquote class="whole">“I am getting frustrated by the number of people calling any HTTP-based interface a REST API. Today’s example is the SocialSite REST API. That is RPC. It screams RPC. There is so much coupling on display that it should be given an X rating.<br><br>What needs to be done to make the REST architectural style clear on the notion that hypertext is a constraint? In other words, if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period. Is there some broken manual somewhere that needs to be fixed?”</blockquote>
+      <p class="cite"><a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven" target="_blank" rel="noopener"><b>Roy T. Fielding</b></a>, “REST APIs must be hypertext-driven”, 20 Oct 2008</p>
+    </div>
+    <figure><img src="media/fielding-crop.png" alt="Fielding's 2008 post, 'REST APIs must be hypertext-driven', as it appears on his blog"></figure>
+  </div>
+  <p class="punch">Not driven by hypertext? Then not REST. Period.</p>
+  <p class="refs"><small>His six rules</small> <deck-ref name="rule-1"></deck-ref> <deck-ref name="rule-2"></deck-ref> <deck-ref name="rule-3"></deck-ref> <deck-ref name="rule-4"></deck-ref> <deck-ref name="rule-5"></deck-ref> <deck-ref name="rule-6"></deck-ref></p>

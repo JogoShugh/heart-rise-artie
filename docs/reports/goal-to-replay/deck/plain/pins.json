@@ -1,0 +1,17 @@
+{
+  "name": "pins",
+  "title": "Pins: What Each Act Was Offered",
+  "part": "Goal to script",
+  "kicker": "release.pins.yaml",
+  "tone": "light",
+  "number": 13,
+  "of": 17,
+  "html": "<h2>Pins: What Each Act Was Offered</h2>\n<div class=\"pins\">\n  <div class=\"pin-sys\"><b>Forge</b><span><code>scm:pulls-get</code> GET</span><span><code>scm:merge</code> PUT</span></div>\n  <div class=\"pin-sys\"><b>Watcher</b><span><code>watcher:watch</code> POST</span></div>\n  <div class=\"pin-sys\"><b>CI</b><span><code>ci:build</code> POST</span></div>\n  <div class=\"pin-sys\"><b>Preview</b><span><code>library:search-loans</code> GET</span><span><code>library:renew</code> POST</span><span><code>library:report-problem</code> POST</span></div>\n  <div class=\"pin-sys\"><b>Dev</b><span><code>env:get-environment</code> GET</span><span><code>env:promote</code> POST</span></div>\n</div>\n<div class=\"guard\">\n  <div class=\"g-yes\"><b>Same form on offer</b><span>the act goes ahead</span></div>\n  <div class=\"g-no\"><b>Gone, or its fields changed</b><span>the replay stops before sending anything</span></div>\n  <div class=\"g-mid\"><b>Only its target moved</b><span>allowed by default (<code>--guard lenient</code>); <code>--guard strict</code> refuses that too</span></div>\n</div>\n<p class=\"refs\"><deck-fragment name=\"pins\">the pins, whole</deck-fragment> <deck-ref name=\"resilience\"></deck-ref></p>\n",
+  "say": "Next to the script, artie generate keeps the pins: a fingerprint of every form the walk used, nine of them across five systems. Before every act on a replay, ARTIE holds the form on offer now to its pin. Same form, same act. A form that's gone, or whose fields changed, and it stops before it sends anything. The one change it lets through by default is the target alone: a form that moved to a new address but asks for the same thing. That check is the whole reason a replay can be trusted with no model in it.",
+  "sources": [
+    {
+      "label": "release.pins.yaml",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.pins.yaml"
+    }
+  ]
+}

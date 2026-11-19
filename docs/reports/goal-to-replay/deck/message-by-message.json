@@ -1,0 +1,141 @@
+{
+  "name": "message-by-message",
+  "title": "The Release, Message by Message",
+  "part": "The release",
+  "kicker": "A replay, from the desk's own trace",
+  "tone": "light",
+  "number": 10,
+  "of": 17,
+  "html": "<h2>The Release, Message by Message</h2>\n<div class=\"seqx\" data-runs=\"gh501,gh504,gl501\" data-labels='{\"gh501\": \"GitHub · 501, promoted\", \"gh504\": \"GitHub · 504, stopped\", \"gl501\": \"GitLab · 501, promoted\"}'>\n  <p class=\"note\">Read as HEART, this slide links a script (<code>deck:code</code>) that plays the release from the desk’s trace: 68 messages between ARTIE, the forge, the watcher, CI, Jenkins, the preview and Dev. Plain JSON carries no links, so no code arrives.</p>\n</div>\n<p class=\"sq-key\"><span><b class=\"k-clock\">◷</b> waiting for an answer</span><span><b class=\"k-mail\">✉</b> answering its reply</span><span><b class=\"k-gear\">⚙</b> building</span><span><b class=\"k-zzz\">zZ</b> a reply, resting</span></p>\n<p class=\"refs\"><deck-ref name=\"rise\"></deck-ref> <deck-ref name=\"hypertext\"></deck-ref> <deck-ref name=\"stateless\"></deck-ref> <deck-ref name=\"layered-system\"></deck-ref></p>\n",
+  "say": "Here's one release, played from the desk's own trace of it, one message at a time. Press play. ARTIE enters the forge by its bookmark and opens pull request 501. Then it asks the watcher to say when the pull request offers scm:merge. Before it asks, the desk makes a reply resource for the answer to come back to. Watch the watcher's clock: it's waiting. Watch the reply: Zzz. It's resting, in the REST sense too: a resource with a state, doing nothing until someone changes it. When the pull request can be merged, the watcher's clock becomes an envelope, and the envelope travels the arrow to the reply. Signed, by its own key. The same again for Jenkins: the CI wrapper waits, Jenkins works, the reply rests. Each link ARTIE follows lifts out of the answer it held and onto the arrow. Pick the GitLab run at the top: same messages, same words, a different forge behind the gateway.",
+  "sources": [
+    {
+      "label": "Merge Watch, two forges (traces)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/tree/main/docs/reports/merge-watch-two-forges/runs"
+    },
+    {
+      "label": "Fielding: dissertation, chapter 5 (2000)",
+      "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "message-by-message.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "cast.json",
+      "title": "The Cast"
+    },
+    "next": {
+      "href": "walk-once.json",
+      "title": "Walk Once, with Claude"
+    },
+    "alternate": {
+      "href": "message-by-message.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ],
+    "deck:code": {
+      "href": "../code/sequence.js",
+      "type": "text/javascript",
+      "title": "Plays the release's messages, and each party's state",
+      "integrity": "sha256-yl+HX8uBovgMJHNSosPoLBP5qQduapyYJUe60mbpTR8="
+    }
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "rise",
+        "kind": "part",
+        "label": "RISE",
+        "title": "RISE: tell me when it's done",
+        "summary": "Reciprocal Interface for State Exchange. Replies for asynchronous work: ask now, be told later. A watcher or a build answers back when it is ready, as Jenkins does in the release.",
+        "cite": "heart-rise-artie (repository)",
+        "_links": {
+          "self": {
+            "href": "../refs/rise.json",
+            "title": "RISE"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc",
+            "title": "heart-rise-artie (repository)"
+          }
+        }
+      },
+      {
+        "name": "hypertext",
+        "kind": "comment",
+        "label": "HYPERTEXT",
+        "title": "What hypertext means",
+        "summary": "His definition: information and controls, presented together. Machines can follow links too.",
+        "quote": "<p>“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions. Hypermedia is just an expansion on what text means to include temporal anchors within a media stream; most researchers have dropped the distinction.</p><p>Hypertext does not need to be HTML on a browser. Machines can follow links when they understand the data format and relationship types.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/hypertext.json",
+            "title": "HYPERTEXT"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-718",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "stateless",
+        "kind": "constraint",
+        "label": "STATELESS",
+        "title": "Stateless (§5.1.3)",
+        "summary": "Every request carries all it needs; session state lives on the client.",
+        "quote": "<p>“We next add a constraint to the client-server interaction: communication must be stateless in nature, as in the client-stateless-server (CSS) style of Section 3.4.3 (Figure 5-3), such that each request from client to server must contain all of the information necessary to understand the request, and cannot take advantage of any stored context on the server. Session state is therefore kept entirely on the client.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.3",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/stateless.json",
+            "title": "STATELESS"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_3",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.3"
+          }
+        }
+      },
+      {
+        "name": "layered-system",
+        "kind": "constraint",
+        "label": "LAYERED",
+        "title": "Layered system (§5.1.6)",
+        "summary": "Each component sees only the next layer; intermediaries can cache and enforce policy. A gateway in front of GitHub is this.",
+        "quote": "<p>“In order to further improve behavior for Internet-scale requirements, we add layered system constraints (Figure 5-7). As described in Section 3.4.2, the layered system style allows an architecture to be composed of hierarchical layers by constraining component behavior such that each component cannot \"see\" beyond the immediate layer with which they are interacting. By restricting knowledge of the system to a single layer, we place a bound on the overall system complexity and promote substrate independence. Layers can be used to encapsulate legacy services and to protect new services from legacy clients, simplifying components by moving infrequently used functionality to a shared intermediary. Intermediaries can also be used to improve system scalability by enabling load balancing of services across multiple networks and processors.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.6",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/layered-system.json",
+            "title": "LAYERED"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_6",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.6"
+          }
+        }
+      }
+    ]
+  }
+}

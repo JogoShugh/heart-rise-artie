@@ -1,0 +1,92 @@
+{
+  "name": "pins",
+  "title": "Pins: What Each Act Was Offered",
+  "part": "Goal to script",
+  "kicker": "release.pins.yaml",
+  "tone": "light",
+  "number": 13,
+  "of": 17,
+  "html": "<h2>Pins: What Each Act Was Offered</h2>\n<div class=\"pins\">\n  <div class=\"pin-sys\"><b>Forge</b><span><code>scm:pulls-get</code> GET</span><span><code>scm:merge</code> PUT</span></div>\n  <div class=\"pin-sys\"><b>Watcher</b><span><code>watcher:watch</code> POST</span></div>\n  <div class=\"pin-sys\"><b>CI</b><span><code>ci:build</code> POST</span></div>\n  <div class=\"pin-sys\"><b>Preview</b><span><code>library:search-loans</code> GET</span><span><code>library:renew</code> POST</span><span><code>library:report-problem</code> POST</span></div>\n  <div class=\"pin-sys\"><b>Dev</b><span><code>env:get-environment</code> GET</span><span><code>env:promote</code> POST</span></div>\n</div>\n<div class=\"guard\">\n  <div class=\"g-yes\"><b>Same form on offer</b><span>the act goes ahead</span></div>\n  <div class=\"g-no\"><b>Gone, or its fields changed</b><span>the replay stops before sending anything</span></div>\n  <div class=\"g-mid\"><b>Only its target moved</b><span>allowed by default (<code>--guard lenient</code>); <code>--guard strict</code> refuses that too</span></div>\n</div>\n<p class=\"refs\"><deck-fragment name=\"pins\">the pins, whole</deck-fragment> <deck-ref name=\"resilience\"></deck-ref></p>\n",
+  "say": "Next to the script, artie generate keeps the pins: a fingerprint of every form the walk used, nine of them across five systems. Before every act on a replay, ARTIE holds the form on offer now to its pin. Same form, same act. A form that's gone, or whose fields changed, and it stops before it sends anything. The one change it lets through by default is the target alone: a form that moved to a new address but asks for the same thing. That check is the whole reason a replay can be trusted with no model in it.",
+  "sources": [
+    {
+      "label": "release.pins.yaml",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.pins.yaml"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "pins.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "keep.json",
+      "title": "Keep: Plain Words Become a Script"
+    },
+    "next": {
+      "href": "replay.json",
+      "title": "Replay: Every Pull Request, No Model"
+    },
+    "alternate": {
+      "href": "pins.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "resilience",
+        "kind": "measure",
+        "label": "RESILIENCE",
+        "title": "Resilience: the server changes, the client doesn't break",
+        "summary": "When the server changes, or misbehaves on purpose, the client takes the failure path the spec names, re-syncs, and goes on; a model comes back only when the controls really changed, to repair. At the small scale it is the regression suite and the gates that hold, even against the model.",
+        "cite": "The third of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/resilience.json",
+            "title": "RESILIENCE"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The third of the three R's"
+          }
+        }
+      }
+    ],
+    "deck:fragment": [
+      {
+        "name": "pins",
+        "label": "The pins, whole (release.pins.yaml)",
+        "lang": "yaml",
+        "path": "exhibits/merge-watch-release/release.pins.yaml",
+        "lines": "5–64",
+        "of": 64,
+        "text": "rung: L2\ndigest: sha256-qKM7TXJvTtzvI3H416WCa/y5oYK6wvYch4GhbwCLhKc=\nforms:\n  scm:pulls-get:\n    integrity: sha256-h02WjR7vd61a3clH1/805IIXM3O8OwspKt3KHwUP7/s=\n    act: sha256-0vjYAyfZzEdAjZBvXTUMge5qmujg/1tlkot9bnCWtaI=\n    method: GET\n    sets:\n      - sha256-gImH34GdmXPjwBtQ7RNGKro/Tbf26SFredj/E+jK13c=\n  watcher:watch:\n    integrity: sha256-vfjsEUQ7/+mWV478GxTnnHzzo8rZLb+s3eHW4KJhRFw=\n    act: sha256-BQiZ8TwYquT9Wgp2yiw4eEIqY3c9/0IwgvhuCvV1KHg=\n    method: POST\n    sets:\n      - sha256-T8prIv6TSqXSB9HdposRpsV8AYFUzfYEqiUvr32dX10=\n  scm:merge:\n    integrity: sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pweUa6ioBBwF8=\n    act: sha256-s8/h0c399Nx7AL340i09iHi9+s/nSZ9R+q5MfjgiYUY=\n    method: PUT\n    sets:\n      - sha256-ARE/YVgALeTnzANV8TegQJiue3vljZt3onMex+jMsvs=\n  ci:build:\n    integrity: sha256-xo3vNZ/YJwDkXNstjxyOUmQHZdWN8PojyD9Ub3KzHGQ=\n    act: sha256-9MVTORRjzrcFoMzlwiQWRmnUPVD+jk4sNjjyGG2m4fI=\n    method: POST\n    sets:\n      - sha256-Uv4wXjFFrnajvow8ez6LM8naU0uFYIKuRdyKs4IQA3A=\n  library:search-loans:\n    integrity: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=\n    act: sha256-Z7N30vs6QUGs1xK2hP+w1F0UgY7gyXs1+HawMkOt274=\n    method: GET\n    sets:\n      - sha256-OO1MlqifBoCG+V9lYByf83cmOoCUf75taO/frDYwjWE=\n  library:renew:\n    integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=\n    act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=\n    method: POST\n    sets:\n      - sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU=\n  library:report-problem:\n    integrity: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=\n    act: sha256-Z+8E81vIjCh35uyOKsoSwVMDm2eCmJBVEcbO6oI3uD8=\n    method: POST\n    sets:\n      - sha256-04lPGu1h4kV3Ra9udmDg1UCTzHfqn47zOSXw6TDIKOQ=\n  env:get-environment:\n    integrity: sha256-UWb+xXKngRFe8ibTwO9SrpSUYNPBbji/5JjlwpAEKfQ=\n    act: sha256-myRjFFxsNF8ai44N4fdXgWOPGB3uRptbwrCqaA8yp6s=\n    method: GET\n    sets:\n      - sha256-sy8+OSs554Ilw4WUAs9A0ywntG59u2PLanv0jt/pId4=\n  env:promote:\n    integrity: sha256-TwXThZ20UPUIctrpRXRoHqarKKsEilvB0sVwvK1PY4s=\n    act: sha256-uhGb8WNCB9bBSTcSnGDncK5OOgbvor2iNrT+IZvrEFA=\n    method: POST\n    sets:\n      - sha256-Uk7KIVDEyuxx08fE2x1gvp0hjkFhpH/7gyFyP7k3Vb8=\nlinks:\n  hr:in-reply-to: ''\n  item: ''",
+        "_links": {
+          "self": {
+            "href": "fragments/pins--pins.json",
+            "title": "The pins, whole (release.pins.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.pins.yaml#L5-L64",
+            "title": "exhibits/merge-watch-release/release.pins.yaml, lines 5–64"
+          }
+        }
+      }
+    ]
+  }
+}

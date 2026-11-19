@@ -1,0 +1,42 @@
+{
+  "name": "replay",
+  "title": "Replay: Every Pull Request, No Model",
+  "part": "Zero-token replay",
+  "kicker": "One script, five releases",
+  "tone": "dark",
+  "number": 14,
+  "of": 17,
+  "html": "<h2>Replay: Every Pull Request, No Model</h2>\n<div class=\"rflow\">\n  <div>Open pull request <i>N</i></div><span aria-hidden=\"true\">➜</span>\n  <div class=\"wait\">◷ Watcher: once it offers <code>scm:merge</code></div><span aria-hidden=\"true\">➜</span>\n  <div>Merge, by squashing</div><span aria-hidden=\"true\">➜</span>\n  <div class=\"wait\">◷ Jenkins: build, deploy a preview</div><span aria-hidden=\"true\">➜</span>\n  <div>Smoke script, on the preview</div>\n</div>\n<div class=\"rsplit\">\n  <div class=\"r-yes\"><b>All scenarios pass</b><span>Promote the commit to Dev</span><em>501, 502, 503, 505</em></div>\n  <div class=\"r-no\"><b>A scenario fails</b><span>Comment on the pull request: “Not promoted to Dev: smoke scenarios … failed.”</span><em>504 · “Renewals: none during the audit”</em></div>\n</div>\n<p class=\"guardline\"><b>Before every act:</b> is the form on offer still the one pinned? If not, stop, and send nothing.</p>\n<div class=\"stats\">\n  <div class=\"stat\"><b>0</b><span>model calls, per release</span></div>\n  <div class=\"stat\"><b>4 of 5</b><span>promoted to Dev</span></div>\n  <div class=\"stat\"><b>18–22 s</b><span>per release, 56 to 61 steps</span></div>\n</div>\n",
+  "say": "Now the desk runs the kept script for each pull request. Only the inputs change. Open it, wait until it offers merge, merge it, have Jenkins build it, smoke-test the preview. If every scenario passes, promote to Dev. If not, comment on the pull request and say which failed. Five pull requests: four pass and go to Dev. The fifth, Renewals: none during the audit, breaks the renewal scenario, and gets the comment instead. That's the release catching a bad change before it reaches anyone, with zero tokens. And before every act, the guard: is the form still what was pinned?",
+  "sources": [
+    {
+      "label": "variants.sh",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/variants.sh"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "replay.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "pins.json",
+      "title": "Pins: What Each Act Was Offered"
+    },
+    "next": {
+      "href": "two-forges.json",
+      "title": "One Script, Two Forges"
+    },
+    "alternate": {
+      "href": "replay.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

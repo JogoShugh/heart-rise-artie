@@ -1,0 +1,113 @@
+{
+  "name": "two-forges",
+  "title": "One Script, Two Forges",
+  "part": "Zero-token replay",
+  "kicker": "The scm: vocabulary",
+  "tone": "light",
+  "number": 15,
+  "of": 17,
+  "html": "<h2>One Script, Two Forges</h2>\n<div class=\"forges2\">\n  <div class=\"f-col\">\n    <b class=\"f-name gh\">GitHub</b>\n    <span>pull request · <code>#501</code> · base branch · comment</span>\n    <span class=\"f-api\">GitHub REST API</span>\n  </div>\n  <div class=\"f-mid\">\n    <span class=\"f-gw\">gateway, at <code>{scm}</code></span>\n    <span class=\"f-words\"><code>scm:pulls-get</code><code>scm:merge</code><code>scm:comment</code></span>\n    <span class=\"f-one\">one kept script · one set of pins</span>\n  </div>\n  <div class=\"f-col\">\n    <b class=\"f-name gl\">GitLab</b>\n    <span>merge request · <code>!501</code> · target branch · note</span>\n    <span class=\"f-api\">GitLab REST API</span>\n  </div>\n</div>\n<div class=\"table-scroll\"><table>\n  <thead><tr><th></th><th>GitHub</th><th>GitLab</th></tr></thead>\n  <tbody>\n    <tr><td>The walk</td><td>once, with Claude: 20 calls</td><td>none needed</td></tr>\n    <tr><td>Replays</td><td>5, with 0 model calls</td><td>5, with 0 model calls, same script, unchanged</td></tr>\n    <tr><td>Promoted</td><td>501, 502, 503, 505</td><td>501, 502, 503, 505</td></tr>\n    <tr><td>Stopped by the smoke test</td><td>504</td><td>504</td></tr>\n    <tr><td>Each release</td><td>56 to 61 steps, 18 to 22 s</td><td>56 to 61 steps, 16 to 18 s</td></tr>\n  </tbody>\n</table></div>\n<p class=\"punch\">The only input that differs: <code>scm</code>, the gateway’s address.</p>\n<p class=\"refs\"><deck-ref name=\"scm\"></deck-ref> <deck-ref name=\"gateway\"></deck-ref> <deck-ref name=\"layered-system\"></deck-ref></p>\n",
+  "say": "And here's the part that makes it more than a neat trick. GitHub and GitLab agree on almost nothing: pull request or merge request, base branch or target branch, comment or note. The goal never names either. It says scm:merge, scm:comment, scm:pulls-get. So does the kept script. A small gateway in front of each forge serves those same forms on top of that forge's own API. The only thing that differs between a GitHub release and a GitLab release is one input: the gateway's address. The script walked once on GitHub replayed five merge requests on GitLab, unchanged, with no model. Four promoted. 504 stopped, on both, as it should.",
+  "sources": [
+    {
+      "label": "One Script, Two Forges (report)",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-two-forges/"
+    },
+    {
+      "label": "GitLab CE",
+      "href": "https://docs.gitlab.com/install/docker/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "two-forges.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "replay.json",
+      "title": "Replay: Every Pull Request, No Model"
+    },
+    "next": {
+      "href": "run-it.json",
+      "title": "Run It Yourself"
+    },
+    "alternate": {
+      "href": "two-forges.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "scm",
+        "kind": "part",
+        "label": "scm:",
+        "title": "scm: one set of typed relations, two forges",
+        "summary": "scm:merge, scm:comment, scm:close and the rest: relation names defined by meaning, not by one server's endpoints. GitHub and GitLab both answer to them, so a kept script runs on either.",
+        "cite": "heart-gateway connectors",
+        "_links": {
+          "self": {
+            "href": "../refs/scm.json",
+            "title": "scm:"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors",
+            "title": "heart-gateway connectors"
+          }
+        }
+      },
+      {
+        "name": "gateway",
+        "kind": "part",
+        "label": "GATEWAY",
+        "title": "The gateway: our controls in front of theirs",
+        "summary": "A small server, on a laptop, in front of an API we don't control (GitHub, a local GitLab). YAML connectors map each act onto the native call and say when it is offered; the gateway answers in HEART.",
+        "cite": "heart-gateway connectors",
+        "_links": {
+          "self": {
+            "href": "../refs/gateway.json",
+            "title": "GATEWAY"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors",
+            "title": "heart-gateway connectors"
+          }
+        }
+      },
+      {
+        "name": "layered-system",
+        "kind": "constraint",
+        "label": "LAYERED",
+        "title": "Layered system (§5.1.6)",
+        "summary": "Each component sees only the next layer; intermediaries can cache and enforce policy. A gateway in front of GitHub is this.",
+        "quote": "<p>“In order to further improve behavior for Internet-scale requirements, we add layered system constraints (Figure 5-7). As described in Section 3.4.2, the layered system style allows an architecture to be composed of hierarchical layers by constraining component behavior such that each component cannot \"see\" beyond the immediate layer with which they are interacting. By restricting knowledge of the system to a single layer, we place a bound on the overall system complexity and promote substrate independence. Layers can be used to encapsulate legacy services and to protect new services from legacy clients, simplifying components by moving infrequently used functionality to a shared intermediary. Intermediaries can also be used to improve system scalability by enabling load balancing of services across multiple networks and processors.”</p>",
+        "cite": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.6",
+        "date": "2000",
+        "_links": {
+          "self": {
+            "href": "../refs/layered-system.json",
+            "title": "LAYERED"
+          },
+          "describedby": {
+            "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_6",
+            "title": "Roy T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, §5.1.6"
+          }
+        }
+      }
+    ]
+  }
+}

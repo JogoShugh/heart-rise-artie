@@ -1,0 +1,21 @@
+{
+  "name": "two-forges",
+  "title": "One Script, Two Forges",
+  "part": "Zero-token replay",
+  "kicker": "The scm: vocabulary",
+  "tone": "light",
+  "number": 15,
+  "of": 17,
+  "html": "<h2>One Script, Two Forges</h2>\n<div class=\"forges2\">\n  <div class=\"f-col\">\n    <b class=\"f-name gh\">GitHub</b>\n    <span>pull request · <code>#501</code> · base branch · comment</span>\n    <span class=\"f-api\">GitHub REST API</span>\n  </div>\n  <div class=\"f-mid\">\n    <span class=\"f-gw\">gateway, at <code>{scm}</code></span>\n    <span class=\"f-words\"><code>scm:pulls-get</code><code>scm:merge</code><code>scm:comment</code></span>\n    <span class=\"f-one\">one kept script · one set of pins</span>\n  </div>\n  <div class=\"f-col\">\n    <b class=\"f-name gl\">GitLab</b>\n    <span>merge request · <code>!501</code> · target branch · note</span>\n    <span class=\"f-api\">GitLab REST API</span>\n  </div>\n</div>\n<div class=\"table-scroll\"><table>\n  <thead><tr><th></th><th>GitHub</th><th>GitLab</th></tr></thead>\n  <tbody>\n    <tr><td>The walk</td><td>once, with Claude: 20 calls</td><td>none needed</td></tr>\n    <tr><td>Replays</td><td>5, with 0 model calls</td><td>5, with 0 model calls, same script, unchanged</td></tr>\n    <tr><td>Promoted</td><td>501, 502, 503, 505</td><td>501, 502, 503, 505</td></tr>\n    <tr><td>Stopped by the smoke test</td><td>504</td><td>504</td></tr>\n    <tr><td>Each release</td><td>56 to 61 steps, 18 to 22 s</td><td>56 to 61 steps, 16 to 18 s</td></tr>\n  </tbody>\n</table></div>\n<p class=\"punch\">The only input that differs: <code>scm</code>, the gateway’s address.</p>\n<p class=\"refs\"><deck-ref name=\"scm\"></deck-ref> <deck-ref name=\"gateway\"></deck-ref> <deck-ref name=\"layered-system\"></deck-ref></p>\n",
+  "say": "And here's the part that makes it more than a neat trick. GitHub and GitLab agree on almost nothing: pull request or merge request, base branch or target branch, comment or note. The goal never names either. It says scm:merge, scm:comment, scm:pulls-get. So does the kept script. A small gateway in front of each forge serves those same forms on top of that forge's own API. The only thing that differs between a GitHub release and a GitLab release is one input: the gateway's address. The script walked once on GitHub replayed five merge requests on GitLab, unchanged, with no model. Four promoted. 504 stopped, on both, as it should.",
+  "sources": [
+    {
+      "label": "One Script, Two Forges (report)",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-two-forges/"
+    },
+    {
+      "label": "GitLab CE",
+      "href": "https://docs.gitlab.com/install/docker/"
+    }
+  ]
+}

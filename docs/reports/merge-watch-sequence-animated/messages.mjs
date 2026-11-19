@@ -10,9 +10,9 @@ import { createRequire } from "node:module";
 const [out, ...runs] = process.argv.slice(2);
 const jsyaml = createRequire(import.meta.url)("../assets/js-yaml.min.js");
 
-const PARTY = { 8160: "replies", 8098: "github", 8099: "watch", 8170: "ci", 8171: "jenkins", 8180: "preview", 8190: "dev" };
-const BEHIND = { 8098: "the GitHub API", 8170: "Jenkins" };
-const NAME = { 8098: "The gateway", 8170: "The CI wrapper" };
+const PARTY = { 8160: "replies", 8098: "github", 8094: "gitlab", 8099: "watch", 8170: "ci", 8171: "jenkins", 8180: "preview", 8190: "dev" };
+const BEHIND = { 8098: "the GitHub API", 8094: "the GitLab API", 8170: "Jenkins" };
+const NAME = { 8098: "The gateway", 8094: "The gateway", 8170: "The CI wrapper" };
 const port = (url) => new URL(url).port;
 const party = (url) => PARTY[port(url)] || "other";
 const short = (url) => { const u = new URL(url); return decodeURIComponent(u.pathname + u.search); };
@@ -111,7 +111,7 @@ function messages(trace) {
   const bodies = new Map();
   let here = null;
   let watchShown = false, jenkinsShown = false;
-  const pull = steps.find((s) => s.params?.relation === "github:pulls-get")?.address;
+  const pull = steps.find((s) => /:pulls-get$/.test(s.params?.relation || ""))?.address;
   const own = (from, to, label, note) => all.push({ kind: "own", from, to, label, note });
   steps.forEach((step, i) => {
     (step.exchanges || []).forEach((ex) => {

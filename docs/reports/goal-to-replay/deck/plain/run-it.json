@@ -1,0 +1,21 @@
+{
+  "name": "run-it",
+  "title": "Run It Yourself",
+  "part": "Zero-token replay",
+  "kicker": "The kit, and the walk",
+  "tone": "light",
+  "number": 16,
+  "of": 17,
+  "html": "<h2>Run It Yourself</h2>\n<div class=\"split\" style=\"grid-template-columns: 1fr 1.25fr\">\n  <div class=\"card\">\n    <span class=\"label\">Walk once (tokens)</span>\n    <pre class=\"cmd\">exhibits/merge-watch-release/capture-release.sh 501</pre>\n    <p>A model key and Jenkins. Writes <code>release.heart.yaml</code> and <code>release.pins.yaml</code>. The kit already ships both, so this step is optional.</p>\n  </div>\n  <div class=\"card\">\n    <span class=\"label\">Replay (zero tokens) · only Docker</span>\n    <pre class=\"cmd\">kit/release.sh up              <span># the parties and Jenkins</span>\nkit/release.sh run github      <span># five releases, a small GitHub in the kit</span>\nkit/release.sh up gitlab       <span># and GitLab too (about 4 GB)</span>\nkit/release.sh run gitlab      <span># the same five, at GitLab</span>\nkit/release.sh run github-live <span># at OWNER/REPO on real GitHub</span>\nkit/release.sh down</pre>\n    <p>Each release’s trace lands in <code>work/runs/&lt;scm&gt;/pr-N.yaml</code>.</p>\n  </div>\n</div>\n",
+  "say": "Two different things to run. The walk, once, needs a model key and Jenkins, and keeps the script and its pins; the kit already ships them, so you can skip it. The replay is the kit: bring it up, then run the five releases at a small GitHub inside the kit, at GitLab in a container, or at your own repository on real GitHub. Only Docker is needed. Notice that GitLab gets no script of its own: it runs the same one.",
+  "sources": [
+    {
+      "label": "kit/release.sh",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/kit/release.sh"
+    },
+    {
+      "label": "capture-release.sh",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/capture-release.sh"
+    }
+  ]
+}

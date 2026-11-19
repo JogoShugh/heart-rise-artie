@@ -1,0 +1,23 @@
+name: sync-reason-act
+part: "Why it works"
+title: "Sync, Reason, Act"
+kicker: One loop, two readers
+say: "Think about what you do on any website. You read the page. You think about what you want. You click a button the page gave you. Read, think, act. ARTIE runs the same loop and calls it sync, reason, act. Sync reads the representation: the state and the controls offered right now. Reason chooses among them, and that's the only place a model sits. Act sends the form the server handed over. Notice that only the middle step costs tokens. ARTIE is to APIs what your browser is to websites. Your browser knows HTML and HTTP, and nothing about your bank: not its URLs, not which buttons exist today. ARTIE knows one media type, and nothing about any one service."
+sources:
+  - ["Fielding, 2008 post and its comments", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]
+  - ["HAL Schema Forms", "https://github.com/jbadeau/hal-schema-forms"]
+html: |
+  <h2>Sync, Reason, Act</h2>
+  <div class="loop3">
+    <div class="lstep"><span class="human">Read</span><b>Sync</b><p>Read the representation: the state, and the controls offered now.</p></div>
+    <span class="larrow" aria-hidden="true">➜</span>
+    <div class="lstep think"><span class="human">Think</span><b>Reason</b><p>Choose among what’s offered. The only place a model sits; a kept script can stand in for it.</p></div>
+    <span class="larrow" aria-hidden="true">➜</span>
+    <div class="lstep"><span class="human">Act</span><b>Act</b><p>Send the form the server handed over: method, target, fields, If-Match.</p></div>
+  </div>
+  <p class="verdict"><span class="no" style="margin-left: 0">Reason is the only step that costs tokens.</span> Sync and Act read and send controls the server put in the answer.</p>
+  <div class="browser-blurb">
+    <p><b>ARTIE is to APIs what a browser is to websites.</b> Your browser is coupled to <code>text/html</code> and HTTP, never to your bank. ARTIE is coupled to <code>application/hal+json</code>, the HEART profile and HTTP.</p>
+    <p class="never">Coupled to media types. Never to a domain, never to a URL.</p>
+  </div>
+  <p class="refs"><deck-ref name="think-of-the-web"></deck-ref> <deck-ref name="uniform-interface"></deck-ref> <deck-ref name="heart"></deck-ref> <deck-ref name="artie"></deck-ref></p>

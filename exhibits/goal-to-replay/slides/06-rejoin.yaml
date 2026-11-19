@@ -1,0 +1,91 @@
+name: rejoin
+part: "Why it works"
+title: "The Rejoin: GitHub's Merge Docs Move into the Answer"
+kicker: Information and controls, together again
+code:
+  file: morph.js
+  title: Animates the slide's stills, as its HTML says
+say: "On the left, GitHub's own answer for pull request 501: its state, and that it's mergeable. Mergeable how? That's in the other window: the OpenAPI description of the merge operation. PUT, an address template you fill in, a body with a commit title, a message, a merge method out of three, and a sha the head must match. A developer reads that and codes it into a client. Now watch. Each of those values leaves the docs and lands in the answer, as a form. The address is this pull request's own. The three merge methods come with the schema. The sha guard becomes If-Match, on the ETag the answer already carries. And the form is only there while the pull request can be merged. That's what our gateway serves for GitHub, and for GitLab, under one name: scm:merge. Nothing moved that GitHub doesn't already publish; it moved to where the client already is."
+sources:
+  - ["GitHub REST API: Merge a pull request", "https://docs.github.com/en/rest/pulls/pulls#merge-a-pull-request"]
+  - ["GitHub OpenAPI description", "https://github.com/github/rest-api-description"]
+  - ["HAL Schema Forms", "https://github.com/jbadeau/hal-schema-forms"]
+html: |
+  <h2>The Rejoin: GitHub's Merge Docs Move into the Answer</h2>
+  <div class="morph" data-start="apart" data-cycles='[{"to": "married", "label": "Into the answer", "head": "The Rejoin: GitHub&apos;s Merge Docs Move into the Answer"}]'>
+    <div class="mo-stage">
+      <section class="mo-scene" data-scene="apart">
+        <div class="aw-apart">
+          <div class="hl">
+            <span class="hl-label">GitHub’s answer · GET /repos/acme/web/pulls/501 · application/vnd.github+json</span>
+            <span class="tk" data-token="number">number: 501</span>
+            <span class="tk" data-token="title">title: "Renewals: two weeks for short loans"</span>
+            <span class="tk" data-token="state">state: open</span>
+            <span class="tk rel" data-token="mergeable">mergeable: true</span>
+            <span class="tk" data-token="etag">ETag: W/"…"</span>
+            <span class="k">_links:</span>
+            <span class="i1 tk" data-token="self">self: {href: /repos/acme/web/pulls/501}</span>
+            <span class="i1">comments: {href: …/issues/501/comments}</span>
+            <span class="hl-note">It says it can be merged. Not how.</span>
+          </div>
+          <p class="aw-gap"><span>A developer reads this, then codes it into a client</span></p>
+          <div class="aw">
+            <div class="aw-bar">api.github.com.json · OpenAPI 3.0 <em>excerpt</em></div>
+            <div class="aw-page">
+              <pre class="aw-code"><span class="tk" data-token="target">/repos/{owner}/{repo}/pulls/{pull_number}/merge</span>:
+    <span class="tk aw-m" data-token="method">put</span>:
+      summary: <span class="tk" data-token="form-title">Merge a pull request</span>
+      operationId: pulls/merge
+      requestBody:
+        content:
+          <span class="tk" data-token="ct">application/json</span>:
+            schema:
+              properties:
+                <span class="tk" data-token="commit-title">commit_title</span>: {type: string}
+                <span class="tk" data-token="commit-message">commit_message</span>: {type: string}
+                <span class="tk" data-token="enum">merge_method: {enum: [merge, squash, rebase]}</span>
+                <span class="tk" data-token="sha">sha: {description: SHA that pull request head must match}</span>
+      responses:
+        '200': if merge was successful
+        '405': Method Not Allowed if merge cannot be performed
+        '409': Conflict if sha was provided and pull request head did not match</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="mo-scene" data-scene="married">
+        <div class="hl hl-one">
+          <span class="hl-label">The answer, HEART · GET /repos/acme/web/pulls/501 · application/hal+json; profile: hal-schema-forms</span>
+          <div class="hl-cols">
+            <div>
+              <span class="tk" data-token="number">number: 501</span>
+              <span class="tk" data-token="title">title: "Renewals: two weeks for short loans"</span>
+              <span class="tk" data-token="state">state: open</span>
+              <span class="tk" data-token="mergeable">mergeable: true</span>
+              <span class="tk" data-token="etag">ETag: "seq-0.hsf.L0.4dc4714549…"</span>
+              <span class="k">_links:</span>
+              <span class="i1 tk" data-token="self">self: {href: /repos/acme/web/pulls/501}</span>
+              <span class="hl-note">Sent back as <span class="tk" data-token="sha">If-Match: the ETag</span>. A stale view gets 412.</span>
+            </div>
+            <div>
+              <span class="k add">_forms:</span>
+              <span class="i1 rel">scm:merge:</span>
+              <span class="i2">title: <span class="tk" data-token="form-title">Merge</span></span>
+              <span class="i2">_links: {target: {href: <span class="tk" data-token="target">/repos/acme/web/pulls/501/actions/merge</span>}}</span>
+              <span class="i2">method: <span class="tk aw-m" data-token="method">PUT</span></span>
+              <span class="i2">contentType: <span class="tk" data-token="ct">application/json</span></span>
+              <span class="i2">schema:</span>
+              <span class="i3">required: [method]</span>
+              <span class="i3">properties:</span>
+              <span class="i4 tk" data-token="enum">method: {enum: [merge, squash, rebase]}</span>
+              <span class="i4"><span class="tk" data-token="commit-title">commit_title</span>: {type: string}</span>
+              <span class="i4"><span class="tk" data-token="commit-message">commit_message</span>: {type: string}</span>
+              <span class="i2">hr:integrity: sha256-sGUdrPfH…</span>
+            </div>
+          </div>
+          <span class="hl-note">Offered only while the pull request can be merged, at its own address. The same name, <code>scm:merge</code>, on GitLab.</span>
+        </div>
+      </section>
+    </div>
+  </div>
+  <p class="refs"><deck-ref name="rule-3"></deck-ref> <deck-ref name="in-band"></deck-ref> <deck-ref name="hypertext"></deck-ref> <deck-ref name="scm"></deck-ref> <deck-ref name="gateway"></deck-ref></p>
