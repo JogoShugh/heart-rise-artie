@@ -82,6 +82,37 @@ Feature: ARTIE hosted in a service
       | enter         | done    |
       | act waterCell | done    |
 
+  Scenario: In HAL-FORMS, a link template under a relation is a GET form, its fields the template's variables
+    A HAL-FORMS target is never a template, so a service offers a lookup whose address has variables as a
+    link template instead (RFC 6570): a GET form in all but name. ARTIE acts on it by its relation, as on any
+    form, and fills the template from the fields.
+    Given the service answers GET "http://localhost:8301/" with:
+      """
+      200 OK
+      Content-Type: application/prs.hal-forms+json
+      ETag: "seq-1.hf.L0"
+      Link: <https://w3id.org/heart-rise/hal-forms>; rel="profile"
+
+      title: The garden
+      _links:
+        self: {href: /}
+        garden:get-bed: {href: "/beds/{id}", templated: true, title: Get a bed}
+        curies: [{name: garden, href: "/profiles/garden#{rel}", templated: true}]
+      """
+    And the host "desk" has ARTIE ask in the dialect "hal-forms"
+    When the host "desk" runs this kept script with ARTIE:
+      """yaml
+      start: http://localhost:8301/
+      steps:
+        - act: garden:get-bed
+          fields: {id: "2"}
+      """
+    Then the host "desk" has its run back, ended, with steps:
+      | step               | outcome |
+      | enter              | done    |
+      | act garden:get-bed | done    |
+    And the wire carried 1 GET to "http://localhost:8301/beds/2"
+
   Scenario Outline: A host's runs may share one HTTP cache: what one run cached, the next reads with no request
     At L2 a bed links its form set, and the set links its schema: each content-addressed and fresh for
     a year. A run answers them from its cache while fresh, with no request. The bed itself is always

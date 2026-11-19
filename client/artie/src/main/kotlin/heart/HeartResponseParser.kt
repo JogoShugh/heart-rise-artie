@@ -113,7 +113,8 @@ object HeartResponseParser {
      * it is resolved against [base], then put back, so a relative template resolves and nothing is parsed
      * that isn't a URI.
      */
-    private fun resolveTemplate(href: String, base: String): String {
+    /** [href], resolved against [base] with its template expressions left as they are (RFC 6570). */
+    internal fun resolveTemplate(href: String, base: String): String {
         val expressions = EXPRESSION.findAll(href).map { it.value }.toList()
         var at = 0
         val held = EXPRESSION.replace(href) { "${HOLE}${at++}$HOLE" }

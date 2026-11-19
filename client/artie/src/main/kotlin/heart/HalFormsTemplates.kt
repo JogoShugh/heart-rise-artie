@@ -63,8 +63,51 @@ object HalFormsTemplates {
             }
         }
 
-    fun forms(root: JsonObject, base: String): Map<String, AffordanceForm> =
-        root[TEMPLATES]?.jsonObject.orEmpty().mapValues { (rel, template) -> form(rel, template.jsonObject, base) }
+    fun forms(root: JsonObject, base: String): Map<String, AffordanceForm> {
+        val templates = root[TEMPLATES]?.jsonObject.orEmpty().mapValues { (rel, t) -> form(rel, t.jsonObject, base) }
+        return lookups(root, base).filterKeys { it !in templates } + templates
+    }
+
+    /**
+     * The lookups a HAL-FORMS answer offers as link templates (RFC 6570), since its targets cannot carry variables:
+     * each read as the GET form it is in all but name, by its relation, its fields the template's variables.
+     */
+    private fun lookups(root: JsonObject, base: String): Map<String, AffordanceForm> =
+        (root[LINKS] as? JsonObject).orEmpty()
+            .filterKeys { it !in PLUMBING }
+            .mapNotNull { (rel, link) ->
+                (link as? JsonObject)?.takeIf(::isLookup)?.let { rel to lookup(rel, it, base) }
+            }
+            .toMap()
+
+    private fun isLookup(link: JsonObject): Boolean =
+        link["templated"]?.jsonPrimitive?.booleanOrNull == true &&
+            (link["type"]?.jsonPrimitive?.contentOrNull ?: HAL_JSON) in HEART_TYPES
+
+    private fun lookup(rel: String, link: JsonObject, base: String): AffordanceForm {
+        val href = link["href"]?.jsonPrimitive?.contentOrNull.orEmpty()
+        val text = JsonObject(mapOf("type" to JsonPrimitive("string")))
+        val variables = UriTemplate.names(href).associateWith { text }
+        return AffordanceForm(
+            rel = rel,
+            target = HeartResponseParser.resolveTemplate(href, base),
+            templated = true,
+            method = "GET",
+            contentType = "application/json",
+            schema = JsonObject(
+                mapOf(
+                    "type" to JsonPrimitive("object"),
+                    PROPERTIES to JsonObject(variables),
+                    REQUIRED to JsonArray(emptyList()),
+                ),
+            ),
+            title = link["title"]?.jsonPrimitive?.contentOrNull,
+        )
+    }
+
+    private const val LINKS = "_links"
+    private val PLUMBING = setOf("self", "curies")
+    private val HEART_TYPES = setOf(HAL_JSON, Dialect.HAL_FORMS.mediaType)
 
     private fun form(rel: String, obj: JsonObject, base: String): AffordanceForm {
         val target = obj["target"]?.jsonPrimitive?.content ?: base

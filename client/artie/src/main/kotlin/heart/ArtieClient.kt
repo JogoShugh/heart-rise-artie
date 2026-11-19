@@ -83,15 +83,15 @@ class ArtieClient(
         }
         broughtIntoBeing = false
         if (form.method != "GET") return send(rel, payload)
-        // HAL Schema Forms fills the target template from the fields. HAL-FORMS cannot
-        // template a target; it puts the fields in the query (mutate-action-URL).
-        val target = when (asking.dialect) {
-            Dialect.HAL_FORMS -> HalFormsTemplates.getTarget(form.target, payload)
+        // HAL Schema Forms fills the target template from the fields. A HAL-FORMS template's target is
+        // no template: it puts the fields in the query (mutate-action-URL). A HAL-FORMS lookup offered as a
+        // link template is filled as HAL Schema Forms fills its target.
+        val target = if (asking.dialect == Dialect.HAL_FORMS && !form.templated) {
+            HalFormsTemplates.getTarget(form.target, payload)
+        } else {
             // A field the target's template does not take goes in its query. Plain JSON offers no form to get here.
-            Dialect.HAL_SCHEMA_FORMS, Dialect.JSON -> {
-                val taken = if (form.templated) UriTemplate.names(form.target) else emptySet()
-                Uris.withQuery(targetOf(form, held, payload), taken, payload)
-            }
+            val taken = if (form.templated) UriTemplate.names(form.target) else emptySet()
+            Uris.withQuery(targetOf(form, held, payload), taken, payload)
         }
         return sync(target)
     }
