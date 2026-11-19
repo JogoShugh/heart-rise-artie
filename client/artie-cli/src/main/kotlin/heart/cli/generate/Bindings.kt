@@ -107,9 +107,8 @@ class Bindings(
 
     private fun argument(step: Step, field: String, value: Any?): Argument {
         val info = step.values[field].map()
-        val type = info["type"]?.toString()
-        val from = info["from"] as? List<*> ?: emptyList<Any?>()
         val text = value?.toString().orEmpty()
+        val (type, from) = typedSources(info, text)
         val input = from.firstNotNullOfOrNull { it.map()["input"]?.toString() }
         // Inside a loop, a value its member gave is read from that member, whichever the loop is at.
         val held = sources.first(from, scope.keys)
@@ -324,6 +323,27 @@ private fun structured(text: String, type: String?, names: Map<String, String>):
     }
     return runCatching { kotlinx.serialization.json.Json.parseToJsonElement(text) }.getOrNull()?.let(::write)
 }
+
+/**
+ * A value's type and sources, as its [info] says. Where the goal's words name where an object's members came from
+ * (`cited`), it is that object, though its form gave no type (a HAL-FORMS property says only an HTML input type), and
+ * the reasoner's choice, not parts of its JSON [text] that match an earlier value by chance.
+ */
+private fun typedSources(info: Map<*, *>, text: String): Pair<String?, List<*>> {
+    val given = info["from"] as? List<*> ?: emptyList<Any?>()
+    val declared = info["type"]?.toString()
+    val shape = if (declared == null && info["cited"].map().isNotEmpty()) structuredType(text) else null
+    val chance = shape != null && given.isNotEmpty() && given.all { it.map()["parts"] != null }
+    return (declared ?: shape) to (if (chance) listOf("chosen") else given)
+}
+
+/** "object" or "array", as the JSON [text] is one; null for any other text. */
+private fun structuredType(text: String): String? =
+    when (runCatching { kotlinx.serialization.json.Json.parseToJsonElement(text) }.getOrNull()) {
+        is kotlinx.serialization.json.JsonObject -> "object"
+        is kotlinx.serialization.json.JsonArray -> "array"
+        else -> null
+    }
 
 /** A goal file's [words] as a literal's: `{name}` of one of [inputs] a slot, `{{` and `}}` a brace, `$` a dollar. */
 private fun slotted(words: String, inputs: Set<String>): String =

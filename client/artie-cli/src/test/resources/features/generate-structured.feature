@@ -64,6 +64,65 @@ Feature: artie generate writes a list or an object sent as one, each part named 
       outcome: done
       """
 
+  Scenario: An object the goal cites by its members is kept as that object, though its form gave no type
+    A HAL-FORMS property says only an HTML input type, so the capture keeps no type for an object sent, and a
+    digit in its JSON text may match some earlier value by chance. The goal's own words, "citing {smoke.passing}
+    of {smoke.of}", say where its members came from: those win, and the object is the reasoner's, for review.
+    Given the file "cited.trace.yaml" is
+      """
+      ---
+      run:
+        inputs: {}
+      ---
+      mode: script
+      say: enter {entry}
+      line: 1
+      params:
+        entry: http://localhost:8392/
+      opens: true
+      outcome: done
+      now:
+        state:
+          changed_files: 1
+      ---
+      mode: intent
+      say: promote it, citing 1 of 1 scenarios passed
+      line: 2
+      params:
+        relation: env:promote
+        smoke: '{"passed":1,"of":1}'
+      values:
+        smoke:
+          value: '{"passed":1,"of":1}'
+          from:
+            - parts:
+                '1':
+                  step: 1
+                  pointer: /changed_files
+          cited:
+            /passed:
+              kept: smoke
+              pointer: /passing
+            /of:
+              kept: smoke
+              pointer: /of
+      outcome: done
+      """
+    When artie is run with
+      | argument         |
+      | generate         |
+      | cited.trace.yaml |
+      | --out            |
+      | cited.heart.yaml |
+      | --format         |
+      | yaml             |
+    Then artie exits 0
+    And the file "cited.heart.yaml" has these lines
+      | line                                                                                        |
+      | smoke: # review: the reasoner chose it, asked "promote it, citing 1 of 1 scenarios passed" |
+      | passed: ${smoke.passing}                                                                    |
+      | of: ${smoke.of}                                                                             |
+
   Scenario: An array's or an object's parts are written one by one, an input where one was
     When artie is run with
       | argument       |
