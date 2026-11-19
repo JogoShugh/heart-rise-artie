@@ -34,6 +34,12 @@ class Hosted(
     var rung: Rung = Rung.L0
 
     /**
+     * The dialect ARTIE asks every party in (SPEC §6.1): HAL Schema Forms unless the host says; HAL-FORMS, the
+     * on-ramp, for a host whose parties are read in it. ARTIE still reads whichever dialect comes back.
+     */
+    var dialect: Dialect = Dialect.HAL_SCHEMA_FORMS
+
+    /**
      * The HTTP cache every run of this host keeps its responses in; null gives each run its own. What one run read
      * that is still fresh (an L2 form set or schema, a year), the next reads from here: no request leaves for it.
      */
@@ -48,7 +54,7 @@ class Hosted(
         val bare = AuthTransport(credentials, named, masks)
         val transport = CachingTransport(IntegrityCheck(bare), cache = cache ?: HttpCache())
         // A script a link hands over is read as it is, below the cache, as a bare call is.
-        return WiredNavigator(ArtieNavigator(ArtieClient(transport, rung), reasoner, exchangeLog = log), bare)
+        return WiredNavigator(ArtieNavigator(ArtieClient(transport, rung, dialect), reasoner, exchangeLog = log), bare)
     }
 
     /** Runs [script], a kept script held as data, with [inputs]; the run comes back, ended or stopped. */

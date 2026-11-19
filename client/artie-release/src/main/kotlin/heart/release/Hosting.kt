@@ -8,6 +8,7 @@ import com.artie.heart.sims.rise.ArtieKey
 import com.artie.heart.sims.rise.OfferWatcher
 import heart.Credential
 import heart.CredentialSource
+import heart.Dialect
 import heart.Hosted
 import heart.HttpCache
 import heart.Origin
@@ -27,8 +28,8 @@ fun hosting(
     masks: List<String>,
     /** Told of the desk's replies once it keeps them: a capture run in this process asks with them. */
     kept: (DeskReplies) -> Unit = {},
-    /** The rung the desk's ARTIE reads every party at (SPEC §6.10). */
-    rung: Rung = Rung.L0,
+    /** The rung and the dialect the desk's ARTIE reads every party at and in. */
+    reading: DeskReading = DeskReading(),
 ): Release.Hosting = Release.Hosting(
     answers = { key -> ArtieAnswers(key.keyId, SigningKey(key.keyId, key.pair.private), Release.REPLY_TOKEN, masks) },
     front = { service ->
@@ -46,7 +47,8 @@ fun hosting(
                     plainHttp = masks,
                     replies = kept,
                 ).also {
-                    it.rung = rung
+                    it.rung = reading.rung
+                    it.dialect = reading.dialect
                     it.cache = cache
                 }
             },
@@ -59,6 +61,18 @@ fun hosting(
 /** The rung the release's [env] says its desk reads at, RELEASE_RUNG: L0, all in one answer, when it says none. */
 fun releaseRung(env: Map<String, String>): Rung =
     env["RELEASE_RUNG"]?.takeIf { it.isNotBlank() }?.let(Rung::valueOf) ?: Rung.L0
+
+/** The dialect the release's [env] says its desk asks in, RELEASE_DIALECT: HAL Schema Forms when it says none. */
+fun releaseDialect(env: Map<String, String>): Dialect =
+    env["RELEASE_DIALECT"]?.takeIf { it.isNotBlank() }?.let(Dialect::named) ?: Dialect.HAL_SCHEMA_FORMS
+
+/** How the desk's ARTIE reads every party: the rung it asks for (SPEC §6.10) and the dialect it asks in (§6.1). */
+data class DeskReading(val rung: Rung = Rung.L0, val dialect: Dialect = Dialect.HAL_SCHEMA_FORMS) {
+    companion object {
+        /** As the release's [env] says: RELEASE_RUNG and RELEASE_DIALECT. */
+        fun of(env: Map<String, String>): DeskReading = DeskReading(releaseRung(env), releaseDialect(env))
+    }
+}
 
 /** The credential the desk's ARTIE presents at each party, by port: each party's own test credential, and no other. */
 object PartyCredentials : CredentialSource {

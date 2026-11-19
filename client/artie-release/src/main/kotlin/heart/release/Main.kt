@@ -15,6 +15,8 @@ import kotlin.concurrent.thread
  * | RELEASE_SCRIPT | the release's kept script (exhibits/merge-watch-release/release.heart.yaml) |
  * | JENKINS_ADMIN_USER, JENKINS_ADMIN_PASSWORD, JENKINS_HOOK_SECRET | as jenkins/run.sh started Jenkins with |
  * | RELEASE_PLAIN_HTTP | networks ARTIE may send credentials to over plain HTTP, as masks; default 192.168.0.0/16 |
+ * | RELEASE_RUNG | the rung the desk's ARTIE reads at: L0 (default), L1 or L2 |
+ * | RELEASE_DIALECT | the dialect the desk's ARTIE asks in: hal-schema-forms (default) or hal-forms |
  */
 fun main(args: Array<String>) {
     val env = System.getenv()
@@ -27,7 +29,7 @@ fun main(args: Array<String>) {
         env["JENKINS_ADMIN_USER"] ?: "artie",
         env.getValue("JENKINS_ADMIN_PASSWORD"),
         env.getValue("JENKINS_HOOK_SECRET"),
-        hosting(host, Path.of(env.getValue("RELEASE_SCRIPT")), masks, { replies.complete(it) }, releaseRung(env)),
+        hosting(host, Path.of(env.getValue("RELEASE_SCRIPT")), masks, { replies.complete(it) }, DeskReading.of(env)),
     )
     if (args.firstOrNull() != "capture") return release.serve()
     // capture GOAL OUT name=value…: the parties served, the release goal walked once with Claude, then done.

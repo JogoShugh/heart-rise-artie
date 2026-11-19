@@ -57,6 +57,7 @@ fun capture(goal: Path, out: Path, inputs: Map<String, String>, replies: DeskRep
     ).also {
         it.reasoner = reasoner
         it.rung = rung
+        it.dialect = releaseDialect(System.getenv())
     }
     val navigator = hosted.navigator()
     val planner = checkNotNull(navigator.planner()) { "the desk's ARTIE has no planner" }

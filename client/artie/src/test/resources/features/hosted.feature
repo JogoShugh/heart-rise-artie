@@ -67,6 +67,21 @@ Feature: ARTIE hosted in a service
       """
     Then the GET to "http://localhost:8301/beds/2" carried header "Prefer" set to "forms=link, schema=link"
 
+  Scenario: A host may have ARTIE ask in HAL-FORMS, the on-ramp dialect, and read what comes back
+    Given the host "desk" has ARTIE ask in the dialect "hal-forms"
+    When the host "desk" runs this kept script with ARTIE:
+      """yaml
+      start: http://localhost:8301/beds/2
+      steps:
+        - act: waterCell
+          fields: {milliliters: 100}
+      """
+    Then the GET to "http://localhost:8301/beds/2" carried header "Accept-Profile" set to "<https://w3id.org/heart-rise/hal-forms>"
+    And the host "desk" has its run back, ended, with steps:
+      | step          | outcome |
+      | enter         | done    |
+      | act waterCell | done    |
+
   Scenario Outline: A host's runs may share one HTTP cache: what one run cached, the next reads with no request
     At L2 a bed links its form set, and the set links its schema: each content-addressed and fresh for
     a year. A run answers them from its cache while fresh, with no request. The bed itself is always
@@ -126,7 +141,7 @@ Feature: ARTIE hosted in a service
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <profile>; rel="profile"
 
       id: 2
       _links:
@@ -142,10 +157,10 @@ Feature: ARTIE hosted in a service
     Then what reached the wire for "<origin>/beds/2" was "<sent>"
 
     Examples:
-      | origin                   | sent                         |
-      | http://192.168.1.18:8301 | GET, with Bearer desk-token  |
-      | http://10.0.0.5:8301     | nothing                      |
-      | http://garden.local:8301 | nothing                      |
+      | origin                   | sent                        | profile                                        |
+      | http://192.168.1.18:8301 | GET, with Bearer desk-token | <https://w3id.org/heart-rise/hal-schema-forms> |
+      | http://10.0.0.5:8301     | nothing                     | <https://w3id.org/heart-rise/hal-schema-forms> |
+      | http://garden.local:8301 | nothing                     | <https://w3id.org/heart-rise/hal-schema-forms> |
 
   Scenario: A hosted run keeps each step's exchanges for its report, credentials never in them
     Given the host "desk" gives ARTIE the token "desk-token" for "http://localhost:8301"

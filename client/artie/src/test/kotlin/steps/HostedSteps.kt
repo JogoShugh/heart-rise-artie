@@ -154,6 +154,13 @@ class HostedSteps(private val ctx: ClientContext) {
         rungs[host] = heart.Rung.valueOf(rung)
     }
 
+    private val dialects = mutableMapOf<String, heart.Dialect>()
+
+    @Given("the host {string} has ARTIE ask in the dialect {string}")
+    fun asksIn(host: String, dialect: String) {
+        dialects[host] = heart.Dialect.named(dialect)
+    }
+
     @Then("the GET to {string} carried header {string} set to {string}")
     fun getHeader(url: String, name: String, value: String) {
         val sent = ctx.transport.requests.filter { it.method == "GET" && it.url == url }.map { it.header(name) }
@@ -277,6 +284,7 @@ class HostedSteps(private val ctx: ClientContext) {
         return Hosted(credentials, keys[host], wire, host, masks[host].orEmpty(), replies[host])
             .also { it.reasoner = reasoners[host] }
             .also { it.rung = rungs[host] ?: heart.Rung.L0 }
+            .also { it.dialect = dialects[host] ?: heart.Dialect.HAL_SCHEMA_FORMS }
             .also { it.cache = caches[host] }
     }
 
