@@ -38,7 +38,7 @@ Feature: Where a resource lives: its item path, filled from its own state
 
   Scenario: HAL-FORMS targets the same address
     When the pull request is rendered in HAL-FORMS
-    Then its template "close" targets "/repos/acme/rockets/pulls/482/actions/close"
+    Then its template "pulls:close" targets "/repos/acme/rockets/pulls/482/actions/close"
 
   Scenario: The OpenAPI description serves the item path, with a parameter for each variable
     When the OpenAPI description of the pull request type is rendered

@@ -13,23 +13,20 @@ Feature: Searches and lookups by the fields a type declares
   Background:
     Given a pull request type found at "/repos/{owner}/{repo}/pulls", filtered by "state"
 
-  Scenario: The search form fills the collection path, and puts the filters in the query
+  Scenario Outline: The <kind> form fills its path, and puts any filters in the query
+    The search form fills the collection path, its filters in the query; the lookup form fills the item path.
     When the pull requests' service index is rendered
-    Then the index form "pulls:list" targets the template "/repos/{owner}/{repo}/pulls{?state}"
+    Then the index form "<form>" targets the template "<template>"
     And its fields are
-      | field | required |
-      | owner | yes      |
-      | repo  | yes      |
-      | state | no       |
+      | field  | required   |
+      | owner  | yes        |
+      | repo   | yes        |
+      | <last> | <required> |
 
-  Scenario: The lookup form fills the item path
-    When the pull requests' service index is rendered
-    Then the index form "pulls:get" targets the template "/repos/{owner}/{repo}/pulls/{number}"
-    And its fields are
-      | field  | required |
-      | owner  | yes      |
-      | repo   | yes      |
-      | number | yes      |
+    Examples:
+      | kind   | form       | template                             | last   | required |
+      | search | pulls:list | /repos/{owner}/{repo}/pulls{?state}  | state  | no       |
+      | lookup | pulls:get  | /repos/{owner}/{repo}/pulls/{number} | number | yes      |
 
   Scenario: A field keeps the schema it was declared with
     When the pull requests' service index is rendered
@@ -87,9 +84,9 @@ Feature: Searches and lookups by the fields a type declares
     search and lookup a template can't carry is a templated link, under its relation, titled, its CURIE declared.
     When the pull requests' service index is rendered in HAL-FORMS
     Then it has none of these templates
-      | template  |
-      | listPulls |
-      | getPull   |
+      | template   |
+      | pulls:list |
+      | pulls:get  |
     And it links these, as templates
       | relation   | href                                 | title              |
       | pulls:list | /repos/{owner}/{repo}/pulls{?state}  | List pull requests |

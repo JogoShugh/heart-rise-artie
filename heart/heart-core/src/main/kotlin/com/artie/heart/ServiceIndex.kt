@@ -106,7 +106,8 @@ class ServiceIndex(
 
     private fun halFormsIndex(): Map<String, Any> = mapOf(
         "title" to title,
-        "_links" to links() + templatedLinks(found),
+        // Its templates are keyed by relation, as its links are: the CURIEs those are written in, declared.
+        "_links" to links() + templatedLinks(found) + ("curies" to found.flatMap { it.profile.curies }.distinct()),
         "_templates" to found.flatMap { type ->
             val finding = checkNotNull(type.finding)
             // A HAL-FORMS target cannot be templated, so a declared collection path has no template here.
@@ -114,14 +115,14 @@ class ServiceIndex(
                 emptyList()
             } else {
                 listOf(
-                    finding.search.name to halFormsTemplate(
+                    type.profile.key(finding.search.relation) to halFormsTemplate(
                         type, finding.search.relation,
                         mapOf(
                             "name" to "name", "type" to "search", "required" to true, "minLength" to 1,
                             "prompt" to finding.nameDescription,
                         ),
                     ),
-                    finding.lookup.name to halFormsTemplate(
+                    type.profile.key(finding.lookup.relation) to halFormsTemplate(
                         type, finding.lookup.relation,
                         mapOf(
                             "name" to "id", "type" to "number", "required" to true, "min" to 1,
@@ -131,7 +132,7 @@ class ServiceIndex(
                 )
             }
             searches + type.bookmarkActs.map { act ->
-                act.name to mapOf(
+                type.profile.key(act.relation) to mapOf(
                     "title" to type.profile.relation(act.relation).title,
                     "method" to "POST",
                     "contentType" to JSON,

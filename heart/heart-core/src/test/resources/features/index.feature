@@ -82,9 +82,9 @@ Feature: The service index, the home document and search pages, from the declara
   Scenario: In HAL-FORMS, the same two forms are GET templates whose fields go in the query
     When the service index is rendered in HAL-FORMS
     Then it offers these GET templates
-      | template    | target | required property |
-      | searchLamps | /lamps | name              |
-      | getLamp     | /lamps | id                |
+      | template          | target | required property |
+      | home:search-lamps | /lamps | name              |
+      | home:get-lamp     | /lamps | id                |
 
   Scenario: The index's validator names its bytes, so it changes only when they do
     Then the index's validator in each dialect is "index-" with the dialect's tag and the first 16 hex digits of its body's digest

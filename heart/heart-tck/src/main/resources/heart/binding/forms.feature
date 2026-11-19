@@ -29,9 +29,11 @@ Feature: Forms over HTTP: named by relations, shared, and accepted where their t
     Then the response status is 200
     And the response has Content-Location "/lamps/7"
 
-  Scenario: HAL-FORMS keeps its template names, and declares no CURIEs
+  Scenario: HAL-FORMS names each template by its relation, and declares the CURIE that relation is written in
+    One vocabulary in both dialects: a client, or a script kept from one, asks for "home:dim" whichever it reads.
     When a client gets "/lamps/7" as hal-forms
-    Then the response has no member "_links.curies"
+    Then the response has the member "_templates.home:dim"
+    And the response has the member "_links.curies"
 
   Scenario: A HAL-FORMS template's properties come from the act's schema, and can be filled in
     One schema per act (A4 rule 1): the HAL-FORMS template says what the

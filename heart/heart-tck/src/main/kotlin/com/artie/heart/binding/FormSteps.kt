@@ -25,10 +25,10 @@ class FormSteps(private val http: HttpWorld) {
         assertTrue(form.path("description").asText().isNotBlank(), "no description on $key: $form")
     }
 
-    @Then("the response has no member {string}")
-    fun hasNo(path: String) {
+    @Then("^the response has (the|no) member \"([^\"]*)\"$")
+    fun member(which: String, path: String) {
         val node = path.split('.').fold(http.json) { at, key -> at.path(key) }
-        assertTrue(node.isMissingNode, "$path present: $node")
+        assertTrue(node.isMissingNode == (which == "no"), "$path ${if (which == "no") "present" else "absent"}: $node")
     }
 
     @Then("the template targeting {string} has the property {string}, required, from {int} to {int}")

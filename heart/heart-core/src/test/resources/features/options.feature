@@ -56,35 +56,29 @@ Feature: Choices from state: a form says where a property's choices are (HAL-SCH
     When the match is rendered at L0
     Then its form "league:foul" has a property "playerNumber" that carries hr:options
 
-  Scenario Outline: The server takes the choices from the state the act was checked against: <case>
-    When the body <body> is checked for the act "foul" against the match
+  Scenario Outline: The server checks the choices against the state the act was checked against: <case>
+    The fouls' choices come from the match itself; the officials' from the server's own copy of another resource.
+    When the body <body> is checked for the act "<act>" against the match
     Then <verdict>
 
     Examples:
-      | case                     | body                                 | verdict                                                        |
-      | a home player            | {"team": "home", "playerNumber": 4}  | the choices accept the body                                          |
-      | a player who fouled out  | {"team": "home", "playerNumber": 7}  | the choices refuse the body at "/playerNumber" as not one of the choices |
-      | the other team's player  | {"team": "home", "playerNumber": 5}  | the choices refuse the body at "/playerNumber" as not one of the choices |
-      | an away player           | {"team": "away", "playerNumber": 9}  | the choices accept the body                                          |
-
-  Scenario Outline: Choices from another resource are checked with the server's own copy of it: <case>
-    When the body <body> is checked for the act "assignOfficial" against the match
-    Then <verdict>
-
-    Examples:
-      | case                       | body                  | verdict                                                       |
-      | an available senior        | {"official": "Kim"}   | the choices accept the body                                         |
-      | a senior who is away       | {"official": "Lou"}   | the choices refuse the body at "/official" as not one of the choices  |
-      | a junior, for a senior game | {"official": "Max"}  | the choices refuse the body at "/official" as not one of the choices  |
+      | case                        | act            | body                                | verdict                                                                  |
+      | a home player               | foul           | {"team": "home", "playerNumber": 4} | the choices accept the body                                              |
+      | a player who fouled out     | foul           | {"team": "home", "playerNumber": 7} | the choices refuse the body at "/playerNumber" as not one of the choices |
+      | the other team's player     | foul           | {"team": "home", "playerNumber": 5} | the choices refuse the body at "/playerNumber" as not one of the choices |
+      | an away player              | foul           | {"team": "away", "playerNumber": 9} | the choices accept the body                                              |
+      | an available senior         | assignOfficial | {"official": "Kim"}                 | the choices accept the body                                              |
+      | a senior who is away        | assignOfficial | {"official": "Lou"}                 | the choices refuse the body at "/official" as not one of the choices     |
+      | a junior, for a senior game | assignOfficial | {"official": "Max"}                 | the choices refuse the body at "/official" as not one of the choices     |
 
   Scenario: HAL-FORMS carries the same choices as HAL-FORMS options
     When the match is rendered in HAL-FORMS
-    Then the template "foul" property "playerNumber" has these inline options
+    Then the template "league:foul" property "playerNumber" has these inline options
       | value | prompt |
       | 4     | Ana    |
       | 5     | Cy     |
       | 9     | Dee    |
-    And the template "assignOfficial" property "official" has an options link "/officials?level=senior"
+    And the template "league:assign-official" property "official" has an options link "/officials?level=senior"
     And that HAL-FORMS representation has a validator, as every Layer 1 representation does
 
   # A page for a person is one resource's, so the server fills each choice in, as HAL-FORMS's inline options do:

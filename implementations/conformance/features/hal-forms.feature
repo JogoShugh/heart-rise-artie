@@ -89,7 +89,7 @@ Feature: What a HEART client must do in HAL-FORMS, the L0 on-ramp
     And a HAL-FORMS client with the build service's credential
     When it enters the job "nightly"
     Then the representation is at rung L0, in HAL-FORMS
-    And it offers exactly "build"
+    And it offers exactly "ci:build"
 
     Examples:
       | case                                    | service fault                                                    |

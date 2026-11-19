@@ -47,12 +47,13 @@ class ActTargets<S, K>(private val layers: Layers<S, K>) {
         val owner = layers.halForms(state)
 
         @Suppress("UNCHECKED_CAST")
-        val template = (owner["_templates"] as Map<String, Any?>?)?.get(act.name)
+        val key = type.profile.key(act.relation)
+        val template = (owner["_templates"] as Map<String, Any?>?)?.get(key)
         val item = type.itemPath.expand(type.state.bodyOf(state))
         return linkedMapOf(
             OWNER_ETAG to ownerETag,
             "_links" to mapOf("self" to mapOf("href" to "$item/actions/${act.path}"), "up" to mapOf("href" to item)),
-            "_templates" to mapOf(act.name to template),
+            "_templates" to mapOf(key to template),
         )
     }
 

@@ -20,8 +20,8 @@ Feature: The bookmark offers acts, like any resource
   Scenario: In HAL-FORMS, the act is a template whose properties come from its schema
     When the service index is rendered in HAL-FORMS
     Then it offers these POST templates
-      | template    | target                | required property | min | max |
-      | installLamp | /actions/install-lamp | brightness        | 1   | 100 |
+      | template          | target                | required property | min | max |
+      | home:install-lamp | /actions/install-lamp | brightness        | 1   | 100 |
 
   Scenario: The act's schema is served by its content, like every act's
     Then the schema of "installLamp" is served at its content address

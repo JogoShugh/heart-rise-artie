@@ -33,12 +33,12 @@ Feature: An act says the HTTP method it is served by
   Scenario: In HAL-FORMS, each template says its method and content type
     When shelf 3 is rendered in HAL-FORMS
     Then its templates say
-      | template  | method | contentType                  | target                          |
-      | restock   | POST   | application/json             | /shelves/3/actions/restock      |
-      | relabel   | PATCH  | application/merge-patch+json | /shelves/3/actions/relabel      |
-      | setPrice  | PUT    | application/json             | /shelves/3/actions/set-price    |
-      | removeTag | DELETE |                              | /shelves/3/actions/remove-tag   |
-      | retire    | DELETE |                              | /shelves/3/actions/retire       |
+      | template         | method | contentType                  | target                        |
+      | store:restock    | POST   | application/json             | /shelves/3/actions/restock    |
+      | store:relabel    | PATCH  | application/merge-patch+json | /shelves/3/actions/relabel    |
+      | store:set-price  | PUT    | application/json             | /shelves/3/actions/set-price  |
+      | store:remove-tag | DELETE |                              | /shelves/3/actions/remove-tag |
+      | store:retire     | DELETE |                              | /shelves/3/actions/retire     |
 
   Scenario: The OpenAPI twin serves each act by its method
     When the OpenAPI description of the shelf is rendered

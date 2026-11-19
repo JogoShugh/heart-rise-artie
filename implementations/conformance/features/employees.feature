@@ -2,7 +2,8 @@ Feature: The employees service, a HEART service that can answer as stock Spring 
   The employees service holds Spring HATEOAS's example employees, Frodo, ring
   bearer, and Bilbo, burglar, served by heart-core: a profile, ETags, and both
   dialects. A new employee comes from hiring, which its bookmark offers; a dismissed
-  one stays, with nothing more to offer.
+  one stays, with nothing more to offer. Its acts are named by their relations in
+  both dialects, so a client asks for "staff:hire" whichever it reads.
 
   Switched to stock Spring, it answers as Spring HATEOAS's own affordances example
   (spring-projects/spring-hateoas-examples) does, a service that knows nothing of
@@ -13,14 +14,14 @@ Feature: The employees service, a HEART service that can answer as stock Spring 
   Scenario Outline: A HEART client walks the employees in <dialect> at rung <rung>
     Given a client asking in <dialect> at rung <rung> for the employees service
     When it enters the employees service at its bookmark
-    And it submits "<hire>" with {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}
-    Then the client holds "/employees/3"
+    And it submits "staff:hire" with {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}
+    And the client holds "/employees/3"
     And it offers exactly these acts
-      | <dismiss> |
-      | <update>  |
-    When it submits "<update>" with {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor"}
-    Then the state's "role" is "gardener, mayor"
-    When it submits "<dismiss>" with {}
+      | staff:dismiss |
+      | staff:update  |
+    And it submits "staff:update" with {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor"}
+    And the state's "role" is "gardener, mayor"
+    And it submits "staff:dismiss" with {}
     Then the state's "status" is "dismissed"
     And the employees service holds these employees
       | firstName |
@@ -28,9 +29,9 @@ Feature: The employees service, a HEART service that can answer as stock Spring 
       | Bilbo     |
 
     Examples:
-      | dialect          | rung | hire       | update       | dismiss       |
-      | HAL-FORMS        | L0   | hire       | update       | dismiss       |
-      | HAL Schema Forms | L2   | staff:hire | staff:update | staff:dismiss |
+      | dialect          | rung |
+      | HAL-FORMS        | L0   |
+      | HAL Schema Forms | L2   |
 
   Scenario Outline: Changed under its clients (<change>), it is still walked by what it offers, in <dialect>
     The service changes after its clients were written: its acts move to new
@@ -39,43 +40,43 @@ Feature: The employees service, a HEART service that can answer as stock Spring 
     Given the employees service has changed: <change>
     And a client asking in <dialect> at rung <rung> for the employees service
     When it enters the employees service at its bookmark
-    And it submits "<hire>" with <hired>
-    Then the client holds "/employees/3"
-    When it submits "<update>" with <updated>
+    And it submits "staff:hire" with <hired>
+    And the client holds "/employees/3"
+    And it submits "staff:update" with <updated>
     Then the state's "role" is "gardener, mayor"
 
     Examples:
-      | change   | dialect          | rung | hire       | update       | hired                                                                | updated                                                                         |
-      | moved    | HAL-FORMS        | L0   | hire       | update       | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}     | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor"}         |
-      | moved    | HAL Schema Forms | L2   | staff:hire | staff:update | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}     | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor"}         |
-      | renamed  | HAL-FORMS        | L0   | hire       | update       | {"firstName": "Samwise", "lastName": "Gamgee", "position": "gardener"} | {"firstName": "Samwise", "lastName": "Gamgee", "position": "gardener, mayor"}     |
-      | renamed  | HAL Schema Forms | L2   | staff:hire | staff:update | {"firstName": "Samwise", "lastName": "Gamgee", "position": "gardener"} | {"firstName": "Samwise", "lastName": "Gamgee", "position": "gardener, mayor"}     |
-      | required | HAL-FORMS        | L0   | hire       | update       | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}     | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor", "reason": "elected"} |
-      | required | HAL Schema Forms | L2   | staff:hire | staff:update | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}     | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor", "reason": "elected"} |
-      | method   | HAL-FORMS        | L0   | hire       | update       | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}     | {"role": "gardener, mayor"}                                                     |
-      | method   | HAL Schema Forms | L2   | staff:hire | staff:update | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}     | {"role": "gardener, mayor"}                                                     |
+      | change   | dialect          | rung | hired                                                                  | updated                                                                                        |
+      | moved    | HAL-FORMS        | L0   | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}     | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor"}                      |
+      | moved    | HAL Schema Forms | L2   | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}     | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor"}                      |
+      | renamed  | HAL-FORMS        | L0   | {"firstName": "Samwise", "lastName": "Gamgee", "position": "gardener"} | {"firstName": "Samwise", "lastName": "Gamgee", "position": "gardener, mayor"}                  |
+      | renamed  | HAL Schema Forms | L2   | {"firstName": "Samwise", "lastName": "Gamgee", "position": "gardener"} | {"firstName": "Samwise", "lastName": "Gamgee", "position": "gardener, mayor"}                  |
+      | required | HAL-FORMS        | L0   | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}     | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor", "reason": "elected"} |
+      | required | HAL Schema Forms | L2   | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}     | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor", "reason": "elected"} |
+      | method   | HAL-FORMS        | L0   | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}     | {"role": "gardener, mayor"}                                                                    |
+      | method   | HAL Schema Forms | L2   | {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}     | {"role": "gardener, mayor"}                                                                    |
 
   Scenario Outline: Changed to ask for notice first, dismissing is offered only once notice is given, in <dialect>
     Given the employees service has changed: notice
     And a client asking in <dialect> at rung <rung> for the employees service
     When it enters the employees service at its bookmark
-    And it submits "<search>" with {"name": "Bilbo"}
+    And it submits "staff:search-employees" with {"name": "Bilbo"}
     And it follows the "item" link titled "Bilbo Baggins"
-    Then it offers exactly these acts
-      | <notice> |
-      | <update> |
-    When it submits "<notice>" with {}
-    Then the state's "status" is "on notice"
     And it offers exactly these acts
-      | <dismiss> |
-      | <update>  |
-    When it submits "<dismiss>" with {}
+      | staff:give-notice |
+      | staff:update      |
+    And it submits "staff:give-notice" with {}
+    And the state's "status" is "on notice"
+    And it offers exactly these acts
+      | staff:dismiss |
+      | staff:update  |
+    And it submits "staff:dismiss" with {}
     Then the state's "status" is "dismissed"
 
     Examples:
-      | dialect          | rung | search                 | notice            | dismiss       | update       |
-      | HAL-FORMS        | L0   | searchEmployees        | giveNotice        | dismiss       | update       |
-      | HAL Schema Forms | L2   | staff:search-employees | staff:give-notice | staff:dismiss | staff:update |
+      | dialect          | rung |
+      | HAL-FORMS        | L0   |
+      | HAL Schema Forms | L2   |
 
   Scenario Outline: Someone else changes an employee right after the client reads him: its update is stale, in <dialect>
     Another person at another desk changes Frodo's role just after the
@@ -85,37 +86,37 @@ Feature: The employees service, a HEART service that can answer as stock Spring 
     Given someone else will change employee 1's role to "keeper of the Red Book" right after a client reads him
     And a client asking in <dialect> at rung <rung> for the employees service
     When it enters the employees service at its bookmark
-    And it submits "<search>" with {"name": "Frodo"}
+    And it submits "staff:search-employees" with {"name": "Frodo"}
     And it follows the "item" link titled "Frodo Baggins"
-    Then the state's "role" is "ring bearer"
-    When it tries to submit "<update>" with {"firstName": "Frodo", "lastName": "Baggins", "role": "ring bearer, retired"}
+    And the state's "role" is "ring bearer"
+    And it tries to submit "staff:update" with {"firstName": "Frodo", "lastName": "Baggins", "role": "ring bearer, retired"}
     Then it was refused as "stale" with status 412
     And the state's "role" is "keeper of the Red Book"
 
     Examples:
-      | dialect          | rung | search                 | update       |
-      | HAL-FORMS        | L0   | searchEmployees        | update       |
-      | HAL Schema Forms | L2   | staff:search-employees | staff:update |
+      | dialect          | rung |
+      | HAL-FORMS        | L0   |
+      | HAL Schema Forms | L2   |
 
   Scenario: As stock Spring, it is walked by every affordance it offers
     Given the employees service answers as stock Spring HATEOAS
     And a client asking in HAL-FORMS at rung L0 for the employees service
     When it enters the employees of the employees service
-    Then it offers exactly these acts
+    And it offers exactly these acts
       | default |
-    When it submits "default" with {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}
-    Then it embeds these employees
+    And it submits "default" with {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}
+    And it embeds these employees
       | firstName | role        |
       | Frodo     | ring bearer |
       | Bilbo     | burglar     |
       | Samwise   | gardener    |
-    When it follows "employees" with no title
-    Then it offers exactly these acts
+    And it follows "employees" with no title
+    And it offers exactly these acts
       | default        |
       | deleteEmployee |
-    When it submits "default" with {"firstName": "Frodo", "lastName": "Baggins", "role": "ring bearer, retired"}
-    Then the state's "role" is "ring bearer, retired"
-    When it submits "deleteEmployee" with {}
+    And it submits "default" with {"firstName": "Frodo", "lastName": "Baggins", "role": "ring bearer, retired"}
+    And the state's "role" is "ring bearer, retired"
+    And it submits "deleteEmployee" with {}
     Then the client holds "/employees/1", gone
     And the employees service holds these employees
       | firstName |

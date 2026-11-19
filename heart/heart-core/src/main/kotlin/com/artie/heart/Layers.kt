@@ -125,9 +125,11 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
      * Layer 1 of [state] in HAL-FORMS, the L0 on-ramp: the state, its self
      * link, and one template per offered act. A template's properties come
      * from the act's schema ([HalFormsProperties]), as the index's do, so
-     * the two dialects say the same about every field. Every template keeps
-     * its act's name. HAL-FORMS says a lone template SHOULD be keyed
-     * "default", but that name says nothing about the act.
+     * the two dialects say the same about every field. Every template is
+     * keyed by its act's relation, as HAL Schema Forms keys a form, so one
+     * vocabulary serves both dialects; the CURIE it is written in is
+     * declared. HAL-FORMS says a lone template SHOULD be keyed "default",
+     * but that name says nothing about the act.
      */
     fun halForms(state: S): Map<String, Any?> {
         val body = LinkedHashMap(type.state.bodyOf(state))
@@ -135,14 +137,15 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         val said = type.state.hypermediaOf(state)
         val collections = type.subCollectionLinks(body) + said.links
         val embedded = type.embeddedOf(body) + said.embedded
-        val named = collections.isNotEmpty() || embedded.isNotEmpty()
+        val acts = offered(type.state.keyOf(state))
+        val named = collections.isNotEmpty() || embedded.isNotEmpty() || acts.isNotEmpty()
         body["_links"] = mapOf("self" to mapOf("href" to item)) +
             (if (named) mapOf("curies" to type.profile.curies) + collections else emptyMap())
         if (embedded.isNotEmpty()) body["_embedded"] = embedded
-        val templates = offered(type.state.keyOf(state)).associate { name ->
+        val templates = acts.associate { name ->
             val act = type.act(name)
             // A DELETE's properties go in the query, as a HAL-FORMS client sends a GET's.
-            name to buildMap {
+            type.profile.key(act.relation) to buildMap {
                 put("title", type.profile.relation(act.relation).title)
                 put("method", act.method)
                 act.contentType?.let { put("contentType", it) }

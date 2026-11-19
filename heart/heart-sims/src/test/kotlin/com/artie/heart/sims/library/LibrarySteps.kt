@@ -252,7 +252,8 @@ class LibrarySteps {
     /** The acts the last answer offers, by relation, in the order it lists them. */
     private fun offered(): List<String> = when (dialect) {
         HSF -> json()["_forms"]?.fieldNames()?.asSequence()?.map { it.removePrefix("library:") }?.toList().orEmpty()
-        HAL_FORMS -> json()["_templates"]?.fieldNames()?.asSequence()?.toList().orEmpty()
+        HAL_FORMS -> json()["_templates"]?.fieldNames()?.asSequence()
+            ?.map { it.removePrefix("library:") }?.toList().orEmpty()
         else -> BUTTON.findAll(body()).filter { it.groupValues[2].isEmpty() }.map { it.groupValues[1] }.toList()
     }
 

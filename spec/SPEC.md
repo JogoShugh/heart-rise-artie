@@ -1050,7 +1050,7 @@ In the HAL Schema Forms dialect these are CURIEs and the representation SHALL in
 }
 ```
 
-HAL-FORMS `_templates` keys are template names rather than link relations, so the prefix is conventional there rather than normative — but SHOULD be used identically, so that one shared source of truth (§6.2) can emit both without a naming translation layer.
+**HAL-FORMS templates are keyed by relation too (decided 2026-11-19).** A HEART server keys each `_templates` entry by the same link relation it keys the act's form by in `_forms`, written the same way (`store:restock`, not `restock`), and declares the CURIE in `_links.curies`, so one vocabulary serves both dialects: a client, or a script kept from one dialect, asks for the same relation in the other. HAL-FORMS itself treats a template key as a name, so a server that is not HEART may key its templates as it likes (Spring HATEOAS writes `default`); a HEART client still reads them by key. A lookup whose target has variables, which a HAL-FORMS target cannot carry, is offered as a link template under its relation instead (§6.11), and a HEART client reads it as a GET form by that relation.
 
 **CURIEs stay (decided 2026-10-09).** A server MAY write a relation as a CURIE or as its full URI; a client SHALL expand CURIEs before matching, and SHALL treat a CURIE whose prefix is not declared as an unknown relation. Full URIs everywhere was considered: it removes the "prefix not defined" class of bugs, but CURIEs are ordinary HAL, generic HAL servers already emit them, and a missing prefix only hides a link rather than misleading the client.
 

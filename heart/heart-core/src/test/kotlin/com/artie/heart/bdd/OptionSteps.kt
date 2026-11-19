@@ -131,7 +131,8 @@ class OptionSteps {
     @Then("the {string} act asks for its fields in this order")
     fun fieldOrder(act: String, table: DataTable) {
         val asked = page?.select("form[data-rel$=:$act] .field [name]")?.map { it.attr("name") }
-            ?: read.path("_templates").path(act).path("properties").map { it.path("name").asText() }
+            ?: read.path("_templates").properties().first { it.key.endsWith(":$act") }.value
+                .path("properties").map { it.path("name").asText() }
         assertEquals(table.asList().drop(1), asked)
     }
 
