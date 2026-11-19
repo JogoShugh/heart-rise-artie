@@ -188,11 +188,16 @@ sealed class Options(val pick: Pick) {
         fun halForms(choices: Options, state: Any?, body: JsonNode, schema: JsonNode): Map<String, Any?> = buildMap {
             when (choices) {
                 is FromState -> put("inline", inline(choices, state, body, schema))
-                is FromLink -> {
+                // A HAL-FORMS options link answers the list itself: it cannot point inside a document, as "items"
+                // does. A list under a pointer is filled in from the server's own copy, as for a page a person reads.
+                is FromLink -> if (choices.items.isNullOrEmpty()) {
                     val href = choices.expanded(body)
                     put("link", mapOf("href" to href, "templated" to href.contains('{'), "type" to "application/json"))
                     put("promptField", choices.pick.prompt)
                     put("valueField", choices.pick.value)
+                } else {
+                    val filled = choices.choices(state, body, JsonNodeFactory.instance.objectNode())
+                    put("inline", filled.map(::inlineOption))
                 }
             }
             choices.pick.minItems?.let { put("minItems", it) }
@@ -217,10 +222,7 @@ sealed class Options(val pick: Pick) {
         }
 
         private fun inline(choices: FromState, state: Any?, body: JsonNode, schema: JsonNode): List<Map<String, Any?>> =
-            combined(choices, state, body, schema).map {
-                // Plain values, not JSON trees: the representation is canonicalized for its validator.
-                mapOf("prompt" to it.prompt, "value" to JsonTrees.plain(it.value.toString()))
-            }
+            combined(choices, state, body, schema).map(::inlineOption)
 
         /** Every choice [choices] gives, over each value the schema's enums allow the pointer's variables. */
         private fun combined(choices: FromState, state: Any?, body: JsonNode, schema: JsonNode): List<Choice> {
@@ -236,3 +238,7 @@ sealed class Options(val pick: Pick) {
         }
     }
 }
+
+/** A choice as an inline HAL-FORMS option: plain values, not JSON trees, as the validator canonicalizes. */
+private fun inlineOption(choice: Choice): Map<String, Any?> =
+    mapOf("prompt" to choice.prompt, "value" to JsonTrees.plain(choice.value.toString()))

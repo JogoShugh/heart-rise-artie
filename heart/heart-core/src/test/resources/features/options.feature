@@ -71,14 +71,19 @@ Feature: Choices from state: a form says where a property's choices are (HAL-SCH
       | a senior who is away        | assignOfficial | {"official": "Lou"}                 | the choices refuse the body at "/official" as not one of the choices     |
       | a junior, for a senior game | assignOfficial | {"official": "Max"}                 | the choices refuse the body at "/official" as not one of the choices     |
 
-  Scenario: HAL-FORMS carries the same choices as HAL-FORMS options
+  Scenario: HAL-FORMS carries the same choices as HAL-FORMS options, filled in where a link could not say where they are
+    A HAL-FORMS options link must answer the list itself: it has no pointer to the list inside a document, as
+    hr:options's "items" is. The officials' list sits under "/officials" in its document, so the server fills
+    those choices in from its own copy, as it does for a page a person reads.
     When the match is rendered in HAL-FORMS
     Then the template "league:foul" property "playerNumber" has these inline options
       | value | prompt |
       | 4     | Ana    |
       | 5     | Cy     |
       | 9     | Dee    |
-    And the template "league:assign-official" property "official" has an options link "/officials?level=senior"
+    And the template "league:assign-official" property "official" has these inline options
+      | value | prompt |
+      | Kim   | Kim    |
     And that HAL-FORMS representation has a validator, as every Layer 1 representation does
 
   # A page for a person is one resource's, so the server fills each choice in, as HAL-FORMS's inline options do:
