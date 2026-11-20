@@ -1,0 +1,24 @@
+# The foul on Rowan sent past ARTIE, straight to the basketball server, after foul-out-1:
+# the game's current ETag as If-Match, so only the choice can be wrong. Token written <token>.
+request:
+  method: POST
+  url: http://localhost:8181/games/2/actions/record-foul
+  headers:
+    Authorization: Bearer <token>
+    Content-Type: application/json
+    Accept: application/hal+json
+    If-Match: '"seq-12.hsf.L0.816206036727826c"'
+  body:
+    team: home
+    playerNumber: 8
+    kind: personal
+response:
+  status: 422
+  body:
+    type: https://w3id.org/heart-rise/problems/invalid-input
+    title: The body does not match the form's schema
+    status: 422
+    detail: request body does not satisfy the affordance schema
+    violations:
+      - pointer: /playerNumber
+        message: 8 is not one of the choices now

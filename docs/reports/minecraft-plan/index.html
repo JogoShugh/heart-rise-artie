@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ARTIE in Minecraft</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&family=Pixelify+Sans:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<style>
+/* A plan page: hero, tiles, then tables; the planned dialogs drawn as Minecraft draws them, on a strip of world. */
+:root {
+  --bg: #f2f3ec; --fg: #1d231f; --muted: #5b675e; --accent: #3a7a33; --earth: #87592c; --card: #fffffa;
+  --rule: #d9d9cb; --chip: #e2eedc; --chip-fg: #285a22; --code: #ecebe1;
+  --sky-top: #8fb8e8; --sky-low: #c4dcf3; --grass: #5d9b3a; --dirt: #79553a;
+  --mc-shade: rgba(14, 14, 14, 0.74); --mc-text: #ffffff; --mc-muted: #c8c8c8; --mc-why: #ffd27a;
+  --mc-btn: #6e6e6e; --mc-btn-hi: #a7a7a7; --mc-btn-lo: #3c3c3c; --mc-edge: #000000; --mc-field: #000000; --mc-field-edge: #a0a0a0;
+  --display: "Source Serif 4", Georgia, serif; --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", Menlo, monospace; --pixel: "Pixelify Sans", "IBM Plex Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121714; --fg: #e2e8e2; --muted: #9daf9f; --accent: #7cc56e; --earth: #d29a5f; --card: #19201b;
+  --rule: #2b372e; --chip: #1f331d; --chip-fg: #b2e3a6; --code: #1e2620;
+  --sky-top: #1f3352; --sky-low: #35507a; --grass: #3f6f2a; --dirt: #4e3826; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #121714; --fg: #e2e8e2; --muted: #9daf9f; --accent: #7cc56e; --earth: #d29a5f; --card: #19201b;
+  --rule: #2b372e; --chip: #1f331d; --chip-fg: #b2e3a6; --code: #1e2620;
+  --sky-top: #1f3352; --sky-low: #35507a; --grass: #3f6f2a; --dirt: #4e3826; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px; }
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 44px; }
+h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
+h1 { font: 600 clamp(2rem, 4.4vw, 2.8rem)/1.08 var(--display); }
+h2 { font: 600 1.45rem/1.2 var(--display); }
+h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+p { margin: 0; }
+a { color: var(--accent); }
+code { font: 0.86em var(--mono); background: var(--code); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+section { display: grid; gap: 14px; min-width: 0; }
+.section-lede { color: var(--muted); max-width: 78ch; }
+.hero { display: grid; gap: 12px; }
+.kicker { font: 600 0.78rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.lede { max-width: 72ch; font-size: 1.07rem; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.tile { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.tile .label { font: 600 0.72rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.tile .n { font: 600 1.35rem/1.2 var(--display); color: var(--accent); }
+.tile .sub { font-size: 0.86rem; color: var(--muted); }
+.three { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.client { border-top: 3px solid var(--accent); background: var(--card); border-radius: 0 0 10px 10px; padding: 12px 14px; display: grid; gap: 6px; align-content: start; }
+.client.mc { border-top-color: var(--earth); }
+.client b { font-size: 0.98rem; }
+.client p { font-size: 0.9rem; color: var(--muted); }
+.tag { justify-self: start; font: 600 0.7rem var(--mono); letter-spacing: 0.04em; padding: 2px 8px; border-radius: 5px; background: var(--chip); color: var(--chip-fg); }
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--card); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.9rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--rule); }
+th { font: 600 0.74rem var(--mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); background: var(--code); }
+tr:last-child td { border-bottom: 0; }
+td.eg { color: var(--muted); }
+ol.steps { margin: 0; padding-left: 22px; display: grid; gap: 8px; max-width: 82ch; }
+.phase { font: 600 0.8rem var(--mono); color: var(--chip-fg); background: var(--chip); padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
+.note { font-size: 0.86rem; color: var(--muted); max-width: 82ch; }
+details { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 0 16px; }
+details[open] { padding-bottom: 14px; }
+summary { cursor: pointer; padding: 12px 0; font-weight: 600; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+details ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.sources { font-size: 0.86rem; }
+
+/* The planned dialogs, drawn on a strip of world. */
+.world { border-radius: 12px; overflow: hidden; border: 1px solid var(--rule);
+  background:
+    linear-gradient(to bottom, transparent 0 78%, var(--grass) 78% 82%, var(--dirt) 82% 100%),
+    linear-gradient(to bottom, var(--sky-top), var(--sky-low));
+  padding: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px; }
+.mc { background: var(--mc-shade); color: var(--mc-text); font-family: var(--pixel); padding: 16px 14px 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.mc .t { text-align: center; font-weight: 600; font-size: 1rem; }
+.mc .b { text-align: center; font-size: 0.86rem; color: var(--mc-muted); line-height: 1.45; }
+.mc .why { color: var(--mc-why); }
+.mc .lab { font-size: 0.8rem; color: var(--mc-muted); }
+.mc .row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.mc .btn { font: 400 0.86rem var(--pixel); color: var(--mc-text); text-align: center; padding: 6px 4px;
+  background: var(--mc-btn); border: 2px solid var(--mc-edge); box-shadow: inset 2px 2px 0 var(--mc-btn-hi), inset -2px -3px 0 var(--mc-btn-lo); }
+.mc .btn.wide { grid-column: 1 / -1; }
+.mc .field { font: 400 0.86rem var(--pixel); background: var(--mc-field); border: 1px solid var(--mc-field-edge); padding: 5px 8px; color: var(--mc-text); }
+.mc-cap { font: 0.78rem var(--mono); color: var(--mc-muted); text-align: center; }
+.mock-note { font-size: 0.84rem; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) { details summary { transition: color 0.15s; } }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">HEART · ARTIE · Plan · 7 November 2026</div>
+    <h1>ARTIE in Minecraft</h1>
+    <p class="lede">A Paper server plugin reads each HEART representation with ARTIE's own client and shows it as a Minecraft dialog: the acts on offer as buttons, their schemas as inputs, and the server's refusals as notices. Players need no mods.</p>
+    <div class="tiles">
+      <div class="tile"><span class="label">Route</span><span class="n">Paper and dialogs</span><span class="sub">Server-driven screens, Java Edition 1.21.6 and later</span></div>
+      <div class="tile"><span class="label">On each player's computer</span><span class="n">Plain Minecraft</span><span class="sub">No client mods</span></div>
+      <div class="tile"><span class="label">Client code</span><span class="n">ARTIE's, reused</span><span class="sub">Kotlin on the JVM, inside the plugin</span></div>
+      <div class="tile"><span class="label">Java</span><span class="n">25 on the server</span><span class="sub">Paper 26.1+ needs it; ARTIE's Java 22 classes run on it</span></div>
+    </div>
+  </header>
+
+  <section>
+    <h2>One representation, three clients</h2>
+    <p class="section-lede">A browser doesn't know about banks; it knows links and forms. A Minecraft dialog can be the same kind of client: it knows buttons and inputs, and the representation says which ones to show.</p>
+    <div class="three">
+      <div class="client"><span class="tag">text/html</span><b>A person in a browser</b><p>Buttons for the acts on offer, already built.</p></div>
+      <div class="client"><span class="tag">HAL Schema Forms</span><b>A model through ARTIE</b><p>A form to fill, with a closed set of choices, already built.</p></div>
+      <div class="client mc"><span class="tag">Minecraft dialog</span><b>A player in Minecraft</b><p>A dialog with buttons and inputs, planned here. The server enforces the same rules for all three.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>How a representation becomes a dialog</h2>
+    <p class="section-lede">Examples are the kit's deploy service, app <code>web</code>.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>In the HEART representation</th><th>In the dialog</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>The resource's state</td><td>Body text</td><td class="eg">web · idle</td></tr>
+        <tr><td>The acts on offer now</td><td>One button each, in a several-button dialog</td><td class="eg">Deploy, Scale the app</td></tr>
+        <tr><td>Why an act is absent (<code>hr:unavailable</code>)</td><td>A line of body text</td><td class="eg">Cancel: No deployment is in progress.</td></tr>
+        <tr><td>Links</td><td>A button that follows it</td><td class="eg">Releases</td></tr>
+        <tr><td>An act's form</td><td>A second dialog with inputs; one button sends, one goes back</td><td class="eg">Deploy</td></tr>
+        <tr><td>A string with <code>enum</code></td><td>Single option</td><td class="eg">Environment: staging, production</td></tr>
+        <tr><td>Choices from state (<code>hr:options</code>)</td><td>Single option, filled with the set the server resolves</td><td class="eg">Region: US East only (EU West unavailable). Release: 1.0 and 1.1 only (1.2 failed)</td></tr>
+        <tr><td>A string</td><td>Text input, its length from the schema's <code>maxLength</code></td><td class="eg">Cancel's reason</td></tr>
+        <tr><td>A boolean</td><td>Tick box</td><td class="eg">None in this service</td></tr>
+        <tr><td>An integer with a minimum and a maximum</td><td>Slider, step 1</td><td class="eg">Replicas has a minimum only, so a text input, checked before sending</td></tr>
+        <tr><td>A success</td><td>The next dialog, from the new representation</td><td class="eg">web · deploying</td></tr>
+        <tr><td>A refusal: 412, 409 or 422</td><td>A one-button notice with the server's own reason, then a fresh read</td><td class="eg">Someone deployed from a browser first: 412</td></tr>
+        <tr><td>A form a dialog can't hold (nested objects, lists)</td><td>A button that opens the same resource in a browser, as <code>text/html</code></td><td class="eg">None in this service</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>The dialogs, as a player would see them</h2>
+    <p class="mock-note">A mock-up of the planned dialogs. The words come from the kit's deploy service: its acts, its choices and its reasons.</p>
+    <div class="world" role="img" aria-label="Four mock Minecraft dialogs: the web app while idle, the deploy form in two steps, and the app while deploying">
+      <div class="mc">
+        <div class="t">web</div>
+        <div class="b">Status: idle<br><span class="why">Cancel: No deployment is in progress.</span></div>
+        <div class="row"><span class="btn">Deploy</span><span class="btn">Scale the app</span><span class="btn">Releases</span><span class="btn">Open in browser</span></div>
+        <div class="mc-cap">the app, idle</div>
+      </div>
+      <div class="mc">
+        <div class="t">Deploy</div>
+        <div class="b">Step 1 of 2: where the region comes from depends on this.</div>
+        <span class="btn wide">Environment: staging</span>
+        <div class="row"><span class="btn">Next</span><span class="btn">Back</span></div>
+        <div class="mc-cap">the form, environment first</div>
+      </div>
+      <div class="mc">
+        <div class="t">Deploy</div>
+        <div class="b">Step 2 of 2: staging</div>
+        <span class="btn wide">Region: US East</span>
+        <span class="btn wide">Release: Release 1.1</span>
+        <div class="row"><span class="btn">Deploy</span><span class="btn">Back</span></div>
+        <div class="mc-cap">only the choices on offer</div>
+      </div>
+      <div class="mc">
+        <div class="t">web</div>
+        <div class="b">Status: deploying<br><span class="why">Deploy: A deployment is in progress.</span><br><span class="why">Scale the app: A deployment is in progress.</span></div>
+        <div class="row"><span class="btn">Cancel</span><span class="btn">Releases</span></div>
+        <div class="mc-cap">after Deploy</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The loop</h2>
+    <ol class="steps">
+      <li>A player runs <code>/artie open &lt;address&gt;</code>. Later, a sign or a lectern can hold an address.</li>
+      <li>The plugin reads the resource with ARTIE's client and keeps its ETag. It does this off the server's main thread, so the game doesn't stall.</li>
+      <li>It builds a dialog with Paper's <code>Dialog.create</code> and shows it with <code>showDialog</code>.</li>
+      <li>The player presses a button. The server receives the button's key and every input's value, read with <code>getText</code>, <code>getBoolean</code> and <code>getFloat</code>.</li>
+      <li>The plugin sends the act with <code>If-Match</code>.</li>
+      <li>The answer becomes the next dialog. A refusal becomes a notice in the server's own words.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Phases</h2>
+    <p class="section-lede">Small steps. You pick each next one.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Phase</th><th>What</th><th>Done when</th></tr></thead>
+      <tbody>
+        <tr><td><span class="phase">0 · Spike</span></td><td>Paper 26.1 on this Mac, on Java 25. One hard-coded dialog with a text input, a single option and two buttons.</td><td>The values a player enters reach the plugin, on plain Minecraft.</td></tr>
+        <tr><td><span class="phase">1 · Read</span></td><td>Any HEART resource as a dialog: its state, a button per act, links to follow, and why each missing act is missing. First against the kit's deploy service.</td><td>A player walks from the workspace to app <code>web</code> and its releases.</td></tr>
+        <tr><td><span class="phase">2 · Act</span></td><td>Forms as input dialogs, sent with <code>If-Match</code>. Refusals as notices.</td><td>A player deploys 1.1 to staging. The same deploy, pressed after someone deployed from a browser, is refused with 412.</td></tr>
+        <tr><td><span class="phase">3 · Goals</span></td><td><code>/artie run release version=1.1</code> runs the kit's kept script, with no model. Each step appears as a chat line, and a stop appears as a notice. Walking a goal with a model is optional, with the key kept on the server.</td><td>The release replays from the game, and a refused replay of 1.2 shows its reason.</td></tr>
+        <tr><td><span class="phase">4 · Side by side</span></td><td>Optional: the same resource as <code>text/html</code> in a browser inside the game (MCEF), beside the dialog.</td><td>One representation, two renderings, in one scene.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>The course, mapped to the phases</h2>
+    <p class="section-lede">stxphen's <a href="https://youtube.com/playlist?list=PL3Cdwhu_4crm-taHKMt9PDZ0zQn5U6o-y">Minecraft Plugin Development (Kotlin)</a>, 90 videos, current to 1.21.9. Watch 1 to 6, then 24, 51 and 52: that is enough for phases 0 to 2.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Phase</th><th>Videos</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><span class="phase">0 · Spike</span></td><td>1 First Plugin · 3 Commands · 4 Command Arguments · <b>51 Dialogs (1.21.7+)</b>, 39 minutes</td><td>A plugin, the <code>/artie</code> command, and the dialog API the plan is built on</td></tr>
+        <tr><td><span class="phase">1 · Read</span></td><td><b>24 Scheduler (Runnables)</b> · 38 Custom JSON Files</td><td>Reading resources off the main thread and showing the dialog back on it; JSON in a plugin</td></tr>
+        <tr><td><span class="phase">2 · Act</span></td><td>51 Dialogs again · 50 Anvil Text Input</td><td>Reading a dialog's inputs; a fallback for long text</td></tr>
+        <tr><td><span class="phase">3 · Goals</span></td><td><b>52 PROJECT: AI Chat (ChatGPT)</b> · 42 Setting Permissions</td><td>A plugin calling a model over HTTP, the shape of a goal walk from the game; who may run what</td></tr>
+        <tr><td><span class="phase">Later</span></td><td>60 Arena Signs · 33 Display Entities (1.19.4+) · 23 Custom GUIs · 47 Pagination (GUI)</td><td>A sign that holds an address; a resource's state floating over a block; long lists, such as issues, as a chest menu</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Not needed for this plan: the minigame videos (53 to 64), Velocity (65 to 73), Folia (82 and 83) and the Windows server setup (81). On the Mac the server is <code>java -jar paper.jar</code> on Java 25.</p>
+  </section>
+
+  <section>
+    <h2>Limits, and what the plan does about each</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Limit</th><th>What the plan does</th></tr></thead>
+      <tbody>
+        <tr><td>A dialog doesn't change while it's open, so one choice can't narrow another</td><td>It asks in steps: the environment first, then that environment's regions</td></tr>
+        <tr><td>Text inputs default to 32 characters</td><td>It sets <code>max_length</code> from the schema's <code>maxLength</code>, else a longer default</td></tr>
+        <tr><td>The slider needs both a start and an end</td><td>Integers with both bounds get a slider, step 1; any other integer gets a text input, checked before sending</td></tr>
+        <tr><td>No nested objects or lists</td><td>It shows a button that opens the resource in a browser</td></tr>
+        <tr><td>Java Edition only</td><td>Bedrock later, through heart-ts, if wanted</td></tr>
+        <tr><td>Players' Minecraft must be the server's version</td><td>It pins one version for the demo</td></tr>
+        <tr><td>Every act a player makes uses the plugin's one token</td><td>Per-player tokens later; Minecraft's permissions decide who may open what</td></tr>
+        <tr><td>A Minecraft Java account</td><td>You need your own; I can't create one</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <details>
+    <summary>Other routes considered</summary>
+    <ul>
+      <li><b>A real browser in the game (MCEF).</b> Chromium inside Minecraft, a library for other mods. MCEF Modern supports Fabric, Minecraft 26.x and Apple Silicon. Every player must install the mod, and it downloads Chromium. Kept for phase 4.</li>
+      <li><b>Bedrock forms.</b> A button-list form, and a form with text fields, dropdowns, sliders and toggles; also a newer data-driven UI. HTTP calls work only on Bedrock's dedicated server, and are experimental. JavaScript, so heart-ts, not ARTIE.</li>
+      <li><b>DialogAPI.</b> A community library for 1.21.6. Paper's own dialog API, from 1.21.7, is the steadier choice.</li>
+    </ul>
+  </details>
+
+  <details>
+    <summary>Not checked yet</summary>
+    <ul>
+      <li>A dialog's values reaching the plugin on this Mac: phase 0.</li>
+      <li>How long state reads in a dialog's body, and where it needs to be shortened.</li>
+      <li>ARTIE's libraries packed into a plugin without clashing with Paper's: kotlinx-serialization, json-schema-validator and Californium (the CoAP client, which a plugin doesn't need).</li>
+      <li>Whether single option shows as a cycling button or a list on 26.1. The mock-up draws it as a button.</li>
+    </ul>
+  </details>
+
+  <section class="sources">
+    <h3>Sources</h3>
+    <ul>
+      <li><a href="https://youtube.com/playlist?list=PL3Cdwhu_4crm-taHKMt9PDZ0zQn5U6o-y">stxphen: Minecraft Plugin Development (Kotlin)</a></li>
+      <li><a href="https://docs.papermc.io/paper/dev/dialogs/">Paper: Dialog API</a></li>
+      <li><a href="https://jd.papermc.io/paper/1.21.11/io/papermc/paper/dialog/DialogResponseView.html">Paper javadoc: DialogResponseView</a></li>
+      <li><a href="https://minecraft.wiki/w/Dialog">Minecraft Wiki: Dialog</a></li>
+      <li><a href="https://www.minecraft.net/ja-jp/article/minecraft-1-21-6-pre-release-1">Minecraft 1.21.6 Pre-Release 1</a></li>
+      <li><a href="https://docs.papermc.io/paper/getting-started/">Paper: Getting started (Java versions)</a></li>
+      <li><a href="https://discourse.cubecoders.com/t/startup-issue-with-minecraft-minecraft-26-1-and-newer-requires-java-25/39955">CubeCoders: 26.1 and newer requires Java 25</a></li>
+      <li><a href="https://www.mado-hosting.com/en/minecraft-mods/mcef-modern">MCEF Modern</a></li>
+      <li><a href="https://www.modpackindex.com/mod/36616/mcef-minecraft-chromium-embedded-framework">MCEF</a></li>
+      <li><a href="https://learn.microsoft.com/minecraft/creator/scriptapi/minecraft/server-ui/minecraft-server-ui">Bedrock: server-ui</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/minecraft/creator/documents/scripting/intro-to-ddui">Bedrock: data-driven UI</a></li>
+      <li><a href="https://wiki.bedrock.dev/scripting/script-net">Bedrock Wiki: script requests</a></li>
+      <li><a href="https://modrinth.com/plugin/dialogapi">DialogAPI on Modrinth</a></li>
+    </ul>
+  </section>
+</div>
+</html>

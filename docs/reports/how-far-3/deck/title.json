@@ -1,0 +1,138 @@
+{
+  "name": "title",
+  "title": "How I Used Claude and Git Hooks Together to Build a Generic AI Agent for HATEOAS APIs",
+  "part": "The problem",
+  "kicker": "How far 3.0",
+  "tone": "dark",
+  "number": 1,
+  "of": 30,
+  "html": "<h1>How I Used Claude and Git Hooks Together to Build a Generic AI Agent for HATEOAS APIs</h1>\n<p class=\"lead\">Claude wrote nearly all of it, mostly from my dictation. Git hooks kept it honest, one behavior at a time.</p>\n<p class=\"refs\"><small>Borrowed</small> <deck-ref name=\"rule-6\"></deck-ref> <deck-ref name=\"zta\"></deck-ref> <small>Built for</small> <deck-ref name=\"right-behavior\"></deck-ref> <deck-ref name=\"repeatability\"></deck-ref> <deck-ref name=\"resilience\"></deck-ref></p>\n",
+  "say": "Have you ever asked an AI agent to do the same job twice and gotten two different answers? This talk is about how I stopped that, in two places at once. In how the agent works: ARTIE, a generic agent for hypermedia APIs. And in how it was built: Claude wrote nearly all of it, mostly from my dictation, and git hooks kept it honest, one behavior at a time. We'll follow one small, real example the whole way: a library's renewal policy, from one sentence I said, to a release that catches a bad policy before it reaches anyone.",
+  "sources": [],
+  "_links": {
+    "self": {
+      "href": "title.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "next": {
+      "href": "two-answers.json",
+      "title": "Same Question, Two Answers"
+    },
+    "alternate": {
+      "href": "title.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "rule-6",
+        "kind": "rule",
+        "label": "BOOKMARK",
+        "title": "Enter with a bookmark; follow what's offered",
+        "summary": "In brief: one URI and known media types to start; every next step chosen from what the server put in the answer.",
+        "quote": "<p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>",
+        "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/rule-6.json",
+            "title": "BOOKMARK"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+            "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "zta",
+        "kind": "talk",
+        "label": "ZTA",
+        "title": "ZTA: Zero Token Architecture",
+        "summary": "Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. (In my words, from the talk's page and Daniel Cranney's write-up.)",
+        "quote": "<p>“You are all having way too much fun burning way too many tokens”</p><p class=\"note\">His opening line, as quoted in Daniel Cranney, <a href=\"https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture\">“Infer Once, Run Everywhere: Zero-Token Architecture”</a>, WeAreDevelopers, 13 October 2026.</p>",
+        "cite": "Kelsey Hightower, WeAreDevelopers World Congress North America",
+        "date": "26 September 2026",
+        "_links": {
+          "self": {
+            "href": "../refs/zta.json",
+            "title": "ZTA"
+          },
+          "describedby": {
+            "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture",
+            "title": "Kelsey Hightower, WeAreDevelopers World Congress North America"
+          }
+        }
+      },
+      {
+        "name": "right-behavior",
+        "kind": "measure",
+        "label": "RIGHT-BEHAVIOR",
+        "title": "Right behavior: only what the state allows, and a reason when not",
+        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
+        "cite": "The first of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/right-behavior.json",
+            "title": "RIGHT-BEHAVIOR"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The first of the three R's"
+          }
+        }
+      },
+      {
+        "name": "repeatability",
+        "kind": "measure",
+        "label": "REPEATABILITY",
+        "title": "Repeatability: the same goal, the same result, every time",
+        "summary": "Given the same inputs, the same outputs, call after call. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
+        "cite": "The second of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/repeatability.json",
+            "title": "REPEATABILITY"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The second of the three R's"
+          }
+        }
+      },
+      {
+        "name": "resilience",
+        "kind": "measure",
+        "label": "RESILIENCE",
+        "title": "Resilience: the server changes, the client doesn't break",
+        "summary": "When the server changes, or misbehaves on purpose, the client takes the failure path the spec names, re-syncs, and goes on; a model comes back only when the controls really changed, to repair. At the small scale it is the regression suite and the gates that hold, even against the model.",
+        "cite": "The third of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/resilience.json",
+            "title": "RESILIENCE"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The third of the three R's"
+          }
+        }
+      }
+    ]
+  }
+}

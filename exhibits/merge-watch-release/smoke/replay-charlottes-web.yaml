@@ -1,0 +1,1458 @@
+---
+run:
+  inputs:
+    deployed:
+      value: http://localhost:8185/
+      given: given
+      question: Which deployment of the library?
+    book:
+      value: Charlotte's Web
+      given: given
+      default: The Hobbit
+    author:
+      value: E. B. White
+      given: given
+      default: J. R. R. Tolkien
+    renewable:
+      value: Matilda
+      given: default
+      default: Matilda
+    problem:
+      value: damaged
+      given: given
+      default: missing-pages
+    comment:
+      value: Spine cracked.
+      given: given
+      default: Pages 12 to 14.
+---
+at: '2026-11-12T17:12:00.608441Z'
+ms: 128
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8185/
+opens: true
+outcome: done
+address: http://localhost:8185/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        hr:cancel:
+          - sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=
+        library:get-account:
+          - sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4=
+        library:get-loan:
+          - sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y=
+        library:get-member:
+          - sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y=
+        library:get-watch:
+          - sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI=
+        library:search-loans:
+          - sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+        library:search-members:
+          - sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18=
+        library:search-watches:
+          - sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno=
+        library:tell-me-when-renewable:
+          - sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=
+      digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+    - library:search-watches
+    - library:get-watch
+    - library:tell-me-when-renewable
+  links:
+    self:
+      - null
+    alternate:
+      - null
+      - null
+      - null
+      - null
+    service-desc:
+      - null
+    hr:keys:
+      - null
+    hr:affordances:
+      - null
+---
+at: '2026-11-12T17:12:00.745959Z'
+ms: 275
+mode: script
+say: act {relation}, name {name}
+inferred: search the loans for "Charlotte's Web"
+fromIntent: Search the loans for "Charlotte's Web", and open Charlotte's Web
+params:
+  relation: library:search-loans
+  name: Charlotte's Web
+values:
+  name:
+    value: Charlotte's Web
+    type: string
+    from:
+      - input: book
+opens: true
+chose:
+  kind: form
+  relation: library:search-loans
+  title: Find loans by title
+  method: GET
+  target: /loans{?name}
+  address: http://localhost:8185/loans?name=Charlotte%27s%20Web
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+  act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:get-watch
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+    - library:search-watches
+    - library:tell-me-when-renewable
+  links:
+    - alternate
+    - hr:affordances
+    - hr:keys
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8185/loans?name=Charlotte%27s+Web
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Charlotte's Web
+---
+at: '2026-11-12T17:12:01.024098Z'
+ms: 13
+mode: script
+say: follow {relation}, titled {title}
+intent: Search the loans for "Charlotte's Web", and open Charlotte's Web
+params:
+  relation: item
+  title: Charlotte's Web
+values:
+  title:
+    value: Charlotte's Web
+    from:
+      - input: book
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: Charlotte's Web
+  method: GET
+  target: http://localhost:8185/loans/3312
+  address: http://localhost:8185/loans/3312
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8185/loans/3312
+now:
+  state:
+    id: 3312
+    title: Charlotte's Web
+    author: E. B. White
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /title:
+    - 6
+    - 7
+    - 25
+    - 26
+---
+at: '2026-11-12T17:12:01.039770Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/loans?name=Charlotte%27s+Web
+outcome: done
+address: http://localhost:8185/loans?name=Charlotte%27s+Web
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Charlotte's Web
+---
+at: '2026-11-12T17:12:01.043820Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/
+outcome: done
+address: http://localhost:8185/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        hr:cancel:
+          - sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=
+        library:get-account:
+          - sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4=
+        library:get-loan:
+          - sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y=
+        library:get-member:
+          - sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y=
+        library:get-watch:
+          - sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI=
+        library:search-loans:
+          - sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+        library:search-members:
+          - sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18=
+        library:search-watches:
+          - sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno=
+        library:tell-me-when-renewable:
+          - sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=
+      digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+    - library:search-watches
+    - library:get-watch
+    - library:tell-me-when-renewable
+  links:
+    self:
+      - null
+    alternate:
+      - null
+      - null
+      - null
+      - null
+    service-desc:
+      - null
+    hr:keys:
+      - null
+    hr:affordances:
+      - null
+---
+at: '2026-11-12T17:12:01.048939Z'
+ms: 3
+mode: script
+say: act {relation}, name {name}
+inferred: search the loans for "Charlotte's Web"
+fromIntent: Search the loans for "Charlotte's Web", and open Charlotte's Web
+params:
+  relation: library:search-loans
+  name: Charlotte's Web
+values:
+  name:
+    value: Charlotte's Web
+    type: string
+    from:
+      - input: book
+      - step: 3
+        pointer: /title
+opens: true
+chose:
+  kind: form
+  relation: library:search-loans
+  title: Find loans by title
+  method: GET
+  target: /loans{?name}
+  address: http://localhost:8185/loans?name=Charlotte%27s%20Web
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+  act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:get-watch
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+    - library:search-watches
+    - library:tell-me-when-renewable
+  links:
+    - alternate
+    - hr:affordances
+    - hr:keys
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8185/loans?name=Charlotte%27s+Web
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Charlotte's Web
+---
+at: '2026-11-12T17:12:01.053758Z'
+ms: 6
+mode: script
+say: follow {relation}, titled {title}
+intent: Search the loans for "Charlotte's Web", and open Charlotte's Web
+params:
+  relation: item
+  title: Charlotte's Web
+values:
+  title:
+    value: Charlotte's Web
+    from:
+      - input: book
+      - step: 3
+        pointer: /title
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: Charlotte's Web
+  method: GET
+  target: http://localhost:8185/loans/3312
+  address: http://localhost:8185/loans/3312
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8185/loans/3312
+now:
+  state:
+    id: 3312
+    title: Charlotte's Web
+    author: E. B. White
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /title:
+    - 25
+    - 26
+---
+at: '2026-11-12T17:12:01.062722Z'
+ms: 0
+mode: script
+say: check
+params:
+  facts:
+    - member: author
+      test: eq E. B. White
+      held: E. B. White
+      holds: true
+outcome: held
+address: http://localhost:8185/loans/3312
+now:
+  state:
+    id: 3312
+    title: Charlotte's Web
+    author: E. B. White
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T17:12:01.062935Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/loans?name=Charlotte%27s+Web
+outcome: done
+address: http://localhost:8185/loans?name=Charlotte%27s+Web
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Charlotte's Web
+---
+at: '2026-11-12T17:12:01.065808Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/
+outcome: done
+address: http://localhost:8185/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        hr:cancel:
+          - sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=
+        library:get-account:
+          - sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4=
+        library:get-loan:
+          - sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y=
+        library:get-member:
+          - sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y=
+        library:get-watch:
+          - sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI=
+        library:search-loans:
+          - sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+        library:search-members:
+          - sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18=
+        library:search-watches:
+          - sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno=
+        library:tell-me-when-renewable:
+          - sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=
+      digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+    - library:search-watches
+    - library:get-watch
+    - library:tell-me-when-renewable
+  links:
+    self:
+      - null
+    alternate:
+      - null
+      - null
+      - null
+      - null
+    service-desc:
+      - null
+    hr:keys:
+      - null
+    hr:affordances:
+      - null
+---
+at: '2026-11-12T17:12:01.068991Z'
+ms: 3
+mode: script
+say: act {relation}, name {name}
+inferred: search the loans for "Matilda"
+fromIntent: Search the loans for "Matilda", and open Matilda
+params:
+  relation: library:search-loans
+  name: Matilda
+values:
+  name:
+    value: Matilda
+    type: string
+    from:
+      - input: renewable
+opens: true
+chose:
+  kind: form
+  relation: library:search-loans
+  title: Find loans by title
+  method: GET
+  target: /loans{?name}
+  address: http://localhost:8185/loans?name=Matilda
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+  act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:get-watch
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+    - library:search-watches
+    - library:tell-me-when-renewable
+  links:
+    - alternate
+    - hr:affordances
+    - hr:keys
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8185/loans?name=Matilda
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Matilda
+---
+at: '2026-11-12T17:12:01.073166Z'
+ms: 5
+mode: script
+say: follow {relation}, titled {title}
+intent: Search the loans for "Matilda", and open Matilda
+params:
+  relation: item
+  title: Matilda
+values:
+  title:
+    value: Matilda
+    from:
+      - input: renewable
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: Matilda
+  method: GET
+  target: http://localhost:8185/loans/3311
+  address: http://localhost:8185/loans/3311
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8185/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-11-12'
+    renewals: 0
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /title:
+    - 18
+    - 19
+---
+at: '2026-11-12T17:12:01.080022Z'
+ms: 12
+mode: script
+say: act {relation}
+intent: Renew it
+params:
+  relation: library:renew
+opens: true
+chose:
+  kind: form
+  relation: library:renew
+  title: Renew
+  method: POST
+  target: http://localhost:8185/loans/3311/actions/renew
+  address: http://localhost:8185/loans/3311/actions/renew
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-mKB6rkhzosKiuPOCcy+AO/8TOYuWyeVQhs5BrzlmKho=
+  if-match: '"seq-1.hsf.L0.0fa0131d7cc560a0"'
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8185/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /title:
+    - 18
+    - 19
+---
+at: '2026-11-12T17:12:01.092721Z'
+ms: 6
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/loans/3311
+outcome: done
+address: http://localhost:8185/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T17:12:01.100628Z'
+ms: 0
+mode: script
+say: check
+params:
+  facts:
+    - member: due
+      test: isNot 2026-11-12
+      held: '2026-12-03'
+      holds: true
+outcome: held
+address: http://localhost:8185/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T17:12:01.100830Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/loans?name=Matilda
+outcome: done
+address: http://localhost:8185/loans?name=Matilda
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Matilda
+---
+at: '2026-11-12T17:12:01.104129Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/
+outcome: done
+address: http://localhost:8185/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        hr:cancel:
+          - sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=
+        library:get-account:
+          - sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4=
+        library:get-loan:
+          - sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y=
+        library:get-member:
+          - sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y=
+        library:get-watch:
+          - sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI=
+        library:search-loans:
+          - sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+        library:search-members:
+          - sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18=
+        library:search-watches:
+          - sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno=
+        library:tell-me-when-renewable:
+          - sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=
+      digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+    - library:search-watches
+    - library:get-watch
+    - library:tell-me-when-renewable
+  links:
+    self:
+      - null
+    alternate:
+      - null
+      - null
+      - null
+      - null
+    service-desc:
+      - null
+    hr:keys:
+      - null
+    hr:affordances:
+      - null
+---
+at: '2026-11-12T17:12:01.106659Z'
+ms: 2
+mode: script
+say: act {relation}, name {name}
+inferred: search the loans for "Matilda"
+fromIntent: Search the loans for "Matilda", and open Matilda
+params:
+  relation: library:search-loans
+  name: Matilda
+values:
+  name:
+    value: Matilda
+    type: string
+    from:
+      - input: renewable
+      - step: 12
+        pointer: /title
+      - step: 13
+        pointer: /title
+opens: true
+chose:
+  kind: form
+  relation: library:search-loans
+  title: Find loans by title
+  method: GET
+  target: /loans{?name}
+  address: http://localhost:8185/loans?name=Matilda
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+  act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:get-watch
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+    - library:search-watches
+    - library:tell-me-when-renewable
+  links:
+    - alternate
+    - hr:affordances
+    - hr:keys
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8185/loans?name=Matilda
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Matilda
+---
+at: '2026-11-12T17:12:01.110490Z'
+ms: 6
+mode: script
+say: follow {relation}, titled {title}
+intent: Search the loans for "Matilda", and open Matilda
+params:
+  relation: item
+  title: Matilda
+values:
+  title:
+    value: Matilda
+    from:
+      - input: renewable
+      - step: 12
+        pointer: /title
+      - step: 13
+        pointer: /title
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: Matilda
+  method: GET
+  target: http://localhost:8185/loans/3311
+  address: http://localhost:8185/loans/3311
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8185/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T17:12:01.117902Z'
+ms: 8
+mode: script
+say: act {relation}
+intent: Renew it
+params:
+  relation: library:renew
+opens: true
+chose:
+  kind: form
+  relation: library:renew
+  title: Renew
+  method: POST
+  target: http://localhost:8185/loans/3311/actions/renew
+  address: http://localhost:8185/loans/3311/actions/renew
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-mKB6rkhzosKiuPOCcy+AO/8TOYuWyeVQhs5BrzlmKho=
+  if-match: '"seq-2.hsf.L0.d6602183ef001c2a"'
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8185/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-12-24'
+    renewals: 2
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T17:12:01.126128Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/loans/3311
+outcome: done
+address: http://localhost:8185/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-12-24'
+    renewals: 2
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T17:12:01.130953Z'
+ms: 12
+mode: script
+say: act {relation}
+inferred: renew the loan
+params:
+  relation: library:renew
+chose:
+  kind: form
+  relation: library:renew
+  title: Renew
+  method: POST
+  target: http://localhost:8185/loans/3311/actions/renew
+  address: http://localhost:8185/loans/3311/actions/renew
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-mKB6rkhzosKiuPOCcy+AO/8TOYuWyeVQhs5BrzlmKho=
+  if-match: '"seq-3.hsf.L0.306b00d4f35b715d"'
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    - hr:unavailable
+    - self
+outcome: refused
+address: http://localhost:8185/loans/3311
+refused:
+  kind: stale
+  by: the server
+  detail: the resource changed since it was read
+---
+at: '2026-11-12T17:12:01.143880Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/loans?name=Matilda
+outcome: done
+address: http://localhost:8185/loans?name=Matilda
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Matilda
+---
+at: '2026-11-12T17:12:01.146210Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/
+outcome: done
+address: http://localhost:8185/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        hr:cancel:
+          - sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=
+        library:get-account:
+          - sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4=
+        library:get-loan:
+          - sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y=
+        library:get-member:
+          - sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y=
+        library:get-watch:
+          - sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI=
+        library:search-loans:
+          - sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+        library:search-members:
+          - sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18=
+        library:search-watches:
+          - sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno=
+        library:tell-me-when-renewable:
+          - sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=
+      digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+    - library:search-watches
+    - library:get-watch
+    - library:tell-me-when-renewable
+  links:
+    self:
+      - null
+    alternate:
+      - null
+      - null
+      - null
+      - null
+    service-desc:
+      - null
+    hr:keys:
+      - null
+    hr:affordances:
+      - null
+---
+at: '2026-11-12T17:12:01.148317Z'
+ms: 3
+mode: script
+say: act {relation}, name {name}
+inferred: search the loans for "Charlotte's Web"
+fromIntent: Search the loans for "Charlotte's Web", and open Charlotte's Web
+params:
+  relation: library:search-loans
+  name: Charlotte's Web
+values:
+  name:
+    value: Charlotte's Web
+    type: string
+    from:
+      - input: book
+      - step: 3
+        pointer: /title
+      - step: 7
+        pointer: /title
+opens: true
+chose:
+  kind: form
+  relation: library:search-loans
+  title: Find loans by title
+  method: GET
+  target: /loans{?name}
+  address: http://localhost:8185/loans?name=Charlotte%27s%20Web
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+  act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:get-watch
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+    - library:search-watches
+    - library:tell-me-when-renewable
+  links:
+    - alternate
+    - hr:affordances
+    - hr:keys
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8185/loans?name=Charlotte%27s+Web
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Charlotte's Web
+---
+at: '2026-11-12T17:12:01.152373Z'
+ms: 4
+mode: script
+say: follow {relation}, titled {title}
+intent: Search the loans for "Charlotte's Web", and open Charlotte's Web
+params:
+  relation: item
+  title: Charlotte's Web
+values:
+  title:
+    value: Charlotte's Web
+    from:
+      - input: book
+      - step: 3
+        pointer: /title
+      - step: 7
+        pointer: /title
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: Charlotte's Web
+  method: GET
+  target: http://localhost:8185/loans/3312
+  address: http://localhost:8185/loans/3312
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8185/loans/3312
+now:
+  state:
+    id: 3312
+    title: Charlotte's Web
+    author: E. B. White
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T17:12:01.157217Z'
+ms: 17
+mode: script
+say: act {relation}, problem {problem}, comment {comment}
+intent: Report damaged on it, saying "Spine cracked."
+params:
+  relation: library:report-problem
+  problem: damaged
+  comment: Spine cracked.
+values:
+  problem:
+    value: damaged
+    type: string
+    from:
+      - input: problem
+  comment:
+    value: Spine cracked.
+    type: string
+    from:
+      - input: comment
+opens: true
+chose:
+  kind: form
+  relation: library:report-problem
+  title: Report a problem
+  method: POST
+  target: http://localhost:8185/loans/3312/actions/report-problem
+  address: http://localhost:8185/loans/3312/actions/report-problem
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+  act: sha256-M7uvJU9wvS8gI9X3f9Fh2oELWtan92UFPWZES08rYYo=
+  if-match: '"seq-1.hsf.L0.678473ad13256252"'
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8185/loans/3312
+now:
+  state:
+    id: 3312
+    title: Charlotte's Web
+    author: E. B. White
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+    reported:
+      problem: damaged
+      comment: Spine cracked.
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T17:12:01.175749Z'
+ms: 7
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/loans/3312
+outcome: done
+address: http://localhost:8185/loans/3312
+now:
+  state:
+    id: 3312
+    title: Charlotte's Web
+    author: E. B. White
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+    reported:
+      problem: damaged
+      comment: Spine cracked.
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T17:12:01.183514Z'
+ms: 0
+mode: script
+say: check
+params:
+  facts:
+    - member: /reported/problem
+      test: eq damaged
+      held: damaged
+      holds: true
+outcome: held
+address: http://localhost:8185/loans/3312
+now:
+  state:
+    id: 3312
+    title: Charlotte's Web
+    author: E. B. White
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+    reported:
+      problem: damaged
+      comment: Spine cracked.
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-11-12T17:12:01.183699Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/loans?name=Charlotte%27s+Web
+outcome: done
+address: http://localhost:8185/loans?name=Charlotte%27s+Web
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Charlotte's Web
+---
+at: '2026-11-12T17:12:01.186373Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8185/
+outcome: done
+address: http://localhost:8185/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        hr:cancel:
+          - sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg=
+        library:get-account:
+          - sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4=
+        library:get-loan:
+          - sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y=
+        library:get-member:
+          - sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y=
+        library:get-watch:
+          - sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI=
+        library:search-loans:
+          - sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+        library:search-members:
+          - sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18=
+        library:search-watches:
+          - sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno=
+        library:tell-me-when-renewable:
+          - sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU=
+      digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+    - library:search-watches
+    - library:get-watch
+    - library:tell-me-when-renewable
+  links:
+    self:
+      - null
+    alternate:
+      - null
+      - null
+      - null
+      - null
+    service-desc:
+      - null
+    hr:keys:
+      - null
+    hr:affordances:
+      - null

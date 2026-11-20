@@ -1,0 +1,5 @@
+[
+  "import api\nr=api.searchEmployees(name=\"Miller\")\nprint(r)",
+  "import api\nfor i in range(3,9):\n    print(api.getEmployee(i))",
+  "import api\nfor i in range(3,7):\n    g=api.getEmployee(i); s=g['body']['status']; e=g['etag']\n    if s=='working': print(i,api.giveNotice(i,{},if_match=e))\n    elif s=='on notice': print(i,api.dismiss(i,if_match=e))"
+]

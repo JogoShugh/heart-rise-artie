@@ -1,0 +1,68 @@
+{
+  "name": "title",
+  "title": "The Goal in Pictures",
+  "part": "The goal",
+  "kicker": "From plain words to the release at run time, in both dialects",
+  "tone": "dark",
+  "number": 1,
+  "of": 19,
+  "html": "<h1>The Goal in Pictures</h1>\n<div class=\"goal-hero\">\n  <p class=\"goal-line\">Release a pull request to Dev once it can be merged and its build passes its smoke test.</p>\n  <p class=\"refs\"><deck-fragment name=\"goal\">the goal, whole</deck-fragment></p>\n</div>\n<p class=\"lead\">Walked once with Claude, kept as a script, and released with no model, in both of HEART's dialects: HAL Schema Forms, and HAL-FORMS.</p>\n<div class=\"four\" style=\"grid-template-columns: repeat(3, minmax(0, 1fr))\">\n  <div><b>HAL Schema Forms</b><span>4 of 5 promoted, 0 model calls per release</span></div>\n  <div><b>HAL-FORMS</b><span>4 of 5 promoted, 0 model calls per release</span></div>\n  <div><b>504 stopped</b><span>by its smoke test, in both, as it should be</span></div>\n</div>\n",
+  "say": "Remember the release goal: release a pull request to Dev once it can be merged and its build passes its smoke test. Eight lines of plain words. We walked it once with Claude and kept it as a script, in HAL Schema Forms. Today the same goal again, but every party answers in HAL-FORMS, the on-ramp dialect, _templates only. Walked once more with Claude, kept by the generator alone, and released five times with no model. Same outcome. Today I want you to see it: where it runs, what each line becomes, and the path it takes through the web.",
+  "sources": [
+    {
+      "label": "release.goal.md",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.goal.md"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "title.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "next": {
+      "href": "where.json",
+      "title": "Where the Release Runs"
+    },
+    "alternate": {
+      "href": "title.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:fragment": [
+      {
+        "name": "goal",
+        "label": "The goal, whole (release.goal.md)",
+        "lang": "markdown",
+        "path": "exhibits/merge-watch-release/release.goal.md",
+        "lines": "19–28",
+        "of": 28,
+        "text": "Release a pull request to Dev once it can be merged and its build passes its smoke test.\n\n- Open pull request {pull} of {owner}/{repo} `as pr`\n- At {watcher}, ask to be told when {pr} offers scm:merge `as watch`\n- Once {watch} is answered, at {pr}, merge it by squashing `as merged`\n- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`\n- Once {build} is answered, follow its in-reply-to link to the build `as built`\n  - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`\n- If {smoke.passed}, at {dev}, open environment {environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed `as promotion`\n  Otherwise, at {pr}, act scm:comment with body = \"Not promoted to Dev: smoke scenarios {smoke.failed} failed.\"",
+        "_links": {
+          "self": {
+            "href": "fragments/title--goal.json",
+            "title": "The goal, whole (release.goal.md)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.goal.md#L19-L28",
+            "title": "exhibits/merge-watch-release/release.goal.md, lines 19–28"
+          }
+        }
+      }
+    ]
+  }
+}

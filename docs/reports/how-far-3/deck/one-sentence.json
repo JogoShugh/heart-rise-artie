@@ -1,0 +1,71 @@
+{
+  "name": "one-sentence",
+  "title": "It Starts With One Sentence",
+  "part": "One behavior, start to finish",
+  "kicker": "Dictated, through /remote-control",
+  "tone": "light",
+  "number": 7,
+  "of": 30,
+  "html": "<h2>It Starts With One Sentence</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <p class=\"lead\">The library renews three weeks at a time, and that was written into the code.</p>\n    <div><h3>What I Wanted</h3><p>The renewal period in a policy file, kept with the library’s code, so a pull request can change it.</p></div>\n    <div><h3>What I Gave</h3><p>One sentence, dictated. That’s the whole specification.</p></div>\n    <p class=\"refs\"><deck-ref name=\"no-time\"></deck-ref></p>\n  </div>\n  <div class=\"phone\">\n    <p class=\"phone-head\">/remote-control</p>\n    <p class=\"me\">Let the library's renewal period come from its policy file, so a commit can change it. If the file doesn't say, keep three weeks.</p>\n    <p class=\"it\">Writing the scenario first.</p>\n    <p class=\"note\">Illustrative: the kind of sentence I dictate. The change itself is real, commit e3dbaca4, 11 November 2026.</p>\n  </div>\n</div>\n",
+  "say": "Now, how it was built. Let's follow one real change, from start to finish. The library renews three weeks at a time, and that was written into the code. I wanted it in a policy file instead, kept with the library's code, so a pull request could change it. So I said one sentence, more or less this one, into my phone. That's the whole specification I gave. Everything that follows, Claude did, and the hooks made sure it did it in the right order.",
+  "sources": [
+    {
+      "label": "Claude Code docs: /remote-control",
+      "href": "https://code.claude.com/docs/en/remote-control"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "one-sentence.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "the-library.json",
+      "title": "Meet the Library"
+    },
+    "next": {
+      "href": "scenario-first.json",
+      "title": "Claude Writes the Scenario First"
+    },
+    "alternate": {
+      "href": "one-sentence.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "no-time",
+        "kind": "ground",
+        "label": "NO-TIME",
+        "title": "No time to type",
+        "summary": "Family and a new dog took the typing time: one hand on a leash, a phone in the other. Half the fix is Claude Code's /remote-control: the session runs on my machine, steered mostly by speech-to-text dictation. The other half is rigour without watching: the agent must behave the same way every time and follow BDD strictly (Gherkin, red, code, green, commit), so hooks enforce the order and log every run, and the record is read later instead of the agent being monitored. Controls that hold while nobody watches: what this talk asks of agents calling APIs too.",
+        "cite": "Claude Code docs: /remote-control, continue a local session from a phone or a browser",
+        "_links": {
+          "self": {
+            "href": "../refs/no-time.json",
+            "title": "NO-TIME"
+          },
+          "describedby": {
+            "href": "https://code.claude.com/docs/en/remote-control",
+            "title": "Claude Code docs: /remote-control, continue a local session from a phone or a browser"
+          }
+        }
+      }
+    ]
+  }
+}

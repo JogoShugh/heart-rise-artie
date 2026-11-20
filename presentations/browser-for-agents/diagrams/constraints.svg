@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 270" role="img" aria-labelledby="constraints-title constraints-desc">
+<title id="constraints-title">REST's four interface constraints</title>
+<desc id="constraints-desc">Identification of resources, manipulation through representations and self-descriptive messages are kept by most HTTP APIs. The fourth, hypermedia as the engine of application state, is mostly dropped, and it is the one a generic client needs.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="constraints-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="480" y="28" text-anchor="middle">REST's four interface constraints (Fielding, 2000, §5.1.5)</text>
+<rect class="box" x="40" y="60" width="205" height="110" rx="10"/>
+<text class="h" x="142" y="110" text-anchor="middle">Identification</text>
+<text class="s" x="142" y="130" text-anchor="middle">of resources</text>
+<rect class="box" x="265" y="60" width="205" height="110" rx="10"/>
+<text class="h" x="367" y="110" text-anchor="middle">Manipulation</text>
+<text class="s" x="367" y="130" text-anchor="middle">through representations</text>
+<rect class="box" x="490" y="60" width="205" height="110" rx="10"/>
+<text class="h" x="592" y="110" text-anchor="middle">Self-descriptive</text>
+<text class="s" x="592" y="130" text-anchor="middle">messages</text>
+<rect class="hl" x="715" y="60" width="205" height="110" rx="10"/>
+<text class="h" x="817" y="100" text-anchor="middle">Hypermedia</text>
+<text class="s" x="817" y="120" text-anchor="middle">as the engine of</text>
+<text class="s" x="817" y="140" text-anchor="middle">application state</text>
+<path class="line" d="M40 190 L40 200 L695 200 L695 190"/>
+<text class="s" x="367" y="228" text-anchor="middle">kept by most HTTP APIs</text>
+<path class="accline" d="M715 190 L715 200 L920 200 L920 190"/>
+<text class="t" x="817" y="228" text-anchor="middle">mostly dropped</text>
+<text class="s" x="817" y="250" text-anchor="middle">and the one a generic client needs</text>
+</svg>

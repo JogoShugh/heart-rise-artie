@@ -1,0 +1,21 @@
+{
+  "name": "run-logging",
+  "label": "Every run leaves one line, even a failed compile (stacks/gradle-kotlin/templates/bdd-run-logging.gradle.kts)",
+  "lang": "kotlin",
+  "path": "bdd-gates: stacks/gradle-kotlin/templates/bdd-run-logging.gradle.kts",
+  "lines": "1–29",
+  "of": 29,
+  "text": "// bdd-gates: records \"BDD_RUN PASS|FAIL\" after every test run, including failed ones.\n// Needs: import java.time.Instant and java.time.temporal.ChronoUnit at the top of the build script.\n\nval logBddRun by tasks.registering {\n    group = \"verification\"\n    description = \"Appends a BDD_RUN fact to .claude/tdd-events.log for the pre-commit TDD-ordering check.\"\n    doLast {\n        // RESULT_XML: the JUnit XML written for the Cucumber suite runner class.\n        val resultFile = file(\"build/test-results/test/TEST-<your.package>.RunCucumberTest.xml\")\n        val logFile = file(\".claude/tdd-events.log\")\n        val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)\n        logFile.parentFile.mkdirs()\n        if (!resultFile.exists()) {\n            // No result file means compilation or discovery failed: still red.\n            logFile.appendText(\"$timestamp BDD_RUN FAIL reason=no-results\\n\")\n            return@doLast\n        }\n        val xml = resultFile.readText()\n        fun attr(name: String) = Regex(\"\"\"$name=\"(\\d+)\"\"\"\").find(xml)?.groupValues?.get(1) ?: \"0\"\n        val status = if (attr(\"failures\") == \"0\" && attr(\"errors\") == \"0\") \"PASS\" else \"FAIL\"\n        logFile.appendText(\n            \"$timestamp BDD_RUN $status total=${attr(\"tests\")} failures=${attr(\"failures\")} errors=${attr(\"errors\")}\\n\",\n        )\n    }\n}\n\ntasks.test {\n    finalizedBy(logBddRun)\n}",
+  "_links": {
+    "self": {
+      "href": "right-red--run-logging.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/stacks/gradle-kotlin/templates/bdd-run-logging.gradle.kts",
+      "title": "stacks/gradle-kotlin/templates/bdd-run-logging.gradle.kts, lines 1–29"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

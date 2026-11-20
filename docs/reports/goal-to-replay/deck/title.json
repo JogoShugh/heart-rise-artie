@@ -1,0 +1,110 @@
+{
+  "name": "title",
+  "title": "One Goal, Walked Once, Replayed Free",
+  "part": "The goal",
+  "kicker": "From plain words to a zero-token release",
+  "tone": "dark",
+  "number": 1,
+  "of": 17,
+  "html": "<h1>One Goal, Walked Once, Replayed Free</h1>\n<div class=\"goal-hero\">\n  <p class=\"goal-line\">Release a pull request to Dev once it can be merged and its build passes its smoke test.</p>\n  <ol class=\"goal-steps\">\n    <li>Open pull request <i>{pull}</i></li>\n    <li>Ask the watcher to say when it offers <code>scm:merge</code></li>\n    <li>Once answered, merge it by squashing</li>\n    <li>Ask Jenkins to build the merge commit, and to say how it goes</li>\n    <li>Once answered, run the smoke script the build links</li>\n    <li>If it passed, promote the commit to Dev; otherwise, comment why not</li>\n  </ol>\n</div>\n<p class=\"lead\">Plain words. No URLs, no methods, no job names. Claude walks it once; every release after runs with no model, on GitHub or GitLab.</p>\n<p class=\"refs\"><deck-fragment name=\"goal\">the goal, whole</deck-fragment> <deck-ref name=\"zta\"></deck-ref> <deck-ref name=\"rule-6\"></deck-ref></p>\n",
+  "say": "Have you ever wished you could just write down what a release should do, in plain words, and have it happen? Here's one. Release a pull request to Dev once it can be merged and its build passes its smoke test. Eight lines under it say how: open the pull request, wait until it can be merged, merge it, have Jenkins build it, smoke-test the preview, then promote to Dev, or say why not. No URLs, no HTTP methods, no Jenkins job names. Claude walks it once. After that it runs every release with no model at all, on GitHub or GitLab. Let me show you why that works, and then how.",
+  "sources": [
+    {
+      "label": "release.goal.md",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.goal.md"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "title.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "next": {
+      "href": "sync-reason-act.json",
+      "title": "Sync, Reason, Act"
+    },
+    "alternate": {
+      "href": "title.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "zta",
+        "kind": "talk",
+        "label": "ZTA",
+        "title": "ZTA: Zero Token Architecture",
+        "summary": "Agents that run inference on every call burn tokens and work against zero trust. Infer once, then run the result as reliable, deterministic code. (In my words, from the talk's page and Daniel Cranney's write-up.)",
+        "quote": "<p>“You are all having way too much fun burning way too many tokens”</p><p class=\"note\">His opening line, as quoted in Daniel Cranney, <a href=\"https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture\">“Infer Once, Run Everywhere: Zero-Token Architecture”</a>, WeAreDevelopers, 13 October 2026.</p>",
+        "cite": "Kelsey Hightower, WeAreDevelopers World Congress North America",
+        "date": "26 September 2026",
+        "_links": {
+          "self": {
+            "href": "../refs/zta.json",
+            "title": "ZTA"
+          },
+          "describedby": {
+            "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture",
+            "title": "Kelsey Hightower, WeAreDevelopers World Congress North America"
+          }
+        }
+      },
+      {
+        "name": "rule-6",
+        "kind": "rule",
+        "label": "BOOKMARK",
+        "title": "Enter with a bookmark; follow what's offered",
+        "summary": "In brief: one URI and known media types to start; every next step chosen from what the server put in the answer.",
+        "quote": "<p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>",
+        "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/rule-6.json",
+            "title": "BOOKMARK"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+            "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+          }
+        }
+      }
+    ],
+    "deck:fragment": [
+      {
+        "name": "goal",
+        "label": "The goal, whole (release.goal.md)",
+        "lang": "markdown",
+        "path": "exhibits/merge-watch-release/release.goal.md",
+        "lines": "2–28",
+        "of": 28,
+        "text": "start: \"{scm}\"\ninputs:\n  pull:      { question: \"Which pull request?\" }\n  owner:     { default: acme }\n  repo:      { default: web }\n  scm:       { default: \"http://localhost:8098/\" }\n  watcher:   { default: \"http://localhost:8099/\" }\n  jenkins:   { default: \"http://localhost:8170/\" }\n  dev:       { default: \"http://localhost:8190/\" }\n  environment: { default: \"1\" }\n  book:      { default: \"The Hobbit\" }\n  author:    { default: \"J. R. R. Tolkien\" }\n  renewable: { default: \"Matilda\" }\n  problem:   { default: \"missing-pages\" }\n  comment:   { default: \"Pages 12 to 14.\" }\n---\n\nRelease a pull request to Dev once it can be merged and its build passes its smoke test.\n\n- Open pull request {pull} of {owner}/{repo} `as pr`\n- At {watcher}, ask to be told when {pr} offers scm:merge `as watch`\n- Once {watch} is answered, at {pr}, merge it by squashing `as merged`\n- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`\n- Once {build} is answered, follow its in-reply-to link to the build `as built`\n  - Run the smoke script it links as ci:smoke-test, on the deployment it links as ci:deployment, with book = {book}, author = {author}, renewable = {renewable}, problem = {problem}, comment = {comment} `as smoke`\n- If {smoke.passed}, at {dev}, open environment {environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed `as promotion`\n  Otherwise, at {pr}, act scm:comment with body = \"Not promoted to Dev: smoke scenarios {smoke.failed} failed.\"",
+        "_links": {
+          "self": {
+            "href": "fragments/title--goal.json",
+            "title": "The goal, whole (release.goal.md)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.goal.md#L2-L28",
+            "title": "exhibits/merge-watch-release/release.goal.md, lines 2–28"
+          }
+        }
+      }
+    ]
+  }
+}

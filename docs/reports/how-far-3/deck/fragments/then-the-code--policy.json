@@ -1,0 +1,21 @@
+{
+  "name": "policy",
+  "label": "The library's policy (LibraryPolicy.kt)",
+  "lang": "kotlin",
+  "path": "heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/LibraryPolicy.kt",
+  "lines": "1–30",
+  "of": 30,
+  "text": "package com.artie.heart.sims.library\n\nimport java.nio.file.Files\nimport java.nio.file.Path\nimport java.util.Properties\n\n/**\n * The library's rules, as its policy file says them: a Java properties file kept with the library's code, so a\n * commit can change them and what a build deploys is what that commit says. A rule the file leaves out keeps its\n * default.\n */\ndata class LibraryPolicy(\n    /** How far a renewal moves a loan's due date: `renewal.weeks`. */\n    val renewalWeeks: Long = DEFAULT_RENEWAL_WEEKS,\n) {\n    companion object {\n        const val DEFAULT_RENEWAL_WEEKS = 3L\n\n        /** The policy [text] says, a properties file's lines. */\n        fun of(text: String): LibraryPolicy {\n            val read = Properties().apply { load(text.reader()) }\n            return LibraryPolicy(\n                renewalWeeks = read.getProperty(\"renewal.weeks\")?.trim()?.toLong() ?: DEFAULT_RENEWAL_WEEKS,\n            )\n        }\n\n        /** The policy in the file at [path]. */\n        fun read(path: Path): LibraryPolicy = of(Files.readString(path))\n    }\n}",
+  "_links": {
+    "self": {
+      "href": "then-the-code--policy.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/LibraryPolicy.kt",
+      "title": "heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/LibraryPolicy.kt, lines 1–30"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

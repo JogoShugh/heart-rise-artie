@@ -1,0 +1,25 @@
+{
+  "name": "hooks",
+  "title": "Instructions are advisory. Hooks are not.",
+  "part": "How it was built",
+  "kicker": "How it was built · Determinism through hooks",
+  "tone": "light",
+  "number": 44,
+  "of": 54,
+  "html": "<h2>Instructions are advisory. Hooks are not.</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);\">\n  <div class=\"rows\">\n    <div class=\"table-scroll\"><table>\n      <thead><tr><th>Gate</th><th>Where</th><th>What it holds</th></tr></thead>\n      <tbody>\n        <tr><td>Gherkin first</td><td>PreToolUse</td><td>No production code until a scenario says what it must do</td></tr>\n        <tr><td>Red, logged</td><td>PostToolUse</td><td>A failing test run is recorded before the first src/main write</td></tr>\n        <tr><td>Green to stop</td><td>Stop</td><td>The session can’t end with the suite red</td></tr>\n        <tr><td>Ordering at commit</td><td>git pre-commit</td><td>The log must show feature, red, code, green, in that order</td></tr>\n        <tr><td>Gate protection</td><td>PreToolUse</td><td>The gates and their log can’t be edited by the model</td></tr>\n      </tbody>\n    </table></div>\n    <p class=\"punch\">Claude Code hooks guard the edits; git hooks guard the history.</p>\n    <p class=\"refs\"><deck-fragment name=\"hooks\">hooks.json</deck-fragment></p>\n  </div>\n  <div class=\"card dark\" style=\"box-shadow: inset 0 0 0 1.5px rgba(227, 179, 65, 0.45); align-content: center; padding: 1.6rem;\">\n    <p style=\"font: 700 3.6rem/1 var(--display); color: #e3b341; margin: 0;\">0</p>\n    <p>model calls to enforce them. The gates are scripts the harness runs, not instructions the model may forget.</p>\n  </div>\n</div>\n",
+  "say": "The bdd-gates skill. A model can be told to write the test first; it can't be trusted to always do it. Hooks make it a property of the environment. They cost zero tokens.",
+  "sources": [
+    {
+      "label": "bdd-gates skill",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    },
+    {
+      "label": "Claude Code hooks",
+      "href": "https://code.claude.com/docs/en/hooks"
+    },
+    {
+      "label": "Git hooks",
+      "href": "https://git-scm.com/docs/githooks"
+    }
+  ]
+}

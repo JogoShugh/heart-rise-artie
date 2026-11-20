@@ -1,0 +1,4305 @@
+---
+run:
+  inputs: {}
+  model:
+    name: claude-sonnet-5-5
+    url: https://api.anthropic.com
+  usage:
+    calls: 10
+    input: 3540
+    output: 2092
+    cache_read: 9180
+    cache_write: 0
+---
+at: '2026-11-03T16:37:27.196588Z'
+ms: 55
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8099/
+opens: true
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:give-notice:
+          - sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-GCerD3XToO0sVD76Cf3xiuMDVGXnig5O0MLt8iHQGB4=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T16:37:27.259619Z'
+ms: 74
+mode: script
+say: act {relation}, name {name}
+intent: Find the employees named Took
+params:
+  relation: staff:search-employees
+  name: Took
+values:
+  name:
+    value: Took
+    type: string
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: staff:search-employees
+  title: Find employees by name
+  method: GET
+  target: /employees{?name}
+  address: http://localhost:8099/employees?name=Took
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:27.339791Z'
+ms: 11
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip01 Took
+values:
+  title:
+    value: Pip01 Took
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Pip01 Took
+  method: GET
+  target: http://localhost:8099/employees/3
+  address: http://localhost:8099/employees/3
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/3
+now:
+  state:
+    id: 3
+    firstName: Pip01
+    lastName: Took
+    role: hobbit
+    status: working
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+keeps:
+  /lastName:
+    - 7
+    - 11
+    - 15
+    - 19
+    - 23
+    - 27
+    - 31
+    - 35
+    - 39
+    - 43
+    - 46
+    - 49
+    - 52
+    - 55
+    - 58
+    - 61
+    - 64
+    - 67
+    - 70
+    - 74
+    - 76
+    - 78
+    - 80
+    - 82
+    - 84
+    - 86
+    - 88
+    - 90
+    - 92
+---
+at: '2026-11-03T16:37:27.351646Z'
+ms: 6
+mode: script
+say: act {relation}
+intent: Give notice to anyone working
+params:
+  relation: staff:give-notice
+opens: true
+chose:
+  kind: form
+  relation: staff:give-notice
+  title: Give notice
+  method: POST
+  target: /employees/{id}/actions/give-notice
+  address: http://localhost:8099/employees/3/actions/give-notice
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/0489e15c599ce443
+    integrity: sha256-BInhXFmc5EODDFLpqj4ZeggX2J+nAafNRcm1dEWwsEo=
+  form: sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.2281b1facc231497"'
+offered:
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/3
+now:
+  state:
+    id: 3
+    firstName: Pip01
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.359276Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees/3
+outcome: done
+address: http://localhost:8099/employees/3
+now:
+  state:
+    id: 3
+    firstName: Pip01
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.363914Z'
+ms: 5
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:27.369697Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip02 Took
+values:
+  title:
+    value: Pip02 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip02 Took
+  method: GET
+  target: http://localhost:8099/employees/4
+  address: http://localhost:8099/employees/4
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/4
+now:
+  state:
+    id: 4
+    firstName: Pip02
+    lastName: Took
+    role: hobbit
+    status: working
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.374028Z'
+ms: 3
+mode: script
+say: act {relation}
+intent: Give notice to anyone working
+params:
+  relation: staff:give-notice
+opens: true
+chose:
+  kind: form
+  relation: staff:give-notice
+  title: Give notice
+  method: POST
+  target: /employees/{id}/actions/give-notice
+  address: http://localhost:8099/employees/4/actions/give-notice
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/0489e15c599ce443
+    integrity: sha256-BInhXFmc5EODDFLpqj4ZeggX2J+nAafNRcm1dEWwsEo=
+  form: sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.2db77e4f6f40070c"'
+offered:
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/4
+now:
+  state:
+    id: 4
+    firstName: Pip02
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.377623Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees/4
+outcome: done
+address: http://localhost:8099/employees/4
+now:
+  state:
+    id: 4
+    firstName: Pip02
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.380913Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:27.384490Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip03 Took
+values:
+  title:
+    value: Pip03 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip03 Took
+  method: GET
+  target: http://localhost:8099/employees/5
+  address: http://localhost:8099/employees/5
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/5
+now:
+  state:
+    id: 5
+    firstName: Pip03
+    lastName: Took
+    role: hobbit
+    status: working
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.388104Z'
+ms: 11
+mode: script
+say: act {relation}
+intent: Give notice to anyone working
+params:
+  relation: staff:give-notice
+opens: true
+chose:
+  kind: form
+  relation: staff:give-notice
+  title: Give notice
+  method: POST
+  target: /employees/{id}/actions/give-notice
+  address: http://localhost:8099/employees/5/actions/give-notice
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/0489e15c599ce443
+    integrity: sha256-BInhXFmc5EODDFLpqj4ZeggX2J+nAafNRcm1dEWwsEo=
+  form: sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.94888f493330626e"'
+offered:
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/5
+now:
+  state:
+    id: 5
+    firstName: Pip03
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.400443Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees/5
+outcome: done
+address: http://localhost:8099/employees/5
+now:
+  state:
+    id: 5
+    firstName: Pip03
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.405529Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:27.408950Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip04 Took
+values:
+  title:
+    value: Pip04 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip04 Took
+  method: GET
+  target: http://localhost:8099/employees/6
+  address: http://localhost:8099/employees/6
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/6
+now:
+  state:
+    id: 6
+    firstName: Pip04
+    lastName: Took
+    role: hobbit
+    status: working
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.412361Z'
+ms: 3
+mode: script
+say: act {relation}
+intent: Give notice to anyone working
+params:
+  relation: staff:give-notice
+opens: true
+chose:
+  kind: form
+  relation: staff:give-notice
+  title: Give notice
+  method: POST
+  target: /employees/{id}/actions/give-notice
+  address: http://localhost:8099/employees/6/actions/give-notice
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/0489e15c599ce443
+    integrity: sha256-BInhXFmc5EODDFLpqj4ZeggX2J+nAafNRcm1dEWwsEo=
+  form: sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.7881f3f3ebb23690"'
+offered:
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/6
+now:
+  state:
+    id: 6
+    firstName: Pip04
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.416632Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees/6
+outcome: done
+address: http://localhost:8099/employees/6
+now:
+  state:
+    id: 6
+    firstName: Pip04
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.419363Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:27.422487Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip05 Took
+values:
+  title:
+    value: Pip05 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip05 Took
+  method: GET
+  target: http://localhost:8099/employees/7
+  address: http://localhost:8099/employees/7
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/7
+now:
+  state:
+    id: 7
+    firstName: Pip05
+    lastName: Took
+    role: hobbit
+    status: working
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.426025Z'
+ms: 5
+mode: script
+say: act {relation}
+intent: Give notice to anyone working
+params:
+  relation: staff:give-notice
+opens: true
+chose:
+  kind: form
+  relation: staff:give-notice
+  title: Give notice
+  method: POST
+  target: /employees/{id}/actions/give-notice
+  address: http://localhost:8099/employees/7/actions/give-notice
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/0489e15c599ce443
+    integrity: sha256-BInhXFmc5EODDFLpqj4ZeggX2J+nAafNRcm1dEWwsEo=
+  form: sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.240f70279a10dc42"'
+offered:
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/7
+now:
+  state:
+    id: 7
+    firstName: Pip05
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.432100Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees/7
+outcome: done
+address: http://localhost:8099/employees/7
+now:
+  state:
+    id: 7
+    firstName: Pip05
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.434759Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:27.437776Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip06 Took
+values:
+  title:
+    value: Pip06 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip06 Took
+  method: GET
+  target: http://localhost:8099/employees/8
+  address: http://localhost:8099/employees/8
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/8
+now:
+  state:
+    id: 8
+    firstName: Pip06
+    lastName: Took
+    role: hobbit
+    status: working
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.441026Z'
+ms: 2
+mode: script
+say: act {relation}
+intent: Give notice to anyone working
+params:
+  relation: staff:give-notice
+opens: true
+chose:
+  kind: form
+  relation: staff:give-notice
+  title: Give notice
+  method: POST
+  target: /employees/{id}/actions/give-notice
+  address: http://localhost:8099/employees/8/actions/give-notice
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/0489e15c599ce443
+    integrity: sha256-BInhXFmc5EODDFLpqj4ZeggX2J+nAafNRcm1dEWwsEo=
+  form: sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.a401a7e41719d758"'
+offered:
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/8
+now:
+  state:
+    id: 8
+    firstName: Pip06
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.444178Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees/8
+outcome: done
+address: http://localhost:8099/employees/8
+now:
+  state:
+    id: 8
+    firstName: Pip06
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.446639Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:27.449766Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip07 Took
+values:
+  title:
+    value: Pip07 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip07 Took
+  method: GET
+  target: http://localhost:8099/employees/9
+  address: http://localhost:8099/employees/9
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/9
+now:
+  state:
+    id: 9
+    firstName: Pip07
+    lastName: Took
+    role: hobbit
+    status: working
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.453020Z'
+ms: 2
+mode: script
+say: act {relation}
+intent: Give notice to anyone working
+params:
+  relation: staff:give-notice
+opens: true
+chose:
+  kind: form
+  relation: staff:give-notice
+  title: Give notice
+  method: POST
+  target: /employees/{id}/actions/give-notice
+  address: http://localhost:8099/employees/9/actions/give-notice
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/0489e15c599ce443
+    integrity: sha256-BInhXFmc5EODDFLpqj4ZeggX2J+nAafNRcm1dEWwsEo=
+  form: sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.fed7fa9c17d45714"'
+offered:
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/9
+now:
+  state:
+    id: 9
+    firstName: Pip07
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.455888Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees/9
+outcome: done
+address: http://localhost:8099/employees/9
+now:
+  state:
+    id: 9
+    firstName: Pip07
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.458536Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:27.461539Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip08 Took
+values:
+  title:
+    value: Pip08 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip08 Took
+  method: GET
+  target: http://localhost:8099/employees/10
+  address: http://localhost:8099/employees/10
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/10
+now:
+  state:
+    id: 10
+    firstName: Pip08
+    lastName: Took
+    role: hobbit
+    status: working
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.465568Z'
+ms: 3
+mode: script
+say: act {relation}
+intent: Give notice to anyone working
+params:
+  relation: staff:give-notice
+opens: true
+chose:
+  kind: form
+  relation: staff:give-notice
+  title: Give notice
+  method: POST
+  target: /employees/{id}/actions/give-notice
+  address: http://localhost:8099/employees/10/actions/give-notice
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/0489e15c599ce443
+    integrity: sha256-BInhXFmc5EODDFLpqj4ZeggX2J+nAafNRcm1dEWwsEo=
+  form: sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.031147206d6a9c14"'
+offered:
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/10
+now:
+  state:
+    id: 10
+    firstName: Pip08
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.468924Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees/10
+outcome: done
+address: http://localhost:8099/employees/10
+now:
+  state:
+    id: 10
+    firstName: Pip08
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.471100Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:27.474630Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip09 Took
+values:
+  title:
+    value: Pip09 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip09 Took
+  method: GET
+  target: http://localhost:8099/employees/11
+  address: http://localhost:8099/employees/11
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/11
+now:
+  state:
+    id: 11
+    firstName: Pip09
+    lastName: Took
+    role: hobbit
+    status: working
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.477707Z'
+ms: 4
+mode: script
+say: act {relation}
+intent: Give notice to anyone working
+params:
+  relation: staff:give-notice
+opens: true
+chose:
+  kind: form
+  relation: staff:give-notice
+  title: Give notice
+  method: POST
+  target: /employees/{id}/actions/give-notice
+  address: http://localhost:8099/employees/11/actions/give-notice
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/0489e15c599ce443
+    integrity: sha256-BInhXFmc5EODDFLpqj4ZeggX2J+nAafNRcm1dEWwsEo=
+  form: sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.50caa0a17dd8d71c"'
+offered:
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/11
+now:
+  state:
+    id: 11
+    firstName: Pip09
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.482596Z'
+ms: 6
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees/11
+outcome: done
+address: http://localhost:8099/employees/11
+now:
+  state:
+    id: 11
+    firstName: Pip09
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.489030Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:27.493021Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip10 Took
+values:
+  title:
+    value: Pip10 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip10 Took
+  method: GET
+  target: http://localhost:8099/employees/12
+  address: http://localhost:8099/employees/12
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/12
+now:
+  state:
+    id: 12
+    firstName: Pip10
+    lastName: Took
+    role: hobbit
+    status: working
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.496743Z'
+ms: 4
+mode: script
+say: act {relation}
+intent: Give notice to anyone working
+params:
+  relation: staff:give-notice
+opens: true
+chose:
+  kind: form
+  relation: staff:give-notice
+  title: Give notice
+  method: POST
+  target: /employees/{id}/actions/give-notice
+  address: http://localhost:8099/employees/12/actions/give-notice
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/0489e15c599ce443
+    integrity: sha256-BInhXFmc5EODDFLpqj4ZeggX2J+nAafNRcm1dEWwsEo=
+  form: sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.843250c6123ecea9"'
+offered:
+  forms:
+    - staff:give-notice
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/12
+now:
+  state:
+    id: 12
+    firstName: Pip10
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.501122Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees/12
+outcome: done
+address: http://localhost:8099/employees/12
+now:
+  state:
+    id: 12
+    firstName: Pip10
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.503570Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:27.506495Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip11 Took
+values:
+  title:
+    value: Pip11 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip11 Took
+  method: GET
+  target: http://localhost:8099/employees/13
+  address: http://localhost:8099/employees/13
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/13
+now:
+  state:
+    id: 13
+    firstName: Pip11
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:27.510074Z'
+ms: 2426
+mode: intent
+say: Move this Took one step through leaving
+params:
+  relation: staff:dismiss
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":13,"firstName":"Pip11","lastName":"Took","role":"hobbit","status":"on notice"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Move this Took one step through leaving
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSiAcKEAgTGAI4AUIIdGhpbmtpbmcSDJdx5qfBFlRWf8aOeBoMWN+TpVEuIdKs/gEkIjBjDfWYC2+twRUGjMYtecjwFTr3rW7gRqpoLHTbVcs44gfsymjcFkJUfGVI5xDdt2AqpQbc9ivimBZC9kqYn/Ri1U1mNVkrsj5IRL+1lTD/CgrgXFDS2aP2JdQN3HmOb6IHcJoKsnKo1szjHdvoAYorO9eHkyuPp+Oiq4fIWp577mPSbrxJYOWO0n11OPfyMV28g3FWMPOXl3LUa+s1rVolxDfZwD8oiIv2pFiG0OetsjLnzd9ivjdLpFy0HKx6WA/yVhjz66ETdedXAKniZUufBXF7RMVUTXNbk3LaKYBdDpJXJKjlF3jSrp9CdPmcL/xwzz47sb7wkHpM2g9Ot2T5FktKVb2J2E4fydKlYQOBnwYwZK/r2LBYMeK68RhDNWWKnFQBHHFme79lvrPcyRNRRPrPh0yBgwDu5l5HqrlyPPlbdOcLLU3hQX0YbR2SutocyYXpZ+OGqwKDQsMyBBicZ1ZcoAzidBPpZD/v6zGyobtcY+0Maxq35EOwGbpZ98c/azqbLGTg/4yvDsrsbOi2MrcCUoc6tO06DWA7XR8rZgzyz+SLVa6Ho5XPR6A2YSVxIz7cKyNEElUhtEse6unF4YvhIz/jtDBQgqlIbrGDukYLoh6cOEYIePd/tZ6pp292KGKXJLx16r0LZwXBLVkirIAjAucyhHpZslqe9vOtYH7mHxY8adrWVeCzov+QjkK0ZSQ0AuWnu4NwrqdDfECCFSlnaxni2SqdAIBYtuZx+61auP4LoSC8yjZIH4pOjXkZQeHXoeeTfZEOZNgwCCo59dGLyFzP3Pe5L55BKZBVS59yW35mp9gu6gQywOfxbUvP/FpKj6g3FzeOdVrsIxOYx6SmEaFNy+lkdzZF72iAcHHS/vn9Oz4gVrJlSMtJqVbUw83AGYheDjhyxv+1BCfxV7xc/1MzvdIPC0+iqR3FHA3qntJmtL6Yn/cvokovIlDoTxa1N+LnqrKj56vLvkDvP7FDkJcIbcbyO6YND+w/kKcsconiFmjlSp4GMW1KR9xggir5cmWN83/TATG/wOk0xNkwztQ3OnDBPrv/dwjIkmOXm/ywuzbCDGHOj6X/HOF+I6EP1/+Rmmol5EYg1uIZrlBlLZNRusWm4w9ChRP1s2pu/iClSjR4GAE="},{"type":"tool_use","id":"toolu_01FTa5qLa16vQLxHpXgLbwKc","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/dismiss
+  address: http://localhost:8099/employees/13/actions/dismiss
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/e90ab1498c6b5e60
+    integrity: sha256-6QqxSYxrXmDlN+MsiOsUZmir+dmZR+SLMlU1BKG9BeQ=
+  form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-2.hsf.L2.ec7089cb0c350f2f"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/13
+now:
+  state:
+    id: 13
+    firstName: Pip11
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:29.936761Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:29.941162Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip12 Took
+values:
+  title:
+    value: Pip12 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip12 Took
+  method: GET
+  target: http://localhost:8099/employees/14
+  address: http://localhost:8099/employees/14
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/14
+now:
+  state:
+    id: 14
+    firstName: Pip12
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:29.944630Z'
+ms: 2636
+mode: intent
+say: Move this Took one step through leaving
+params:
+  relation: staff:dismiss
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":14,"firstName":"Pip12","lastName":"Took","role":"hobbit","status":"on notice"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Move this Took one step through leaving
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSkQcKEAgTGAI4AUIIdGhpbmtpbmcSDOg2OaCkhDnbcif1UxoMA8QKzPZyl1bpgloNIjAyWXgY34i1jVIgTk3AGFnR8/d1d5qgLOIEGABIDonf3LdnK2vBbKJt2VOlxA4stfYqrgYs+nsNvve79jYGUHkCFde5gQ1mlmZcMRA2EQ1wL10zK9QvaoRiSAp0ivp9FDJsZmYC+XEjU4eWxVNUOuorllbN+dvY/J/joHSXHuIcgpitwVRxglooLCgiTLNET/IZwwQZ4+314E5ax1A8nGQG7yxVnsL++K3Vr4VmfYkx5nMCXhk2YPdMbe+701yM7IEd5CHcfxi0eWUCQUYndLS3XEOng2lCj8ZL89lMHo1UVcsnE9NCV/3iWOrVcdHiKkfgOV30pJLEzH6y66+M05NY5xLsFsW9AOK/fFuqKaGLDI8x563fJE7trlTgMYwZuVAtcSzg7kikN8cJBV4pGoqo4iVbDHKB/FNLaylEg6tDQR04ZQj5Qwvp9F1h1Ad4zkAW5bJG5Jc0MMcYn2Q5NIiM5jk2Icf68GhWsufbr3eODpwb3WuaiHJYi6q+8g4p9Pqx186Xdxl0FB4yDh8CRzFJuHNFhPsXxFVECqWRQCEwK1wsXuJ43hIDhSwYHmJTuJxMnqbxEVQ2J8lGM5d5DgukXNZLCKxk6vKqgiMhxF0oDZRaeCyxYvhW5OVqjOAH4RUbN4rXy7dDCoHRB9SNv5LTkeK1rFMol4mTnI12nZepuvvCCm0jU79pA7xE4nA3JhG5/Dv95HnFII9UWCPTmT+CsJhPwJtxNp6lmSnwCCWwV7prrTWSSnmMZ1iAlMld7Fe1+0DEL0dEG6C0x5W3WZH2E8d9z4+hQbsPv2hfA04llHl9Jqxxwekh/BsIu18v4XJAWWJSA8MrHIA+dOxjWUQVFCT9FaPkksn2qARVAexlcqEqhyrz4ra+bULDLBvsAgtluhVcr05HzYXVNVmjZy9fZcuPN8UPiuN1ABDboM+ubafP4GDnQsuNg7em65WhxIS51TJvu2TD+DvjOaFDGELSHWzF9gAaOiIN6a/46Bi/goyunk7VYWQkqKVVrEDBUPeG3BNSEaIxgJUkLgrSg9kAGwIkBW877LxVe0ioieFSxTy9BXFDT8kKfNtvHEUJCrq7i5NYKlNPrsubxAKYdkihHTLCF1mHX0GCJ42OUHbYXaWain04IiO0hT2tFh5MC2ICGAE="},{"type":"tool_use","id":"toolu_011oG9ESaxduQnVbWdZZkr6g","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/dismiss
+  address: http://localhost:8099/employees/14/actions/dismiss
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/e90ab1498c6b5e60
+    integrity: sha256-6QqxSYxrXmDlN+MsiOsUZmir+dmZR+SLMlU1BKG9BeQ=
+  form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-2.hsf.L2.20c974469df072b9"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/14
+now:
+  state:
+    id: 14
+    firstName: Pip12
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:32.581078Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:32.585864Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip13 Took
+values:
+  title:
+    value: Pip13 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip13 Took
+  method: GET
+  target: http://localhost:8099/employees/15
+  address: http://localhost:8099/employees/15
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/15
+now:
+  state:
+    id: 15
+    firstName: Pip13
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:32.589515Z'
+ms: 2583
+mode: intent
+say: Move this Took one step through leaving
+params:
+  relation: staff:dismiss
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":15,"firstName":"Pip13","lastName":"Took","role":"hobbit","status":"on notice"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Move this Took one step through leaving
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSjwgKEAgTGAI4AUIIdGhpbmtpbmcSDGfQbL1Wi5UmJgBaoxoM8n75ph4ID55u1LnLIjC7JAgiw47ZfwTwWXHi8BUpuKIDYqaeOutmmBZR077HTyaCB35BeBgdi2lfn4re4jsqrAfBI3rX6NbzHpQzqFH++7LIjjPP6D+tSv58fc52O6nPDMC9Wsj2mvy4K9drhTzZqsBeyVY8vPWZRbXPylO4+Aj4uubvTaLA0T48Kfy6Zx1PpcB/gss86gInicFjui4YSEIwOBjPHnHfcgv5VlT+PbYzTd3g+787bfGyKMby6WLiS6PeLO1lAw2EBrv47kgZStvzSTAFjixlK01fRdS9OEG28mXq6C9pP069KZJpxTlzXXeed0Czun9z0aMIXZ6lFWT8bCd6S7JdTdQBLl5SGXHH3ZM4FDynXBEyQPHSchxicTuRY+6I+30JdqU+EUdpZkCp3xN0G2lF8AxY+NDjKbhLF4jdDyAjppOGbTG5Ma2H7Jp4lnjE7p9aeru9i4PrVtgIcJAsQGSSmU6RlfkgK2D9D9I0qYmyolBnMMuLqnpQrHuc00ZQvQVFqbz+okRbETFINN4goWuwf+wHmfutbm5kdynoWOWSlnTjQnO72buzwoQSk8h5zkSphp/yty56cOe9qUF6F2CCZAif6+5/GHHuGHaLgyXcvnoOT8cQcPfceyJnc9Je8iiwbIUD/fhP/CVodHTrB4TRmJh1+6p8c/9b29H84yFyiiSdzHAx1CqepKZV0Qrv1vzxpliZ5wi801NtjXW1IGBejnEwUmvn4hZpYDJAw/UuMKLQdk1mHF5ERN3R/VT1qpy2i/wi9uk/x8YeF/me+j1QKsNRfy0BfaG4xq9xPLfv0d5ToJma4/KBU/VvTIXLa7pageE+1ywj3SkRNuCtQcZFq+irE80ndgLXHoiqIoRvDN5n0XRo6H5+kXgeCeQuKjGEvhHfJKBAsVYsnH6bNJqrl4KLkO94Tyd46D0W2bINOF4lLM1KHopZwpHfaj9aZiQjR5lWTTCPwvZ5ycwAqQ8bhkb2v9McCYdZ9hY4KGnHfgLz+qq2MEdxNKu5fT2gRZM0ysMQBRGAsjl7aRcLbTm2tmrmrDdg3tSy21EpmuUgNqBJJkZq7Lb48ZRbRwcymrfkVeWcbfZGFJeTSOPl6rS9P83wl9SK6KBJWetfWVDo6eFHlkP5fumdDEUlqKcyAZrKrkWl4xHLNQo9AfBJVerP0vpZsSeshidaKAnh/qCuB8ewz8fqjF+xP10Qv04zRVCNpuuznIG7iY4KPbhmDjMO1nDbV9XNuqbz03D5a0uCOYT0kccnhqayQ9H5thrSoZ9UzjqxpFmqnKdkTaNZg0Q7MdhPZK94tcDS7eMvAPW3lPzJKhQlGAE="},{"type":"tool_use","id":"toolu_01YSkumi71d8MCPUTGtz3RUp","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/dismiss
+  address: http://localhost:8099/employees/15/actions/dismiss
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/e90ab1498c6b5e60
+    integrity: sha256-6QqxSYxrXmDlN+MsiOsUZmir+dmZR+SLMlU1BKG9BeQ=
+  form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-2.hsf.L2.bad410da7438a3e3"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/15
+now:
+  state:
+    id: 15
+    firstName: Pip13
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:35.172778Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:35.177197Z'
+ms: 3
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip14 Took
+values:
+  title:
+    value: Pip14 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip14 Took
+  method: GET
+  target: http://localhost:8099/employees/16
+  address: http://localhost:8099/employees/16
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/16
+now:
+  state:
+    id: 16
+    firstName: Pip14
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:35.181320Z'
+ms: 1756
+mode: intent
+say: Move this Took one step through leaving
+params:
+  relation: staff:dismiss
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":16,"firstName":"Pip14","lastName":"Took","role":"hobbit","status":"on notice"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Move this Took one step through leaving
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSpAYKEAgTGAI4AUIIdGhpbmtpbmcSDHz57l9ZB+K5AnKhgxoMp1Ioa7RXZSthVJP3IjC/D36ZIxqlPDdNI21TmIxy0JyUowj3de2xelu1S9vXTBXs+MYOUiv9Um8u6+62SGYqwQUkCYomu/YY7MyMXFJoZuO0ug5GZ5DO0swuMpJTBeE5zsQYQ33gmz+CdtPHkfqFmeWZGof3VnL3uHE6XtfFMBdK83VEeEv9MGRHDJyhVTo8mNGcarIFyKEN2AsrCA8biiwv7SpFN44Ual11UCy1CpiJDx1ndEbx4qznIreSB3aFVOZEjW7U2ZAu+SxmvR0SEvHCIyDovwUr1RhGCdO9hB34g1/RiGEUbLCiZ559O9XBno9sO+A3sRFZwpOu464k/kzDKwHnBxAcA1mcbk27HQM5lrlaa2E/ZcYzkRHaDMprKQqG/E3OAEJJ9ZaqfViEE3JkHCpLcZONalGpw+mdxbHiA2gkepU6K3mEDaSxvwBqAYaPTRaRXGkK4TkNbXM5UV9R3/zVj7wAJmlHWMdJo6HETy0zrEGl7GNaNiyMh4LUWOZqS5h5ThpKHxHmtwQmWj749Xpq+Gx/fCaLM2BMveCrgx7hhCLvyFg0EInyA/rNYWQkyiEJbxUGSOQzv5iKTaIwHnJkFnObBPyrqSdbkm09G8v5Rk70gx6lBOzARMn6UFFrlIw1fPzIJAm3gqsbSUi0YXMMDR3Yu2+XH8Xw/uN4QqO6P0XcC3h0myp/F8jUXiQdwmOHGNvkP70qPEn2lUgpul6gjPfdFyvPIe3JPYwD+2fm8wI1HlflTbK/SgpNK4OTkITUKizoncz16yrLCtLRo3QEh6hGS5Jr04XaS5KUpi0zdHsKTH+XOUSOOgnPVQt8lXsfulH/JfGS3x8uNRRX06PWYFyOfzSNPiBCSAWndM9isXLfwsNBi6Zo8NifDAt34HBEfR/np34SOiD1pmfyDKTLKKttmzaixhztKcsdI9j22dNgLeClJ4Izt6rgDd6sUrl6VWtbA706JPQ2cwjOjaB6W/DoD162RXMq2ZohCaBII7BYXG58wd+R3OkEQasYAQ=="},{"type":"tool_use","id":"toolu_01EWQ3pBVaQgMMjje728w1v3","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/dismiss
+  address: http://localhost:8099/employees/16/actions/dismiss
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/e90ab1498c6b5e60
+    integrity: sha256-6QqxSYxrXmDlN+MsiOsUZmir+dmZR+SLMlU1BKG9BeQ=
+  form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-2.hsf.L2.c32c73d280887412"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/16
+now:
+  state:
+    id: 16
+    firstName: Pip14
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:36.938386Z'
+ms: 5
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:36.944425Z'
+ms: 4
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip15 Took
+values:
+  title:
+    value: Pip15 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip15 Took
+  method: GET
+  target: http://localhost:8099/employees/17
+  address: http://localhost:8099/employees/17
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/17
+now:
+  state:
+    id: 17
+    firstName: Pip15
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:36.949796Z'
+ms: 3084
+mode: intent
+say: Move this Took one step through leaving
+params:
+  relation: staff:dismiss
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":17,"firstName":"Pip15","lastName":"Took","role":"hobbit","status":"on notice"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Move this Took one step through leaving
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSiQcKEAgTGAI4AUIIdGhpbmtpbmcSDD7rwdJwxLwje0QBaBoMJyoD156/cpfOWO6WIjDCL31+IUXUym02TseIP5gbgsRNv8cnsDKfEA9nI7Lxxynwy8SJHbiEWhtqDZkhz20qpgYa2QnXWfoCrW+BtiwzCs3haPW2PEunZCzjKAK4AYecmA20ELUsmi7EkXrQXmhbI9pVdnz/jQgvwtfX8Z+abG4I4aMFDTWBJVPEF68k4bXx8L3NRXiVc1iooQqZjy+Ami9XFUz9hh6AE4te3VIdL6IWJMJDhFKi9Q0wwT4s21FS5hgF0GG7KfpIFRTNrKFE+W1BJyYkMIna3Ol/QtunELHt7lfAlbhV+h8+OJZq7cTzR2F/XNFxLdLBp2mY8xA5Fjux3d1L2TpfGDqjW0MoEiOuM/3iUQsPcrpalmhgwf91KeDE5EAMlv9gk2Dj5WpZK/lro5iLlK4+Ciqr3urziMYaEB4WiTjYY1W4Er1QC2Nkwv04UqdIwzGqW2dOHDOqSPc53ovwm/+71oTeZNDiwt0qCGhUmDr088SHTsFYZAvgiClOg/DC4+f0UxSMQ+MFI2CElQzU5iu+a3k3/nFXXvfSkIhSau3AORcL9Wqb+klUmwRDFR21KH5bdaVkwGiYfIQtdDtPhDF8yIrzo558YixeLdAYBlPJBl88YzjNf4mFh8p/7U3zEjA5/IAtJHA+p7vzj7b40tpcOXlrq5wNxZJYc75lVwnjACGJayyEo+IYrs9q1EEeoiPZg1ll6x7n/NjrIZfXBnoDWB+l4bdHKl29jd3BZEg8Q3LHrZkvHio/jCvEowBtUETrIS7hEqrmORUr14fPkTor2wwfmCNLC9uABuW2C9MBWvswAZwiL1Ar/ZJaRcIx0vSfFAJf1xCr5xz5aVSUgEiFePb1Y8t3MXaYDDEoTxGtuOCfsJPdj73Znpv0eyEemQm0puiMXbLJ7SfwUITOg+l1iWY6eWGqChbtMQrt58zfcNcW1SvxAiNGgEcpJQyoGDbovOPE5PCn76SvtS/emP1wpsuoZfd61xMqnk9GyJGCXKdxDqAgsxlA53DQWjLwnWb9SUHkHuJTQAc1W82aWnUfPGA/cI/o3sS82krPdDBUU3AAxrw3ZCm1MkS47UuoaCG6gc2buEkINiRaf9YUa8bG2oZi6Ch7xnbuFwixBP4tzVNyLDSMLWEWasP+1hduSRgB"},{"type":"tool_use","id":"toolu_012CV2bpUvRy1F8vruqzmb3x","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/dismiss
+  address: http://localhost:8099/employees/17/actions/dismiss
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/e90ab1498c6b5e60
+    integrity: sha256-6QqxSYxrXmDlN+MsiOsUZmir+dmZR+SLMlU1BKG9BeQ=
+  form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-2.hsf.L2.4eb2fcab36cee3b2"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/17
+now:
+  state:
+    id: 17
+    firstName: Pip15
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:40.034929Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:40.039063Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip16 Took
+values:
+  title:
+    value: Pip16 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip16 Took
+  method: GET
+  target: http://localhost:8099/employees/18
+  address: http://localhost:8099/employees/18
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/18
+now:
+  state:
+    id: 18
+    firstName: Pip16
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:40.042693Z'
+ms: 2193
+mode: intent
+say: Move this Took one step through leaving
+params:
+  relation: staff:dismiss
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":18,"firstName":"Pip16","lastName":"Took","role":"hobbit","status":"on notice"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Move this Took one step through leaving
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQS8AYKEAgTGAI4AUIIdGhpbmtpbmcSDAEcASS8elhpAY01xRoMJcSXU39uCCHSiKvjIjC1FXH2PE+i7Mu70jTHLvJ1XFQVgQzneMlmiD/FswwV4qoP9AztJggpjr5GMUKAHooqjQa8ZAALbhUs7Ef/6KIQ4z5wEeL4Hdzoek2ypnHhjZMY4xypssw6hLbk2S+Rc0WxQikLKRcBfm9tAPvp3VjmW6IHheIlOWIHC4DMzn1l+ON98n6pQDHAlws71wUbLkkjXiAeTsWYvzZAMiSmdg4rPBp65zWxRtD3MstDXTh0VM4Wkzr15fBp6N2nCmWAjO33GbkZ4v4H9A3cpMuAyR/fchAd0JWJEHtV5aM2MlAqD7SUwwHSQY7KHn4Q506g8/TW+fyBcJIG7gd3nI+NVlc/z9SDcWUvOTxntplTzMtQpNc7WB99B+duU8bXWuBxMhx9NtmZ2PG05/x76dtaxPQIsjkGN//PSTQIe2Pa9PuquZ+01H0EoIqZPqsdYFzQZMXhzac9hxnSamAbFQPJIjTAj5DgUeMURZEhdbSXtL1ENGlihUgF2aeHT5NJ65tNaP2/oPNr5aObVrUxe6sAw7lEospzUjIVPzLkn3y2rjjJzVyHGTMHa4QKiP+Zibz7R7XL0SfDvIiW3aNzpYcR3u5yQaNWCvqQrSoucpKm5YgHykBl+tPrtr30mIfJvAl9nUoGwC2wiXRMphjR8kal/4paFfC80hpHMNRiHOntdyYUzkj2hpwVt50NVgMo5GC3i+ZH02j/1GFtKKGLq24DxunmcJGotA+LkroMWcSHlx4kxYRVeMc97Ao2cd90lvaO8Aj2sYhzX1Tq7UI38nB7Q569daXmE/44H/a4aVuzN5O4TsDub2Js3tVv4npGl4RL0ltf/aWoPNHkWUtXbALB9bqCLP08IHLlAuQLA12akZxPeNXPA5vOzSLVDsJsEEyzu9dN1Cv5EYxn1fWwCVfjULk0uy8qbHix0VVeQTHWF5bw6d0Us3a7+mWjhDEpV3TScZdNWjxNzW2i1i9NOMS/Io7D1o7mhflF32KSZGrfeqdsgyKxTbyI/X3rmNafcsIUek0orhHW1or/EOhgSFGqOGwHuEmRI3x5FLdXALTYfR66EUhCInPa+l4qfLjYqP7DLEjAjx5qB/Xsg1pb58th7JT/GAE="},{"type":"tool_use","id":"toolu_01KFXn4D85LwY2QDTmkWjoHb","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/dismiss
+  address: http://localhost:8099/employees/18/actions/dismiss
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/e90ab1498c6b5e60
+    integrity: sha256-6QqxSYxrXmDlN+MsiOsUZmir+dmZR+SLMlU1BKG9BeQ=
+  form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-2.hsf.L2.c9b9592cb1e4c99f"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/18
+now:
+  state:
+    id: 18
+    firstName: Pip16
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:42.236162Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:42.240494Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip17 Took
+values:
+  title:
+    value: Pip17 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip17 Took
+  method: GET
+  target: http://localhost:8099/employees/19
+  address: http://localhost:8099/employees/19
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/19
+now:
+  state:
+    id: 19
+    firstName: Pip17
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:42.243979Z'
+ms: 2354
+mode: intent
+say: Move this Took one step through leaving
+params:
+  relation: staff:dismiss
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":19,"firstName":"Pip17","lastName":"Took","role":"hobbit","status":"on notice"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Move this Took one step through leaving
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQS1QcKEAgTGAI4AUIIdGhpbmtpbmcSDPYNjQOrLmW0zdjbKBoMp61miIWh41ZnQ12HIjBltOi/gYE5RYd7Y5BjR97O7ek0jh31HR2eahW8mdnqp2+LUGBIEEVrNqPa+StJh0Eq8gaQr92aSkjPdDxpPcb2M2d7s5qZYMRsfSdW5DAXpX4fVFB389hSGayqM3eGqrqlNQr4t0mxqQx/fGbTYRq25xwcvgWpwNGBH2w8GS5wXknEL8cTWxjWuK6JtBwhJo+Sy5y0jDcT5XRN+dWmU/jXGt524mHxKFSljRMzuhJmNovRA9jNj55kx0m9wlfkO3+SKFke8F54afhKJe2y6ggveBHsM9tD3icU1nmvHfw9dnOGdfT6mdzI8z+sySDUkFogUU2fc80Vgj5oMcBUBHO3duT3iyygnSdEcDFjA5B+X8NT3Fw+B/ckgfLqNEqyClHku+x+KW//P2Kpg8JjAu3s15JZ4ypc6zzEK9wkO2HFjZxxCu5ctjVnIA/5BOEo2TqH0c881B5utIeQ9Wz6D0zhQX2qmw9nI08pKtQfyN6h7d/G2ni0evowVIy7WwIMzk4AtsgwIXYGB6dAumL5qlMhbE1fdjJ8TdIeGs/9n9TZmln4hMn661wFsSkg9kAcR3NcqvadJ2AiboF3g7AgHH7n95Gou+joBHhA7zuNznW2cD/xCT64OaoQ8/0QsdpPIYtQFbNdtkAEzdhyyU92su20AQ8jY8lEo0W30d5Pv+jp6L2/CSUu9WeQP+l1vp7OrKId5Jc/RbxvE48EnFyUk2fYnJbT8QKeLKk4xD27YtWjPZd3GQvZiIXUGQfj/pDso5uVJeUpeNKlmSacrAHlK4K4f4jWgH4iQykKVKrvifAubLWNFKd+hssgSZjEWJm9OqGe6zNPhZ5uNAMcQkSaPOitH5ekhiPEYc1r0TRai1kmM6zZbMILftBqqr34WWirhw3vDk3QmvIls1dH+/TXxcFKTF0YHSVgrkmhUgO3CjyqSnujH+KEAwVgIeUtsljDkBIJ+e0SBCRlZCJQdSh2YZM01xFwUy4rtUcoVYByeUAHVzakcs5reiKJKRMuOF2acEZK4IlWBiQm1wqC6GorWYXmRixZNTKCiZwz8BmbVKIktVeOU9AnLEXa6VkoNl9I8/i5BKMVzpaaYcWQOXDvpEMr/slZCWw/XBrQWvIXSXekJC7xsKfzdd6lAMxmwRMv7FxXpHfxYC/i+FaUBY9ojBwJSvecHlK5ygw4JDAj1rESyUwX7JSrAmtxF2Y9GbI4P5ry3LHj/qiyBCZTeNV9cwsTU0/N19cYAQ=="},{"type":"tool_use","id":"toolu_01Xb2R2RGmmw3u9fgrJ2egFc","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/dismiss
+  address: http://localhost:8099/employees/19/actions/dismiss
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/e90ab1498c6b5e60
+    integrity: sha256-6QqxSYxrXmDlN+MsiOsUZmir+dmZR+SLMlU1BKG9BeQ=
+  form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-2.hsf.L2.f246dbe3c2f3b741"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/19
+now:
+  state:
+    id: 19
+    firstName: Pip17
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:44.598487Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:44.603176Z'
+ms: 3
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip18 Took
+values:
+  title:
+    value: Pip18 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip18 Took
+  method: GET
+  target: http://localhost:8099/employees/20
+  address: http://localhost:8099/employees/20
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/20
+now:
+  state:
+    id: 20
+    firstName: Pip18
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:44.607120Z'
+ms: 2280
+mode: intent
+say: Move this Took one step through leaving
+params:
+  relation: staff:dismiss
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":20,"firstName":"Pip18","lastName":"Took","role":"hobbit","status":"on notice"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Move this Took one step through leaving
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQShgcKEAgTGAI4AUIIdGhpbmtpbmcSDPPJXelMtrvZBGzzdhoMaFVuoVKL51R9akM/IjC7nDkAS6rX2VdL6nYy1lC0nuHRFhYa0i9KWUyNFG7B3wTZN6OvXonRE3oGJwcoii4qowav0rfnpaQ7cV0ySW8XGhyVVNfR1yXPN5LIFHpS8m2+qIO4++C1Und5XZ6W+quxZnD6TBehAIVg8LVILHsJPBoWu2d+EKwI4g+YOTckdFNtch9KHZT3rb2CEvRjTHc1V4i6VeiPEnyTQxRhJEQ/Sjrko2+P/idAopMcCp58uSJwlzp542yJYgirwip2mZeBVrl/iufD/whrCJ5DNoeuG64a3nX5i+db4HpJJxGKF6DbZ718mxVWDw2yK4wCnFYqDnwoh0YAFbUCUODOVEMYYbQyEpqdIfE/i2Bb4q3rxqsucMECMBoCx6BuvjOdNzyu7UTwa2l2NFQX0gxvFzZ73smhE6z2P5K7mu065yWsbv+XMvEdeGebH0oTodaYDkxOcghalnj4ZriwyQajc8ugkLy7aiB9YtYBm6nYPpHpche+gYqKtASD6P0Jkfei3x6ZwzADQRapxkEN8G+fsPrpdmSbzKZcx072kDsHphKoEYkHYSq20OKGneBZ4bB5KnxeDksIR5TbtVxRYyz8SEv1mtZrfrMrjfs/mnzYlS4HF/CeGFP0EXta/g+fg64Wc8ZrYtLm9kMx5vchKfUXYmKc4tNgrVsIyXh7bBCInzrL71gqmNvnjJpZeAEdsd4u3+qwGH7hsARXyFnWT/fhgwItKqU3jVzaEvv1/xqLecxJaDP6Qieb8ZWl1Vqfz9OEe/EfjH4K0xRoKzDv9OFT/QZxHnM5vSSMKgs7Q2Ixg3F3mly6FjrXo+Py3M/+1tIyFU2X5gqlDraA/9Sf8iv9H2p8zMPPM4+D6MOP/dRUI+PIg4gBVLlhdqVSvYOmw9E3BU9nrwyvCy1h6QwpQskrToBpHyYPyq5JDZ7c345agu2a9wS/shpkSPV5IxM9cmAXncE3dXvUZD4mbJcYTw4H5IU5e3n4uZaJmxxSWE5yAM0IVfGxsxHX1V0cKp3Msk0igyfGUVqOutdRReqvRO8emGyhAXaLAfy/07rWErJdP5Er9JFjFb4zmmP3RHK0ChwSqXxccyaaHj9TjFHJhpYx91Q4fsBRlzEOw/91b1oX+skTlB0ac7OI+xgB"},{"type":"tool_use","id":"toolu_01FMAqYak9mDcNoJ5x3prhds","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/dismiss
+  address: http://localhost:8099/employees/20/actions/dismiss
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/e90ab1498c6b5e60
+    integrity: sha256-6QqxSYxrXmDlN+MsiOsUZmir+dmZR+SLMlU1BKG9BeQ=
+  form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-2.hsf.L2.67a2b8cca835574b"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/20
+now:
+  state:
+    id: 20
+    firstName: Pip18
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:46.887646Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:46.892089Z'
+ms: 4
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip19 Took
+values:
+  title:
+    value: Pip19 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip19 Took
+  method: GET
+  target: http://localhost:8099/employees/21
+  address: http://localhost:8099/employees/21
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/21
+now:
+  state:
+    id: 21
+    firstName: Pip19
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:46.897818Z'
+ms: 2097
+mode: intent
+say: Move this Took one step through leaving
+params:
+  relation: staff:dismiss
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":21,"firstName":"Pip19","lastName":"Took","role":"hobbit","status":"on notice"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Move this Took one step through leaving
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQS4QYKEAgTGAI4AUIIdGhpbmtpbmcSDM4/R6O4gw9WcIg9RRoM6dCPn+XlJMFO8MN7IjCNvPgeHI59Ogq65COCWAMQ2Hh4+9eDG2Xe9rvPZGQpfeHOcaxZu4JaALZqsw1PGfkq/gV0h98LRjU4e2HDM0lJHIrhOz8B8bhxLC15gTxqzluFH8V3/8DC+krhkCzgkoR/aQxg4yhFQj9jrAhF6uK8c6+EslUl7vSOmUqnSbSe0ThW0YdkekOaLKd9L/SWoYhNO5mf2XaLcNzUSlV33Y5DCxFSutoleLFAhJxRsDty4xmnqiZydcTkDOIG1Dz11FK7LYJdWrL/jRYkvhTDNsbVSID4Q9hFNHmoYE/npkhBTk82V2E7AZDZYrdUF6oD1AT0MGEGeJnu4JOa0VWM+VJbHxKN/22My4L44P6bjvwTJIFLFx8zSwXBMi5ViCCjHNUDLzy814jw3+r/26/LPgujCY+1dYRB9hBVqAr5NavMsSTA9zK60Xk/zf96AX2XMuvLtWARxgu2crtQEOGbN16GFUz/fVDSpRg3HWL9KuN2MaEaRmQksHkOxIxmoTesC2r6u45FF5eDlUYD1hdZzhYTzWIignxH3jLVkdF2xIn/VH6DKfYCYYScgW0/lCv2TKB9C0p/6HK/2MT3a/OaugHi75+KJSTAFynexWXdLRQpemA7OOrTIVyg6sX2SciRCgsC0UgO8bQREmHxZqEcpZSlkjognxhue/Civiz8w8+Nnn2DOiVjjqhTjPJbwixhG3URt4jXt2RO+i5PBctQtkqz/rhwGC0NFkicJUk871+u8vKDscuMYNv6s1cz+B0lFdqYVG31+wZnjuNEBM23SP2HY8dMPTJcamKJjktEGRu4eyeCvoNUeutbeMoXZl6HYnIj3AM+zUG1kDgSFdDmxCP6fgKsPxmNOPl/AGQuaqxnepMMtoYo36bG4zrMmoNr5uVMDgP6JJiwFmko4pCYfkkUFif2nhct6UQTdp8kt0iC7Y2kOOJeC3ny+CotaTZ0QD/cwxeA+O6x7cyuBQZMzjfc6WT3QugEc4ldQzxfNpqCDJS62GwA9dO5zXcL9an5MeUBmRjft5IUX//cQ6wRnDYHskUzrnbUPmgrFSGjl9S3gDZAs2BHG3S/gsFon1zKkhQtGAE="},{"type":"tool_use","id":"toolu_01MrcJppqLsJMoSafZQ5n6W7","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/dismiss
+  address: http://localhost:8099/employees/21/actions/dismiss
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/e90ab1498c6b5e60
+    integrity: sha256-6QqxSYxrXmDlN+MsiOsUZmir+dmZR+SLMlU1BKG9BeQ=
+  form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-2.hsf.L2.5648122e2f6d8d77"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/21
+now:
+  state:
+    id: 21
+    firstName: Pip19
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:48.995164Z'
+ms: 5
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:49.000563Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip20 Took
+values:
+  title:
+    value: Pip20 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip20 Took
+  method: GET
+  target: http://localhost:8099/employees/22
+  address: http://localhost:8099/employees/22
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees/22
+now:
+  state:
+    id: 22
+    firstName: Pip20
+    lastName: Took
+    role: hobbit
+    status: on notice
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:49.003918Z'
+ms: 2066
+mode: intent
+say: Move this Took one step through leaving
+params:
+  relation: staff:dismiss
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":22,"firstName":"Pip20","lastName":"Took","role":"hobbit","status":"on notice"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Move this Took one step through leaving
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQS0gYKEAgTGAI4AUIIdGhpbmtpbmcSDFeTCReEvLOcg7INXhoMb8kX6lTmIDZjvenGIjBrwlOfcQUcTZ6KCc6TvEVRFMsc63hyndxNLQGOy7oK5+0ZECF3unO9O/Dqg5SvchUq7wVrkDJrmLfJMFSfFihSdYBXGQgZF8g7ODlAiBKVTTjT44veBDvRJ+8ErhI/f7GJxMNIH9j4Bh06bVcOY8/DVcQKE7+1Xp7BMh9T0t9QA6hWdTRIF3T7gqCRo8ysZ/oMbcuNyD9gs/LNGZsClLmDt13OBIaRbWFppWNfPxcWxDNTvY6fbu2P7W57quaFcXoNJgMRXprW9KLSm5LNKdl1LHDuAPVhkT12sQn1JbdOiH7JlxlCNwfkxcSkmsSyEJKhQN2ZHBwS0g5QPgDQ0iqCaUgn3tjMPLRU/SeTGyp/ww8ghQ+o3V3SBm9c69JTBI05/DznYK9lA55e3nPEFU3gEWAiptpLP/qLRDuhpu5IcjDrZunroJXIzF+Hpl5GDppd0xjF5jOrt7aXlYay5dtoyj+LToS+nkB3DsH0lDRcsdSxJRTh7FCQzGPSAnbPgyHdlVPpWhaz4LVw1FnIrRfGzBRNYFW9vt+u8iolXyXE0kup5inO+PBk6wOJOXKGmMKxUYk6b2qNPvhz6Gfp+Q6v4xHWT+2RzuTr/XRPs5iqqnDfBtM/Ck9Jk7wDuagQXUNHmS/rJOWlTj8MiFy0pb+5setT45HxY+a8BLrVgpdXaOx1ltzy3HolUGh1UepBwRYNHA0+nAmJGJ4IwUL6rDBJLoM65F35SgXFHBpmIshQsvLz9oW5aAIRCUqsA4P7REqNTs7HtWZvMSZ+96HzdQks0lBBAnFFffFPOGKl+iJfrVGMOeR8+kTm4p/qWA/SM8uAHv8wlERN2xj/XWhP7d9fs808z9/E2ru6eik+fEhPafi3A15DLfdrD8jsULnIUh1Z2VTfT8bbZyZcqJC1zVWRLPoCVURkVyYforXYmH7fptHo8rJhJQUNnCjJZH7+CkMSGPP41lFk5FA52adGP0HkgqZ5XmmBkXCSR80o0+3tkCpFXAIKVUcw0b3UMDp/XYQIjlq/f8RC1XCQv6NBYMIPiz7NkWND0aXKMiZGmcJfgRWbGAE="},{"type":"tool_use","id":"toolu_01JV1FRF6WXgkQyAr6sQvCU4","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/dismiss
+  address: http://localhost:8099/employees/22/actions/dismiss
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/e90ab1498c6b5e60
+    integrity: sha256-6QqxSYxrXmDlN+MsiOsUZmir+dmZR+SLMlU1BKG9BeQ=
+  form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-2.hsf.L2.63d5a1f3aeea694d"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/22
+now:
+  state:
+    id: 22
+    firstName: Pip20
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:51.070827Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:51.073617Z'
+ms: 1
+mode: script
+say: follow {relation}
+params:
+  relation: next
+chose:
+  kind: link
+  relation: next
+  method: GET
+  target: http://localhost:8099/employees?name=Took&page=2
+  address: http://localhost:8099/employees?name=Took&page=2
+  picked: relation
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - next
+    - self
+outcome: done
+address: http://localhost:8099/employees?name=Took&page=2
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    prev:
+      - null
+    item:
+      - Pip21 Took
+      - Pip22 Took
+      - Pip23 Took
+      - Pip24 Took
+      - Pip25 Took
+      - Pip26 Took
+      - Pip27 Took
+      - Pip28 Took
+      - Pip29 Took
+      - Pip30 Took
+---
+at: '2026-11-03T16:37:51.075737Z'
+ms: 1
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip21 Took
+values:
+  title:
+    value: Pip21 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip21 Took
+  method: GET
+  target: http://localhost:8099/employees/23
+  address: http://localhost:8099/employees/23
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - prev
+    - self
+outcome: done
+address: http://localhost:8099/employees/23
+now:
+  state:
+    id: 23
+    firstName: Pip21
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:51.078687Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took&page=2
+outcome: done
+address: http://localhost:8099/employees?name=Took&page=2
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    prev:
+      - null
+    item:
+      - Pip21 Took
+      - Pip22 Took
+      - Pip23 Took
+      - Pip24 Took
+      - Pip25 Took
+      - Pip26 Took
+      - Pip27 Took
+      - Pip28 Took
+      - Pip29 Took
+      - Pip30 Took
+---
+at: '2026-11-03T16:37:51.081147Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip22 Took
+values:
+  title:
+    value: Pip22 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip22 Took
+  method: GET
+  target: http://localhost:8099/employees/24
+  address: http://localhost:8099/employees/24
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - prev
+    - self
+outcome: done
+address: http://localhost:8099/employees/24
+now:
+  state:
+    id: 24
+    firstName: Pip22
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:51.084710Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took&page=2
+outcome: done
+address: http://localhost:8099/employees?name=Took&page=2
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    prev:
+      - null
+    item:
+      - Pip21 Took
+      - Pip22 Took
+      - Pip23 Took
+      - Pip24 Took
+      - Pip25 Took
+      - Pip26 Took
+      - Pip27 Took
+      - Pip28 Took
+      - Pip29 Took
+      - Pip30 Took
+---
+at: '2026-11-03T16:37:51.087Z'
+ms: 1
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip23 Took
+values:
+  title:
+    value: Pip23 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip23 Took
+  method: GET
+  target: http://localhost:8099/employees/25
+  address: http://localhost:8099/employees/25
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - prev
+    - self
+outcome: done
+address: http://localhost:8099/employees/25
+now:
+  state:
+    id: 25
+    firstName: Pip23
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:51.089435Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took&page=2
+outcome: done
+address: http://localhost:8099/employees?name=Took&page=2
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    prev:
+      - null
+    item:
+      - Pip21 Took
+      - Pip22 Took
+      - Pip23 Took
+      - Pip24 Took
+      - Pip25 Took
+      - Pip26 Took
+      - Pip27 Took
+      - Pip28 Took
+      - Pip29 Took
+      - Pip30 Took
+---
+at: '2026-11-03T16:37:51.091522Z'
+ms: 1
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip24 Took
+values:
+  title:
+    value: Pip24 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip24 Took
+  method: GET
+  target: http://localhost:8099/employees/26
+  address: http://localhost:8099/employees/26
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - prev
+    - self
+outcome: done
+address: http://localhost:8099/employees/26
+now:
+  state:
+    id: 26
+    firstName: Pip24
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:51.093704Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took&page=2
+outcome: done
+address: http://localhost:8099/employees?name=Took&page=2
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    prev:
+      - null
+    item:
+      - Pip21 Took
+      - Pip22 Took
+      - Pip23 Took
+      - Pip24 Took
+      - Pip25 Took
+      - Pip26 Took
+      - Pip27 Took
+      - Pip28 Took
+      - Pip29 Took
+      - Pip30 Took
+---
+at: '2026-11-03T16:37:51.095534Z'
+ms: 1
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip25 Took
+values:
+  title:
+    value: Pip25 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip25 Took
+  method: GET
+  target: http://localhost:8099/employees/27
+  address: http://localhost:8099/employees/27
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - prev
+    - self
+outcome: done
+address: http://localhost:8099/employees/27
+now:
+  state:
+    id: 27
+    firstName: Pip25
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:51.098412Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took&page=2
+outcome: done
+address: http://localhost:8099/employees?name=Took&page=2
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    prev:
+      - null
+    item:
+      - Pip21 Took
+      - Pip22 Took
+      - Pip23 Took
+      - Pip24 Took
+      - Pip25 Took
+      - Pip26 Took
+      - Pip27 Took
+      - Pip28 Took
+      - Pip29 Took
+      - Pip30 Took
+---
+at: '2026-11-03T16:37:51.100379Z'
+ms: 1
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip26 Took
+values:
+  title:
+    value: Pip26 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip26 Took
+  method: GET
+  target: http://localhost:8099/employees/28
+  address: http://localhost:8099/employees/28
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - prev
+    - self
+outcome: done
+address: http://localhost:8099/employees/28
+now:
+  state:
+    id: 28
+    firstName: Pip26
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:51.102378Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took&page=2
+outcome: done
+address: http://localhost:8099/employees?name=Took&page=2
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    prev:
+      - null
+    item:
+      - Pip21 Took
+      - Pip22 Took
+      - Pip23 Took
+      - Pip24 Took
+      - Pip25 Took
+      - Pip26 Took
+      - Pip27 Took
+      - Pip28 Took
+      - Pip29 Took
+      - Pip30 Took
+---
+at: '2026-11-03T16:37:51.104345Z'
+ms: 1
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip27 Took
+values:
+  title:
+    value: Pip27 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip27 Took
+  method: GET
+  target: http://localhost:8099/employees/29
+  address: http://localhost:8099/employees/29
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - prev
+    - self
+outcome: done
+address: http://localhost:8099/employees/29
+now:
+  state:
+    id: 29
+    firstName: Pip27
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:51.106718Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took&page=2
+outcome: done
+address: http://localhost:8099/employees?name=Took&page=2
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    prev:
+      - null
+    item:
+      - Pip21 Took
+      - Pip22 Took
+      - Pip23 Took
+      - Pip24 Took
+      - Pip25 Took
+      - Pip26 Took
+      - Pip27 Took
+      - Pip28 Took
+      - Pip29 Took
+      - Pip30 Took
+---
+at: '2026-11-03T16:37:51.108681Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip28 Took
+values:
+  title:
+    value: Pip28 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip28 Took
+  method: GET
+  target: http://localhost:8099/employees/30
+  address: http://localhost:8099/employees/30
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - prev
+    - self
+outcome: done
+address: http://localhost:8099/employees/30
+now:
+  state:
+    id: 30
+    firstName: Pip28
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:51.112362Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took&page=2
+outcome: done
+address: http://localhost:8099/employees?name=Took&page=2
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    prev:
+      - null
+    item:
+      - Pip21 Took
+      - Pip22 Took
+      - Pip23 Took
+      - Pip24 Took
+      - Pip25 Took
+      - Pip26 Took
+      - Pip27 Took
+      - Pip28 Took
+      - Pip29 Took
+      - Pip30 Took
+---
+at: '2026-11-03T16:37:51.116280Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip29 Took
+values:
+  title:
+    value: Pip29 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip29 Took
+  method: GET
+  target: http://localhost:8099/employees/31
+  address: http://localhost:8099/employees/31
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - prev
+    - self
+outcome: done
+address: http://localhost:8099/employees/31
+now:
+  state:
+    id: 31
+    firstName: Pip29
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:51.119332Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took&page=2
+outcome: done
+address: http://localhost:8099/employees?name=Took&page=2
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    prev:
+      - null
+    item:
+      - Pip21 Took
+      - Pip22 Took
+      - Pip23 Took
+      - Pip24 Took
+      - Pip25 Took
+      - Pip26 Took
+      - Pip27 Took
+      - Pip28 Took
+      - Pip29 Took
+      - Pip30 Took
+---
+at: '2026-11-03T16:37:51.121204Z'
+ms: 1
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Pip30 Took
+values:
+  title:
+    value: Pip30 Took
+    from:
+      - parts:
+          Took:
+            step: 3
+            pointer: /lastName
+chose:
+  kind: link
+  relation: item
+  title: Pip30 Took
+  method: GET
+  target: http://localhost:8099/employees/32
+  address: http://localhost:8099/employees/32
+  picked: title
+offered:
+  forms: []
+  links:
+    - first
+    - item
+    - last
+    - prev
+    - self
+outcome: done
+address: http://localhost:8099/employees/32
+now:
+  state:
+    id: 32
+    firstName: Pip30
+    lastName: Took
+    role: hobbit
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T16:37:51.123607Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took&page=2
+outcome: done
+address: http://localhost:8099/employees?name=Took&page=2
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    prev:
+      - null
+    item:
+      - Pip21 Took
+      - Pip22 Took
+      - Pip23 Took
+      - Pip24 Took
+      - Pip25 Took
+      - Pip26 Took
+      - Pip27 Took
+      - Pip28 Took
+      - Pip29 Took
+      - Pip30 Took
+---
+at: '2026-11-03T16:37:51.125971Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees?name=Took
+outcome: done
+address: http://localhost:8099/employees?name=Took
+now:
+  state:
+    count: 30
+  forms: []
+  links:
+    self:
+      - null
+    first:
+      - null
+    last:
+      - null
+    next:
+      - null
+    item:
+      - Pip01 Took
+      - Pip02 Took
+      - Pip03 Took
+      - Pip04 Took
+      - Pip05 Took
+      - Pip06 Took
+      - Pip07 Took
+      - Pip08 Took
+      - Pip09 Took
+      - Pip10 Took
+      - Pip11 Took
+      - Pip12 Took
+      - Pip13 Took
+      - Pip14 Took
+      - Pip15 Took
+      - Pip16 Took
+      - Pip17 Took
+      - Pip18 Took
+      - Pip19 Took
+      - Pip20 Took
+---
+at: '2026-11-03T16:37:51.130883Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:give-notice:
+          - sha256-DWXurUM56Sze32NQvxRKsnTifBDbExM4BzDLK5thhaA=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-GCerD3XToO0sVD76Cf3xiuMDVGXnig5O0MLt8iHQGB4=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null

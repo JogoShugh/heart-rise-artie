@@ -1,0 +1,31 @@
+name: sticky-note
+part: Scene one · 1997
+title: "The person joins them, by hand"
+fiction: true
+html: |
+  <h2>The person joins them, by hand</h2>
+  <div class="pair">
+    <div class="script">
+      <div class="line"><span class="who ana">Ana</span><p>My PIN goes in the address? Where anyone behind me can read it?</p></div>
+      <div class="line"><span class="who marcus">Marcus</span><p>…That's what forms.html says.</p></div>
+      <div class="line"><span class="who ana">Ana</span><p>Fine. Three numbers: 3310, 3311, 3312. They aren't even links. I'm copying them onto a sticky note.</p></div>
+      <div class="line"><span class="who marcus">Marcus</span><p>That's normal. Now pick POST from the method menu and type the address. In the body box, type card equals your card, ampersand, pin equals your PIN. Exactly as shown.</p></div>
+    </div>
+    <figure><img src="media/loans-data.png" alt="Her loans page: a table of loan numbers, book numbers, titles and due dates, 1997-11-12; no links; her card and PIN in the address." loading="lazy"><figcaption>Her loans: numbers to copy, no links, nothing to press. Her card and PIN ride in the address.</figcaption></figure>
+  </div>
+  <details class="more"><summary>Why the PIN is in the address</summary>
+    <ul>
+      <li>With no forms, every value travels in an address or a body the person types. Secrets included.</li>
+      <li>forms.yaml lists the card and PIN as query parameters of the loans list, so forms.html tells her to type them there.</li>
+    </ul>
+  </details>
+  <details class="more"><summary>The CGI behind her loans page, and the PIN in the address</summary>
+    <p class="note">library.cgi reads the card and PIN from the query string, because forms.yaml lists them as query parameters. Then her loans page is a table of numbers: no links, nothing to press.</p>
+    <pre class="source" data-source="exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi" data-from="elsif (($q-&gt;param('card')" data-count="3"></pre>
+    <pre class="source" data-source="exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi" data-from="sub list {"></pre>
+  </details>
+points:
+  - "Ana opens her loans page the way forms.html says: her card number and PIN typed on the end of the address, where anyone behind her can read them."
+  - "The page is three loan numbers with titles and due dates. None is a link, so she copies 3310, 3311 and 3312 onto a sticky note."
+  - "Marcus talks her through the rest: POST from WebWalker's method menu, the renew address with the number in it, and her card and PIN in the body box."
+  - "<b>What it shows:</b> with no controls in the page, the person carries everything by hand, her PIN included."

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run It Yourself · One Goal, Two Dialects</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Walk, keep, replay</span></header>
+<h2>Run It Yourself</h2>
+<pre class="cmd">sh exhibits/merge-watch-release/hal-forms/run.sh          <span># walk once in HAL-FORMS, keep, replay five</span>
+sh exhibits/merge-watch-release/hal-forms/run.sh replay   <span># replay five, no model</span>
+RELEASE_RUNG=L2 sh exhibits/merge-watch-release/variants.sh OUT   <span># the HAL Schema Forms script, at L2</span>
+sh exhibits/two-dialects/build.sh                        <span># this deck</span></pre>
+<p class="note">Needs Docker for Jenkins, and a model key for the walk only.</p>
+</article>
+<nav class="foot"><a href="deck/nothing-broke.html" rel="prev"><small>Back</small><b>Nothing Broke in HAL Schema Forms</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#run-it">with heart-ts</a></span>
+<a href="deck/close.html" rel="next"><small>Next</small><b>Plain Words, Either Dialect</b></a></nav>
+</main></div></body></html>

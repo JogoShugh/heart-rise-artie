@@ -1,0 +1,326 @@
+---
+run:
+  what: Claude Code (claude -p), heart-mcp its only MCP server, the HEART gateway for real GitHub at localhost:8093
+  when: 2026-11-14T03:58Z
+  prompt: >-
+    Using only the heart tools: in the github service, open pull request 2344 of JogoShugh/heart-github-test. If it can
+    be merged, merge it by squashing. Then try to merge it a second time. Report exactly what the service said each
+    time, and which acts were offered before and after the merge.
+  pull_request: https://github.com/JogoShugh/heart-github-test/pull/2344
+  model: claude-opus-5-5
+  mcp_servers:
+    - 'heart: connected'
+  tools:
+    - mcp__heart__heart_act
+    - mcp__heart__heart_back
+    - mcp__heart__heart_describe
+    - mcp__heart__heart_explain
+    - mcp__heart__heart_follow
+    - mcp__heart__heart_look
+  result:
+    turns: 7
+    duration_ms: 22635
+    cost_usd_reported: 0.26748299999999997
+---
+at: '2026-11-14T03:58:40.535Z'
+mode: intent
+say: enter {service}, by heart_look
+params:
+  service: github
+outcome: done
+address: http://localhost:8093/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - scm:issues-get
+    - scm:issues-get-comment
+    - scm:issues-list-comments
+    - scm:issues-list-for-repo
+    - scm:pulls-get
+    - scm:pulls-list
+    - scm:repos-get
+    - scm:repos-get-branch
+    - scm:repos-list-branches
+    - scm:repos-list-for-user
+  links:
+    alternate:
+      - null
+    hr:affordances:
+      - null
+  embedded: {}
+---
+at: '2026-11-14T03:58:43.546Z'
+mode: intent
+say: heart_act {relation}, owner {owner}, repo {repo}, pull_number {pull_number}
+params:
+  relation: scm:pulls-get
+  owner: JogoShugh
+  repo: heart-github-test
+  pull_number: 2344
+outcome: done
+address: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+now:
+  state:
+    id: 5306975352
+    node_id: PR_kwDOVM7WJc8AAAABPFIEeA
+    number: 2344
+    state: open
+    locked: false
+    title: 'Renewals: one week while stock is short'
+    body: Variant 503 of the Riverside Public Library release.
+    labels: []
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-11-14T03:58:02.000Z'
+    updated_at: '2026-11-14T03:58:02.000Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 48d8e716f120c59db113fee727c4fec305f05a9a
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:library/pr-503
+      ref: library/pr-503
+      sha: 0a2e4cff0ae652ae2b7f226f648de015135ec980
+    base:
+      label: JogoShugh:library/main
+      ref: library/main
+      sha: 6c58894f1c19d744e67c8e2b054b0d8217011596
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: true
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 3
+    deletions: 1
+    changed_files: 2
+  forms:
+    - scm:close
+    - scm:comment
+    - scm:edit
+    - scm:label
+    - scm:merge
+    - scm:request-review
+    - scm:update-branch
+  links:
+    scm:issues-list-comments:
+      - null
+    scm:commits:
+      - null
+    scm:issues-get:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    scm:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    scm:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    scm:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    scm:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-11-14T03:58:50.942Z'
+mode: intent
+say: heart_act {relation}, method {method}
+params:
+  relation: scm:merge
+  method: squash
+outcome: done
+address: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+now:
+  state:
+    id: 5306975352
+    node_id: PR_kwDOVM7WJc8AAAABPFIEeA
+    number: 2344
+    state: closed
+    locked: false
+    title: 'Renewals: one week while stock is short'
+    body: Variant 503 of the Riverside Public Library release.
+    created_at: '2026-11-14T03:58:02.000Z'
+    updated_at: '2026-11-14T03:58:49.000Z'
+    closed_at: '2026-11-14T03:58:49.000Z'
+    merged_at: '2026-11-14T03:58:49.000Z'
+    merge_commit_sha: 66be32c9db5daaa4f23bd8acab9b5710fac8d6c9
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:library/pr-503
+      ref: library/pr-503
+      sha: 0a2e4cff0ae652ae2b7f226f648de015135ec980
+    base:
+      label: JogoShugh:library/main
+      ref: library/main
+      sha: 6c58894f1c19d744e67c8e2b054b0d8217011596
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: true
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 3
+    deletions: 1
+    changed_files: 2
+  forms:
+    - scm:comment
+    - scm:edit
+    - scm:label
+  links:
+    scm:issues-get:
+      - null
+    scm:issues-list-comments:
+      - null
+    scm:commits:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    scm:merged-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    scm:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    scm:head-repo:
+      - title: null
+        state:
+          homepage: null
+          mirror_url: null
+          license: null
+    scm:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    scm:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          mirror_url: null
+          license: null
+          default_branch: main
+summary: >-
+  Done: PUT /repos/JogoShugh/heart-github-test/pulls/2344/actions/merge, If-Match "seq-0.hsf.L2.66835c9c7c8fc78d",
+  answered 200. Merged as 66be32c; now 3 forms, merge not among them.
+sent:
+  method: PUT
+  url: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344/actions/merge
+  If-Match: '"seq-0.hsf.L2.66835c9c7c8fc78d"'
+  status: 200
+---
+mode: intent
+say: heart_act {relation}, method {method}
+params:
+  relation: scm:merge
+  method: squash
+outcome: refused
+expect: not offered
+address: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+refused:
+  kind: not offered
+  by: heart-mcp, before sending
+  detail: 'scm:merge is not offered now. Offered: scm:comment, scm:edit, scm:label. Nothing was sent.'
+---
+at: '2026-11-14T03:58:54.020Z'
+mode: intent
+say: heart_explain {relation}
+params:
+  relation: scm:merge
+summary: 'Read the reason: A closed pull request can''t be merged; reopen it first.'
+outcome: done
+address: http://localhost:8093/repos/JogoShugh/heart-github-test/pulls/2344
+explanation:
+  scm:merge: A closed pull request can't be merged; reopen it first.

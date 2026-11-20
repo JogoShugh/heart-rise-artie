@@ -1,0 +1,227 @@
+what: company.heart.yaml for Harbor Point, run with no model at L0, L1 and L2, measured from each run's exchanges
+measured:
+  L0:
+    requests: 110
+    bytes received: 118348
+    ms on the wire: 246
+    loan reads: 37
+    bytes per loan read: 1871
+    by kind:
+      resource:
+        requests: 110
+        distinct: 57
+        bytes: 118348
+  L1:
+    requests: 114
+    bytes received: 52404
+    ms on the wire: 152
+    loan reads: 37
+    bytes per loan read: 462
+    by kind:
+      resource:
+        requests: 110
+        distinct: 57
+        bytes: 46947
+      affordance set:
+        requests: 4
+        distinct: 4
+        bytes: 5457
+  L2:
+    requests: 116
+    bytes received: 51972
+    ms on the wire: 154
+    loan reads: 37
+    bytes per loan read: 462
+    by kind:
+      resource:
+        requests: 110
+        distinct: 57
+        bytes: 46947
+      affordance set:
+        requests: 4
+        distinct: 4
+        bytes: 4577
+      schema:
+        requests: 2
+        distinct: 2
+        bytes: 448
+fragments:
+  L0 loan:
+    id: 3321
+    title: The Phantom Tollbooth
+    author: Norton Juster
+    due: 2026-11-12
+    renewals: 0
+    standing: renewable
+    _links:
+      self:
+        href: /loans/3321
+      curies:
+        - name: library
+          href: /profiles/library#{rel}
+          templated: true
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:unavailable:
+        href: /unavailable/fc81f545088ea825
+        type: application/json
+        integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+    _forms:
+      library:renew:
+        title: Renew
+        description: Keeps the book three weeks more.
+        _links:
+          target:
+            href: /loans/3321/actions/renew
+        method: POST
+        contentType: application/json
+        schema:
+          properties: {}
+          type: object
+          $id: /schemas/efddc7bd8bbcef73
+        hr:integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+      library:report-problem:
+        title: Report a problem
+        description: "Tells the library what is wrong with the book: one of the kinds it lists, and a comment."
+        _links:
+          target:
+            href: /loans/3321/actions/report-problem
+        method: POST
+        contentType: application/json
+        schema:
+          properties:
+            comment:
+              description: Anything the desk should know, in a sentence or two
+              maxLength: 200
+              title: Comment
+              type: string
+            problem:
+              description: What is wrong with the book
+              hr:options:
+                items: /kinds
+                link:
+                  href: /problem-kinds
+                  templated: false
+                maxItems: 1
+                promptField: prompt
+                valueField: value
+              title: Problem
+              type: string
+          required:
+            - problem
+          type: object
+          $id: /schemas/6770c985e2914e09
+        hr:integrity: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+      library:return:
+        title: Return
+        description: Gives the book back to the library.
+        _links:
+          target:
+            href: /loans/3321/actions/return
+        method: POST
+        contentType: application/json
+        schema:
+          properties: {}
+          type: object
+          $id: /schemas/efddc7bd8bbcef73
+        hr:integrity: sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+  L1 loan:
+    id: 3321
+    title: The Phantom Tollbooth
+    author: Norton Juster
+    due: 2026-11-12
+    renewals: 0
+    standing: renewable
+    _links:
+      self:
+        href: /loans/3321
+      curies:
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:forms:
+        href: /affordance-sets/a069b6affe9ff8f1
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-oGm2r/6f+PHQifmqjyzd4aUi5knwW3Kx9uREXUGxvj0=
+  L2 loan:
+    id: 3321
+    title: The Phantom Tollbooth
+    author: Norton Juster
+    due: 2026-11-12
+    renewals: 0
+    standing: renewable
+    _links:
+      self:
+        href: /loans/3321
+      curies:
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:forms:
+        href: /affordance-sets/292caa98b3e91085
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU=
+  L2 affordance set:
+    url: /affordance-sets/292caa98b3e91085
+    body:
+      _forms:
+        library:renew:
+          _links:
+            target:
+              href: /loans/{id}/actions/renew
+              templated: true
+          contentType: application/json
+          description: Keeps the book three weeks more.
+          hr:integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+          hr:templatePointers:
+            id: /id
+          method: POST
+          schema:
+            $ref: /schemas/efddc7bd8bbcef73
+            hr:integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+          title: Renew
+        library:report-problem:
+          _links:
+            target:
+              href: /loans/{id}/actions/report-problem
+              templated: true
+          contentType: application/json
+          description: "Tells the library what is wrong with the book: one of the kinds it lists, and a comment."
+          hr:integrity: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+          hr:templatePointers:
+            id: /id
+          method: POST
+          schema:
+            $ref: /schemas/6770c985e2914e09
+            hr:integrity: sha256-Z3DJheKRTgmJja7uI1mGdUfhe3Z5qLtG1jBgtXeOq5o=
+          title: Report a problem
+        library:return:
+          _links:
+            target:
+              href: /loans/{id}/actions/return
+              templated: true
+          contentType: application/json
+          description: Gives the book back to the library.
+          hr:integrity: sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+          hr:templatePointers:
+            id: /id
+          method: POST
+          schema:
+            $ref: /schemas/efddc7bd8bbcef73
+            hr:integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+          title: Return
+      _links:
+        curies:
+          - href: /profiles/library#{rel}
+            name: library
+            templated: true
+          - href: https://w3id.org/heart-rise/rels/{rel}
+            name: hr
+            templated: true
+        hr:unavailable:
+          href: /unavailable/fc81f545088ea825
+          integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+          type: application/json

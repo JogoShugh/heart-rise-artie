@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fielding's Rules, Checked</title>
+<meta name="description" content="HEART and ARTIE read against Roy Fielding's rules and his replies, re-checked commit by commit, with the open gaps.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; the at-a-glance table scrolls inside its own box. */
+:root {
+  --bg: #f3f6f5;
+  --surface: #ffffff;
+  --fg: #17211d;
+  --muted: #55645d;
+  --rule: #d3ddd8;
+  --leaf: #2b7a4b;
+  --link: #2f5f8f;
+  --amber: #8a6a1f;
+  --refuse: #a3442e;
+  --code-bg: #e9efec;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732;
+    --leaf: #6cc690; --link: #8ab8e6; --amber: #e0bf6a; --refuse: #e58a72; --code-bg: #1d2723; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732;
+  --leaf: #6cc690; --link: #8ab8e6; --amber: #e0bf6a; --refuse: #e58a72; --code-bg: #1d2723; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font: 16px/1.65 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 44rem; margin: 0 auto; padding-block: 3rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.75rem; }
+.wide { margin-inline: calc((44rem - min(62rem, 100%)) / 2); }
+@media (max-width: 62rem) { .wide { margin-inline: 0; } }
+h1, h2, h3 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2rem, 5vw, 2.9rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.05rem; font-family: var(--body); font-weight: 600; }
+p, li { max-width: 65ch; }
+p { margin: 0; }
+section { display: grid; gap: 1rem; min-width: 0; }
+.eyebrow { font: 600 0.74rem/1 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.12rem; color: var(--muted); }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.85rem 1rem; font: 0.79rem/1.6 var(--mono); }
+pre code { background: none; padding: 0; font-size: 1em; }
+.c { color: var(--muted); }
+.k { color: var(--link); }
+.g { color: var(--leaf); }
+.r { color: var(--refuse); }
+a { color: var(--link); }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.4rem; }
+.note { color: var(--muted); font-size: 0.92rem; }
+
+.claim { display: grid; gap: 1rem; border-top: 1px solid var(--rule); padding-top: 1.5rem; }
+.claim blockquote { margin: 0; font-family: var(--display); font-weight: 500; font-size: 1.15rem; line-height: 1.45; color: var(--fg); padding-left: 1rem; border-left: 3px solid var(--rule); }
+.verdict { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.pill { font: 600 0.74rem/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; padding: 0.35rem 0.6rem; border-radius: 999px; border: 1px solid currentColor; }
+.pill.yes { color: var(--leaf); }
+.pill.adjust { color: var(--amber); }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1rem; }
+.pair > div { display: grid; gap: 0.45rem; align-content: start; min-width: 0; }
+.label { font: 600 0.74rem/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.label.before { color: var(--refuse); }
+.label.after { color: var(--leaf); }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1.25rem; align-items: start; }
+figure { margin: 0; display: grid; gap: 0.5rem; align-content: start; min-width: 0; }
+figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 8px; background: #fff; }
+figcaption { font-size: 0.9rem; color: var(--muted); }
+figcaption b { color: var(--fg); }
+.close { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 1.1rem 1.25rem; display: grid; gap: 0.8rem; }
+footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; display: grid; gap: 0.35rem; }
+.act { display: grid; gap: 1.1rem; }
+.actlabel { font: 600 0.78rem/1 var(--body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--leaf); }
+.map { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+.map table { border-collapse: collapse; width: 100%; min-width: 34rem; font-size: 0.93rem; }
+.map th, .map td { text-align: left; vertical-align: top; padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--rule); }
+.map tr:last-child td { border-bottom: 0; }
+.map thead th { font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.anatomy { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+@media (max-width: 48rem) { .anatomy { grid-template-columns: minmax(0, 1fr); } }
+.callouts { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
+.callouts li { display: grid; gap: 0.15rem; padding-left: 0.8rem; border-left: 3px solid var(--rule); }
+.callouts li b { font-size: 0.92rem; }
+.callouts li span { font-size: 0.9rem; color: var(--muted); }
+.aside { background: var(--surface); border: 1px dashed var(--rule); border-radius: 8px; padding: 1.1rem 1.25rem; display: grid; gap: 0.8rem; }
+.figures { font-variant-numeric: tabular-nums; }
+main h2 { margin-top: 1.5rem; }
+main h3 { font-family: var(--display); font-size: 1.15rem; margin-top: 1.2rem; }
+main blockquote { margin: 0; padding-left: 1rem; border-left: 3px solid var(--rule); color: var(--muted); }
+main .map table { min-width: 70rem; font-size: 0.82rem; }
+main p, main li { line-height: 1.65; }
+main > * + * { margin-top: 0.9rem; }
+</style>
+</head>
+<body>
+<main class="wrap" style="display:block">
+<p><em>H.E.A.R.T. + R.I.S.E. · ARTIE · read against Roy T. Fielding, 20 Oct 2008</em></p>
+<h1>Fielding's Rules, Checked</h1>
+<blockquote>
+<p><strong>Note.</strong> Re-checked 11 October 2026 at commit <code>a70ecc2</code>, against the live garden server over HTTP and CoAP: the garden suite (15 scenarios), the HEART conformance suite run against the garden (14 pass; 4 test an act on the bookmark that creates a resource, which the garden does not offer), ARTIE's live suite (24 scenarios) and the last Buster campaign. No verdict changed. The server's HEART code now lives in the library at <code>heart/</code> (<code>heart/ARCHITECTURE.md</code>); the garden server keeps only its domain and its declaration. Paths below are current.</p>
+<p>Re-checked again 12 October 2026 at commit <code>a7831ce</code>, after fixing what the Roy Bott review noticed: a CoAP request now carries its W3C trace context; a refusal's <code>detail</code> names the act by its relation and gives the domain's reason; the garden's bookmark offers an act that builds a new bed (201, <code>Location</code>); and the garden refuses water a bed cannot hold (422 <code>rule-refused</code>). Evidence: the garden suite (17 scenarios), the HEART conformance suite against the garden (18 of 18, none skipped), ARTIE's live suite (26 scenarios) and a fresh Buster campaign (125 mutations, 0 FAIL). No verdict changed.</p>
+<p>Re-checked 15 October 2026, on the work since <code>a7831ce</code> (some of it not yet committed): <code>coaps</code> with pre-shared keys (Rule 1); HEART's identifiers moved to <code>https://w3id.org/heart-rise/</code>, each with a page; a Layer 1 <code>ETag</code> that changes whenever its representation's bytes do; an act's former paths; the OpenAPI twin's opt-in link to each state's affordance set; and <strong>choices from state</strong> (HAL-SCHEMA-FORMS-HR Rule 8): a property's choices taken from the resource itself or from another resource, enforced by the server and shown to a model as a closed set. Two verdicts moved. Rule 2 goes from ✅ to 🟡: on a closer reading, the way an act's <code>If-Match</code> is scoped stretches RFC 9110, and the section <a href="#precondition-scope">Precondition scope, examined</a> says how far, what the alternatives cost, and the fix this review recommends. And the "interface in the form" reply is stronger: a form now says not only how to build the request but which values it may carry now.</p>
+<p>Re-checked 25 October 2026 at commit <code>e5c16e8</code>, on the work since 15 October: resources embedded the HAL way (<code>_embedded</code>, SPEC §6.1); search and list results revalidated by their own <code>ETag</code>; an OpenAPI-to-HEART gateway that serves GitHub as HEART; heart-script, its scripts, goals in plain words, and <code>artie generate</code>, which writes a run's decisions as a script with a lock file; listeners that look again only when what they read has changed, with the gateway holding a read until a webhook says it has; and choices from state in two more clients, heart-ts and heart-mcp, and live on two domains (<code>docs/reports/choices-live/</code>). One verdict changed, the same day: Rule 2 is back to ✅, because an act's target is now a resource with a representation of its own, read under its owner's ETag (<a href="#precondition-scope">Precondition scope, examined</a>). One row is added, <a href="#inference">Inference per run</a>, because the project's goal is Fielding's rules with as little model inference per run as possible, and nothing here measured that half. It asks the question this review had left alone: a script that runs with no model names its relations, as the early-bound client of the OpenAPI review does, so how is it still a REST client? Rule 2 also gains one thing to watch: the gateway's held read.</p>
+<p>Re-checked again 25 October 2026 at commit <code>7681d05</code>, after Rule 2's fix. A fresh Buster campaign on the garden: 22 rounds, 130 planned mutations, all made, 79 pass, 51 pass (attested), 0 FAIL, every plugin exercised. Its first attempt that day found a fault in Buster, not in HEART or ARTIE: Buster still looked for the forms link under the relation's name before 15 October, so it found none, and the four plugins that attack it had silently not run since then; it was fixed test-first (<code>buster</code>'s own repository, not yet committed there). The fragment that links an act's target to its form now has a meaning the profile gives it (HAL-SCHEMA-FORMS-HR Rule 11). Three new things to watch, none a verdict: <code>whenever(by = …)</code> keys off relation names two of which are not registered ("key off the content"); <code>at(address)</code> trusts a script to pass an address the server handed over (Rule 4); and the gateway's relation names are made from OpenAPI operation ids ("typed relations"). Later that day the first two were closed in code (<code>a26dd40</code>, <code>5f8bd31</code>); the third, a matter of naming, stays to watch.</p></blockquote>
+<p>Each heading below is Fielding's own wording, from <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be hypertext-driven"</a> and his replies in its comments. Under each is a short account of what the spec and today's code do about it, with the evidence. Where the work falls short, this review says so. Revised 8–9 October 2026: Rule 4 resolved, the entry point added, Rule 6 re-read in full, the <code>If-Match</code> narrowing removed, and rung discovery added (a JSON Home index and <code>Preference-Applied</code>). Revised 10 October 2026: forms named by typed relations described in an ALPS profile, refusals as RFC 9457 problem details, absent acts explained by the server, Layer 1 always read with <code>Cache-Control: no-cache</code>, act responses naming their resource in <code>Content-Location</code>, and ARTIE checked by an adversarial proxy, Buster. The spec now has a protocol-neutral core with two bindings, HTTP and CoAP, and ARTIE works live over both (Rule 1).</p>
+<blockquote>
+<p>"if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period."</p>
+<p>— The post's thesis. H.E.A.R.T. takes it literally for machine clients: the manifest in each response is the only source of what the client may do next.</p>
+</blockquote>
+<p>Key: ✅ Supports the work does this · 🟡 Partly mostly, with a stated gap · 🔴 Tension the work departs from it</p>
+<h2>At a glance</h2>
+<p>Each row jumps to its full account below. Columns are the commits this review has been checked against, all re-assessed with Fielding’s full wording.</p>
+<div class="map"><table>
+<thead>
+<tr>
+<th>Axis</th>
+<th><code>c16e61b</code> 4 Oct · first review</th>
+<th><code>c5db0e4</code> 8 Oct · integrity, template pointers</th>
+<th><code>91fb71a</code> 8 Oct · service index</th>
+<th><code>e2a773f</code> 9 Oct · strong If-Match</th>
+<th><code>9a39cfc</code> 9 Oct · discovery, no fixed paths</th>
+<th><code>360865f</code> 10 Oct · typed relations, Buster</th>
+<th><code>d10c048</code> 10 Oct · any protocol</th>
+<th><code>4c52390</code> 10 Oct · CoAP binding</th>
+<th><code>b7f4d00</code> 10 Oct · first real-model run</th>
+<th><code>a70ecc2</code> 11 Oct · re-checked live</th>
+<th><code>a7831ce</code> 12 Oct · trace over CoAP, bed from the bookmark</th>
+<th>15 Oct · coaps, ETag digest, choices from state</th>
+<th>25 Oct · scripts, gateway, listeners, act targets</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#r1">Any protocol</a> Rule 1</td>
+<td>🔴</td>
+<td>🔴</td>
+<td>🔴</td>
+<td>🔴</td>
+<td>🔴</td>
+<td>🔴</td>
+<td>🟡</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#r2">No protocol changes</a> Rule 2</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>🟡</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#r3">Media types first</a> Rule 3</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#r4">Server-taught URIs</a> Rule 4</td>
+<td>🟡</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#r5">No typed resources</a> Rule 5</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#r6">Bookmark only</a> Rule 6</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#hypertext">Hypertext = affordance</a> Reply</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#typed-relations">Typed relations</a> Reply</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#interface">Interface in the form</a> Reply</td>
+<td>🟡</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#client-decides">Client decides</a> Reply</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#cool-uris">Cool URIs</a> Reply</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#post-meaning">What POST means</a> Reply</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#prior-knowledge">Concentrated prior knowledge</a> Reply</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#no-batch">No batch calls</a> Reply</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#follow-nose">Follow your nose</a> Reply</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#key-off-content">Key off the content</a> Reply</td>
+<td>🟡</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#app-state">App vs resource state</a> Reply</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#public-ids">Public identifiers</a> Reply</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#ai-driven">AI-driven clients</a> Reply</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a href="#model-quality">How well a model chooses</a> Project, §10</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+<td>🟡</td>
+</tr>
+<tr>
+<td><a href="#inference">Inference per run</a> Project goal</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>🟡</td>
+</tr>
+</tbody>
+</table></div>
+<h2>The six rules in the post</h2>
+<p><a id="r1"></a></p>
+<h3>"A REST API should not be dependent on any single communication protocol … any protocol element that uses a URI for identification must allow any URI scheme to be used"</h3>
+<p><em>Rule 1</em></p>
+<p><strong>✅ Supports:</strong> A protocol-neutral core with two real bindings, HTTP and CoAP, chosen by URI scheme. (10 Oct 2026.)</p>
+<p>The full rule allows that a "successful mapping to a given protocol may be dependent on the availability of metadata, choice of methods, etc." So depending on a protocol's details is not the problem. The problem is mixing identification with interaction. The spec now separates them. §6.0 states the core in protocol-neutral terms: read, requested and applied rendering, validator, never fresh, act, done, stale, not offered, invalid, refusal detail. It then maps each one to a binding. Any URI scheme may appear in any link. A client picks a binding by the URI’s scheme, refuses a scheme it has no binding for before sending anything, and never rewrites a URI to another scheme.</p>
+<p>There are two real bindings. §6.1–§6.12 are the HTTP binding. §6.0.1 is a CoAP binding (RFC 7252). CoAP has no header for a profile or a preference, so the binding carries them in experimental CoAP options, one for one with their HTTP headers. A Layer 1 read carries a critical, unsafe <code>No-Cache</code> option, which no proxy can answer from its cache. The validator is 8 bytes, CoAP’s limit, and the refusals are CoAP codes with the same problem types. The reference server answers CoAP natively on UDP beside HTTP, from the same services and the same act checks. ARTIE’s core is unchanged; <code>CoapBinding</code> serves <code>coap:</code> URIs. Live, over UDP against the real server, ARTIE takes a bed through sow, water and harvest at L0 and at L2, and goes from the <code>coap://…/</code> bookmark to an act. Nothing is sent over HTTP in any of them.</p>
+<p>What remains is narrower than the rule. The CoAP option and format numbers are experimental until registered with IANA. There is no <code>coaps</code> (DTLS) yet. HAL-FORMS, the HTTP on-ramp, is not served over CoAP. A CoAP request carries no client identity. Since 12 October it does carry trace context: option 65020 holds the same value as HTTP's <code>traceparent</code> header, elective, safe to forward and no part of the cache key (RFC 7252 §5.4.6). ARTIE mints a new span for each CoAP request, so each event in its log names the request it is about, as over HTTP; in the live run every CoAP event has a span.</p>
+<ul>
+<li><strong>Code:</strong> client <code>heart/Binding.kt</code>, <code>HttpBinding.kt</code>, <code>CoapBinding.kt</code>; library <code>heart-coap/…/CoapFrontDoor.kt</code>; garden <code>declaration/BedActs.kt</code></li>
+<li><strong>Tests:</strong> <code>any-protocol.feature</code>, <code>coap-binding.feature</code> (client, with traceparent), <code>coap.feature</code> (server), live "Over CoAP" scenarios, including "every event names the span of the request it is about"</li>
+<li><strong>Spec:</strong> §6.0 "Core and bindings", §6.0.1 "The CoAP binding"</li>
+</ul>
+<p><a id="r2"></a></p>
+<h3>"A REST API should not contain any changes to the communication protocols aside from filling-out or fixing the details of underspecified bits of standard protocols"</h3>
+<p><em>Rule 2</em></p>
+<p><strong>✅ Supports:</strong> Standard mechanisms only, each as its RFC reads. (Narrowing removed 9 Oct 2026; the act's precondition scope examined 15 Oct 2026 and resolved 25 Oct 2026, see <a href="#precondition-scope">Precondition scope, examined</a>.)</p>
+<p>Every mechanism is an existing standard: <code>Prefer</code> tokens (RFC 7240, which allows unregistered tokens), conditional requests (RFC 9110, RFC 6585), <code>immutable</code> (RFC 8246), <code>Link: rel="profile"</code> and <code>Accept-Profile</code> (W3C content negotiation by profile). Spec 0.4 dropped its private use of the media-type <code>profile</code> parameter for exactly this reason. Conditional acts follow RFC 9110 §13.1.1 as written. HTTP is stateless, so an act repeats the <code>Accept</code>, <code>Accept-Profile</code> and <code>Prefer</code> its client synced with; the server selects the owning bed’s representation from them and compares <code>If-Match</code> with that representation’s <code>ETag</code> by strong comparison, the whole value. An earlier rule read only the state number inside the <code>ETag</code> and ignored the rest, a narrowing of RFC 9110; it was removed in <code>e2a773f</code>. Declaring what a server serves adds nothing new either: <code>Preference-Applied</code> (RFC 7240) says which rung each response is at, and the service index is also served as <code>application/json-home</code>, whose link hints <code>formats</code>, <code>accept-prefer</code> and <code>precondition-req</code> were written for exactly this. OPTIONS was considered and rejected, since its response has no defined body and is not cached. The 10 October work kept to the same line: a client reads Layer 1 with the request directive <code>Cache-Control: no-cache</code> (RFC 9111 §5.2.1.4), refusals are <code>application/problem+json</code> (RFC 9457) with JSON Pointers (RFC 6901), an act’s response names the bed it represents in <code>Content-Location</code> (RFC 9110 §8.7), and every request carries a W3C <code>traceparent</code>, over CoAP in an experimental option one for one with the header. Things that need watching: <code>Accept-Profile</code> is a W3C draft, and JSON Home and HTTP link hints are Internet-Drafts. Using a draft mechanism is not a change to the protocol, but it may move.</p>
+<ul>
+<li><strong>Spec:</strong> §6.1 "Why not a media-type parameter", §6.3 "Precondition scope"</li>
+<li><strong>Tests:</strong> <code>negotiation.feature</code> (heart-core), <code>conditional-requests.feature</code> (heart-spring), <code>index.feature</code> (heart-core: the home document), client <code>layer1-freshness.feature</code></li>
+<li><strong>Resolved 25 Oct 2026:</strong> the act's precondition scope (<a href="#precondition-scope">below</a>)</li>
+<li><strong>To watch (25 Oct 2026):</strong> the gateway's held read. A listener's conditional GET may carry <code>Prefer: wait=N</code>, and the gateway then holds it while the answer would be 304, until a signed webhook says the resource changed or the time runs out. RFC 7240 §4.3 defines <code>wait</code> as how long the client expects the server to take to process the request; using it to wait for a change is a long poll under that name, not what the RFC describes. It is a gateway feature, not in SPEC, and a client that ignores it is answered at once. If SPEC takes it up, it should be named for what it does, as RFC 7240 lets anyone define a preference, rather than borrow <code>wait</code>.</li>
+</ul>
+<p><a id="precondition-scope"></a></p>
+<h3>Precondition scope, examined</h3>
+<p><em>Added 15 October 2026. Rule 2, read strictly.</em></p>
+<p><strong>What HEART does.</strong> An act goes to its own target, <code>POST /beds/2/actions/water-cell</code>, but its <code>If-Match</code> carries the <code>ETag</code> of a different resource: the bed, <code>/beds/2</code>, whose representation offered the form. The server compares the two, refuses a mismatch with 412, and answers with the bed's new representation, naming it in <code>Content-Location</code>. SPEC §6.3 calls the bed the act's <em>owning resource</em>.</p>
+<p><strong>Why that stretches RFC 9110.</strong> §13.1.1 evaluates <code>If-Match</code> against "the selected representation of the target resource", and the target resource of this request is <code>/beds/2/actions/water-cell</code>, not <code>/beds/2</code>. HEART's defence, written on 8 October, is that the origin server decides what a target's selected representation is (§3.2), and that it decides it to be the owning bed's representation. That defence holds up only halfway: today <code>/beds/2/actions/water-cell</code> has no representation of its own at all. <code>GET</code> on it is not served. So the "selected representation" is a fiction the server asserts, not something a client, a cache or a proxy could observe. A strict reader of Rule 2, which forbids changing the protocol beyond filling its underspecified parts, could fairly call this a change to what <code>If-Match</code> means. It works, it is consistent, and every client and test relies on it; but it is the one place where HEART leans on its own reading of HTTP rather than HTTP's.</p>
+<p><strong>The obvious fix, and why it is worse.</strong> Post the act to the bed itself: <code>POST /beds/2</code>, with the bed's own <code>ETag</code> in <code>If-Match</code>. That is RFC 9110 exactly. But then the request has to say <em>which</em> act it is, and there are only two places left to say it:</p>
+<ul>
+<li><strong>In the body</strong>, as <code>{"act": "water-cell", "milliliters": 250}</code>. This is tunnelling: the operation is hidden inside the payload, the way SOAP hides it in the envelope.</li>
+<li><strong>In a header</strong>, as SOAP 1.1 did with <code>SOAPAction: "urn:garden#waterCell"</code>. That is a protocol extension of HEART's own, the thing Rule 2 forbids, and it is still invisible to most tools.</li>
+</ul>
+<p>Either way, the operation disappears from the request line. That costs a great deal in practice:
+- <strong>Logs:</strong> access logs, which record the method and URI, can no longer tell a watering from a harvest. Filtering by operation means parsing bodies or custom headers.
+- <strong>Gateways:</strong> they route, rate-limit and authorize on the URI. A rule like "only the irrigation service may <code>POST …/water-cell</code>" can no longer be written there.
+- <strong>Metrics and traces:</strong> these group requests by route. Every act would collapse into one <code>POST /beds/{id}</code> series.
+- <strong>Caches:</strong> they invalidate by URI. They already invalidate <code>/beds/2</code> after any unsafe request to it, so nothing is gained there.</p>
+<p>Fielding's own reply covers the method: "You don't get to decide what POST means — that is decided by the resource". It doesn't ask for one URI per resource with a multiplexed body. Distinct, readable URIs for distinct things are what he encourages, as long as the server provides them, which HEART's forms do.</p>
+<p><strong>What this review recommends: make the action resource real.</strong> Keep the per-act URIs. Give each one an actual representation, so that its <code>ETag</code> is genuinely the target's own:</p>
+<ul>
+<li><strong>What <code>GET</code> returns:</strong> <code>GET /beds/2/actions/water-cell</code> returns that act's form for bed 2: its title, schema and choices, the same form the bed embeds or links. When the act isn't offered, it returns an explanation (the act's entry in <code>hr:unavailable</code>) with a 409-style problem, or a representation saying so.</li>
+<li><strong>Its validator:</strong> the action resource's <code>ETag</code> names that representation, and changes whenever the bed's state does, since the form exists only by virtue of the bed's state. The simplest form: the bed's state version plus the form's digest.</li>
+<li><strong>The act:</strong> <code>POST</code> with <code>If-Match</code> is then compared against <strong>the target resource's own</strong> selected representation, exactly as §13.1.1 says. A stale view of the bed yields a stale view of the action resource, so the 412 behaviour is unchanged.</li>
+<li><strong>What clients may send:</strong> a client that already holds the bed's <code>ETag</code> keeps working if the server accepts either validator. This review suggests one release where both are accepted, then the action resource's own.</li>
+</ul>
+<p>That keeps everything the URI buys for observability, removes the fiction, and adds something useful. An action resource becomes a thing you can fetch, link to, cache-revalidate and log. That is the "define more resources" advice from the batch-calls reply below.</p>
+<p><strong>An alternative worth naming: nouns for acts.</strong> An event-sourced domain could expose each act as creating a subordinate resource: <code>POST /beds/2/waterings</code> answers <code>201</code> with <code>/beds/2/waterings/17</code>, one of the bed's history events. The operation stays in the URI, and the collection has its own representation and validator. It suits domains whose acts are records, such as waterings, fouls and comments, better than ones whose acts are commands, such as thaw or resolve. It is a modelling choice per domain. HEART's declaration could allow it, since an act's path is already the domain's to name.</p>
+<p><strong>Status:</strong> resolved 25 October 2026, the simplest way the recommendation allows. Every act's target answers <code>GET</code> and <code>HEAD</code> (SPEC §6.2, "An act's target is a resource"), over HTTP and CoAP. The body is small: a link <code>up</code> to the owner, a link <code>hr:form</code> to the act's form where it already lives in the owner's shared affordance set (by a JSON Pointer fragment, with the set's integrity and the form's own), and <code>ownerETag</code>. It holds no copy of the form and none of the owner's state, so its bytes change exactly when the owner's representation does, and the owner's ETag is a strong validator for it. The comparison <code>If-Match</code> gets is therefore with the target's own ETag, as RFC 9110 §13.1.1 reads, and it is the value every client already sends: no client changed, and none needs the <code>GET</code> before acting, so there is no release in which two validators are accepted. An act not offered answers its <code>GET</code> with 409 and why. Evidence: the HEART conformance suite's three new scenarios, passing on every server that runs it (the lamp over http4k, the gateway's lamp and its GitHub, the garden, basketball and tickets); <code>coap.feature</code>'s two; the garden's identifier check, which now finds <code>hr:form</code> and its page. Still not served: <code>GET</code> on an act the bookmark offers. The richer answers the same address could give, all opt-in, are parked in <code>spec/ideas/act-resource.md</code>.</p>
+<p><a id="r3"></a></p>
+<h3>"A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types."</h3>
+<p><em>Rule 3</em></p>
+<p><strong>✅ Supports:</strong> The spec defines a profile, one relation and processing rules. It defines no endpoints.</p>
+<p>H.E.A.R.T. adds a profile on top of existing media types (<code>application/hal+json</code> with HAL Schema Forms, and <code>application/prs.hal-forms+json</code>). It names its own extended relations, <code>hr:forms</code>, <code>hr:unavailable</code> and, since 25 October, <code>hr:form</code>, under <code>https://w3id.org/heart-rise/rels/</code> (under <code>https://github.com/jogoshugh/heart-rise/rels/</code> until 15 October; each now has a page). The example server names each of its acts by a relation too (<code>garden:water-cell</code>, a CURIE for <code>/profiles/garden#water-cell</code>), and describes them in an ALPS document at that address. This is the “extended relation names” half of the rule. And it defines how to process the three layers. The garden beds and their action URLs are an example server, not part of the protocol: nothing in the spec requires <code>/beds</code> or <code>/actions</code>.</p>
+<ul>
+<li><strong>Spec:</strong> §6.1 profiles and the forms relation; §6.4 layering</li>
+<li><strong>Tests:</strong> <code>forms-link.feature</code>, <code>form-relations.feature</code> (client and server), <code>layers.feature</code> (heart-core)</li>
+<li><strong>Added 25 Oct 2026:</strong> HAL-SCHEMA-FORMS-HR Rule 11, a processing rule of the profile: a fragment is a JSON Pointer into the body. No registered media type said so for <code>application/hal+json</code> (RFC 6839 §3.1 hands <code>+json</code> the fragment semantics of <code>application/json</code>, which has none), and an act's target links its form by one.</li></ul>
+<p><a id="r4"></a></p>
+<h3>"A REST API must not define fixed resource names or hierarchies … allow servers to instruct clients on how to construct appropriate URIs, such as is done in HTML forms and URI templates"</h3>
+<p><em>Rule 4</em></p>
+<p><strong>✅ Supports:</strong> The server instructs; the client reads nothing from a URL; the spec names no paths. (Resolved 8–9 Oct 2026.)</p>
+<p>Every act goes to a target the server sent. ARTIE's <code>act()</code> takes an action name, never a URL. Where a target is a template, the form itself says how to fill it: <code>"hr:templatePointers": {"id": "/id"}</code>, a JSON Pointer (RFC 6901) into the bed's representation, taken from JSON Hyper-Schema's <code>templatePointers</code>. That is an instruction "within media types", defined in the published H.E.A.R.T. profile of HAL Schema Forms, not a rule the client knows from elsewhere. The earlier gap is closed: ARTIE used to verify shared layers by reading the hash out of the URL path. It now checks bytes against an <code>integrity</code> value carried in the linking representation, as Subresource Integrity does, and reads nothing from any URL. The spec no longer names paths either (9 Oct 2026): §6.5 requires only one URL per distinct body, served <code>immutable</code>. Since 11 October the reference server names each body by the first 16 hex digits of its digest (<code>/affordance-sets/588773b4c4ba671e</code>), with no <code>sha256-</code> in front, so the name no longer looks like a digest; integrity is the only check, and a server refuses to start if two bodies would share a name. The reason is this rule, not URI opacity: Fielding wrote that “REST does not require that a URI be opaque” and that RESTful applications are “encouraged to use human-meaningful, hierarchical identifiers”, which the reference server’s paths are.</p>
+<ul>
+<li><strong>Tests:</strong> <code>layers.feature</code> (heart-core: the pointer <code>id</code> at <code>/id</code>), client <code>conditional-acts.feature</code> (pointers, fields, refusals), <code>sync-l2.feature</code> (a hash-shaped URL is ignored; mismatched integrity is refused)</li>
+<li><strong>Spec:</strong> <code>spec/HAL-SCHEMA-FORMS-HR.md</code> Rules 1 and 2; §6.5 "Naming is the server's", §6.9.1</li>
+<li><strong>To watch (25 Oct 2026):</strong> heart-script's <code>at(address)</code> reads again a resource by its address, and its documentation says the address must be one the server handed over: a link's target, a <code>Location</code>, the held resource's own. Every script today passes one so (<code>held.address</code>), but nothing checks it, so a hand-written script could pass an address it made up. ARTIE could refuse an address not seen in the run. <strong>Closed the same day (<code>a26dd40</code>):</strong> the client every script runs through keeps the addresses the server handed over in the run, and refuses to read again at any other (<code>script.feature</code>). A link not yet followed doesn't count, since the client keeps a link's relation and title, not its address.</li></ul>
+<p><a id="r5"></a></p>
+<h3>"A REST API should never have “typed” resources that are significant to the client … The only types that are significant to a client are the current representation’s media type and standardized relation names."</h3>
+<p><em>Rule 5</em></p>
+<p><strong>✅ Supports:</strong> ARTIE knows nothing about beds.</p>
+<p>The client branches only on the media type and profile (its <code>Dialect</code>) and on the forms relation. A resource's state is opaque JSON that it carries but never interprets. The garden appears only in test data. The planned evaluation uses five unrelated domains, plus renamed actions, precisely to check that nothing domain-specific has crept in.</p>
+<ul>
+<li><strong>Code:</strong> <code>heart/Dialect.kt</code>, <code>HeartResponseParser.kt</code></li>
+<li><strong>Plan:</strong> <code>spec/EVAL-L6.md</code> §3</li>
+</ul>
+<p><a id="r6"></a></p>
+<h3>"A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations."</h3>
+<p><em>Rule 6</em></p>
+<p><strong>✅ Supports:</strong> One bookmark reaches everything, and every transition is a choice or a form the server offered.</p>
+<p><code>enter("/")</code> takes the only URL ARTIE is ever given: the service index. From there it searches beds by name or looks one up by id, using GET forms whose targets fill from their own fields, and follows a result chosen by its <code>item</code> relation and title. After that, every act must name a choice in the current manifest. A name that is not offered is refused before any request is sent. Each response becomes the new state and manifest. A <code>412</code> or <code>409</code> makes the client re-sync instead of trusting what it held. At L6 the reasoner can only pick among the offers it is shown, and the agent rejects anything else.</p>
+<p>Filling a template is "the user’s manipulation of those representations": the form and its template pointers come from the server, as an HTML form does, so L1 and L2 meet this rule as fully as L0. An earlier version of this review rated the rule "Partly", arguing from a "strictest reading" that required a complete link per action. That reading depended on quoting the rule without its last clause, and is withdrawn. The entry point, a real gap until <code>91fb71a</code>, is closed: <code>GET /</code> is a service index, and live scenarios go from it alone to a watered bed at L0 and L2. Since 12 October the garden's bookmark also offers <code>garden:build-bed</code>, an act that brings a new bed into being: ARTIE enters <code>/</code>, builds a bed from the form, lands on it from the response and sows it, with no URI of its own.</p>
+<p>What remains is the rule’s first sentence: "standardized media types … expected to be understood by any client". ARTIE’s prior knowledge is HAL, HAL Schema Forms and the H.E.A.R.T. profile of it. HAL is an IETF draft, HAL Schema Forms is a published but unstandardized specification, and the profile is this project’s own. A generic HAL Schema Forms client can use L0, which uses none of the profile’s additions, but not L1 or L2. That is a question of adoption, not of how ARTIE behaves, and it is the same theme as the typed-relations reply below. Both dialects have the entry point: HAL-FORMS cannot put a field into a target’s path, so its index uses GET templates whose fields go in the query (<code>/beds?name=</code>, <code>/beds?id=</code>), and a live scenario goes from <code>/</code> alone to a watered bed in HAL-FORMS too.</p>
+<p>The bookmark also tells ARTIE what the server can do, without a second bookmark. Asked for <code>application/json-home</code>, the same <code>/</code> answers with a home document whose hints list the dialects and the <code>Prefer</code> values honoured. ARTIE asks for the best it offers, never more than its own setting, and then believes each response’s <code>Preference-Applied</code> over the declaration. A server just starting at L0 declares nothing and is used at L0. Live, the real server was started at L0, L1 and L2 in turn, and ARTIE found and worked at each level from <code>/</code> alone. <code>/.well-known/api-catalog</code> (RFC 9727) would go one step further, from a host name alone; it is parked, because it adds a fixed name and ARTIE is always given the index.</p>
+<ul>
+<li><strong>Tests:</strong> <code>service-index.feature</code> (client and server), live "build a new bed and sow it", the HEART conformance suite's bookmark-act scenarios (201, 428, 412, 422), <code>act-unknown.feature</code>, <code>conditional-acts.feature</code>, <code>reason-l6.feature</code>; live "From the bookmark alone" at L0 and L2, full cycles at L0, L1, L2 and over HAL-FORMS, discovery against servers capped at L0, L1 and L2; client <code>rung-discovery.feature</code>. Buster campaign (12 Oct): an offered act was removed from the manifest 13 times, twice in the scenario that builds a bed, and ARTIE never sent it</li>
+<li><strong>Open:</strong> the media type and profile are published but not standardized</li>
+</ul>
+<h2>From his replies in the comments</h2>
+<p>Fielding answered readers in the comments for three weeks. Several replies read as if written for machine clients like ARTIE.</p>
+<p><a id="hypertext"></a></p>
+<h3>"the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions"</h3>
+<p><em>His definition of hypertext · reply to llimllib and Bjorg, 20 Oct</em></p>
+<p><strong>✅ Supports:</strong> This is where H.E.A.R.T. gets the word "affordance".</p>
+<p>A Layer 1 response is state and manifest together, and the absence of an action is information: you cannot water an empty bed. Since 10 October the server can also say why. An <code>hr:unavailable</code> link leads to a list of acts not offered now, each with a reason, and a client fetches it only when it needs to explain. At L0 everything arrives in one response. At L1 and L2 the controls are linked rather than inline, but they are still part of the same representation, through a named relation, and a <code>304</code> proves the link is unchanged.</p>
+<ul>
+<li><strong>Spec:</strong> §3.4, §6.1 three layers, §6.7</li>
+<li><strong>Tests:</strong> <code>sync-l0.feature</code>, <code>sync-l2.feature</code>, <code>explaining-absence.feature</code>, <code>layers.feature</code> (heart-core)</li>
+</ul>
+<p><a id="typed-relations"></a></p>
+<h3>"Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents."</h3>
+<p><em>Reply to snoopdave, 20 Oct</em></p>
+<p><strong>✅ Supports:</strong> Each act is now a typed relation, described where it is defined. (10 Oct 2026.)</p>
+<p>Each action comes with its own JSON Schema (Layer 3), and every act is named by a relation, not by a server-chosen key: <code>garden:water-cell</code> expands to <code>/profiles/garden#water-cell</code>, and that address is an ALPS document with the act’s title and description. The form carries the title and description too, and each schema field is annotated, so a reasoner sees what an act is for, not only what it is called. A deterministic client can key off the relation URI. What remains is scope, not mechanism: these relations belong to one service’s profile. A vocabulary shared across services, so that two shops’ “submit order” are the same relation, is the RISE work, parked.</p>
+<ul>
+<li><strong>Tests:</strong> <code>form-relations.feature</code> (client and server), <code>hal-forms-on-ramp.feature</code></li>
+<li><strong>Open:</strong> spec §7.5 RISE shared relation vocabulary</li>
+<li><strong>To watch (25 Oct 2026):</strong> the gateway names GitHub's acts after its OpenAPI operation ids, as in <code>github:issues-list-for-repo</code>. They are extended relation names, which Rule 3 allows, and each is described in the gateway's ALPS profile from GitHub's own description; but the names are made mechanically and read like endpoint names. Meaning a careful reader would want in the name is in the description only.</li></ul>
+<p><a id="interface"></a></p>
+<h3>"The interface doesn’t need to be discovered. It is defined right there in the hypertext. The representation tells the client how to compose all transitions to the next application state."</h3>
+<p><em>Reply to nkallen, 21 Oct</em></p>
+<p><strong>✅ Supports:</strong> A form entry is everything needed to build the request.</p>
+<p>Each <code>_forms</code> entry carries the target, the method, the content type and the schema. ARTIE builds the request from that entry and nothing else. Since 15 October a property can also say where its choices are (HAL-SCHEMA-FORMS-HR Rule 8): from the resource's own state, such as "this team's players who have not fouled out", or from another resource, such as "the agents on duty for this priority". So the form tells the client not only how to compose the transition but which values it may carry right now. ARTIE resolves them deterministically, shows a model only that closed set, and never sends a value outside it. The server refuses one if it arrives. Content addressing keeps "right there" cheap. The set and its schemas are fetched once and served from cache afterwards. Two beds in the same state cost one set fetch, proved live with two clients behind one cache.</p>
+<ul>
+<li><strong>Tests:</strong> client <code>act.feature</code>, <code>l1-and-sharing.feature</code>, <code>choices.feature</code>; heart-core <code>options.feature</code>; basketball and tickets features; live L3 scenario</li>
+</ul>
+<p><a id="client-decides"></a></p>
+<h3>"The client (user or agent) has to decide what transition to take, not what interface to use."</h3>
+<p><em>Reply to TheOtherMarcus, 21 Oct</em></p>
+<p><strong>✅ Supports:</strong> This is exactly how the L6 work is split.</p>
+<p>The reasoner decides the transition: an action name and field values, or a question for the user. It is never shown a URI or a method, and its output type has no field for one. Deterministic code then builds the interface: target, method, <code>If-Match</code>, body. A mutation test proved that skipping the agent's checks lets bad selections through, so the boundary is enforced, not just intended.</p>
+<ul>
+<li><strong>Code:</strong> <code>heart/Reasoning.kt</code>, <code>ArtieAgent.kt</code></li>
+<li><strong>Tests:</strong> <code>reason-l6.feature</code></li>
+</ul>
+<p><a id="cool-uris"></a></p>
+<h3>"Because implementations change, but cool URIs don’t."</h3>
+<p><em>Reply to TheOtherMarcus, 21 Oct</em></p>
+<p><strong>✅ Supports:</strong> Content-addressed URIs cannot change, and the server's implementation can.</p>
+<p>An affordance-set or schema URL is named by the server from the hash of its bytes, so it is valid forever and served as <code>immutable</code>. The client checks the bytes against the <code>integrity</code> value in the link that led to them, never against the URL. Action URLs can change freely, because clients read them again on every sync. Today's evidence: the server moved from Spring MVC on Tomcat to WebFlux on Netty, and ARTIE's live scenarios passed unchanged.</p>
+<ul>
+<li><strong>Tests:</strong> <code>content.feature</code> (heart-spring), <code>content-addressing.feature</code> (heart-core), live hash check, <code>runtime-stack.feature</code></li>
+</ul>
+<p><a id="post-meaning"></a></p>
+<h3>"You don’t get to decide what POST means — that is decided by the resource. Its purpose is supposed to be described in the same context in which you found the URI that you are posting to."</h3>
+<p><em>Reply to TheOtherMarcus, 21 Oct</em></p>
+<p><strong>✅ Supports:</strong> The purpose sits next to the target, and the answer is the next hypertext.</p>
+<p>A form carries its title and schema beside its target. The response to an act is a full representation: what changed, and what can be done next. That matches his description of a POST answered with "another hypertext representation (telling you what happened and what can be done next)". Since 10 October the response also says, in <code>Content-Location</code>, which resource it is a representation of: the bed, not the action URL. An act on the bookmark that builds a bed is answered <code>201</code>, with the new bed in <code>Location</code> and its representation in the body. When the resource refuses, the problem's <code>detail</code> uses the same words the form does: it names the act by its relation and gives the domain's reason (<code>garden:sow-seed is not offered now: The bed is already planted.</code>), never a name from the code. A rule the schema cannot say is refused as <code>rule-refused</code>, pointing at the field (<code>/milliliters</code>: "The bed would be waterlogged: at most 600 ml now.").</p>
+<ul>
+<li><strong>Tests:</strong> client <code>act.feature</code> (the manifest reflects the transition); heart-core <code>acts.feature</code> (a refusal's detail); garden <code>garden.feature</code> (building a bed, over-watering refused)</li>
+</ul>
+<p><a id="prior-knowledge"></a></p>
+<h3>"Of course the client has prior knowledge. … What REST does is concentrate that need for prior knowledge into readily standardizable forms."</h3>
+<p><em>Reply to jdubray, 22 Oct</em></p>
+<p><strong>✅ Supports:</strong> ARTIE's prior knowledge fits on one card.</p>
+<p>ARTIE knows HTTP, two media types, two profile URIs, two link relations (<code>hr:forms</code>, <code>hr:unavailable</code>), two <code>Prefer</code> tokens, the meaning of <code>409</code>, <code>412</code>, <code>422</code> and <code>428</code>, and RFC 9457 problem details for their bodies. ALPS and CURIEs are read only to describe an act, never to decide one. To learn what a server serves it adds one more media type, <code>application/json-home</code>, and three of its standard hints, rather than a format of this project’s own. All of it is written in spec §6, and none of it is about gardens. Both of today's decisions were about making that knowledge standardizable: naming the forms relation, and giving HAL-FORMS a clear, limited role.</p>
+<ul>
+<li><strong>Spec:</strong> §6.1 decisions, §6.3 client behaviour</li>
+</ul>
+<p><a id="no-batch"></a></p>
+<h3>"If you find yourself in need of a batch operation, then most likely you just haven’t defined enough resources."</h3>
+<p><em>Reply to tlainhart, 22 Oct</em></p>
+<p><strong>✅ Supports:</strong> The layers are more resources, not a batch call.</p>
+<p>Instead of one big response or a bulk endpoint, the manifest and each schema are their own resources, each with its own address and cache life. L0's "everything in one response" is a rendering of the same resource, chosen with <code>Prefer</code>, not a batch operation.</p>
+<ul>
+<li><strong>Spec:</strong> §6.1 layer table, §6.10.1–6.10.3</li>
+</ul>
+<p><a id="follow-nose"></a></p>
+<h3>"follow your nose … Basically, how far ahead is the client looking?"</h3>
+<p><em>Reply to Robert Cerny, 23 Oct</em></p>
+<p><strong>✅ Supports:</strong> ARTIE looks zero steps ahead.</p>
+<p>It keeps no script of request sequences. Each act is decided from the current manifest. A stale act is dropped, never resent. It does not even assume the rung it asked for: each response says, in <code>Preference-Applied</code>, what it is. The live full cycle (sow, water, harvest) is discovered one response at a time, at every rung and in both dialects. Under Buster, a forged <code>ETag</code> was planted 21 times where ARTIE would act next; every time, the act was refused with <code>412</code>, ARTIE re-synced, and it never resent the stale act.</p>
+<ul>
+<li><strong>Tests:</strong> <code>live-server.feature</code>; client <code>conditional-acts.feature</code> (412 drops the act); <code>scripts/buster-campaign.sh</code></li>
+</ul>
+<p><a id="key-off-content"></a></p>
+<h3>"If they are keying off of something unique within the content … then it’s okay. Usually, however, what they do is assume that the response has a specific structure beyond that defined by the media type."</h3>
+<p><em>Reply to Robert Cerny, 23 Oct</em></p>
+<p><strong>✅ Supports:</strong> ARTIE checks the declared profile before reading the structure.</p>
+<p>A response must name the hal-schema-forms (or hal-forms) profile in <code>Link: rel="profile"</code>, or ARTIE refuses it. Only then does it read <code>_forms</code> or <code>_templates</code>. One difference from his wording: the profile is declared in a header rather than in the body, following the W3C profile-negotiation draft. Buster tests this side of the rule from the server’s end, by changing what the content says. ARTIE was attacked 46 times in this way (curies removed, the <code>Preference-Applied</code> header removed, link <code>integrity</code> stripped, one byte flipped), and every time it declined to use what the content no longer vouched for. 44 of those 46 verdicts are also confirmed by ARTIE’s own decision log, matched by trace id.</p>
+<ul>
+<li><strong>Tests:</strong> <code>sync-l0.feature</code> (three ways a missing or wrong profile is refused)</li>
+<li><strong>To watch (25 Oct 2026):</strong> heart-script's <code>whenever(by = …)</code> finds who made a resource under an embedded relation named <code>author</code>, <code>user</code> or <code>creator</code>. <code>author</code> is registered with IANA; <code>user</code> and <code>creator</code> are not, so that part assumes a structure no media type or profile defines, which is what this reply warns about. Keeping only <code>author</code>, or letting a profile say which of its relations means "made by", would close it. <strong>Closed the same day (<code>5f8bd31</code>):</strong> <code>madeBy</code> reads <code>author</code> alone, and the GitHub gateway's connector embeds GitHub's <code>user</code> and <code>creator</code> under it (<code>embedded.feature</code>, <code>github-links.feature</code>).</li></ul>
+<p><a id="app-state"></a></p>
+<h3>"Don’t confuse application state (the state of the user’s application of computing to a given task) with resource state (the state of the world as exposed by a given service)."</h3>
+<p><em>Reply to TheOtherMarcus, 22 Oct</em></p>
+<p><strong>✅ Supports:</strong> The ETag carries resource state; the client holds application state.</p>
+<p>The ETag's state version is the resource state. The representation ARTIE holds, with its manifest, is the application state. A <code>412</code> is precisely the moment the two have drifted apart: someone else changed the resource. ARTIE resolves it by fetching fresh application state, not by forcing its old intent through.</p>
+<ul>
+<li><strong>Code:</strong> <code>StateETag.kt</code> (heart-core), <code>ArtieClient</code> refusal handling</li>
+</ul>
+<p><a id="public-ids"></a></p>
+<h3>"Identifiers are public information."</h3>
+<p><em>Reply to Dima, 1 Nov</em></p>
+<p><strong>✅ Supports:</strong> Content addresses are explicitly not secrets.</p>
+<p>The spec states that a content address can be computed by anyone who can rebuild the bytes, so it must never be used as a capability. It then works through what that means for caching and confidentiality.</p>
+<ul>
+<li><strong>Spec:</strong> §6.5 "Content addresses are not capability URLs", §6.9.4, §6.9.5</li>
+</ul>
+<p><a id="ai-driven"></a></p>
+<h3>"All it needs to know is the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of AI-driven."</h3>
+<p><em>Reply to billburke, 8 Nov</em></p>
+<p><strong>✅ Supports:</strong> He named the AI-driven client in 2008. ARTIE runs one, against a real server, knowing only the instructions and the purpose. (10 Oct 2026.)</p>
+<p>ARTIE works with no model at all: a configuration-driven client is fully conformant. L6 adds an AI-driven purpose behind the same rules. The scripted tests prove a bad choice can never reach the server. Since 10 October the reasoner is shown each act’s title and description, and it may ask for the act’s ALPS description or for why an act is missing before it chooses. The first real-model run (10 October) is one scripted case against the real server: asked to “water bed 2 with 250 ml”, Claude chose <code>garden:water-cell</code> with 250, ARTIE’s checks passed it, and the server’s own history shows the watering. That is what this reply asks for: the client knows the meaning of the instructions (relation names, titles, descriptions, schemas, and no URI or method) and a purpose (a plain sentence), and the purpose can be AI-driven. An earlier version of this review held the row at Partly until a model was shown to choose <em>well</em>. That is a fair question, but it is not this sentence’s, so it now has its own row below. The caveat here is that it is shown working on one real case, not yet measured.</p>
+<ul>
+<li><strong>Tests:</strong> <code>reason-l6.feature</code> (scripted); two <code>@llm</code> scenarios with a real Claude model, one against the real server, both passing</li>
+<li><strong>Plan:</strong> <code>spec/EVAL-L6.md</code></li>
+</ul>
+<h2>Beyond the post</h2>
+<p>Questions the project asks of itself that Fielding’s rules do not. They are scored the same way, but they are not his.</p>
+<p><a id="model-quality"></a></p>
+<h3>How often does a real model choose well, across domains and when the names change?</h3>
+<p><em>SPEC §10 success metrics; plan in <code>spec/EVAL-L6.md</code></em></p>
+<p><strong>🟡 Partly:</strong> Shown working on real cases; not yet measured.</p>
+<p>Two cases pass with a real Claude model. One is against the real server: “water bed 2 with 250 ml” led to the right act and the right value, and the server recorded it. Since then there have been many more live runs with a real model: the seven server changes of the OpenAPI-vs-HEART exhibit, the seed bench's goal runs, GitHub through the gateway, and on 25 October seven asks in words on basketball and a support desk: Claude did the three that named someone who could be chosen, refused the three that named someone who couldn't and said who could, and asked which on the one that fit two. That is still a record of runs, not a rate. The evaluation in <code>spec/EVAL-L6.md</code> would answer that. It needs five small domains, 60–75 reviewed requests with answer keys, renamed copies of each domain, and several runs per case. It would measure selection accuracy, precondition sensitivity (asking instead of doing a different legal act), clarification, structural hallucination, and cost. A scorer proven first on scripted reasoners would grade it, against a pass bar agreed before the first run.</p>
+<ul>
+<li><strong>Tests:</strong> two <code>@llm</code> scenarios (<code>llmTest</code>); live runs in <code>exhibits/openapi-vs-heart</code>, <code>exhibits/seed-bench</code>, <code>exhibits/choices-live</code></li>
+<li><strong>Open:</strong> the eval harness, the domains and cases, the pass bar, local and hosted models</li>
+</ul>
+<p><a id="inference"></a></p>
+<h3>How little does a run need a model, and is a run without one still a REST client?</h3>
+<p><em>The project's goal: Fielding's rules, with minimal inference per run</em></p>
+<p><strong>🟡 Partly:</strong> A model decides once; afterwards a script does the same work with none, and a changed server is caught before anything is sent. When a guard refuses, the run stops; it does not yet hand the step back to a model.</p>
+<p><strong>The question.</strong> Rule 6 asks that every transition be "driven by client selection of server-provided choices". A model reading each representation does that, at the cost of a model call per step. A script does it for free, but it names its relations in advance: <code>act("garden:water-cell", …)</code>. That is the early-bound client the OpenAPI review set aside as "failing rule 6 by its own design". So the cheap path and Fielding's path seem to pull apart, and a project that wants both has to say how they meet.</p>
+<p><strong>How HEART meets them: a script is a cached decision, and its lock file is its validator.</strong> REST already has an answer for doing work once and reusing it safely: the cache constraint. A response is reused while its validator matches and checked again when it doesn't. <code>artie generate</code> applies the same rule to decisions. A run where a model chose each step becomes a script, plus a lock file that pins, for every relation the script uses, the integrity of the form it was chosen from (HAL-SCHEMA-FORMS-HR Rule 10). Before the script sends an act, ARTIE checks the form the server offers now against the pin (<code>ScriptGuard</code>). If it matches, the cached decision still applies and is sent with no model. If it doesn't, the guard refuses and nothing is sent. Lenient mode with <code>on-change: values</code> lets a changed form through only when it kept its method and what the script sends fits its new schema. So the script is early-bound in its names but never acts on a server that has changed beneath it. Everything else a generic client does, it still does: it enters at the bookmark, acts only on forms offered in the current representation, sends <code>If-Match</code>, follows the server's targets, and reads choices from state deterministically. What it skips is only the model.</p>
+<p><strong>What is deterministic now, with no model at any point:</strong></p>
+<ul>
+<li>choosing a form's values from state (<code>hr:options</code>), resolved from the resource or a linked one;</li>
+<li>a stale act decided again from fresh state (<code>decide { }</code>), its values recomputed by the script;</li>
+<li>noticing that something changed: listeners poll what they last read, answered 304 while unchanged, one shared poll per resource;</li>
+<li>waiting for a server catching up, before a strict guard refuses.</li>
+</ul>
+<p><strong>Evidence.</strong></p>
+<ul>
+<li>The seed bench (<code>docs/reports/seed-bench/</code>): run b20 with Claude deciding each part of a goal once; <code>artie generate</code> wrote it as a script; run g4, the script alone, did the same work on new issues, 229 steps, none reasoned, no model called.</li>
+<li><code>script-guard.feature</code>: lenient and strict pins, a changed form refused before sending; <code>script-replay.feature</code>, <code>script-catch-up.feature</code>; <code>decide-again.feature</code>.</li>
+<li>The listeners run (<code>docs/reports/listeners-live/</code>): three handlers watching GitHub for minutes with no model, each answering once.</li>
+<li>The care dial (<code>docs/reports/care-dial/</code>): what each guard costs, from careful to <code>--guard off-the-rails</code>.</li>
+</ul>
+<p><strong>What remains.</strong></p>
+<ul>
+<li><strong>The way back to a model.</strong> When a guard refuses because the server changed, the run stops and says why. Handing that one step back to a model, then pinning its new decision, would close the loop: inference only where the world changed. It is designed, not built (<code>spec/ideas/replay-guards-lenient-strict.md</code>, "repaired on the fly"; <code>spec/ideas/self-repair-without-repeating-acts.md</code>).</li>
+<li><strong>Not measured.</strong> How many runs a decision serves before it must be made again, and what the first run costs, across domains. One live proof per exhibit, no rates.</li>
+<li><strong>The first run still needs a model,</strong> or a person writing the script. That is by design: meaning that isn't in the representation has to come from someone.</li>
+</ul>
+<ul>
+<li><strong>Code:</strong> client <code>ScriptGuard.kt</code>, <code>artie-cli</code> <code>generate</code>, heart-script <code>Flow.kt</code> (<code>decide</code>), <code>Listening.kt</code>, <code>Choices.kt</code></li>
+<li><strong>Open:</strong> the step back to a model on a guard's refusal; rates</li>
+</ul><p><strong>Gaps to carry forward:</strong> CoAP's experimental option numbers, unregistered (now including 65020 for trace context), and Buster attacks only the HTTP binding (<code>spec/ideas/buster-over-coap.md</code>) (Rule 1); the draft <code>Accept-Profile</code> (Rule 2); a published but unstandardized media type and profile (Rule 6); action relations that are typed but belong to one service, with no shared vocabulary yet (the "typed relations" reply); how well a model chooses, shown on real cases but not yet measured (its own row); the step back to a model when a script's guard refuses, and how many runs one decision serves (<a href="#inference">Inference per run</a>); and, to watch, the gateway's held read borrowing <code>Prefer: wait</code> (Rule 2), <code>at(address)</code> unchecked (Rule 4), relation names made from operation ids (the "typed relations" reply), and <code>whenever(by = …)</code> reading unregistered relation names (the "key off the content" reply). Resolved 8–9 October 2026: content addresses recognised by URL shape (Rule 4); no entry point (Rule 6); the <code>If-Match</code> narrowing (Rule 2). Resolved 10 October 2026: an AI-driven client working against the real server (the AI-driven reply); a protocol-neutral core with HTTP and CoAP bindings chosen by URI scheme, proven live over UDP (Rule 1); actions named by typed relations with an ALPS description (the "typed relations" reply). Resolved 12 October 2026: no trace context over CoAP (Rule 1). Resolved 14 October 2026: no <code>coaps</code> (Rule 1), now DTLS 1.2 with a pre-shared key per client. Added 15 October 2026: choices from state (the "interface in the form" reply). Resolved 25 October 2026: the act's precondition scope (Rule 2), now that an act's target has a representation of its own. Withdrawn: "template filling at L1 and L2" (Rule 6), which rested on a truncated quote.</p>
+<p>Source: Roy T. Fielding, "REST APIs must be hypertext-driven", Untangled, 20 October 2008, and his comments on it. Quotes are verbatim. Evidence refers to <code>~/repos/artie</code> as of commit <code>e5c16e8</code>, 25 October 2026; rows not touched since are as checked at <code>a7831ce</code>, 12 October. The Buster campaign of 12 October, at <code>a7831ce</code>: 22 rounds, 125 planned mutations, all made, 74 pass, 51 pass (attested), 0 FAIL, no holes. Run again 25 October, at <code>7681d05</code>: 22 rounds, 130, all made, 79 pass, 51 pass (attested), 0 FAIL, no holes.</p>
+<footer style="margin-top:2rem">Source: <code>spec/FIELDING-REVIEW.md</code> in the repository. <a href="../">All reports</a>.</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,40 @@
+name: code-green-commit
+part: How it was built
+title: The fix, the green run, the gated commit
+kicker: How it was built · Code, green, commit
+say: "The fix in Detours.kt: keep a step whose `as` name another step mentions. Then green, then the commit, which the git pre-commit hook checks for ordering. The report beside it is the module's real test report."
+sources:
+  - ["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]
+  - ["bdd-gates skill", "https://github.com/JogoShugh/bdd-gates-skill"]
+fragments:
+  - name: detours
+    label: Detours.kt, keep a read another step names
+    source: client/artie-cli/src/main/kotlin/heart/cli/generate/Detours.kt
+    from: "private fun named(capture: Capture): Set<Int> {"
+    count: 8
+    lang: kotlin
+html: |
+  <h2>The fix, the green run, the gated commit</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);">
+    <div class="rows">
+      <pre><code>// Detours.kt: keep a read another step names
+  private fun named(capture: Capture): Set&lt;Int&gt; {
+    val marks = capture.steps.associateWith {
+      capture.marks(it) }
+    return marks.filter { (step, own) -&gt;
+      val name = own["as"]?.toString()
+        ?: return@filter false
+      val mention = Regex("""\{$name[.}]""")
+      marks.any { (other, its) -&gt; other.line !=
+        step.line &amp;&amp; its.values.any {
+          mention.containsMatchIn("$it") } }
+    }.keys.map { it.number }.toSet()</code></pre>
+      <p class="refs"><deck-fragment name="detours">Detours.kt</deck-fragment></p>
+      <pre><code>pre-commit: TDD ordering check passed.
+  # then the capture again, and the open-PR step stays</code></pre>
+    </div>
+    <div class="rows">
+      <figure><img src="media/testreport-crop.png" alt="The artie-cli test report: 198 tests, 0 failures"><figcaption>artie-cli test report: 198 tests, 0 failures.</figcaption></figure>
+      <p class="punch">Then the replay, on real GitHub and local GitLab, with the regenerated script.</p>
+    </div>
+  </div>

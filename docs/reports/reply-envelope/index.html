@@ -1,0 +1,962 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body style="margin:0">
+<title>Reply Envelope</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The look every generated report shares: tokens for light and dark, type, the column, tiles, tags, tables,
+   disclosures and the theme switch. A generator inlines this first, then only what its own page adds. */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2330; --muted: #5d6879; --rule: #dde2ea; --track: #eef1f5;
+  --accent: #4b4fc4;
+  --good: #1f7a3a; --good-bg: #e3f3e7; --safe: #2b5fa8; --safe-bg: #e3ecf8;
+  --warn: #8a5a00; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2; --quiet-bg: #eceff3;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; line-height: 1.15; } h2 { font-size: 21px; } h3 { font-size: 18px; }
+h4 { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+p { margin: 0; max-width: 72ch; }
+section { display: grid; gap: 12px; min-width: 0; }
+.sub, .none { color: var(--muted); font-size: 13px; }
+.mono { font-family: var(--mono); font-size: 13px; }
+.num { font-family: var(--mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* The title row: title and lede on the left, the theme switch on the right. */
+.top { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+.top > div { min-width: 0; }
+.lede { color: var(--muted); margin-top: 6px; }
+.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+
+/* Tones: a class that sets --c and --cbg, for tiles, tags and borders. */
+.good { --c: var(--good); --cbg: var(--good-bg); } .safe { --c: var(--safe); --cbg: var(--safe-bg); }
+.warn { --c: var(--warn); --cbg: var(--warn-bg); } .bad { --c: var(--bad); --cbg: var(--bad-bg); }
+.quiet { --c: var(--muted); --cbg: var(--quiet-bg); }
+.tag { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 10px; margin: 0 4px 4px 0;
+  color: var(--c, var(--muted)); background: var(--cbg, var(--quiet-bg)); white-space: nowrap; text-decoration: none; }
+
+/* Tiles: a number or a word on top, a label, a line under; a button tile filters. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.tile { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-top: 3px solid var(--c, var(--rule)); border-radius: 6px; padding: 12px 16px; display: grid; gap: 2px; }
+.tile b { font: 600 24px/1.2 var(--display); color: var(--c, var(--ink)); }
+.tile .name { font: 500 13px var(--mono); color: var(--muted); }
+button.tile { cursor: pointer; }
+button.tile[aria-pressed="true"] { background: var(--cbg, var(--panel)); }
+.chipbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.chipbar button { font: 500 12px var(--mono); border: 1px solid var(--rule); background: var(--panel); color: var(--ink);
+  border-radius: 12px; padding: 2px 10px; cursor: pointer; }
+
+/* Tables, each in its own sideways scroll. */
+.scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+thead th { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+tbody tr:last-child > * { border-bottom: 0; }
+
+/* Disclosures, and the source a page shows of itself. */
+details.box { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+details.box > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
+details.box > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
+
+.theme:focus-visible, summary:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+/* This page's own. */
+/* The JSON viewer (json-view.js): collapsed boxes, line diffs, unchanged runs folded behind buttons. */
+/* A column of boxes. */
+.stack { display: grid; gap: 0.5rem; min-width: 0; }
+details.jv { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 0.45rem 0.75rem; min-width: 0; }
+details.jv > summary { cursor: pointer; font-size: 0.9rem; }
+details.jv[open] > summary { margin-bottom: 0.5rem; }
+.jv-body { display: grid; gap: 0.35rem; min-width: 0; }
+.jv-label { margin: 0; font: 500 0.75rem var(--mono); color: var(--muted); white-space: pre; }
+.jv-doc { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 6px; padding: 0.5rem 0.6rem;
+  font: 0.78rem/1.45 var(--mono); }
+.jv-doc .ln { display: block; white-space: pre; }
+.jv-doc .ln.add { background: color-mix(in srgb, var(--leaf) 16%, transparent); }
+.jv-doc .ln.del { background: color-mix(in srgb, var(--gate) 16%, transparent); }
+.jv-doc .ln.note { color: var(--muted); }
+.jv-gap, .jv-full { font: 500 0.75rem var(--mono); color: var(--muted); background: none; border: 1px dashed var(--rule);
+  border-radius: 4px; padding: 0.1rem 0.5rem; margin: 0.15rem 0; cursor: pointer; }
+.jv-gap { display: block; }
+.jv-gap:hover, .jv-full:hover { color: var(--fg); border-style: solid; }
+.jv-tools { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+.jv-full[disabled] { opacity: 0.5; cursor: default; }
+.jv-req { margin: 0 0 0.35rem; font-size: 0.82rem; overflow-x: auto; white-space: nowrap; }
+.jv-req .who { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.4rem; }
+/* Reply envelope, end to end: the standards tags, the template and the steps. */
+/* The JSON viewer's tokens, from the shared report palette. */
+:root { --surface: var(--panel); --code-bg: var(--track); --leaf: var(--good); --gate: var(--bad); --fg: var(--ink); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+#reply { display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; min-width: 0; }
+.block { display: grid; gap: 12px; min-width: 0; }
+.block > h2 { margin-bottom: 0; }
+
+/* The status tags: codified, proposed, de facto, thesis, ours. */
+.tag { display: inline-block; font: 600 10.5px/1.5 var(--mono); letter-spacing: .05em; text-transform: uppercase;
+  padding: 1px 6px; border-radius: 4px; white-space: normal; vertical-align: 1px; }
+.tag-codified { color: var(--good); background: var(--good-bg); }
+.tag-proposed { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.tag-defacto { color: var(--warn); background: var(--warn-bg); }
+.tag-thesis { color: var(--safe); background: color-mix(in srgb, var(--safe) 14%, transparent); }
+.tag-ours { color: var(--muted); background: var(--quiet-bg); border: 1px solid var(--rule); }
+ul.legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+ul.legend li { font-size: 14px; }
+ul.points { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 84ch; }
+ul.points li { font-size: 15px; }
+code { font: 12.5px var(--mono); overflow-wrap: anywhere; }
+
+/* Tables scroll inside themselves on a phone. */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
+.tbl-wrap table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tbl-wrap th, .tbl-wrap td { text-align: left; vertical-align: top; padding: 8px 10px; border-top: 1px solid var(--rule); min-width: 9ch; }
+.tbl-wrap thead th { border-top: 0; font: 500 11.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); background: var(--track); }
+.tbl-wrap td:first-child code { white-space: nowrap; }
+/* On a phone each row stacks, one labelled block per cell. */
+@media (max-width: 720px) {
+  .tbl-wrap { overflow-x: visible; }
+  .tbl-wrap table, .tbl-wrap tbody, .tbl-wrap tr, .tbl-wrap td { display: block; width: 100%; }
+  .tbl-wrap thead { display: none; }
+  .tbl-wrap tr { box-sizing: border-box; padding: 8px 12px; border-top: 1px solid var(--rule); display: grid; gap: 4px; }
+  .tbl-wrap tbody tr:first-child { border-top: 0; }
+  .tbl-wrap th, .tbl-wrap td { min-width: 0; border-top: 0; padding: 0; overflow-wrap: anywhere; }
+  .tbl-wrap td::before { content: attr(data-label); display: block; font: 500 10.5px var(--mono); letter-spacing: .05em;
+    text-transform: uppercase; color: var(--muted); }
+  .tbl-wrap td:first-child code { white-space: normal; }
+}
+
+/* The steps. */
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bar .sub { margin-right: 4px; color: var(--muted); font: 500 12px var(--mono); }
+.btn { font: 500 12px var(--mono); border: 1px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: 12px;
+  padding: 3px 10px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 14px;
+  padding: 2px 10px; text-decoration: none; }
+.chip:hover { border-color: var(--accent); }
+@media (min-width: 900px) {
+  .step { scroll-margin-top: 16px; }
+}
+.step { display: grid; gap: 10px; min-width: 0; padding: 14px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+.step > h3 { margin: 0; }
+.step > .lede { color: var(--ink); font-size: 15px; }
+.exchange { display: grid; gap: 6px; min-width: 0; }
+pre.line { margin: 0; font: 12.5px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink);
+  background: var(--track); border-radius: 6px; padding: 8px 10px; }
+pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent); }
+.note { color: var(--muted); font-size: 14px; margin: 0; }
+.here { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin: 0; font-size: 13px; }
+.here-label { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.chip-std { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; background: var(--track); border-radius: 6px; padding: 2px 6px; }
+</style>
+<div class="wrap">
+  <div class="top"><div>
+    <h1>A reply the caller writes, filled in by the responder</h1>
+    <p class="lede">A mockup, not built. Ana Torres's assistant asks Riverside Public Library to say when a loan is renewable, and writes the reply it wants back: its own message, with standard names left null for the library to fill in. Digests, keys, times and identities are made up. Each name is tagged with where its standard comes from.</p>
+  </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
+<div id="reply"></div>
+</div>
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+// One viewer for every JSON example in the reports. A <details class="jv"> names its documents by the ids of
+// <script type="application/json"> blocks: data-a alone shows one document; data-a and data-b show what b
+// changes of a, as a line diff with a few lines of context. Nothing renders until the reader opens it; the
+// unchanged lines and the whole documents appear only on a click.
+(() => {
+  const CONTEXT = 3;   // unchanged lines kept around each change
+  const PREVIEW = 14;  // lines of a lone document shown before "show all"
+  const CHANGE = 24;   // a run of changed lines longer than this shows its first FIRST lines, the rest on a click
+  const FIRST = 16;
+  const cache = new Map();
+
+  const linesOf = (value) => (typeof value === "string" ? value : JSON.stringify(value, null, 2)).split("\n");
+  const doc = (id) => {
+    if (!cache.has(id)) cache.set(id, linesOf(JSON.parse(document.getElementById(id).textContent)));
+    return cache.get(id);
+  };
+
+  const el = (tag, cls, text) => {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+
+  // Lines of a and b, each marked " " (both), "-" (a only) or "+" (b only): a longest common subsequence
+  // after trimming the common head and tail, which is most of a JSON answer.
+  const diff = (a, b) => {
+    let head = 0;
+    while (head < a.length && head < b.length && a[head] === b[head]) head++;
+    let tail = 0;
+    while (tail < a.length - head && tail < b.length - head && a[a.length - 1 - tail] === b[b.length - 1 - tail]) tail++;
+    const x = a.slice(head, a.length - tail), y = b.slice(head, b.length - tail);
+    const n = x.length, m = y.length, w = m + 1;
+    const table = new Uint32Array((n + 1) * w);
+    for (let i = n - 1; i >= 0; i--)
+      for (let j = m - 1; j >= 0; j--)
+        table[i * w + j] = x[i] === y[j] ? table[(i + 1) * w + j + 1] + 1 : Math.max(table[(i + 1) * w + j], table[i * w + j + 1]);
+    const out = a.slice(0, head).map((line) => [" ", line]);
+    let i = 0, j = 0;
+    while (i < n && j < m) {
+      if (x[i] === y[j]) { out.push([" ", x[i]]); i++; j++; }
+      else if (table[(i + 1) * w + j] >= table[i * w + j + 1]) out.push(["-", x[i++]]);
+      else out.push(["+", y[j++]]);
+    }
+    while (i < n) out.push(["-", x[i++]]);
+    while (j < m) out.push(["+", y[j++]]);
+    return out.concat(a.slice(a.length - tail).map((line) => [" ", line]));
+  };
+
+  const row = ([mark, line]) => el("span", { " ": "ln", "-": "ln del", "+": "ln add" }[mark], `${mark} ${line}`);
+
+  // The diff with each long run of unchanged lines folded into a button that unfolds it.
+  const diffView = (a, b) => {
+    const lines = diff(a, b), pre = el("pre", "jv-doc");
+    if (!lines.some(([mark]) => mark !== " ")) pre.append(el("span", "ln note", "  (no difference)"));
+    let k = 0;
+    while (k < lines.length) {
+      if (lines[k][0] !== " ") {
+        let end = k;
+        while (end < lines.length && lines[end][0] !== " ") end++;
+        const run = lines.slice(k, end);
+        if (run.length <= CHANGE) run.forEach((l) => pre.append(row(l)));
+        else {
+          run.slice(0, FIRST).forEach((l) => pre.append(row(l)));
+          const rest = run.slice(FIRST);
+          const more = el("button", "jv-gap", `⋯ ${rest.length} more changed lines`);
+          more.type = "button";
+          more.addEventListener("click", () => more.replaceWith(...rest.map(row)));
+          pre.append(more);
+        }
+        k = end;
+        continue;
+      }
+      let end = k;
+      while (end < lines.length && lines[end][0] === " ") end++;
+      const first = k === 0, last = end === lines.length;
+      const keepHead = first ? 0 : CONTEXT, keepTail = last ? 0 : CONTEXT;
+      if (end - k <= keepHead + keepTail + 1) { lines.slice(k, end).forEach((l) => pre.append(row(l))); }
+      else {
+        lines.slice(k, k + keepHead).forEach((l) => pre.append(row(l)));
+        const hidden = lines.slice(k + keepHead, end - keepTail);
+        const gap = el("button", "jv-gap", `⋯ ${hidden.length} unchanged lines`);
+        gap.type = "button";
+        gap.addEventListener("click", () => gap.replaceWith(...hidden.map(row)));
+        pre.append(gap);
+        lines.slice(end - keepTail, end).forEach((l) => pre.append(row(l)));
+      }
+      k = end;
+    }
+    return pre;
+  };
+
+  // A lone document: its first lines, the rest on a click.
+  const docView = (lines) => {
+    const pre = el("pre", "jv-doc");
+    lines.slice(0, PREVIEW).forEach((line) => pre.append(el("span", "ln", line)));
+    if (lines.length > PREVIEW) {
+      const more = el("button", "jv-gap", `⋯ ${lines.length - PREVIEW} more lines`);
+      more.type = "button";
+      more.addEventListener("click", () => more.replaceWith(...lines.slice(PREVIEW).map((l) => el("span", "ln", l))));
+      pre.append(more);
+    }
+    return pre;
+  };
+
+  // "Show all": a whole document, on demand.
+  const fullButton = (label, lines, host) => {
+    const button = el("button", "jv-full", `${label} in full (${lines.length} lines)`);
+    button.type = "button";
+    button.addEventListener("click", () => {
+      const pre = el("pre", "jv-doc");
+      lines.forEach((line) => pre.append(el("span", "ln", line)));
+      button.disabled = true;
+      host.append(el("p", "jv-label", `${label}, in full`), pre);
+    });
+    return button;
+  };
+
+  const render = (box) => {
+    const body = el("div", "jv-body"), tools = el("div", "jv-tools");
+    const a = doc(box.dataset.a), labelA = box.dataset.labelA || "document";
+    if (box.dataset.b) {
+      const b = doc(box.dataset.b), labelB = box.dataset.labelB || "after";
+      body.append(el("p", "jv-label", `− ${labelA}   + ${labelB}`), diffView(a, b));
+      tools.append(fullButton(labelA, a, body), fullButton(labelB, b, body));
+    } else {
+      body.append(el("p", "jv-label", labelA), docView(a));
+    }
+    // Before the box's tail (a nested box, such as why the rest are absent), if it has one.
+    const tail = box.querySelector(":scope > .jv-tail");
+    box.insertBefore(body, tail);
+    if (tools.childElementCount) box.insertBefore(tools, tail);
+  };
+
+  // For other scripts (run-report.js): a box for documents already in hand, rendered when opened like any other.
+  let made = 0;
+  window.JsonView = {
+    box({ a, b, labelA, labelB, summary, lead }) {
+      const box = el("details", "jv");
+      const id = (value) => { const key = `jvm${made++}`; cache.set(key, linesOf(value)); return key; };
+      box.dataset.a = id(a);
+      if (b !== undefined) box.dataset.b = id(b);
+      if (labelA) box.dataset.labelA = labelA;
+      if (labelB) box.dataset.labelB = labelB;
+      const head = el("summary");
+      head.innerHTML = summary;
+      box.append(head);
+      if (lead) box.append(lead);
+      return box;
+    },
+  };
+
+  // toggle doesn't bubble, but a capturing listener on the document sees every one.
+  document.addEventListener("toggle", (event) => {
+    const box = event.target;
+    if (box.classList && box.classList.contains("jv") && box.open && !box.dataset.rendered) {
+      box.dataset.rendered = "1";
+      render(box);
+    }
+  }, true);
+})();
+// Reply envelope, end to end: the data. Every name is tagged with where its standard comes from (see LEGEND).
+// Digests, keys, times and identities are made up; the shapes are the ones the design proposes.
+(() => {
+  // HEART representations: HAL Schema Forms, the reference dialect (SPEC §6.1). The hr prefix is declared in curies.
+  const CURIES = { curies: [{ name: "hr", href: "https://w3id.org/heart-rise/rels/{rel}", templated: true }] };
+
+  // The caller's template: its own message, with the standard names left null for the responder to fill.
+  const template = () => ({
+    id: null,
+    time: null,
+    source: null,
+    subject: null,
+    outcome: null,
+    result: null,
+    problem: null,
+    correlation: "asst-req-5521",
+    note: "Ana: text me too, and tell me the date",
+  });
+
+  const LEGEND = [
+    { k: "codified", t: "Codified", d: "A published IETF RFC, W3C Recommendation, OASIS or ISO standard. Safe to cite as a standard." },
+    { k: "proposed", t: "Proposed", d: "Still a draft: an IETF Internet-Draft or a W3C Working Draft. It can change, or never ship." },
+    { k: "defacto", t: "De facto", d: "Widely used, with no standards-body document: a written spec from a foundation or vendor, a book's pattern, or a product's own protocol." },
+    { k: "thesis", t: "Thesis", d: "A principle from a doctoral thesis, not a standard. Fielding's constraints, 2000." },
+    { k: "ours", t: "Ours", d: "Named in this design, with no standard behind it. It can change." },
+  ];
+
+  const CHANGED = [
+    "One template, not an echo wrapped in a stamp. The caller writes its whole reply. The responder fills the standard names left null, and removes the rest.",
+    "Signed with the responder's own key (RFC 9421), not a shared secret. A secret would have to travel inside the template, so it is out.",
+    "A repeat after a lost answer gets 412. The sender reads again, finds its own id, and stops. No new replay rule.",
+    "The reply's address is the correlation for the wait. The caller's own id, correlation, serves its own log; the responder never reads it.",
+  ];
+
+  const STANDARDS = [
+    { key: "id", does: "The responder's id for this delivery. A repeat carries the same id.", tags: [{ k: "defacto", note: "CloudEvents attribute id" }], src: "CloudEvents 1.0. A written spec from CNCF, not an IETF, W3C or ISO document." },
+    { key: "time", does: "When the responder processed the delivery, in UTC.", tags: [{ k: "defacto", note: "CloudEvents attribute time" }, { k: "codified", note: "format: RFC 3339" }], src: "CloudEvents 1.0 for the name. RFC 3339 for the format: date-time with Z." },
+    { key: "source", does: "URI of the responder.", tags: [{ k: "defacto", note: "CloudEvents attribute source" }], src: "CloudEvents 1.0." },
+    { key: "subject", does: "URI of the resource the result is about.", tags: [{ k: "defacto", note: "CloudEvents attribute subject" }], src: "CloudEvents 1.0." },
+    { key: "outcome", does: "done, refused or failed.", tags: [{ k: "ours" }], src: "No standard for these three words. They are not HTTP status codes." },
+    { key: "result", does: "The answer itself, shaped by the responder's own form.", tags: [{ k: "ours", note: "name" }, { k: "defacto", note: "shape: HAL-FORMS" }], src: "The shape comes from the responder's form, read before acting. HAL-FORMS is a written spec, not a standards-body document." },
+    { key: "problem", does: "A failure, as an RFC 9457 problem. Also the body of every refusal in this report.", tags: [{ k: "codified", note: "RFC 9457" }], src: "RFC 9457 Problem Details for HTTP APIs. Its extension members (answer, limit, expires) are allowed; their names are ours." },
+    { key: "null-fill", does: "A null in the template means: fill me. Names left unfilled are removed.", tags: [{ k: "ours" }], src: "Not RFC 7396 JSON Merge Patch, where null means delete. Stated here so nobody reads it that way." },
+    { key: "correlation", does: "The caller's own id for its request. Copied untouched; the responder never reads it.", tags: [{ k: "ours", note: "name" }, { k: "defacto", note: "concept" }], src: "Concept: Enterprise Integration Patterns, Correlation Identifier (Hohpe and Woolf, 2003). AMQP 1.0 has correlation-id (CODIFIED: OASIS, ISO/IEC 19464). AMQP 0-9-1 has correlation_id (DE FACTO: RabbitMQ)." },
+    { key: "expires", does: "After this instant the reply is expired. The caller sets it on the reply.", tags: [{ k: "ours", note: "name" }, { k: "codified", note: "format: RFC 3339" }], src: "The format is RFC 3339. The idea matches AMQP 1.0's absolute-expiry-time; the name is ours." },
+    { key: "Date", does: "When the responder sent the delivery.", tags: [{ k: "codified", note: "RFC 9110 §6.6.1" }], src: "RFC 9110. A header; the caller stores the body's time, not this." },
+    { key: "If-Match", does: "The validator the sender last read. A delivery is refused if the reply has changed since.", tags: [{ k: "codified", note: "RFC 9110 §13.1.1" }], src: "RFC 9110. Used with ETag." },
+    { key: "ETag", does: "The reply's validator, sent with every read and answer.", tags: [{ k: "codified", note: "RFC 9110 §8.8.3" }], src: "RFC 9110." },
+    { key: "Location", does: "Where a new resource is: the reply, the watch.", tags: [{ k: "codified", note: "RFC 9110 §10.2.2" }], src: "RFC 9110." },
+    { key: "traceparent", does: "Continues the caller's trace: same trace id, new span id.", tags: [{ k: "codified", note: "W3C Trace Context, Level 1" }], src: "W3C Recommendation, for HTTP headers. Carrying it in AMQP messages is common practice (OpenTelemetry), not in the W3C document." },
+    { key: "Content-Digest", does: "A digest of the body. Proves the bytes, not who sent them.", tags: [{ k: "codified", note: "RFC 9530" }], src: "RFC 9530, Digest Fields." },
+    { key: "Signature-Input", does: "The signed parts, and the parameters created, expires, keyid, alg and tag: when, which key, which purpose.", tags: [{ k: "codified", note: "RFC 9421" }], src: "RFC 9421, HTTP Message Signatures. tag is a parameter the RFC defines; the value heart-reply is ours." },
+    { key: "Signature", does: "The signature itself, as a byte sequence.", tags: [{ k: "codified", note: "RFC 9421, RFC 8941" }], src: "RFC 9421 uses RFC 8941 Structured Fields for the :base64: value." },
+    { key: "JWK", does: "The responder's public key, as a JSON Web Key.", tags: [{ k: "codified", note: "RFC 7517; RFC 8037 for OKP and Ed25519" }], src: "RFC 7517 (JSON Web Key). RFC 8037 (OKP keys, Ed25519)." },
+    { key: "WWW-Authenticate", does: "Tells a refused sender how to authenticate. Required on a 401.", tags: [{ k: "codified", note: "RFC 9110 §11.6.1" }, { k: "ours", note: "scheme Signature" }], src: "The rule is RFC 9110. The scheme name Signature is ours; no registered scheme is assumed." },
+    { key: "status codes", does: "200, 201, 401, 409, 412, 413 and 428 in this design.", tags: [{ k: "codified", note: "RFC 9110 §15; 428 from RFC 6585" }], src: "RFC 9110 names 413 Content Too Large." },
+    { key: "_links", does: "Links to related resources, by relation name.", tags: [{ k: "defacto", note: "HAL" }], src: "HAL is an IETF Internet-Draft that expired. Widely used; no RFC." },
+    { key: "application/hal+json", does: "The media type of every HEART representation, with its profile link: heart-rise/hal-schema-forms.", tags: [{ k: "defacto", note: "HAL" }, { k: "ours", note: "profile" }], src: "HAL is an IETF Internet-Draft that expired. The profile URI is HEART's; the client selects it with Accept-Profile and the server names it in Link rel=\"profile\"." },
+    { key: "_forms", does: "The forms (acts) a resource offers: method, target, contentType and the schema of the input.", tags: [{ k: "defacto", note: "HAL Schema Forms" }, { k: "ours", note: "HEART's reference dialect" }], src: "HAL Schema Forms is a community spec. HEART's reference dialect uses its _forms key, with HEART's additions." },
+    { key: "JSON Schema", does: "Describes the properties of the input, including which names are fillable.", tags: [{ k: "proposed", note: "draft 2020-12" }], src: "An IETF Internet-Draft, in wide use. Check its current status before citing it as a standard." },
+    { key: "hr: relations", does: "hr:reply-to, hr:keys, hr:loan, hr:deliver: relation names.", tags: [{ k: "ours" }], src: "HEART's own prefix. Not registered anywhere." },
+  ];
+
+  const REJECTED = [
+    { name: "Standard Webhooks headers (webhook-id, webhook-timestamp, webhook-signature)", tags: [{ k: "defacto" }], why: "Its signature is HMAC with a shared secret. The secret would travel inside the template. Rejected." },
+    { name: "Idempotency-Key header", tags: [{ k: "proposed" }], why: "An IETF httpapi Internet-Draft. Not needed: the answered state and If-Match already allow one answer only." },
+    { name: "RFC 7396 JSON Merge Patch, null means delete", tags: [{ k: "codified" }], why: "Our null means fill. Reusing the name would confuse anyone who knows merge patch. Not used." },
+    { name: "AsyncAPI document", tags: [{ k: "defacto" }], why: "A written spec that describes channels and payloads both sides share at design time. That shared document is the coupling this design avoids; see the coupling section." },
+    { name: "Digest alone, no signature", tags: [{ k: "codified" }], why: "RFC 9530 proves the bytes, not the sender. Kept, but not enough alone." },
+  ];
+
+  const STEPS = [
+    {
+      id: "s1",
+      title: "The assistant opens a reply on its own inbox",
+      lede: "Before it asks, the assistant writes the reply it wants back. The template is its own message. The standard names it wants filled are null.",
+      std: ["null-fill", "correlation", "expires", "_forms", "JSON Schema", "Location", "status codes", "_links", "time", "id", "subject", "outcome", "result", "source"],
+      exchanges: [{
+        line: "POST https://assistant.example/replies",
+        headers: ["Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"'],
+        body: { template: template(), expires: "2026-11-15T09:00:00Z" },
+        bodyLabel: "Request body: the template and the expiry",
+        res: {
+          line: "201 Created",
+          headers: ["Location: https://assistant.example/replies/7f3a"],
+          body: {
+            state: "awaiting",
+            expires: "2026-11-15T09:00:00Z",
+            template: template(),
+            _links: { ...CURIES, self: { href: "https://assistant.example/replies/7f3a" } },
+            _forms: {
+              "hr:deliver": {
+                method: "POST",
+                target: "https://assistant.example/replies/7f3a/actions/deliver",
+                schema: {
+                  type: "object",
+                  properties: {
+                    id: { type: "string" },
+                    time: { type: "string", format: "date-time" },
+                    source: { type: "string", format: "uri" },
+                    subject: { type: "string", format: "uri" },
+                    outcome: { enum: ["done", "refused", "failed"] },
+                    result: { type: "object" },
+                    problem: { type: "object" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      }],
+      note: "The responder fills only the names listed in this schema, and only where the template has null. Everything else, the caller's own fields included, comes back exactly as sent.",
+    },
+    {
+      id: "s2",
+      title: "The assistant asks the library, and passes the reply's address",
+      lede: "The assistant acts on the loan. Its one hypermedia input is the reply's link, in _rise.",
+      std: ["Location", "_links", "hr: relations", "status codes"],
+      exchanges: [{
+        line: "POST https://library.example/loans/L-40219/actions/tell-me-when-renewable",
+        headers: ["Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"'],
+        body: { _rise: { _links: { ...CURIES, "hr:reply-to": { href: "https://assistant.example/replies/7f3a" } } } },
+        res: {
+          line: "201 Created",
+          headers: ["Location: https://library.example/watches/w-88"],
+          body: {
+            state: "waiting",
+            _links: { ...CURIES,
+              self: { href: "https://library.example/watches/w-88" },
+              "hr:loan": { href: "https://library.example/loans/L-40219" },
+              "hr:keys": { href: "https://library.example/keys" },
+            },
+          },
+        },
+      }],
+      note: "The library learns one address. It learns nothing of the assistant's channels, topics or queues. The assistant gets the library's key location here, for step 6.",
+    },
+    {
+      id: "s3",
+      title: "The hold clears",
+      lede: "A simulator control clears the hold on the loan. The watch moves to ready, and the library wakes.",
+      std: [],
+      exchanges: [],
+      note: "No HTTP exchange here. This is inside the library.",
+    },
+    {
+      id: "s4",
+      title: "The library reads the reply before it sends",
+      lede: "The library reads the reply first. Read before send: it learns the validator, the form, and which names to fill.",
+      std: ["ETag", "If-Match", "Date", "_forms", "status codes"],
+      exchanges: [{
+        line: "GET https://assistant.example/replies/7f3a",
+        headers: ["Accept: application/hal+json", "Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>"],
+        res: {
+          line: "200 OK",
+          headers: ["ETag: \"seq-1.hsf.L2.c4b8a0e62d9f1137\""],
+          body: { state: "awaiting", expires: "2026-11-15T09:00:00Z", template: template() },
+        },
+      }],
+      note: "The library takes the target from the form in the representation. It never builds the deliver address itself.",
+    },
+    {
+      id: "s5",
+      title: "The library delivers: fills the template, signs the request",
+      lede: "The library copies the caller's template, fills the null names it has values for, and signs the whole request with its own key.",
+      std: ["If-Match", "ETag", "Date", "traceparent", "Content-Digest", "Signature-Input", "Signature", "id", "time", "source", "subject", "outcome", "result", "correlation", "status codes", "_links"],
+      exchanges: [{
+        line: "POST https://assistant.example/replies/7f3a/actions/deliver",
+        headers: [
+          "If-Match: \"seq-1.hsf.L2.c4b8a0e62d9f1137\"",
+          "Date: Sun, 08 Nov 2026 15:40:12 GMT",
+          "traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+          "Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"',
+          "Content-Digest: sha-256=:bW9jay1kaWdlc3Q=:",
+          "Signature-Input: sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\" \"traceparent\");created=1794152412;expires=1794152712;keyid=\"lib-2026-11\";alg=\"ed25519\";tag=\"heart-reply\"",
+          "Signature: sig1=:bW9jay1zaWduYXR1cmU=:",
+        ],
+        body: {
+          id: "lib-dlv-90211",
+          time: "2026-11-08T15:40:12Z",
+          source: "https://library.example/riverside",
+          subject: "https://library.example/loans/L-40219",
+          outcome: "done",
+          result: { loan: "https://library.example/loans/L-40219", standing: "renewable", renewUntil: "2026-12-06" },
+          correlation: "asst-req-5521",
+          note: "Ana: text me too, and tell me the date",
+        },
+        bodyLabel: "Request body: the caller's template, filled",
+        res: {
+          line: "200 OK",
+          headers: ["ETag: \"seq-2.hsf.L2.19d6e3f0a8c57b24\""],
+          body: { state: "answered", id: "lib-dlv-90211", time: "2026-11-08T15:40:12Z" },
+        },
+      }],
+      note: "problem was never filled, so the responder removed it. The caller's note and correlation come back exactly as sent.",
+    },
+    {
+      id: "s6",
+      title: "The assistant checks the library's signature",
+      lede: "The assistant fetches the library's key from the link it read at step 2, and verifies the request before it trusts the answer.",
+      std: ["JWK", "Signature-Input", "Content-Digest", "ETag", "_links"],
+      exchanges: [{
+        line: "GET https://library.example/keys",
+        headers: ["Accept: application/hal+json", "Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>"],
+        res: {
+          line: "200 OK",
+          headers: ["ETag: \"seq-3.hsf.L2.7a1e5c0d9b2f4863\""],
+          body: { keys: [{ kty: "OKP", crv: "Ed25519", kid: "lib-2026-11", x: "bW9jay1wdWJsaWMta2V5" }] },
+        },
+      }],
+      note: "The keyid in Signature-Input matches kid. Then the assistant checks Content-Digest, the created to expires window, and its own log for asst-req-5521. Only then does it mark its own request done.",
+    },
+    {
+      id: "s7",
+      title: "A lost answer: the library sends the same delivery again",
+      lede: "The first answer never reached the library. It retries: the same body and id, a new Date and a new signature, because the old window has closed. The validator is the one it read at step 4.",
+      std: ["If-Match", "Date", "Signature-Input", "problem", "status codes"],
+      exchanges: [{
+        line: "POST https://assistant.example/replies/7f3a/actions/deliver",
+        headers: [
+          "If-Match: \"seq-1.hsf.L2.c4b8a0e62d9f1137\"",
+          "Date: Sun, 08 Nov 2026 15:46:12 GMT",
+          "Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"',
+          "Content-Digest: sha-256=:bW9jay1kaWdlc3Q=:",
+          "Signature-Input: sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\" \"traceparent\");created=1794152772;expires=1794153072;keyid=\"lib-2026-11\";alg=\"ed25519\";tag=\"heart-reply\"",
+        ],
+        body: "same as step 5",
+        res: {
+          line: "412 Precondition Failed",
+          headers: ["Content-Type: application/problem+json"],
+          body: {
+            type: "https://w3id.org/heart-rise/problems/validator-stale",
+            title: "The reply changed since you read it",
+            status: 412,
+            detail: "The reply's ETag is now \"seq-2.hsf.L2.19d6e3f0a8c57b24\".",
+          },
+        },
+      }],
+      note: "Nothing is applied twice. The sender reads again (step 8).",
+    },
+    {
+      id: "s8",
+      title: "The library reads again and finds its own answer",
+      lede: "The sender reads the reply and compares the id with the one it sent.",
+      std: ["ETag", "id"],
+      exchanges: [{
+        line: "GET https://assistant.example/replies/7f3a",
+        headers: ["Accept: application/hal+json", "Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>"],
+        res: {
+          line: "200 OK",
+          headers: ["ETag: \"seq-2.hsf.L2.19d6e3f0a8c57b24\""],
+          body: { state: "answered", id: "lib-dlv-90211", time: "2026-11-08T15:40:12Z" },
+        },
+      }],
+      note: "The id is its own, so the answer is its own. The library stops retrying.",
+    },
+    {
+      id: "s9",
+      title: "A different answer is refused",
+      lede: "A second, different delivery arrives with the current validator. It is a bug on the library's side, or a second replica.",
+      std: ["If-Match", "problem", "status codes", "id", "outcome"],
+      exchanges: [{
+        line: "POST https://assistant.example/replies/7f3a/actions/deliver",
+        headers: ["If-Match: \"seq-2.hsf.L2.19d6e3f0a8c57b24\"", "Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"'],
+        body: {
+          id: "lib-dlv-90419",
+          time: "2026-11-08T16:02:55Z",
+          source: "https://library.example/riverside",
+          subject: "https://library.example/loans/L-40219",
+          outcome: "refused",
+          correlation: "asst-req-5521",
+        },
+        bodyLabel: "Request body (signature headers as in step 5, omitted here)",
+        res: {
+          line: "409 Conflict",
+          headers: ["Content-Type: application/problem+json"],
+          body: {
+            type: "https://w3id.org/heart-rise/problems/already-answered",
+            title: "This reply is already answered",
+            status: 409,
+            answer: "lib-dlv-90211",
+          },
+        },
+      }],
+      note: "Deliver is not offered once answered, so the answer is 409. answer is an extension member; its name is ours.",
+    },
+    {
+      id: "s10",
+      title: "A reply that expired first",
+      lede: "The library was late. The assistant's inbox moved the reply to expired at its expires time.",
+      std: ["expires", "problem", "status codes", "If-Match"],
+      exchanges: [{
+        line: "POST https://assistant.example/replies/7f40/actions/deliver",
+        headers: ["If-Match: \"seq-4.hsf.L2.6a3f1e8d0c9b5277\"", "Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"'],
+        body: { id: "lib-dlv-90533", time: "2026-11-15T09:20:00Z", source: "https://library.example/riverside", subject: "https://library.example/loans/L-40219", outcome: "done", correlation: "asst-req-5522" },
+        bodyLabel: "Request body (signature headers omitted here)",
+        res: {
+          line: "409 Conflict",
+          headers: ["Content-Type: application/problem+json"],
+          body: {
+            type: "https://w3id.org/heart-rise/problems/reply-expired",
+            title: "This reply expired before the answer",
+            status: 409,
+            expires: "2026-11-15T09:00:00Z",
+          },
+        },
+      }],
+      note: "Once expired, deliver is not offered. The caller learns when the reply expired, not only that it did.",
+    },
+    {
+      id: "s11",
+      title: "A forged delivery",
+      lede: "Someone who holds the reply's address, but not the library's key, sends a body the library never wrote.",
+      std: ["Signature-Input", "Signature", "WWW-Authenticate", "problem", "status codes"],
+      exchanges: [{
+        line: "POST https://assistant.example/replies/7f41/actions/deliver",
+        headers: [
+          "If-Match: \"seq-1.hsf.L2.c4b8a0e62d9f1137\"",
+          "Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"',
+          "Content-Digest: sha-256=:bm90LXRoZS1kaWdlc3Q=:",
+          "Signature-Input: sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\" \"traceparent\");created=1794152412;expires=1794152712;keyid=\"lib-2026-11\";alg=\"ed25519\";tag=\"heart-reply\"",
+          "Signature: sig1=:bm90LXRoZS1yaWdodC1rZXk=:",
+        ],
+        body: { id: "forged-1", time: "2026-11-08T15:41:00Z", source: "https://library.example/riverside", outcome: "done", result: { standing: "renewable" } },
+        res: {
+          line: "401 Unauthorized",
+          headers: ["WWW-Authenticate: Signature realm=\"heart-reply\"", "Content-Type: application/problem+json"],
+          body: {
+            type: "https://w3id.org/heart-rise/problems/signature-invalid",
+            title: "The signature does not match the request",
+            status: 401,
+          },
+        },
+      }],
+      note: "The signature check runs before any state check, so a forger learns nothing about the reply. The scheme name Signature is ours; RFC 9110 requires WWW-Authenticate on a 401.",
+    },
+    {
+      id: "s12",
+      title: "A template too large",
+      lede: "A caller tries to store a long message in the reply.",
+      std: ["problem", "status codes"],
+      exchanges: [{
+        line: "POST https://assistant.example/replies",
+        headers: ["Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"'],
+        body: { template: { ...template(), note: "Ana: (5,000 characters, shortened in this report)" }, expires: "2026-11-15T09:00:00Z" },
+        bodyLabel: "Request body, shortened for this report",
+        res: {
+          line: "413 Content Too Large",
+          headers: ["Content-Type: application/problem+json"],
+          body: {
+            type: "https://w3id.org/heart-rise/problems/reply-too-large",
+            title: "The reply template is larger than 4,096 bytes",
+            status: 413,
+            limit: 4096,
+          },
+        },
+      }],
+      note: "The cap stops a reply address from becoming storage. Both sides hold the template while the reply waits.",
+    },
+  ];
+
+  const COUPLING = [
+    { what: "Where the answer goes", caller: "Its own reply address, passed in _rise.", responder: "Only the link it was given.", shared: "No." },
+    { what: "Which names to fill", caller: "The standard names, as null in its template.", responder: "The names in the reply's _forms schema, read at delivery time.", shared: "No." },
+    { what: "The answer's shape", caller: "The responder's form, read before it acts.", responder: "Its own form.", shared: "No." },
+    { what: "The caller's own fields (note, correlation)", caller: "All of them.", responder: "Copies them. Never reads them.", shared: "No." },
+    { what: "Channels, topics, queues", caller: "None of the responder's.", responder: "None of the caller's.", shared: "No." },
+    { what: "The signing key", caller: "Found by link (hr:keys), cached by ETag.", responder: "Its own.", shared: "No." },
+    { what: "What both sides share at design time", caller: "Standard names only: CloudEvents, RFC 3339, RFC 9421, traceparent, RFC 9457.", responder: "The same.", shared: "Standards only." },
+  ];
+
+  const FIELDING = [
+    { c: "Client-server", how: "Each side acts on the other only through links it was given. Neither holds the other's internals.", steps: "2, 5" },
+    { c: "Stateless", how: "Each delivery carries its own Date, created window and traceparent. The only state is the resource the reply names.", steps: "5, 7" },
+    { c: "Cacheable", how: "Reads of the reply and of the keys carry an ETag. Deliver is a POST and is not cached.", steps: "4, 6" },
+    { c: "Uniform interface: identification", how: "The reply, the watch and the keys each have their own URI, given in Location or _links.", steps: "1, 2" },
+    { c: "Uniform interface: manipulation through representations", how: "The reply is JSON. The library changes it by sending a representation, not by calling a method.", steps: "5" },
+    { c: "Uniform interface: self-descriptive messages", how: "Signature names its key, Content-Digest names the body, the template names what it wants back, and media types say how to read it.", steps: "5, 6" },
+    { c: "Uniform interface: hypermedia as the engine of state", how: "The library never builds the deliver address. It takes the target from _forms on the reply it read.", steps: "4, 5" },
+    { c: "Layered system", how: "The signature covers the target URI and the headers, so an intermediary cannot change them without failing verification.", steps: "5, 11" },
+    { c: "Code on demand", how: "Not used.", steps: "none" },
+  ];
+
+  const BOUNDS = [
+    { text: "The template is at most 4,096 bytes. Larger is 413, with the limit in the problem.", tags: [{ k: "ours", note: "the limit" }, { k: "codified", note: "413, RFC 9110" }] },
+    { text: "Only names listed in the reply's schema are filled. Other nulls are removed.", tags: [{ k: "ours" }] },
+    { text: "Every deliver carries If-Match. Without it: 428.", tags: [{ k: "codified", note: "428, RFC 6585; If-Match, RFC 9110" }] },
+    { text: "A signature is good for five minutes, from created to expires.", tags: [{ k: "codified", note: "parameters, RFC 9421" }, { k: "ours", note: "the five minutes" }] },
+    { text: "At its expires time, the reply moves to expired. Deliver is then not offered.", tags: [{ k: "ours" }, { k: "codified", note: "RFC 3339" }] },
+    { text: "One answer only. Once answered, deliver is not offered: 409.", tags: [{ k: "ours", note: "the rule" }, { k: "codified", note: "409, RFC 9110" }] },
+    { text: "Reply addresses are https only in this design.", tags: [{ k: "ours" }] },
+    { text: "The template holds no secrets. The responder stores it while the reply waits.", tags: [{ k: "ours", note: "the policy" }] },
+    { text: "The signature check runs before any validator or state check, so a forger learns nothing.", tags: [{ k: "ours", note: "the order" }, { k: "codified", note: "RFC 9421" }] },
+    { text: "Retries are bounded by the sender's policy. A sender that gives up reads once more before it stops.", tags: [{ k: "ours", note: "the policy" }] },
+  ];
+
+  const OPEN = [
+    "The reply as a HEART resource (recommended). It keeps read before send, If-Match and one answer. A one-shot POST drops all three.",
+    "Repeats: 412, then read again, as in step 7 (recommended). No replay rule.",
+    "Signing: RFC 9421 with the responder's key (recommended). Standard Webhooks is dropped; its shared secret would travel in the template.",
+    "A receipt: a hr: relation, on the responder's side, to a resource that tracks the occurrence. Link only in the first version (recommended). The relation name must come from the IANA registry before use; none is assumed here.",
+    "Standard names bare, spelled as CloudEvents spells them (recommended). The hr: prefix only on HEART's own names.",
+  ];
+
+  window.REPLY = { CHANGED, LEGEND, STANDARDS, REJECTED, STEPS, COUPLING, FIELDING, BOUNDS, OPEN };
+})();
+// Reply envelope, end to end: the renderer. The data is in reply.js.
+(() => {
+  const R = window.REPLY;
+  const host = document.getElementById("reply");
+  const LABEL = { codified: "Codified", proposed: "Proposed", defacto: "De facto", thesis: "Thesis", ours: "Ours" };
+
+  const el = (tag, cls, text) => {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined && text !== null) node.textContent = text;
+    return node;
+  };
+
+  // One status tag, e.g. "CODIFIED · RFC 9421".
+  const tag = ({ k, note }) => el("span", `tag tag-${k}`, note ? `${LABEL[k]} · ${note}` : LABEL[k]);
+
+  const byKey = new Map(R.STANDARDS.map((s) => [s.key, s]));
+  const standard = (key) => {
+    const s = byKey.get(key);
+    if (!s) throw new Error(`no standard named ${key}`);
+    return s;
+  };
+
+  const section = (title, lede) => {
+    const sec = el("section", "block");
+    sec.append(el("h2", null, title));
+    if (lede) sec.append(el("p", "lede", lede));
+    return sec;
+  };
+
+  const table = (head, rows) => {
+    const wrap = el("div", "tbl-wrap");
+    const t = el("table");
+    const tr = el("tr");
+    head.forEach((h) => tr.append(el("th", null, h)));
+    const thead = el("thead");
+    thead.append(tr);
+    t.append(thead);
+    const body = el("tbody");
+    rows.forEach((cells) => {
+      const row = el("tr");
+      cells.forEach((c, i) => {
+        const td = el("td");
+        td.dataset.label = head[i];
+        if (c instanceof Node) td.append(c);
+        else td.textContent = c;
+        row.append(td);
+      });
+      body.append(row);
+    });
+    t.append(body);
+    wrap.append(t);
+    return wrap;
+  };
+
+  // ---- What changed from the first idea.
+  const changed = () => {
+    const sec = section("What changed from the first idea");
+    const ul = el("ul", "points");
+    R.CHANGED.forEach((c) => ul.append(el("li", null, c)));
+    sec.append(ul);
+    return sec;
+  };
+
+  // ---- Every name, its status, its source.
+  const standards = () => {
+    const sec = section("Standards behind every name",
+      "Each name carries its status. Read the status before reading the name: CODIFIED means a published standard, PROPOSED a draft, DE FACTO a convention without a standards-body document, THESIS a principle, OURS our own.");
+    const legend = el("ul", "legend");
+    R.LEGEND.forEach((l) => {
+      const li = el("li");
+      li.append(el("span", `tag tag-${l.k}`, l.t), el("span", null, ` ${l.d}`));
+      legend.append(li);
+    });
+    sec.append(legend);
+    const rows = R.STANDARDS.map((s) => {
+      const name = el("code", null, s.key);
+      const status = el("span");
+      s.tags.forEach((t) => status.append(tag(t), " "));
+      return [name, s.does, status, s.src];
+    });
+    sec.append(table(["Name", "What it does", "Status", "Source"], rows));
+    return sec;
+  };
+
+  // ---- The steps: each exchange with its lines, its JSON folded, the standards it uses.
+  const steps = () => {
+    const sec = section("End to end",
+      "Twelve steps: the happy path, a lost answer, a second answer, an expired reply, a forged delivery and an oversize template. Bodies are folded; open them to read.");
+    const nav = el("nav", "chips");
+    nav.setAttribute("aria-label", "Steps");
+    R.STEPS.forEach((s, i) => {
+      const a = el("a", "chip", String(i + 1));
+      a.href = `#${s.id}`;
+      nav.append(a);
+    });
+    const bar = el("div", "bar");
+    const open = el("button", "btn", "Open every body");
+    const close = el("button", "btn", "Close every body");
+    open.type = close.type = "button";
+    const setAll = (state) => document.querySelectorAll("details.jv").forEach((d) => { d.open = state; });
+    open.addEventListener("click", () => setAll(true));
+    close.addEventListener("click", () => setAll(false));
+    bar.append(el("span", "sub", "Steps:"), open, close);
+    sec.append(nav, bar);
+
+    R.STEPS.forEach((s, i) => {
+      const block = el("article", "step");
+      block.id = s.id;
+      block.append(el("h3", null, `${i + 1}. ${s.title}`), el("p", "lede", s.lede));
+      s.exchanges.forEach((x) => {
+        const ex = el("div", "exchange");
+        ex.append(el("pre", "line", [x.line, ...(x.headers || [])].join("\n")));
+        if (typeof x.body === "string") ex.append(el("p", "note", `Body: ${x.body}.`));
+        else if (x.body !== undefined) ex.append(window.JsonView.box({ a: x.body, summary: x.bodyLabel || "Request body" }));
+        if (x.res) {
+          ex.append(el("pre", "line res", [x.res.line, ...(x.res.headers || [])].join("\n")));
+          if (x.res.body !== undefined) ex.append(window.JsonView.box({ a: x.res.body, summary: "Response body" }));
+        }
+        block.append(ex);
+      });
+      if (s.exchanges.length === 0) block.append(el("p", "note", "No exchange."));
+      if (s.std.length) {
+        const here = el("p", "here");
+        here.append(el("span", "here-label", "Standards here: "));
+        s.std.forEach((key) => {
+          const chip = el("span", "chip-std");
+          chip.append(el("code", null, key), " ", tag(standard(key).tags[0]));
+          here.append(chip);
+        });
+        block.append(here);
+      }
+      if (s.note) block.append(el("p", "note", s.note));
+      sec.append(block);
+    });
+    return sec;
+  };
+
+  // ---- Loose coupling, against AsyncAPI.
+  const coupling = () => {
+    const sec = section("Loose coupling, and AsyncAPI");
+    sec.append(el("p", null, "AsyncAPI describes channels and message payloads in one document that both sides share. That is its strength for documenting a system, and it is the coupling: rename a channel or change a payload, and the other side breaks until its copy of the document changes."));
+    sec.append(el("p", null, "This reply design names no channel and no caller payload. The reply address is a link made per request. The echo is opaque. The only shared names are standards' names, which change on the standards' own schedule, not ours."));
+    sec.append(el("p", null, "AsyncAPI 3.0 can also describe a reply channel. It fixes that channel in the document, at design time. Here the caller supplies the address per request. An AsyncAPI document can still describe the broker and the topics around this design; the reply does not need that document to work."));
+    sec.append(table(["What", "Caller knows", "Responder knows", "Shared as a document"],
+      R.COUPLING.map((c) => [c.what, c.caller, c.responder, c.shared])));
+    return sec;
+  };
+
+  // ---- Fielding's constraints, one row each.
+  const fielding = () => {
+    const sec = section("Fielding's constraints",
+      "Fielding's constraints come from a 2000 thesis (THESIS). They are principles, not a standard. The steps show where each one holds.");
+    sec.append(table(["Constraint", "How this design meets it", "Steps"],
+      R.FIELDING.map((f) => [f.c, f.how, f.steps])));
+    return sec;
+  };
+
+  // ---- Bounds: the essentials.
+  const bounds = () => {
+    const sec = section("Bounds");
+    const ul = el("ul", "points");
+    R.BOUNDS.forEach((b) => {
+      const li = el("li");
+      li.append(el("span", null, b.text + " "));
+      b.tags.forEach((t) => li.append(tag(t), " "));
+      ul.append(li);
+    });
+    sec.append(ul);
+    return sec;
+  };
+
+  // ---- Considered, not used.
+  const rejected = () => {
+    const sec = section("Considered and not used");
+    sec.append(table(["Option", "Status", "Why not"],
+      R.REJECTED.map((r) => {
+        const status = el("span");
+        r.tags.forEach((t) => status.append(tag(t), " "));
+        return [r.name, status, r.why];
+      })));
+    return sec;
+  };
+
+  // ---- Open decisions.
+  const open = () => {
+    const sec = section("Open decisions", "Each has a recommendation. None is decided here.");
+    const ol = el("ol", "points");
+    R.OPEN.forEach((o) => ol.append(el("li", null, o)));
+    sec.append(ol);
+    return sec;
+  };
+
+  host.append(changed(), standards(), steps(), coupling(), fielding(), bounds(), rejected(), open());
+})();
+</script>
+</body></html>

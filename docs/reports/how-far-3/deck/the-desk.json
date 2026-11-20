@@ -1,0 +1,89 @@
+{
+  "name": "the-desk",
+  "title": "A Person Asks the Release Desk",
+  "part": "The release, in the order it runs",
+  "kicker": "Step 1 · desk:release",
+  "tone": "light",
+  "number": 20,
+  "of": 30,
+  "html": "<h2>A Person Asks the Release Desk</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 7fr) minmax(0, 5fr)\">\n  <figure><img src=\"media/desk.png\" alt=\"The release desk's text/html representation, offering Release a pull request\"><figcaption>The release desk, as HTML for a person: “Release a pull request” is its act.</figcaption></figure>\n  <div class=\"rows\">\n    <div><h3>One Act</h3><p><code>desk:release</code>: which pull request.</p></div>\n    <div><h3>It Speaks HEART</h3><p>The same media type as the library, and as HTML for a person.</p></div>\n    <div><h3>ARTIE Takes Over</h3><p>The desk starts ARTIE on the kept release script.</p></div>\n    <p class=\"refs\"><deck-ref name=\"heart\"></deck-ref> <deck-ref name=\"artie\"></deck-ref></p>\n  </div>\n</div>\n",
+  "say": "A release starts with a person, at the release desk. The desk is a small service, and it speaks HEART, the same as the library: here it is in a browser, as plain HTML, because a HEART service can answer a person too. Its one act: release a pull request. Fill in which one, and send. The desk hands the job to ARTIE, running the kept release script. From here on, ARTIE drives, and every step it takes is something the last answer offered. First stop: the forge, to open the pull request.",
+  "sources": [
+    {
+      "label": "The kept release script (release.heart.yaml)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/merge-watch-release/release.heart.yaml"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "the-desk.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "renewal-prs.json",
+      "title": "Five Pull Requests Change the Policy"
+    },
+    "next": {
+      "href": "two-real-services.json",
+      "title": "Open the Pull Request, on Either Forge"
+    },
+    "alternate": {
+      "href": "the-desk.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "heart",
+        "kind": "part",
+        "label": "HEART",
+        "title": "HEART: one media type, information and controls together",
+        "summary": "Hypermedia Enforced Agentic Reliable Transactions. HAL with HAL Schema Forms, plus a small profile. Every answer carries the resource's data and the forms for the acts its state allows now, each with a method, an address and a JSON Schema; an act that isn't offered can say why (hr:unavailable).",
+        "cite": "HAL Schema Forms, the HEART profile",
+        "_links": {
+          "self": {
+            "href": "../refs/heart.json",
+            "title": "HEART"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/spec/HAL-SCHEMA-FORMS-HR.md",
+            "title": "HAL Schema Forms, the HEART profile"
+          }
+        }
+      },
+      {
+        "name": "artie",
+        "kind": "part",
+        "label": "ARTIE",
+        "title": "ARTIE: the generic client",
+        "summary": "Autonomous Restful Traversal and Interactive Engine. Coupled to HEART and HTTP, and to nothing about any one API, as a browser is to HTML. It enters by a bookmark, checks a kept script's pins against what is offered, sends each act with its If-Match validator, and caches forms and schemas (L2).",
+        "cite": "heart-rise-artie (repository)",
+        "_links": {
+          "self": {
+            "href": "../refs/artie.json",
+            "title": "ARTIE"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/client",
+            "title": "heart-rise-artie (repository)"
+          }
+        }
+      }
+    ]
+  }
+}

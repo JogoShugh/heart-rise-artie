@@ -1,0 +1,21 @@
+{
+  "name": "gherkin-first",
+  "label": "core/gherkin-first.sh (PreToolUse)",
+  "lang": "bash",
+  "path": "bdd-gates: core/gherkin-first.sh",
+  "lines": "1–25",
+  "of": 25,
+  "text": "#!/usr/bin/env bash\n# PreToolUse (Edit|Write|MultiEdit). Blocks a write to production code unless\n# a feature file already has an in-flight change, or the author switched\n# refactor mode on (scripts/refactor-mode). Exit 2 blocks the tool call\n# and sends stderr back to Claude.\nset -o pipefail\n. \"$(dirname \"$0\")/lib.sh\"\n\nfile_path=$(bdd_hook_file_path)\n[ -n \"$file_path\" ] || exit 0\nbdd_has_config || exit 0\nbdd_load\n\nrel=$(bdd_rel \"$file_path\")\nbdd_is_prod \"$rel\" || exit 0\nbdd_features_dirty && exit 0\n# The author switched refactor mode on: pre-commit checks its own terms.\nbdd_refactor_on && exit 0\n\ncat >&2 <<EOF\nBlocked: about to modify production code ($rel) with no feature file change in this changeset yet.\nWrite or update the Gherkin scenario first, run the BDD suite to see it fail, then implement.\nFeature patterns: $(bdd_list featurePatterns | tr '\\n' ' ')\nEOF\nexit 2",
+  "_links": {
+    "self": {
+      "href": "gherkin-first--gherkin-first.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/gherkin-first.sh",
+      "title": "core/gherkin-first.sh, lines 1–25"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

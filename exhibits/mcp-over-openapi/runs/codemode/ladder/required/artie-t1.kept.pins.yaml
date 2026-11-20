@@ -1,0 +1,26 @@
+# What t1.kept.heart.yaml was recorded against, from ../runs/artie/artie-goal-t1-20261102-003323.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed; --guard strict
+# also refuses one offered in a set not recorded for it.
+rung: L2
+digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+forms:
+  staff:hire:
+    integrity: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+    method: POST
+    sets: []
+  staff:update:
+    integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+    method: PUT
+    sets:
+      - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+  staff:search-employees:
+    integrity: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+    method: GET
+    sets: []
+  staff:dismiss:
+    integrity: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+    method: DELETE
+    sets:
+      - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+links:
+  item: ''

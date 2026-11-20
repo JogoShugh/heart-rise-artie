@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Web That Wasn't</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The series' palette: leaf green for right, amber for a note, red for wrong. */
+:root {
+  --bg: #f5f6f3; --surface: #ffffff; --fg: #1b211c; --muted: #58625a; --rule: #d6dcd4;
+  --leaf: #2f7d32; --leaf-bg: #e3f1e2; --hold: #9a5b00; --hold-bg: #fbf1df; --link: #2f5f8f; --code-bg: #eaeee8;
+  --bad: #b3261e; --bad-bg: #fbe4e1;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+    --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+    --bad: #f2a19a; --bad-bg: #3a1d1a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+  --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+  --bad: #f2a19a; --bad-bg: #3a1d1a;
+  color-scheme: dark;
+}
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.7 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--bg); border-bottom: 1px solid var(--rule); }
+.top-in { max-width: 52rem; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-block: 0.55rem; }
+.eyebrow { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.theme { flex: none; font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.theme:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+main { max-width: 52rem; margin: 0 auto; padding-block: 2.5rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.3rem; }
+h1, h2 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.3rem, 7vw, 3.3rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.45rem; margin-top: 1.4rem; }
+h3 { font: 600 1rem/1.4 var(--body); margin: 0; }
+p, li { max-width: 70ch; }
+p { margin: 0; }
+.dek { font-family: var(--display); font-weight: 500; font-size: 1.22rem; line-height: 1.5; color: var(--muted); margin-top: -0.4rem; }
+a { color: var(--link); text-underline-offset: 2px; }
+ul, ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 0.4rem; }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.9rem 1rem; font: 0.78rem/1.6 var(--mono); }
+pre code { background: none; padding: 0; font-size: 1em; overflow-wrap: normal; }
+figure { margin: 0; display: grid; gap: 0.4rem; }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+figcaption { font-size: 0.86rem; color: var(--muted); }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.8rem; }
+.pair > * { min-width: 0; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 36rem; font-size: 0.9rem; line-height: 1.5; }
+th, td { text-align: left; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td.y { background: var(--leaf-bg); color: var(--leaf); font-weight: 600; }
+td.m { background: var(--hold-bg); color: var(--hold); font-weight: 600; }
+td.n { background: var(--bad-bg); color: var(--bad); font-weight: 600; }
+.note { font-size: 0.9rem; color: var(--muted); }
+details.more > summary { cursor: pointer; color: var(--link); font-size: 0.88rem; font-weight: 600; }
+details.more[open] > summary { margin-bottom: 0.5rem; }
+details.more ul { font-size: 0.92rem; line-height: 1.55; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.6rem; }
+.stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.7rem 0.9rem; }
+.stat b { display: block; font: 650 1.5rem/1.2 var(--display); }
+.stat span { font-size: 0.85rem; color: var(--muted); }
+.label { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+blockquote { margin: 0; padding: 0.5rem 0.9rem; border-left: 3px solid var(--rule); color: var(--muted); font-size: 0.95rem; }
+.controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5rem; align-items: center; }
+.controls label { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.controls select { font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.3rem 0.6rem; }
+blockquote.fielding { border-left-color: var(--leaf); color: var(--fg); font: 500 1.08rem/1.55 var(--display); padding: 0.6rem 1rem; }
+blockquote.fielding p + p { margin-top: 0.6rem; }
+.diagram { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.6rem; overflow-x: auto; }
+.diagram pre.mermaid { background: none; padding: 0; margin: 0; max-height: none; font: 0.85rem/1.4 var(--body); text-align: center; }
+details.overheard { background: var(--hold-bg); border-radius: 10px; padding: 0.55rem 0.9rem; display: grid; gap: 0.45rem; }
+details.overheard > summary { cursor: pointer; color: var(--hold); font: 600 0.88rem var(--body); }
+details.overheard > summary small { font-weight: 400; margin-left: 0.3rem; }
+details.overheard .setting { font-size: 0.85rem; color: var(--muted); font-style: italic; }
+details.overheard .setting:empty { display: none; }
+details.overheard .line { font: 500 1rem/1.5 var(--display); }
+.lead { font: 500 1.15rem/1.55 var(--display); }
+.lead b { color: var(--leaf); }
+pre .add { color: var(--leaf); }
+pre .del { color: var(--bad); }
+details[data-level] h3 { margin-top: 0.7rem; }
+details[data-level] h3 small { font-weight: 400; color: var(--muted); }
+blockquote cite { display: block; margin-top: 0.35rem; font: 400 0.85rem var(--body); color: var(--muted); font-style: normal; }
+details[data-level] { border-left: 2px solid var(--rule); padding-left: 0.9rem; display: grid; gap: 0.6rem; }
+details[data-level] > summary { cursor: pointer; color: var(--link); font-size: 0.9rem; font-weight: 600; list-style: none; }
+details[data-level] > summary::-webkit-details-marker { display: none; }
+details[data-level] > summary::before { content: "+"; display: inline-block; width: 1.1rem; font-family: var(--mono); }
+details[data-level][open] > summary::before { content: "\2212"; }
+details[data-level] > summary small { font-weight: 400; color: var(--muted); margin-left: 0.35rem; }
+details[data-level="3"] { border-left-style: dotted; }
+details[data-level] ul { font-size: 0.93rem; line-height: 1.55; }
+</style>
+</head>
+<body>
+
+<div class="top"><div class="top-in">
+  <span class="eyebrow">HEART · Riverside Public Library · 4 November 2026</span>
+  <div class="controls">
+    <label for="detail">Detail</label>
+    <select id="detail" aria-label="How much detail to show">
+      <option value="1">Summary</option>
+      <option value="2">More</option>
+      <option value="3">Everything</option>
+    </select>
+    <label for="overheard">Overheard</label>
+    <select id="overheard" aria-label="Show or hide the overheard conversations">
+      <option value="closed">Closed</option>
+      <option value="open">Open</option>
+    </select>
+    <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
+  </div>
+</div></div>
+
+<main>
+  <h1>The Web That Wasn't</h1>
+  <p class="dek">One library built twice: as if web pages had never carried forms, and as HEART serves it.</p>
+
+  <details class="overheard"><summary>Overheard <small>1997, the library's help line</small></summary>
+    <p class="setting">The web that wasn't. Ana Torres calls Riverside Public Library from her kitchen; Marcus answers.</p>
+    <p class="line"><b>Ana:</b> I just want to renew <i>The Hobbit</i>. Why am I picking POST from a menu and typing my card number into a box?</p>
+    <p class="line"><b>Marcus:</b> That's how renewing works online. It's all in <code>forms.html</code>.</p>
+    <p class="line"><b>Ana:</b> I typed every bit of it, and it said 409. A hold is waiting. Couldn't it have told me before I typed it all?</p>
+    <p class="line"><b>Marcus:</b> The page doesn't know what you can do. <code>forms.yaml</code> does, for every book alike.</p>
+    <p class="line"><b>Ana:</b> Why can't the page just show me a Renew button when I can, and say why when I can't?</p>
+    <p class="line"><b>Marcus:</b> …Huh.</p>
+  </details>
+  <h2>Information and Controls</h2>
+  <blockquote class="fielding">“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.”<cite>Roy T. Fielding, 2008</cite></blockquote>
+  <p class="lead">Hypermedia as the engine of application state, <b>HATEOAS</b>, is the most followed constraint of all time on the human web, and the least followed on the machine web.</p>
+  <ul>
+    <li><b>The human web:</b> every page you have ever loaded follows it. It carries what you can do, from where you are, now.</li>
+    <li><b>The machine web, JSON over HTTP:</b> the data in one answer, the operations in a document beside it, the same for every state.</li>
+  </ul>
+  <details data-level="2"><summary>Fielding's complaint <small>2008</small></summary>
+    <ul>
+      <li>He named the rule in 2000: hypermedia as the engine of application state.</li>
+      <li>In 2008 he objected to APIs that list their operations up front, and called one of them RPC.</li>
+    </ul>
+    <details data-level="3"><summary>In his words</summary>
+      <blockquote class="fielding"><p>“I am getting frustrated by the number of people calling any HTTP-based interface a REST API. Today’s example is the SocialSite REST API. That is RPC. It screams RPC. There is so much coupling on display that it should be given an X rating.</p>
+      <p>What needs to be done to make the REST architectural style clear on the notion that hypertext is a constraint? In other words, if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period. Is there some broken manual somewhere that needs to be fixed?”</p>
+      <cite>The post’s opening</cite></blockquote>
+      <blockquote class="fielding"><p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API).”</p>
+      <cite>From the same post</cite></blockquote>
+      <p class="note">Roy T. Fielding, <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">“REST APIs must be hypertext-driven”</a>, 20 October 2008; the rule itself, dissertation, 2000, §5.1.5.</p>
+    </details>
+  </details>
+
+  <h2>HEART, in brief</h2>
+  <p>HTTP services that answer the way web pages do: each answer carries its state and the controls that state allows. ARTIE is its generic client, as a browser is HTML's.</p>
+  <details data-level="2"><summary>How it works, and the loop it shares with the human web</summary>
+    <ul>
+      <li><b>One declaration, every reader:</b> a service declares its acts, what each state offers, and why an act is absent; heart-core serves it as HTML, HAL-FORMS, HAL Schema Forms and an OpenAPI twin.</li>
+      <li><b>The human web's loop is look, think, act.</b> ARTIE's is the same loop by other names: sync, reason, act.</li>
+    </ul>
+    <div class="pair" style="grid-template-columns: minmax(0, 1fr)">
+      <div class="diagram"><pre class="mermaid">
+flowchart LR
+  D["Declaration: acts, offers by state, why absent"] --> C{{"heart-core"}}
+  C --> H["HTML: a person in a browser"]
+  C --> F["HAL-FORMS"]
+  C --> S["HAL Schema Forms: ARTIE"]
+  C --> O["OpenAPI twin"]
+</pre></div>
+      <div class="diagram"><pre class="mermaid">
+flowchart LR
+  L(["Look / Sync"]) --> T{{"Think / Reason"}}
+  T --> A["Act / Act"]
+  A -- "the next page, or a refusal" --> L
+</pre></div>
+    </div>
+    <div class="table-scroll"><table>
+      <thead><tr><th>The human web</th><th>ARTIE</th></tr></thead>
+      <tbody>
+        <tr><td><b>Look:</b> read the page</td><td><b>Sync:</b> read the state and the controls offered now, with its ETag</td></tr>
+        <tr><td><b>Think:</b> choose what to press</td><td><b>Reason:</b> choose among the offered controls: the model once, or a kept script with none</td></tr>
+        <tr><td><b>Act:</b> press it</td><td><b>Act:</b> send the form, with If-Match; the answer is the next state</td></tr>
+      </tbody>
+    </table></div>
+    <details data-level="3"><summary>Rungs, profile, and APIs you don't own</summary>
+      <ul>
+        <li><b>Rungs:</b> at L0 the forms and their schemas are inside each answer; at L2 they are linked, one set per state, shared by every resource in it and checked by integrity.</li>
+        <li><b>Profile:</b> each relation, such as <code>library:renew</code>, is named and described once, in an ALPS document the answers link to.</li>
+        <li><b>Refusals:</b> an act not offered is refused 409, a stale one 412, a body that doesn't fit its form 422, each with the reason.</li>
+        <li><b>APIs you don't own:</b> the HEART gateway serves an OpenAPI service as HEART, with your own controls in front.</li>
+        <li><b>More:</b> <a href="https://jogoshugh.github.io/heart-rise-artie/reports/architecture/">HEART Architecture</a>, ten diagrams of what is built.</li>
+      </ul>
+    </details>
+  </details>
+
+  <h2>The same moment, two webs</h2>
+  <div class="pair" style="grid-template-columns: minmax(0, 1fr)">
+    <figure><span class="label">The web that wasn't</span><img src="media/renew-409.png" alt="A renewal typed by hand and sent, answered 409 Conflict: a hold is waiting." loading="lazy"><figcaption>Renew sent by hand; refused after.</figcaption></figure>
+    <figure><span class="label">The web as it is</span><img src="media/hobbit-greyed.png" alt="The Hobbit's page: Renew greyed with the reason, Return offered." loading="lazy"><figcaption>Renew greyed; the page says why first.</figcaption></figure>
+  </div>
+  <ul>
+    <li><b>Same library, same rules:</b> Ana Torres's three books; renew is refused while a hold is waiting or after three renewals.</li>
+    <li><b>The web that wasn't:</b> a document of every address, pages of numbers, a POST typed by hand.</li>
+    <li><b>The web as it is:</b> each page carries the controls its state allows, to a person or an agent.</li>
+  </ul>
+
+  <h2>The web that wasn't</h2>
+  <p>Imagine the equivalent of YAML existed in 1997, and the equivalent of OpenAPI was made then, named <code>forms.yaml</code>. Pages never got forms of their own.</p>
+  <figure><img src="media/web-that-wasnt.gif" alt="WebWalker opens the site's forms.yaml, forms.html made from it, Ana's loans as numbers, and a renewal refused with 409." loading="lazy"><figcaption>Perl and CGI.pm, the site's <code>forms.yaml</code>; WebWalker, a browser with a method menu and a body box.</figcaption></figure>
+  <details data-level="2"><summary>How it works</summary>
+    <ul>
+      <li>The site publishes <code>forms.yaml</code>; <code>forms.cgi</code> reads it with <code>YAML::XS</code> and writes <code>forms.html</code>, the page people browse it by.</li>
+      <li><code>library.cgi</code> answers with data only, and reads each POST's body through CGI.pm's <code>param()</code>.</li>
+    </ul>
+    <div class="pair">
+      <figure><img src="media/forms-yaml.png" alt="The site's forms.yaml shown in WebWalker." loading="lazy"><figcaption><code>forms.yaml</code></figcaption></figure>
+      <figure><img src="media/forms-html.png" alt="forms.html: Renew a loan, POST, its address and body." loading="lazy"><figcaption><code>forms.html</code>, from it</figcaption></figure>
+    </div>
+    <figure><img src="media/loans-data.png" alt="Ana's loans as a table of numbers." loading="lazy"><figcaption>Her loans: numbers to copy</figcaption></figure>
+    <details data-level="3"><summary>forms.yaml, and the POST by hand</summary>
+<pre><code>/loans/{loanId}/renew:
+  post:
+    operationId: renewLoan
+    summary: Renew a loan
+    description: Only while it is renewed fewer than three times and no one's hold is waiting.
+    requestBody:
+      content:
+        application/x-www-form-urlencoded:
+          schema: { $ref: '#/components/schemas/Member' }   # card, pin
+    responses:
+      '200': { description: 'renewed: due three weeks later' }
+      '409': { description: it cannot be renewed (the answer says why) }
+      '401': { description: wrong card number or PIN }</code></pre>
+<pre><code>curl -X POST -d 'card=…&amp;pin=…' http://localhost:8150/cgi-bin/library.cgi/loans/3310/renew
+HTTP/1.1 409 Conflict
+Cannot renew. A hold is waiting for this book, so it can't be renewed.</code></pre>
+      <p class="note">Apache 2.4, mod_cgid, CGI.pm, in Docker: <code>exhibits/the-web-that-wasnt/perl</code>.</p>
+    </details>
+  </details>
+
+  <h2>The web as it is</h2>
+  <details class="overheard"><summary>Overheard <small>today, Ana's kitchen</small></summary>
+    <p class="setting">The web we got. Ana renews from her phone.</p>
+    <p class="line"><b>Ana:</b> There's a Renew button on <i>Matilda</i>. On <i>The Hobbit</i> it's grey, and it says a hold is waiting.</p>
+    <p class="line"><b>Marcus:</b> The page only offers what the book can do now. Nobody types POST.</p>
+  </details>
+
+  <figure><img src="media/heart-html.gif" alt="Ana opens her account, renews Matilda, then finds The Hobbit's Renew greyed with the reason." loading="lazy"><figcaption>HEART's HTML, from one declaration: Ana renews <i>Matilda</i>; <i>The Hobbit</i> says why not.</figcaption></figure>
+  <details data-level="2"><summary>Stills</summary>
+    <div class="pair">
+      <figure><img src="media/account.png" alt="Ana's account, linking her three books." loading="lazy"><figcaption>Her account</figcaption></figure>
+      <figure><img src="media/matilda-offers.png" alt="Matilda with Renew and Return." loading="lazy"><figcaption><i>Matilda</i></figcaption></figure>
+    </div>
+    <details data-level="3"><summary>The same loan as HAL-FORMS</summary>
+<pre><code>GET /loans/3310   Accept: application/prs.hal-forms+json
+
+"standing": "hold waiting",
+"_templates": {
+  "return": { "method": "POST", "target": "/loans/3310/actions/return" }
+}</code></pre>
+      <p class="note">The library: <code>heart/heart-sims</code>, declared once for heart-core; 26 scenarios in <code>library.feature</code>.</p>
+    </details>
+  </details>
+
+  <h2>The same document, then and now</h2>
+  <details class="overheard"><summary>Overheard <small>today, the library's IT office</small></summary>
+    <p class="setting">Priya builds the library's API; Sam builds the assistant that renews books for members.</p>
+    <p class="line"><b>Priya:</b> Our loans API is JSON over HTTP, with a full OpenAPI description.</p>
+    <p class="line"><b>Sam:</b> So my agent reads every operation, sends a renew for <i>The Hobbit</i>, and gets a 409.</p>
+    <p class="line"><b>Priya:</b> Renew is listed for every loan. It has to be.</p>
+    <p class="line"><b>Sam:</b> That's <code>forms.yaml</code>. We gave people better than that in 1997.</p>
+  </details>
+
+  <div class="pair">
+    <div><span class="label">1997: the Perl site's forms.yaml</span>
+<pre><code>/loans/{loanId}/renew:
+  post:
+    summary: Renew a loan
+    description: Only while it is renewed
+      fewer than three times and no one's
+      hold is waiting.
+    responses:
+      '200': renewed
+      '409': it cannot be renewed</code></pre></div>
+    <div><span class="label">2026: heart-core's OpenAPI twin</span>
+<pre><code>/loans/{id}/actions/renew:
+  post:
+    description: Offered while the book is out,
+      renewed fewer than three times, and
+      no one's hold is waiting.
+    requestBody: { $ref: Renew }
+    responses:
+      '200': The loan after the act
+      '409': NotOffered</code></pre></div>
+  </div>
+  <p class="note">Both list renew for every loan, always; <code>forms.yaml</code> is the OpenAPI of the web that wasn't, and <code>forms.html</code> its Swagger UI. Whether this loan can be renewed now, each says only after the call.</p>
+
+  <h2>One loan, every client</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th><i>The Hobbit</i>, read from</th><th>Renew</th><th>Why not</th></tr></thead>
+    <tbody>
+      <tr><th>HTML, a person</th><td class="m">greyed</td><td>beside the button</td></tr>
+      <tr><th>HAL-FORMS</th><td class="m">absent</td><td>not in HAL-FORMS</td></tr>
+      <tr><th>HAL Schema Forms, an agent</th><td class="m">absent</td><td>linked: <code>hr:unavailable</code></td></tr>
+      <tr><th>OpenAPI</th><td class="n">listed, as always</td><td>409 after the call</td></tr>
+      <tr><th><code>forms.yaml</code>, the web that wasn't</th><td class="n">listed, as always</td><td>409 after sending</td></tr>
+    </tbody>
+  </table></div>
+  <details data-level="2"><summary>What an agent reads</summary>
+<pre><code>GET /loans/3310   Accept: application/hal+json (HAL Schema Forms)
+
+"standing": "hold waiting",
+"_links": { "hr:unavailable": { "href": "/unavailable/61bc1cd6003e61f0" } },
+"_forms": {
+  "library:return": { "method": "POST", "_links": { "target": { "href": "/loans/3310/actions/return" } } }
+}</code></pre>
+    <details data-level="3"><summary>Why renew is absent, as served</summary>
+<pre><code>GET /unavailable/61bc1cd6003e61f0
+
+{ "unavailable": [ {
+    "rel": "/profiles/library#renew",
+    "title": "Renew",
+    "reason": "A hold is waiting for this book, so it can't be renewed."
+} ] }</code></pre>
+      <p class="note">The same document for every loan in the same state.</p>
+    </details>
+  </details>
+
+  <h2>Adding the controls back, step by step</h2>
+  <details class="overheard"><summary>Overheard <small>the same office, an hour later</small></summary>
+    <p class="setting"></p>
+    <p class="line"><b>Priya:</b> What would it take to give the API what Ana's page has?</p>
+    <p class="line"><b>Sam:</b> Links, forms, forms by state, why absent, a version tag. The page already does all of it.</p>
+    <p class="line"><b>Priya:</b> So the API answers like the page does.</p>
+  </details>
+
+  <p>A loan as JSON over HTTP, given back what Ana's page gives her: data, then the controls with it.</p>
+  <ol>
+    <li><b>The answer links itself</b> and names its vocabulary.</li>
+    <li><b>The acts arrive as forms:</b> where to send, how, and what to put in.</li>
+    <li><b>The forms follow the state:</b> only what this loan can do now.</li>
+    <li><b>What's absent says why.</b></li>
+    <li><b>A version tag guards the act:</b> stale is refused.</li>
+    <li><b>One form set per state,</b> shared by every loan in it.</li>
+  </ol>
+  <details data-level="2"><summary>The wire, step by step</summary>
+    <h3>Before · JSON over HTTP</h3>
+<pre><code>GET /loans/3310   Accept: application/json
+
+{ "id": 3310, "title": "The Hobbit", "author": "J. R. R. Tolkien",
+  "due": "2026-11-12", "renewals": 0, "standing": "hold waiting" }</code></pre>
+    <p class="note">Data only. What can be done is in the OpenAPI document, for every loan alike.</p>
+    <h3>1 · The answer links itself and names its vocabulary</h3>
+<pre><code><span class="add">+ "_links": {
++   "self": { "href": "/loans/3310" },
++   "curies": [ { "name": "library", "href": "/profiles/library#{rel}", "templated": true } ]
++ }</span></code></pre>
+    <p class="note">Each relation, such as <code>library:renew</code>, is defined once, in the library's profile.</p>
+    <h3>2 · The acts arrive as forms <small>(Matilda)</small></h3>
+<pre><code><span class="add">+ "_forms": {
++   "library:renew": {
++     "title": "Renew",
++     "_links": { "target": { "href": "/loans/3311/actions/renew" } },
++     "method": "POST",
++     "contentType": "application/json",
++     "schema": { "type": "object", "properties": {} }
++   },
++   "library:return": { … }
++ }</span></code></pre>
+    <h3>3 · The forms follow the state <small>(The Hobbit)</small></h3>
+<pre><code>  "standing": "hold waiting",
+  "_forms": {
+<span class="del">-   "library:renew": { … },</span>
+    "library:return": { … }
+  }</code></pre>
+    <p class="note">The server offers only what this loan can do now. A client acts on what is there, with no rule of its own.</p>
+    <h3>4 · What's absent says why</h3>
+<pre><code><span class="add">+ "hr:unavailable": { "href": "/unavailable/61bc1cd6003e61f0" }</span>
+
+GET /unavailable/61bc1cd6003e61f0
+{ "unavailable": [ { "rel": "/profiles/library#renew", "title": "Renew",
+    "reason": "A hold is waiting for this book, so it can't be renewed." } ] }</code></pre>
+    <p class="note">A person sees it beside the greyed button; an agent reads it as data.</p>
+    <h3>5 · A version tag guards the act</h3>
+<pre><code>ETag: "seq-1.hsf.L0.d96396fb7e046607"
+
+POST /loans/3311/actions/renew   If-Match: "seq-0.stale"
+412 Precondition Failed   The act is stale: the state has changed</code></pre>
+    <h3>6 · One form set per state, shared <small>(L2)</small></h3>
+<pre><code><span class="del">- "_forms": { … },</span>
+<span class="add">+ "hr:forms": { "href": "/affordance-sets/31a5b6105822d925",
++               "integrity": "sha256-MaW2EFgi2SXHXtDeNNqfRqaPpMhuPfrUB/RV+oPsfQ8=" }</span></code></pre>
+    <p class="note">Every loan with a hold waiting links the same set: fetched once, checked by its integrity.</p>
+    <details data-level="3"><summary>What the library declares, step by step</summary>
+<pre><code>// 1 · its vocabulary
+Profile(name = "library", relations = listOf(Relation("renew", AlpsType.UNSAFE, "Renew", …), …))
+
+// 2 · its acts
+acts = listOf(Act("renew", "renew", NO_INPUT), Act("return", "return", NO_INPUT))
+
+// 3 · what each state offers
+keyOf = { it.standing }
+offered = { standing -> when (standing) {
+    RENEWABLE -> listOf("renew", "return")
+    RETURNED -> emptyList()
+    else -> listOf("return")
+} }
+
+// 4 · why, when it doesn't
+whyAbsent = { standing, _ -> WHY.getValue(standing) }   // ON_HOLD: "A hold is waiting for this book, …"
+
+// 5 · the version every act is checked against
+versionOf = { it.version }
+
+// 6 · nothing to declare: the client asks for L2 with Prefer: forms=link</code></pre>
+      <p class="note">heart-core writes the wire from it: the HTML, both JSON dialects, the profile and the OpenAPI twin. For an API you don't own, the HEART gateway does the same from its OpenAPI description: <a href="https://jogoshugh.github.io/heart-rise-artie/reports/take-heart/">Take HEART</a>; for a GitHub pull request, step by step: <a href="https://jogoshugh.github.io/heart-rise-artie/reports/information-and-controls/">Information and Controls</a>.</p>
+    </details>
+  </details>
+
+  <h2>An agent: ARTIE with Claude</h2>
+  <details class="overheard"><summary>Overheard <small>the next week</small></summary>
+    <p class="setting"></p>
+    <p class="line"><b>Sam:</b> The agent found the way once, ten model calls. Every run since uses none.</p>
+    <p class="line"><b>Ana:</b> When the hold on <i>The Hobbit</i> clears, will it renew it?</p>
+    <p class="line"><b>Sam:</b> If the library offers renew then, yes. It acts on what's offered.</p>
+  </details>
+
+<pre><code>Renew each of Ana's books that can be renewed, and say why for any that can't.
+
+- Look up Ana's account by her library card number {card}
+  - For each book she has out: renew it if renewing is offered; otherwise say why it can't be renewed</code></pre>
+  <div class="stats">
+    <div class="stat"><b>10</b><span>model calls, once, to find the way</span></div>
+    <div class="stat"><b>0</b><span>model calls each run after</span></div>
+  </div>
+  <p>It renewed <i>Matilda</i>, and said of the others:</p>
+  <blockquote>The Hobbit offers no renew form (standing: hold waiting, so another patron has a hold).</blockquote>
+  <blockquote>Charlotte's Web can't be renewed (renewed the most allowed, 3 renewals).</blockquote>
+  <details data-level="2"><summary>The kept script</summary>
+<pre><code>steps:
+  - act: library:get-account
+    fields:
+      id: ${card}
+    then:
+      - whenever:
+          - when-offered:
+              - act: library:renew</code></pre>
+    <ul>
+      <li>Kept by <code>artie generate</code> from the run: every book the account links, renewed when it offers renew, with no model.</li>
+    </ul>
+    <details data-level="3"><summary>In full: the script, its pins, the run</summary>
+<pre><code>inputs:
+  card:
+    type: integer
+
+steps:
+  - act: library:get-account
+    fields:
+      id: ${card}
+    intent: Look up Ana's account by her library card number ${card}
+    then:
+      - whenever:
+          - when-offered:
+              - act: library:renew
+                inferred: renew this book (Matilda)
+                from-intent: "For each book she has out: renew it if renewing is offered; otherwise say why it can't be renewed"
+                then: []
+            intent: "For each book she has out: renew it if renewing is offered; otherwise say why it can't be renewed"
+            otherwise:
+              - note: none of these acts is offered here</code></pre>
+<pre><code># renew.pins.yaml: held to before every act
+library:renew:
+  integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+  method: POST</code></pre>
+      <ul>
+        <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2; 10 calls; 25,192 input tokens (7,332 sent, 16,074 read from cache, 1,786 written to it); 1,684 output.</li>
+        <li><b>Each run after:</b> 11 steps, no model.</li>
+        <li><b>Sources:</b> <code>exhibits/the-web-that-wasnt/artie</code>: the goal, its trace and run report, the kept script and its pins.</li>
+      </ul>
+    </details>
+  </details>
+</main>
+
+<!-- pages-only: on GitHub Pages the diagrams are drawn by Mermaid; an artifact draws them itself. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var dark = root.dataset.theme === 'dark' ||
+    (root.dataset.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+  mermaid.initialize({ startOnLoad: false, theme: dark ? 'dark' : 'neutral', securityLevel: 'strict',
+    fontFamily: 'IBM Plex Sans, system-ui, sans-serif', flowchart: { useMaxWidth: true } });
+  // Each diagram is drawn once its section is open, so it is laid out at its real size.
+  function draw() { mermaid.run({ querySelector: 'details[open] pre.mermaid:not([data-processed])' }); }
+  document.querySelectorAll('details').forEach(function (d) { d.addEventListener('toggle', draw); });
+  window.addEventListener('load', draw);
+})();
+</script>
+<!-- /pages-only -->
+<script>
+// How much of the page is open: Summary, More (each section's first drill-down) or Everything. Kept in this
+// browser where it can be.
+(function () {
+  var select = document.getElementById('detail'), key = 'heart-report-detail';
+  function apply(level) {
+    document.querySelectorAll('details[data-level]').forEach(function (d) { d.open = Number(d.dataset.level) <= level; });
+  }
+  try { var kept = localStorage.getItem(key); if (kept) select.value = kept; } catch (e) {}
+  apply(Number(select.value));
+  select.addEventListener('change', function () {
+    apply(Number(select.value));
+    try { localStorage.setItem(key, select.value); } catch (e) {}
+  });
+})();
+</script>
+<script>
+// The overheard conversations, closed or open together, apart from the Detail levels; kept where it can be.
+(function () {
+  var select = document.getElementById('overheard'), key = 'heart-report-overheard';
+  function apply() { document.querySelectorAll('details.overheard').forEach(function (d) { d.open = select.value === 'open'; }); }
+  try { var kept = localStorage.getItem(key); if (kept) select.value = kept; } catch (e) {}
+  apply();
+  select.addEventListener('change', function () { apply(); try { localStorage.setItem(key, select.value); } catch (e) {} });
+})();
+</script>
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+})();
+</script>
+</body>
+</html>

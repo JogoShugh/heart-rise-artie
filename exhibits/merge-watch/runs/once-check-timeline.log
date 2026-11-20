@@ -1,0 +1,12 @@
+06:48:46 start
+1 send GET https://api.github.com/repos/JogoShugh/heart-github-test/branches/deps-main: done
+2 send POST https://api.github.com/repos/JogoShugh/heart-github-test/git/refs: done
+3 send GET https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-401.txt?ref=deps/left-pad-4.0.1-1026-065119: refused
+4 send PUT https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-401.txt: done
+5 send POST https://api.github.com/repos/JogoShugh/heart-github-test/pulls: done
+6 send POST https://api.github.com/repos/JogoShugh/heart-github-test/issues/820/labels: done
+finished, 6 steps
+06:51:23 unwatched bump 4.0.1 opened
+1 send PATCH https://api.github.com/repos/JogoShugh/heart-github-test/issues/819: done
+finished, 1 steps
+06:54:28 watch issue 819 closed

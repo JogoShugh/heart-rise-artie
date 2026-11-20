@@ -1,0 +1,12 @@
+Status: 200 OK
+Content-Type: text/html; charset=ISO-8859-1
+
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	 "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>Riverside Public Library -- Your loans</title>
+</head>
+<body bgcolor="#FFFFFF">
+<h2>Your loans</h2><table border="1" cellpadding="4"><tr><th>Loan</th> <th>Title</th> <th>Due</th> <th></th></tr> <tr><td>3310</td> <td>The Hobbit</td> <td>1997-11-12</td> <td><i>A hold is waiting for this book, so it can't be renewed.</i> <form method="post" action="/cgi-bin/library.cgi/loans/3310/return" enctype="application/x-www-form-urlencoded"><input type="hidden" name="card" value="21000451" ><input type="hidden" name="pin" value="1234" ><input type="submit" name=".submit" value="Return" ></form></td></tr> <tr><td>3311</td> <td>Matilda</td> <td>1997-11-12</td> <td><form method="post" action="/cgi-bin/library.cgi/loans/3311/renew" enctype="application/x-www-form-urlencoded"><input type="hidden" name="card" value="21000451" ><input type="hidden" name="pin" value="1234" ><input type="submit" name=".submit" value="Renew" ></form> <form method="post" action="/cgi-bin/library.cgi/loans/3311/return" enctype="application/x-www-form-urlencoded"><input type="hidden" name="card" value="21000451" ><input type="hidden" name="pin" value="1234" ><input type="submit" name=".submit" value="Return" ></form></td></tr> <tr><td>3312</td> <td>Charlotte&#39;s Web</td> <td>1997-11-12</td> <td><i>It has been renewed 3 times, the most allowed.</i> <form method="post" action="/cgi-bin/library.cgi/loans/3312/return" enctype="application/x-www-form-urlencoded"><input type="hidden" name="card" value="21000451" ><input type="hidden" name="pin" value="1234" ><input type="submit" name=".submit" value="Return" ></form></td></tr></table><hr><p><small>Riverside Public Library. 200 OK.</small></p>
+</body>
+</html>

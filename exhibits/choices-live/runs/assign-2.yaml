@@ -1,0 +1,447 @@
+---
+run:
+  inputs:
+    entry:
+      value: http://localhost:8282/
+      given: default
+      default: http://localhost:8282/
+  usage:
+    calls: 4
+    input: 3707
+    output: 495
+    cache_read: 3380
+    cache_write: 0
+---
+at: '2026-10-25T11:22:16.112951Z'
+ms: 42
+mode: script
+say: enter {entry}
+line: 10
+params:
+  entry: http://localhost:8282/
+opens: true
+outcome: done
+address: http://localhost:8282/
+now:
+  state:
+    title: Support tickets
+  forms:
+    - support:search-tickets
+    - support:get-ticket
+    - support:open-ticket
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-25T11:22:16.158836Z'
+ms: 17
+mode: script
+say: act {relation}, id {id}
+line: 11
+within: 10
+params:
+  relation: support:get-ticket
+  id: 1
+values:
+  id:
+    value: 1
+    type: integer
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: support:get-ticket
+  title: Get a ticket by its number
+  method: GET
+  target: /tickets/{id}
+  address: http://localhost:8282/tickets/1
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-oAeR9piy9Af2Pmy5vrnKRvKfPPPhOCRlF9qIWC9voCA=
+offered:
+  forms:
+    - support:get-ticket
+    - support:open-ticket
+    - support:search-tickets
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8282/tickets/1
+now:
+  state:
+    id: 1
+    subject: Cannot log in
+    customer: Dana Reyes
+    description: The login button does nothing.
+    priority: high
+    status: NEW
+    agent: null
+    conversation: []
+  forms:
+    - support:assign
+    - support:comment
+    - support:change-priority
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-10-25T11:22:16.177476Z'
+ms: 3
+mode: script
+say: act {relation}, agent {agent}
+line: 13
+within: 11
+params:
+  relation: support:assign
+  agent: lena
+values:
+  agent:
+    value: lena
+    type: string
+    from:
+      - constant
+chose:
+  kind: form
+  relation: support:assign
+  title: Assign
+  method: POST
+  target: http://localhost:8282/tickets/1/actions/assign
+  address: http://localhost:8282/tickets/1/actions/assign
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-Y4OFd2qV0RousqJTtrcfWaTc78/X0XwbyiOL1MFNa+8=
+  if-match: '"seq-1.hsf.L0.5f600b5b7c6fedc3"'
+offered:
+  forms:
+    - support:assign
+    - support:change-priority
+    - support:comment
+  links:
+    - hr:unavailable
+    - self
+outcome: refused
+address: http://localhost:8282/tickets/1
+refused:
+  kind: not a choice
+  by: the client
+  detail: 'agent: "lena" is not one of the choices'
+---
+at: '2026-10-25T11:22:16.182336Z'
+ms: 1855
+mode: intent
+say: assign this ticket to Lena
+line: 18
+within: 11
+params: {}
+reason:
+  template: assign this ticket to Lena
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":1,"subject":"Cannot log in","customer":"Dana Reyes","description":"The login button does nothing.","priority":"high","status":"NEW","agent":null,"conversation":[]}
+      </state>
+      <offers>
+      {"support:assign":{"title":"Assign","description":"Hands the ticket to an agent, who then works on it.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"agent":{"description":"The agent who works on the ticket Choices: \"priya\" (priya), \"marco\" (marco)","examples":["priya"],"title":"Agent","type":"string","enum":["priya","marco"]}},"required":["agent"],"title":"Assign","type":"object","$id":"/schemas/f545bad95c4d6f45"}},"support:comment":{"title":"Comment","description":"Adds a note to the conversation: internal, or for the customer to read.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"internal":{"description":"True for the desk only; false for the customer to read too","title":"Internal","type":"boolean"},"text":{"description":"The comment","maxLength":2000,"minLength":1,"title":"Text","type":"string"}},"required":["internal","text"],"title":"Comment","type":"object","$id":"/schemas/adc88dab72ecde0c"}},"support:change-priority":{"title":"Change the priority","description":"Makes the ticket more or less urgent.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"priority":{"description":"How urgent the problem is","enum":["low","normal","high","urgent"],"title":"Priority","type":"string"}},"required":["priority"],"title":"Change the priority","type":"object","$id":"/schemas/1eef0a9a7201cf0f"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      assign this ticket to Lena
+      </intent>
+    answered: '[{"type":"text","text":"Lena isn''t one of the agents I can assign this ticket to. The only choices are priya and marco."},{"type":"tool_use","id":"toolu_01WE5XbyHUZqKzKAb4FCXqZq","name":"select","input":{"action":"clarify","question":"Lena isn''t an available agent. Would you like to assign this ticket to priya or marco instead?"},"caller":{"type":"direct"}}]'
+outcome: refused
+address: http://localhost:8282/tickets/1
+refused:
+  kind: unclear to the reasoner
+  by: the client
+  detail: Lena isn't an available agent. Would you like to assign this ticket to priya or marco instead?
+---
+at: '2026-10-25T11:22:18.044264Z'
+ms: 1507
+mode: intent
+say: assign this ticket to Marco
+line: 22
+within: 11
+params:
+  relation: support:assign
+  agent: marco
+values:
+  agent:
+    value: marco
+    type: string
+    from:
+      - paraphrase
+reason:
+  template: assign this ticket to Marco
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":1,"subject":"Cannot log in","customer":"Dana Reyes","description":"The login button does nothing.","priority":"high","status":"NEW","agent":null,"conversation":[]}
+      </state>
+      <offers>
+      {"support:assign":{"title":"Assign","description":"Hands the ticket to an agent, who then works on it.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"agent":{"description":"The agent who works on the ticket Choices: \"priya\" (priya), \"marco\" (marco)","examples":["priya"],"title":"Agent","type":"string","enum":["priya","marco"]}},"required":["agent"],"title":"Assign","type":"object","$id":"/schemas/f545bad95c4d6f45"}},"support:comment":{"title":"Comment","description":"Adds a note to the conversation: internal, or for the customer to read.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"internal":{"description":"True for the desk only; false for the customer to read too","title":"Internal","type":"boolean"},"text":{"description":"The comment","maxLength":2000,"minLength":1,"title":"Text","type":"string"}},"required":["internal","text"],"title":"Comment","type":"object","$id":"/schemas/adc88dab72ecde0c"}},"support:change-priority":{"title":"Change the priority","description":"Makes the ticket more or less urgent.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"priority":{"description":"How urgent the problem is","enum":["low","normal","high","urgent"],"title":"Priority","type":"string"}},"required":["priority"],"title":"Change the priority","type":"object","$id":"/schemas/1eef0a9a7201cf0f"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      assign this ticket to Marco
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_016R9GEXURdTUhoo3JrLZZr5","name":"select","input":{"action":"act","affordance":"support:assign","fields":{"agent":"marco"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: support:assign
+  title: Assign
+  method: POST
+  target: http://localhost:8282/tickets/1/actions/assign
+  address: http://localhost:8282/tickets/1/actions/assign
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-Y4OFd2qV0RousqJTtrcfWaTc78/X0XwbyiOL1MFNa+8=
+  if-match: '"seq-1.hsf.L0.5f600b5b7c6fedc3"'
+offered:
+  forms:
+    - support:assign
+    - support:change-priority
+    - support:comment
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8282/tickets/1
+now:
+  state:
+    id: 1
+    subject: Cannot log in
+    customer: Dana Reyes
+    description: The login button does nothing.
+    priority: high
+    status: ASSIGNED
+    agent: marco
+    conversation: []
+  forms:
+    - support:assign
+    - support:comment
+    - support:ask-customer
+    - support:resolve
+    - support:change-priority
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-10-25T11:22:19.553382Z'
+ms: 43
+mode: script
+say: act {relation}, priority {priority}
+line: 24
+within: 11
+params:
+  relation: support:change-priority
+  priority: urgent
+values:
+  priority:
+    value: urgent
+    type: string
+    from:
+      - constant
+chose:
+  kind: form
+  relation: support:change-priority
+  title: Change the priority
+  method: POST
+  target: http://localhost:8282/tickets/1/actions/change-priority
+  address: http://localhost:8282/tickets/1/actions/change-priority
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-cqNAG1r+IiKSk9gkxsodg6Ce0k+Sg0gl9XgNzBZ6kbs=
+  if-match: '"seq-2.hsf.L0.9f5799e1c81a4bd0"'
+offered:
+  forms:
+    - support:ask-customer
+    - support:assign
+    - support:change-priority
+    - support:comment
+    - support:resolve
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8282/tickets/1
+now:
+  state:
+    id: 1
+    subject: Cannot log in
+    customer: Dana Reyes
+    description: The login button does nothing.
+    priority: urgent
+    status: ASSIGNED
+    agent: marco
+    conversation: []
+  forms:
+    - support:assign
+    - support:comment
+    - support:ask-customer
+    - support:resolve
+    - support:change-priority
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-10-25T11:22:19.597542Z'
+ms: 2631
+mode: intent
+say: give this ticket to Tom
+line: 26
+within: 11
+params: {}
+reason:
+  template: give this ticket to Tom
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":1,"subject":"Cannot log in","customer":"Dana Reyes","description":"The login button does nothing.","priority":"urgent","status":"ASSIGNED","agent":"marco","conversation":[]}
+      </state>
+      <offers>
+      {"support:assign":{"title":"Assign","description":"Hands the ticket to an agent, who then works on it.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"agent":{"description":"The agent who works on the ticket Choices: \"priya\" (priya)","examples":["priya"],"title":"Agent","type":"string","enum":["priya"]}},"required":["agent"],"title":"Assign","type":"object","$id":"/schemas/f545bad95c4d6f45"}},"support:comment":{"title":"Comment","description":"Adds a note to the conversation: internal, or for the customer to read.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"internal":{"description":"True for the desk only; false for the customer to read too","title":"Internal","type":"boolean"},"text":{"description":"The comment","maxLength":2000,"minLength":1,"title":"Text","type":"string"}},"required":["internal","text"],"title":"Comment","type":"object","$id":"/schemas/adc88dab72ecde0c"}},"support:ask-customer":{"title":"Ask the customer","description":"Puts a question to the customer and waits for their reply.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"question":{"description":"What the customer is asked","examples":["Which browser?"],"maxLength":2000,"minLength":1,"title":"Question","type":"string"}},"required":["question"],"title":"Ask the customer","type":"object","$id":"/schemas/f2482b4390364063"}},"support:resolve":{"title":"Resolve","description":"Says how the problem was solved.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"resolution":{"description":"How the problem was solved","maxLength":2000,"minLength":1,"title":"Resolution","type":"string"}},"required":["resolution"],"title":"Resolve","type":"object","$id":"/schemas/5c5a75ffbfdf1238"}},"support:change-priority":{"title":"Change the priority","description":"Makes the ticket more or less urgent.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"priority":{"description":"How urgent the problem is","enum":["low","normal","high","urgent"],"title":"Priority","type":"string"}},"required":["priority"],"title":"Change the priority","type":"object","$id":"/schemas/1eef0a9a7201cf0f"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      give this ticket to Tom
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQS2AUKEAgTGAI4AUIIdGhpbmtpbmcSDN8tFkefRLXikwWiKBoMxRRNWZesnGzG3QCBIjCn8ueO7kgUH4H7+yt0sFoNG6gZ+navW+2GJphLrQOZfrKcEn2nNjBnSOuidNF8rbwq9QS4k/Uz/yWuiDYx8EBfV2/nvomlo1Y3w2UjYIFNpvTY7QqIeLzEOU34l18dnf5AOPk/yGn0VSnPs7jd19imdwdjN4zfuimEfnPHGM2LwT6qRboiu9xxNgNzH0GdKOZwy6tqolytAS8PqSwJY/kOuap9lsqMINtsRXxf1Sftm31fQUAI/oR+siPTIGTVUFTNCRqJ1C8YwhTk3ukh9ELnoOEtvZ0t0XwJSOy1eyJ6zs4HCq7YhQRdhstWr5oH9IEYtZGym2jjCGh8QqgJTka7OEOMs1H65usjYno48xcA6dkisbNR6Rh85eGg2nnUFhIxiM9R6pBkMy3V6txva6Lp6ltfY7BkpdhA5ap8wGe0T984KnFCc/tD7CG40hCCfjud8P2zH1MlUEzxzlNUY3ADmKH9QAFAXCk1uIYwOIgIDQIKwLwLdr1i0iS72RYCxRaLacmDIS80+dJOg3WhGwN5JJhwUVnqAATzf3kxBoXXvmTfegzJWfEDqwE+Ij2dfjsZMLeozr430pQJWb5nh44W9gZyA796BvZhX9Cz7Dtdp7R642AJAczvbExjJ7NQeAoPkciSQgMxo2UhUiSufyznB9CRtCdMWJDFT9XasOEJlt+ddeC4p1bvhDw7S+4MmVXQFnCqs5QV7nt7HiIIKKdZZM08485HI/EzAULnph3nDiYD37rkZK5bjsFVCkIX5Wjgw5vMh27zkxMPNMcdqGNkkBdvZxLW8TYZscYDocis0rmCiva/DR2zub7/BQXuLS+i7QctpB8LRSFcjtyylPJnYFbWQB4VyKhn3LmWI0IWoLMjQIPTeXpXEmSeiVBAfz3ElvFVTxIeHhgB"},{"type":"tool_use","id":"toolu_017K41KT83n6WgSz6my9ThV4","name":"select","input":{"action":"clarify","question":"Tom isn''t available as an agent for this ticket. The only agent I can assign it to is priya. Do you want to assign it to priya instead?"},"caller":{"type":"direct"}}]'
+outcome: refused
+address: http://localhost:8282/tickets/1
+refused:
+  kind: unclear to the reasoner
+  by: the client
+  detail: Tom isn't available as an agent for this ticket. The only agent I can assign it to is priya. Do you want to assign it to priya instead?
+---
+at: '2026-10-25T11:22:22.230463Z'
+ms: 1309
+mode: intent
+say: reassign this urgent ticket to Priya
+line: 30
+within: 11
+params:
+  relation: support:assign
+  agent: priya
+values:
+  agent:
+    value: priya
+    type: string
+    from:
+      - paraphrase
+reason:
+  template: reassign this urgent ticket to Priya
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":1,"subject":"Cannot log in","customer":"Dana Reyes","description":"The login button does nothing.","priority":"urgent","status":"ASSIGNED","agent":"marco","conversation":[]}
+      </state>
+      <offers>
+      {"support:assign":{"title":"Assign","description":"Hands the ticket to an agent, who then works on it.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"agent":{"description":"The agent who works on the ticket Choices: \"priya\" (priya)","examples":["priya"],"title":"Agent","type":"string","enum":["priya"]}},"required":["agent"],"title":"Assign","type":"object","$id":"/schemas/f545bad95c4d6f45"}},"support:comment":{"title":"Comment","description":"Adds a note to the conversation: internal, or for the customer to read.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"internal":{"description":"True for the desk only; false for the customer to read too","title":"Internal","type":"boolean"},"text":{"description":"The comment","maxLength":2000,"minLength":1,"title":"Text","type":"string"}},"required":["internal","text"],"title":"Comment","type":"object","$id":"/schemas/adc88dab72ecde0c"}},"support:ask-customer":{"title":"Ask the customer","description":"Puts a question to the customer and waits for their reply.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"question":{"description":"What the customer is asked","examples":["Which browser?"],"maxLength":2000,"minLength":1,"title":"Question","type":"string"}},"required":["question"],"title":"Ask the customer","type":"object","$id":"/schemas/f2482b4390364063"}},"support:resolve":{"title":"Resolve","description":"Says how the problem was solved.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"resolution":{"description":"How the problem was solved","maxLength":2000,"minLength":1,"title":"Resolution","type":"string"}},"required":["resolution"],"title":"Resolve","type":"object","$id":"/schemas/5c5a75ffbfdf1238"}},"support:change-priority":{"title":"Change the priority","description":"Makes the ticket more or less urgent.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"priority":{"description":"How urgent the problem is","enum":["low","normal","high","urgent"],"title":"Priority","type":"string"}},"required":["priority"],"title":"Change the priority","type":"object","$id":"/schemas/1eef0a9a7201cf0f"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      reassign this urgent ticket to Priya
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_017fMEh9c7rHT4km47VEEax6","name":"select","input":{"action":"act","affordance":"support:assign","fields":{"agent":"priya"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: support:assign
+  title: Assign
+  method: POST
+  target: http://localhost:8282/tickets/1/actions/assign
+  address: http://localhost:8282/tickets/1/actions/assign
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-Y4OFd2qV0RousqJTtrcfWaTc78/X0XwbyiOL1MFNa+8=
+  if-match: '"seq-3.hsf.L0.de5724bb50717be3"'
+offered:
+  forms:
+    - support:ask-customer
+    - support:assign
+    - support:change-priority
+    - support:comment
+    - support:resolve
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8282/tickets/1
+now:
+  state:
+    id: 1
+    subject: Cannot log in
+    customer: Dana Reyes
+    description: The login button does nothing.
+    priority: urgent
+    status: ASSIGNED
+    agent: priya
+    conversation: []
+  forms:
+    - support:assign
+    - support:comment
+    - support:ask-customer
+    - support:resolve
+    - support:change-priority
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-10-25T11:22:23.541654Z'
+ms: 3
+mode: script
+say: return to {address}
+line: 11
+within: 10
+params:
+  address: http://localhost:8282/
+outcome: done
+address: http://localhost:8282/
+now:
+  state:
+    title: Support tickets
+  forms:
+    - support:search-tickets
+    - support:get-ticket
+    - support:open-ticket
+  links:
+    self:
+      - null
+    service-desc:
+      - null

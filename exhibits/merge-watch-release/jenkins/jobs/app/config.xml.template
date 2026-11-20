@@ -1,0 +1,107 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <description>Builds Riverside Public Library at a commit, deploys it as the preview on PREVIEW_PORT, and archives its smoke script. Every start and finish is posted to the release wrapper (Notification plugin).</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification">
+      <endpoints>
+        <com.tikal.hudson.plugins.notification.Endpoint>
+          <protocol>HTTP</protocol>
+          <format>JSON</format>
+          <urlInfo>
+            <urlOrId>@@HOOK_URL@@</urlOrId>
+            <urlType>PUBLIC</urlType>
+          </urlInfo>
+          <event>all</event>
+          <branch>.*</branch>
+          <timeout>30000</timeout>
+          <loglines>0</loglines>
+          <retries>2</retries>
+        </com.tikal.hudson.plugins.notification.Endpoint>
+      </endpoints>
+    </com.tikal.hudson.plugins.notification.HudsonNotificationProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>SHA</name>
+          <description>The commit to build: the merged one.</description>
+          <trim>true</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>RELEASE_BUILD</name>
+          <description>The wrapper's number for this build, echoed in each notification.</description>
+          <trim>true</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>PREVIEW_PORT</name>
+          <defaultValue>8180</defaultValue>
+          <trim>true</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/sh
+set -eu
+echo "== checkout $SHA"
+rm -rf src
+git clone -q /repos/library-app src
+# A commit merged on GitLab is only there: fetch its branches when the local repository hasn't the commit.
+if ! git -C src cat-file -e "$SHA^{commit}" 2>/dev/null; then
+  echo "== $SHA is not in the local repository: fetching from GitLab"
+  git -C src fetch -q "http://host.docker.internal:8929/acme/web.git" '+refs/heads/*:refs/remotes/gitlab/*' || true
+fi
+# One merged on real GitHub is on its library/ branches there.
+if ! git -C src cat-file -e "$SHA^{commit}" 2>/dev/null; then
+  echo "== $SHA is not on GitLab either: fetching from GitHub"
+  git -C src fetch -q "https://github.com/JogoShugh/heart-github-test.git" '+refs/heads/library/*:refs/remotes/github/*'
+fi
+git -C src -c advice.detachedHead=false checkout -q "$SHA"
+git -C src log -1 --format='%H %s'
+
+echo "== test: the policy file reads"
+grep -E '^renewal\.weeks=[0-9]+$' src/library.properties
+
+echo "== deploy the preview on $PREVIEW_PORT"
+mkdir -p /var/jenkins_home/previews
+pid="/var/jenkins_home/previews/library-$PREVIEW_PORT.pid"
+if [ -f "$pid" ]; then kill "$(cat "$pid")" 2>/dev/null || true; sleep 2; fi
+cp src/library.properties "/var/jenkins_home/previews/library-$PREVIEW_PORT.properties"
+JENKINS_NODE_COOKIE=dontKillMe BUILD_ID=dontKillMe nohup java -cp '/sims/lib/*' com.artie.heart.sims.MainKt \
+  library "$PREVIEW_PORT" "/var/jenkins_home/previews/library-$PREVIEW_PORT.properties" \
+  > "/var/jenkins_home/previews/library-$PREVIEW_PORT.log" 2>&amp;1 &amp;
+echo $! > "$pid"
+for i in $(seq 1 60); do
+  code=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:$PREVIEW_PORT/" || true)
+  [ "$code" = 401 ] &amp;&amp; break
+  sleep 1
+done
+[ "$code" = 401 ] || { echo "the preview did not come up"; exit 1; }
+echo "preview up: http://localhost:$PREVIEW_PORT/"
+
+echo "== archive the smoke script"
+rm -rf artifacts &amp;&amp; mkdir -p artifacts
+cp -r src/smoke/. artifacts/
+echo "$SHA" > artifacts/commit.txt
+echo "http://localhost:$PREVIEW_PORT/" > artifacts/deployment.txt
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>artifacts/**</artifacts>
+      <allowEmptyArchive>false</allowEmptyArchive>
+      <onlyIfSuccessful>true</onlyIfSuccessful>
+      <fingerprint>false</fingerprint>
+      <defaultExcludes>true</defaultExcludes>
+      <caseSensitive>true</caseSensitive>
+      <followSymlinks>false</followSymlinks>
+    </hudson.tasks.ArtifactArchiver>
+  </publishers>
+  <buildWrappers/>
+</project>

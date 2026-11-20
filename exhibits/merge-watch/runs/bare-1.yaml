@@ -1,0 +1,3904 @@
+---
+run:
+  inputs:
+    owner:
+      value: JogoShugh
+      given: given
+      question: Whose repository?
+    repo:
+      value: heart-github-test
+      given: default
+      default: heart-github-test
+      question: Which repository?
+    label:
+      value: dependencies
+      given: default
+      default: dependencies
+      question: Which label marks a dependency bump?
+    hold:
+      value: hold
+      given: default
+      default: hold
+      question: Which label means a person objects?
+  usage:
+    calls: 6
+    input: 1420
+    output: 901
+    cache_read: 4590
+    cache_write: 918
+---
+at: '2026-10-27T15:39:10.970447Z'
+ms: 881
+mode: script
+say: send {method} {url}
+line: 13
+within: 12
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues
+---
+at: '2026-10-27T15:39:11.864103Z'
+ms: 483
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:39:12.350997Z'
+ms: 380
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/829
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/829
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/829
+---
+at: '2026-10-27T15:39:12.733460Z'
+ms: 1884
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/829/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/829/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/829/merge
+---
+at: '2026-10-27T15:39:14.620511Z'
+ms: 426
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+---
+at: '2026-10-27T15:39:15.048451Z'
+ms: 945
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+---
+at: '2026-10-27T15:39:15.996174Z'
+ms: 468
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/822
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/822
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/822
+---
+at: '2026-10-27T15:39:16.467123Z'
+ms: 503
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+---
+at: '2026-10-27T15:39:16.971444Z'
+ms: 801
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+---
+at: '2026-10-27T15:39:17.774540Z'
+ms: 370
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+---
+at: '2026-10-27T15:39:18.146315Z'
+ms: 1108
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+---
+at: '2026-10-27T15:39:19.256143Z'
+ms: 753
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+---
+at: '2026-10-27T15:39:20.011319Z'
+ms: 939
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+---
+at: '2026-10-27T15:39:20.952033Z'
+ms: 589
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/810
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/810
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/810
+---
+at: '2026-10-27T15:39:21.542943Z'
+ms: 423
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+---
+at: '2026-10-27T15:39:21.967712Z'
+ms: 818
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+---
+at: '2026-10-27T15:39:22.787285Z'
+ms: 717
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/805
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/805
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/805
+---
+at: '2026-10-27T15:39:23.505838Z'
+ms: 388
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+---
+at: '2026-10-27T15:39:23.895056Z'
+ms: 1056
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+---
+at: '2026-10-27T15:39:24.952846Z'
+ms: 287
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+---
+at: '2026-10-27T15:39:40.250248Z'
+ms: 408
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:39:40.660566Z'
+ms: 423
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/829
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/829
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/829
+---
+at: '2026-10-27T15:39:41.084378Z'
+ms: 3870
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/829/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/829/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/829/merge
+---
+at: '2026-10-27T15:39:44.955846Z'
+ms: 716
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+---
+at: '2026-10-27T15:39:45.673527Z'
+ms: 890
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+---
+at: '2026-10-27T15:39:46.565204Z'
+ms: 551
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+---
+at: '2026-10-27T15:39:47.117661Z'
+ms: 1185
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+---
+at: '2026-10-27T15:39:48.304027Z'
+ms: 364
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+---
+at: '2026-10-27T15:39:48.669906Z'
+ms: 959
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+---
+at: '2026-10-27T15:39:49.630551Z'
+ms: 717
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+---
+at: '2026-10-27T15:39:50.349089Z'
+ms: 1003
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+---
+at: '2026-10-27T15:39:51.353960Z'
+ms: 366
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+---
+at: '2026-10-27T15:39:51.720946Z'
+ms: 815
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+---
+at: '2026-10-27T15:39:52.537573Z'
+ms: 388
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+---
+at: '2026-10-27T15:39:52.927022Z'
+ms: 1021
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+---
+at: '2026-10-27T15:39:53.949515Z'
+ms: 306
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+---
+at: '2026-10-27T15:40:09.265117Z'
+ms: 415
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:40:09.681796Z'
+ms: 408
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+---
+at: '2026-10-27T15:40:10.091095Z'
+ms: 1089
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+---
+at: '2026-10-27T15:40:11.181748Z'
+ms: 791
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+---
+at: '2026-10-27T15:40:11.974020Z'
+ms: 1108
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+---
+at: '2026-10-27T15:40:13.083946Z'
+ms: 366
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+---
+at: '2026-10-27T15:40:13.451314Z'
+ms: 847
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+---
+at: '2026-10-27T15:40:14.299291Z'
+ms: 589
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+---
+at: '2026-10-27T15:40:14.889313Z'
+ms: 1040
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+---
+at: '2026-10-27T15:40:15.930321Z'
+ms: 398
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+---
+at: '2026-10-27T15:40:16.329881Z'
+ms: 803
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+---
+at: '2026-10-27T15:40:17.134618Z'
+ms: 613
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+---
+at: '2026-10-27T15:40:17.748478Z'
+ms: 1038
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+---
+at: '2026-10-27T15:40:18.787950Z'
+ms: 192
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+---
+at: '2026-10-27T15:40:33.982658Z'
+ms: 520
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:40:34.503992Z'
+ms: 404
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+---
+at: '2026-10-27T15:40:34.909508Z'
+ms: 1105
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+---
+at: '2026-10-27T15:40:36.016226Z'
+ms: 456
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+---
+at: '2026-10-27T15:40:36.473788Z'
+ms: 1123
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+---
+at: '2026-10-27T15:40:37.598397Z'
+ms: 240
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+---
+at: '2026-10-27T15:40:37.838849Z'
+ms: 733
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+---
+at: '2026-10-27T15:40:38.573383Z'
+ms: 403
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+---
+at: '2026-10-27T15:40:38.977250Z'
+ms: 922
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+---
+at: '2026-10-27T15:40:39.900984Z'
+ms: 310
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+---
+at: '2026-10-27T15:40:40.212420Z'
+ms: 988
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+---
+at: '2026-10-27T15:40:41.202562Z'
+ms: 459
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+---
+at: '2026-10-27T15:40:41.663084Z'
+ms: 947
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+---
+at: '2026-10-27T15:40:42.610966Z'
+ms: 243
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+---
+at: '2026-10-27T15:40:57.856539Z'
+ms: 405
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:40:58.263418Z'
+ms: 354
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+---
+at: '2026-10-27T15:40:58.619441Z'
+ms: 898
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+---
+at: '2026-10-27T15:40:59.519103Z'
+ms: 659
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+---
+at: '2026-10-27T15:41:00.179329Z'
+ms: 869
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+---
+at: '2026-10-27T15:41:01.049945Z'
+ms: 296
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+---
+at: '2026-10-27T15:41:01.347439Z'
+ms: 1055
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+---
+at: '2026-10-27T15:41:02.403493Z'
+ms: 483
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+---
+at: '2026-10-27T15:41:02.887735Z'
+ms: 1060
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+---
+at: '2026-10-27T15:41:03.949533Z'
+ms: 456
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+---
+at: '2026-10-27T15:41:04.407188Z'
+ms: 785
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+---
+at: '2026-10-27T15:41:05.193917Z'
+ms: 469
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+---
+at: '2026-10-27T15:41:05.664018Z'
+ms: 1030
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+---
+at: '2026-10-27T15:41:06.695271Z'
+ms: 262
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+---
+at: '2026-10-27T15:41:21.967943Z'
+ms: 577
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:41:22.546663Z'
+ms: 354
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+---
+at: '2026-10-27T15:41:22.901419Z'
+ms: 978
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+---
+at: '2026-10-27T15:41:23.881335Z'
+ms: 484
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+---
+at: '2026-10-27T15:41:24.366916Z'
+ms: 799
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+---
+at: '2026-10-27T15:41:25.167407Z'
+ms: 415
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+---
+at: '2026-10-27T15:41:25.583708Z'
+ms: 775
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+---
+at: '2026-10-27T15:41:26.360480Z'
+ms: 559
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+---
+at: '2026-10-27T15:41:26.920533Z'
+ms: 1079
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+---
+at: '2026-10-27T15:41:28.000734Z'
+ms: 370
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+---
+at: '2026-10-27T15:41:28.371946Z'
+ms: 832
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+---
+at: '2026-10-27T15:41:29.205632Z'
+ms: 443
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+---
+at: '2026-10-27T15:41:29.650106Z'
+ms: 984
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+---
+at: '2026-10-27T15:41:30.636185Z'
+ms: 263
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+---
+at: '2026-10-27T15:41:45.901583Z'
+ms: 383
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:41:46.286441Z'
+ms: 405
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+---
+at: '2026-10-27T15:41:46.692677Z'
+ms: 877
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+---
+at: '2026-10-27T15:41:47.571454Z'
+ms: 582
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+---
+at: '2026-10-27T15:41:48.154881Z'
+ms: 1194
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+---
+at: '2026-10-27T15:41:49.349896Z'
+ms: 482
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+---
+at: '2026-10-27T15:41:49.833569Z'
+ms: 664
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+---
+at: '2026-10-27T15:41:50.498989Z'
+ms: 545
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+---
+at: '2026-10-27T15:41:51.045256Z'
+ms: 1174
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+---
+at: '2026-10-27T15:41:52.220626Z'
+ms: 329
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+---
+at: '2026-10-27T15:41:52.551148Z'
+ms: 892
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+---
+at: '2026-10-27T15:41:53.444349Z'
+ms: 554
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+---
+at: '2026-10-27T15:41:53.999471Z'
+ms: 1023
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+---
+at: '2026-10-27T15:41:55.024116Z'
+ms: 208
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+---
+at: '2026-10-27T15:42:10.241925Z'
+ms: 325
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:42:10.568046Z'
+ms: 385
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+---
+at: '2026-10-27T15:42:10.953565Z'
+ms: 1079
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+---
+at: '2026-10-27T15:42:12.034103Z'
+ms: 471
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+---
+at: '2026-10-27T15:42:12.506334Z'
+ms: 1076
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+---
+at: '2026-10-27T15:42:13.583458Z'
+ms: 499
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+---
+at: '2026-10-27T15:42:14.083958Z'
+ms: 1003
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+---
+at: '2026-10-27T15:42:15.088652Z'
+ms: 495
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+---
+at: '2026-10-27T15:42:15.585239Z'
+ms: 1097
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+---
+at: '2026-10-27T15:42:16.684060Z'
+ms: 391
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+---
+at: '2026-10-27T15:42:17.076078Z'
+ms: 850
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+---
+at: '2026-10-27T15:42:17.927196Z'
+ms: 409
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+---
+at: '2026-10-27T15:42:18.337708Z'
+ms: 883
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+---
+at: '2026-10-27T15:42:19.221565Z'
+ms: 263
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+---
+at: '2026-10-27T15:42:34.492574Z'
+ms: 767
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:42:35.260624Z'
+ms: 372
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+---
+at: '2026-10-27T15:42:35.633650Z'
+ms: 1007
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823/merge
+---
+at: '2026-10-27T15:42:38.791216Z'
+ms: 1139
+mode: script
+say: send {method} {url}
+line: 20
+within: 19
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/823/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/823/comments
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/823/comments
+---
+at: '2026-10-27T15:42:39.931380Z'
+ms: 756
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+---
+at: '2026-10-27T15:42:40.688781Z'
+ms: 829
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817/merge
+---
+at: '2026-10-27T15:42:44.570792Z'
+ms: 1104
+mode: script
+say: send {method} {url}
+line: 20
+within: 19
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/817/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/817/comments
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/817/comments
+---
+at: '2026-10-27T15:42:45.675980Z'
+ms: 418
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+---
+at: '2026-10-27T15:42:46.095578Z'
+ms: 852
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813/merge
+---
+at: '2026-10-27T15:42:48.600874Z'
+ms: 1257
+mode: script
+say: send {method} {url}
+line: 20
+within: 19
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/813/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/813/comments
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/813/comments
+---
+at: '2026-10-27T15:42:49.858757Z'
+ms: 521
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+---
+at: '2026-10-27T15:42:50.381125Z'
+ms: 908
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811/merge
+---
+at: '2026-10-27T15:42:53.173090Z'
+ms: 976
+mode: script
+say: send {method} {url}
+line: 20
+within: 19
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/811/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/811/comments
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/811/comments
+---
+at: '2026-10-27T15:42:54.150291Z'
+ms: 285
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+---
+at: '2026-10-27T15:42:54.436197Z'
+ms: 751
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806/merge
+---
+at: '2026-10-27T15:42:56.965912Z'
+ms: 1016
+mode: script
+say: send {method} {url}
+line: 20
+within: 19
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/806/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/806/comments
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/806/comments
+---
+at: '2026-10-27T15:42:57.983676Z'
+ms: 410
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+---
+at: '2026-10-27T15:42:58.395071Z'
+ms: 1212
+mode: script
+say: send {method} {url}
+line: 19
+within: 15
+params:
+  method: PUT
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+values:
+  method:
+    value: PUT
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: refused
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803/merge
+---
+at: '2026-10-27T15:43:01.352724Z'
+ms: 780
+mode: script
+say: send {method} {url}
+line: 20
+within: 19
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/803/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/803/comments
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/803/comments
+---
+at: '2026-10-27T15:43:02.134246Z'
+ms: 208
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+---
+at: '2026-10-27T15:43:17.352816Z'
+ms: 387
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:43:17.748023Z'
+ms: 376
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/823
+---
+at: '2026-10-27T15:43:18.125101Z'
+ms: 388
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/817
+---
+at: '2026-10-27T15:43:18.514062Z'
+ms: 225
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/813
+---
+at: '2026-10-27T15:43:18.740390Z'
+ms: 386
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/811
+---
+at: '2026-10-27T15:43:19.127188Z'
+ms: 293
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/806
+---
+at: '2026-10-27T15:43:19.421983Z'
+ms: 491
+mode: script
+say: send {method} {url}
+line: 16
+within: 15
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/pulls/803
+---
+at: '2026-10-27T15:43:19.914356Z'
+ms: 274
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+---
+at: '2026-10-27T15:43:35.198376Z'
+ms: 324
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:43:35.523822Z'
+ms: 249
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+---
+at: '2026-10-27T15:43:50.782686Z'
+ms: 548
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:43:51.333424Z'
+ms: 223
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+---
+at: '2026-10-27T15:44:06.563200Z'
+ms: 326
+mode: script
+say: send {method} {url}
+line: 15
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          dependencies:
+            input: label
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues?labels=dependencies
+---
+at: '2026-10-27T15:44:06.890522Z'
+ms: 257
+mode: script
+say: send {method} {url}
+line: 14
+within: 14
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/830

@@ -1,0 +1,640 @@
+---
+run:
+  inputs:
+    entry:
+      value: http://localhost:8099/
+      given: default
+      default: http://localhost:8099/
+  model:
+    name: claude-sonnet-5-5
+    url: https://api.anthropic.com
+  usage:
+    calls: 6
+    input: 3136
+    output: 871
+    cache_read: 5508
+    cache_write: 0
+---
+at: '2026-11-02T11:56:13.842609Z'
+ms: 43
+mode: script
+say: enter {entry}
+line: 5
+params:
+  entry: http://localhost:8099/
+opens: true
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-02T11:56:13.890161Z'
+ms: 2040
+mode: intent
+say: Hire Samwise Gamgee as a gardener
+line: 6
+within: 5
+params:
+  relation: staff:hire
+  firstName: Samwise
+  lastName: Gamgee
+  role: gardener
+values:
+  firstName:
+    value: Samwise
+    type: string
+    from:
+      - words
+  lastName:
+    value: Gamgee
+    type: string
+    from:
+      - words
+  role:
+    value: gardener
+    type: string
+    from:
+      - words
+reason:
+  template: Hire Samwise Gamgee as a gardener
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"Employees","hr:manifest":{"forms":{"staff:dismiss":["sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04="],"staff:get-employee":["sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY="],"staff:hire":["sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM="],"staff:search-employees":["sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4="],"staff:update":["sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM="]},"digest":"sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc="}}
+      </state>
+      <offers>
+      {"staff:search-employees":{"title":"Find employees by name","description":"Lists the employees whose name has the text.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"name":{"type":"string","minLength":1,"title":"Name","description":"Part of the employee's first or last name; case is ignored"}},"required":["name"]}},"staff:get-employee":{"title":"Get an employee by number","description":"Goes to one employee, given their number.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Employee number","description":"The employee's number"}},"required":["id"]}},"staff:hire":{"title":"Hire an employee","description":"Hires someone, in a role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object","$id":"/schemas/10847085ef79da90"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Hire Samwise Gamgee as a gardener
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_012qpeBynXbqZWoLG25XLmKL","name":"select","input":{"action":"act","affordance":"staff:hire","fields":{"firstName":"Samwise","lastName":"Gamgee","role":"gardener"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:hire
+  title: Hire an employee
+  method: POST
+  target: http://localhost:8099/actions/hire
+  address: http://localhost:8099/actions/hire
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+  if-match: '"index-hsf-1cabcac1d5b82c1c"'
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: new resource
+address: http://localhost:8099/employees/3
+now:
+  state:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+keeps:
+  /firstName:
+    - 3
+    - 5
+  /lastName:
+    - 3
+    - 5
+---
+at: '2026-11-02T11:56:15.933833Z'
+ms: 1895
+mode: intent
+say: Change his role to "gardener, mayor"
+line: 7
+within: 6
+params:
+  relation: staff:update
+  firstName: Samwise
+  lastName: Gamgee
+  role: gardener, mayor
+values:
+  firstName:
+    value: Samwise
+    type: string
+    from:
+      - step: 2
+        pointer: /firstName
+  lastName:
+    value: Gamgee
+    type: string
+    from:
+      - step: 2
+        pointer: /lastName
+  role:
+    value: gardener, mayor
+    type: string
+    from:
+      - words
+reason:
+  template: Change his role to "gardener, mayor"
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":3,"firstName":"Samwise","lastName":"Gamgee","role":"gardener","status":"working"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Change his role to "gardener, mayor"
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSuwUKEAgTGAI4AUIIdGhpbmtpbmcSDF7MlsSjrGp0zhBP1xoM6eXwpwbtMPWegPN1IjDmYdEvkuQv6qECaqsX2ZpQPJoC3USgvxf6dwfw/Fj2oK4XJTxL1LtKS+2DEJ9Kec8q2ARZ3zJuywlQtg54IzVYCiRoY/LjAd7o/x38KkkCvuWZWz9sPdqg9PCSJjoNUgrV+oGtF3xPyt6CrPqPhd4w2cyqALp7CZpp1990+70g2MkjfZK0DjUcHIhtz6Nn8xlFIC6r8qPAeKZb2LgcgbdPBncqGEfL8k5npt5AjmKQ19O/BN2Cx19v8eN61NyEZDxxiZ4dxa/XXCA1raJDF5mZ++uw/Xv4u+0doAKtaZeKGLD7Y8k1OEazjPJPMdsS9ekP9j0ckE3CXYYKMfbCCSa+wbuoggzqLfrrqcKdFdj+PEXsGG4ral6QdjdKHePOhX6uOZ7VVz68ynexngW9ZhaEka0HwQBcSaaZBei5YkFecH3NdEG2DpWOvPYon12vqkA34sv+XaakKv9SDVlg7djkfo/wFMDnxco7p8LaYSFSSwHJ04e79DV+wiS8b9SSZy4kCuU7WV573dFsh1ZdaTH5ZqgenvjZueTefZiHsCB1ZZwVmivEx5+sgeBTKZgaLZeBRdBTHdcuRAtdnSLzgmvCvKULtqIatggF5qLmfb2SJVwLND20OICZK4bpApD6/j/Xcy7pABM/aXbBcTKQIxDEzkQr6X19yQmSO0CQCrc9QMXUu3+mRHvf40DdPyIBg5WMYrqUUV6yUH4xuNE5qKUYrBNl1zd9J4DEDhhyMPT9/W3KDeFMimd6sYorNiEeRlUkN1FLkkHBHAVJKswfaODeDha9ivf5LdTdYEEWdWK09FoQA6qMdR4X3TgAU3phqH/iJggvYgA2f9FFptLwvnkew+iqoKXsRCg6JDcYAQ=="},{"type":"tool_use","id":"toolu_0164e5LJ1odXJfDDQdp6jt7n","name":"select","input":{"action":"act","affordance":"staff:update","fields":{"firstName":"Samwise","lastName":"Gamgee","role":"gardener, mayor"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:update
+  title: Update the employee
+  method: PUT
+  target: /employees/{id}/actions/update
+  address: http://localhost:8099/employees/3/actions/update
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/2f822c4fedc9305e
+    integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+  form: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+  schema:
+    href: http://localhost:8099/schemas/10847085ef79da90
+    integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+  if-match: '"seq-1.hsf.L2.e2fb3b99798c9371"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: refused
+address: http://localhost:8099/employees/3
+refused:
+  kind: stale
+  by: the server
+  detail: the resource changed since it was read
+---
+at: '2026-11-02T11:56:17.832599Z'
+ms: 5
+mode: script
+say: return to {address}
+line: 7
+within: 6
+params:
+  address: http://localhost:8099/employees/3
+outcome: done
+address: http://localhost:8099/employees/3
+now:
+  state:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T11:56:17.840699Z'
+ms: 2543
+mode: intent
+say: Change his role to "gardener, mayor"
+line: 7
+within: 6
+params:
+  relation: staff:update
+  firstName: Samwise
+  lastName: Gamgee
+  role: gardener, mayor
+values:
+  firstName:
+    value: Samwise
+    type: string
+    from:
+      - step: 2
+        pointer: /firstName
+  lastName:
+    value: Gamgee
+    type: string
+    from:
+      - step: 2
+        pointer: /lastName
+  role:
+    value: gardener, mayor
+    type: string
+    from:
+      - words
+reason:
+  template: Change his role to "gardener, mayor"
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":3,"firstName":"Samwise","lastName":"Gamgee","role":"gardener","status":"working"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Change his role to "gardener, mayor". Your choice here, staff:update with {"firstName":"Samwise","lastName":"Gamgee","role":"gardener, mayor"}, was refused: the resource changed since it was read Since then: nothing in its state changed. Decide again from what is there now. If these words would undo or write over that change, do not act: ask, naming it.
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQS/ggKEAgTGAI4AUIIdGhpbmtpbmcSDFutCK7Rpbc54lTtERoMGZWW9QAOPZ8ZRJtfIjAe/Gx8oQgJrFJSJKxbz0jNnDfn6rPFBPMroQDJKlaleS8944zIbGQZa99PsFK9gFUqmwhuwbu6B/9KmTeSX0vLOW25YX/Lm+S7ZmLPJGAxomW3E7o3owG/vqkRMmSWOf0dvOdwOD19D/rMjJloDYWPNfbFeS/oxumFmEuy3zYZ22CMZEFizQClPEa4XlB9/NTK6CVqoBlm+EWM+d9FJ3cg9X6D2Cg5MjM3IF2gOoAVsp9UR401oK0Hht97WTCZioVazauMdGOg+uAcZURI4SwATq4368vXkuJRM6kko0jCJ5eENmRwSlyC+3GNiwlYTFwEB5f6PS3uSn74WuRsO4qwMl5zcYua+nU6lP9N/Q48FCSldLX/2gRXpm3KIaV3eD5gvqd/MEo8mPOIUgf5FhSg8Qdt/qRueaRWD92ISPSBMQIeiYjHx6pb6rENWXi8V0qG2cuzlmyxqOuD6R5hsSub0dmGz4LqjSDCfpPbLzTmLi7zOkFZaxqHUKVxpSZ+g9xkxkoMvCczBcrTqhb+WL+3sRSP1c2s2B2P+zGgs+imvWThOw7RplJZTc8lKrVF0KELMow1mdvSvFbuP2R6LEwObZi1O2bEkIzrUCi+hCtDKyZGY8SjvW4LhX5j9FKEwjDr7vZ370uoHDDgABPBDmpDK1+2MPW+nnd+ltW2ITjJivujUsU8NZjZRYhYP/1QJ7P6BpN43+DFNFovz3k+HN06l/OqP7GoRKlJbBU6jk5VuVKiOqy4DOt3i4qXOAhytDm+e8N36Dl01GsGCjSrKIqUOX+RRO8+vqOfHimNAK4Bj8X9WGU8Ul2h4HIW8zkIzJiVhgyj5FkuW3pL2r3ieLN5XW0n7AoNTjs5LaTS6BGzfnnIPxqsaUt8AAP6NXwPdmHn7K6qsqsx08Q/fP8nrtKJXxpwhmnkoYd71aIqLsqnHl0THIJIongDG0dWRnpcvIzjbpubanhXkESjUtW9EWOcAcLfUJ6JU7D09/mxOai4KeFtyyh9QtOXdQdyfLt7K0K8HwS/30G4vd9jWcY7ydXggKjaEx8s6bLLe12p0TR0Gi69B7exPGaDpXiFQvDb8dY/eyoooyAgfRMaDVEjoI3lw4w3K2HbDkn/2c6gtDFWAVP73hkDwwyW020MR7sHUxqjvZrj4DusCutaG8lpzsLYgiHclRWmqwE9gBNYHx32S4Q+zY/WhYDzWqYD3tKVbTipfIQu3IiCSIxY7Gay7IkE+J0BAZ7hjwP2XvSSrjMCWt19CFQ2HJoST4HnUivY3SV3+nh59SbepkGo99rzUua1EFO8O1Rt/7V9Jad/AHMl/Kbgp7jNaBEk12REQhXI1mE4PFmAaGG2tjI8uzj6RwYw8kVQzs607GpbQEKwzGLVssIVEPNVf6fHoyFG5hiwQ3Jaf6ELeH/L7fcNDGelxwHLE7g6M4f1YewpZWMwW41/XPaO1dgJUj/pLJzGgwddGAE="},{"type":"tool_use","id":"toolu_0124jDDJvwyUxUeiN1eDNLEt","name":"select","input":{"action":"act","affordance":"staff:update","fields":{"firstName":"Samwise","lastName":"Gamgee","role":"gardener, mayor"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:update
+  title: Update the employee
+  method: PUT
+  target: /employees/{id}/actions/revise
+  address: http://localhost:8099/employees/3/actions/revise
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/63724ec16931af3d
+    integrity: sha256-Y3JOwWkxrz1/mF1oBejsaBKjxZJFK1CJoEIxest+a2Q=
+  form: sha256-zqXw21JQKyhbfKDJom1kvKerZiJ/LnzwG0Uw8lJ91+M=
+  schema:
+    href: http://localhost:8099/schemas/10847085ef79da90
+    integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+  if-match: '"seq-1.hsf.L2.893f32360eadbfda"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/3
+now:
+  state:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T11:56:20.386944Z'
+ms: 4
+mode: script
+say: return to {address}
+line: 6
+within: 5
+params:
+  address: http://localhost:8099/
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-4ZS7YGt7UeRuwLxUwmSmKWIg8cwGIYKKEUqo0Ve/oBU=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-/RPFDi1Xj3tW7JmHYq05eXapW+tFvtRwj+4wkdUWB04=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-zqXw21JQKyhbfKDJom1kvKerZiJ/LnzwG0Uw8lJ91+M=
+      digest: sha256-Sj4zh2fzqxi8fM7x1ecw66WaNN0Cqczp+Zzpa7wKxpU=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-02T11:56:20.392377Z'
+ms: 1653
+mode: intent
+say: Find the employees named Baggins
+line: 9
+within: 5
+params:
+  relation: staff:search-employees
+  name: Baggins
+values:
+  name:
+    value: Baggins
+    type: string
+    from:
+      - words
+reason:
+  template: Find the employees named Baggins
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"Employees","hr:manifest":{"forms":{"staff:dismiss":["sha256-4ZS7YGt7UeRuwLxUwmSmKWIg8cwGIYKKEUqo0Ve/oBU="],"staff:get-employee":["sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY="],"staff:hire":["sha256-/RPFDi1Xj3tW7JmHYq05eXapW+tFvtRwj+4wkdUWB04="],"staff:search-employees":["sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4="],"staff:update":["sha256-zqXw21JQKyhbfKDJom1kvKerZiJ/LnzwG0Uw8lJ91+M="]},"digest":"sha256-Sj4zh2fzqxi8fM7x1ecw66WaNN0Cqczp+Zzpa7wKxpU="}}
+      </state>
+      <offers>
+      {"staff:search-employees":{"title":"Find employees by name","description":"Lists the employees whose name has the text.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"name":{"type":"string","minLength":1,"title":"Name","description":"Part of the employee's first or last name; case is ignored"}},"required":["name"]}},"staff:get-employee":{"title":"Get an employee by number","description":"Goes to one employee, given their number.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Employee number","description":"The employee's number"}},"required":["id"]}},"staff:hire":{"title":"Hire an employee","description":"Hires someone, in a role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object","$id":"/schemas/10847085ef79da90"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Find the employees named Baggins
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01PisiFPSzjSGGtQebDgv4n7","name":"select","input":{"action":"act","affordance":"staff:search-employees","fields":{"name":"Baggins"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:search-employees
+  title: Find employees by name
+  method: GET
+  target: /employees{?name}
+  address: http://localhost:8099/employees?name=Baggins
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8099/employees?name=Baggins
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Frodo Baggins
+      - Bilbo Baggins
+---
+at: '2026-11-02T11:56:22.046895Z'
+ms: 1826
+mode: intent
+say: Open Bilbo Baggins
+line: 10
+within: 9
+params:
+  relation: item
+  title: Bilbo Baggins
+values:
+  title:
+    value: Bilbo Baggins
+    from:
+      - words
+reason:
+  template: Open Bilbo Baggins
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":2}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Frodo Baggins"},{"rel":"item","title":"Bilbo Baggins"}]
+      </links>
+      <intent>
+      Open Bilbo Baggins
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01A1FmKnjDHQLEv92YEgrHgP","name":"select","input":{"action":"follow","rel":"item","title":"Bilbo Baggins"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: Bilbo Baggins
+  method: GET
+  target: http://localhost:8099/employees/2
+  address: http://localhost:8099/employees/2
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/2
+now:
+  state:
+    id: 2
+    firstName: Bilbo
+    lastName: Baggins
+    role: burglar
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T11:56:23.875722Z'
+ms: 1241
+mode: intent
+say: Dismiss him
+line: 11
+within: 10
+params:
+  relation: staff:dismiss
+reason:
+  template: Dismiss him
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":2,"firstName":"Bilbo","lastName":"Baggins","role":"burglar","status":"working"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Dismiss him
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01VjsfRThMYFjVCMrfyjXA8p","name":"select","input":{"action":"act","affordance":"staff:dismiss","fields":{}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:dismiss
+  title: Dismiss the employee
+  method: DELETE
+  target: /employees/{id}/actions/let-go
+  address: http://localhost:8099/employees/2/actions/let-go
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/63724ec16931af3d
+    integrity: sha256-Y3JOwWkxrz1/mF1oBejsaBKjxZJFK1CJoEIxest+a2Q=
+  form: sha256-4ZS7YGt7UeRuwLxUwmSmKWIg8cwGIYKKEUqo0Ve/oBU=
+  schema:
+    href: http://localhost:8099/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.82058c356b816d47"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/2
+now:
+  state:
+    id: 2
+    firstName: Bilbo
+    lastName: Baggins
+    role: burglar
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T11:56:25.117589Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 10
+within: 9
+params:
+  address: http://localhost:8099/employees?name=Baggins
+outcome: done
+address: http://localhost:8099/employees?name=Baggins
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Frodo Baggins
+      - Bilbo Baggins
+---
+at: '2026-11-02T11:56:25.120980Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 9
+within: 5
+params:
+  address: http://localhost:8099/
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-4ZS7YGt7UeRuwLxUwmSmKWIg8cwGIYKKEUqo0Ve/oBU=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-/RPFDi1Xj3tW7JmHYq05eXapW+tFvtRwj+4wkdUWB04=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-zqXw21JQKyhbfKDJom1kvKerZiJ/LnzwG0Uw8lJ91+M=
+      digest: sha256-Sj4zh2fzqxi8fM7x1ecw66WaNN0Cqczp+Zzpa7wKxpU=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null

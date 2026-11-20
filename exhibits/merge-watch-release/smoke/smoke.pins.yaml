@@ -1,0 +1,24 @@
+# What smoke.heart.yaml was recorded against, from smoke.capture.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its
+# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
+# one offered in a set not recorded for it.
+rung: L0
+digest: sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs=
+forms:
+  library:search-loans:
+    integrity: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+    act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
+    method: GET
+    sets: []
+  library:renew:
+    integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+    act: sha256-mKB6rkhzosKiuPOCcy+AO/8TOYuWyeVQhs5BrzlmKho=
+    method: POST
+    sets: []
+  library:report-problem:
+    integrity: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+    act: sha256-M7uvJU9wvS8gI9X3f9Fh2oELWtan92UFPWZES08rYYo=
+    method: POST
+    sets: []
+links:
+  item: ''

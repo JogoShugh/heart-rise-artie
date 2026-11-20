@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Local Models Below the Goal, in YAML</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: the Reason on Rails reading column; one device, the ladder of forms, with where a laptop model can stand. */
+:root {
+  --paper: #F7F3EA; --ink: #1D2128; --muted: #5B6370; --rule: #DDD5C6; --panel: #FFFDF8;
+  --accent: #A45F12; --accent-soft: #F6E3C2; --code: #EFE9DC; --good: #2F6B3A; --good-soft: #DFF0DC; --bad: #A3352B; --bad-soft: #F6DEDA;
+  --display: 'IBM Plex Sans', system-ui, sans-serif; --body: 'Source Serif 4', Georgia, serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A; --good: #9FD49A; --good-soft: #1E3322; --bad: #F09A90; --bad-soft: #3A2020;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A; --good: #9FD49A; --good-soft: #1E3322; --bad: #F09A90; --bad-soft: #3A2020;
+  color-scheme: dark }
+body { background: var(--paper); color: var(--ink); margin: 0; font: 400 1.125rem/1.7 var(--body); }
+main { max-width: 44rem; margin: 0 auto; padding-block: 3.5rem 5rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.masthead { border-bottom: 1px solid var(--rule); padding-bottom: 1.8rem; margin-bottom: 1rem; }
+.kicker { font: 600 0.8rem/1.3 var(--display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin: 0 0 1rem; }
+h1 { font: 600 clamp(2.2rem, 6vw, 3.3rem)/1.05 var(--display); margin: 0 0 1rem; text-wrap: balance; letter-spacing: -0.01em; }
+.dek { font-size: 1.25rem; line-height: 1.5; color: var(--muted); margin: 0; }
+h2 { font: 600 1.5rem/1.25 var(--display); margin: 3rem 0 0.9rem; text-wrap: balance; }
+p { margin: 0 0 1rem; }
+a { color: var(--accent); text-underline-offset: 2px; }
+code { font: 0.86em var(--mono); background: var(--code); padding: 0.1em 0.3em; border-radius: 4px; }
+ul.obs { margin: 1rem 0 1.4rem; padding: 0; list-style: none; display: grid; gap: 0.5rem; }
+ul.obs li { position: relative; padding-left: 1.4rem; }
+ul.obs li::before { content: ""; position: absolute; left: 0.2rem; top: 0.68em; width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--accent); }
+ul.obs b { font-weight: 600; }
+.table { overflow-x: auto; margin: 1rem 0 1.4rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; min-width: 34rem; font: 400 0.9rem/1.45 var(--display); font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--rule); }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-weight: 600; color: var(--muted); font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; }
+tbody th { font-weight: 600; }
+tr.ref td, tr.ref th { color: var(--muted); font-style: italic; }
+.pass { color: var(--good); font-weight: 600; }
+.fail { color: var(--bad); font-weight: 600; }
+ol.ladder { list-style: none; padding: 0; margin: 1.6rem 0; display: grid; gap: 0.5rem; }
+ol.ladder li { border: 1px solid var(--rule); border-radius: 10px; padding: 0.75rem 1rem; background: var(--panel);
+  display: grid; grid-template-columns: 8.5rem minmax(0, 1fr) 7.5rem; gap: 0.3rem 1rem; align-items: start;
+  font: 400 0.92rem/1.45 var(--display); }
+ol.ladder b { font-weight: 600; }
+ol.ladder span { color: var(--muted); min-width: 0; }
+ol.ladder em { font-style: normal; font-weight: 600; text-align: right; border-radius: 999px; padding: 0.15rem 0.6rem; justify-self: end; }
+ol.ladder li.no em { color: var(--bad); background: var(--bad-soft); }
+ol.ladder li.yes em { color: var(--good); background: var(--good-soft); }
+ol.ladder li.na em { color: var(--muted); background: var(--code); }
+@media (max-width: 560px) { ol.ladder li { grid-template-columns: 1fr; } ol.ladder em { justify-self: start; } }
+details.src { margin: 0.6rem 0; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); }
+details.src > summary { cursor: pointer; padding: 0.7rem 1rem; list-style: none; font: 600 0.95rem/1.4 var(--display); color: var(--accent); }
+details.src > summary::-webkit-details-marker { display: none; }
+details.src > summary::before { content: "+"; display: inline-block; width: 1.2rem; }
+details.src[open] > summary::before { content: "−"; }
+details.src > summary small { font-weight: 400; color: var(--muted); margin-left: 0.3rem; }
+details.src > p { font: 400 0.92rem/1.55 var(--display); color: var(--muted); margin: 0 1rem 0.6rem; }
+details.src pre { margin: 0 1rem 1rem; background: var(--code); border-radius: 8px; padding: 0.9rem 1rem; overflow-x: auto;
+  font: 0.78rem/1.55 var(--mono); }
+details.src > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.bottom { margin: 2rem 0; padding: 1rem 1.2rem; border: 1px solid var(--accent); border-radius: 12px; background: var(--accent-soft); }
+.bottom p { font: 400 1rem/1.6 var(--display); margin: 0 0 0.5rem; }
+.bottom p:last-child { margin: 0; }
+.sources { margin-top: 3.5rem; border-top: 1px solid var(--rule); padding-top: 1rem; font: 400 0.9rem/1.6 var(--display); color: var(--muted); }
+.sources ul { padding-left: 1.2rem; margin: 0.4rem 0 0; }
+</style>
+</head><body>
+<main>
+<header class="masthead">
+<p class="kicker">HEART and ARTIE · one laptop, no key · 5 November 2026</p>
+<h1>Local Models Below the Goal, in YAML</h1>
+<p class="dek">The merge watch again, with its scripts kept as data. Claude ran the goal once; <code>artie generate</code> wrote it as YAML; a 30B model on the laptop ran that YAML 7 times out of 7, merging every bump and telling every draft.</p>
+</header>
+
+<h2>What changed since the first report</h2>
+<ul class="obs">
+<li><b>The scripts are data.</b> In <a href="../local-models/">the first report</a> (30 October) the intent and kept scripts were Kotlin, compiled on every run. Here they are YAML, run by <code>artie run</code> as data, with no compiler.</li>
+<li><b>Generated, not mocked up.</b> The October goal run kept its watch only as Kotlin, so Claude ran the goal again, and <code>artie generate --format yaml</code> wrote both scripts from that run: <code>--intents</code> for the intent form.</li>
+<li><b>The same scene.</b> The scratch repository, a fresh dependency bump that can be merged and a draft that can't, through the HEART gateway; the same two qwen3 30B-A3B builds through Ollama, at 1024 output tokens.</li>
+</ul>
+
+<h2>The scripts</h2>
+<p>The goal as the person wrote it, and the two forms <code>artie generate</code> made from Claude's run of it. Open one to read it.</p>
+<details class="src"><summary>The goal <small>plain text, merge.goal.md</small></summary>
+<p>Claude planned it once, asking the model at 17 steps: it merged the bump, gave the draft three minutes, then labelled it and told its author why.</p>
+<pre><code>---
+start: https://localhost:8392/
+inputs:
+  owner: { question: &quot;Whose repository?&quot; }
+  repo:  { default: heart-github-test, question: &quot;Which repository?&quot; }
+  label: { default: dependencies, question: &quot;Which label marks a dependency bump?&quot; }
+  hold:  { default: hold, question: &quot;Which label means a person objects?&quot; }
+  told:  { default: watch-told, question: &quot;Which label marks a pull request the watch has told why?&quot; }
+---
+
+Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed.
+
+- In {owner}/{repo}
+  - Open an issue titled &quot;Merge watch&quot;, saying &quot;Close this issue to stop the watch.&quot; `as watch`
+  - Whenever a pull request labelled {label} changes `as pr`
+    - If it's labelled {hold}, leave it, and say so once.
+    - If it's labelled {told}, leave it.
+    - Once it can be merged, merge it by squashing.
+      Or give up after 3 minutes.
+      Otherwise, label it {told}, then tell its author in one friendly sentence why it wasn't merged and what to do next. `reasoned`
+- Until someone closes {watch}</code></pre>
+</details>
+<details class="src"><summary>The intent script <small>yaml/merge.intent.heart.yaml</small></summary>
+<p>The goal's shape as data: the watch, the wait, the give-up. Each act is still in words, for the model to choose from what the gateway offers, on every run.</p>
+<pre><code>heart: 1
+kind: intent
+start: https://localhost:8393/
+
+inputs:
+  owner:
+    question: Whose repository?
+  repo:
+    default: heart-github-test
+    question: Which repository?
+  label:
+    default: dependencies
+    question: Which label marks a dependency bump?
+  hold:
+    default: hold
+    question: Which label means a person objects?
+  told:
+    default: watch-told
+    question: Which label marks a pull request the watch has told why?
+
+steps:
+  - inferred: get repository ${owner}/${repo}
+    from-intent: In ${owner}/${repo}
+    then:
+      - intent: Open an issue titled &quot;Merge watch&quot;, saying &quot;Close this issue to stop the watch.&quot;
+        then:
+          - keep-as: watch
+  - at: https://localhost:8393/
+    steps:
+      - watch:
+          until:
+            - at: watch
+              field: state
+              is: closed
+          steps:
+            - inferred: list pull requests of ${owner}/${repo} filtered by label ${label}
+              from-intent: a pull request labelled ${label} changes
+              then:
+                - whenever:
+                    - has:
+                        - field: github:labels
+                          has: ${label}
+                    - leave-where:
+                        say: leave it, and say so once.
+                        facts:
+                          - field: github:labels
+                            has: ${hold}
+                    - leave-where:
+                        say: leave it.
+                        facts:
+                          - field: github:labels
+                            has: ${told}
+                    - once:
+                        offered: github:merge
+                        give-up: 3m
+                        steps:
+                          - intent: merge it by squashing.
+                            then: []
+                        otherwise:
+                          - intent: label it ${told}
+                            reasoned: true
+                          - intent: &quot;tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: ${why}&quot;
+                            reasoned: true</code></pre>
+</details>
+<details class="src"><summary>The kept script <small>yaml/merge.heart.yaml</small></summary>
+<p>Every act pinned to what Claude's run chose. Only the two acts after a give-up stay in words, so the model is asked only when a bump can't be merged.</p>
+<pre><code>heart: 1
+kind: kept
+start: https://localhost:8393/
+
+inputs:
+  owner:
+    question: Whose repository?
+  repo:
+    default: heart-github-test
+    question: Which repository?
+  label:
+    default: dependencies
+    question: Which label marks a dependency bump?
+  hold:
+    default: hold
+    question: Which label means a person objects?
+  told:
+    default: watch-told
+    question: Which label marks a pull request the watch has told why?
+
+steps:
+  - act: github:repos-get
+    fields:
+      owner: ${owner}
+      repo: ${repo}
+    inferred: get repository ${owner}/${repo}
+    from-intent: In ${owner}/${repo}
+    then:
+      - act: github:open-issue
+        fields:
+          title: Merge watch
+          body: Close this issue to stop the watch.
+        intent: Open an issue titled &quot;Merge watch&quot;, saying &quot;Close this issue to stop the watch.&quot;
+        then:
+          - keep-as: watch
+  - at: https://localhost:8393/
+    steps:
+      - watch:
+          until:
+            - at: watch
+              field: state
+              is: closed
+          steps:
+            - act: github:pulls-list
+              fields:
+                owner: ${owner}
+                repo: ${repo}
+                labels: ${label}
+              inferred: list pull requests of ${owner}/${repo} filtered by label ${label}
+              from-intent: a pull request labelled ${label} changes
+              then:
+                - whenever:
+                    - has:
+                        - field: github:labels
+                          has: ${label}
+                    - leave-where:
+                        say: leave it, and say so once.
+                        facts:
+                          - field: github:labels
+                            has: ${hold}
+                    - leave-where:
+                        say: leave it.
+                        facts:
+                          - field: github:labels
+                            has: ${told}
+                    - once:
+                        offered: github:merge
+                        give-up: 3m
+                        steps:
+                          - act: github:merge
+                            fields:
+                              merge_method: squash
+                            intent: merge it by squashing.
+                            then: []
+                        otherwise:
+                          - intent: label it ${told}
+                            reasoned: true
+                          - intent: &quot;tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: ${why}&quot;
+                            reasoned: true</code></pre>
+</details>
+
+<h2>The runs</h2>
+<div class="table"><table>
+<thead><tr><th scope="col">Model and script</th><th scope="col">Merged</th><th scope="col">Told</th><th scope="col">Model calls</th><th scope="col">Output tokens</th><th scope="col">Seconds</th><th scope="col">Along the way</th></tr></thead>
+<tbody>
+<tr><th scope="row">qwen3 30B-A3B instruct, intent</th><td class="pass">yes</td><td class="pass">yes</td><td>8</td><td>401</td><td>496</td><td>2 refused stale; asked a question once</td></tr>
+<tr><th scope="row">qwen3 30B-A3B instruct, intent</th><td class="pass">yes</td><td class="pass">yes</td><td>8</td><td>421</td><td>462</td><td>2 refused stale; asked a question once</td></tr>
+<tr><th scope="row">qwen3 30B-A3B instruct, intent</th><td class="pass">yes</td><td class="pass">yes</td><td>8</td><td>408</td><td>445</td><td>2 refused stale; asked a question once</td></tr>
+<tr><th scope="row">qwen3 30B-A3B thinking, intent</th><td class="pass">yes</td><td class="pass">yes</td><td>7</td><td>3,218</td><td>558</td><td>1 refused stale</td></tr>
+<tr><th scope="row">qwen3 30B-A3B thinking, intent</th><td class="pass">yes</td><td class="pass">yes</td><td>7</td><td>3,235</td><td>480</td><td>1 refused stale</td></tr>
+<tr><th scope="row">qwen3 30B-A3B thinking, intent</th><td class="pass">yes</td><td class="pass">yes</td><td>7</td><td>3,203</td><td>493</td><td>1 refused stale</td></tr>
+<tr><th scope="row">qwen3 30B-A3B instruct, kept</th><td class="pass">yes</td><td class="pass">yes</td><td>4</td><td>214</td><td>650</td><td>2 refused stale; asked a question once</td></tr>
+<tr class="ref"><th scope="row">Claude, the goal</th><td>yes</td><td>yes</td><td>17 asked</td><td>not recorded</td><td>589</td><td>the run that wrote the scripts</td></tr>
+</tbody></table></div>
+<ul class="obs">
+<li><b>"Refused stale"</b> is the gateway at work: the pull request changed between ARTIE's read and its act, so the act was refused (412), and ARTIE read again.</li>
+<li><b>"Asked a question"</b> is the instruct build answering a label turn with a question instead of a choice. ARTIE refuses an answer in words and looks again next time; on the next look it labelled and told. The thinking build didn't.</li>
+</ul>
+
+<h2>Against the first report</h2>
+<div class="table"><table>
+<thead><tr><th scope="col">Model and script</th><th scope="col">Kotlin, 30 Oct</th><th scope="col">YAML, 5 Nov</th><th scope="col">Calls, Kotlin → YAML</th><th scope="col">Output tokens, Kotlin → YAML</th></tr></thead>
+<tbody>
+<tr><th scope="row">qwen3 30B-A3B instruct, intent</th><td>9 of 11</td><td class="pass">3 of 3</td><td>6–11 → 8</td><td>320–550 → 401–421</td></tr>
+<tr><th scope="row">qwen3 30B-A3B thinking, intent</th><td>7 of 9</td><td class="pass">3 of 3</td><td>6–10 → 7</td><td>2,200–4,000 → 3,203–3,235</td></tr>
+<tr><th scope="row">qwen3 30B-A3B instruct, kept</th><td>1 of 1</td><td class="pass">1 of 1</td><td>→ 4</td><td>→ 214</td></tr>
+</tbody></table></div>
+<p>The model's share is unchanged: the same few calls and the same output per run, and the same one habit of the instruct build after a stale refusal. Runs took longer (445–650 seconds against 276–430) because the scratch repository now holds three pages of open bump pull requests, which the watch walks on every look; the format didn't add the time.</p>
+
+<div class="bottom">
+<p><b>Intent YAML:</b> 6 of 6 runs fully passed on the laptop's 30B models.</p>
+<p><b>Kept YAML:</b> 1 of 1, the model asked only for the label and the sentence to the author.</p>
+<p><b>The split still holds, now as data:</b> Claude finds the way once, <code>artie generate</code> keeps it as YAML, and a free local model does the reasoner's part of every run after.</p>
+</div>
+
+<h2>Limits, and what the runs turned up</h2>
+<ul class="obs">
+<li><b>Three runs each.</b> Enough to see the shape again, not to rank the builds.</li>
+<li><b>ARTIE looks for the lock file in the wrong place.</b> Its help says NAME.pins.yaml beside the script; it looks in the working folder. Run from <code>exhibits/merge-watch</code>, the YAML scripts held to the October Kotlin pins until the runs named theirs with <code>--pins</code>. A fix, test first, is open.</li>
+<li><b>Not counted:</b> a first batch lost to GitHub answering 500 to writes for a few minutes, and runs held to the wrong pins. Their outputs are kept beside these, in <code>runs/yaml/first-batch</code> and <code>runs/yaml/spurious</code>.</li>
+<li><b>Claude's token use</b> for the goal run wasn't recorded: the run was stopped once its watch's issue was closed, before it wrote its totals.</li>
+</ul>
+
+<footer class="sources">
+<b>Sources</b>
+<ul>
+<li>The first report: <a href="../local-models/">Local Models Below the Goal</a></li>
+<li>The scripts and their pins: <a href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/exhibits/merge-watch/yaml">exhibits/merge-watch/yaml</a></li>
+<li>Every run's output, trace and the summary: <a href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/exhibits/merge-watch/runs/yaml">exhibits/merge-watch/runs/yaml</a></li>
+<li>The plan and the October results: <a href="https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/spec/PLAN-LOCAL-MODEL.md">spec/PLAN-LOCAL-MODEL.md</a></li>
+</ul>
+</footer>
+</main>
+</body></html>

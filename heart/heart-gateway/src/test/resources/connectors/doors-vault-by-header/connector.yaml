@@ -1,0 +1,5 @@
+# Vault doors are read by their own reader, listed first; every other door by the default.
+profile: doors
+readers:
+  - vault-door.reader.yaml
+  - door.reader.yaml

@@ -1,0 +1,30 @@
+name: commit-proves-order
+part: "One behavior, start to finish"
+title: "The Commit Has to Prove the Order"
+kicker: git pre-commit reads the log, line by line
+say: "Last step: the commit. And here the git pre-commit hook reads the log since the last commit, in order. Did a feature file change before the first production write? Was there a failing run before that write? Was the last run green? If any answer is no, there's no commit, whoever is committing: Claude, me, anyone. This one passed. It's commit e3dbaca4, on the 11th of November: the library's rules come from its policy file. Seven files, the feature, its steps, the policy and the three places that use it. One sentence from me; one behavior, in the right order, on the record."
+sources:
+  - ["Commit e3dbaca4", "https://github.com/JogoShugh/heart-rise-artie/commit/e3dbaca4"]
+  - ["bdd-gates skill", "https://github.com/JogoShugh/bdd-gates-skill"]
+fragments:
+  - name: pre-commit
+    label: The ordering check (core/pre-commit)
+    source: bdd-gates:core/pre-commit
+    lang: bash
+html: |
+  <h2>The Commit Has to Prove the Order</h2>
+  <div class="split">
+    <div class="rows">
+      <div><h3>A Feature File, First?</h3><p>Before the first production write.</p></div>
+      <div><h3>A Failing Run, Before the Code?</h3><p>Red, logged, before that write.</p></div>
+      <div><h3>Green, Last?</h3><p>The final run passed.</p></div>
+      <p class="punch">Any “no”, and there’s no commit, whoever is committing.</p>
+      <p class="refs"><deck-ref name="repeatability"></deck-ref> <deck-fragment name="pre-commit">pre-commit</deck-fragment></p>
+    </div>
+    <div class="card dark" style="align-self: center">
+      <span class="label">The commit</span>
+      <p style="font-family: var(--mono); margin: .4rem 0">e3dbaca4 · 11 Nov 2026</p>
+      <p>The library’s rules come from its policy file, and the simulator serves the library alone by one, as a preview</p>
+      <p class="note">7 files: the feature, its steps, the policy, and where it’s used.</p>
+    </div>
+  </div>

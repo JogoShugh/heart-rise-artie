@@ -1,0 +1,34 @@
+{
+  "name": "ai-driven",
+  "title": "A purpose, not a program",
+  "part": "Scene four · that evening",
+  "fiction": true,
+  "number": 16,
+  "of": 25,
+  "html": "<h2>A purpose, not a program</h2>\n<p class=\"setting\">That evening. Priya has gone back to the 2008 post the quote on the whiteboard came from, and is reading the replies under it.</p>\n<ul class=\"points\"><li>That evening, Priya reads the replies under Fielding's 2008 post. In one, he says what a client needs once each answer carries its instructions; it is quoted whole on the slide.</li><li>He names three kinds of purpose: user-driven, configuration-driven and AI-driven. Sam matches them: Ana at her page, a kept script, a model.</li><li>So they don't write the assistant a program. They write its purpose, in plain words, in member.goal.md, and let each answer's forms supply the rest.</li><li><b>What it shows:</b> the agent needs a goal, not a program; once it has found the way, what it did can be kept.</li></ul>\n<div class=\"script\">\n  <div class=\"line\"><span class=\"who priya\">Priya</span><p>Someone asked him about queues, three weeks after the post. Listen to how he ends his answer.</p></div>\n</div>\n<blockquote class=\"fielding\">“If a client is receiving instructions on how to interact with a resource just before acting only on those instructions, then the client doesn’t care if the resource is a distributed queue. It simply doesn’t need to know how the resource is implemented. All it needs to know is the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of AI-driven.”<cite>Roy T. Fielding, a reply under his post, 8 November 2008</cite></blockquote>\n<div class=\"script\">\n  <div class=\"line\"><span class=\"who sam\">Sam</span><p>“Some idea of what it wants to do next.” That's all a client needs?</p></div>\n  <div class=\"line\"><span class=\"who priya\">Priya</span><p>When every answer carries its instructions, yes. And he names three kinds of purpose.</p></div>\n  <div class=\"line\"><span class=\"who sam\">Sam</span><p>Ana at her page is user-driven. A script is configuration-driven. And a model reading the forms…</p></div>\n  <div class=\"line\"><span class=\"who priya\">Priya</span><p>…is some sort of AI-driven. In 2008. So we don't write the assistant a program. We write it the purpose, in plain words, and the forms tell it the rest.</p></div>\n  <div class=\"line\"><span class=\"who sam\">Sam</span><p>And once it has found the way, we keep what it did as a script. The AI-driven run becomes a configuration-driven one.</p></div>\n</div>\n<div class=\"goal\"><span class=\"label\">What they wrote that night: member.goal.md</span>\n<pre><code>Renew each book a member has out that can be renewed, and say why for any that can't.\n\n- Find the account of the member named {member}\n  - For each book they have out: renew it if renewing is offered; otherwise say why it can't be renewed</code></pre></div>\n<details class=\"more\"><summary>He said it more than once, that autumn</summary>\n  <blockquote class=\"fielding\"><p>“When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p><cite>A reply, 23 October 2008</cite></blockquote>\n  <blockquote class=\"fielding\"><p>“Think of it in terms of the Web. How many Web browsers are aware of the distinction between an online-banking resource and a Wiki resource? None of them. They don’t need to be aware of the resource types. What they need to be aware of is the potential state transitions — the links and forms — and what semantics/actions are implied by traversing those links. A browser represents them as distinct UI controls so that a user can see potential transitions and anticipate the effect of chosen actions. A spider can follow them to the extent that the relationships are known to be safe. Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.”</p><cite>A reply, 20 October 2008</cite></blockquote>\n  <p class=\"note\">Roy T. Fielding, replies under <a href=\"https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven\">“REST APIs must be hypertext-driven”</a>, October and November 2008, quoted as written. The quotes are real; the conversation is not.</p>\n</details>\n<details class=\"more\"><summary>How a goal in plain words runs</summary>\n  <ul>\n    <li><b>The goal:</b> the purpose in a sentence, then an outline of steps. <code>{member}</code> is an input, given on each run.</li>\n    <li><b>The first run:</b> ARTIE reads each answer's forms and asks the model which one serves the step it is on. The model chooses only among what the answer offers.</li>\n    <li><b>Kept:</b> <code>artie generate</code> writes what the run chose as a script, the goal's words beside each step. Runs after it call no model.</li>\n  </ul>\n</details>\n",
+  "_links": {
+    "self": {
+      "href": "ai-driven.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "openapi-opt-in.json",
+      "title": "OpenAPI clients can opt in"
+    },
+    "next": {
+      "href": "next-week.json",
+      "title": "Find the way once, then keep it"
+    },
+    "alternate": {
+      "href": "ai-driven.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

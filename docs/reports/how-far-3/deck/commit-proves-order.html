@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Commit Has to Prove the Order · Claude and Git Hooks, Together · 3.0</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">git pre-commit reads the log, line by line</span></header>
+<h2>The Commit Has to Prove the Order</h2>
+<div class="split">
+  <div class="rows">
+    <div><h3>A Feature File, First?</h3><p>Before the first production write.</p></div>
+    <div><h3>A Failing Run, Before the Code?</h3><p>Red, logged, before that write.</p></div>
+    <div><h3>Green, Last?</h3><p>The final run passed.</p></div>
+    <p class="punch">Any “no”, and there’s no commit, whoever is committing.</p>
+    <p class="refs"><a class="ref-plain" href="deck/three-rs-one-behavior.html">REPEATABILITY</a> <details class="fragment-plain"><summary>The ordering check (core/pre-commit)</summary><pre><code>#!/usr/bin/env bash
+# Gherkin-first ordering check for any commit that touches production code.
+# Installed by the bdd-gates skill. Activate once with:
+#   git config core.hooksPath .githooks
+# Tool-agnostic: runs for a plain terminal `git commit` too.
+#
+# Since the last commit, the event log must show:
+#   1. a FEATURE_WRITE before the first MAIN_WRITE,
+#   2. a failing BDD run before the first MAIN_WRITE,
+#   3. a passing final BDD run.
+# Or, when the author switched refactor mode on (scripts/refactor-mode), the
+# refactor terms below instead.
+# Order is taken from line order in the append-only log, so events in the same
+# second still compare correctly. Timestamps only bound the &quot;since&quot; window.
+# Known simplification: ordering is global per commit, not per scenario.
+set -o pipefail
+
+root=$(git rev-parse --show-toplevel)
+export BDD_GATES_ROOT=$root
+. &quot;$root/.claude/bdd-gates/lib.sh&quot;
+bdd_has_config || exit 0
+bdd_load
+
+staged_prod=()
+while IFS= read -r f; do
+  bdd_is_prod &quot;$f&quot; &amp;&amp; staged_prod+=(&quot;$f&quot;)
+done &lt; &lt;(git diff --cached --name-only --diff-filter=ACMR)
+[ ${#staged_prod[@]} -gt 0 ] || exit 0
+
+log=$(bdd_log)
+
+# Refactor mode: switched on by the author (scripts/refactor-mode), for one
+# commit on the HEAD it names. Production code may change with no feature
+# change and no red run, but only on these terms:
+#   1. no feature file and no test file differs from HEAD, staged or not;
+#   2. a BDD run passed after the mode was switched on, before the first
+#      production write, and the last run passed, after the last write.
+if bdd_refactor_present; then
+  if ! bdd_refactor_on; then
+    echo &quot;pre-commit: refactor mode was switched on for $(bdd_refactor_field head), but HEAD is now $(git rev-parse HEAD).&quot; &gt;&amp;2
+    echo &quot;  The author switches it off (scripts/refactor-mode off) or on again.&quot; &gt;&amp;2
+    exit 1
+  fi
+  reasons=()
+  while IFS= read -r line; do
+    p=${line:3}
+    p=${p##* -&gt; }
+    bdd_is_test &quot;$p&quot; &amp;&amp; reasons+=(&quot;a refactor leaves tests and features as they are, but $p differs from HEAD&quot;)
+  done &lt; &lt;(git status --porcelain -uall)
+  head=$(bdd_refactor_field head)
+  window=$(awk -v on=&quot;REFACTOR_ON head=$head&quot; 'index($0, on) { buf = &quot;&quot;; found = 1; next } found { buf = buf $0 &quot;\n&quot; } END { printf &quot;%s&quot;, buf }' &quot;$log&quot; 2&gt;/dev/null)
+  first_line() { printf '%b' &quot;$window&quot; | grep -nE -- &quot;$1&quot; | head -1 | cut -d: -f1; }
+  last_line() { printf '%b' &quot;$window&quot; | grep -nE -- &quot;$1&quot; | tail -1 | cut -d: -f1; }
+  pass=$(first_line ' BDD_RUN PASS ')
+  main=$(first_line ' MAIN_WRITE ')
+  last_main=$(last_line ' MAIN_WRITE ')
+  last_run=$(last_line ' BDD_RUN ')
+  [ -n &quot;$pass&quot; ] || reasons+=(&quot;no passing BDD run since refactor mode was switched on (green before the change)&quot;)
+  if [ -n &quot;$pass&quot; ] &amp;&amp; [ -n &quot;$main&quot; ] &amp;&amp; [ &quot;$pass&quot; -gt &quot;$main&quot; ]; then
+    reasons+=(&quot;production code was written before the suite was seen green&quot;)
+  fi
+  case &quot;$(printf '%b' &quot;$window&quot; | grep -E ' BDD_RUN ' | tail -1)&quot; in
+    *&quot; PASS&quot;*) ;;
+    *) reasons+=(&quot;the latest BDD run is not PASS (green after the change)&quot;) ;;
+  esac
+  if [ -n &quot;$last_main&quot; ] &amp;&amp; [ -n &quot;$last_run&quot; ] &amp;&amp; [ &quot;$last_run&quot; -lt &quot;$last_main&quot; ]; then
+    reasons+=(&quot;production code was written after the last BDD run&quot;)
+  fi
+  if [ ${#reasons[@]} -gt 0 ]; then
+    echo &quot;pre-commit: refactor check FAILED:&quot; &gt;&amp;2
+    printf '  - %s\n' &quot;${reasons[@]}&quot; &gt;&amp;2
+    exit 1
+  fi
+  echo &quot;pre-commit: refactor check passed ($(bdd_refactor_field reason)).&quot;
+  exit 0
+fi
+
+if [ ! -f &quot;$log&quot; ]; then
+  echo &quot;pre-commit: no TDD event log ($log), but this commit touches production code:&quot; &gt;&amp;2
+  printf '  %s\n' &quot;${staged_prod[@]}&quot; &gt;&amp;2
+  exit 1
+fi
+
+# The log stamps UTC; convert the last commit time to UTC before comparing.
+commit_epoch=$(git log -1 --format=%ct 2&gt;/dev/null || echo 0)
+since=$(date -u -r &quot;$commit_epoch&quot; +%Y-%m-%dT%H:%M:%SZ 2&gt;/dev/null \
+  || date -u -d &quot;@$commit_epoch&quot; +%Y-%m-%dT%H:%M:%SZ)
+recent=$(awk -v since=&quot;$since&quot; '$1 &gt; since' &quot;$log&quot;)
+
+if [ -z &quot;$recent&quot; ]; then
+  echo &quot;pre-commit: no TDD events since the last commit, but this commit touches production code.&quot; &gt;&amp;2
+  exit 1
+fi
+
+# CUCUMBER_RUN is accepted as a legacy name for BDD_RUN.
+run_re=' (BDD_RUN|CUCUMBER_RUN) '
+first_line() { printf '%s\n' &quot;$recent&quot; | grep -nE -- &quot;$1&quot; | head -1 | cut -d: -f1; }
+feature=$(first_line ' FEATURE_WRITE ')
+fail=$(first_line &quot;${run_re}FAIL&quot;)
+main=$(first_line ' MAIN_WRITE ')
+last_run=$(printf '%s\n' &quot;$recent&quot; | grep -E -- &quot;$run_re&quot; | tail -1)
+
+reasons=()
+[ -n &quot;$feature&quot; ] || reasons+=(&quot;no FEATURE_WRITE since the last commit&quot;)
+[ -n &quot;$fail&quot; ] || reasons+=(&quot;no failing BDD run since the last commit (the scenario was never seen red)&quot;)
+if [ -n &quot;$feature&quot; ] &amp;&amp; [ -n &quot;$main&quot; ] &amp;&amp; [ &quot;$feature&quot; -gt &quot;$main&quot; ]; then
+  reasons+=(&quot;production code was written before any feature file&quot;)
+fi
+if [ -n &quot;$fail&quot; ] &amp;&amp; [ -n &quot;$main&quot; ] &amp;&amp; [ &quot;$fail&quot; -gt &quot;$main&quot; ]; then
+  reasons+=(&quot;production code was written before the BDD suite was seen failing&quot;)
+fi
+case &quot;$last_run&quot; in
+  *&quot; PASS&quot;*) ;;
+  *) reasons+=(&quot;the latest BDD run since the last commit is not PASS&quot;) ;;
+esac
+
+if [ ${#reasons[@]} -gt 0 ]; then
+  echo &quot;pre-commit: TDD ordering check FAILED:&quot; &gt;&amp;2
+  printf '  - %s\n' &quot;${reasons[@]}&quot; &gt;&amp;2
+  echo &quot;&quot; &gt;&amp;2
+  echo &quot;Events since the last commit:&quot; &gt;&amp;2
+  printf '%s\n' &quot;$recent&quot; | sed 's/^/  /' &gt;&amp;2
+  exit 1
+fi
+
+echo &quot;pre-commit: TDD ordering check passed.&quot;
+exit 0</code></pre></details></p>
+  </div>
+  <div class="card dark" style="align-self: center">
+    <span class="label">The commit</span>
+    <p style="font-family: var(--mono); margin: .4rem 0">e3dbaca4 · 11 Nov 2026</p>
+    <p>The library’s rules come from its policy file, and the simulator serves the library alone by one, as a preview</p>
+    <p class="note">7 files: the feature, its steps, the policy, and where it’s used.</p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/then-the-code.html" rel="prev"><small>Back</small><b>Then the Code, Then Green</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#commit-proves-order">with heart-ts</a></span>
+<a href="deck/hooks.html" rel="next"><small>Next</small><b>How the Order Is Enforced</b></a></nav>
+</main></div></body></html>

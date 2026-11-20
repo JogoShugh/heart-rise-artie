@@ -1,0 +1,58 @@
+name: gherkin-first
+part: How it was built
+title: No production write until a feature file changes
+kicker: For the engineers · Gherkin first
+say: "gherkin-first.sh runs before every Edit or Write. If the file is production code and no feature file has an in-flight change, it exits 2 with a message the model reads. log-event.sh, after every edit, appends a fact to the event log, which the pre-commit check reads in order."
+sources:
+  - ["bdd-gates: core/", "https://github.com/JogoShugh/bdd-gates-skill"]
+fragments:
+  - name: gherkin-first
+    label: core/gherkin-first.sh (PreToolUse)
+    source: bdd-gates:core/gherkin-first.sh
+    lang: bash
+  - name: log-event
+    label: core/log-event.sh (PostToolUse)
+    source: bdd-gates:core/log-event.sh
+    lang: bash
+  - name: bdd-run
+    label: core/bdd-run.sh, every run, pass or fail
+    source: bdd-gates:core/bdd-run.sh
+    lang: bash
+html: |
+  <h2>No production write until a feature file changes</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);">
+    <div class="rows">
+      <pre><code># core/gherkin-first.sh (PreToolUse)
+  rel=$(bdd_rel "$file_path")
+  bdd_is_prod "$rel" || exit 0
+  bdd_features_dirty &amp;&amp; exit 0
+  # The author switched refactor mode on
+  bdd_refactor_on &amp;&amp; exit 0
+
+  cat &gt;&amp;2 &lt;&lt;EOF
+  Blocked: about to modify production code
+  ($rel) with no feature file change in this
+  changeset yet. Write or update the Gherkin
+  scenario first, run the BDD suite to see it
+  fail, then implement.
+  EOF
+  exit 2</code></pre>
+      <p class="refs"><deck-fragment name="gherkin-first">gherkin-first.sh</deck-fragment></p>
+    </div>
+    <div class="rows">
+      <pre><code># core/log-event.sh (PostToolUse)
+  if bdd_is_prod "$rel"; then
+    bdd_append "MAIN_WRITE $rel"
+  elif bdd_is_feature "$rel"; then
+    bdd_append "FEATURE_WRITE $rel"
+  fi</code></pre>
+      <p class="refs"><deck-fragment name="log-event">log-event.sh</deck-fragment></p>
+      <pre><code># core/bdd-run.sh: every run, pass or fail
+  if [ $ec -eq 0 ]; then
+    bdd_append "BDD_RUN PASS exit=0"
+  else
+    bdd_append "BDD_RUN FAIL exit=$ec"
+  fi</code></pre>
+      <p class="refs"><deck-fragment name="bdd-run">bdd-run.sh</deck-fragment></p>
+    </div>
+  </div>

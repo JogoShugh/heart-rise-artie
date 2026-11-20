@@ -1,0 +1,111 @@
+{
+  "name": "smoke-by-link",
+  "title": "The Smoke Script, Found by Link",
+  "part": "The release, in the order it runs",
+  "kicker": "Steps 5 and 6 · ci:build, then ci:smoke-test",
+  "tone": "light",
+  "number": 23,
+  "of": 30,
+  "html": "<h2>The Smoke Script, Found by Link</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <div><h3>Jenkins Tells the CI Service</h3><p>Its notification plugin posts each build event; the CI service answers ARTIE’s reply, signed, linking the build.</p></div>\n    <div><h3>The Build Links What It Made</h3><p><code>ci:deployment</code>: where it runs. <code>ci:smoke-test</code>: the scenarios it shipped with.</p></div>\n    <div><h3>ARTIE Follows, Then Runs</h3><p>Neither address is in the script. Both came in the answer.</p></div>\n    <p class=\"refs\"><deck-ref name=\"rise\"></deck-ref> <deck-ref name=\"rule-4\"></deck-ref> <deck-ref name=\"follow-your-nose\"></deck-ref></p>\n  </div>\n  <div class=\"card dark\" style=\"align-self: center\">\n    <span class=\"label\">From the kept script</span>\n    <pre style=\"margin: .4rem 0 0; white-space: pre-wrap; font-size: .9rem\">- enter: ${jenkins}\n  steps:\n    - ask: ci:build\n      fields:\n        commit: ${merged.merge_commit_sha}\n      reply: build\n- once-answered:\n    reply: build\n    steps:\n      - follow: hr:in-reply-to\n        then:\n          - run-script: ci:smoke-test\n            on-link: ci:deployment\n            as: smoke</pre>\n  </div>\n</div>\n",
+  "say": "Build it. ARTIE asks the CI service to build the merge commit, and waits again. The CI service is a thin HEART service in front of a real Jenkins, the official image, in a container. When Jenkins finishes, its notification plugin tells the CI service, and the CI service answers ARTIE's reply, with a link to the build. ARTIE follows it. A build that succeeded links two things: where it was deployed, and the smoke scenarios it shipped with. ARTIE runs those scenarios against that deployment. Neither address was in the release script; both came in the answer. One of those scenarios, S3, renews a book and checks the due date moves. Now, the moment of truth.",
+  "sources": [
+    {
+      "label": "The kept release script (release.heart.yaml)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/merge-watch-release/release.heart.yaml"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "smoke-by-link.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "watcher.json",
+      "title": "The Watcher: Tell Me When It Offers Merge"
+    },
+    "next": {
+      "href": "dev-or-comment.json",
+      "title": "Promoted to Dev, or Told Why"
+    },
+    "alternate": {
+      "href": "smoke-by-link.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "rise",
+        "kind": "part",
+        "label": "RISE",
+        "title": "RISE: tell me when it's done",
+        "summary": "Reciprocal Interface for State Exchange. Replies for asynchronous work: ask now, be told later. A watcher or a build answers back when it is ready, as Jenkins does in the release.",
+        "cite": "heart-rise-artie (repository)",
+        "_links": {
+          "self": {
+            "href": "../refs/rise.json",
+            "title": "RISE"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc",
+            "title": "heart-rise-artie (repository)"
+          }
+        }
+      },
+      {
+        "name": "rule-4",
+        "kind": "rule",
+        "label": "NO-FIXED-URIS",
+        "title": "No fixed resource names or hierarchies",
+        "summary": "In brief: the server owns its namespace and tells the client how to build addresses: forms, URI templates.",
+        "quote": "<p>“A REST API must not define fixed resource names or hierarchies (an obvious coupling of client and server). Servers must have the freedom to control their own namespace. Instead, allow servers to instruct clients on how to construct appropriate URIs, such as is done in HTML forms and URI templates, by defining those instructions within media types and link relations. [Failure here implies that clients are assuming a resource structure due to out-of band information, such as a domain-specific standard, which is the data-oriented equivalent to RPC’s functional coupling].”</p>",
+        "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/rule-4.json",
+            "title": "NO-FIXED-URIS"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+            "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "follow-your-nose",
+        "kind": "comment",
+        "label": "FOLLOW-NOSE",
+        "title": "How far ahead is the client looking?",
+        "summary": "A pre-programmed client and a deliberating one can leave the same trace; what matters is how the client decides.",
+        "quote": "<p>“The short answer: “follow your nose”. That is the phrase we usually use to distinguish the process of following information-provided transitions/semantics versus following a set procedure or interface declaration outside of that flow of information. Basically, how far ahead is the client looking?</p><p>The difficulty in providing any trace criterion for REST is that what matters is how the client decides to take transitions. A client that has been pre-programmed to make a sequence of requests (regardless of the response) is going to produce the same network trace as one that examines each response and makes deliberate decisions based on the content.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "23 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/follow-your-nose.json",
+            "title": "FOLLOW-NOSE"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-753",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      }
+    ]
+  }
+}

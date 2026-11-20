@@ -1,0 +1,21 @@
+{
+  "name": "commit-proves-order",
+  "title": "The Commit Has to Prove the Order",
+  "part": "One behavior, start to finish",
+  "kicker": "git pre-commit reads the log, line by line",
+  "tone": "light",
+  "number": 11,
+  "of": 30,
+  "html": "<h2>The Commit Has to Prove the Order</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <div><h3>A Feature File, First?</h3><p>Before the first production write.</p></div>\n    <div><h3>A Failing Run, Before the Code?</h3><p>Red, logged, before that write.</p></div>\n    <div><h3>Green, Last?</h3><p>The final run passed.</p></div>\n    <p class=\"punch\">Any “no”, and there’s no commit, whoever is committing.</p>\n    <p class=\"refs\"><deck-ref name=\"repeatability\"></deck-ref> <deck-fragment name=\"pre-commit\">pre-commit</deck-fragment></p>\n  </div>\n  <div class=\"card dark\" style=\"align-self: center\">\n    <span class=\"label\">The commit</span>\n    <p style=\"font-family: var(--mono); margin: .4rem 0\">e3dbaca4 · 11 Nov 2026</p>\n    <p>The library’s rules come from its policy file, and the simulator serves the library alone by one, as a preview</p>\n    <p class=\"note\">7 files: the feature, its steps, the policy, and where it’s used.</p>\n  </div>\n</div>\n",
+  "say": "Last step: the commit. And here the git pre-commit hook reads the log since the last commit, in order. Did a feature file change before the first production write? Was there a failing run before that write? Was the last run green? If any answer is no, there's no commit, whoever is committing: Claude, me, anyone. This one passed. It's commit e3dbaca4, on the 11th of November: the library's rules come from its policy file. Seven files, the feature, its steps, the policy and the three places that use it. One sentence from me; one behavior, in the right order, on the record.",
+  "sources": [
+    {
+      "label": "Commit e3dbaca4",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/commit/e3dbaca4"
+    },
+    {
+      "label": "bdd-gates skill",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>allowed-now · HEART identifiers</title><link rel="stylesheet" href="../../style.css"></head>
+<body><main><span class="kind">Link relation</span>
+<h1>allowed-now</h1>
+<p><code>https://jogoshugh.github.io/heart-rise-artie/rels/allowed-now</code></p>
+<p>Links a resource to what may be done to it now: its state-based affordances. The target answers with JSON naming the operations allowed in the resource's current state, by their names in the API's own OpenAPI description, and a reason for each one that isn't:</p>
+<p><code>{"allowed": ["pulls/update-branch"], "notAllowed": {"pulls/merge": "The branch is behind its base; update it first."}}</code></p>
+<p>A client follows the link before it acts, and acts only on an operation in <code>allowed</code>. The link can be added by the API itself or by a layer in front of it, which can add rules of its own. It is sent as a <code>Link</code> header (RFC 8288), beside the API's own links.</p>
+<p>This is the smallest form of HEART's <a href="../forms/">forms</a> relation, which links to full forms instead of operation names.</p>
+<h2>Used in</h2><ul><li><a href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/exhibits/allowed-now">exhibits/allowed-now</a>: a proxy in front of GitHub's REST API, and a client that merges only what's allowed now</li></ul>
+<footer>HEART identifiers. Index: <a href="../../">all identifiers</a></footer>
+</main></body></html>

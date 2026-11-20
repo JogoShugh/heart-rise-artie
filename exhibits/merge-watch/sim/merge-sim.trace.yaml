@@ -1,0 +1,4143 @@
+---
+run:
+  inputs:
+    owner:
+      value: acme
+      given: given
+      question: Whose repository?
+    repo:
+      value: web
+      given: given
+      default: heart-github-test
+      question: Which repository?
+    label:
+      value: dependencies
+      given: default
+      default: dependencies
+      question: Which label marks a dependency bump?
+    hold:
+      value: hold
+      given: default
+      default: hold
+      question: Which label means a person objects?
+    told:
+      value: watch-told
+      given: default
+      default: watch-told
+      question: Which label marks a pull request the watch has told why?
+  source: |-
+    act(intent = "get repository $owner/$repo")
+    act(intent = """Open an issue titled "Merge watch" with body: Close this issue to stop the watch.""")
+  marks:
+    '1':
+      fromIntent: In ${owner}/${repo}
+    '2':
+      as: watch
+      intent: Open an issue titled "Merge watch", saying "Close this issue to stop the watch."
+  moves:
+    - 'why: Open the repository acme/web as the step says.'
+    - 'get repository acme/web: acted github:repos-get, done, at http://localhost:8098/repos/acme/web'
+    - 'why: The repository acme/web is open, which is all this step asks for.'
+    - 'done: In acme/web'
+    - 'why: The repository is held and offers github:open-issue, so I''ll open the watch issue.'
+    - 'Open an issue titled "Merge watch" with body: Close this issue to stop the watch.: acted github:open-issue, new resource, at http://localhost:8098/repos/acme/web/issues/483'
+    - 'why: The issue "Merge watch" was created (#483) with the requested body, so the step''s work is done.'
+    - 'done: Open an issue titled "Merge watch", saying "Close this issue to stop the watch."'
+    - 'why: The repository offers no link to pull requests, so I''ll go back to the start, which may have a form that lists them.'
+    - back to the start, at http://localhost:8098/
+    - 'why: github:pulls-list filters by labels, so use it to list open pull requests in acme/web labelled dependencies.'
+    - 'List pull requests in acme/web filtered by label dependencies: decided github:pulls-list, at http://localhost:8098/'
+    - 'why: The held pull request must be labelled dependencies, which its embedded labels show.'
+    - 'whenever: a pull request labelled dependencies changes: decided the check {"github:labels":["dependencies"]}, at http://localhost:8098/repos/acme/web/pulls/482'
+    - 'why: The condition is that the pull request carries the hold label, so check that its labels include $hold.'
+    - 'if: it''s labelled hold: decided the check {"github:labels":["hold"]}, at http://localhost:8098/repos/acme/web/pulls/482'
+    - 'why: The condition is that the pull request carries the watch-told label, so check that its labels include $told.'
+    - 'if: it''s labelled watch-told: decided the check {"github:labels":["watch-told"]}, at http://localhost:8098/repos/acme/web/pulls/482'
+    - 'stop: refused once, this step waits: name the form its act needs, even when it isn''t offered now; stop again to end the run'
+    - 'why: The step waits until the pull request can be merged, which means the github:merge form is offered.'
+    - 'once: waits for github:merge'
+    - 'why: github:merge is now offered and the pull request is mergeable, so merge it by squashing.'
+    - 'Merge the pull request by squashing.: decided github:merge, at http://localhost:8098/repos/acme/web/pulls/482'
+    - 'why: The squash merge was answered by the server and the pull request now shows merged and closed, so this step is done.'
+    - 'why: The watch ends once issue 483 is closed, so check that its state is closed.'
+    - 'until: someone closes http://localhost:8098/repos/acme/web/issues/483: decided the check {"state":"closed"}, at http://localhost:8098/repos/acme/web/issues/483'
+    - 'watched: Whenever a pull request labelled dependencies changes, until someone closes http://localhost:8098/repos/acme/web/issues/483'
+  model:
+    name: claude-sonnet-5-5
+    url: https://api.anthropic.com
+  usage:
+    calls: 14
+    input: 26276
+    output: 2564
+    cache_read: 16018
+    cache_write: 8896
+  watch:
+    from: 5
+    script: |-
+      watch(until = { at("watch") { "state" eq "closed" } }) {
+          act("github:pulls-list", "owner" to owner, "repo" to repo, "labels" to label, inferred = "List pull requests in ${owner}/${repo} filtered by label ${label}", fromIntent = "a pull request labelled ${label} changes") {
+              whenever {
+                  has { "github:labels" has label }
+                  leaveWhere("leave it, and say so once.") { "github:labels" has hold }
+                  leaveWhere("leave it.") { "github:labels" has told }
+                  once("github:merge", giveUp = 3.minutes, otherwise = { why ->
+                      act(intent = "label it ${told}")
+                      act(intent = "tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: ${why ?: "no reason given"}")
+                  }) {
+                      act("github:merge", "merge_method" to "squash", intent = "merge it by squashing.") {}
+                  }
+              }
+          }
+      }
+    steps:
+      - watch:
+          until:
+            - at: watch
+              field: state
+              is: closed
+          steps:
+            - act: github:pulls-list
+              fields:
+                owner: ${owner}
+                repo: ${repo}
+                labels: ${label}
+              inferred: List pull requests in ${owner}/${repo} filtered by label ${label}
+              from-intent: a pull request labelled ${label} changes
+              then:
+                - whenever:
+                    - has:
+                        - field: github:labels
+                          has: ${label}
+                    - leave-where:
+                        say: leave it, and say so once.
+                        facts:
+                          - field: github:labels
+                            has: ${hold}
+                    - leave-where:
+                        say: leave it.
+                        facts:
+                          - field: github:labels
+                            has: ${told}
+                    - once:
+                        offered: github:merge
+                        give-up: 3m
+                        steps:
+                          - act: github:merge
+                            fields:
+                              merge_method: squash
+                            intent: merge it by squashing.
+                            then: []
+                        otherwise:
+                          - intent: label it ${told}
+                            reasoned: true
+                          - intent: 'tell its author in one friendly sentence why it wasn''t merged and what to do next. The wait gave up, and the server says why: ${why}'
+                            reasoned: true
+---
+at: '2026-11-03T02:23:26.473650Z'
+ms: 66
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8098/
+opens: true
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T02:23:28.884414Z'
+ms: 1661
+mode: intent
+say: get repository acme/web
+line: 1
+params:
+  relation: github:repos-get
+  owner: acme
+  repo: web
+values:
+  owner:
+    value: acme
+    type: string
+    from:
+      - input: owner
+  repo:
+    value: web
+    type: string
+    from:
+      - input: repo
+reason:
+  template: get repository $owner/$repo
+  slots:
+    owner:
+      value: acme
+      from:
+        - input: owner
+    repo:
+      value: web
+      from:
+        - input: repo
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"GitHub v3 REST API","hr:manifest":{"forms":{"github:add-sub-issue":["sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU="],"github:assign":["sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I="],"github:branch-from-here":["sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo="],"github:close":["sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=","sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ="],"github:close-duplicate":["sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs="],"github:close-not-planned":["sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04="],"github:comment":["sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=","sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0="],"github:commit-file":["sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE="],"github:edit":["sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=","sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=","sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU="],"github:issues-get":["sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc="],"github:issues-get-comment":["sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk="],"github:issues-list-comments":["sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY="],"github:issues-list-for-repo":["sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw="],"github:label":["sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=","sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU="],"github:lock":["sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg="],"github:merge":["sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE="],"github:open-issue":["sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI="],"github:open-pull-request":["sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg="],"github:pulls-get":["sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE="],"github:pulls-list":["sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk="],"github:remove-sub-issue":["sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY="],"github:reopen":["sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=","sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU="],"github:repos-get":["sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go="],"github:repos-get-branch":["sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg="],"github:repos-list-branches":["sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc="],"github:repos-list-for-user":["sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54="],"github:request-review":["sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c="],"github:set-milestone":["sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM="],"github:unassign":["sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A="],"github:unlabel":["sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU="],"github:unlock":["sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0="],"github:update-branch":["sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8="]},"digest":"sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE="}}
+      </state>
+      <offers>
+      {"github:pulls-list":{"title":"List pull requests","description":"Lists pull requests in a specified repository.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"state":{"type":"string","default":"open","enum":["open","closed","all"],"title":"State","description":"Either `open`, `closed`, or `all` to filter by state."},"sort":{"type":"string","default":"created","enum":["created","updated","popularity","long-running"],"title":"Sort","description":"What to sort results by. `popularity` will sort by the number of comments. `long-running` will sort by date created and will limit the results to pull requests that have been open for more than a month and have had activity within the past month."},"direction":{"type":"string","enum":["asc","desc"],"title":"Direction","description":"The direction of the sort. Default: `desc` when sort is `created` or sort is not specified, otherwise `asc`."},"labels":{"type":"string","title":"Labels","description":"A list of comma separated label names. Example: `bug,ui,@high`"}},"required":["owner","repo"]}},"github:pulls-get":{"title":"Get a pull request","description":"Draft pull requests are available in public repositories with GitHub Free and GitHub Free for organizations, GitHub Pro, and legacy per-repository billing plans, and in public and private repositories with GitHub Team and GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"pull_number":{"type":"integer","title":"Pull_number","description":"The number that identifies the pull request."}},"required":["owner","repo","pull_number"]}},"github:issues-list-for-repo":{"title":"List repository issues","description":"List issues in a repository. Only open issues will be listed. Pull requests are left out: list them with github:pulls-list, which filters by labels too.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"state":{"type":"string","default":"open","enum":["open","closed","all"],"title":"State","description":"Indicates the state of the issues to return."},"labels":{"type":"string","title":"Labels","description":"A list of comma separated label names. Example: `bug,ui,@high`"},"assignee":{"type":"string","title":"Assignee","description":"Can be the name of a user. Pass in `none` for issues with no assigned user, and `*` for issues assigned to any user."},"creator":{"type":"string","title":"Creator","description":"The user that created the issue."},"mentioned":{"type":"string","title":"Mentioned","description":"A user that's mentioned in the issue."},"milestone":{"type":"string","title":"Milestone","description":"If an `integer` is passed, it should refer to a milestone by its `number` field. If the string `*` is passed, issues with any milestone are accepted. If the string `none` is passed, issues without milestones are returned."},"sort":{"type":"string","default":"created","enum":["created","updated","comments"],"title":"Sort","description":"What to sort results by."},"direction":{"type":"string","default":"desc","enum":["asc","desc"],"title":"Direction","description":"The direction to sort the results by."},"since":{"type":"string","format":"date-time","title":"Since","description":"Only show results that were last updated after the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`."}},"required":["owner","repo"]}},"github:issues-get":{"title":"Get an issue","description":"The API returns a [`301 Moved Permanently` status](https://docs.github.com/rest/guides/best-practices-for-using-the-rest-api#follow-redirects) if the issue was\n[transferred](https://docs.github.com/articles/transferring-an-issue-to-another-repository/) to another repository. If\nthe issue was transferred to or deleted from a repository where the authenticated user lacks read access, the API\nreturns a `404 Not Found` status. If the issue was deleted from a repository where the authenticated user has read\naccess, the API returns a `410 Gone` status. To receive webhook events for transferred and deleted issues, subscribe\nto the [`issues`](https://docs.github.com/webhooks/event-payloads/#issues) webhook.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"issue_number":{"type":"integer","title":"Issue_number","description":"The number that identifies the issue."}},"required":["owner","repo","issue_number"]}},"github:repos-list-for-user":{"title":"List repositories for a user","description":"Lists public repositories for the specified user.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"username":{"type":"string","title":"Username","description":"The handle for the GitHub user account."},"type":{"type":"string","default":"owner","enum":["all","owner","member"],"title":"Type","description":"Limit results to repositories of the specified type."},"sort":{"type":"string","default":"full_name","enum":["created","updated","pushed","full_name"],"title":"Sort","description":"The property to sort the results by."},"direction":{"type":"string","enum":["asc","desc"],"title":"Direction","description":"The order to sort by. Default: `asc` when using `full_name`, otherwise `desc`."}},"required":["username"]}},"github:repos-get":{"title":"Get a repository","description":"The `parent` and `source` objects are present when the repository is a fork. `parent` is the repository this repository was forked from, `source` is the ultimate source for the network.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."}},"required":["owner","repo"]}},"github:issues-list-comments":{"title":"List issue comments","description":"You can use the REST API to list comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"issue_number":{"type":"integer","title":"Issue_number","description":"The number that identifies the issue."},"since":{"type":"string","format":"date-time","title":"Since","description":"Only show results that were last updated after the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`."}},"required":["owner","repo","issue_number"]}},"github:issues-get-comment":{"title":"Get an issue comment","description":"You can use the REST API to get comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"comment_id":{"type":"integer","format":"int64","title":"Comment_id","description":"The unique identifier of the comment."}},"required":["owner","repo","comment_id"]}},"github:repos-list-branches":{"title":"List branches","description":"List branches","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"protected":{"type":"boolean","title":"Protected","description":"Setting to `true` returns only branches protected by branch protections or rulesets. When set to `false`, only unprotected branches are returned. Omitting this parameter returns all branches."}},"required":["owner","repo"]}},"github:repos-get-branch":{"title":"Get a branch","description":"Get a branch","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"branch":{"type":"string","title":"Branch","description":"The name of the branch. Cannot contain wildcard characters. To use wildcard characters in branch names, use [the GraphQL API](https://docs.github.com/graphql)."}},"required":["owner","repo","branch"]}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      get repository acme/web
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01Cg1njAzPM81icXf9osbCSx","name":"select","input":{"action":"act","affordance":"github:repos-get","fields":{"owner":"acme","repo":"web"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: github:repos-get
+  title: Get a repository
+  method: GET
+  target: /repos/{owner}/{repo}
+  address: http://localhost:8098/repos/acme/web
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8098/repos/acme/web
+now:
+  state:
+    allow_auto_merge: false
+    allow_forking: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_squash_merge: true
+    archived: false
+    created_at: '2011-01-26T19:01:12Z'
+    default_branch: master
+    delete_branch_on_merge: true
+    description: This your first repo!
+    disabled: false
+    fork: false
+    forks: 9
+    forks_count: 9
+    full_name: acme/web
+    has_downloads: true
+    has_issues: true
+    has_pages: false
+    has_projects: true
+    has_wiki: true
+    id: 1296269
+    is_template: false
+    language: null
+    name: web
+    network_count: 0
+    node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+    open_issues: 0
+    open_issues_count: 0
+    permissions:
+      admin: false
+      maintain: false
+      push: true
+      triage: true
+      pull: true
+    private: false
+    pushed_at: '2011-01-26T19:06:43Z'
+    size: 108
+    stargazers_count: 80
+    subscribers_count: 42
+    temp_clone_token: ABTLWHOULUVAXGTRYU7OC2876QJ2O
+    topics:
+      - acme
+      - atom
+      - electron
+      - api
+    updated_at: '2011-01-26T19:14:43Z'
+    visibility: public
+    watchers: 80
+    watchers_count: 80
+    web_commit_signoff_required: false
+    hr:address:
+      owner: acme
+      repo: web
+  forms:
+    - github:open-issue
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:repos-list-branches:
+      - null
+    github:archive:
+      - null
+    github:assignees:
+      - null
+    github:blobs:
+      - null
+    github:branches:
+      - null
+    github:clone:
+      - null
+    github:collaborators:
+      - null
+    github:comments:
+      - null
+    github:commits:
+      - null
+    github:compare:
+      - null
+    github:contents:
+      - null
+    github:contributors:
+      - null
+    github:deployments:
+      - null
+    github:downloads:
+      - null
+    github:events:
+      - null
+    github:forks:
+      - null
+    github:git-commits:
+      - null
+    github:git-refs:
+      - null
+    github:git-tags:
+      - null
+    github:git:
+      - null
+    github:homepage:
+      - null
+    github:hooks:
+      - null
+    alternate:
+      - null
+    github:issue-comment:
+      - null
+    github:issue-events:
+      - null
+    github:issues:
+      - null
+    github:keys:
+      - null
+    github:labels:
+      - null
+    github:languages:
+      - null
+    github:merges:
+      - null
+    github:milestones:
+      - null
+    github:mirror:
+      - null
+    github:notifications:
+      - null
+    github:pulls:
+      - null
+    github:releases:
+      - null
+    github:ssh:
+      - null
+    github:stargazers:
+      - null
+    github:statuses:
+      - null
+    github:subscribers:
+      - null
+    github:subscription:
+      - null
+    github:svn:
+      - null
+    github:tags:
+      - null
+    github:teams:
+      - null
+    github:trees:
+      - null
+  embedded:
+    github:owner:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:parent:
+      - title: null
+        state:
+          allow_auto_merge: false
+          allow_merge_commit: true
+          allow_rebase_merge: true
+          allow_squash_merge: true
+          archived: false
+          created_at: '2011-01-26T19:01:12Z'
+          default_branch: master
+          delete_branch_on_merge: true
+          description: This your first repo!
+          disabled: false
+          fork: false
+          forks: 1
+          forks_count: 9
+          full_name: acme/web
+          has_downloads: true
+          has_issues: true
+          has_pages: false
+          has_projects: true
+          has_wiki: true
+          id: 1296269
+          is_template: true
+          language: null
+          name: Hello-World
+          network_count: 0
+          node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+          open_issues: 1
+          open_issues_count: 0
+          permissions:
+            admin: false
+            pull: true
+            push: false
+          private: false
+          pushed_at: '2011-01-26T19:06:43Z'
+          size: 108
+          stargazers_count: 80
+          subscribers_count: 42
+          temp_clone_token: ABTLWHOULUVAXGTRYU7OC2876QJ2O
+          topics:
+            - acme
+            - atom
+            - electron
+            - api
+          updated_at: '2011-01-26T19:14:43Z'
+          visibility: public
+          watchers: 1
+          watchers_count: 80
+    github:source:
+      - title: null
+        state:
+          allow_auto_merge: false
+          allow_merge_commit: true
+          allow_rebase_merge: true
+          allow_squash_merge: true
+          archived: false
+          created_at: '2011-01-26T19:01:12Z'
+          default_branch: master
+          delete_branch_on_merge: true
+          description: This your first repo!
+          disabled: false
+          fork: false
+          forks: 1
+          forks_count: 9
+          full_name: acme/web
+          has_downloads: true
+          has_issues: true
+          has_pages: false
+          has_projects: true
+          has_wiki: true
+          id: 1296269
+          is_template: true
+          language: null
+          name: Hello-World
+          network_count: 0
+          node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+          open_issues: 1
+          open_issues_count: 0
+          permissions:
+            admin: false
+            pull: true
+            push: false
+          private: false
+          pushed_at: '2011-01-26T19:06:43Z'
+          size: 108
+          stargazers_count: 80
+          subscribers_count: 42
+          temp_clone_token: ABTLWHOULUVAXGTRYU7OC2876QJ2O
+          topics:
+            - acme
+            - atom
+            - electron
+            - api
+          updated_at: '2011-01-26T19:14:43Z'
+          visibility: public
+          watchers: 1
+          watchers_count: 80
+    github:template-repository:
+      - title: null
+        state:
+          allow_auto_merge: false
+          allow_merge_commit: true
+          allow_rebase_merge: true
+          allow_squash_merge: true
+          archived: false
+          created_at: '2011-01-26T19:01:12Z'
+          default_branch: master
+          delete_branch_on_merge: true
+          description: This your first repo!
+          disabled: false
+          fork: false
+          forks: 9
+          forks_count: 9
+          full_name: acme/web-Template
+          has_downloads: true
+          has_issues: true
+          has_pages: false
+          has_projects: true
+          has_wiki: true
+          id: 1296269
+          is_template: true
+          language: null
+          name: Hello-World-Template
+          network_count: 0
+          node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+          open_issues: 0
+          open_issues_count: 0
+          permissions:
+            admin: false
+            pull: true
+            push: false
+          private: false
+          pushed_at: '2011-01-26T19:06:43Z'
+          size: 108
+          stargazers_count: 80
+          subscribers_count: 42
+          temp_clone_token: ABTLWHOULUVAXGTRYU7OC2876QJ2O
+          topics:
+            - acme
+            - atom
+            - electron
+            - api
+          updated_at: '2011-01-26T19:14:43Z'
+          visibility: public
+          watchers: 80
+          watchers_count: 80
+    github:organization:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: Organization
+    license:
+      - title: null
+        state:
+          key: mit
+          name: MIT License
+          node_id: MDc6TGljZW5zZW1pdA==
+          spdx_id: MIT
+keeps:
+  /topics/0:
+    - 6
+    - 9
+    - 19
+    - 24
+  /hr:address/owner:
+    - 6
+    - 9
+    - 19
+    - 24
+  /_embedded/github:owner/0/login:
+    - 6
+    - 9
+    - 19
+    - 24
+  /_embedded/github:parent/0/topics/0:
+    - 6
+    - 9
+    - 19
+    - 24
+  /_embedded/github:source/0/topics/0:
+    - 6
+    - 9
+    - 19
+    - 24
+  /_embedded/github:template-repository/0/topics/0:
+    - 6
+    - 9
+    - 19
+    - 24
+  /_embedded/github:organization/0/login:
+    - 6
+    - 9
+    - 19
+    - 24
+  /name:
+    - 6
+    - 9
+    - 19
+    - 24
+  /hr:address/repo:
+    - 6
+    - 9
+    - 19
+    - 24
+---
+at: '2026-11-03T02:23:34.658216Z'
+ms: 1813
+mode: intent
+say: 'Open an issue titled "Merge watch" with body: Close this issue to stop the watch.'
+line: 2
+within: 1
+params:
+  relation: github:open-issue
+  title: Merge watch
+  body: Close this issue to stop the watch.
+values:
+  title:
+    value: Merge watch
+    from:
+      - words
+  body:
+    value: Close this issue to stop the watch.
+    type: string
+    from:
+      - words
+reason:
+  template: 'Open an issue titled "Merge watch" with body: Close this issue to stop the watch.'
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"allow_auto_merge":false,"allow_forking":true,"allow_merge_commit":true,"allow_rebase_merge":true,"allow_squash_merge":true,"archived":false,"created_at":"2011-01-26T19:01:12Z","default_branch":"master","delete_branch_on_merge":true,"description":"This your first repo!","disabled":false,"fork":false,"forks":9,"forks_count":9,"full_name":"acme/web","has_downloads":true,"has_issues":true,"has_pages":false,"has_projects":true,"has_wiki":true,"id":1296269,"is_template":false,"language":null,"name":"web","network_count":0,"node_id":"MDEwOlJlcG9zaXRvcnkxMjk2MjY5","open_issues":0,"open_issues_count":0,"permissions":{"admin":false,"maintain":false,"push":true,"triage":true,"pull":true},"private":false,"pushed_at":"2011-01-26T19:06:43Z","size":108,"stargazers_count":80,"subscribers_count":42,"temp_clone_token":"ABTLWHOULUVAXGTRYU7OC2876QJ2O","topics":["acme","atom","electron","api"],"updated_at":"2011-01-26T19:14:43Z","visibility":"public","watchers":80,"watchers_count":80,"web_commit_signoff_required":false,"hr:address":{"owner":"acme","repo":"web"}}
+      </state>
+      <offers>
+      {"github:open-issue":{"title":"Open an issue","description":"Open a new issue in this repository.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"assignees":{"description":"Logins for Users to assign to this issue. _NOTE: Only users with push access can set assignees for new issues. Assignees are silently dropped otherwise._","items":{"type":"string"},"title":"Assignees","type":"array"},"body":{"description":"The contents of the issue.","title":"Body","type":"string"},"labels":{"description":"Labels to associate with this issue. _NOTE: Only users with push access can set labels for new issues. Labels are silently dropped otherwise._","items":{"oneOf":[{"type":"string"},{"properties":{"color":{"nullable":true,"type":"string"},"description":{"nullable":true,"type":"string"},"id":{"type":"integer"},"name":{"type":"string"}},"type":"object"}]},"title":"Labels","type":"array"},"milestone":{"nullable":true,"oneOf":[{"type":"string"},{"description":"The `number` of the milestone to associate this issue with. _NOTE: Only users with push access can set the milestone for new issues. The milestone is silently dropped otherwise._","type":"integer"}],"title":"Milestone"},"title":{"description":"The title of the issue.","oneOf":[{"type":"string"},{"type":"integer"}],"title":"Title"}},"required":["title"],"title":"Open an issue","type":"object","$id":"/schemas/a6135350178a1927"}}}
+      </offers>
+      <links>
+      [{"rel":"github:repos-list-branches"},{"rel":"github:svn"},{"rel":"github:owner","state":{"gravatar_id":"","id":1,"login":"acme","node_id":"MDQ6VXNlcjE=","site_admin":false,"type":"User"}},{"rel":"github:parent","state":{"allow_auto_merge":false,"allow_merge_commit":true,"allow_rebase_merge":true,"allow_squash_merge":true,"archived":false,"created_at":"2011-01-26T19:01:12Z","default_branch":"master","delete_branch_on_merge":true,"description":"This your first repo!","disabled":false,"fork":false,"forks":1,"forks_count":9,"full_name":"acme/web","has_downloads":true,"has_issues":true,"has_pages":false,"has_projects":true,"has_wiki":true,"id":1296269,"is_template":true,"language":null,"name":"Hello-World","network_count":0,"node_id":"MDEwOlJlcG9zaXRvcnkxMjk2MjY5","open_issues":1,"open_issues_count":0,"permissions":{"admin":false,"pull":true,"push":false},"private":false,"pushed_at":"2011-01-26T19:06:43Z","size":108,"stargazers_count":80,"subscribers_count":42,"temp_clone_token":"ABTLWHOULUVAXGTRYU7OC2876QJ2O","topics":["acme","atom","electron","api"],"updated_at":"2011-01-26T19:14:43Z","visibility":"public","watchers":1,"watchers_count":80}},{"rel":"github:source","state":{"allow_auto_merge":false,"allow_merge_commit":true,"allow_rebase_merge":true,"allow_squash_merge":true,"archived":false,"created_at":"2011-01-26T19:01:12Z","default_branch":"master","delete_branch_on_merge":true,"description":"This your first repo!","disabled":false,"fork":false,"forks":1,"forks_count":9,"full_name":"acme/web","has_downloads":true,"has_issues":true,"has_pages":false,"has_projects":true,"has_wiki":true,"id":1296269,"is_template":true,"language":null,"name":"Hello-World","network_count":0,"node_id":"MDEwOlJlcG9zaXRvcnkxMjk2MjY5","open_issues":1,"open_issues_count":0,"permissions":{"admin":false,"pull":true,"push":false},"private":false,"pushed_at":"2011-01-26T19:06:43Z","size":108,"stargazers_count":80,"subscribers_count":42,"temp_clone_token":"ABTLWHOULUVAXGTRYU7OC2876QJ2O","topics":["acme","atom","electron","api"],"updated_at":"2011-01-26T19:14:43Z","visibility":"public","watchers":1,"watchers_count":80}},{"rel":"github:template-repository","state":{"allow_auto_merge":false,"allow_merge_commit":true,"allow_rebase_merge":true,"allow_squash_merge":true,"archived":false,"created_at":"2011-01-26T19:01:12Z","default_branch":"master","delete_branch_on_merge":true,"description":"This your first repo!","disabled":false,"fork":false,"forks":9,"forks_count":9,"full_name":"acme/web-Template","has_downloads":true,"has_issues":true,"has_pages":false,"has_projects":true,"has_wiki":true,"id":1296269,"is_template":true,"language":null,"name":"Hello-World-Template","network_count":0,"node_id":"MDEwOlJlcG9zaXRvcnkxMjk2MjY5","open_issues":0,"open_issues_count":0,"permissions":{"admin":false,"pull":true,"push":false},"private":false,"pushed_at":"2011-01-26T19:06:43Z","size":108,"stargazers_count":80,"subscribers_count":42,"temp_clone_token":"ABTLWHOULUVAXGTRYU7OC2876QJ2O","topics":["acme","atom","electron","api"],"updated_at":"2011-01-26T19:14:43Z","visibility":"public","watchers":80,"watchers_count":80}},{"rel":"github:organization","state":{"gravatar_id":"","id":1,"login":"acme","node_id":"MDQ6VXNlcjE=","site_admin":false,"type":"Organization"}},{"rel":"license","state":{"key":"mit","name":"MIT License","node_id":"MDc6TGljZW5zZW1pdA==","spdx_id":"MIT"}}]
+      </links>
+      <intent>
+      Open an issue titled "Merge watch" with body: Close this issue to stop the watch.
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_0157V8ix2JaU7YjwgQFJqmgJ","name":"select","input":{"action":"act","affordance":"github:open-issue","fields":{"title":"Merge watch","body":"Close this issue to stop the watch."}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: github:open-issue
+  title: Open an issue
+  method: POST
+  target: http://localhost:8098/repos/acme/web/actions/open-issue
+  address: http://localhost:8098/repos/acme/web/actions/open-issue
+  picked: relation
+  not sent:
+    - assignees
+    - labels
+    - milestone
+guard:
+  rung: L0
+  form: sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+  if-match: '"seq-0.hsf.L0.1ccdb98fc39a7fc9"'
+offered:
+  forms:
+    - github:open-issue
+  links:
+    - alternate
+    - github:archive
+    - github:assignees
+    - github:blobs
+    - github:branches
+    - github:clone
+    - github:collaborators
+    - github:comments
+    - github:commits
+    - github:compare
+    - github:contents
+    - github:contributors
+    - github:deployments
+    - github:downloads
+    - github:events
+    - github:forks
+    - github:git
+    - github:git-commits
+    - github:git-refs
+    - github:git-tags
+    - github:homepage
+    - github:hooks
+    - github:issue-comment
+    - github:issue-events
+    - github:issues
+    - github:keys
+    - github:labels
+    - github:languages
+    - github:merges
+    - github:milestones
+    - github:mirror
+    - github:notifications
+    - github:pulls
+    - github:releases
+    - github:repos-list-branches
+    - github:ssh
+    - github:stargazers
+    - github:statuses
+    - github:subscribers
+    - github:subscription
+    - github:svn
+    - github:tags
+    - github:teams
+    - github:trees
+    - hr:unavailable
+    - self
+outcome: new resource
+address: http://localhost:8098/repos/acme/web/issues/483
+now:
+  state:
+    active_lock_reason: null
+    assignees: []
+    author_association: COLLABORATOR
+    body: Close this issue to stop the watch.
+    closed_at: null
+    comments: 0
+    created_at: '2011-04-22T13:33:48Z'
+    id: 2000483
+    labels: []
+    locked: false
+    milestone: null
+    node_id: MDU6SXNzdWUx
+    number: 483
+    pinned_comment: null
+    state: open
+    state_reason: null
+    title: Merge watch
+    updated_at: '2011-04-22T13:33:48Z'
+    hr:address:
+      owner: acme
+      repo: web
+      issue_number: '483'
+  forms:
+    - github:close
+    - github:close-not-planned
+    - github:close-duplicate
+    - github:edit
+    - github:lock
+    - github:label
+    - github:unlabel
+    - github:assign
+    - github:unassign
+    - github:set-milestone
+    - github:comment
+    - github:add-sub-issue
+    - github:remove-sub-issue
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:labels:
+      - null
+    github:repos-get:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignee:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:closed-by:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+keeps:
+  /hr:address/owner:
+    - 6
+    - 9
+    - 19
+    - 24
+  /hr:address/repo:
+    - 6
+    - 9
+    - 19
+    - 24
+---
+at: '2026-11-03T02:23:38.373636Z'
+ms: 29
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/repos/acme/web
+outcome: done
+address: http://localhost:8098/repos/acme/web
+now:
+  state:
+    allow_auto_merge: false
+    allow_forking: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_squash_merge: true
+    archived: false
+    created_at: '2011-01-26T19:01:12Z'
+    default_branch: master
+    delete_branch_on_merge: true
+    description: This your first repo!
+    disabled: false
+    fork: false
+    forks: 9
+    forks_count: 9
+    full_name: acme/web
+    has_downloads: true
+    has_issues: true
+    has_pages: false
+    has_projects: true
+    has_wiki: true
+    id: 1296269
+    is_template: false
+    language: null
+    name: web
+    network_count: 0
+    node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+    open_issues: 0
+    open_issues_count: 0
+    permissions:
+      admin: false
+      maintain: false
+      push: true
+      triage: true
+      pull: true
+    private: false
+    pushed_at: '2011-01-26T19:06:43Z'
+    size: 108
+    stargazers_count: 80
+    subscribers_count: 42
+    temp_clone_token: ABTLWHOULUVAXGTRYU7OC2876QJ2O
+    topics:
+      - acme
+      - atom
+      - electron
+      - api
+    updated_at: '2011-01-26T19:14:43Z'
+    visibility: public
+    watchers: 80
+    watchers_count: 80
+    web_commit_signoff_required: false
+    hr:address:
+      owner: acme
+      repo: web
+  forms:
+    - github:open-issue
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:repos-list-branches:
+      - null
+    github:archive:
+      - null
+    github:assignees:
+      - null
+    github:blobs:
+      - null
+    github:branches:
+      - null
+    github:clone:
+      - null
+    github:collaborators:
+      - null
+    github:comments:
+      - null
+    github:commits:
+      - null
+    github:compare:
+      - null
+    github:contents:
+      - null
+    github:contributors:
+      - null
+    github:deployments:
+      - null
+    github:downloads:
+      - null
+    github:events:
+      - null
+    github:forks:
+      - null
+    github:git-commits:
+      - null
+    github:git-refs:
+      - null
+    github:git-tags:
+      - null
+    github:git:
+      - null
+    github:homepage:
+      - null
+    github:hooks:
+      - null
+    alternate:
+      - null
+    github:issue-comment:
+      - null
+    github:issue-events:
+      - null
+    github:issues:
+      - null
+    github:keys:
+      - null
+    github:labels:
+      - null
+    github:languages:
+      - null
+    github:merges:
+      - null
+    github:milestones:
+      - null
+    github:mirror:
+      - null
+    github:notifications:
+      - null
+    github:pulls:
+      - null
+    github:releases:
+      - null
+    github:ssh:
+      - null
+    github:stargazers:
+      - null
+    github:statuses:
+      - null
+    github:subscribers:
+      - null
+    github:subscription:
+      - null
+    github:svn:
+      - null
+    github:tags:
+      - null
+    github:teams:
+      - null
+    github:trees:
+      - null
+  embedded:
+    github:owner:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:parent:
+      - title: null
+        state:
+          allow_auto_merge: false
+          allow_merge_commit: true
+          allow_rebase_merge: true
+          allow_squash_merge: true
+          archived: false
+          created_at: '2011-01-26T19:01:12Z'
+          default_branch: master
+          delete_branch_on_merge: true
+          description: This your first repo!
+          disabled: false
+          fork: false
+          forks: 1
+          forks_count: 9
+          full_name: acme/web
+          has_downloads: true
+          has_issues: true
+          has_pages: false
+          has_projects: true
+          has_wiki: true
+          id: 1296269
+          is_template: true
+          language: null
+          name: Hello-World
+          network_count: 0
+          node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+          open_issues: 1
+          open_issues_count: 0
+          permissions:
+            admin: false
+            pull: true
+            push: false
+          private: false
+          pushed_at: '2011-01-26T19:06:43Z'
+          size: 108
+          stargazers_count: 80
+          subscribers_count: 42
+          temp_clone_token: ABTLWHOULUVAXGTRYU7OC2876QJ2O
+          topics:
+            - acme
+            - atom
+            - electron
+            - api
+          updated_at: '2011-01-26T19:14:43Z'
+          visibility: public
+          watchers: 1
+          watchers_count: 80
+    github:source:
+      - title: null
+        state:
+          allow_auto_merge: false
+          allow_merge_commit: true
+          allow_rebase_merge: true
+          allow_squash_merge: true
+          archived: false
+          created_at: '2011-01-26T19:01:12Z'
+          default_branch: master
+          delete_branch_on_merge: true
+          description: This your first repo!
+          disabled: false
+          fork: false
+          forks: 1
+          forks_count: 9
+          full_name: acme/web
+          has_downloads: true
+          has_issues: true
+          has_pages: false
+          has_projects: true
+          has_wiki: true
+          id: 1296269
+          is_template: true
+          language: null
+          name: Hello-World
+          network_count: 0
+          node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+          open_issues: 1
+          open_issues_count: 0
+          permissions:
+            admin: false
+            pull: true
+            push: false
+          private: false
+          pushed_at: '2011-01-26T19:06:43Z'
+          size: 108
+          stargazers_count: 80
+          subscribers_count: 42
+          temp_clone_token: ABTLWHOULUVAXGTRYU7OC2876QJ2O
+          topics:
+            - acme
+            - atom
+            - electron
+            - api
+          updated_at: '2011-01-26T19:14:43Z'
+          visibility: public
+          watchers: 1
+          watchers_count: 80
+    github:template-repository:
+      - title: null
+        state:
+          allow_auto_merge: false
+          allow_merge_commit: true
+          allow_rebase_merge: true
+          allow_squash_merge: true
+          archived: false
+          created_at: '2011-01-26T19:01:12Z'
+          default_branch: master
+          delete_branch_on_merge: true
+          description: This your first repo!
+          disabled: false
+          fork: false
+          forks: 9
+          forks_count: 9
+          full_name: acme/web-Template
+          has_downloads: true
+          has_issues: true
+          has_pages: false
+          has_projects: true
+          has_wiki: true
+          id: 1296269
+          is_template: true
+          language: null
+          name: Hello-World-Template
+          network_count: 0
+          node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+          open_issues: 0
+          open_issues_count: 0
+          permissions:
+            admin: false
+            pull: true
+            push: false
+          private: false
+          pushed_at: '2011-01-26T19:06:43Z'
+          size: 108
+          stargazers_count: 80
+          subscribers_count: 42
+          temp_clone_token: ABTLWHOULUVAXGTRYU7OC2876QJ2O
+          topics:
+            - acme
+            - atom
+            - electron
+            - api
+          updated_at: '2011-01-26T19:14:43Z'
+          visibility: public
+          watchers: 80
+          watchers_count: 80
+    github:organization:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: Organization
+    license:
+      - title: null
+        state:
+          key: mit
+          name: MIT License
+          node_id: MDc6TGljZW5zZW1pdA==
+          spdx_id: MIT
+---
+at: '2026-11-03T02:23:40.842182Z'
+ms: 6
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T02:23:42.977661Z'
+ms: 1846
+mode: intent
+say: List pull requests in acme/web filtered by label dependencies
+line: 2
+within: 1
+params:
+  relation: github:pulls-list
+  owner: acme
+  repo: web
+  labels: dependencies
+values:
+  owner:
+    value: acme
+    type: string
+    from:
+      - input: owner
+      - step: 2
+        pointer: /topics/0
+      - step: 2
+        pointer: /hr:address/owner
+      - step: 2
+        pointer: /_embedded/github:owner/0/login
+      - step: 2
+        pointer: /_embedded/github:parent/0/topics/0
+      - step: 2
+        pointer: /_embedded/github:source/0/topics/0
+      - step: 2
+        pointer: /_embedded/github:template-repository/0/topics/0
+      - step: 2
+        pointer: /_embedded/github:organization/0/login
+      - step: 3
+        pointer: /hr:address/owner
+  repo:
+    value: web
+    type: string
+    from:
+      - input: repo
+      - step: 2
+        pointer: /name
+      - step: 2
+        pointer: /hr:address/repo
+      - step: 3
+        pointer: /hr:address/repo
+  labels:
+    value: dependencies
+    type: string
+    from:
+      - input: label
+reason:
+  template: 'Open an issue titled "Merge watch" with body: Close this issue to stop the watch.'
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"GitHub v3 REST API","hr:manifest":{"forms":{"github:add-sub-issue":["sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU="],"github:assign":["sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I="],"github:branch-from-here":["sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo="],"github:close":["sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=","sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ="],"github:close-duplicate":["sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs="],"github:close-not-planned":["sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04="],"github:comment":["sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=","sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0="],"github:commit-file":["sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE="],"github:edit":["sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=","sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=","sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU="],"github:issues-get":["sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc="],"github:issues-get-comment":["sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk="],"github:issues-list-comments":["sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY="],"github:issues-list-for-repo":["sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw="],"github:label":["sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=","sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU="],"github:lock":["sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg="],"github:merge":["sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE="],"github:open-issue":["sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI="],"github:open-pull-request":["sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg="],"github:pulls-get":["sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE="],"github:pulls-list":["sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk="],"github:remove-sub-issue":["sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY="],"github:reopen":["sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=","sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU="],"github:repos-get":["sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go="],"github:repos-get-branch":["sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg="],"github:repos-list-branches":["sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc="],"github:repos-list-for-user":["sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54="],"github:request-review":["sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c="],"github:set-milestone":["sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM="],"github:unassign":["sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A="],"github:unlabel":["sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU="],"github:unlock":["sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0="],"github:update-branch":["sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8="]},"digest":"sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE="}}
+      </state>
+      <offers>
+      {"github:pulls-list":{"title":"List pull requests","description":"Lists pull requests in a specified repository.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"state":{"type":"string","default":"open","enum":["open","closed","all"],"title":"State","description":"Either `open`, `closed`, or `all` to filter by state."},"sort":{"type":"string","default":"created","enum":["created","updated","popularity","long-running"],"title":"Sort","description":"What to sort results by. `popularity` will sort by the number of comments. `long-running` will sort by date created and will limit the results to pull requests that have been open for more than a month and have had activity within the past month."},"direction":{"type":"string","enum":["asc","desc"],"title":"Direction","description":"The direction of the sort. Default: `desc` when sort is `created` or sort is not specified, otherwise `asc`."},"labels":{"type":"string","title":"Labels","description":"A list of comma separated label names. Example: `bug,ui,@high`"}},"required":["owner","repo"]}},"github:pulls-get":{"title":"Get a pull request","description":"Draft pull requests are available in public repositories with GitHub Free and GitHub Free for organizations, GitHub Pro, and legacy per-repository billing plans, and in public and private repositories with GitHub Team and GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"pull_number":{"type":"integer","title":"Pull_number","description":"The number that identifies the pull request."}},"required":["owner","repo","pull_number"]}},"github:issues-list-for-repo":{"title":"List repository issues","description":"List issues in a repository. Only open issues will be listed. Pull requests are left out: list them with github:pulls-list, which filters by labels too.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"state":{"type":"string","default":"open","enum":["open","closed","all"],"title":"State","description":"Indicates the state of the issues to return."},"labels":{"type":"string","title":"Labels","description":"A list of comma separated label names. Example: `bug,ui,@high`"},"assignee":{"type":"string","title":"Assignee","description":"Can be the name of a user. Pass in `none` for issues with no assigned user, and `*` for issues assigned to any user."},"creator":{"type":"string","title":"Creator","description":"The user that created the issue."},"mentioned":{"type":"string","title":"Mentioned","description":"A user that's mentioned in the issue."},"milestone":{"type":"string","title":"Milestone","description":"If an `integer` is passed, it should refer to a milestone by its `number` field. If the string `*` is passed, issues with any milestone are accepted. If the string `none` is passed, issues without milestones are returned."},"sort":{"type":"string","default":"created","enum":["created","updated","comments"],"title":"Sort","description":"What to sort results by."},"direction":{"type":"string","default":"desc","enum":["asc","desc"],"title":"Direction","description":"The direction to sort the results by."},"since":{"type":"string","format":"date-time","title":"Since","description":"Only show results that were last updated after the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`."}},"required":["owner","repo"]}},"github:issues-get":{"title":"Get an issue","description":"The API returns a [`301 Moved Permanently` status](https://docs.github.com/rest/guides/best-practices-for-using-the-rest-api#follow-redirects) if the issue was\n[transferred](https://docs.github.com/articles/transferring-an-issue-to-another-repository/) to another repository. If\nthe issue was transferred to or deleted from a repository where the authenticated user lacks read access, the API\nreturns a `404 Not Found` status. If the issue was deleted from a repository where the authenticated user has read\naccess, the API returns a `410 Gone` status. To receive webhook events for transferred and deleted issues, subscribe\nto the [`issues`](https://docs.github.com/webhooks/event-payloads/#issues) webhook.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"issue_number":{"type":"integer","title":"Issue_number","description":"The number that identifies the issue."}},"required":["owner","repo","issue_number"]}},"github:repos-list-for-user":{"title":"List repositories for a user","description":"Lists public repositories for the specified user.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"username":{"type":"string","title":"Username","description":"The handle for the GitHub user account."},"type":{"type":"string","default":"owner","enum":["all","owner","member"],"title":"Type","description":"Limit results to repositories of the specified type."},"sort":{"type":"string","default":"full_name","enum":["created","updated","pushed","full_name"],"title":"Sort","description":"The property to sort the results by."},"direction":{"type":"string","enum":["asc","desc"],"title":"Direction","description":"The order to sort by. Default: `asc` when using `full_name`, otherwise `desc`."}},"required":["username"]}},"github:repos-get":{"title":"Get a repository","description":"The `parent` and `source` objects are present when the repository is a fork. `parent` is the repository this repository was forked from, `source` is the ultimate source for the network.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."}},"required":["owner","repo"]}},"github:issues-list-comments":{"title":"List issue comments","description":"You can use the REST API to list comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"issue_number":{"type":"integer","title":"Issue_number","description":"The number that identifies the issue."},"since":{"type":"string","format":"date-time","title":"Since","description":"Only show results that were last updated after the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`."}},"required":["owner","repo","issue_number"]}},"github:issues-get-comment":{"title":"Get an issue comment","description":"You can use the REST API to get comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"comment_id":{"type":"integer","format":"int64","title":"Comment_id","description":"The unique identifier of the comment."}},"required":["owner","repo","comment_id"]}},"github:repos-list-branches":{"title":"List branches","description":"List branches","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"protected":{"type":"boolean","title":"Protected","description":"Setting to `true` returns only branches protected by branch protections or rulesets. When set to `false`, only unprotected branches are returned. Omitting this parameter returns all branches."}},"required":["owner","repo"]}},"github:repos-get-branch":{"title":"Get a branch","description":"Get a branch","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"branch":{"type":"string","title":"Branch","description":"The name of the branch. Cannot contain wildcard characters. To use wildcard characters in branch names, use [the GraphQL API](https://docs.github.com/graphql)."}},"required":["owner","repo","branch"]}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      List pull requests in acme/web filtered by label dependencies
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01N9BdzhNSstGQSeDDLkrM8S","name":"select","input":{"action":"act","affordance":"github:pulls-list","fields":{"owner":"acme","repo":"web","labels":"dependencies"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: github:pulls-list
+  title: List pull requests
+  method: GET
+  target: /repos/{owner}/{repo}/pulls{?state,sort,direction,labels}
+  address: http://localhost:8098/repos/acme/web/pulls?labels=dependencies
+  picked: relation
+  not sent:
+    - state
+    - sort
+    - direction
+guard:
+  rung: L0
+  form: sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8098/repos/acme/web/pulls?labels=dependencies
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Speed up the nightly build
+---
+at: '2026-11-03T02:23:44.835805Z'
+ms: 5
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T02:23:44.843281Z'
+ms: 3
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T02:23:44.847854Z'
+ms: 3
+mode: script
+say: act {relation}, owner {owner}, repo {repo}, labels {labels}
+line: 2
+within: 1
+params:
+  relation: github:pulls-list
+  owner: acme
+  repo: web
+  labels: dependencies
+values:
+  owner:
+    value: acme
+    type: string
+    from:
+      - input: owner
+      - step: 2
+        pointer: /topics/0
+      - step: 2
+        pointer: /hr:address/owner
+      - step: 2
+        pointer: /_embedded/github:owner/0/login
+      - step: 2
+        pointer: /_embedded/github:parent/0/topics/0
+      - step: 2
+        pointer: /_embedded/github:source/0/topics/0
+      - step: 2
+        pointer: /_embedded/github:template-repository/0/topics/0
+      - step: 2
+        pointer: /_embedded/github:organization/0/login
+      - step: 3
+        pointer: /hr:address/owner
+  repo:
+    value: web
+    type: string
+    from:
+      - input: repo
+      - step: 2
+        pointer: /name
+      - step: 2
+        pointer: /hr:address/repo
+      - step: 3
+        pointer: /hr:address/repo
+  labels:
+    value: dependencies
+    type: string
+    from:
+      - input: label
+opens: true
+chose:
+  kind: form
+  relation: github:pulls-list
+  title: List pull requests
+  method: GET
+  target: /repos/{owner}/{repo}/pulls{?state,sort,direction,labels}
+  address: http://localhost:8098/repos/acme/web/pulls?labels=dependencies
+  picked: relation
+  not sent:
+    - state
+    - sort
+    - direction
+guard:
+  rung: L0
+  form: sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8098/repos/acme/web/pulls?labels=dependencies
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Speed up the nightly build
+---
+at: '2026-11-03T02:23:44.856337Z'
+ms: 43
+mode: script
+say: follow {relation}, titled {title}
+line: 2
+within: 1
+params:
+  relation: item
+  title: Speed up the nightly build
+values:
+  title:
+    value: Speed up the nightly build
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Speed up the nightly build
+  method: GET
+  target: http://localhost:8098/repos/acme/web/pulls/482
+  address: http://localhost:8098/repos/acme/web/pulls/482
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8098/repos/acme/web/pulls/482
+now:
+  state:
+    active_lock_reason: too heated
+    additions: 100
+    author_association: OWNER
+    auto_merge: null
+    base:
+      label: acme:master
+      ref: master
+      sha: 6dcb09b5b57875f334f61aebed695e2e4193db5e
+    body: ''
+    changed_files: 5
+    closed_at: '2011-01-26T19:01:12Z'
+    comments: 10
+    commits: 3
+    created_at: '2011-01-26T19:01:12Z'
+    deletions: 3
+    draft: false
+    head:
+      label: acme:new-topic
+      ref: new-topic
+      sha: 3f2a9c1
+    id: 1000482
+    locked: true
+    maintainer_can_modify: true
+    merge_commit_sha: e5bd3914e2e596debea16f433f57875b5b90bcd6
+    mergeable: true
+    mergeable_state: clean
+    merged: false
+    merged_at: '2011-01-26T19:01:12Z'
+    node_id: MDExOlB1bGxSZXF1ZXN0MQ==
+    number: 482
+    rebaseable: true
+    requested_reviewers: []
+    requested_teams:
+      - description: A great team.
+        id: 1
+        name: Justice League
+        node_id: MDQ6VGVhbTE=
+        notification_setting: notifications_enabled
+        permission: admin
+        privacy: closed
+        slug: justice-league
+    review_comments: 0
+    state: open
+    title: Speed up the nightly build
+    updated_at: '2011-01-26T19:01:12Z'
+    hr:address:
+      owner: acme
+      repo: web
+      pull_number: '482'
+  forms:
+    - github:close
+    - github:merge
+    - github:comment
+    - github:label
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comment:
+      - null
+    github:review-comments:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+    github:requested-teams-html:
+      - null
+    github:requested-teams-members:
+      - null
+    github:requested-teams-repositories:
+      - null
+    github:requested-teams:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignee:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignees:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: hubot
+          node_id: MDQ6VXNlcjE=
+          site_admin: true
+          type: User
+    github:merged-by:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:milestone:
+      - title: null
+        state:
+          closed_at: '2013-02-12T13:22:01Z'
+          closed_issues: 8
+          created_at: '2011-04-10T20:09:31Z'
+          description: Tracking milestone for version 1.0
+          due_on: '2012-10-09T23:39:01Z'
+          id: 1002604
+          node_id: MDk6TWlsZXN0b25lMTAwMjYwNA==
+          number: 1
+          open_issues: 4
+          state: open
+          title: v1.0
+          updated_at: '2014-03-03T18:58:10Z'
+    github:labels:
+      - title: null
+        state:
+          name: dependencies
+    github:head-user:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:head-repo:
+      - title: null
+        state: {}
+    github:base-user:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:base-repo:
+      - title: null
+        state:
+          default_branch: master
+          fork: false
+          full_name: acme/web
+          id: 1296269
+          name: web
+          node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+          private: false
+keeps:
+  /hr:address/owner:
+    - 19
+    - 24
+  /_embedded/author/0/login:
+    - 19
+    - 24
+  /_embedded/github:assignee/0/login:
+    - 19
+    - 24
+  /_embedded/github:assignees/0/login:
+    - 19
+    - 24
+  /_embedded/github:merged-by/0/login:
+    - 19
+    - 24
+  /_embedded/github:head-user/0/login:
+    - 19
+    - 24
+  /_embedded/github:base-user/0/login:
+    - 19
+    - 24
+  /hr:address/repo:
+    - 19
+    - 24
+  /_embedded/github:base-repo/0/name:
+    - 19
+    - 24
+  /_embedded/github:labels/0/name:
+    - 19
+    - 24
+---
+at: '2026-11-03T02:24:01.387033Z'
+ms: 1804
+mode: intent
+say: Merge the pull request by squashing.
+line: 2
+within: 1
+params:
+  relation: github:merge
+  merge_method: squash
+values:
+  merge_method:
+    value: squash
+    type: string
+    from:
+      - paraphrase
+reason:
+  template: 'Open an issue titled "Merge watch" with body: Close this issue to stop the watch.'
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"active_lock_reason":"too heated","additions":100,"author_association":"OWNER","auto_merge":null,"base":{"label":"acme:master","ref":"master","sha":"6dcb09b5b57875f334f61aebed695e2e4193db5e"},"body":"","changed_files":5,"closed_at":"2011-01-26T19:01:12Z","comments":10,"commits":3,"created_at":"2011-01-26T19:01:12Z","deletions":3,"draft":false,"head":{"label":"acme:new-topic","ref":"new-topic","sha":"3f2a9c1"},"id":1000482,"locked":true,"maintainer_can_modify":true,"merge_commit_sha":"e5bd3914e2e596debea16f433f57875b5b90bcd6","mergeable":true,"mergeable_state":"clean","merged":false,"merged_at":"2011-01-26T19:01:12Z","node_id":"MDExOlB1bGxSZXF1ZXN0MQ==","number":482,"rebaseable":true,"requested_reviewers":[],"requested_teams":[{"description":"A great team.","id":1,"name":"Justice League","node_id":"MDQ6VGVhbTE=","notification_setting":"notifications_enabled","permission":"admin","privacy":"closed","slug":"justice-league"}],"review_comments":0,"state":"open","title":"Speed up the nightly build","updated_at":"2011-01-26T19:01:12Z","hr:address":{"owner":"acme","repo":"web","pull_number":"482"}}
+      </state>
+      <offers>
+      {"github:close":{"title":"Close","description":"Close it; a pull request unmerged, an issue as completed.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{},"required":[],"title":"Close","type":"object","$id":"/schemas/91c3b4ed90232223"}},"github:merge":{"title":"Merge","description":"Merge the pull request into its base branch.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"commit_message":{"description":"Extra detail to append to automatic commit message.","title":"Commit message","type":"string"},"commit_title":{"description":"Title for the automatic commit message.","title":"Commit title","type":"string"},"merge_method":{"description":"The merge method to use.","enum":["merge","squash","rebase"],"title":"Merge method","type":"string"}},"required":[],"title":"Merge","type":"object","$id":"/schemas/7a2a2819cabd9c39"}},"github:comment":{"title":"Comment","description":"Add a comment to the pull request's conversation.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"body":{"description":"The contents of the comment.","title":"Body","type":"string"}},"required":["body"],"title":"Comment","type":"object","$id":"/schemas/5cc19958fe9e94c5"}},"github:label":{"title":"Label","description":"Add labels to the pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"labels":{"description":"The labels to add to the issue's existing labels. You can also pass an `array` of labels directly, but GitHub recommends passing an object with the `labels` key. To replace all of the labels for an issue, use \"[Set labels for an issue](https://docs.github.com/rest/issues/labels#set-labels-for-an-issue).\"","items":{"oneOf":[{"type":"string"},{"properties":{"confidence":{"description":"The confidence level for this label choice.","enum":["low","medium","high"],"type":"string"},"name":{"description":"The name of the label to add.","type":"string"},"rationale":{"description":"Optional reasoning for adding this label.","type":"string"},"suggest":{"description":"If `true`, the label is stored as a pending suggestion for human review rather than applied directly.","type":"boolean"}},"required":["name"],"type":"object"}]},"minItems":1,"title":"Labels","type":"array"}},"required":[],"title":"Label","type":"object","$id":"/schemas/6657324c8d4f4e78"}},"github:edit":{"title":"Edit","description":"Change its title or description.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"body":{"description":"The contents of the pull request.","title":"Body","type":"string"},"title":{"description":"The title of the pull request.","title":"Title","type":"string"}},"required":[],"title":"Edit","type":"object","$id":"/schemas/9f05e4cceb013a00"}},"github:request-review":{"title":"Request a review","description":"Ask people or teams to review the pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"anyOf":[{"required":["reviewers"]},{"required":["team_reviewers"]}],"properties":{"reviewers":{"description":"The people to ask, by their logins, such as octocat.","items":{"type":"string"},"title":"Reviewers","type":"array"},"team_reviewers":{"description":"The teams to ask, by their slugs, such as maintainers.","items":{"type":"string"},"title":"Team reviewers","type":"array"}},"required":[],"title":"Request a review","type":"object","$id":"/schemas/fab3ba59fd5e4a8d"}},"github:update-branch":{"title":"Update the branch","description":"Bring the latest changes from the base branch into this one.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{},"required":[],"title":"Update the branch","type":"object","$id":"/schemas/62f60422b20449be"}}}
+      </offers>
+      <links>
+      [{"rel":"github:issues-list-comments"},{"rel":"github:commits"},{"rel":"github:issues-get"},{"rel":"author","state":{"gravatar_id":"","id":1,"login":"acme","node_id":"MDQ6VXNlcjE=","site_admin":false,"type":"User"}},{"rel":"github:assignee","state":{"gravatar_id":"","id":1,"login":"acme","node_id":"MDQ6VXNlcjE=","site_admin":false,"type":"User"}},{"rel":"github:assignees","state":{"gravatar_id":"","id":1,"login":"acme","node_id":"MDQ6VXNlcjE=","site_admin":false,"type":"User"}},{"rel":"github:assignees","state":{"gravatar_id":"","id":1,"login":"hubot","node_id":"MDQ6VXNlcjE=","site_admin":true,"type":"User"}},{"rel":"github:merged-by","state":{"gravatar_id":"","id":1,"login":"acme","node_id":"MDQ6VXNlcjE=","site_admin":false,"type":"User"}},{"rel":"github:milestone","state":{"closed_at":"2013-02-12T13:22:01Z","closed_issues":8,"created_at":"2011-04-10T20:09:31Z","description":"Tracking milestone for version 1.0","due_on":"2012-10-09T23:39:01Z","id":1002604,"node_id":"MDk6TWlsZXN0b25lMTAwMjYwNA==","number":1,"open_issues":4,"state":"open","title":"v1.0","updated_at":"2014-03-03T18:58:10Z"}},{"rel":"github:labels","state":{"name":"dependencies"}},{"rel":"github:head-user","state":{"gravatar_id":"","id":1,"login":"acme","node_id":"MDQ6VXNlcjE=","site_admin":false,"type":"User"}},{"rel":"github:head-repo","state":{}},{"rel":"github:base-user","state":{"gravatar_id":"","id":1,"login":"acme","node_id":"MDQ6VXNlcjE=","site_admin":false,"type":"User"}},{"rel":"github:base-repo","state":{"default_branch":"master","fork":false,"full_name":"acme/web","id":1296269,"name":"web","node_id":"MDEwOlJlcG9zaXRvcnkxMjk2MjY5","private":false}}]
+      </links>
+      <intent>
+      Merge the pull request by squashing.
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01Y1je4tUSNe1uoNyL1HHEpa","name":"select","input":{"action":"act","affordance":"github:merge","fields":{"merge_method":"squash"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: github:merge
+  title: Merge
+  method: PUT
+  target: http://localhost:8098/repos/acme/web/pulls/482/actions/merge
+  address: http://localhost:8098/repos/acme/web/pulls/482/actions/merge
+  picked: relation
+  not sent:
+    - commit_message
+    - commit_title
+guard:
+  rung: L0
+  form: sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+  if-match: '"seq-0.hsf.L0.003e5fdc2b832794"'
+offered:
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:label
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    - alternate
+    - github:commits
+    - github:diff
+    - github:issues-get
+    - github:issues-list-comments
+    - github:patch
+    - github:requested-teams
+    - github:requested-teams-html
+    - github:requested-teams-members
+    - github:requested-teams-repositories
+    - github:review-comment
+    - github:review-comments
+    - github:statuses
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8098/repos/acme/web/pulls/482
+now:
+  state:
+    active_lock_reason: too heated
+    additions: 100
+    author_association: OWNER
+    auto_merge: null
+    base:
+      label: acme:master
+      ref: master
+      sha: 6dcb09b5b57875f334f61aebed695e2e4193db5e
+    body: ''
+    changed_files: 5
+    closed_at: '2011-01-26T19:01:12Z'
+    comments: 10
+    commits: 3
+    created_at: '2011-01-26T19:01:12Z'
+    deletions: 3
+    draft: false
+    head:
+      label: acme:new-topic
+      ref: new-topic
+      sha: 3f2a9c1
+    id: 1000482
+    locked: true
+    maintainer_can_modify: true
+    merge_commit_sha: e5bd3914e2e596debea16f433f57875b5b90bcd6
+    mergeable: null
+    mergeable_state: unknown
+    merged: true
+    merged_at: '2011-01-26T19:01:12Z'
+    node_id: MDExOlB1bGxSZXF1ZXN0MQ==
+    number: 482
+    rebaseable: true
+    requested_reviewers: []
+    requested_teams:
+      - description: A great team.
+        id: 1
+        name: Justice League
+        node_id: MDQ6VGVhbTE=
+        notification_setting: notifications_enabled
+        permission: admin
+        privacy: closed
+        slug: justice-league
+    review_comments: 0
+    state: closed
+    title: Speed up the nightly build
+    updated_at: '2011-01-26T19:01:12Z'
+    hr:address:
+      owner: acme
+      repo: web
+      pull_number: '482'
+  forms:
+    - github:comment
+    - github:label
+    - github:edit
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comment:
+      - null
+    github:review-comments:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+    github:requested-teams-html:
+      - null
+    github:requested-teams-members:
+      - null
+    github:requested-teams-repositories:
+      - null
+    github:requested-teams:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignee:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignees:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: hubot
+          node_id: MDQ6VXNlcjE=
+          site_admin: true
+          type: User
+    github:merged-by:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:milestone:
+      - title: null
+        state:
+          closed_at: '2013-02-12T13:22:01Z'
+          closed_issues: 8
+          created_at: '2011-04-10T20:09:31Z'
+          description: Tracking milestone for version 1.0
+          due_on: '2012-10-09T23:39:01Z'
+          id: 1002604
+          node_id: MDk6TWlsZXN0b25lMTAwMjYwNA==
+          number: 1
+          open_issues: 4
+          state: open
+          title: v1.0
+          updated_at: '2014-03-03T18:58:10Z'
+    github:labels:
+      - title: null
+        state:
+          name: dependencies
+    github:head-user:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:head-repo:
+      - title: null
+        state: {}
+    github:base-user:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:base-repo:
+      - title: null
+        state:
+          default_branch: master
+          fork: false
+          full_name: acme/web
+          id: 1296269
+          name: web
+          node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+          private: false
+keeps:
+  /hr:address/owner:
+    - 19
+    - 24
+  /_embedded/author/0/login:
+    - 19
+    - 24
+  /_embedded/github:assignee/0/login:
+    - 19
+    - 24
+  /_embedded/github:assignees/0/login:
+    - 19
+    - 24
+  /_embedded/github:merged-by/0/login:
+    - 19
+    - 24
+  /_embedded/github:head-user/0/login:
+    - 19
+    - 24
+  /_embedded/github:base-user/0/login:
+    - 19
+    - 24
+  /hr:address/repo:
+    - 19
+    - 24
+  /_embedded/github:base-repo/0/name:
+    - 19
+    - 24
+  /_embedded/github:labels/0/name:
+    - 19
+    - 24
+---
+at: '2026-11-03T02:24:03.196186Z'
+ms: 40
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/repos/acme/web/pulls/482
+outcome: done
+address: http://localhost:8098/repos/acme/web/pulls/482
+now:
+  state:
+    active_lock_reason: too heated
+    additions: 100
+    author_association: OWNER
+    auto_merge: null
+    base:
+      label: acme:master
+      ref: master
+      sha: 6dcb09b5b57875f334f61aebed695e2e4193db5e
+    body: ''
+    changed_files: 5
+    closed_at: '2011-01-26T19:01:12Z'
+    comments: 10
+    commits: 3
+    created_at: '2011-01-26T19:01:12Z'
+    deletions: 3
+    draft: false
+    head:
+      label: acme:new-topic
+      ref: new-topic
+      sha: 3f2a9c1
+    id: 1000482
+    locked: true
+    maintainer_can_modify: true
+    merge_commit_sha: e5bd3914e2e596debea16f433f57875b5b90bcd6
+    mergeable: null
+    mergeable_state: unknown
+    merged: true
+    merged_at: '2011-01-26T19:01:12Z'
+    node_id: MDExOlB1bGxSZXF1ZXN0MQ==
+    number: 482
+    rebaseable: true
+    requested_reviewers: []
+    requested_teams:
+      - description: A great team.
+        id: 1
+        name: Justice League
+        node_id: MDQ6VGVhbTE=
+        notification_setting: notifications_enabled
+        permission: admin
+        privacy: closed
+        slug: justice-league
+    review_comments: 0
+    state: closed
+    title: Speed up the nightly build
+    updated_at: '2011-01-26T19:01:12Z'
+    hr:address:
+      owner: acme
+      repo: web
+      pull_number: '482'
+  forms:
+    - github:comment
+    - github:label
+    - github:edit
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comment:
+      - null
+    github:review-comments:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+    github:requested-teams-html:
+      - null
+    github:requested-teams-members:
+      - null
+    github:requested-teams-repositories:
+      - null
+    github:requested-teams:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignee:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignees:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: hubot
+          node_id: MDQ6VXNlcjE=
+          site_admin: true
+          type: User
+    github:merged-by:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:milestone:
+      - title: null
+        state:
+          closed_at: '2013-02-12T13:22:01Z'
+          closed_issues: 8
+          created_at: '2011-04-10T20:09:31Z'
+          description: Tracking milestone for version 1.0
+          due_on: '2012-10-09T23:39:01Z'
+          id: 1002604
+          node_id: MDk6TWlsZXN0b25lMTAwMjYwNA==
+          number: 1
+          open_issues: 4
+          state: open
+          title: v1.0
+          updated_at: '2014-03-03T18:58:10Z'
+    github:labels:
+      - title: null
+        state:
+          name: dependencies
+    github:head-user:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:head-repo:
+      - title: null
+        state: {}
+    github:base-user:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:base-repo:
+      - title: null
+        state:
+          default_branch: master
+          fork: false
+          full_name: acme/web
+          id: 1296269
+          name: web
+          node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+          private: false
+---
+at: '2026-11-03T02:24:05.533625Z'
+ms: 26
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/repos/acme/web/pulls/482
+outcome: done
+address: http://localhost:8098/repos/acme/web/pulls/482
+now:
+  state:
+    active_lock_reason: too heated
+    additions: 100
+    author_association: OWNER
+    auto_merge: null
+    base:
+      label: acme:master
+      ref: master
+      sha: 6dcb09b5b57875f334f61aebed695e2e4193db5e
+    body: ''
+    changed_files: 5
+    closed_at: '2011-01-26T19:01:12Z'
+    comments: 10
+    commits: 3
+    created_at: '2011-01-26T19:01:12Z'
+    deletions: 3
+    draft: false
+    head:
+      label: acme:new-topic
+      ref: new-topic
+      sha: 3f2a9c1
+    id: 1000482
+    locked: true
+    maintainer_can_modify: true
+    merge_commit_sha: e5bd3914e2e596debea16f433f57875b5b90bcd6
+    mergeable: null
+    mergeable_state: unknown
+    merged: true
+    merged_at: '2011-01-26T19:01:12Z'
+    node_id: MDExOlB1bGxSZXF1ZXN0MQ==
+    number: 482
+    rebaseable: true
+    requested_reviewers: []
+    requested_teams:
+      - description: A great team.
+        id: 1
+        name: Justice League
+        node_id: MDQ6VGVhbTE=
+        notification_setting: notifications_enabled
+        permission: admin
+        privacy: closed
+        slug: justice-league
+    review_comments: 0
+    state: closed
+    title: Speed up the nightly build
+    updated_at: '2011-01-26T19:01:12Z'
+    hr:address:
+      owner: acme
+      repo: web
+      pull_number: '482'
+  forms:
+    - github:comment
+    - github:label
+    - github:edit
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comment:
+      - null
+    github:review-comments:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+    github:requested-teams-html:
+      - null
+    github:requested-teams-members:
+      - null
+    github:requested-teams-repositories:
+      - null
+    github:requested-teams:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignee:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignees:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: hubot
+          node_id: MDQ6VXNlcjE=
+          site_admin: true
+          type: User
+    github:merged-by:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:milestone:
+      - title: null
+        state:
+          closed_at: '2013-02-12T13:22:01Z'
+          closed_issues: 8
+          created_at: '2011-04-10T20:09:31Z'
+          description: Tracking milestone for version 1.0
+          due_on: '2012-10-09T23:39:01Z'
+          id: 1002604
+          node_id: MDk6TWlsZXN0b25lMTAwMjYwNA==
+          number: 1
+          open_issues: 4
+          state: open
+          title: v1.0
+          updated_at: '2014-03-03T18:58:10Z'
+    github:labels:
+      - title: null
+        state:
+          name: dependencies
+    github:head-user:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:head-repo:
+      - title: null
+        state: {}
+    github:base-user:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: acme
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:base-repo:
+      - title: null
+        state:
+          default_branch: master
+          fork: false
+          full_name: acme/web
+          id: 1296269
+          name: web
+          node_id: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+          private: false
+---
+at: '2026-11-03T02:24:05.561305Z'
+ms: 3
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/repos/acme/web/pulls?labels=dependencies
+outcome: done
+address: http://localhost:8098/repos/acme/web/pulls?labels=dependencies
+now:
+  state:
+    count: 0
+  forms: []
+  links:
+    self:
+      - null
+    item: []
+---
+at: '2026-11-03T02:24:05.565065Z'
+ms: 1
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T02:24:05.567500Z'
+ms: 1
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T02:24:05.570401Z'
+ms: 12
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/repos/acme/web/issues/483
+outcome: done
+address: http://localhost:8098/repos/acme/web/issues/483
+now:
+  state:
+    active_lock_reason: null
+    assignees: []
+    author_association: COLLABORATOR
+    body: Close this issue to stop the watch.
+    closed_at: null
+    comments: 0
+    created_at: '2011-04-22T13:33:48Z'
+    id: 2000483
+    labels: []
+    locked: false
+    milestone: null
+    node_id: MDU6SXNzdWUx
+    number: 483
+    pinned_comment: null
+    state: open
+    state_reason: null
+    title: Merge watch
+    updated_at: '2011-04-22T13:33:48Z'
+    hr:address:
+      owner: acme
+      repo: web
+      issue_number: '483'
+  forms:
+    - github:close
+    - github:close-not-planned
+    - github:close-duplicate
+    - github:edit
+    - github:lock
+    - github:label
+    - github:unlabel
+    - github:assign
+    - github:unassign
+    - github:set-milestone
+    - github:comment
+    - github:add-sub-issue
+    - github:remove-sub-issue
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:labels:
+      - null
+    github:repos-get:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignee:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:closed-by:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+---
+at: '2026-11-03T02:24:23.309138Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T02:24:23.312921Z'
+ms: 3
+mode: script
+say: act {relation}, owner {owner}, repo {repo}, labels {labels}
+line: 2
+within: 1
+params:
+  relation: github:pulls-list
+  owner: acme
+  repo: web
+  labels: dependencies
+values:
+  owner:
+    value: acme
+    type: string
+    from:
+      - input: owner
+      - step: 2
+        pointer: /topics/0
+      - step: 2
+        pointer: /hr:address/owner
+      - step: 2
+        pointer: /_embedded/github:owner/0/login
+      - step: 2
+        pointer: /_embedded/github:parent/0/topics/0
+      - step: 2
+        pointer: /_embedded/github:source/0/topics/0
+      - step: 2
+        pointer: /_embedded/github:template-repository/0/topics/0
+      - step: 2
+        pointer: /_embedded/github:organization/0/login
+      - step: 3
+        pointer: /hr:address/owner
+      - step: 10
+        pointer: /hr:address/owner
+      - step: 10
+        pointer: /_embedded/author/0/login
+      - step: 10
+        pointer: /_embedded/github:assignee/0/login
+      - step: 10
+        pointer: /_embedded/github:assignees/0/login
+      - step: 10
+        pointer: /_embedded/github:merged-by/0/login
+      - step: 10
+        pointer: /_embedded/github:head-user/0/login
+      - step: 10
+        pointer: /_embedded/github:base-user/0/login
+      - step: 11
+        pointer: /hr:address/owner
+      - step: 11
+        pointer: /_embedded/author/0/login
+      - step: 11
+        pointer: /_embedded/github:assignee/0/login
+      - step: 11
+        pointer: /_embedded/github:assignees/0/login
+      - step: 11
+        pointer: /_embedded/github:merged-by/0/login
+      - step: 11
+        pointer: /_embedded/github:head-user/0/login
+      - step: 11
+        pointer: /_embedded/github:base-user/0/login
+  repo:
+    value: web
+    type: string
+    from:
+      - input: repo
+      - step: 2
+        pointer: /name
+      - step: 2
+        pointer: /hr:address/repo
+      - step: 3
+        pointer: /hr:address/repo
+      - step: 10
+        pointer: /hr:address/repo
+      - step: 10
+        pointer: /_embedded/github:base-repo/0/name
+      - step: 11
+        pointer: /hr:address/repo
+      - step: 11
+        pointer: /_embedded/github:base-repo/0/name
+  labels:
+    value: dependencies
+    type: string
+    from:
+      - input: label
+      - step: 10
+        pointer: /_embedded/github:labels/0/name
+      - step: 11
+        pointer: /_embedded/github:labels/0/name
+opens: true
+chose:
+  kind: form
+  relation: github:pulls-list
+  title: List pull requests
+  method: GET
+  target: /repos/{owner}/{repo}/pulls{?state,sort,direction,labels}
+  address: http://localhost:8098/repos/acme/web/pulls?labels=dependencies
+  picked: relation
+  not sent:
+    - state
+    - sort
+    - direction
+guard:
+  rung: L0
+  form: sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8098/repos/acme/web/pulls?labels=dependencies
+now:
+  state:
+    count: 0
+  forms: []
+  links:
+    self:
+      - null
+    item: []
+---
+at: '2026-11-03T02:24:23.319697Z'
+ms: 3
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T02:24:23.322920Z'
+ms: 1
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T02:24:23.324717Z'
+ms: 11
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/repos/acme/web/issues/483
+outcome: done
+address: http://localhost:8098/repos/acme/web/issues/483
+now:
+  state:
+    active_lock_reason: null
+    assignees: []
+    author_association: COLLABORATOR
+    body: Close this issue to stop the watch.
+    closed_at: null
+    comments: 0
+    created_at: '2011-04-22T13:33:48Z'
+    id: 2000483
+    labels: []
+    locked: false
+    milestone: null
+    node_id: MDU6SXNzdWUx
+    number: 483
+    pinned_comment: null
+    state: open
+    state_reason: null
+    title: Merge watch
+    updated_at: '2011-04-22T13:33:48Z'
+    hr:address:
+      owner: acme
+      repo: web
+      issue_number: '483'
+  forms:
+    - github:close
+    - github:close-not-planned
+    - github:close-duplicate
+    - github:edit
+    - github:lock
+    - github:label
+    - github:unlabel
+    - github:assign
+    - github:unassign
+    - github:set-milestone
+    - github:comment
+    - github:add-sub-issue
+    - github:remove-sub-issue
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:labels:
+      - null
+    github:repos-get:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignee:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:closed-by:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+---
+at: '2026-11-03T02:24:38.339977Z'
+ms: 4
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T02:24:38.345055Z'
+ms: 4
+mode: script
+say: act {relation}, owner {owner}, repo {repo}, labels {labels}
+line: 2
+within: 1
+params:
+  relation: github:pulls-list
+  owner: acme
+  repo: web
+  labels: dependencies
+values:
+  owner:
+    value: acme
+    type: string
+    from:
+      - input: owner
+      - step: 2
+        pointer: /topics/0
+      - step: 2
+        pointer: /hr:address/owner
+      - step: 2
+        pointer: /_embedded/github:owner/0/login
+      - step: 2
+        pointer: /_embedded/github:parent/0/topics/0
+      - step: 2
+        pointer: /_embedded/github:source/0/topics/0
+      - step: 2
+        pointer: /_embedded/github:template-repository/0/topics/0
+      - step: 2
+        pointer: /_embedded/github:organization/0/login
+      - step: 3
+        pointer: /hr:address/owner
+      - step: 10
+        pointer: /hr:address/owner
+      - step: 10
+        pointer: /_embedded/author/0/login
+      - step: 10
+        pointer: /_embedded/github:assignee/0/login
+      - step: 10
+        pointer: /_embedded/github:assignees/0/login
+      - step: 10
+        pointer: /_embedded/github:merged-by/0/login
+      - step: 10
+        pointer: /_embedded/github:head-user/0/login
+      - step: 10
+        pointer: /_embedded/github:base-user/0/login
+      - step: 11
+        pointer: /hr:address/owner
+      - step: 11
+        pointer: /_embedded/author/0/login
+      - step: 11
+        pointer: /_embedded/github:assignee/0/login
+      - step: 11
+        pointer: /_embedded/github:assignees/0/login
+      - step: 11
+        pointer: /_embedded/github:merged-by/0/login
+      - step: 11
+        pointer: /_embedded/github:head-user/0/login
+      - step: 11
+        pointer: /_embedded/github:base-user/0/login
+  repo:
+    value: web
+    type: string
+    from:
+      - input: repo
+      - step: 2
+        pointer: /name
+      - step: 2
+        pointer: /hr:address/repo
+      - step: 3
+        pointer: /hr:address/repo
+      - step: 10
+        pointer: /hr:address/repo
+      - step: 10
+        pointer: /_embedded/github:base-repo/0/name
+      - step: 11
+        pointer: /hr:address/repo
+      - step: 11
+        pointer: /_embedded/github:base-repo/0/name
+  labels:
+    value: dependencies
+    type: string
+    from:
+      - input: label
+      - step: 10
+        pointer: /_embedded/github:labels/0/name
+      - step: 11
+        pointer: /_embedded/github:labels/0/name
+opens: true
+chose:
+  kind: form
+  relation: github:pulls-list
+  title: List pull requests
+  method: GET
+  target: /repos/{owner}/{repo}/pulls{?state,sort,direction,labels}
+  address: http://localhost:8098/repos/acme/web/pulls?labels=dependencies
+  picked: relation
+  not sent:
+    - state
+    - sort
+    - direction
+guard:
+  rung: L0
+  form: sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8098/repos/acme/web/pulls?labels=dependencies
+now:
+  state:
+    count: 0
+  forms: []
+  links:
+    self:
+      - null
+    item: []
+---
+at: '2026-11-03T02:24:38.352307Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T02:24:38.354837Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-03T02:24:38.357578Z'
+ms: 29
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/repos/acme/web/issues/483
+outcome: done
+address: http://localhost:8098/repos/acme/web/issues/483
+now:
+  state:
+    active_lock_reason: null
+    assignees: []
+    author_association: COLLABORATOR
+    body: Close this issue to stop the watch.
+    closed_at: null
+    comments: 0
+    created_at: '2011-04-22T13:33:48Z'
+    id: 2000483
+    labels: []
+    locked: false
+    milestone: null
+    node_id: MDU6SXNzdWUx
+    number: 483
+    pinned_comment: null
+    state: closed
+    state_reason: null
+    title: Merge watch
+    updated_at: '2011-04-22T13:33:48Z'
+    hr:address:
+      owner: acme
+      repo: web
+      issue_number: '483'
+  forms:
+    - github:reopen
+    - github:edit
+    - github:lock
+    - github:label
+    - github:unlabel
+    - github:assign
+    - github:unassign
+    - github:set-milestone
+    - github:comment
+    - github:add-sub-issue
+    - github:remove-sub-issue
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:labels:
+      - null
+    github:repos-get:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:assignee:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+    github:closed-by:
+      - title: null
+        state:
+          gravatar_id: ''
+          id: 1
+          login: ada
+          node_id: MDQ6VXNlcjE=
+          site_admin: false
+          type: User
+---
+at: '2026-11-03T02:24:38.387564Z'
+ms: 1
+mode: script
+say: return to {address}
+line: 2
+within: 1
+params:
+  address: http://localhost:8098/
+outcome: done
+address: http://localhost:8098/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-L6nXxZsyHxsf1/XbPyBFJwMnqq3Apbo15YEOl/MK1fU=
+        github:assign:
+          - sha256-b1xKTpiyf/A4nywJg3+VvfHnSrvbDDSu4ear+I/FG3I=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-tZX8qXscE2PRCNwydMRkF7zeNbaItL7EQCzusXD5rUs=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+          - sha256-UOPgAJp9/yv+7yfL8trA43kBgGbIZWcekk6Q7/RCkl0=
+        github:commit-file:
+          - sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+        github:edit:
+          - sha256-9Gz/V46vOmXDuyXPFd6qz+/RswtitAu6nbymH/AhImk=
+          - sha256-VlZMNYxSdNcqgrUEgSV0ONJDD5cZNRLwH+NwY40oKkk=
+          - sha256-YUHm86Kqefnw8PjS3RnxlAPYZlLUjXhe1naP1iPzyCU=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-ni8YfirNUQbGkkRlkfQHsAQ/ss2S+Y331YdXzr1d+EE=
+          - sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+        github:lock:
+          - sha256-rqm81MAY095A/u0d4sSbhzdnzYQiZlZ7p+5k75+kfPg=
+        github:merge:
+          - sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+        github:open-issue:
+          - sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+        github:open-pull-request:
+          - sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-HjpwBckatJzyOIHqWDV25vvac+y5uy4iMnM/dOxM33c=
+        github:set-milestone:
+          - sha256-Z07Do23/zXvB84vyjqmFhF73poJTWr66pYzLrtGEchM=
+        github:unassign:
+          - sha256-1fu0GCn02fpSyBvtfsWNX3Icfqs4RxY0JF8VmNi4E1A=
+        github:unlabel:
+          - sha256-Vo4qC7yylQA217fK1TVamCLoyOS0O0S4WM3QTPduQPU=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null

@@ -1,0 +1,1 @@
+Searches employees by surname, and for each with that exact lastName: gives notice if working, dismisses if on notice (If-Match with fresh etag), leaves dismissed alone. Raises on unexpected status. Arg: surname.

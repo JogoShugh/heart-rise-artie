@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Clone, Proven</title>
+<style>
+  :root { --bg: #f6f5f1; --fg: #1d211f; --soft: #5b625e; --line: #dcdcd4; --card: #ffffff; --pass: #e6f4ea; --pass-edge: #2f6b4f;
+    --code: #f0efe9; color-scheme: light;
+    --kt-kw: #8a3f8f; --kt-str: #2f6f3f; --kt-tpl: #b0641c; --kt-cm: #7b847e; --kt-fn: #1f5a8a; --kt-num: #a0522d; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+      --pass: #16321f; --pass-edge: #7cc4a0; --code: #1f2522; color-scheme: dark;
+      --kt-kw: #d79ad9; --kt-str: #9fd6ac; --kt-tpl: #e6a35c; --kt-cm: #7f8b84; --kt-fn: #8cc0ea; --kt-num: #e0a080; }
+  }
+  :root[data-theme="dark"] { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+    --pass: #16321f; --pass-edge: #7cc4a0; --code: #1f2522; color-scheme: dark;
+    --kt-kw: #d79ad9; --kt-str: #9fd6ac; --kt-tpl: #e6a35c; --kt-cm: #7f8b84; --kt-fn: #8cc0ea; --kt-num: #e0a080; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 1rem max(16px, env(safe-area-inset-left, 0px)) 3rem; }
+  h1 { font-size: 1.5rem; margin: .2rem 0 .3rem; text-wrap: balance; }
+  h2 { font-size: 1.1rem; margin: 1.8rem 0 .5rem; }
+  p, li { color: var(--soft); max-width: 75ch; }
+  code { font: .88em ui-monospace, Menlo, monospace; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .6rem; margin: 1rem 0; }
+  .tile { background: var(--pass); border: 1px solid var(--pass-edge); border-radius: 8px; padding: .7rem .8rem; }
+  .tile b { display: block; font-size: 1.35rem; }
+  .tile span { color: var(--soft); font-size: .88rem; }
+  .wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; border: 1px solid var(--line); padding: .4rem .55rem; }
+  th { font-weight: 600; }
+  td code { white-space: nowrap; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; margin: .5rem 0; }
+  summary { cursor: pointer; padding: .55rem .8rem; font-weight: 600; }
+  pre { margin: 0; padding: .7rem .8rem; background: var(--code); overflow-x: auto; font: 12.5px/1.45 ui-monospace, Menlo, monospace; }
+</style>
+</head>
+<body>
+<main>
+  <h1>The Clone, Proven</h1>
+  <p>The employees simulator in <code>heart/heart-sims</code>, switched to answer as Spring's example, against
+    Spring HATEOAS's own <code>affordances</code> example run untouched, on 2026-11-12 (UTC).</p>
+
+  <div class="tiles">
+    <div class="tile"><b>14 / 14</b><span>exchanges the same: status, Content-Type, Location, ETag and body, byte for byte</span></div>
+    <div class="tile"><b>6 / 6</b><span>steps of ARTIE's script done on each, unchanged; the same output, line for line</span></div>
+    <div class="tile"><b>0</b><span>differences in ARTIE's two traces, beside clocks, trace ids and the server's name</span></div>
+    <div class="tile"><b>c100c56</b><span>the example's commit, 2021-04-07; its checkout clean</span></div>
+  </div>
+
+  <h2>The example, as run</h2>
+  <div class="wrap"><table>
+    <tr><th>What</th><th>Value</th></tr>
+    <tr><td>Repository</td><td><code>https://github.com/spring-projects/spring-hateoas-examples</code>, module <code>affordances</code></td></tr>
+    <tr><td>Commit</td><td><code>c100c56982473c60e8042f14e6052333a3ae1b55, 2021-04-07, "Migrate to main branch."</code></td></tr>
+    <tr><td>Changed locally</td><td>0 files (<code>git status --short</code>)</td></tr>
+    <tr><td>Spring Boot</td><td><code>2.3.4.RELEASE</code> (the parent POM)</td></tr>
+    <tr><td>Spring HATEOAS</td><td><code>1.1.2.RELEASE</code> (resolved in the container's Maven repository)</td></tr>
+    <tr><td>Java</td><td><code>openjdk version "11.0.18" 2023-01-17</code>, image <code>maven:3.8.7-eclipse-temurin-11</code></td></tr>
+    <tr><td>Started with</td><td><code>mvn -q -B -pl affordances -am install -DskipTests && mvn -q -B -pl affordances spring-boot:run</code></td></tr>
+    <tr><td>Served at</td><td><code>http://localhost:8097</code> (container port 8080), Tomcat</td></tr>
+  </table></div>
+  <p>Its versions are its own and old: Spring Boot 2.3 and Spring HATEOAS 1.1, the example's last commit in 2021.
+    Nothing was upgraded or patched to run it.</p>
+
+  <h2>The clone, as run</h2>
+  <div class="wrap"><table>
+    <tr><th>What</th><th>Value</th></tr>
+    <tr><td>Code</td><td><code>heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/employees/StockSpring.kt</code>, shown whole below</td></tr>
+    <tr><td>Commit</td><td><code>69cdedcd</code> of this repository</td></tr>
+    <tr><td>Started with</td><td><code>java -cp 'heart/heart-sims/build/sims/lib/*' com.artie.heart.sims.MainKt 8096 employees.test</code></td></tr>
+    <tr><td>Switched to answer as Spring's example</td><td><code>PUT /_sim/employees/mode</code>, body <code>stock-spring</code>; reset first with <code>POST /_sim/reset</code></td></tr>
+    <tr><td>Served at</td><td><code>http://localhost:8096</code>, Jetty, in http4k</td></tr>
+  </table></div>
+
+  <h2>How it was compared</h2>
+  <ul>
+    <li><b>Side by side.</b> <code>SpringCloneTrace</code> (in <code>heart-sims/src/test</code>) sends each request to the
+      clone, then the same request to the example. It stops the run at the first difference in status, Content-Type,
+      Location, ETag or body. Both write every link absolute, against the address they were asked at, so the example's
+      origin is written as the clone's before the bytes are compared. Nothing else is changed. The tab
+      <b>Side by side</b> shows each exchange, with the example's own answer as its comparison.</li>
+    <li><b>ARTIE.</b> <code>wild/fresh-run/explore.kts</code>, the script first run against the example on 2026-11-02,
+      run again on each, with only its entry changed for the clone. The two tabs <b>ARTIE on</b> show each run line by
+      line.</li>
+    <li>Both started fresh before each run: the example's container restarted, the clone reset.</li>
+  </ul>
+
+  <h2>Every behaviour the example shows, in both</h2>
+  <div class="wrap"><table>
+    <tr><th>Behaviour</th><th>Where the example does it</th><th>Seen at</th></tr>
+    <tr><td>HAL-FORMS when asked for it, or for anything (<code>*/*</code>)</td><td><code>@EnableHypermediaSupport(type = HAL_FORMS)</code></td><td>Side by side 1, 3</td></tr>
+    <tr><td>Asked for <code>application/hal+json</code>: its own JSON, <code>links</code> as an array, <code>content</code>, no forms</td><td>Spring HATEOAS's default rendering</td><td>Side by side 2, 5</td></tr>
+    <tr><td>Templates' methods in lower case: <code>post</code>, <code>put</code>, <code>delete</code></td><td><code>afford(methodOn(…))</code></td><td>Side by side 1, 4</td></tr>
+    <tr><td>Templates name every field of an employee (<code>firstName</code>, <code>id</code>, <code>lastName</code>, <code>role</code>), none for a delete</td><td><code>afford(…updateEmployee(null, id))</code>, <code>afford(…deleteEmployee(id))</code></td><td>Side by side 1, 4</td></tr>
+    <tr><td>No <code>target</code> on a template, no profile, no ETag</td><td>not written anywhere</td><td>every exchange</td></tr>
+    <tr><td>If-None-Match and If-Match ignored: read in full, written anyway</td><td>no validators</td><td>Side by side 6, 10</td></tr>
+    <tr><td>Create, update and delete answered 204 with no body; create and update name the employee in Location</td><td><code>ResponseEntity.noContent().location(uri)</code></td><td>Side by side 8, 10, 12</td></tr>
+    <tr><td>A missing employee: 404, empty, no problem document</td><td><code>ResponseEntity.notFound().build()</code></td><td>Side by side 7, 13</td></tr>
+    <tr><td>New ids from the store's sequence: Samwise is 3</td><td><code>repository.save</code>, after the two loaded at start</td><td>Side by side 8</td></tr>
+    <tr><td>Links absolute, against the address asked</td><td><code>linkTo(methodOn(…))</code></td><td>every exchange</td></tr>
+  </table></div>
+
+  <h2>What differs, and why it doesn't count</h2>
+  <div class="wrap"><table>
+    <tr><th>Difference</th><th>The example</th><th>The clone</th><th>A client reads it?</th></tr>
+    <tr><td>Server header</td><td>none</td><td><code>Server: Jetty(12.0.16)</code></td><td>no</td></tr>
+    <tr><td>Reason phrase</td><td>none (<code>HTTP/1.1 200</code>)</td><td><code>OK</code>, <code>No Content</code></td><td>no (RFC 9110 §15: ignore it)</td></tr>
+    <tr><td>Order of headers, <code>Date</code></td><td colspan="2">each its own</td><td>no</td></tr>
+    <tr><td>Origin in links</td><td><code>localhost:8097</code></td><td><code>localhost:8096</code></td><td>yes, and each is right for where it was asked</td></tr>
+  </table></div>
+
+  <h2>Not covered</h2>
+  <ul>
+    <li>A method sent in lower case, as the templates write it: Tomcat refuses <code>post</code> with 405
+      (2026-11-02 log). The clients here send methods upper case, so neither run sends one.</li>
+    <li>The example's other modules, and errors it has no code for, such as a body that isn't JSON.</li>
+  </ul>
+
+  <h2>The sources, whole</h2>
+  <details><summary>EmployeeController.java, the example</summary><pre>/*
+ * Copyright 2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.hateoas.examples;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.Link;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @author Greg Turnquist
+ */
+@RestController
+class EmployeeController {
+
+	private final EmployeeRepository repository;
+
+	EmployeeController(EmployeeRepository repository) {
+		this.repository = repository;
+	}
+
+	@GetMapping("/employees")
+	ResponseEntity&lt;CollectionModel&lt;EntityModel&lt;Employee&gt;&gt;&gt; findAll() {
+
+		List&lt;EntityModel&lt;Employee&gt;&gt; employeeResources = StreamSupport.stream(repository.findAll().spliterator(), false)
+				.map(employee -&gt; EntityModel.of(employee,
+						linkTo(methodOn(EmployeeController.class).findOne(employee.getId())).withSelfRel()
+								.andAffordance(afford(methodOn(EmployeeController.class).updateEmployee(null, employee.getId())))
+								.andAffordance(afford(methodOn(EmployeeController.class).deleteEmployee(employee.getId()))),
+						linkTo(methodOn(EmployeeController.class).findAll()).withRel("employees")))
+				.collect(Collectors.toList());
+
+		return ResponseEntity.ok(CollectionModel.of( //
+				employeeResources, //
+				linkTo(methodOn(EmployeeController.class).findAll()).withSelfRel()
+						.andAffordance(afford(methodOn(EmployeeController.class).newEmployee(null)))));
+	}
+
+	@PostMapping("/employees")
+	ResponseEntity&lt;?&gt; newEmployee(@RequestBody Employee employee) {
+
+		Employee savedEmployee = repository.save(employee);
+
+		return EntityModel.of(savedEmployee,
+				linkTo(methodOn(EmployeeController.class).findOne(savedEmployee.getId())).withSelfRel()
+						.andAffordance(afford(methodOn(EmployeeController.class).updateEmployee(null, savedEmployee.getId())))
+						.andAffordance(afford(methodOn(EmployeeController.class).deleteEmployee(savedEmployee.getId()))),
+				linkTo(methodOn(EmployeeController.class).findAll()).withRel("employees")).getLink(IanaLinkRelations.SELF)
+						.map(Link::getHref) //
+						.map(href -&gt; {
+							try {
+								return new URI(href);
+							} catch (URISyntaxException e) {
+								throw new RuntimeException(e);
+							}
+						}) //
+						.map(uri -&gt; ResponseEntity.noContent().location(uri).build())
+						.orElse(ResponseEntity.badRequest().body("Unable to create " + employee));
+	}
+
+	@GetMapping("/employees/{id}")
+	ResponseEntity&lt;EntityModel&lt;Employee&gt;&gt; findOne(@PathVariable long id) {
+
+		return repository.findById(id)
+				.map(employee -&gt; EntityModel.of(employee,
+						linkTo(methodOn(EmployeeController.class).findOne(employee.getId())).withSelfRel()
+								.andAffordance(afford(methodOn(EmployeeController.class).updateEmployee(null, employee.getId())))
+								.andAffordance(afford(methodOn(EmployeeController.class).deleteEmployee(employee.getId()))),
+						linkTo(methodOn(EmployeeController.class).findAll()).withRel("employees")))
+				.map(ResponseEntity::ok) //
+				.orElse(ResponseEntity.notFound().build());
+	}
+
+	@PutMapping("/employees/{id}")
+	ResponseEntity&lt;?&gt; updateEmployee(@RequestBody Employee employee, @PathVariable long id) {
+
+		Employee employeeToUpdate = employee;
+		employeeToUpdate.setId(id);
+
+		Employee updatedEmployee = repository.save(employeeToUpdate);
+
+		return EntityModel.of(updatedEmployee,
+				linkTo(methodOn(EmployeeController.class).findOne(updatedEmployee.getId())).withSelfRel()
+						.andAffordance(afford(methodOn(EmployeeController.class).updateEmployee(null, updatedEmployee.getId())))
+						.andAffordance(afford(methodOn(EmployeeController.class).deleteEmployee(updatedEmployee.getId()))),
+				linkTo(methodOn(EmployeeController.class).findAll()).withRel("employees")).getLink(IanaLinkRelations.SELF)
+						.map(Link::getHref).map(href -&gt; {
+							try {
+								return new URI(href);
+							} catch (URISyntaxException e) {
+								throw new RuntimeException(e);
+							}
+						}) //
+						.map(uri -&gt; ResponseEntity.noContent().location(uri).build()) //
+						.orElse(ResponseEntity.badRequest().body("Unable to update " + employeeToUpdate));
+	}
+
+	@DeleteMapping("/employees/{id}")
+	ResponseEntity&lt;?&gt; deleteEmployee(@PathVariable long id) {
+
+		repository.deleteById(id);
+
+		return ResponseEntity.noContent().build();
+	}
+}</pre></details>
+  <details><summary>HypermediaConfiguration.java, the example</summary><pre>/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.hateoas.examples;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
+
+/**
+ * @author Greg Turnquist
+ */
+@Configuration
+@EnableHypermediaSupport(type = HypermediaType.HAL_FORMS)
+class HypermediaConfiguration {
+
+}</pre></details>
+  <details><summary>DatabaseLoader.java, the example</summary><pre>/*
+ * Copyright 2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.hateoas.examples;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
+/**
+ * Pre-load some data using a Spring Boot {@link CommandLineRunner}.
+ *
+ * @author Greg Turnquist
+ */
+@Component
+class DatabaseLoader {
+
+	/**
+	 * Use Spring to inject a {@link EmployeeRepository} that can then load data. Since this will run only after the app
+	 * is operational, the database will be up.
+	 *
+	 * @param repository
+	 */
+	@Bean
+	CommandLineRunner init(EmployeeRepository repository) {
+
+		return args -&gt; {
+			repository.save(new Employee("Frodo", "Baggins", "ring bearer"));
+			repository.save(new Employee("Bilbo", "Baggins", "burglar"));
+		};
+	}
+
+}</pre></details>
+  <details><summary>StockSpring.kt, the clone</summary><pre><code class="kotlin">package com.artie.heart.sims.employees
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method.DELETE
+import org.http4k.core.Method.GET
+import org.http4k.core.Method.POST
+import org.http4k.core.Method.PUT
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status
+import org.http4k.routing.bind
+import org.http4k.routing.path
+import org.http4k.routing.routes
+
+/**
+ * The employees as Spring HATEOAS's own affordances example
+ * (spring-projects/spring-hateoas-examples, module affordances) serves them out of the box,
+ * byte for byte, copied from a run of it on 1 November 2026 and checked against it since
+ * (SpringCloneTrace). It is no HEART service, and does nothing a HEART service would:
+ * HAL-FORMS only, its templates' methods in lower case, no profile, no ETag, absolute links,
+ * and every act answered 204 with no body (a create and an update name the employee in
+ * Location). Asked for application/hal+json, it answers its own JSON: a `links`
+ * array, no forms.
+ */
+class StockSpring(private val staff: Staff) {
+    private val mapper = ObjectMapper()
+
+    val handler: HttpHandler = routes(
+        "/employees" bind GET to { request -&gt; list(request) },
+        "/employees" bind POST to { request -&gt;
+            val made = fromBody(request, null)
+            Response(Status.NO_CONTENT).header("Location", "${origin(request)}/employees/${made.id}")
+        },
+        "/employees/{id}" bind GET to { request -&gt;
+            staff.get(idOf(request))?.let { one(request, it) } ?: Response(Status.NOT_FOUND)
+        },
+        "/employees/{id}" bind PUT to { request -&gt;
+            val saved = fromBody(request, idOf(request))
+            Response(Status.NO_CONTENT).header("Location", "${origin(request)}/employees/${saved.id}")
+        },
+        "/employees/{id}" bind DELETE to { request -&gt;
+            staff.remove(idOf(request))
+            Response(Status.NO_CONTENT)
+        },
+    )
+
+    /** Spring's save: a new employee when there is no [id], the employee [id] as given otherwise. */
+    private fun fromBody(request: Request, id: Long?): Employee {
+        val body = mapper.readTree(request.bodyString())
+        fun text(name: String) = body.path(name).asText("")
+        return if (id == null) {
+            staff.hire(text("firstName"), text("lastName"), text("role"))
+        } else {
+            staff.save(id, text("firstName"), text("lastName"), text("role"))
+        }
+    }
+
+    private fun idOf(request: Request) = request.path("id")?.toLongOrNull() ?: -1
+
+    /** Where the request came: Spring writes every link absolute, against the address it was asked at. */
+    private fun origin(request: Request) =
+        "http://${request.header(HOST_HEADER) ?: request.header("Host") ?: request.uri.authority}"
+
+    private fun halForms(request: Request) = request.header("Accept").orEmpty().let { HAL_FORMS in it || HAL !in it }
+
+    private fun list(request: Request): Response {
+        val origin = origin(request)
+        val body = if (halForms(request)) {
+            mapper.createObjectNode().apply {
+                putObject("_embedded").putArray("employees").apply { staff.working().forEach { add(employee(it, origin)) } }
+                putObject("_links").putObject("self").put("href", "$origin/employees")
+                set&lt;ObjectNode&gt;("_templates", templates(mapOf("default" to "post")))
+            }
+        } else {
+            mapper.createObjectNode().apply {
+                putArray("links").addObject().put("rel", "self").put("href", "$origin/employees")
+                putArray("content").apply { staff.working().forEach { add(plain(it, origin)) } }
+            }
+        }
+        return answer(request, body)
+    }
+
+    private fun one(request: Request, employee: Employee): Response {
+        val origin = origin(request)
+        return answer(request, if (halForms(request)) employee(employee, origin) else plain(employee, origin))
+    }
+
+    private fun answer(request: Request, body: ObjectNode) = Response(Status.OK)
+        .header("Content-Type", if (halForms(request)) HAL_FORMS else HAL)
+        .body(mapper.writeValueAsString(body))
+
+    private fun fields(employee: Employee): ObjectNode = mapper.createObjectNode()
+        .put("id", employee.id).put("firstName", employee.firstName)
+        .put("lastName", employee.lastName).put("role", employee.role)
+
+    private fun employee(employee: Employee, origin: String): ObjectNode = fields(employee).apply {
+        putObject("_links").apply {
+            putObject("self").put("href", "$origin/employees/${employee.id}")
+            putObject("employees").put("href", "$origin/employees")
+        }
+        set&lt;ObjectNode&gt;("_templates", templates(mapOf("default" to "put", "deleteEmployee" to "delete")))
+    }
+
+    private fun plain(employee: Employee, origin: String): ObjectNode = fields(employee).apply {
+        putArray("links").apply {
+            addObject().put("rel", "self").put("href", "$origin/employees/${employee.id}")
+            addObject().put("rel", "employees").put("href", "$origin/employees")
+        }
+    }
+
+    /** Spring's templates: a method in lower case, and every field of an employee, or none for a delete. */
+    private fun templates(methods: Map&lt;String, String&gt;): ObjectNode = mapper.createObjectNode().apply {
+        methods.forEach { (name, method) -&gt;
+            putObject(name).apply {
+                put("method", method)
+                val properties = putArray("properties")
+                if (method != "delete") FIELDS.forEach { properties.addObject().put("name", it) }
+            }
+        }
+    }
+
+    companion object {
+        const val HOST_HEADER = "X-Sim-Host"
+        private const val HAL_FORMS = "application/prs.hal-forms+json"
+        private const val HAL = "application/hal+json"
+        private val FIELDS = listOf("firstName", "id", "lastName", "role")
+    }
+}</code></pre></details>
+  <details><summary>SpringCloneTrace.kt, the comparison</summary><pre><code class="kotlin">package com.artie.heart.sims.employees
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
+import org.http4k.client.JavaHttpClient
+import org.http4k.core.Method
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.junit.jupiter.api.Test
+import java.io.File
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+
+/**
+ * Proves the employees simulator, answering as stock Spring (`/_sim/employees/mode`), is a clone of Spring HATEOAS's
+ * own affordances example: every request goes to the clone and to the example itself, run untouched, and the run
+ * stops at the first answer that differs in status, Content-Type, Location, ETag or body, byte for byte once the
+ * example's origin is written as the clone's (both write every link absolute, against the address they were asked
+ * at). It writes the trace for the run report, each step's comparison the example's own answer, only when
+ * SPRING_CLONE_OUT names a folder, with SPRING_REAL and SPRING_CLONE the two origins.
+ */
+class SpringCloneTrace {
+    @Test
+    fun writesTheComparison() {
+        val out = System.getenv("SPRING_CLONE_OUT")?.let(::File) ?: return
+        val real = System.getenv("SPRING_REAL") ?: "http://localhost:8097"
+        val clone = System.getenv("SPRING_CLONE") ?: "http://localhost:8096"
+        out.mkdirs()
+        File(out, "trace.yaml").writeText(CloneRun(real, clone).trace())
+    }
+}
+
+private class CloneRun(private val real: String, private val clone: String) {
+    private val mapper = ObjectMapper()
+    private val yaml = ObjectMapper(YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER))
+    private val client = JavaHttpClient()
+    private val steps = mutableListOf&lt;Map&lt;String, Any?&gt;&gt;()
+
+    fun trace(): String {
+        val reset = client(Request(Method.POST, "$clone/_sim/reset"))
+        check(reset.status.successful) { "the clone did not reset" }
+        check(client(Request(Method.PUT, "$clone/_sim/employees/mode").body("stock-spring")).status.successful)
+        read()
+        acts()
+        return yaml.writeValueAsString(mapOf("steps" to steps))
+    }
+
+    /** What each media type gets, and what a client's validators get: nothing to revalidate with. */
+    private fun read() {
+        get("The entry, asked for as {accept}", "/employees", HAL_FORMS)
+        get("The entry, asked for as {accept}: Spring's own JSON, links in an array, no forms", "/employees", HAL)
+        get("The entry, asked for as {accept}: HAL-FORMS", "/employees", ANY)
+        get("Employee {id}, as {accept}", "/employees/1", HAL_FORMS, mapOf("id" to 1))
+        get("Employee {id}, as {accept}", "/employees/1", HAL, mapOf("id" to 1))
+        send(
+            "Employee {id} again, with If-None-Match: no ETag was given, so nothing to revalidate, read in full",
+            Request(Method.GET, "/employees/1").header("Accept", HAL_FORMS).header("If-None-Match", "\"1\""),
+            mapOf("id" to 1),
+        )
+        get("Employee {id}, who never was", "/employees/$NEVER", HAL_FORMS, mapOf("id" to NEVER), expect = 404)
+    }
+
+    /** The templates' acts, sent upper case (Tomcat refuses `post`), each answered 204 with no body. */
+    private fun acts() {
+        send(
+            "Act {relation} on the entry: hire {firstName}, by POST, answered with no body",
+            json(Method.POST, "/employees", SAMWISE), mapOf("relation" to "default", "firstName" to "Samwise"), 204,
+        )
+        get("The entry again: {count} employees", "/employees", HAL_FORMS, mapOf("count" to 3))
+        send(
+            "Act {relation} on employee {id}: {role}, by PUT, with an If-Match that matches nothing, taken anyway",
+            json(Method.PUT, "/employees/1", FRODO_RETIRED).header("If-Match", "\"stale\""),
+            mapOf("relation" to "default", "id" to 1, "role" to "ring bearer, retired"), 204,
+        )
+        get("Employee {id}, as changed", "/employees/1", HAL_FORMS, mapOf("id" to 1))
+        send(
+            "Act {relation} on employee {id}, by DELETE, answered with no body",
+            Request(Method.DELETE, "/employees/1"), mapOf("relation" to "deleteEmployee", "id" to 1), 204,
+        )
+        get("Employee {id}, gone", "/employees/1", HAL_FORMS, mapOf("id" to 1), expect = 404)
+        get("The entry at the end", "/employees", HAL_FORMS)
+    }
+
+    private fun get(
+        say: String,
+        path: String,
+        accept: String,
+        params: Map&lt;String, Any?&gt; = emptyMap(),
+        expect: Int = 200,
+    ) = send(say, Request(Method.GET, path).header("Accept", accept), params + ("accept" to accept), expect)
+
+    private fun json(method: Method, path: String, body: String) =
+        Request(method, path).header("Content-Type", JSON).header("Accept", HAL_FORMS).body(body)
+
+    /** [request] to the clone and to the example; recorded, and refused here if the two answers differ. */
+    private fun send(say: String, request: Request, params: Map&lt;String, Any?&gt;, expect: Int = 200) {
+        val at = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        val started = System.nanoTime()
+        val cloned = client(request.uri(request.uri.scheme("http").authority(authority(clone))))
+        val ms = (System.nanoTime() - started) / NANOS_PER_MILLI
+        val original = client(request.uri(request.uri.scheme("http").authority(authority(real))))
+        check(cloned.status.code == expect) { "$say: the clone answered ${cloned.status.code}, expected $expect" }
+        same(say, cloned, original)
+        steps += linkedMapOf(
+            "at" to at,
+            "mode" to "script",
+            "say" to say,
+            "params" to params,
+            "request" to requestOf(request, clone),
+            "response" to responseOf(cloned, clone),
+            "compare" to mapOf(
+                "label" to "Spring HATEOAS's affordances example, commit c100c56, at $real",
+                "diff" to true,
+                "request" to requestOf(request, real),
+                "response" to responseOf(original, real),
+            ),
+            "summary" to "${verdictOf(cloned)}, as Spring's example answers, byte for byte",
+            "expect" to expect,
+            "ms" to ms,
+        ) + listOfNotNull(
+            // The addresses the run names itself, not judged as hypermedia: the entry, and an employee who never was.
+            if (steps.isEmpty() || params["id"] == NEVER) "entry" to true else null,
+        )
+    }
+
+    /** Every part a client reads, the same: each origin written alike, the bytes otherwise as sent. */
+    private fun same(say: String, cloned: Response, original: Response) {
+        fun part(response: Response, origin: String) = listOf(
+            response.status.code.toString(),
+            response.header("Content-Type").orEmpty(),
+            response.header("Location").orEmpty().replace(origin, ORIGIN),
+            response.header("ETag").orEmpty(),
+            response.bodyString().replace(origin, ORIGIN),
+        )
+        val (a, b) = part(cloned, clone) to part(original, real)
+        PARTS.forEachIndexed { i, name -&gt;
+            check(a[i] == b[i]) { "$say: $name differs:\n clone: ${a[i]}\n Spring: ${b[i]}" }
+        }
+    }
+
+    private fun verdictOf(response: Response) = when {
+        response.status.code == NO_CONTENT -&gt; "No content"
+        response.status.code == NOT_FOUND -&gt; "Not found, with no body"
+        else -&gt; "Read"
+    }
+
+    private fun authority(origin: String) = origin.removePrefix("http://")
+
+    private fun requestOf(request: Request, origin: String): Map&lt;String, Any?&gt; = linkedMapOf(
+        "method" to request.method.name,
+        "url" to origin + request.uri.toString(),
+        "headers" to listOf("Accept", "Content-Type", "If-Match", "If-None-Match")
+            .mapNotNull { name -&gt; request.header(name)?.let { name to it } }.toMap(),
+        "body" to request.bodyString().takeIf { it.isNotEmpty() }?.let { mapper.readValue(it, Any::class.java) },
+    )
+
+    private fun responseOf(response: Response, origin: String): Map&lt;String, Any?&gt; = linkedMapOf(
+        "status" to response.status.code,
+        "headers" to listOf("Content-Type", "Location", "ETag", "Content-Length")
+            .mapNotNull { name -&gt; response.header(name)?.let { name to it } }.toMap(),
+        "body" to response.bodyString().takeIf { it.isNotEmpty() }?.let { mapper.readValue(it, Any::class.java) },
+    ).also { check(origin.isNotEmpty()) }
+
+    private companion object {
+        const val HAL_FORMS = "application/prs.hal-forms+json"
+        const val HAL = "application/hal+json"
+        const val ANY = "*/*"
+        const val JSON = "application/json"
+        const val ORIGIN = "{origin}"
+        const val NO_CONTENT = 204
+        const val NOT_FOUND = 404
+        const val NEVER = 99
+        const val NANOS_PER_MILLI = 1_000_000L
+        val PARTS = listOf("status", "Content-Type", "Location", "ETag", "body")
+        const val SAMWISE = """{"firstName":"Samwise","lastName":"Gamgee","role":"gardener"}"""
+        const val FRODO_RETIRED = """{"firstName":"Frodo","lastName":"Baggins","role":"ring bearer, retired"}"""
+    }
+}</code></pre></details>
+  <details><summary>Run it again</summary><pre>The example, untouched, in its container (first time: docker run as the 2026-11-02 log says):
+  docker restart hal-forms-fresh        # http://localhost:8097
+The clone:
+  ./gradlew -p heart :heart-sims:installSims
+  java -cp 'heart/heart-sims/build/sims/lib/*' com.artie.heart.sims.MainKt 8096 employees.test
+Side by side (it resets the clone and switches it to answer as Spring's example):
+  SPRING_CLONE_OUT=$PWD/docs/reports/spring-hateoas-clone ./gradlew -p heart :heart-sims:test --tests '*SpringCloneTrace*' --rerun
+ARTIE on each, both started fresh (restart the container; POST /_sim/reset and PUT /_sim/employees/mode stock-spring):
+  artie run wild/fresh-run/explore.kts --dialect hal-forms --trace docs/reports/spring-hateoas-clone/artie-real.yaml --exchanges
+  artie run wild/fresh-run/explore.kts entry=http://localhost:8096/employees --dialect hal-forms --trace docs/reports/spring-hateoas-clone/artie-clone.yaml --exchanges
+Then: sh docs/reports/spring-hateoas-clone/build.sh</pre></details>
+</main>
+<script>// Kotlin syntax colouring for heart-scripts shown in reports: comments, strings (with their $templates),
+// keywords, numbers, and calls, the DSL's verbs among them. Every <code class="kotlin"> on the page is
+// coloured in place, from its text, so the page needs no library. The rules come with it, so no page can
+// leave them out; their colours are the page's own tokens (--kt-kw, --kt-str, --kt-tpl, --kt-cm, --kt-fn,
+// --kt-num, light and dark), with light values to fall back on when a page has none.
+// window.KotlinView.classes(text) gives each character's class ("" for plain), for a page that colours
+// text it also marks (the derivation report).
+(() => {
+  const KEYWORDS = new Set(["val", "var", "fun", "if", "else", "when", "return", "by", "to", "in", "is", "as",
+    "null", "true", "false", "class", "object", "for", "while", "import", "package", "this", "it"]);
+  const TOKEN = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("""[\s\S]*?"""(?!")|"(?:\\.|[^"\\])*")|\b(\d+(?:\.\d+)?L?)\b|\b([A-Za-z_]\w*)\b/g;
+  // Each token of the text: its class ("" for plain) and its text, in order, covering every character.
+  const tokens = (text) => {
+    const out = [];
+    let last = 0;
+    for (const m of text.matchAll(TOKEN)) {
+      out.push(["", text.slice(last, m.index)]);
+      const [all, comment, str, num, word] = m;
+      // A call: a name with ( or { after it. Tested on what follows, as a lookahead alone can't be captured.
+      const call = word && /^\s*[({]/.test(text.slice(m.index + all.length));
+      if (comment) out.push(["kt-cm", comment]);
+      else if (str) {
+        // A string, its ${…} and $name templates marked inside it.
+        let at = 0;
+        str.replace(/\$\{[^}]*\}|\$[A-Za-z_]\w*/g, (t, i) => {
+          out.push(["kt-str", str.slice(at, i)], ["kt-str kt-tpl", t]);
+          at = i + t.length;
+          return t;
+        });
+        out.push(["kt-str", str.slice(at)]);
+      } else if (num) out.push(["kt-num", num]);
+      else if (KEYWORDS.has(word)) out.push(["kt-kw", word]);
+      else if (call) out.push(["kt-fn", word]);
+      else out.push(["", all]);
+      last = m.index + all.length;
+    }
+    out.push(["", text.slice(last)]);
+    return out.filter(([, t]) => t.length > 0);
+  };
+  const classes = (text) => tokens(text).flatMap(([cls, t]) => Array.from({ length: t.length }, () => cls));
+  const colour = (code) => {
+    const out = document.createDocumentFragment();
+    for (const [cls, text] of tokens(code.textContent)) {
+      if (!cls) { out.append(document.createTextNode(text)); continue; }
+      const s = document.createElement("span");
+      s.className = cls;
+      s.textContent = text;
+      out.append(s);
+    }
+    code.replaceChildren(out);
+  };
+  const rules = document.createElement("style");
+  rules.textContent = [
+    ".kt-kw { color: var(--kt-kw, #8a3f8f); font-weight: 500; }", ".kt-str { color: var(--kt-str, #2f6f3f); }",
+    ".kt-str.kt-tpl, .kt-tpl { color: var(--kt-tpl, #b0641c); }",
+    ".kt-cm { color: var(--kt-cm, #7b847e); font-style: italic; }",
+    ".kt-fn { color: var(--kt-fn, #1f5a8a); }", ".kt-num { color: var(--kt-num, #a0522d); }",
+  ].join("\n");
+  document.head.append(rules);
+  window.KotlinView = { classes };
+  document.querySelectorAll("code.kotlin").forEach(colour);
+})();</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+name: then-the-code
+part: "One behavior, start to finish"
+title: "Then the Code, Then Green"
+kicker: The smallest change that makes the table pass
+say: "Only now does the code change, and the hook lets it, because a feature file changed first. Here's the heart of it, from the real commit. A policy, read from a properties file, with one rule: renewal.weeks. If the file leaves it out, three weeks. And a renewal now moves the due date by however many weeks the policy says. That's it. Then the suite runs again, through the runner, and all four rows pass. Green, logged."
+sources:
+  - ["LibraryPolicy.kt", "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/LibraryPolicy.kt"]
+fragments:
+  - name: policy
+    label: The library's policy (LibraryPolicy.kt)
+    source: artie:heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/LibraryPolicy.kt
+    lang: kotlin
+html: |
+  <h2>Then the Code, Then Green</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr)">
+    <div class="card dark">
+      <pre style="margin: 0; white-space: pre-wrap; font-size: .9rem">data class LibraryPolicy(
+      val renewalWeeks: Long = DEFAULT_RENEWAL_WEEKS,
+  ) {
+      companion object {
+          const val DEFAULT_RENEWAL_WEEKS = 3L
+  
+          fun of(text: String): LibraryPolicy {
+              val read = Properties().apply { load(text.reader()) }
+              return LibraryPolicy(
+                  renewalWeeks = read.getProperty("renewal.weeks")
+                      ?.trim()?.toLong() ?: DEFAULT_RENEWAL_WEEKS,
+              )
+          }
+      }
+  }</pre>
+    </div>
+    <div class="rows">
+      <div><h3>One Rule</h3><p><code>renewal.weeks</code>, read from the library’s policy file. Left out: three weeks.</p></div>
+      <div><h3>A Renewal Uses It</h3><p>The due date moves by the policy’s weeks.</p></div>
+      <div><h3>Green, Logged</h3><p>All four rows pass, through the runner.</p></div>
+      <p class="refs"><deck-ref name="repeatability"></deck-ref> <deck-fragment name="policy">LibraryPolicy.kt</deck-fragment></p>
+    </div>
+  </div>

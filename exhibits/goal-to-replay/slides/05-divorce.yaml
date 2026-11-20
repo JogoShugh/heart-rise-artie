@@ -1,0 +1,20 @@
+name: divorce
+part: "Why it works"
+title: "The Divorce: Data in the Answer, Controls Elsewhere"
+kicker: The machine Web
+say: "Then APIs came along, and kept the data in the answer but moved the controls out. Into docs. Into OpenAPI descriptions. Into SDKs and custom clients, one per service. And now into MCP tool lists. A developer reads the docs and codes the method, the address and the body into a client; an agent gets the whole list loaded up front, whatever state the thing is in. GitHub's OpenAPI description is 13 and a half megabytes as one file. Fair enough, it's a big API. But nothing in a pull request's answer tells you whether you may merge it right now, or how. Fielding had a sentence for that, too."
+sources:
+  - ["Fielding (2008)", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]
+  - ["GitHub OpenAPI description", "https://github.com/github/rest-api-description"]
+html: |
+  <h2>The Divorce: Data in the Answer, Controls Elsewhere</h2>
+  <div class="split" style="grid-template-columns: 1fr 1.1fr 1fr; align-items: stretch">
+    <div class="panel" style="padding: 1.4rem 1.5rem; gap: 0.8rem"><h3 style="font: 650 1.6rem/1.15 var(--display); color: var(--leaf); margin: 0; text-transform: none; letter-spacing: 0">The answer</h3><p style="font-size: 1.1rem">Data only: state, ids, timestamps, maybe a few links. Nothing says what you may do next, or how.</p></div>
+    <div class="box" style="padding: 1.4rem 1.5rem; gap: 0.8rem; align-content: start"><h3>The controls, out of band</h3>
+      <ul style="margin: 0; font-size: 1.1rem"><li>Docs, read by a person</li><li>OpenAPI descriptions</li><li>SDKs and custom clients, one per service</li><li>MCP tool lists, loaded up front</li></ul>
+    </div>
+    <div class="stats" style="grid-template-columns: 1fr; align-content: start"><div class="stat bad"><b>13.5 MB</b><span style="display: block; margin-top: 0.6rem; font-size: 1rem; line-height: 1.5">GitHub’s OpenAPI description, as one file. Every operation, whatever state the pull request is in.</span></div></div>
+  </div>
+  <blockquote class="big">“Failure here implies that out-of-band information is driving interaction instead of hypertext.”</blockquote>
+  <p class="cite"><a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven" target="_blank" rel="noopener"><b>Roy T. Fielding</b></a>, “REST APIs must be hypertext-driven”, 2008</p>
+  <p class="refs"><deck-ref name="rule-3"></deck-ref> <deck-ref name="in-band"></deck-ref> <deck-ref name="right-behavior"></deck-ref></p>

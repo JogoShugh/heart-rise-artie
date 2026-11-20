@@ -1,0 +1,20 @@
+{
+  "name": "resilience",
+  "kind": "measure",
+  "label": "RESILIENCE",
+  "title": "Resilience: the server changes, the client doesn't break",
+  "summary": "When the server changes, or misbehaves on purpose, the client takes the failure path the spec names, re-syncs, and goes on; a model comes back only when the controls really changed, to repair. At the small scale it is the regression suite and the gates that hold, even against the model.",
+  "cite": "The third of the three R's",
+  "_links": {
+    "describedby": {
+      "href": "#three-rs-one-behavior",
+      "title": "The third of the three R's"
+    },
+    "self": {
+      "href": "resilience.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+name: run-it
+part: "The release"
+title: "Run It Yourself"
+kicker: Walk, keep, replay
+say: "Three commands. The first walks the goal once with Claude in HAL-FORMS, keeps the script, and replays the five. The second replays only, with no model. The third replays the HAL Schema Forms script, at L0 or, with RELEASE_RUNG, at L2."
+sources:
+  - ["hal-forms/run.sh", "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/hal-forms/run.sh"]
+html: |
+  <h2>Run It Yourself</h2>
+  <pre class="cmd">sh exhibits/merge-watch-release/hal-forms/run.sh          <span># walk once in HAL-FORMS, keep, replay five</span>
+  sh exhibits/merge-watch-release/hal-forms/run.sh replay   <span># replay five, no model</span>
+  RELEASE_RUNG=L2 sh exhibits/merge-watch-release/variants.sh OUT   <span># the HAL Schema Forms script, at L2</span>
+  sh exhibits/two-dialects/build.sh                        <span># this deck</span></pre>
+  <p class="note">Needs Docker for Jenkins, and a model key for the walk only.</p>

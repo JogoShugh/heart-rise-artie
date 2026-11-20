@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Native and HEART, Measured</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="The GitHub triage task, run by Claude alone and by Claude through ARTIE and HEART, three times each, reasoned and scripted, judged by one checker.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script>try { document.documentElement.dataset.theme = localStorage.getItem("nt-theme") || "light"; } catch (e) { document.documentElement.dataset.theme = "light"; }</script>
+<style>
+/* One reading column; tiles, then a table a phase, then what HEART needed fixed. Rust is Claude alone, teal is HEART. */
+:root {
+  --bg: #f3f6f5; --surface: #ffffff; --fg: #17211d; --muted: #55645d; --rule: #d3ddd8; --link: #2f5f8f;
+  --native: #a4502c; --native-soft: #f6e7df; --heart: #1f6f6b; --heart-soft: #dcefec;
+  --ok: #2f6f3f; --ok-soft: #e1f0e3; --bad: #b4403a; --bad-soft: #f8e1df;
+  --display: "Literata", Georgia, serif; --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --kw: #8a3f8f; --str: #2f6f3f; --num: #a0522d; --fn: #1f5a8a; --tpl: #b0641c;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732; --link: #8ab8e6;
+  --native: #e39a76; --native-soft: #33231c; --heart: #7fd0c8; --heart-soft: #16302d;
+  --ok: #9fd6ac; --ok-soft: #1b2e21; --bad: #e58a84; --bad-soft: #3a1f1d;
+  --kw: #d79ad9; --str: #9fd6ac; --num: #e0a080; --fn: #8cc0ea; --tpl: #e6a35c; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732; --link: #8ab8e6;
+  --native: #e39a76; --native-soft: #33231c; --heart: #7fd0c8; --heart-soft: #16302d;
+  --ok: #9fd6ac; --ok-soft: #1b2e21; --bad: #e58a84; --bad-soft: #3a1f1d;
+  --kw: #d79ad9; --str: #9fd6ac; --num: #e0a080; --fn: #8cc0ea; --tpl: #e6a35c; color-scheme: dark; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); }
+main { max-width: 74rem; margin: 0 auto; padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 2rem; }
+header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; align-items: start; }
+h1 { font: 650 2.2rem/1.15 var(--display); margin: 0 0 .5rem; text-wrap: balance; }
+h2 { font: 650 1.35rem/1.25 var(--display); margin: 0 0 .7rem; }
+p { margin: 0; } .lede, .sub { color: var(--muted); max-width: 66ch; } .sub { margin: 0 0 .8rem; }
+.seg { display: flex; align-items: center; gap: .4rem; }
+.seg-label { font: 600 .7rem var(--body); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.seg button { font: 500 .8rem var(--body); background: var(--surface); color: var(--fg); border: 1px solid var(--rule); border-radius: 6px; padding: .25rem .6rem; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.seg button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: .8rem; }
+.tile { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: .7rem .9rem; display: grid; gap: .4rem; }
+.tile .label { font: 600 .74rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.tile .pair { display: grid; gap: .2rem; } .tile b { font: 600 1.25rem var(--body); margin-left: .4rem; font-variant-numeric: tabular-nums; }
+.tag { display: inline-block; font: 600 .7rem var(--body); letter-spacing: .05em; text-transform: uppercase; border-radius: 4px; padding: .05rem .4rem; }
+.tag.native { background: var(--native-soft); color: var(--native); } .tag.heart { background: var(--heart-soft); color: var(--heart); }
+.wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 58rem; font-size: .9rem; }
+th, td { text-align: left; vertical-align: top; padding: .5rem .7rem; border-bottom: 1px solid var(--rule); }
+tr:last-child td { border-bottom: 0; }
+thead th { font: 600 .7rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; } td.note { color: var(--muted); max-width: 26rem; }
+tr.failed td { background: var(--bad-soft); }
+.stamp { font: .75rem var(--mono); color: var(--muted); }
+.pill { font: 600 .82rem var(--body); border-radius: 999px; padding: .05rem .5rem; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); } .pill.bad { background: var(--bad-soft); color: var(--bad); }
+.setup { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1rem 2rem; }
+ul { margin: .3rem 0 0; padding-left: 1.2rem; display: grid; gap: .5rem; } li { max-width: 68ch; } li p { color: var(--muted); }
+.commit { font: .75rem var(--mono); color: var(--muted); }
+.tabs { display: flex; gap: .4rem; border-bottom: 1px solid var(--rule); }
+.tabs button { font: 600 .95rem var(--body); background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: .4rem .2rem .6rem; margin-right: 1rem; cursor: pointer; }
+.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.tabs button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.tab { display: grid; gap: 2rem; }
+[hidden] { display: none !important; }
+:root:not([data-detail="full"]) .full { display: none !important; }
+.toggles { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; }
+.code { border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); overflow: hidden; }
+.code .head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem 1rem; padding: .55rem .9rem; border-bottom: 1px solid var(--rule); background: var(--bg); font-size: .85rem; color: var(--muted); }
+.code pre { margin: 0; padding: .8rem .9rem; overflow: auto; max-height: 34rem; font: .78rem/1.55 var(--mono); }
+.code pre code { background: none; padding: 0; }
+.hljs-keyword, .hljs-built_in, .hljs-literal { color: var(--kw); } .hljs-string { color: var(--str); }
+.hljs-comment { color: var(--muted); font-style: italic; } .hljs-number { color: var(--num); }
+.hljs-title, .hljs-function .hljs-title { color: var(--fn); } .hljs-subst, .hljs-variable, .hljs-template-variable { color: var(--tpl); }
+table.match { min-width: 60rem; } table.match td:first-child { font-weight: 600; width: 16%; }
+table.match td:nth-child(2) { width: 26%; } table.match td:last-child { white-space: nowrap; }
+table.strict { min-width: 44rem; } table.strict td:first-child { font-weight: 600; width: 22%; }
+.pair2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 34rem), 1fr)); gap: 1rem; }
+.pair2 > * { min-width: 0; }
+dl.points { display: grid; gap: .9rem; margin: 0; } dl.points dt { font-weight: 600; } dl.points dd { margin: .2rem 0 0; color: var(--muted); max-width: 72ch; }
+dl.points code, .tab p code, li code { font: .85em var(--mono); color: var(--fg); }
+.verdict { display: inline-block; font: 600 .68rem var(--body); letter-spacing: .05em; text-transform: uppercase; border-radius: 4px; padding: .05rem .35rem; margin-right: .4rem; vertical-align: .1em; }
+.verdict.weak { background: var(--bad-soft); color: var(--bad); } .verdict.good { background: var(--ok-soft); color: var(--ok); } .verdict.note { background: var(--bg); color: var(--muted); border: 1px solid var(--rule); }
+.close { max-width: 66ch; font-family: var(--display); font-size: 1.1rem; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div><h1>Native and HEART, Measured</h1>
+    <p class="lede">The GitHub triage task, 29 steps, done by Claude alone from what it knows of GitHub's REST API, and by Claude through ARTIE and the HEART gateway. Three runs each with a model choosing every move, then three each by a script made from a run, with no model. One checker judged every run by what GitHub held after it: 23 checks.</p></div>
+    <div class="toggles"><div class="seg"><span class="seg-label" id="detail-label">Detail</span><div role="group" aria-labelledby="detail-label" style="display:flex;gap:.3rem"><button type="button" data-detail="brief">Brief</button><button type="button" data-detail="full">Full</button></div></div>
+    <div class="seg"><span class="seg-label" id="theme-label">Theme</span><div role="group" aria-labelledby="theme-label" style="display:flex;gap:.3rem"><button type="button" data-th="light">Light</button><button type="button" data-th="dark">Dark</button></div></div></div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Report">
+    <button type="button" role="tab" id="tab-results" aria-controls="results" data-tab="results">Results</button>
+    <button type="button" role="tab" id="tab-scripts" aria-controls="scripts" data-tab="scripts">The scripts</button>
+  </nav>
+
+  <div class="tab" id="results" role="tabpanel" aria-labelledby="tab-results">
+  <section class="tiles" aria-label="Summary, on the code as it ended"><div class="tile"><div class="label">Reasoned runs that did the task</div><div class="pair"><div><span class="tag native">Native</span><b>3 of 3</b></div><div><span class="tag heart">HEART</span><b>3 of 3</b></div></div></div><div class="tile"><div class="label">Reasoned, mean time</div><div class="pair"><div><span class="tag native">Native</span><b>70</b> s</div><div><span class="tag heart">HEART</span><b>261</b> s</div></div></div><div class="tile"><div class="label">Reasoned, model calls a run</div><div class="pair"><div><span class="tag native">Native</span><b>13</b></div><div><span class="tag heart">HEART</span><b>77</b></div></div></div><div class="tile"><div class="label">Reasoned, tokens out a run</div><div class="pair"><div><span class="tag native">Native</span><b>4,861</b></div><div><span class="tag heart">HEART</span><b>11,359</b></div></div></div><div class="tile"><div class="label">Scripted runs that did the task</div><div class="pair"><div><span class="tag native">Native</span><b>3 of 3</b></div><div><span class="tag heart">HEART</span><b>3 of 3</b></div></div></div><div class="tile"><div class="label">Scripted, mean time</div><div class="pair"><div><span class="tag native">Native</span><b>22</b> s</div><div><span class="tag heart">HEART</span><b>68</b> s</div></div></div></section>
+
+  <section class="setup">
+    <div><h2>The arms</h2><ul>
+      <li><span class="tag native">Native</span> <code>claude-sonnet-5-5</code>, one <code>http</code> tool aimed at api.github.com, no documentation, no gh, no MCP server. The task with HEART's marks put in words.</li>
+      <li><span class="tag heart">HEART</span> the same model, as ARTIE's planner and reasoner, through the gateway in front of GitHub. The task as the goal file, <code>github-triage.goal.md</code>.</li>
+    </ul></div>
+    <div><h2>Made repeatable</h2><ul>
+      <li><span class="tag native">Native</span> one model call: its own run's transcript in, a 162-line Python script out (53,306 tokens in, 3,471 out).</li>
+      <li><span class="tag heart">HEART</span> <code>artie generate</code> from one run's capture: no model, a script and its lock file.</li>
+    </ul></div>
+  </section>
+
+  <section><h2>Reasoned: the model chooses every move</h2>
+  <p class="sub full">Native's input tokens are nearly all read from its prompt cache: one conversation that grows. HEART sends each call a fresh view of the resource held, and makes two calls a move, the planner's and the reasoner's.</p>
+  <div class="wrap"><table><thead><tr><th>Arm</th><th>Run</th><th>Checks</th><th>Seconds</th><th>Requests / steps</th><th>Model calls</th><th>Tokens in</th><th>Out</th><th>Cache read</th><th>Cache written</th><th>Note</th></tr></thead><tbody><tr class="native"><td><span class="tag native">Native</span></td><td>1<div class="stamp">1022-062745</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">70.3</td><td class="num">22</td><td class="num">14</td><td class="num">30</td><td class="num">5,062</td><td class="num">279,947</td><td class="num">48,608</td><td class="note"><span class="full"></span></td></tr><tr class="native"><td><span class="tag native">Native</span></td><td>2<div class="stamp">1022-064648</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">69.2</td><td class="num">24</td><td class="num">12</td><td class="num">26</td><td class="num">4,662</td><td class="num">274,290</td><td class="num">52,541</td><td class="note"><span class="full"></span></td></tr><tr class="native"><td><span class="tag native">Native</span></td><td>3<div class="stamp">1022-070245</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">71.4</td><td class="num">24</td><td class="num">12</td><td class="num">26</td><td class="num">4,858</td><td class="num">275,123</td><td class="num">52,726</td><td class="note"><span class="full"></span></td></tr><tr class="heart failed"><td><span class="tag heart">HEART</span></td><td>1<div class="stamp">1022-062915</div></td><td class="num"><span class="pill bad">6/18</span></td><td class="num">146</td><td class="num"></td><td class="num">41</td><td class="num">77,733</td><td class="num">8,050</td><td class="num">51,064</td><td class="num">3,987</td><td class="note"><span class="full">before the fix: went back from the branch list again and again; the step ran out of moves</span></td></tr><tr class="heart failed"><td><span class="tag heart">HEART</span></td><td>2<div class="stamp">1022-063415</div></td><td class="num"><span class="pill bad">7/18</span></td><td class="num">139</td><td class="num"></td><td class="num">42</td><td class="num">77,796</td><td class="num">8,061</td><td class="num">53,560</td><td class="num">3,204</td><td class="note"><span class="full">before the fix: the same</span></td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>3<div class="stamp">1022-064219</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">246</td><td class="num">55</td><td class="num">77</td><td class="num">234,895</td><td class="num">11,426</td><td class="num">101,061</td><td class="num">5,733</td><td class="note"><span class="full"></span></td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>4<div class="stamp">1022-065759</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">270</td><td class="num">55</td><td class="num">77</td><td class="num">235,189</td><td class="num">11,293</td><td class="num">101,061</td><td class="num">5,733</td><td class="note"><span class="full"></span></td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>5<div class="stamp">1022-070410</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">266</td><td class="num">55</td><td class="num">77</td><td class="num">236,909</td><td class="num">11,359</td><td class="num">105,166</td><td class="num">1,628</td><td class="note"><span class="full"></span></td></tr></tbody></table></div></section>
+
+  <section><h2>Scripted: no model</h2>
+  <p class="sub full">HEART's script runs 1 to 3 came before the fixes below; 4 to 6 after.</p>
+  <div class="wrap"><table><thead><tr><th>Arm</th><th>Run</th><th>Checks</th><th>Seconds</th><th>Requests / steps</th><th>Model calls</th><th>Tokens in</th><th>Out</th><th>Cache read</th><th>Cache written</th><th>Note</th></tr></thead><tbody><tr class="native"><td><span class="tag native">Native</span></td><td>1<div class="stamp">1022-071000</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">22.6</td><td class="num">23</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"><span class="full"></span></td></tr><tr class="native"><td><span class="tag native">Native</span></td><td>2<div class="stamp">1022-071143</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">22.0</td><td class="num">23</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"><span class="full"></span></td></tr><tr class="native"><td><span class="tag native">Native</span></td><td>3<div class="stamp">1022-071244</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">21.2</td><td class="num">23</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"><span class="full"></span></td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>1<div class="stamp">1022-071029</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">68.0</td><td class="num">58</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"><span class="full">before the fixes</span></td></tr><tr class="heart failed"><td><span class="tag heart">HEART</span></td><td>2<div class="stamp">1022-071213</div></td><td class="num"><span class="pill bad">7/18</span></td><td class="num">26.4</td><td class="num"></td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"><span class="full">before the fixes: the new pull request&#x27;s edit refused 412, GitHub having changed it a moment after making it</span></td></tr><tr class="heart failed"><td><span class="tag heart">HEART</span></td><td>3<div class="stamp">1022-071312</div></td><td class="num"><span class="pill bad">3/13</span></td><td class="num">18.4</td><td class="num"></td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"><span class="full">before the fixes: main had moved to the branch list&#x27;s second page</span></td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>4<div class="stamp">1022-072058</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">68.7</td><td class="num">58</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"><span class="full"></span></td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>5<div class="stamp">1022-072213</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">70.1</td><td class="num">58</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"><span class="full"></span></td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>6<div class="stamp">1022-072329</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">66.2</td><td class="num">58</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"><span class="full"></span></td></tr></tbody></table></div></section>
+
+  <section><h2>What HEART needed, found by these runs</h2>
+  <p class="sub full">Native needed nothing changed. Each fix below is in ARTIE, test first, and the runs after it are on the fixed code.</p>
+  <ul><li><b>The planner says why before each move.</b> <span class="commit">1079117, 0ca4df2</span><p class="full">At the branch list it went back about one time in four instead of on to main; each wasted pair of moves ran its step out. Asked for its reason first, it went on to main every time. HEART reasoned runs 1 and 2 are from before this.</p></li><li><b>A follow reads a list&#x27;s next pages to find a titled link.</b> <span class="commit">4b75a7c</span><p class="full">The script followed the branch list to main as the run had; once the list grew, main was on its second page. The list offers next links; ARTIE follows them, building no address.</p></li><li><b>A script&#x27;s act refused 412 is decided again once.</b> <span class="commit">4b75a7c</span><p class="full">GitHub changes a new pull request a moment after making it; the script&#x27;s edit, sent with the ETag it had just read, was refused. ARTIE has read it again; when the form is still offered and the lock file still holds, the act is sent once more. A second 412 stops the script.</p></li></ul></section>
+
+  <section><h2>What this trial does not test</h2><ul>
+    <li><b>A service that changes.</b> Today's GitHub is the GitHub the native model learned. New features, moved paths, renamed fields in the gateway: where knowledge from training goes stale and what the service offers doesn't. That is the next trial.</li>
+    <li><b>The duplicate's link.</b> Both arms closed the duplicate as a duplicate; native sent the original's id and GitHub kept no link to it. The checker asks for the reason, not the link.</li>
+  </ul></section>
+
+  <p class="close">On a GitHub it knows, Claude alone was faster, needed fewer model calls, and got it right every time from the start. HEART got there too, after the three fixes these runs found, and is slower for the gateway and its two calls a move. The case for HEART is the service that moves, which this trial left still.</p>
+  </div>
+
+  <div class="tab" id="scripts" role="tabpanel" aria-labelledby="tab-scripts" hidden>
+
+  <section><h2>Two scripts, one task</h2>
+  <p class="sub full">Both do the triage task with no model; both passed every run made on the code as it ended. Claude
+  wrote the Python in one call from its own run's transcript. <code>artie generate</code> wrote the Kotlin from one
+  HEART run's capture, with a lock file beside it.</p>
+  <div class="pair2">
+    <div class="code"><div class="head"><span><span class="tag native">Native</span> native-script.py</span>
+      <span>162 lines · 23 requests · 22 s</span></div>
+      <pre><code class="language-python">#!/usr/bin/env python3
+import sys, os, json, time, base64
+import urllib.request, urllib.error
+
+if len(sys.argv) != 5:
+    sys.exit(&quot;usage: script.py OWNER REPO LABEL STAMP&quot;)
+OWNER, REPO, LABEL, STAMP = sys.argv[1:5]
+TOKEN = os.environ.get(&quot;GITHUB_TOKEN&quot;)
+if not TOKEN:
+    sys.exit(&quot;GITHUB_TOKEN is not set&quot;)
+
+API = &quot;https://api.github.com&quot;
+R = &quot;/repos/%s/%s&quot; % (OWNER, REPO)
+
+
+def req(method, path, body=None, ok=(200, 201, 204)):
+    print(&quot;%s %s&quot; % (method, path), flush=True)
+    data = json.dumps(body).encode() if body is not None else None
+    r = urllib.request.Request(API + path, data=data, method=method)
+    r.add_header(&quot;Authorization&quot;, &quot;Bearer &quot; + TOKEN)
+    r.add_header(&quot;Accept&quot;, &quot;application/vnd.github+json&quot;)
+    r.add_header(&quot;X-GitHub-Api-Version&quot;, &quot;2022-11-28&quot;)
+    r.add_header(&quot;User-Agent&quot;, &quot;triage-script&quot;)
+    if data is not None:
+        r.add_header(&quot;Content-Type&quot;, &quot;application/json&quot;)
+    try:
+        with urllib.request.urlopen(r) as resp:
+            status = resp.status
+            raw = resp.read()
+    except urllib.error.HTTPError as e:
+        status = e.code
+        raw = e.read()
+    if status not in ok:
+        sys.exit(&quot;FAILED: %s %s -&gt; HTTP %d: %s&quot; % (method, path, status, raw.decode(errors=&quot;replace&quot;)[:500]))
+    if raw:
+        try:
+            return json.loads(raw)
+        except ValueError:
+            return None
+    return None
+
+
+def b64(s):
+    return base64.b64encode(s.encode()).decode()
+
+
+branch = &quot;fix-blank-names-&quot; + STAMP
+
+# main sha
+main = req(&quot;GET&quot;, R + &quot;/git/ref/heads/main&quot;)
+main_sha = main[&quot;object&quot;][&quot;sha&quot;]
+
+# crash issue
+crash = req(&quot;POST&quot;, R + &quot;/issues&quot;, {
+    &quot;title&quot;: &quot;Crash when a bed has no name (%s)&quot; % STAMP,
+    &quot;body&quot;: &quot;A bed with a blank name crashes the garden.&quot;,
+    &quot;labels&quot;: [LABEL],
+    &quot;assignees&quot;: [OWNER],
+})
+crash_no, crash_id = crash[&quot;number&quot;], crash[&quot;id&quot;]
+if crash.get(&quot;state&quot;) != &quot;open&quot;:
+    crash = req(&quot;PATCH&quot;, R + &quot;/issues/%d&quot; % crash_no, {&quot;state&quot;: &quot;open&quot;})
+    if crash.get(&quot;state&quot;) != &quot;open&quot;:
+        sys.exit(&quot;crash issue is not open&quot;)
+
+# test issue
+test = req(&quot;POST&quot;, R + &quot;/issues&quot;, {
+    &quot;title&quot;: &quot;Test blank bed names (%s)&quot; % STAMP,
+    &quot;body&quot;: &quot;This is part of #%d.&quot; % crash_no,
+})
+test_no, test_id = test[&quot;number&quot;], test[&quot;id&quot;]
+
+# duplicate issue
+dup = req(&quot;POST&quot;, R + &quot;/issues&quot;, {
+    &quot;title&quot;: &quot;Garden crashes on an empty bed name (%s)&quot; % STAMP,
+    &quot;body&quot;: &quot;This was seen on the demo garden.&quot;,
+})
+dup_no = dup[&quot;number&quot;]
+
+# branch
+req(&quot;POST&quot;, R + &quot;/git/refs&quot;, {&quot;ref&quot;: &quot;refs/heads/&quot; + branch, &quot;sha&quot;: main_sha})
+
+# commits
+req(&quot;PUT&quot;, R + &quot;/contents/fix-%s.md&quot; % STAMP, {
+    &quot;message&quot;: &quot;Refuse a bed with no name&quot;,
+    &quot;content&quot;: b64(&quot;Bed names may not be blank.\n&quot;),
+    &quot;branch&quot;: branch,
+})
+req(&quot;PUT&quot;, R + &quot;/contents/test-%s.md&quot; % STAMP, {
+    &quot;message&quot;: &quot;Test that a blank bed name is refused&quot;,
+    &quot;content&quot;: b64(&quot;A bed with a blank name is refused.\n&quot;),
+    &quot;branch&quot;: branch,
+})
+
+# pull request
+pr = req(&quot;POST&quot;, R + &quot;/pulls&quot;, {
+    &quot;title&quot;: &quot;Refuse a bed with no name (%s)&quot; % STAMP,
+    &quot;head&quot;: branch,
+    &quot;base&quot;: &quot;main&quot;,
+    &quot;body&quot;: &quot;Fixes #%d.&quot; % crash_no,
+})
+pr_no = pr[&quot;number&quot;]
+req(&quot;PATCH&quot;, R + &quot;/pulls/%d&quot; % pr_no, {
+    &quot;body&quot;: &quot;Fixes #%d and is tested by #%d.&quot; % (crash_no, test_no),
+})
+
+# wait for mergeable
+pr_now = None
+for _ in range(30):
+    pr_now = req(&quot;GET&quot;, R + &quot;/pulls/%d&quot; % pr_no)
+    if pr_now.get(&quot;mergeable&quot;) is True and pr_now.get(&quot;mergeable_state&quot;) in (&quot;clean&quot;, &quot;unstable&quot;, &quot;has_hooks&quot;):
+        break
+    if pr_now.get(&quot;mergeable&quot;) is False:
+        sys.exit(&quot;pull request is not mergeable (state %s)&quot; % pr_now.get(&quot;mergeable_state&quot;))
+    time.sleep(2)
+else:
+    sys.exit(&quot;pull request did not become mergeable in time&quot;)
+
+# merge
+m = req(&quot;PUT&quot;, R + &quot;/pulls/%d/merge&quot; % pr_no, {
+    &quot;merge_method&quot;: &quot;squash&quot;,
+    &quot;commit_title&quot;: &quot;Refuse a bed with no name (#%d)&quot; % pr_no,
+    &quot;sha&quot;: pr_now[&quot;head&quot;][&quot;sha&quot;],
+})
+if not m.get(&quot;merged&quot;):
+    sys.exit(&quot;merge response did not say merged&quot;)
+req(&quot;GET&quot;, R + &quot;/pulls/%d/merge&quot; % pr_no, ok=(204,))
+
+# crash issue: sub-issue, comment, close, lock
+req(&quot;POST&quot;, R + &quot;/issues/%d/sub_issues&quot; % crash_no, {&quot;sub_issue_id&quot;: test_id})
+req(&quot;POST&quot;, R + &quot;/issues/%d/comments&quot; % crash_no,
+    {&quot;body&quot;: &quot;Fixed in #%d, tested in #%d.&quot; % (pr_no, test_no)})
+req(&quot;PATCH&quot;, R + &quot;/issues/%d&quot; % crash_no, {&quot;state&quot;: &quot;closed&quot;, &quot;state_reason&quot;: &quot;completed&quot;})
+req(&quot;PUT&quot;, R + &quot;/issues/%d/lock&quot; % crash_no, {&quot;lock_reason&quot;: &quot;resolved&quot;}, ok=(204,))
+
+# test issue
+req(&quot;POST&quot;, R + &quot;/issues/%d/comments&quot; % test_no,
+    {&quot;body&quot;: &quot;The test went in with #%d.&quot; % pr_no})
+req(&quot;PATCH&quot;, R + &quot;/issues/%d&quot; % test_no, {&quot;state&quot;: &quot;closed&quot;, &quot;state_reason&quot;: &quot;completed&quot;})
+
+# duplicate issue
+req(&quot;POST&quot;, R + &quot;/issues/%d/comments&quot; % dup_no,
+    {&quot;body&quot;: &quot;Same crash as #%d.&quot; % crash_no})
+req(&quot;PATCH&quot;, R + &quot;/issues/%d&quot; % dup_no, {
+    &quot;state&quot;: &quot;closed&quot;,
+    &quot;state_reason&quot;: &quot;duplicate&quot;,
+    &quot;duplicate_of&quot;: crash_id,
+    &quot;duplicate_of_issue_id&quot;: crash_id,
+})
+
+# verification
+c = req(&quot;GET&quot;, R + &quot;/issues/%d&quot; % crash_no)
+if not (c[&quot;state&quot;] == &quot;closed&quot; and c[&quot;state_reason&quot;] == &quot;completed&quot; and c[&quot;locked&quot;]):
+    sys.exit(&quot;crash issue check failed: state=%s reason=%s locked=%s&quot; % (c[&quot;state&quot;], c[&quot;state_reason&quot;], c[&quot;locked&quot;]))
+t = req(&quot;GET&quot;, R + &quot;/issues/%d&quot; % test_no)
+if t[&quot;state&quot;] != &quot;closed&quot;:
+    sys.exit(&quot;test issue is not closed&quot;)
+d = req(&quot;GET&quot;, R + &quot;/issues/%d&quot; % dup_no)
+if not (d[&quot;state&quot;] == &quot;closed&quot; and d[&quot;state_reason&quot;] == &quot;duplicate&quot;):
+    sys.exit(&quot;duplicate issue check failed: state=%s reason=%s&quot; % (d[&quot;state&quot;], d[&quot;state_reason&quot;]))
+
+print(&quot;done: crash #%d, test #%d, duplicate #%d, pull request #%d&quot; % (crash_no, test_no, dup_no, pr_no))
+</code></pre></div>
+    <div class="code"><div class="head"><span><span class="tag heart">HEART</span> heart-script.kts</span>
+      <span>118 lines · 58 steps · 68 s</span></div>
+      <pre><code class="language-kotlin">// Generated by artie generate from ../../exhibits/native-vs-heart/runs/heart-5-1022-070410.yaml, the run of tests/github-triage.goal.md.
+// Every selection as that run made it, nested as it nested, with no model.
+// What it was offered is pinned in ../../exhibits/native-vs-heart/runs/heart-script.pins.yaml, held to before every act.
+//   artie run ../../exhibits/native-vs-heart/runs/heart-script.kts owner=JogoShugh stamp=1022-070410
+val owner by input(question = &quot;Whose repository?&quot;)
+val repo by input(default = &quot;heart-github-test&quot;, question = &quot;Which repository?&quot;)
+val label by input(default = &quot;bug&quot;, question = &quot;Which label marks a bug?&quot;)
+val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(&quot;MMdd-HHmmss&quot;)))
+
+heart(&quot;http://localhost:8392/&quot;) {
+    var issueNumber = 0L // step 3&#x27;s /number
+    var testNumber = 0L // step 10&#x27;s /number
+    var prBody = &quot;&quot; // step 21&#x27;s /body
+    var prNumber = 0L // step 21&#x27;s /number
+    var testId = 0L // step 10&#x27;s /id
+    var dupeNumber = 0L // step 12&#x27;s /number
+    var issueId = 0L // step 3&#x27;s /id
+
+    act(&quot;github:repos-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, intent = &quot;get the repository $owner/$repo&quot;) {
+        act(&quot;github:open-issue&quot;, intent = &quot;&quot;&quot;Open an issue titled &quot;Crash when a bed has no name ($stamp)&quot; with the body: a bed with a blank name crashes the garden&quot;&quot;&quot;, fields = {
+            &quot;title&quot; to &quot;Crash when a bed has no name ($stamp)&quot;
+            &quot;body&quot; to &quot;a bed with a blank name crashes the garden&quot;
+        }) {
+            sync()
+            issueNumber = state.long(&quot;number&quot;)
+            issueId = state.long(&quot;id&quot;)
+            act(&quot;github:label&quot;, &quot;labels&quot; to listOf(label), intent = &quot;Label it with $label&quot;) {}
+            act(&quot;github:assign&quot;, &quot;assignees&quot; to listOf(owner), intent = &quot;assign it to $owner&quot;) {}
+            check(&quot;state&quot; to &quot;open&quot;)
+        }
+        act(&quot;github:open-issue&quot;, intent = &quot;&quot;&quot;Open an issue titled &quot;Test blank bed names ($stamp)&quot; with the body: part of #${issueNumber}&quot;&quot;&quot;, fields = {
+            &quot;title&quot; to &quot;Test blank bed names ($stamp)&quot;
+            &quot;body&quot; to &quot;part of #$issueNumber&quot;
+        }) {
+            testNumber = state.long(&quot;number&quot;)
+            testId = state.long(&quot;id&quot;)
+        }
+        act(&quot;github:open-issue&quot;, intent = &quot;&quot;&quot;Open an issue titled &quot;Garden crashes on an empty bed name ($stamp)&quot; with the body: seen on the demo garden&quot;&quot;&quot;, fields = {
+            &quot;title&quot; to &quot;Garden crashes on an empty bed name ($stamp)&quot;
+            &quot;body&quot; to &quot;seen on the demo garden&quot;
+        }) {
+            dupeNumber = state.long(&quot;number&quot;)
+        }
+        follow(&quot;github:repos-list-branches&quot;, intent = &quot;follow the link to list the branches&quot;) {
+            follow(&quot;item&quot;, &quot;main&quot;, intent = &quot;follow the link to the main branch&quot;) {
+                act(&quot;github:branch-from-here&quot;, intent = &quot;start a new branch named fix-blank-names-$stamp from here&quot;, fields = {
+                    &quot;name&quot; to &quot;fix-blank-names-$stamp&quot;
+                }) {
+                    sync()
+                    act(&quot;github:commit-file&quot;, intent = &quot;&quot;&quot;Commit a file named fix-$stamp.md with the content &quot;Bed names may not be blank.&quot; and the commit message &quot;Refuse a bed with no name&quot;&quot;&quot;&quot;, fields = {
+                        &quot;path&quot; to &quot;fix-$stamp.md&quot;
+                        &quot;message&quot; to &quot;Refuse a bed with no name&quot;
+                        &quot;content&quot; to &quot;Bed names may not be blank.&quot;
+                    }) {}
+                    act(&quot;github:commit-file&quot;, intent = &quot;&quot;&quot;Commit a file named test-$stamp.md with the content &quot;A bed with a blank name is refused.&quot; and the commit message &quot;Test that a blank bed name is refused&quot;&quot;&quot;&quot;, fields = {
+                        &quot;path&quot; to &quot;test-$stamp.md&quot;
+                        &quot;message&quot; to &quot;Test that a blank bed name is refused&quot;
+                        &quot;content&quot; to &quot;A bed with a blank name is refused.&quot;
+                    }) {}
+                    act(&quot;github:open-pull-request&quot;, intent = &quot;&quot;&quot;Open a pull request into main titled &quot;Refuse a bed with no name ($stamp)&quot; with the body: fixes #${issueNumber}&quot;&quot;&quot;, fields = {
+                        &quot;base&quot; to &quot;main&quot;
+                        &quot;title&quot; to &quot;Refuse a bed with no name ($stamp)&quot;
+                        &quot;body&quot; to &quot;fixes #$issueNumber&quot;
+                    }) {
+                        sync()
+                        prBody = state.text(&quot;body&quot;)
+                        prNumber = state.long(&quot;number&quot;)
+                        act(&quot;github:edit&quot;, intent = &quot;change its description to: fixes #${issueNumber} and is tested by #${testNumber}&quot;, fields = {
+                            &quot;body&quot; to &quot;$prBody and is tested by #$testNumber&quot;
+                        }) {}
+                        until(tries = 20) { offers(&quot;github:merge&quot;) }
+                        act(&quot;github:merge&quot;, intent = &quot;&quot;&quot;merge it by squashing its commits, with the commit title &quot;Refuse a bed with no name (#${prNumber})&quot;&quot;&quot;&quot;, fields = {
+                            &quot;merge_method&quot; to &quot;squash&quot;
+                            &quot;commit_title&quot; to &quot;Refuse a bed with no name (#$prNumber)&quot;
+                        }) {}
+                        check(&quot;merged&quot; to true)
+                    }
+                }
+            }
+        }
+    }
+    act(&quot;github:issues-get&quot;, intent = &quot;get issue ${issueNumber} of $owner/$repo&quot;, fields = {
+        &quot;owner&quot; to owner
+        &quot;repo&quot; to repo
+        &quot;issue_number&quot; to issueNumber
+    }) {
+        act(&quot;github:add-sub-issue&quot;, &quot;sub_issue_id&quot; to testId, intent = &quot;add sub-issue by id ${testId}&quot;) {}
+        act(&quot;github:comment&quot;, intent = &quot;comment on it: Fixed in #${prNumber}, tested in #${testNumber}.&quot;, fields = {
+            &quot;body&quot; to &quot;Fixed in #$prNumber, tested in #$testNumber.&quot;
+        }) {}
+        act(&quot;github:lock&quot;, &quot;lock_reason&quot; to &quot;resolved&quot;, intent = &quot;lock the conversation as resolved&quot;) {}
+        check(&quot;state&quot; to &quot;closed&quot;, &quot;state_reason&quot; to &quot;completed&quot;, &quot;locked&quot; to true)
+    }
+    act(&quot;github:issues-get&quot;, intent = &quot;get issue ${testNumber} of $owner/$repo&quot;, fields = {
+        &quot;owner&quot; to owner
+        &quot;repo&quot; to repo
+        &quot;issue_number&quot; to testNumber
+    }) {
+        act(&quot;github:comment&quot;, intent = &quot;comment on it: The test went in with #${prNumber}.&quot;, fields = {
+            &quot;body&quot; to &quot;The test went in with #$prNumber.&quot;
+        }) {}
+        act(&quot;github:close&quot;, intent = &quot;close it as completed&quot;) {}
+        check(&quot;state&quot; to &quot;closed&quot;)
+    }
+    act(&quot;github:issues-get&quot;, intent = &quot;get issue ${dupeNumber} of $owner/$repo&quot;, fields = {
+        &quot;owner&quot; to owner
+        &quot;repo&quot; to repo
+        &quot;issue_number&quot; to dupeNumber
+    }) {
+        act(&quot;github:comment&quot;, intent = &quot;comment on it: Same crash as #${issueNumber}.&quot;, fields = {
+            &quot;body&quot; to &quot;Same crash as #$issueNumber.&quot;
+        }) {}
+        act(&quot;github:close-duplicate&quot;, intent = &quot;close it as a duplicate of the issue with id ${issueId} (#215)&quot;, fields = {
+            &quot;duplicate_issue_id&quot; to issueId
+        }) {}
+        check(&quot;state&quot; to &quot;closed&quot;, &quot;state_reason&quot; to &quot;duplicate&quot;)
+    }
+}
+</code></pre></div>
+  </div></section>
+
+  <section><h2>What each checks, step by step</h2>
+  <p class="sub full">Much of the time between them is strictness. Before and after each act, ARTIE checks what
+  the Python never does: it won't send what it can't stand behind, and a refusal stops it before its harm. The
+  Python is fast because it trusts its memory and takes any 2xx as success, which is how an ignored field passed.</p>
+  <div class="wrap"><table class="strict"><thead><tr><th>Check</th><th><span class="tag heart">HEART</span> ARTIE script</th><th><span class="tag native">Native</span> Python script</th></tr></thead><tbody><tr><td>Is the act allowed now?</td><td>The form must be in the representation held, or it refuses before sending.</td><td>Sends regardless; learns from the status.</td></tr><tr><td>Is the body valid?</td><td>Each field checked against the form&#x27;s JSON Schema before sending; one it doesn&#x27;t name is refused.</td><td>Sends any field; GitHub drops the ones it doesn&#x27;t know, quietly (duplicate_of).</td></tr><tr><td>Has the form changed since the script was made?</td><td>The lock file pins each form&#x27;s integrity, checked before every act.</td><td>Can&#x27;t tell.</td></tr><tr><td>Has the resource changed since it was read?</td><td>If-Match on every act; a 412 is read again and decided again.</td><td>Writes blind.</td></tr><tr><td>What does a refusal mean?</td><td>409 not allowed here, 412 stale, 422 invalid or a rule said no, 428 precondition wanted: each its own handling.</td><td>Anything but 200, 201 or 204 ends it; within those it goes on.</td></tr><tr><td>Was something made?</td><td>201 with a Location is told from 200: what was made is held, and named.</td><td>Any success is the same.</td></tr><tr><td>After a block</td><td>The resource the block began at is read again (&quot;return to&quot;): the next step acts on what is.</td><td>Acts on what it last saw.</td></tr><tr><td>Links</td><td>Followed only where offered.</td><td>Builds every address itself.</td></tr></tbody></table></div></section>
+
+  <section><h2>To do what ARTIE does, the Python would have to…</h2>
+  <p class="sub full">Against GitHub's own API, with no gateway: what the Python would have to build, check by
+  check, to match ARTIE in its lenient mode. Some of it GitHub doesn't allow at all: it takes no validator on a
+  write, so no client can be sure a write didn't race. The rest is GitHub's own rules and descriptions, rebuilt in
+  every client, per API; HEART puts them in one place, the server, and every client reads them there.</p>
+  <div class="wrap"><table class="match"><thead><tr><th>Check</th><th><span class="tag heart">HEART</span> what ARTIE has</th><th><span class="tag native">Native</span> what the Python would have to build</th><th>Against GitHub</th></tr></thead><tbody><tr><td>The act allowed now</td><td>Offered or not, in the representation held, by the server&#x27;s own rules.</td><td>Read the resource first, then re-implement GitHub&#x27;s rules for each act: an issue&#x27;s state and lock, the caller&#x27;s permission (GET /repos → permissions), branch protection (GET /branches/{b}/protection), required checks and reviews before a merge. Server logic, copied into every client, drifting from GitHub&#x27;s.</td><td><span class="verdict note">partly</span></td></tr><tr><td>The body valid</td><td>Each form carries its JSON Schema; ARTIE checks the body against it, and a field it doesn&#x27;t name is refused.</td><td>Fetch GitHub&#x27;s OpenAPI description (github/rest-api-description, megabytes), find the operation by path and method, resolve its $refs, and validate with a JSON Schema library (not in Python&#x27;s standard library). It still wouldn&#x27;t refuse an unknown field: GitHub&#x27;s schemas don&#x27;t close them, so that list is hand-kept.</td><td><span class="verdict note">partly</span></td></tr><tr><td>The form unchanged since the script was made</td><td>The lock file pins each form&#x27;s integrity (a hash of its definition), checked before every act.</td><td>Hash each operation&#x27;s schema from the description at record time; at run time fetch the description again and compare. The description changes often; X-GitHub-Api-Version pins behaviour, not what a hash can check.</td><td><span class="verdict note">partly</span></td></tr><tr><td>The resource unchanged since it was read</td><td>If-Match on every act; the gateway compares it with what it reads upstream, and answers 412.</td><td>GitHub&#x27;s REST API takes no If-Match on writes: ETags are for conditional GETs. The script can read, compare updated_at or the ETag, and write, leaving a race between; only refs, contents and merges take a sha to hold to. The gateway narrows the same gap; it can&#x27;t close it either, upstream doesn&#x27;t let it.</td><td><span class="verdict weak">GitHub doesn&#x27;t allow it</span></td></tr><tr><td>What a refusal means</td><td>409 not allowed now, 412 stale, 422 invalid or a rule said no, 428 precondition wanted, each with HEART&#x27;s meaning and the server&#x27;s detail.</td><td>A table of GitHub&#x27;s own: 404 for no permission, 422 for most things, 405 for a merge not allowed, 409 for a conflict, 403 for rate limits and abuse detection; the message text parsed to tell them apart.</td><td><span class="verdict note">partly</span></td></tr><tr><td>What was made</td><td>201 with a Location: what was made is held and named, and its address is the server&#x27;s.</td><td>Read the number and url from each body, operation by operation; some answer 201 with a Location, some 200.</td><td><span class="verdict good">GitHub allows it</span></td></tr><tr><td>Reading again after a block</td><td>The resource the block began at is read again, so the next step acts on what is.</td><td>A GET after each nested sequence, by an address the script builds.</td><td><span class="verdict good">GitHub allows it</span></td></tr><tr><td>Links followed only where offered</td><td>Addresses come from the representation; the script names relations.</td><td>Follow GitHub&#x27;s *_url fields instead of building paths: most are RFC 6570 templates ({/sha}), so a template expander is needed; they say where, never whether it is allowed now.</td><td><span class="verdict note">partly</span></td></tr><tr><td>Lists paged on</td><td>next links, followed until the titled link is found.</td><td>Parse the Link header for rel=&quot;next&quot;, page by page.</td><td><span class="verdict good">GitHub allows it</span></td></tr><tr><td>Waiting on the service&#x27;s word</td><td>until { offers(&quot;github:merge&quot;) }: merge is offered or it isn&#x27;t.</td><td>Poll mergeable and interpret mergeable_state, knowing which states are safe (the trial&#x27;s script took &quot;unstable&quot;).</td><td><span class="verdict note">partly</span></td></tr><tr><td>Deciding again after a 412</td><td>Read again; if the form is still offered and the lock file holds, the act once more.</td><td>With no 412 to get, nothing to decide again; a write that raced is simply applied.</td><td><span class="verdict weak">GitHub doesn&#x27;t allow it</span></td></tr><tr><td>A record of what it did and why</td><td>The capture: each step, each value&#x27;s source, the exchanges; the lock file; the derivation.</td><td>Logging written for it: requests, answers, where each value came from.</td><td><span class="verdict good">GitHub allows it</span></td></tr></tbody></table></div>
+  <p class="full">Tallied: of twelve, GitHub allows four outright, six in part, and two not at all. Doing the six
+  in part means an OpenAPI description, a schema validator, a template expander, and GitHub's rules per act,
+  kept up to date by hand. That is a gateway, built inside one client.</p></section>
+
+  <section><h2>The Python, read closely</h2>
+  <p class="sub full">It is good code for what it is: what one model remembers of one API, written down. Its weaknesses
+  are the weaknesses of that.</p>
+  <dl class="points"><div><dt><span class="verdict weak">weak</span>Every address and field is the model&#x27;s memory of GitHub.</dt><dd class="full"><code>&quot;/git/ref/heads/main&quot;, &quot;/git/refs&quot;, &quot;/contents/…&quot;, &quot;/pulls/%d/merge&quot;, &quot;sub_issue_id&quot;, &quot;state_reason&quot;</code></dd><dd class="full">Nothing in the script was read from the service: each path, each field, each value of state_reason is what the model learned of GitHub&#x27;s REST API. Move one path, rename one field, add one required field, and the script fails at that line, or worse, sends something the service quietly ignores. It can&#x27;t tell which.</dd></div><div><dt><span class="verdict weak">weak</span>Where its memory runs out, it guesses, and a guess that is ignored passes.</dt><dd class="full"><code>&quot;duplicate_of&quot;: crash_id, &quot;duplicate_of_issue_id&quot;: crash_id</code></dd><dd class="full">It sends two field names for the duplicate&#x27;s original, hoping one is right. GitHub ignored both: the duplicate is closed as a duplicate of nothing. Its own check asks only for state_reason, so the script says done. A field the service doesn&#x27;t know is never refused, only dropped.</dd></div><div><dt><span class="verdict weak">weak</span>No validators: every write is blind.</dt><dd class="full"><code>req(…) sends no If-Match on any PATCH, PUT or POST</code></dd><dd class="full">It never meets a 412 because it never says what it read. That is why it never stalled on GitHub&#x27;s late change to a new pull request; it is also why it would overwrite a change someone else made between its read and its write, and never know.</dd></div><div><dt><span class="verdict weak">weak</span>It reads GitHub&#x27;s internals to decide when to merge, and merges past failing checks.</dt><dd class="full"><code>mergeable_state in (&quot;clean&quot;, &quot;unstable&quot;, &quot;has_hooks&quot;)</code></dd><dd class="full">GitHub&#x27;s word for whether a pull request can be merged is a field the model interprets, not an action the service offers. &quot;unstable&quot; means a check is failing or still running (one the branch doesn&#x27;t require): the script merges it anyway, as it would one with no checks at all.</dd></div><div><dt><span class="verdict weak">weak</span>It does what was already done, and code the task never needed.</dt><dd class="full"><code>PATCH … {&quot;state&quot;: &quot;closed&quot;, &quot;state_reason&quot;: &quot;completed&quot;} on the crash issue; the reopen branch after creating it</code></dd><dd class="full">The merge has already closed the crash issue; the script closes it again, as a fixed step. It reopens the crash issue if it isn&#x27;t open just after making it, a case that can&#x27;t happen. A script that can&#x27;t see what is possible does everything, in case.</dd></div><div><dt><span class="verdict weak">weak</span>It stops half done, and running it again makes a second set.</dt><dd class="full"><code>sys.exit(&quot;FAILED: …&quot;) at the first error; nothing checks what an earlier run left</code></dd><dd class="full">A failure leaves issues, a branch and maybe a pull request behind, with nothing to say which. Run again with the same stamp, it opens the issues again; there is no record of what it did beyond the lines it printed.</dd></div><div><dt><span class="verdict weak">weak</span>No retries, no rate limits, a pinned API version.</dt><dd class="full"><code>&quot;X-GitHub-Api-Version&quot;: &quot;2022-11-28&quot;; urlopen with no retry</code></dd><dd class="full">A 502 or a secondary rate limit ends the run. The API version header pins it to the GitHub the model remembers; a version that drops a field it uses is found by failing.</dd></div><div><dt><span class="verdict good">strong</span>It reads every number, id and sha from the answers.</dt><dd class="full"><code>crash_no, crash_id = crash[&quot;number&quot;], crash[&quot;id&quot;]; &quot;sha&quot;: pr_now[&quot;head&quot;][&quot;sha&quot;]</code></dd><dd class="full">Nothing from the run that taught it is written in: issue numbers, ids, the head sha the merge is held to, all come from GitHub&#x27;s answers as it goes. It merges only the head it saw.</dd></div><div><dt><span class="verdict good">strong</span>It goes straight to what it needs.</dt><dd class="full"><code>GET /git/ref/heads/main, then POST /git/refs</code></dd><dd class="full">23 requests where the ARTIE script makes 58: no list to page through, no block to come back to. On a GitHub that matches its memory, that is why it is three times faster.</dd></div><div><dt><span class="verdict note">note</span>It checks its end state, its own way.</dt><dd class="full"><code>the three GETs at the end</code></dd><dd class="full">It reads the three issues back and checks state, state reason and the lock: a good habit, but only for what it thought to check, and not the duplicate&#x27;s original, which it had guessed at.</dd></div></dl></section>
+
+  <section><h2>The Kotlin, for fairness</h2>
+  <dl class="points"><div><dt><span class="verdict good">strong</span>Relations, not addresses.</dt><dd class="full"><code>act(&quot;github:open-issue&quot;, …), follow(&quot;github:repos-list-branches&quot;), act(&quot;github:close-duplicate&quot;, …)</code></dd><dd class="full">Each step names what the service offers; ARTIE finds the form or link in the representation it holds and builds the request from it. A moved path, a new required field, is the service&#x27;s to say.</dd></div><div><dt><span class="verdict good">strong</span>Held to what was offered.</dt><dd class="full"><code>heart-script.pins.yaml: each form&#x27;s integrity, checked before every act</code></dd><dd class="full">A form that changed, or is no longer offered, stops the script before it sends anything: it refuses before its harm, never after.</dd></div><div><dt><span class="verdict good">strong</span>Every write says what it read.</dt><dd class="full"><code>If-Match on every act; sync() after making a resource; a 412 decided again once</code></dd><dd class="full">It can&#x27;t overwrite what it didn&#x27;t see. Where GitHub changes something on its own, it reads again and decides again, within what its lock file allows.</dd></div><div><dt><span class="verdict good">strong</span>It waits on the service&#x27;s word.</dt><dd class="full"><code>until(tries = 20) { offers(&quot;github:merge&quot;) }</code></dd><dd class="full">Whether the pull request can be merged is whether merge is offered, not a field it interprets.</dd></div><div><dt><span class="verdict good">strong</span>Every value has a source.</dt><dd class="full"><code>issueNumber = state.long(&quot;number&quot;); heart-script.derivation.yaml</code></dd><dd class="full">Each variable is read where the run found it, and the derivation file says, for each value, where it came from and by which rule.</dd></div><div><dt><span class="verdict weak">weak</span>It replays the run&#x27;s route, not the shortest.</dt><dd class="full"><code>follow(&quot;github:repos-list-branches&quot;) { follow(&quot;item&quot;, &quot;main&quot;) { … } }</code></dd><dd class="full">The planner got to main by the branch list, so the script does too: 58 steps to the Python&#x27;s 23, and the list pages as it grows. It is slower for every request going through the gateway.</dd></div><div><dt><span class="verdict weak">weak</span>It leans on what the service did on its own.</dt><dd class="full"><code>no close of the crash issue</code></dd><dd class="full">The run made no act at the crash issue&#x27;s close: the merge had closed it. The script relies on that, and on its check to catch it if GitHub ever doesn&#x27;t.</dd></div><div><dt><span class="verdict note">note</span>Its words can carry a value from the run.</dt><dd class="full"><code>intent = &quot;close it as a duplicate of the issue with id ${issueId} (#215)&quot;</code></dd><dd class="full">An intent&#x27;s words are only words: the act&#x27;s values are its fields, here issueId, read fresh. But the words still say #215, the run&#x27;s number.</dd></div></dl></section>
+
+  <p class="close">The Python is faster because it knows GitHub. The Kotlin is slower because it asks. The trial
+  ran against the GitHub the model knows; the next one changes it.</p>
+  </div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+(() => {
+  try { document.querySelectorAll("pre code").forEach((c) => hljs.highlightElement(c)); } catch (e) { /* plain text then */ }
+  const tabs = document.querySelectorAll("[data-tab]");
+  const show = (id) => {
+    tabs.forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === id)));
+    document.querySelectorAll(".tab").forEach((t) => { t.hidden = t.id !== id; });
+  };
+  tabs.forEach((b) => b.addEventListener("click", () => show(b.dataset.tab)));
+  show(location.hash === "#scripts" ? "scripts" : "results");
+  const detail = (d) => {
+    document.documentElement.dataset.detail = d;
+    document.querySelectorAll("[data-detail]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.detail === d)));
+    try { localStorage.setItem("nt-detail", d); } catch (e) { /* the page works without it */ }
+  };
+  document.querySelectorAll("[data-detail]").forEach((b) => b.addEventListener("click", () => detail(b.dataset.detail)));
+  let kept = "brief";
+  try { kept = localStorage.getItem("nt-detail") || "brief"; } catch (e) { /* brief */ }
+  detail(kept);
+  const theme = (t) => {
+    document.documentElement.dataset.theme = t;
+    document.querySelectorAll("[data-th]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.th === t)));
+    try { localStorage.setItem("nt-theme", t); } catch (e) { /* the page works without it */ }
+  };
+  document.querySelectorAll("[data-th]").forEach((b) => b.addEventListener("click", () => theme(b.dataset.th)));
+  theme(document.documentElement.dataset.theme || "light");
+})();
+</script>
+</body>
+</html>

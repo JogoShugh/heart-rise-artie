@@ -1,0 +1,390 @@
+---
+run:
+  inputs: {}
+  source: |-
+    act(intent = "search employees named Baggins")
+    act(intent = """open the item "Frodo Baggins"""")
+    act(intent = """update the employee's role to "ring bearer, retired"""")
+    act(intent = """update the employee's role to "keeper of the Red Book, retired"""")
+  marks:
+    '1':
+      intent: Find the employees named Baggins
+    '2':
+      intent: Open Frodo Baggins
+    '4':
+      intent: Add ", retired" to the end of his current role, keeping the rest of it as it is
+  moves:
+    - 'why: Search employees by the name Baggins using the search form.'
+    - 'search employees named Baggins: acted staff:search-employees, done, at http://localhost:8099/employees?name=Baggins'
+    - 'why: The search for Baggins returned both employees, so the step is complete.'
+    - 'done: Find the employees named Baggins'
+    - 'why: Open Frodo Baggins from the search results list.'
+    - 'open the item "Frodo Baggins": followed item, done, at http://localhost:8099/employees/1'
+    - 'why: Frodo Baggins is open at /employees/1, so the step "Open Frodo Baggins" is complete.'
+    - 'done: Open Frodo Baggins'
+    - 'why: Current role is "ring bearer"; update it to "ring bearer, retired" using the update form.'
+    - 'update the employee''s role to "ring bearer, retired": refused, unclear to the reasoner: Frodo''s role was changed from "ring bearer" to "keeper of the Red Book" after you started. Do you still want to overwrite it with "ring bearer, retired"?'
+    - 'why: The current role is now "keeper of the Red Book", so append ", retired" to that.'
+    - 'update the employee''s role to "keeper of the Red Book, retired": acted staff:update, done, at http://localhost:8099/employees/1'
+    - 'why: Role is now "keeper of the Red Book, retired", so the step is complete.'
+    - 'done: Add ", retired" to the end of his current role, keeping the rest of it as it is'
+  model:
+    name: claude-sonnet-5-5
+    url: https://api.anthropic.com
+  usage:
+    calls: 7
+    input: 4576
+    output: 940
+    cache_read: 12502
+    cache_write: 0
+---
+at: '2026-11-02T12:18:43.590515Z'
+ms: 54
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8099/
+opens: true
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-02T12:18:45.227139Z'
+ms: 1849
+mode: intent
+say: search employees named Baggins
+line: 1
+params:
+  relation: staff:search-employees
+  name: Baggins
+values:
+  name:
+    value: Baggins
+    type: string
+    from:
+      - words
+reason:
+  template: search employees named Baggins
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"Employees","hr:manifest":{"forms":{"staff:dismiss":["sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04="],"staff:get-employee":["sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY="],"staff:hire":["sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM="],"staff:search-employees":["sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4="],"staff:update":["sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM="]},"digest":"sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc="}}
+      </state>
+      <offers>
+      {"staff:search-employees":{"title":"Find employees by name","description":"Lists the employees whose name has the text.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"name":{"type":"string","minLength":1,"title":"Name","description":"Part of the employee's first or last name; case is ignored"}},"required":["name"]}},"staff:get-employee":{"title":"Get an employee by number","description":"Goes to one employee, given their number.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Employee number","description":"The employee's number"}},"required":["id"]}},"staff:hire":{"title":"Hire an employee","description":"Hires someone, in a role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object","$id":"/schemas/10847085ef79da90"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      search employees named Baggins
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01Xd4XPuRSdfVjhATEKS3JSk","name":"select","input":{"action":"act","affordance":"staff:search-employees","fields":{"name":"Baggins"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:search-employees
+  title: Find employees by name
+  method: GET
+  target: /employees{?name}
+  address: http://localhost:8099/employees?name=Baggins
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8099/employees?name=Baggins
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Frodo Baggins
+      - Bilbo Baggins
+---
+at: '2026-11-02T12:18:50.778717Z'
+ms: 1007
+mode: intent
+say: open the item "Frodo Baggins"
+line: 2
+within: 1
+params:
+  relation: item
+  title: Frodo Baggins
+values:
+  title:
+    value: Frodo Baggins
+    from:
+      - words
+reason:
+  template: open the item "Frodo Baggins"
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":2}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Frodo Baggins"},{"rel":"item","title":"Bilbo Baggins"}]
+      </links>
+      <intent>
+      open the item "Frodo Baggins"
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01AkpYfyEWZ1rvLY3FAwoJJT","name":"select","input":{"action":"follow","rel":"item","title":"Frodo Baggins"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: Frodo Baggins
+  method: GET
+  target: http://localhost:8099/employees/1
+  address: http://localhost:8099/employees/1
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+keeps:
+  /firstName:
+    - 4
+  /lastName:
+    - 4
+---
+at: '2026-11-02T12:19:03.777747Z'
+ms: 2698
+mode: intent
+say: update the employee's role to "keeper of the Red Book, retired"
+line: 4
+within: 2
+params:
+  relation: staff:update
+  firstName: Frodo
+  lastName: Baggins
+  role: keeper of the Red Book, retired
+values:
+  firstName:
+    value: Frodo
+    type: string
+    from:
+      - step: 3
+        pointer: /firstName
+      - words
+  lastName:
+    value: Baggins
+    type: string
+    from:
+      - step: 3
+        pointer: /lastName
+      - words
+  role:
+    value: keeper of the Red Book, retired
+    type: string
+    from:
+      - chosen
+reason:
+  template: update the employee's role to "keeper of the Red Book, retired"
+  slots: {}
+opens: true
+judgement: true
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":1,"firstName":"Frodo","lastName":"Baggins","role":"keeper of the Red Book","status":"working"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      update the employee's role to "keeper of the Red Book, retired"
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSrgYKEAgTGAI4AUIIdGhpbmtpbmcSDJf+L19zW1Zp0kIk1BoMk32fVK1Wnh2T5lcfIjA2Ep583J61ahzozmIakQVkabQrPWbyr1+oUxk1nX0Pzx8sV3RFyElLefvMMq8cth0qywWckY8skN10pg3B8s8omNGUf7mXrF8LPHapXGidcZIombCsWlbjY3WJlWhyvLfGThy+tR6yDNf03LK5BfWQcGTUGd9xicNHMrL9ehUyYbc5ezQoUUoFl7FekkwqMunOAZTXkNyY5tNanHBPNeKCxvkv3CV2kzUoSfnbXddorvs4ScCn29CGjA2oJ+7t4jW0aSMJY+EBLh1YF+t8Nl1IO9fF/Bm9N7J0LHCBq7S1LQC0e+kLFnJu5lk3xu8SKZXOiNK6vVe5zvI4D5dMxEmbGbR/1tm//tfEOKJcOW4FnBFhj/lf8FBShgLxxlAA0LbMq6CTLqYxskIcahSfqwedOuJS7JEcOqiIlTMZh5UGDna6gS9FFQkvby4UipTO9Yi9ao/teP+4IoKupTYPV6y9HMEngI8gQgyC3c5tCSTnun6KX9Z/3hZul0W4TFwRICzutJdx2NoQEKEIVXXwQBk/w0aaEefX3UlDfuJJY3cVdiZ0KaQydKyfvO1J2jqhBEpSyzVOZ5NrJu8TfLKOlQ0736MXH51LaGg0IybmjDwDWZN07jvJ+GRLkplOKAcGEVWBQYYBwDeaotDKfVPwAtQTjHknfRjFMv0CwPh9r2SM66V8EihNunn9ha8MhAvWvAychPTsvIzs02yV/DCu1z3hyM19gd8Y2wcnlfWA+NSAgn4RVh508A/t5HQ/y566LoaZO0Wvo7rsVGxOB0UA1hh5BiC7QQI2C959VOUtOQkb0wRSnUw/xsioc/c62DMIpn72iLEDKlfYl5JVl0GrUCeBMB8QXj9PGmGRO7/9q6/JtnZo39u7y5vB/LvfxgAX4Z85WQyO3fpdNNifCDLXXLuGzSN88dE53i5XYaKhIdQtvzuXgE+BCVmisFIHZIUsllu6mEnC2JNGSLCMZ9PZcPTiOlqgZ8Ioaplz4UxsWFCzGzqMU5FxY0G7PqrLLZ5RGAE="},{"type":"tool_use","id":"toolu_01KQ4oirfEiiobdkweHG1tdn","name":"select","input":{"action":"act","affordance":"staff:update","fields":{"firstName":"Frodo","lastName":"Baggins","role":"keeper of the Red Book, retired"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:update
+  title: Update the employee
+  method: PUT
+  target: /employees/{id}/actions/update
+  address: http://localhost:8099/employees/1/actions/update
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/2f822c4fedc9305e
+    integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+  form: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+  schema:
+    href: http://localhost:8099/schemas/10847085ef79da90
+    integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+  if-match: '"seq-2.hsf.L2.60e873853d6ada59"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: keeper of the Red Book, retired
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T12:19:07.692888Z'
+ms: 10
+mode: script
+say: return to {address}
+line: 4
+within: 2
+params:
+  address: http://localhost:8099/employees/1
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: keeper of the Red Book, retired
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T12:19:07.703773Z'
+ms: 7
+mode: script
+say: return to {address}
+line: 4
+within: 2
+params:
+  address: http://localhost:8099/employees?name=Baggins
+outcome: done
+address: http://localhost:8099/employees?name=Baggins
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Frodo Baggins
+      - Bilbo Baggins
+---
+at: '2026-11-02T12:19:07.712065Z'
+ms: 8
+mode: script
+say: return to {address}
+line: 4
+within: 2
+params:
+  address: http://localhost:8099/
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null

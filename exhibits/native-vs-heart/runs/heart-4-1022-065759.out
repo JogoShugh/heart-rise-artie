@@ -1,0 +1,56 @@
+1 enter http://localhost:8392/: done
+2 get the repository JogoShugh/heart-github-test: done
+3 Open an issue titled "Crash when a bed has no name (1022-065759)" with body: A bed with a blank name crashes the garden.: new resource
+4 Label it with bug: done
+5 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/207: done
+6 Assign it to JogoShugh: done
+7 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/207: done
+8 check: held
+9 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+10 Open an issue titled "Test blank bed names (1022-065759)" with body: This is part of #207.: new resource
+11 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+12 Open an issue titled "Garden crashes on an empty bed name (1022-065759)" with body: This was seen on the demo garden.: new resource
+13 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+14 list the branches of the repository: done
+15 open the main branch: done
+16 Start a new branch named fix-blank-names-1022-065759 from here: new resource
+17 Add a file named fix-1022-065759.md with content "Bed names may not be blank." and commit message "Refuse a bed with no name": done
+18 return to http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-065759: done
+19 Add a file named test-1022-065759.md with content "A bed with a blank name is refused." and commit message "Test that a blank bed name is refused": done
+20 return to http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-065759: done
+21 Open a pull request into main titled "Refuse a bed with no name (1022-065759)" with body: This fixes #207.: new resource
+22 Change its description to: This fixes #207 and is tested by #208.: done
+23 return to http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/210: done
+24 until: held
+25 Merge it by squashing its commits, with the commit title "Refuse a bed with no name (#210)": done
+26 return to http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/210: done
+27 check: held
+28 return to http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-065759: done
+29 return to http://localhost:8392/repos/JogoShugh/heart-github-test/branches/main: done
+30 return to http://localhost:8392/repos/JogoShugh/heart-github-test/branches: done
+31 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+32 return to http://localhost:8392/: done
+33 get issue 207 of JogoShugh/heart-github-test: done
+34 Make issue with id 5977995761 a sub-issue of this issue: done
+35 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/207: done
+36 comment on it: Fixed in #210, tested in #208.: new resource
+37 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/207: done
+38 lock the conversation as resolved: done
+39 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/207: done
+40 check: held
+41 return to http://localhost:8392/: done
+42 get issue 208 of JogoShugh/heart-github-test: done
+43 comment on it: The test went in with #210.: new resource
+44 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/208: done
+45 close it as completed: done
+46 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/208: done
+47 check: held
+48 return to http://localhost:8392/: done
+49 get issue 209 of JogoShugh/heart-github-test: done
+50 comment on it: Same crash as #207.: new resource
+51 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/209: done
+52 Close it as a duplicate of the issue with id 5977988480.: done
+53 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/209: done
+54 check: held
+55 return to http://localhost:8392/: done
+finished, 55 steps

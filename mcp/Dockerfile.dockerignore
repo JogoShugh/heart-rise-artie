@@ -1,0 +1,9 @@
+# The build needs heart/, client/ and mcp/, without anything built or cached.
+*
+!build-logic
+!heart
+!client
+!mcp
+**/build
+**/.gradle
+**/.kotlin

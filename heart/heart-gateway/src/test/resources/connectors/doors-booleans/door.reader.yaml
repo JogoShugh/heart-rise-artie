@@ -1,0 +1,5 @@
+# The default reader: each door says, per action, whether it is allowed now (as Google Drive's capabilities do).
+allowed:
+  booleans: /capabilities
+  map: { canOpen: open, canClose: close, canLock: lock, canUnlock: unlock }
+hide: [/capabilities]

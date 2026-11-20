@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Overheard at Riverside</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="The web that wasn't and the web we got, told as overheard conversations; a deck served as HEART resources and read by heart-ts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="json-view.css">
+</head><body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation</span></div>
+  <div class="mode" role="group" aria-label="What the deck is served as">
+    <button type="button" data-mode="plain" aria-pressed="false">Plain JSON</button>
+    <button type="button" data-mode="heart" aria-pressed="true">HEART</button>
+  </div>
+  <div class="mode" role="group" aria-label="How each scene is told">
+    <button type="button" data-voice="talk" aria-pressed="true">Conversation</button>
+    <button type="button" data-voice="points" aria-pressed="false">Points</button>
+  </div>
+  <button class="pill outline-toggle" id="outline-toggle" type="button" aria-controls="outline" aria-expanded="false">Outline</button>
+  <button class="pill" id="theme" type="button">◐ Dark</button>
+</div></header>
+
+<div class="deck">
+  <nav class="outline" id="outline" aria-label="Outline">
+    <p class="label">Outline</p>
+    <ol id="outline-list"></ol>
+    <p class="how">Move with ← and →, or pick from the outline. Every slide has its own address.</p>
+  </nav>
+  <main class="stage">
+    <p class="mode-note" id="mode-note"></p>
+    <article class="slide" id="slide" aria-live="polite"><p class="note">Reading the deck…</p></article>
+    <nav class="foot" aria-label="Back and on">
+      <span class="off" data-rel="prev"><small>Back</small><b>—</b></span>
+      <span class="where" id="where"></span>
+      <span class="off" data-rel="next"><small>Next</small><b>—</b></span>
+    </nav>
+    <div class="source" id="source"></div>
+  </main>
+</div>
+<noscript><p>This deck is read by a HEART client in the page. Without JavaScript, read it as <a href="deck/contents.html">plain pages</a>.</p></noscript>
+
+<script src="heart-ts.js"></script>
+<script src="json-view.js"></script>
+<script src="theme-switch.js"></script>
+<script src="deck.js"></script>
+</body></html>

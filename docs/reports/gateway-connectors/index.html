@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How the HEART gateway is configured: a generic engine in code, and one folder of YAML per API. The standard approach, every key, and GitHub's connector as the worked example.">
+<title>Gateway Connectors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The Take HEART reports' look: one reading column, the paired exchanges break out wider. */
+:root {
+  --bg: #f3f6f5;
+  --surface: #ffffff;
+  --fg: #17211d;
+  --muted: #55645d;
+  --rule: #d3ddd8;
+  --leaf: #2b7a4b;
+  --link: #2f5f8f;
+  --gate: #7a5a1f;
+  --code-bg: #e9efec;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732;
+    --leaf: #6cc690; --link: #8ab8e6; --gate: #e0b866; --code-bg: #1d2723; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732;
+  --leaf: #6cc690; --link: #8ab8e6; --gate: #e0b866; --code-bg: #1d2723; color-scheme: dark;
+}
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 44rem; margin: 0 auto; padding-block: 3rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.6rem; }
+.wide { margin-inline: calc((44rem - min(76rem, 100vw - 32px)) / 2); }
+@media (max-width: 46rem) { .wide { margin-inline: 0; } }
+h1, h2 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.1rem, 5.5vw, 3.2rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; }
+p, li { max-width: 65ch; }
+p { margin: 0; }
+header, section { display: grid; gap: 1rem; min-width: 0; }
+.eyebrow { font: 600 0.74rem/1 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.15rem; color: var(--muted); }
+.thesis { font-family: var(--display); font-weight: 500; font-size: 1.3rem; line-height: 1.45; border-left: 3px solid var(--leaf); padding-left: 1rem; }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.75rem 0.9rem; font: 0.74rem/1.5 var(--mono); }
+pre code { background: none; padding: 0; font-size: 1em; display: block; min-width: max-content; }
+pre .ln { display: block; }
+pre .add, .addkey { background: color-mix(in srgb, var(--leaf) 24%, transparent); }
+.addkey { padding: 0 0.3em; border-radius: 3px; }
+.c { color: var(--muted); font-style: italic; }
+a { color: var(--link); }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.5rem; }
+.note { color: var(--muted); font-size: 0.9rem; }
+
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 34rem; font-size: 0.92rem; }
+th, td { text-align: left; padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tbody th { font-weight: 500; }
+
+/* One pull request: its page, then the same read two ways, side by side. */
+.pull { padding-top: 1.4rem; border-top: 2px solid var(--rule); }
+.pull .head { display: grid; gap: 0.35rem; }
+.pull .where { color: var(--muted); }
+.pull .where b { color: var(--leaf); }
+figure { margin: 0; display: grid; gap: 0.4rem; }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 8px; }
+figcaption { font-size: 0.86rem; color: var(--muted); }
+.shot { max-width: 44rem; }
+.pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+@media (max-width: 52rem) { .pair { grid-template-columns: minmax(0, 1fr); } }
+.side { display: grid; gap: 0.5rem; min-width: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.9rem; }
+.side.gh { border-top: 4px solid var(--link); }
+.side.hr { border-top: 4px solid var(--leaf); }
+.who { font: 600 0.78rem/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.ex { display: grid; gap: 0.5rem; margin-top: 0.4rem; }
+
+/* The collapsed optimization section. */
+details.advanced { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.9rem 1.1rem; }
+details.advanced > summary { cursor: pointer; font-family: var(--display); font-weight: 650; font-size: 1.2rem; }
+details.advanced[open] > summary { margin-bottom: 1rem; }
+.adv { display: grid; gap: 1rem; min-width: 0; }
+.adv .side { background: var(--bg); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.shared td, tr.shared th { background: color-mix(in srgb, var(--leaf) 12%, transparent); }
+
+/* Phase 10: the acts. */
+.acting { display: grid; gap: 1.4rem; padding-top: 1.4rem; border-top: 2px solid var(--rule); }
+.actstep { display: grid; gap: 0.6rem; }
+h3 { font-family: var(--display); font-weight: 650; font-size: 1.2rem; margin: 0; }
+
+/* This page: a reference. Key tables, the shipped files, the steps of the approach. */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; counter-reset: s; }
+.steps > li { counter-increment: s; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 0.2rem 0.8rem; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.85rem 1rem; max-width: none; }
+.steps > li::before { content: counter(s); grid-row: span 2; font: 650 1.3rem/1 var(--display); color: var(--leaf); }
+.steps b { font-family: var(--display); font-size: 1.04rem; }
+.files { display: grid; gap: 1rem; }
+.file { display: grid; gap: 0.5rem; min-width: 0; }
+.file .name { font: 600 0.82rem var(--mono); color: var(--leaf); }
+td code, th code { white-space: nowrap; }
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+@media (max-width: 52rem) { .split { grid-template-columns: minmax(0, 1fr); } }
+.box { display: grid; gap: 0.5rem; min-width: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.9rem; }
+.box.code-side { border-top: 4px solid var(--link); }
+.box.conf-side { border-top: 4px solid var(--leaf); }
+.box ul { font-size: 0.94rem; }
+h3 { font-family: var(--display); font-weight: 650; font-size: 1.15rem; margin: 0; }
+</style>
+<style>
+/* The JSON viewer (json-view.js): collapsed boxes, line diffs, unchanged runs folded behind buttons. */
+/* A column of boxes. */
+.stack { display: grid; gap: 0.5rem; min-width: 0; }
+details.jv { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 0.45rem 0.75rem; min-width: 0; }
+details.jv > summary { cursor: pointer; font-size: 0.9rem; }
+details.jv[open] > summary { margin-bottom: 0.5rem; }
+.jv-body { display: grid; gap: 0.35rem; min-width: 0; }
+.jv-label { margin: 0; font: 500 0.75rem var(--mono); color: var(--muted); white-space: pre; }
+.jv-doc { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 6px; padding: 0.5rem 0.6rem;
+  font: 0.78rem/1.45 var(--mono); }
+.jv-doc .ln { display: block; white-space: pre; }
+.jv-doc .ln.add { background: color-mix(in srgb, var(--leaf) 16%, transparent); }
+.jv-doc .ln.del { background: color-mix(in srgb, var(--gate) 16%, transparent); }
+.jv-doc .ln.note { color: var(--muted); }
+.jv-gap, .jv-full { font: 500 0.75rem var(--mono); color: var(--muted); background: none; border: 1px dashed var(--rule);
+  border-radius: 4px; padding: 0.1rem 0.5rem; margin: 0.15rem 0; cursor: pointer; }
+.jv-gap { display: block; }
+.jv-gap:hover, .jv-full:hover { color: var(--fg); border-style: solid; }
+.jv-tools { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+.jv-full[disabled] { opacity: 0.5; cursor: default; }
+.jv-req { margin: 0 0 0.35rem; font-size: 0.82rem; overflow-x: auto; white-space: nowrap; }
+.jv-req .who { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.4rem; }
+</style>
+<script>
+// One viewer for every JSON example in the reports. A <details class="jv"> names its documents by the ids of
+// <script type="application/json"> blocks: data-a alone shows one document; data-a and data-b show what b
+// changes of a, as a line diff with a few lines of context. Nothing renders until the reader opens it; the
+// unchanged lines and the whole documents appear only on a click.
+(() => {
+  const CONTEXT = 3;   // unchanged lines kept around each change
+  const PREVIEW = 14;  // lines of a lone document shown before "show all"
+  const CHANGE = 24;   // a run of changed lines longer than this shows its first FIRST lines, the rest on a click
+  const FIRST = 16;
+  const cache = new Map();
+
+  const linesOf = (value) => (typeof value === "string" ? value : JSON.stringify(value, null, 2)).split("\n");
+  const doc = (id) => {
+    if (!cache.has(id)) cache.set(id, linesOf(JSON.parse(document.getElementById(id).textContent)));
+    return cache.get(id);
+  };
+
+  const el = (tag, cls, text) => {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+
+  // Lines of a and b, each marked " " (both), "-" (a only) or "+" (b only): a longest common subsequence
+  // after trimming the common head and tail, which is most of a JSON answer.
+  const diff = (a, b) => {
+    let head = 0;
+    while (head < a.length && head < b.length && a[head] === b[head]) head++;
+    let tail = 0;
+    while (tail < a.length - head && tail < b.length - head && a[a.length - 1 - tail] === b[b.length - 1 - tail]) tail++;
+    const x = a.slice(head, a.length - tail), y = b.slice(head, b.length - tail);
+    const n = x.length, m = y.length, w = m + 1;
+    const table = new Uint32Array((n + 1) * w);
+    for (let i = n - 1; i >= 0; i--)
+      for (let j = m - 1; j >= 0; j--)
+        table[i * w + j] = x[i] === y[j] ? table[(i + 1) * w + j + 1] + 1 : Math.max(table[(i + 1) * w + j], table[i * w + j + 1]);
+    const out = a.slice(0, head).map((line) => [" ", line]);
+    let i = 0, j = 0;
+    while (i < n && j < m) {
+      if (x[i] === y[j]) { out.push([" ", x[i]]); i++; j++; }
+      else if (table[(i + 1) * w + j] >= table[i * w + j + 1]) out.push(["-", x[i++]]);
+      else out.push(["+", y[j++]]);
+    }
+    while (i < n) out.push(["-", x[i++]]);
+    while (j < m) out.push(["+", y[j++]]);
+    return out.concat(a.slice(a.length - tail).map((line) => [" ", line]));
+  };
+
+  const row = ([mark, line]) => el("span", { " ": "ln", "-": "ln del", "+": "ln add" }[mark], `${mark} ${line}`);
+
+  // The diff with each long run of unchanged lines folded into a button that unfolds it.
+  const diffView = (a, b) => {
+    const lines = diff(a, b), pre = el("pre", "jv-doc");
+    if (!lines.some(([mark]) => mark !== " ")) pre.append(el("span", "ln note", "  (no difference)"));
+    let k = 0;
+    while (k < lines.length) {
+      if (lines[k][0] !== " ") {
+        let end = k;
+        while (end < lines.length && lines[end][0] !== " ") end++;
+        const run = lines.slice(k, end);
+        if (run.length <= CHANGE) run.forEach((l) => pre.append(row(l)));
+        else {
+          run.slice(0, FIRST).forEach((l) => pre.append(row(l)));
+          const rest = run.slice(FIRST);
+          const more = el("button", "jv-gap", `⋯ ${rest.length} more changed lines`);
+          more.type = "button";
+          more.addEventListener("click", () => more.replaceWith(...rest.map(row)));
+          pre.append(more);
+        }
+        k = end;
+        continue;
+      }
+      let end = k;
+      while (end < lines.length && lines[end][0] === " ") end++;
+      const first = k === 0, last = end === lines.length;
+      const keepHead = first ? 0 : CONTEXT, keepTail = last ? 0 : CONTEXT;
+      if (end - k <= keepHead + keepTail + 1) { lines.slice(k, end).forEach((l) => pre.append(row(l))); }
+      else {
+        lines.slice(k, k + keepHead).forEach((l) => pre.append(row(l)));
+        const hidden = lines.slice(k + keepHead, end - keepTail);
+        const gap = el("button", "jv-gap", `⋯ ${hidden.length} unchanged lines`);
+        gap.type = "button";
+        gap.addEventListener("click", () => gap.replaceWith(...hidden.map(row)));
+        pre.append(gap);
+        lines.slice(end - keepTail, end).forEach((l) => pre.append(row(l)));
+      }
+      k = end;
+    }
+    return pre;
+  };
+
+  // A lone document: its first lines, the rest on a click.
+  const docView = (lines) => {
+    const pre = el("pre", "jv-doc");
+    lines.slice(0, PREVIEW).forEach((line) => pre.append(el("span", "ln", line)));
+    if (lines.length > PREVIEW) {
+      const more = el("button", "jv-gap", `⋯ ${lines.length - PREVIEW} more lines`);
+      more.type = "button";
+      more.addEventListener("click", () => more.replaceWith(...lines.slice(PREVIEW).map((l) => el("span", "ln", l))));
+      pre.append(more);
+    }
+    return pre;
+  };
+
+  // "Show all": a whole document, on demand.
+  const fullButton = (label, lines, host) => {
+    const button = el("button", "jv-full", `${label} in full (${lines.length} lines)`);
+    button.type = "button";
+    button.addEventListener("click", () => {
+      const pre = el("pre", "jv-doc");
+      lines.forEach((line) => pre.append(el("span", "ln", line)));
+      button.disabled = true;
+      host.append(el("p", "jv-label", `${label}, in full`), pre);
+    });
+    return button;
+  };
+
+  const render = (box) => {
+    const body = el("div", "jv-body"), tools = el("div", "jv-tools");
+    const a = doc(box.dataset.a), labelA = box.dataset.labelA || "document";
+    if (box.dataset.b) {
+      const b = doc(box.dataset.b), labelB = box.dataset.labelB || "after";
+      body.append(el("p", "jv-label", `− ${labelA}   + ${labelB}`), diffView(a, b));
+      tools.append(fullButton(labelA, a, body), fullButton(labelB, b, body));
+    } else {
+      body.append(el("p", "jv-label", labelA), docView(a));
+    }
+    // Before the box's tail (a nested box, such as why the rest are absent), if it has one.
+    const tail = box.querySelector(":scope > .jv-tail");
+    box.insertBefore(body, tail);
+    if (tools.childElementCount) box.insertBefore(tools, tail);
+  };
+
+  // For other scripts (run-report.js): a box for documents already in hand, rendered when opened like any other.
+  let made = 0;
+  window.JsonView = {
+    box({ a, b, labelA, labelB, summary, lead }) {
+      const box = el("details", "jv");
+      const id = (value) => { const key = `jvm${made++}`; cache.set(key, linesOf(value)); return key; };
+      box.dataset.a = id(a);
+      if (b !== undefined) box.dataset.b = id(b);
+      if (labelA) box.dataset.labelA = labelA;
+      if (labelB) box.dataset.labelB = labelB;
+      const head = el("summary");
+      head.innerHTML = summary;
+      box.append(head);
+      if (lead) box.append(lead);
+      return box;
+    },
+  };
+
+  // toggle doesn't bubble, but a capturing listener on the document sees every one.
+  document.addEventListener("toggle", (event) => {
+    const box = event.target;
+    if (box.classList && box.classList.contains("jv") && box.open && !box.dataset.rendered) {
+      box.dataset.rendered = "1";
+      render(box);
+    }
+  }, true);
+})();
+</script>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <p class="eyebrow">Take HEART · Part 2 · configuring the gateway</p>
+    <h1>Gateway Connectors</h1>
+    <p class="lede">The HEART gateway serves an API that publishes only OpenAPI as a HEART server: forms for what each resource allows now, reasons for the rest. Everything it knows about one API sits in that API's connector, a folder of YAML. GitHub's is the worked example.</p>
+  </header>
+
+  <section>
+    <p class="thesis">The engine is code, written once for every API. An API is configuration: one folder, three kinds of file, no code.</p>
+  </section>
+
+  <section class="wide">
+    <div class="split">
+      <div class="box code-side">
+        <p class="who">Code, the same for every API</p>
+        <ul>
+          <li>Read an OpenAPI description, keeping only the operations a connector includes, before parsing it.</li>
+          <li>Turn a resource file into a HEART resource type: its address, its search, its forms.</li>
+          <li>Turn an act into a call: the fixed body, the client's fields, the fields bound from state.</li>
+          <li>Decide what an answer allows: the reader's signal, then its rules, each with its reason.</li>
+          <li>Call the upstream as each caller, and revalidate what it read with ETags.</li>
+          <li>Serve all of it as HEART, through heart-core and heart-http4k.</li>
+        </ul>
+        <p class="note">Kotlin, in <code>heart-gateway/src/main</code>. It names no API.</p>
+      </div>
+      <div class="box conf-side">
+        <p class="who">Configuration, one folder per API</p>
+        <ul>
+          <li><code>connector.yaml</code>: which operations to read, headers for every call, and which files follow.</li>
+          <li><code>&lt;name&gt;.resource.yaml</code>: one resource of the API, its acts and the other answers it reads.</li>
+          <li><code>&lt;name&gt;.reader.yaml</code>: how to tell what an answer allows now, and why not the rest.</li>
+          <li>Optionally a <code>.jsonata</code> file, for an API whose signal no built-in reader understands.</li>
+        </ul>
+        <p class="note">GitHub's is <code>heart-gateway/connectors/github</code>, shipped in the gateway's distribution.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The standard approach</h2>
+    <p>Every connector is written the same way, in this order. Each step is a file or a key; none is code.</p>
+    <ol class="steps">
+      <li><b>Slice the description.</b><span>In <code>connector.yaml</code>, list under <code>include</code> only the operations the connector uses. The gateway cuts the rest out before parsing: GitHub's 13.5 MB description loads in about a second. Add any <code>headers</code> every call needs.</span></li>
+      <li><b>Name each resource by its own paths.</b><span>In a resource file, say which operation reads one (<code>read</code>) and which lists them (<code>search</code>), and give a JSON Pointer into the resource's state for each variable of the read's path (<code>pointers</code>). An upstream whose paths are already HEART's, <code>/{collection}/{id}</code> with acts at <code>/actions/{name}</code>, needs no resource file at all.</span></li>
+      <li><b>Name acts after what people do, not after operations.</b><span>Each act is one operation with a <code>body</code> fixed by the connector, the <code>fields</code> the client fills, and the fields bound from the state the client's validator matched (<code>bind</code>). GitHub's close and reopen are the same operation with a different fixed body.</span></li>
+      <li><b>Bind the upstream's own concurrency checks.</b><span>Where an operation takes the version it expects, bind it from the state, so the upstream refuses a write on a view that's out of date. Merge's <code>sha</code> and update-branch's <code>expected_head_sha</code> both come from <code>/head/sha</code>.</span></li>
+      <li><b>Say what the upstream's refusals mean.</b><span><code>stale</code> names the status that means the client's view is out of date (answered 412); <code>refused</code> the one that means not now (answered 409, in the upstream's words). Anything else passes through as the problem it is.</span></li>
+      <li><b>Read what's allowed, standards first.</b><span>An answer with HEART's affordance <code>Link</code> or OData's advertised actions needs no reader. Otherwise a reader names one signal: <code>names</code>, <code>booleans</code>, <code>links</code>, <code>odata</code>, a <code>table</code> by a state field, or a <code>jsonata</code> file.</span></li>
+      <li><b>Refine with rules, each with its reason.</b><span>After the signal, a reader's <code>rules</code>, in order: when every condition holds, the acts named are absent, with that reason. The first reason given for an act stands. A condition may read a <code>fact</code>, another of the upstream's answers, such as the repository's permissions.</span></li>
+      <li><b>Leave the last word to the upstream.</b><span>Rules only say early, and why. The gateway reads the resource again just before acting, and the upstream's own refusal of an act always reaches the client.</span></li>
+    </ol>
+  </section>
+
+  <section class="wide">
+    <h2>Running it</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Setting</th><th>What it is</th><th>GitHub</th></tr></thead>
+        <tbody>
+          <tr><th><code>UPSTREAM_URL</code></th><td>Where the upstream is.</td><td><code>https://api.github.com</code></td></tr>
+          <tr><th><code>UPSTREAM_SPEC</code></th><td>Its OpenAPI description, a URL or a mounted file; by default <code>UPSTREAM_URL/openapi.json</code>.</td><td>GitHub's <code>api.github.com.json</code>, from github/rest-api-description</td></tr>
+          <tr><th><code>GATEWAY_CONNECTOR</code></th><td>The connector's folder.</td><td><code>connectors/github</code></td></tr>
+          <tr><th><code>GATEWAY_PROFILE</code></th><td>The profile relations are named in, when there is no connector to name one.</td><td>not needed: the connector says <code>github</code></td></tr>
+          <tr><th><code>UPSTREAM_AUTH</code></th><td><code>none</code>, <code>bearer</code> (<code>UPSTREAM_TOKEN</code>), <code>basic</code> (<code>UPSTREAM_USER</code>, <code>UPSTREAM_PASSWORD</code>), or <code>caller</code>: forward each caller's own credential, and let the upstream judge it.</td><td><code>caller</code></td></tr>
+          <tr><th><code>HEART_AUTH_BASIC_USERS</code>, <code>HEART_AUTH_BEARER_TOKENS</code></th><td>Who may call the gateway, as on every HEART server; not needed with <code>caller</code>, though a request with no credential is still refused.</td><td>not needed</td></tr>
+          <tr><th><code>PORT</code></th><td>Where the gateway listens; 8090 by default.</td><td>any</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="wide">
+    <h2>Every key</h2>
+    <h3><code>connector.yaml</code></h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Key</th><th>Says</th></tr></thead>
+        <tbody>
+          <tr><th><code>profile</code></th><td>The profile the API's relations are named in: forms are keyed <code>github:merge</code>, described at <code>/profiles/github</code>.</td></tr>
+          <tr><th><code>include</code></th><td>The operations to read, by operationId. Without it, every operation is read.</td></tr>
+          <tr><th><code>headers</code></th><td>Headers every upstream call carries.</td></tr>
+          <tr><th><code>resources</code></th><td>The resource files, in order.</td></tr>
+          <tr><th><code>readers</code></th><td>The reader files, in order: the first that recognizes an answer reads it, so the API's default reader comes last. A reader file in the folder but not listed stops the gateway.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3><code>&lt;name&gt;.resource.yaml</code></h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Key</th><th>Says</th></tr></thead>
+        <tbody>
+          <tr><th><code>noun</code>, <code>collection</code></th><td>What one is called, and the collection's name.</td></tr>
+          <tr><th><code>read</code></th><td>The operation that reads one. Its path is where the resource lives in HEART too.</td></tr>
+          <tr><th><code>search</code></th><td>The operation that lists them. A bare JSON array, paged by <code>Link: rel="next"</code>, is followed to the end.</td></tr>
+          <tr><th><code>pointers</code></th><td>For each variable of the read's path, a JSON Pointer into the state: <code>pull_number: /number</code>.</td></tr>
+          <tr><th><code>filters</code></th><td>The list's query parameters the search form offers.</td></tr>
+          <tr><th><code>title</code></th><td>Where a listed item's title is, for the search page's item links.</td></tr>
+          <tr><th><code>address</code></th><td>Where the item's own URL is, when its state names its parts only there, as an issue's <code>/url</code> does: the read's path variables are read from it and kept in the state as <code>hr:address</code>. Instead of <code>pointers</code>.</td></tr>
+          <tr><th><code>skip</code></th><td>Conditions under which a listed item is not one of these resources: GitHub lists pull requests among issues (<code>/pull_request: {present: true}</code>).</td></tr>
+          <tr><th><code>lists</code></th><td>Other list operations whose members are these resources, each served at its own path and linked from the resource: an issue's sub-issues.</td></tr>
+          <tr><th><code>links</code></th><td>List operations under the resource that another resource file searches by, linked from it: an issue's comments.</td></tr>
+          <tr><th><code>acts</code></th><td>The acts, each by name: <code>operation</code>, <code>title</code>, <code>description</code>, <code>body</code> (fixed), <code>fields</code> (the client's), <code>bind</code> (from state), <code>stale</code> and <code>refused</code> (what the upstream's statuses mean), and <code>creates</code> (the noun of the resource the operation's answer is: the gateway answers 201 with its address in <code>Location</code>). A field the state doesn't fill but the operation's path names goes in the path: remove-label's <code>{name}</code>.</td></tr>
+          <tr><th><code>facts</code></th><td>Other answers a reader's rules may read, each by name: an <code>operation</code>, and <code>pointers</code> filling its path from the resource's state.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3><code>&lt;name&gt;.reader.yaml</code></h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Key</th><th>Says</th></tr></thead>
+        <tbody>
+          <tr><th><code>matches</code></th><td>Which answers this reader reads: by members of the <code>body</code>, its <code>mediaType</code>, or the description's <code>path</code> template it was asked at. None means every answer: the default reader.</td></tr>
+          <tr><th><code>allowed</code></th><td>One signal: <code>names</code> (a list of action names), <code>booleans</code> (a map of capabilities), <code>links</code> (an array of links by rel), <code>odata</code> (OData's advertised actions), <code>table</code> (a state field, with <code>rows</code> of <code>allow</code> and <code>absent</code> reasons), <code>always</code> (the same acts in every state, for a resource with no state to choose by, as a comment), or <code>jsonata</code> (a file). <code>map</code> renames the API's words to operationIds.</td></tr>
+          <tr><th><code>allowed.rules</code></th><td>In order: <code>when</code> (each JSON Pointer, or <code>fact:/pointer</code>, against a condition: a JSON value it must equal, <code>null</code> matching a member that is there and null; <code>{present: true}</code>; <code>{not: value}</code>; <code>{same-as: term}</code> or <code>{not-same-as: term}</code>, another pointer or fact, as an issue's author and the caller) and <code>absent</code> (act to reason). Every condition of a rule must hold.</td></tr>
+          <tr><th><code>hide</code></th><td>Members that are control, not state, left out of the HEART state.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Two kinds of upstream</h2>
+    <p>An API whose answers already say what is allowed needs very little. The door service the gateway's tests run against lists the names of the actions allowed now, and its whole connector is this:</p>
+    <div class="files">
+      <div class="file"><p class="name">doors-names/connector.yaml</p><pre><code>profile: doors
+readers:
+  - door.reader.yaml</code></pre></div>
+      <div class="file"><p class="name">doors-names/door.reader.yaml</p><pre><code>allowed:
+  names: /allowedActions
+hide: [/allowedActions]</code></pre></div>
+    </div>
+    <p>GitHub says nothing about what is allowed. Its answers carry the facts, <code>state</code>, <code>draft</code>, <code>merged</code>, <code>mergeable</code>, <code>mergeable_state</code>, and the repository's <code>permissions</code>, but no decisions, and its paths aren't HEART's. So its connector writes the decisions down, once, with their reasons, and names its resource by its own paths. That is the most a connector has to say.</p>
+  </section>
+
+  <section class="wide">
+    <h2>GitHub's connector, as shipped</h2>
+    <p>Four resources: a pull request, an issue, a repository (where new issues come from) and an issue's comment. How each pull request act maps to GitHub:</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Act</th><th>GitHub operation</th><th>Fixed body</th><th>Client fills</th><th>Bound from state</th><th>GitHub's statuses</th></tr></thead>
+        <tbody>
+          <tr><th>close</th><td><code>PATCH /repos/{owner}/{repo}/pulls/{pull_number}</code></td><td><code>{"state": "closed"}</code></td><td></td><td></td><td></td></tr>
+          <tr><th>reopen</th><td>same</td><td><code>{"state": "open"}</code></td><td></td><td></td><td></td></tr>
+          <tr><th>edit</th><td>same</td><td></td><td>title, body</td><td></td><td></td></tr>
+          <tr><th>merge</th><td><code>PUT …/merge</code></td><td></td><td>merge_method, commit_title, commit_message</td><td><code>sha</code> from <code>/head/sha</code></td><td>409 stale, 405 refused</td></tr>
+          <tr><th>update-branch</th><td><code>PUT …/update-branch</code></td><td></td><td></td><td><code>expected_head_sha</code> from <code>/head/sha</code></td><td>422 refused</td></tr>
+          <tr><th>request-review</th><td><code>POST …/requested_reviewers</code></td><td></td><td>reviewers, team_reviewers (at least one)</td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>How each issue, repository and comment act maps to GitHub. Act names close, reopen and edit are shared with pull requests: one relation in the profile, whichever resource does it.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Resource</th><th>Act</th><th>GitHub operation</th><th>Fixed body</th><th>Client fills</th></tr></thead>
+        <tbody>
+          <tr><th>issue</th><td>close</td><td><code>PATCH /repos/{owner}/{repo}/issues/{issue_number}</code></td><td><code>{"state": "closed", "state_reason": "completed"}</code></td><td></td></tr>
+          <tr><th>issue</th><td>close-not-planned</td><td>same</td><td><code>{"state": "closed", "state_reason": "not_planned"}</code></td><td></td></tr>
+          <tr><th>issue</th><td>close-duplicate</td><td>same</td><td><code>{"state": "closed", "state_reason": "duplicate"}</code></td><td>duplicate_issue_id</td></tr>
+          <tr><th>issue</th><td>reopen</td><td>same</td><td><code>{"state": "open", "state_reason": "reopened"}</code></td><td></td></tr>
+          <tr><th>issue</th><td>edit</td><td>same</td><td></td><td>title, body</td></tr>
+          <tr><th>issue</th><td>set-milestone</td><td>same</td><td></td><td>milestone</td></tr>
+          <tr><th>issue</th><td>lock, unlock</td><td><code>PUT</code>, <code>DELETE …/lock</code></td><td></td><td>lock_reason (lock)</td></tr>
+          <tr><th>issue</th><td>label, unlabel</td><td><code>POST …/labels</code>, <code>DELETE …/labels/{name}</code></td><td></td><td>labels; name, put in the path</td></tr>
+          <tr><th>issue</th><td>assign, unassign</td><td><code>POST</code>, <code>DELETE …/assignees</code></td><td></td><td>assignees</td></tr>
+          <tr><th>issue</th><td>comment</td><td><code>POST …/comments</code>, creates a comment: 201</td><td></td><td>body</td></tr>
+          <tr><th>issue</th><td>add-sub-issue, remove-sub-issue</td><td><code>POST …/sub_issues</code>, <code>DELETE …/sub_issue</code></td><td></td><td>sub_issue_id (replace_parent)</td></tr>
+          <tr><th>repository</th><td>open-issue</td><td><code>POST /repos/{owner}/{repo}/issues</code>, creates an issue: 201</td><td></td><td>title, body, assignees, labels, milestone</td></tr>
+          <tr><th>comment</th><td>edit</td><td><code>PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}</code></td><td></td><td>body</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="stack"><details class="jv" data-a="jefe824bc23a5" data-label-a="connector.yaml"><summary><code>connectors/github/connector.yaml</code></summary></details><details class="jv" data-a="j5585480f8a1d" data-label-a="pull.resource.yaml"><summary><code>connectors/github/pull.resource.yaml</code></summary></details><details class="jv" data-a="j0d8091946c97" data-label-a="pull.reader.yaml"><summary><code>connectors/github/pull.reader.yaml</code></summary></details><details class="jv" data-a="j07f2f42e0593" data-label-a="issue.resource.yaml"><summary><code>connectors/github/issue.resource.yaml</code></summary></details><details class="jv" data-a="jafcab949f7df" data-label-a="issue.reader.yaml"><summary><code>connectors/github/issue.reader.yaml</code></summary></details><details class="jv" data-a="j623ade86d77c" data-label-a="repository.resource.yaml"><summary><code>connectors/github/repository.resource.yaml</code></summary></details><details class="jv" data-a="j2f5050f34917" data-label-a="repository.reader.yaml"><summary><code>connectors/github/repository.reader.yaml</code></summary></details><details class="jv" data-a="jdec1b33f5b71" data-label-a="comment.resource.yaml"><summary><code>connectors/github/comment.resource.yaml</code></summary></details><details class="jv" data-a="j280186a01573" data-label-a="comment.reader.yaml"><summary><code>connectors/github/comment.reader.yaml</code></summary></details></div>
+  </section>
+
+  <section>
+    <h2>What the gateway checks at start</h2>
+    <p>A connector that doesn't fit the description stops the gateway before it serves anything, naming the file: an included operation the description lacks, a resource or reader naming an operation or path it lacks, a field an act asks for that its operation's body doesn't have, a reader file present but not listed, a listed file that isn't there, a key that isn't a JSON Pointer.</p>
+  </section>
+
+  <section>
+    <h2>Testing a connector</h2>
+    <ul>
+      <li><b>A small upstream in memory</b>, answering as the real one does. GitHub's serves GitHub's own example answers, from its description, set to each state.</li>
+      <li><b>Features in tables</b>: what each state offers, as one matrix of state by act, and why each act is absent, as rows of state, act and reason.</li>
+      <li><b>HEART's conformance kit</b>, run through the gateway in front of that upstream: the same scenarios every HEART server passes.</li>
+      <li><b>A live run</b> on a scratch repository: <code>live/github/seed.py</code> makes the states, <code>capture.py</code> reads them both ways, <code>act.py</code> acts through the forms.</li>
+    </ul>
+    <p>GitHub's connector, as of 2026-10-17: every act tested against the fake GitHub. Against real GitHub: every pull request act but an accepted review request (the repository has one collaborator), and every state but behind and no push permission; every issue, repository and comment act but set-milestone, through the forms, with the issues opened and commented on by the forms themselves (<code>live/github/issues.py</code>, <code>capture-issues.py</code>). Who may do what by role is tested against the fake only: the live token is the owner's. The report GitHub Gateway Status has the full tables and the live JSON.</p>
+  </section>
+
+  <section>
+    <h2>Not yet</h2>
+    <ul>
+      <li>Conditions say equal, present, not and same-as; a rule can't yet say "more than".</li>
+      <li>One read path per resource.</li>
+      <li>A fine-grained token narrower than its user's permissions: the gateway offers what the user may do, and the upstream's 403 has the last word. Nothing in GitHub's answers says what the token may do.</li>
+      <li>OpenAPI 3.0's <code>nullable</code> isn't translated to JSON Schema 2020-12 in act schemas; no field GitHub's acts use needs it.</li>
+    </ul>
+  </section>
+<script type="application/json" id="jefe824bc23a5">"# GitHub's REST API: pull requests and issues (spec/PLAN-GITHUB-PULLS.md, spec/PLAN-GITHUB-ISSUES.md).\n# Run the gateway with GATEWAY_CONNECTOR pointing here, UPSTREAM_URL=https://api.github.com,\n# UPSTREAM_SPEC at GitHub's description (github/rest-api-description, api.github.com.json),\n# and UPSTREAM_AUTH=caller, so GitHub is called as each caller, with their own token.\nprofile: github\n# Only these operations of GitHub's description are read; the rest is left out before parsing.\ninclude:\n  - pulls/list\n  - pulls/get\n  - pulls/update\n  - pulls/merge\n  - pulls/update-branch\n  - pulls/request-reviewers\n  - issues/list-for-repo\n  - issues/get\n  - issues/create\n  - issues/update\n  - issues/lock\n  - issues/unlock\n  - issues/add-labels\n  - issues/remove-label\n  - issues/add-assignees\n  - issues/remove-assignees\n  - issues/list-comments\n  - issues/get-comment\n  - issues/update-comment\n  - issues/create-comment\n  - issues/list-sub-issues\n  - issues/add-sub-issue\n  - issues/remove-sub-issue\n  - repos/get\n  - users/get-authenticated\n# Every call to GitHub names the API version it was written against.\nheaders:\n  X-GitHub-Api-Version: \"2022-11-28\"\nresources:\n  - pull.resource.yaml\n  - issue.resource.yaml\n  - repository.resource.yaml\n  - comment.resource.yaml\nreaders:\n  - pull.reader.yaml\n  - issue.reader.yaml\n  - repository.reader.yaml\n  - comment.reader.yaml\n"</script><script type="application/json" id="j5585480f8a1d">"# A pull request: read by pulls/get, a repository's listed by pulls/list.\nnoun: pull\ncollection: pulls\nread: pulls/get\nsearch: pulls/list\n# Where each variable of the read's path is, in a pull request's state.\npointers:\n  owner: /base/repo/owner/login\n  repo: /base/repo/name\n  pull_number: /number\n# The list's query parameters a search form offers; GitHub pages with Link, so page and per_page are not.\nfilters: [state, sort, direction]\ntitle: /title\n# Acts, each a projection of one of GitHub's operations.\nacts:\n  close:\n    operation: pulls/update\n    title: Close\n    description: Close it; a pull request unmerged, an issue as completed.\n    body: { state: closed }\n  reopen:\n    operation: pulls/update\n    title: Reopen\n    description: Open it again.\n    body: { state: open }\n  merge:\n    operation: pulls/merge\n    title: Merge\n    description: Merge the pull request into its base branch.\n    fields: [merge_method, commit_title, commit_message]\n    # GitHub merges only if the head is still at this sha: the head the client's view had.\n    bind: { sha: /head/sha }\n    # GitHub's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.\n    stale: 409\n    refused: 405\n  edit:\n    operation: pulls/update\n    title: Edit\n    description: Change its title or description.\n    fields: [title, body]\n  request-review:\n    operation: pulls/request-reviewers\n    title: Request a review\n    description: Ask people or teams to review the pull request.\n    fields: [reviewers, team_reviewers]\n  update-branch:\n    operation: pulls/update-branch\n    title: Update the branch\n    description: Bring the latest changes from the base branch into this one.\n    # GitHub updates the branch only if its head is still the one the client's view had.\n    bind: { expected_head_sha: /head/sha }\n    # GitHub's 422 here: the branch is already up to date, or the head moved; either way, not now, in its words.\n    refused: 422\n# Other answers the reader's rules read: the repository says whether the caller may push.\nfacts:\n  repository:\n    operation: repos/get\n    pointers:\n      owner: /base/repo/owner/login\n      repo: /base/repo/name\n"</script><script type="application/json" id="j0d8091946c97">"# A pull request says nothing about what is allowed, so the rules are written here:\n# first by its state, then by the rules below, in order, each with its reason.\nmatches:\n  path: /repos/{owner}/{repo}/pulls/{pull_number}\nallowed:\n  table: /state\n  rows:\n    open:\n      allow: [close, merge, edit, request-review, update-branch]\n      absent: { reopen: The pull request is already open. }\n    closed:\n      allow: [reopen, edit]\n      absent:\n        close: The pull request is already closed.\n        merge: \"A closed pull request can't be merged; reopen it first.\"\n        request-review: \"A closed pull request can't have reviews requested; reopen it first.\"\n        update-branch: \"A closed pull request's branch isn't updated; reopen it first.\"\n  rules:\n    # The repository's own answer says whether the caller may push (the fact named in pull.resource.yaml).\n    - when: { \"repository:/permissions/push\": false }\n      absent:\n        close: You can't push to this repository.\n        reopen: You can't push to this repository.\n        merge: You can't push to this repository.\n        edit: You can't push to this repository.\n        request-review: You can't push to this repository.\n        update-branch: You can't push to this repository.\n    - when: { /merged: true }\n      absent: { reopen: A merged pull request can't be reopened. }\n    - when: { /draft: true }\n      absent: { merge: \"A draft can't be merged; mark it ready for review first.\" }\n    # GitHub works mergeability out in the background; until it has, mergeable is null.\n    - when: { /mergeable: null }\n      absent: { merge: \"GitHub is still checking whether it can be merged; read it again shortly.\" }\n    # GitHub says behind only when the base's protection asks for up-to-date branches and names a required\n    # check; with none required, a branch behind its base is clean (seen live, 2026-10-16).\n    - when: { /mergeable_state: behind }\n      absent: { merge: \"The branch is behind its base; update it first.\" }\n    - when: { /mergeable_state: dirty }\n      absent:\n        merge: \"The branch has conflicts with its base; resolve them first.\"\n        update-branch: \"The branch has conflicts with its base; resolve them first.\"\n    - when: { /mergeable_state: blocked }\n      absent: { merge: \"Branch protection blocks the merge: a required check or review is missing.\" }\n"</script><script type="application/json" id="j07f2f42e0593">"# An issue: read by issues/get, a repository's listed by issues/list-for-repo.\nnoun: issue\ncollection: issues\nread: issues/get\nsearch: issues/list-for-repo\n# An issue names its owner and repository only in its own URL: the gateway reads the read's path variables\n# from it, and keeps them in the state as hr:address, for forms to fill their targets from.\naddress: /url\nfilters: [state, labels, assignee, creator, mentioned, milestone, sort, direction, since]\ntitle: /title\n# GitHub lists pull requests as issues too; those are the pull request resource's.\nskip:\n  /pull_request: { present: true }\n# Lists under an issue, each linked from it: its sub-issues, which are issues, so served here,\n# and its comments, which the comment resource searches by.\nlists: [issues/list-sub-issues]\nlinks: [issues/list-comments]\n# Other answers the reader's rules read: the repository's permissions for the caller, and the caller.\nfacts:\n  repository:\n    operation: repos/get\n    pointers:\n      owner: /hr:address/owner\n      repo: /hr:address/repo\n  user:\n    operation: users/get-authenticated\nacts:\n  close:\n    operation: issues/update\n    title: Close\n    description: Close it; a pull request unmerged, an issue as completed.\n    body: { state: closed, state_reason: completed }\n  close-not-planned:\n    operation: issues/update\n    title: Close as not planned\n    description: Close the issue as something that won't be done.\n    body: { state: closed, state_reason: not_planned }\n  close-duplicate:\n    operation: issues/update\n    title: Close as a duplicate\n    description: Close the issue as a duplicate of another, named by its id.\n    body: { state: closed, state_reason: duplicate }\n    fields: [duplicate_issue_id]\n  reopen:\n    operation: issues/update\n    title: Reopen\n    description: Open it again.\n    body: { state: open, state_reason: reopened }\n  edit:\n    operation: issues/update\n    title: Edit\n    description: Change its title or description.\n    fields: [title, body]\n  lock:\n    operation: issues/lock\n    title: Lock the conversation\n    description: Limit the conversation to collaborators, for a reason.\n    fields: [lock_reason]\n  unlock:\n    operation: issues/unlock\n    title: Unlock the conversation\n    description: Let everyone comment again.\n  label:\n    operation: issues/add-labels\n    title: Label\n    description: Add labels to the issue.\n    fields: [labels]\n  unlabel:\n    operation: issues/remove-label\n    title: Remove a label\n    description: Take one label off the issue, by its name.\n    # GitHub names the label in its path, /labels/{name}: the form asks for it, the gateway puts it there.\n    fields: [name]\n  assign:\n    operation: issues/add-assignees\n    title: Assign\n    description: Assign people to the issue.\n    fields: [assignees]\n  unassign:\n    operation: issues/remove-assignees\n    title: Unassign\n    description: Take people off the issue.\n    fields: [assignees]\n  set-milestone:\n    operation: issues/update\n    title: Set the milestone\n    description: Put the issue in a milestone, by its number, or take it out with null.\n    fields: [milestone]\n  comment:\n    operation: issues/create-comment\n    title: Comment\n    description: Add a comment to the issue's conversation.\n    fields: [body]\n    # GitHub answers with the new comment; the gateway answers 201, with the comment's address in Location.\n    creates: comment\n  add-sub-issue:\n    operation: issues/add-sub-issue\n    title: Add a sub-issue\n    description: Make another issue a sub-issue of this one, named by its id (not its number).\n    fields: [sub_issue_id, replace_parent]\n  remove-sub-issue:\n    operation: issues/remove-sub-issue\n    title: Remove a sub-issue\n    description: Take a sub-issue off this issue, named by its id (not its number).\n    fields: [sub_issue_id]\n"</script><script type="application/json" id="jafcab949f7df">"# An issue says nothing about what is allowed, so the rules are written here:\n# first by its state, then by the rules below, in order, each with its reason.\nmatches:\n  path: /repos/{owner}/{repo}/issues/{issue_number}\nallowed:\n  table: /state\n  rows:\n    open:\n      allow:\n        [close, close-not-planned, close-duplicate, edit, lock, unlock, label, unlabel, assign, unassign, set-milestone,\n         comment, add-sub-issue, remove-sub-issue]\n      absent: { reopen: The issue is already open. }\n    closed:\n      allow:\n        [reopen, edit, lock, unlock, label, unlabel, assign, unassign, set-milestone, comment, add-sub-issue,\n         remove-sub-issue]\n      absent:\n        close: The issue is already closed.\n        close-not-planned: The issue is already closed.\n        close-duplicate: The issue is already closed.\n  rules:\n    - when: { /locked: true }\n      absent: { lock: The conversation is already locked. }\n    - when: { /locked: false }\n      absent: { unlock: \"The conversation isn't locked.\" }\n    # Who may do what (GitHub's roles): the issue's author, or triage, closes and reopens; triage labels,\n    # assigns and sets the milestone; the author, or push, edits; push locks and unlocks.\n    - when: { /user/login: { not-same-as: \"user:/login\" }, \"repository:/permissions/triage\": false }\n      absent:\n        close: \"Only the issue's author or someone with triage access can close or reopen it.\"\n        close-not-planned: \"Only the issue's author or someone with triage access can close or reopen it.\"\n        close-duplicate: \"Only the issue's author or someone with triage access can close or reopen it.\"\n        reopen: \"Only the issue's author or someone with triage access can close or reopen it.\"\n    - when: { /user/login: { not-same-as: \"user:/login\" }, \"repository:/permissions/push\": false }\n      absent: { edit: \"Only the issue's author or someone with push access can edit it.\" }\n    - when: { \"repository:/permissions/triage\": false }\n      absent:\n        label: You need triage access to this repository.\n        unlabel: You need triage access to this repository.\n        assign: You need triage access to this repository.\n        unassign: You need triage access to this repository.\n        set-milestone: You need triage access to this repository.\n        add-sub-issue: You need triage access to this repository.\n        remove-sub-issue: You need triage access to this repository.\n    - when: { \"repository:/permissions/push\": false }\n      absent:\n        lock: You need push access to lock or unlock the conversation.\n        unlock: You need push access to lock or unlock the conversation.\n    # A locked conversation takes comments only from collaborators with push access.\n    - when: { /locked: true, \"repository:/permissions/push\": false }\n      absent: { comment: The conversation is locked; only collaborators can comment. }\n"</script><script type="application/json" id="j623ade86d77c">"# A repository: read by repos/get. It is where new issues come from: GitHub's issues/create\n# is an act the repository offers, and GitHub's answer is the new issue (spec/PLAN-GITHUB-ISSUES.md, I5).\nnoun: repository\ncollection: repos\nread: repos/get\n# Where each variable of the read's path is, in a repository's state.\npointers:\n  owner: /owner/login\n  repo: /name\nacts:\n  open-issue:\n    operation: issues/create\n    title: Open an issue\n    description: Open a new issue in this repository.\n    fields: [title, body, assignees, labels, milestone]\n    # GitHub answers with the new issue; the gateway answers 201, with the issue's address in Location.\n    creates: issue\n"</script><script type="application/json" id="j2f5050f34917">"# A repository says whether it takes issues in has_issues and archived; the rules are written here.\nmatches:\n  path: /repos/{owner}/{repo}\nallowed:\n  table: /has_issues\n  rows:\n    \"true\":\n      allow: [open-issue]\n    \"false\":\n      absent: { open-issue: Issues are turned off for this repository. }\n  rules:\n    - when: { /archived: true }\n      absent: { open-issue: The repository is archived; it takes no issues. }\n"</script><script type="application/json" id="jdec1b33f5b71">"# An issue's comment: read by issues/get-comment, an issue's listed by issues/list-comments.\nnoun: comment\ncollection: comments\nread: issues/get-comment\nsearch: issues/list-comments\n# A comment names its owner and repository only in its own URL, as an issue does.\naddress: /url\nfilters: [since]\ntitle: /body\n# The reader's rules read the repository's permissions for the caller, and the caller.\nfacts:\n  repository:\n    operation: repos/get\n    pointers:\n      owner: /hr:address/owner\n      repo: /hr:address/repo\n  user:\n    operation: users/get-authenticated\nacts:\n  edit:\n    operation: issues/update-comment\n    title: Edit\n    description: Change its title or description.\n    fields: [body]\n"</script><script type="application/json" id="j280186a01573">"# A comment has no state to choose by: its author, or anyone with push access, may edit it.\nmatches:\n  path: /repos/{owner}/{repo}/issues/comments/{comment_id}\nallowed:\n  always: [edit]\n  rules:\n    - when: { /user/login: { not-same-as: \"user:/login\" }, \"repository:/permissions/push\": false }\n      absent: { edit: \"Only the comment's author or someone with push access can edit it.\" }\n"</script>
+</main>
+</body>
+</html>

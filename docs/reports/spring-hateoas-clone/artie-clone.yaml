@@ -1,0 +1,700 @@
+---
+run:
+  inputs:
+    entry:
+      value: http://localhost:8096/employees
+      given: given
+      default: http://localhost:8097/employees
+---
+at: '2026-11-12T01:13:58.375688Z'
+ms: 62
+mode: script
+say: enter {entry}
+line: 7
+params:
+  entry: http://localhost:8096/employees
+opens: true
+exchanges:
+  - at: '2026-11-12T01:13:58.376938Z'
+    ms: 53
+    request:
+      method: GET
+      url: http://localhost:8096/employees
+      headers:
+        Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+        Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+        Cache-Control: no-cache
+        traceparent: 00-6b95d7102b814c64bb80df9c2951f186-55beca2db0c22bf9-01
+        User-Agent: ARTIE/0.5
+    response:
+      status: 200
+      headers:
+        content-type: application/prs.hal-forms+json
+        date: Thu, 12 Nov 2026 01:13:58 GMT
+        server: Jetty(12.0.16)
+        transfer-encoding: chunked
+      body:
+        _embedded:
+          employees:
+            - id: 1
+              firstName: Frodo
+              lastName: Baggins
+              role: ring bearer
+              _links:
+                self:
+                  href: http://localhost:8096/employees/1
+                employees:
+                  href: http://localhost:8096/employees
+              _templates:
+                default:
+                  method: put
+                  properties:
+                    - name: firstName
+                    - name: id
+                    - name: lastName
+                    - name: role
+                deleteEmployee:
+                  method: delete
+                  properties: []
+            - id: 2
+              firstName: Bilbo
+              lastName: Baggins
+              role: burglar
+              _links:
+                self:
+                  href: http://localhost:8096/employees/2
+                employees:
+                  href: http://localhost:8096/employees
+              _templates:
+                default:
+                  method: put
+                  properties:
+                    - name: firstName
+                    - name: id
+                    - name: lastName
+                    - name: role
+                deleteEmployee:
+                  method: delete
+                  properties: []
+        _links:
+          self:
+            href: http://localhost:8096/employees
+        _templates:
+          default:
+            method: post
+            properties:
+              - name: firstName
+              - name: id
+              - name: lastName
+              - name: role
+outcome: done
+address: http://localhost:8096/employees
+now:
+  state: {}
+  forms:
+    - default
+  links:
+    self:
+      - null
+  embedded:
+    employees:
+      - title: null
+        state:
+          id: 1
+          firstName: Frodo
+          lastName: Baggins
+          role: ring bearer
+      - title: null
+        state:
+          id: 2
+          firstName: Bilbo
+          lastName: Baggins
+          role: burglar
+keeps:
+  /_embedded/employees/0/firstName:
+    - 4
+  /_embedded/employees/0/lastName:
+    - 4
+  /_embedded/employees/1/lastName:
+    - 4
+  /_embedded/employees/0/role:
+    - 4
+---
+at: '2026-11-12T01:13:58.443075Z'
+ms: 34
+mode: script
+say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
+line: 9
+within: 7
+params:
+  relation: default
+  firstName: Samwise
+  lastName: Gamgee
+  role: gardener
+values:
+  firstName:
+    value: Samwise
+    from:
+      - constant
+  lastName:
+    value: Gamgee
+    from:
+      - constant
+  role:
+    value: gardener
+    from:
+      - constant
+chose:
+  kind: form
+  relation: default
+  method: POST
+  target: http://localhost:8096/employees
+  address: http://localhost:8096/employees
+  picked: relation
+  not sent:
+    - id
+guard:
+  rung: L0
+  act: sha256-Azo4o82ytZAublfQFfn3HD1j96psV5EuhdPBnjZc5jU=
+exchanges:
+  - at: '2026-11-12T01:13:58.473249Z'
+    ms: 2
+    request:
+      method: POST
+      url: http://localhost:8096/employees
+      headers:
+        Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+        Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+        Content-Type: application/json
+        If-Match: ''
+        traceparent: 00-6b95d7102b814c64bb80df9c2951f186-68a223462683984d-01
+        User-Agent: ARTIE/0.5
+      body:
+        firstName: Samwise
+        lastName: Gamgee
+        role: gardener
+    response:
+      status: 204
+      headers:
+        date: Thu, 12 Nov 2026 01:13:58 GMT
+        location: http://localhost:8096/employees/3
+        server: Jetty(12.0.16)
+  - at: '2026-11-12T01:13:58.475768Z'
+    ms: 1
+    request:
+      method: GET
+      url: http://localhost:8096/employees
+      headers:
+        Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+        Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+        Cache-Control: no-cache
+        traceparent: 00-6b95d7102b814c64bb80df9c2951f186-8706f743822fea90-01
+        User-Agent: ARTIE/0.5
+    response:
+      status: 200
+      headers:
+        content-type: application/prs.hal-forms+json
+        date: Thu, 12 Nov 2026 01:13:58 GMT
+        server: Jetty(12.0.16)
+        transfer-encoding: chunked
+      body:
+        _embedded:
+          employees:
+            - id: 1
+              firstName: Frodo
+              lastName: Baggins
+              role: ring bearer
+              _links:
+                self:
+                  href: http://localhost:8096/employees/1
+                employees:
+                  href: http://localhost:8096/employees
+              _templates:
+                default:
+                  method: put
+                  properties:
+                    - name: firstName
+                    - name: id
+                    - name: lastName
+                    - name: role
+                deleteEmployee:
+                  method: delete
+                  properties: []
+            - id: 2
+              firstName: Bilbo
+              lastName: Baggins
+              role: burglar
+              _links:
+                self:
+                  href: http://localhost:8096/employees/2
+                employees:
+                  href: http://localhost:8096/employees
+              _templates:
+                default:
+                  method: put
+                  properties:
+                    - name: firstName
+                    - name: id
+                    - name: lastName
+                    - name: role
+                deleteEmployee:
+                  method: delete
+                  properties: []
+            - id: 3
+              firstName: Samwise
+              lastName: Gamgee
+              role: gardener
+              _links:
+                self:
+                  href: http://localhost:8096/employees/3
+                employees:
+                  href: http://localhost:8096/employees
+              _templates:
+                default:
+                  method: put
+                  properties:
+                    - name: firstName
+                    - name: id
+                    - name: lastName
+                    - name: role
+                deleteEmployee:
+                  method: delete
+                  properties: []
+        _links:
+          self:
+            href: http://localhost:8096/employees
+        _templates:
+          default:
+            method: post
+            properties:
+              - name: firstName
+              - name: id
+              - name: lastName
+              - name: role
+offered:
+  forms:
+    - default
+  links:
+    - self
+outcome: done
+address: http://localhost:8096/employees
+now:
+  state: {}
+  forms:
+    - default
+  links:
+    self:
+      - null
+  embedded:
+    employees:
+      - title: null
+        state:
+          id: 1
+          firstName: Frodo
+          lastName: Baggins
+          role: ring bearer
+      - title: null
+        state:
+          id: 2
+          firstName: Bilbo
+          lastName: Baggins
+          role: burglar
+      - title: null
+        state:
+          id: 3
+          firstName: Samwise
+          lastName: Gamgee
+          role: gardener
+keeps:
+  /_embedded/employees/0/firstName:
+    - 4
+  /_embedded/employees/0/lastName:
+    - 4
+  /_embedded/employees/1/lastName:
+    - 4
+---
+at: '2026-11-12T01:13:58.479794Z'
+ms: 1
+mode: script
+say: follow {relation}
+line: 11
+within: 7
+params:
+  relation: employees
+opens: true
+chose:
+  kind: link
+  relation: employees
+  method: GET
+  target: http://localhost:8096/employees/1
+  address: http://localhost:8096/employees/1
+  picked: relation
+exchanges:
+  - at: '2026-11-12T01:13:58.479995Z'
+    ms: 1
+    request:
+      method: GET
+      url: http://localhost:8096/employees/1
+      headers:
+        Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+        Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+        Cache-Control: no-cache
+        traceparent: 00-6b95d7102b814c64bb80df9c2951f186-515b8165db84e96b-01
+        User-Agent: ARTIE/0.5
+    response:
+      status: 200
+      headers:
+        content-type: application/prs.hal-forms+json
+        date: Thu, 12 Nov 2026 01:13:58 GMT
+        server: Jetty(12.0.16)
+        transfer-encoding: chunked
+      body:
+        id: 1
+        firstName: Frodo
+        lastName: Baggins
+        role: ring bearer
+        _links:
+          self:
+            href: http://localhost:8096/employees/1
+          employees:
+            href: http://localhost:8096/employees
+        _templates:
+          default:
+            method: put
+            properties:
+              - name: firstName
+              - name: id
+              - name: lastName
+              - name: role
+          deleteEmployee:
+            method: delete
+            properties: []
+offered:
+  forms:
+    - default
+  links:
+    - self
+outcome: done
+address: http://localhost:8096/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer
+  forms:
+    - default
+    - deleteEmployee
+  links:
+    self:
+      - null
+    employees:
+      - null
+keeps:
+  /firstName:
+    - 4
+  /lastName:
+    - 4
+---
+at: '2026-11-12T01:13:58.482406Z'
+ms: 3
+mode: script
+say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
+line: 13
+within: 11
+params:
+  relation: default
+  firstName: Frodo
+  lastName: Baggins
+  role: ring bearer, retired
+values:
+  firstName:
+    value: Frodo
+    from:
+      - step: 1
+        pointer: /_embedded/employees/0/firstName
+      - step: 2
+        pointer: /_embedded/employees/0/firstName
+      - step: 3
+        pointer: /firstName
+  lastName:
+    value: Baggins
+    from:
+      - step: 1
+        pointer: /_embedded/employees/0/lastName
+      - step: 1
+        pointer: /_embedded/employees/1/lastName
+      - step: 2
+        pointer: /_embedded/employees/0/lastName
+      - step: 2
+        pointer: /_embedded/employees/1/lastName
+      - step: 3
+        pointer: /lastName
+  role:
+    value: ring bearer, retired
+    from:
+      - parts:
+          ring bearer:
+            step: 1
+            pointer: /_embedded/employees/0/role
+chose:
+  kind: form
+  relation: default
+  method: PUT
+  target: http://localhost:8096/employees/1
+  address: http://localhost:8096/employees/1
+  picked: relation
+  not sent:
+    - id
+guard:
+  rung: L0
+  act: sha256-0lEQdDgT6z5R23jm4qTtAJ3u58fMwAz//4/CN3xvmmE=
+exchanges:
+  - at: '2026-11-12T01:13:58.482804Z'
+    ms: 1
+    request:
+      method: PUT
+      url: http://localhost:8096/employees/1
+      headers:
+        Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+        Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+        Content-Type: application/json
+        If-Match: ''
+        traceparent: 00-6b95d7102b814c64bb80df9c2951f186-77a785a6f47e66aa-01
+        User-Agent: ARTIE/0.5
+      body:
+        firstName: Frodo
+        lastName: Baggins
+        role: ring bearer, retired
+    response:
+      status: 204
+      headers:
+        date: Thu, 12 Nov 2026 01:13:58 GMT
+        location: http://localhost:8096/employees/1
+        server: Jetty(12.0.16)
+  - at: '2026-11-12T01:13:58.484894Z'
+    ms: 1
+    request:
+      method: GET
+      url: http://localhost:8096/employees/1
+      headers:
+        Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+        Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+        Cache-Control: no-cache
+        traceparent: 00-6b95d7102b814c64bb80df9c2951f186-13a0c2db17de39a3-01
+        User-Agent: ARTIE/0.5
+    response:
+      status: 200
+      headers:
+        content-type: application/prs.hal-forms+json
+        date: Thu, 12 Nov 2026 01:13:58 GMT
+        server: Jetty(12.0.16)
+        transfer-encoding: chunked
+      body:
+        id: 1
+        firstName: Frodo
+        lastName: Baggins
+        role: ring bearer, retired
+        _links:
+          self:
+            href: http://localhost:8096/employees/1
+          employees:
+            href: http://localhost:8096/employees
+        _templates:
+          default:
+            method: put
+            properties:
+              - name: firstName
+              - name: id
+              - name: lastName
+              - name: role
+          deleteEmployee:
+            method: delete
+            properties: []
+offered:
+  forms:
+    - default
+    - deleteEmployee
+  links:
+    - employees
+    - self
+outcome: done
+address: http://localhost:8096/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer, retired
+  forms:
+    - default
+    - deleteEmployee
+  links:
+    self:
+      - null
+    employees:
+      - null
+---
+at: '2026-11-12T01:13:58.488223Z'
+ms: 1
+mode: script
+say: act {relation}
+line: 15
+within: 11
+params:
+  relation: deleteEmployee
+chose:
+  kind: form
+  relation: deleteEmployee
+  method: DELETE
+  target: http://localhost:8096/employees/1
+  address: http://localhost:8096/employees/1
+  picked: relation
+guard:
+  rung: L0
+  act: sha256-iVBIYGe/MYW1yMb5DgJh6je+8uECmBDM1BlO+uX/IQ4=
+exchanges:
+  - at: '2026-11-12T01:13:58.488701Z'
+    ms: 1
+    request:
+      method: DELETE
+      url: http://localhost:8096/employees/1
+      headers:
+        Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+        Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+        If-Match: ''
+        traceparent: 00-6b95d7102b814c64bb80df9c2951f186-91049162a0b0e4db-01
+        User-Agent: ARTIE/0.5
+    response:
+      status: 204
+      headers:
+        date: Thu, 12 Nov 2026 01:13:58 GMT
+        server: Jetty(12.0.16)
+offered:
+  forms:
+    - default
+    - deleteEmployee
+  links:
+    - employees
+    - self
+outcome: done
+address: http://localhost:8096/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer, retired
+  forms:
+    - default
+    - deleteEmployee
+  links:
+    self:
+      - null
+    employees:
+      - null
+---
+at: '2026-11-12T01:13:58.490575Z'
+ms: 1
+mode: script
+say: return to {address}
+line: 11
+within: 7
+params:
+  address: http://localhost:8096/employees
+exchanges:
+  - at: '2026-11-12T01:13:58.490809Z'
+    ms: 1
+    request:
+      method: GET
+      url: http://localhost:8096/employees
+      headers:
+        Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+        Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+        Cache-Control: no-cache
+        traceparent: 00-6b95d7102b814c64bb80df9c2951f186-96fa6ef0a7d73bba-01
+        User-Agent: ARTIE/0.5
+    response:
+      status: 200
+      headers:
+        content-type: application/prs.hal-forms+json
+        date: Thu, 12 Nov 2026 01:13:58 GMT
+        server: Jetty(12.0.16)
+        transfer-encoding: chunked
+      body:
+        _embedded:
+          employees:
+            - id: 2
+              firstName: Bilbo
+              lastName: Baggins
+              role: burglar
+              _links:
+                self:
+                  href: http://localhost:8096/employees/2
+                employees:
+                  href: http://localhost:8096/employees
+              _templates:
+                default:
+                  method: put
+                  properties:
+                    - name: firstName
+                    - name: id
+                    - name: lastName
+                    - name: role
+                deleteEmployee:
+                  method: delete
+                  properties: []
+            - id: 3
+              firstName: Samwise
+              lastName: Gamgee
+              role: gardener
+              _links:
+                self:
+                  href: http://localhost:8096/employees/3
+                employees:
+                  href: http://localhost:8096/employees
+              _templates:
+                default:
+                  method: put
+                  properties:
+                    - name: firstName
+                    - name: id
+                    - name: lastName
+                    - name: role
+                deleteEmployee:
+                  method: delete
+                  properties: []
+        _links:
+          self:
+            href: http://localhost:8096/employees
+        _templates:
+          default:
+            method: post
+            properties:
+              - name: firstName
+              - name: id
+              - name: lastName
+              - name: role
+outcome: done
+address: http://localhost:8096/employees
+now:
+  state: {}
+  forms:
+    - default
+  links:
+    self:
+      - null
+  embedded:
+    employees:
+      - title: null
+        state:
+          id: 2
+          firstName: Bilbo
+          lastName: Baggins
+          role: burglar
+      - title: null
+        state:
+          id: 3
+          firstName: Samwise
+          lastName: Gamgee
+          role: gardener

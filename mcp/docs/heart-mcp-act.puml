@@ -1,0 +1,53 @@
+@startuml heart-mcp-act
+title One act through heart-mcp: water bed 2 with 250 ml
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam sequenceMessageAlign left
+autonumber
+
+participant "Model\n(in Claude Code)" as model
+participant "heart-mcp" as mcp
+participant "ARTIE" as artie
+participant "Garden server" as garden
+database "Postgres" as db
+
+== Look first ==
+model -> mcp : heart_look(service: "garden"), then heart_follow to bed 2
+mcp -> artie : enter bookmark, follow link
+artie -> garden : GET bed 2 (HAL), GET its forms
+garden --> artie : state + ETag, offered acts + schemas
+artie -> artie : hold representation and ETag
+mcp --> model : state, acts (water-cell + schema), links\nno URLs, no ETag
+
+== Act ==
+model -> mcp : heart_act(act: "garden:water-cell",\nfields: {milliliters: 250})
+mcp -> mcp : check held copy:\nact offered? fields fit schema?
+alt act not offered, or fields break the schema
+  mcp --> model : rejected-before-sending\n(nothing sent)
+else checks pass
+  mcp -> artie : act
+  artie -> garden : POST water-cell\nIf-Match: ETag the model saw
+  alt 200
+    garden -> db : append WaterApplied row
+    garden --> artie : new state, new acts
+    mcp --> model : acted\n(water no longer offered)
+  else 412 someone changed the bed first
+    garden --> artie : precondition failed
+    artie -> garden : GET bed again
+    mcp --> model : stale, fresh state\n(act never resent)
+  else 409 act no longer legal
+    artie -> garden : GET bed again
+    mcp --> model : not-offered, fresh state
+  else 422 rule-refused
+    garden --> artie : "at most 600 ml now"
+    mcp --> model : rule-refused, in the bed's words
+  else 422 invalid input
+    mcp --> model : invalid-input, with violations
+  end
+end
+
+note over model, artie
+  The model only chooses.
+  heart-mcp checks the choice. ARTIE builds every request.
+end note
+@enduml

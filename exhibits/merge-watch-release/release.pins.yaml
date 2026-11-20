@@ -1,0 +1,64 @@
+# What /Users/josh/repos/artie/exhibits/merge-watch-release/release.heart.yaml was recorded against, from /Users/josh/repos/artie/exhibits/merge-watch-release/release.capture.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its
+# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
+# one offered in a set not recorded for it.
+rung: L2
+digest: sha256-qKM7TXJvTtzvI3H416WCa/y5oYK6wvYch4GhbwCLhKc=
+forms:
+  scm:pulls-get:
+    integrity: sha256-h02WjR7vd61a3clH1/805IIXM3O8OwspKt3KHwUP7/s=
+    act: sha256-0vjYAyfZzEdAjZBvXTUMge5qmujg/1tlkot9bnCWtaI=
+    method: GET
+    sets:
+      - sha256-gImH34GdmXPjwBtQ7RNGKro/Tbf26SFredj/E+jK13c=
+  watcher:watch:
+    integrity: sha256-vfjsEUQ7/+mWV478GxTnnHzzo8rZLb+s3eHW4KJhRFw=
+    act: sha256-BQiZ8TwYquT9Wgp2yiw4eEIqY3c9/0IwgvhuCvV1KHg=
+    method: POST
+    sets:
+      - sha256-T8prIv6TSqXSB9HdposRpsV8AYFUzfYEqiUvr32dX10=
+  scm:merge:
+    integrity: sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pweUa6ioBBwF8=
+    act: sha256-s8/h0c399Nx7AL340i09iHi9+s/nSZ9R+q5MfjgiYUY=
+    method: PUT
+    sets:
+      - sha256-ARE/YVgALeTnzANV8TegQJiue3vljZt3onMex+jMsvs=
+  ci:build:
+    integrity: sha256-xo3vNZ/YJwDkXNstjxyOUmQHZdWN8PojyD9Ub3KzHGQ=
+    act: sha256-9MVTORRjzrcFoMzlwiQWRmnUPVD+jk4sNjjyGG2m4fI=
+    method: POST
+    sets:
+      - sha256-Uv4wXjFFrnajvow8ez6LM8naU0uFYIKuRdyKs4IQA3A=
+  library:search-loans:
+    integrity: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+    act: sha256-Z7N30vs6QUGs1xK2hP+w1F0UgY7gyXs1+HawMkOt274=
+    method: GET
+    sets:
+      - sha256-OO1MlqifBoCG+V9lYByf83cmOoCUf75taO/frDYwjWE=
+  library:renew:
+    integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+    act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    method: POST
+    sets:
+      - sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU=
+  library:report-problem:
+    integrity: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+    act: sha256-Z+8E81vIjCh35uyOKsoSwVMDm2eCmJBVEcbO6oI3uD8=
+    method: POST
+    sets:
+      - sha256-04lPGu1h4kV3Ra9udmDg1UCTzHfqn47zOSXw6TDIKOQ=
+  env:get-environment:
+    integrity: sha256-UWb+xXKngRFe8ibTwO9SrpSUYNPBbji/5JjlwpAEKfQ=
+    act: sha256-myRjFFxsNF8ai44N4fdXgWOPGB3uRptbwrCqaA8yp6s=
+    method: GET
+    sets:
+      - sha256-sy8+OSs554Ilw4WUAs9A0ywntG59u2PLanv0jt/pId4=
+  env:promote:
+    integrity: sha256-TwXThZ20UPUIctrpRXRoHqarKKsEilvB0sVwvK1PY4s=
+    act: sha256-uhGb8WNCB9bBSTcSnGDncK5OOgbvor2iNrT+IZvrEFA=
+    method: POST
+    sets:
+      - sha256-Uk7KIVDEyuxx08fE2x1gvp0hjkFhpH/7gyFyP7k3Vb8=
+links:
+  hr:in-reply-to: ''
+  item: ''

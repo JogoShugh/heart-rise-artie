@@ -1,0 +1,206 @@
+---
+run:
+  inputs: {}
+---
+at: '2026-11-02T10:05:31.289847Z'
+ms: 44
+mode: script
+say: enter {entry}
+line: 6
+params:
+  entry: http://localhost:8099/
+opens: true
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-Ieyh8GdyoS25Y/kOerY4oxsQIYDt+fAgRoKfUM2I9jA=
+      digest: sha256-rhKdQAdpQo2kd4lTvmwTclTfEwT4JvNvNzHHm8RcQmU=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-02T10:05:31.338698Z'
+ms: 35
+mode: script
+say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
+intent: Hire Samwise Gamgee as a gardener
+line: 7
+within: 6
+params:
+  relation: staff:hire
+  firstName: Samwise
+  lastName: Gamgee
+  role: gardener
+values:
+  firstName:
+    value: Samwise
+    type: string
+    from:
+      - constant
+  lastName:
+    value: Gamgee
+    type: string
+    from:
+      - constant
+  role:
+    value: gardener
+    type: string
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: staff:hire
+  title: Hire an employee
+  method: POST
+  target: http://localhost:8099/actions/hire
+  address: http://localhost:8099/actions/hire
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+  if-match: '"index-hsf-f5e32bdb058defb4"'
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: new resource
+address: http://localhost:8099/employees/3
+now:
+  state:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+keeps:
+  /firstName:
+    - 4
+  /lastName:
+    - 4
+  /role:
+    - 4
+---
+at: '2026-11-02T10:05:31.376718Z'
+ms: 3
+mode: script
+say: return to {address}
+line: 12
+within: 7
+params:
+  address: http://localhost:8099/employees/3
+outcome: done
+address: http://localhost:8099/employees/3
+now:
+  state:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T10:05:31.381386Z'
+ms: 1
+mode: script
+say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
+intent: Change his role to "gardener, mayor"
+line: 13
+within: 7
+params:
+  relation: staff:update
+  firstName: Samwise
+  lastName: Gamgee
+  role: gardener, mayor
+values:
+  firstName:
+    value: Samwise
+    type: string
+    from:
+      - step: 2
+        pointer: /firstName
+  lastName:
+    value: Gamgee
+    type: string
+    from:
+      - step: 2
+        pointer: /lastName
+  role:
+    value: gardener, mayor
+    type: string
+    from:
+      - parts:
+          gardener:
+            step: 2
+            pointer: /role
+chose:
+  kind: form
+  relation: staff:update
+  title: Update the employee
+  method: PUT
+  target: /employees/{id}/actions/update
+  address: http://localhost:8099/employees/3/actions/update
+  picked: relation
+  not sent:
+    - reason
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/65c3d1a823c1b6a4
+    integrity: sha256-ZcPRqCPBtqQCg2hP1qwqHMEDnHPQx7W7qFd9NBcN6U0=
+  form: sha256-Ieyh8GdyoS25Y/kOerY4oxsQIYDt+fAgRoKfUM2I9jA=
+  schema:
+    href: http://localhost:8099/schemas/de4fbaae70e3e4d8
+    integrity: sha256-3k+6rnDj5NjWT9H0JeJeHH0965mMAk7TwxsqEkmfSvY=
+  if-match: '"seq-1.hsf.L2.4a8a1d510bf96285"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: refused
+address: http://localhost:8099/employees/3
+refused:
+  kind: invalid input
+  by: the client
+  detail: reason is required

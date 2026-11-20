@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>progress · HEART identifiers</title><link rel="stylesheet" href="../../style.css"></head>
+<body><main><span class="kind">Link relation</span>
+<h1>progress</h1>
+<p><code>https://w3id.org/heart-rise/rels/progress</code></p>
+<p>On a reply, while it awaits: report how far the work has got. A PATCH of the reply itself, application/merge-patch+json, with If-Match the reply&#x27;s ETag, signed (RFC 9421, with Content-Digest). Minimum schema: state, the const awaiting; percent, an integer from 0 to 100; note, a string or null, where a note left out stays and null clears it; _links with hr:in-reply-to. 200 with the reply; 401 unsigned or badly signed; 409 not offered once the reply is answered, or link-conflict for another request; 412 stale; 422 invalid. Each progress is a change and is recorded in the reply&#x27;s version-history. Written as the CURIE hr:progress.</p>
+<h2>Defined in</h2><ul><li><a href="https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-core/src/test/resources/features/reply.feature">https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-core/src/test/resources/features/reply.feature</a></li></ul>
+<footer>HEART identifiers, built from <code>standards/identifiers.json</code>. Index: <a href="../../">https://w3id.org/heart-rise</a></footer>
+</main></body></html>

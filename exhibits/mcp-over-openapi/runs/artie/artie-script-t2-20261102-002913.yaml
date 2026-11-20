@@ -1,0 +1,190 @@
+---
+run:
+  inputs:
+    entry:
+      value: http://localhost:8099/
+      given: default
+      default: http://localhost:8099/
+---
+at: '2026-11-02T05:29:15.803771Z'
+ms: 79
+mode: script
+say: enter {entry}
+line: 4
+params:
+  entry: http://localhost:8099/
+opens: true
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-02T05:29:15.887244Z'
+ms: 28
+mode: script
+say: act {relation}, name {name}
+line: 5
+within: 4
+params:
+  relation: staff:search-employees
+  name: Frodo
+values:
+  name:
+    value: Frodo
+    type: string
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: staff:search-employees
+  title: Find employees by name
+  method: GET
+  target: /employees{?name}
+  address: http://localhost:8099/employees?name=Frodo
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8099/employees?name=Frodo
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Frodo Baggins
+---
+at: '2026-11-02T05:29:15.918374Z'
+ms: 8
+mode: script
+say: follow {relation}, titled {title}
+line: 6
+within: 5
+params:
+  relation: item
+  title: Frodo Baggins
+values:
+  title:
+    value: Frodo Baggins
+    from:
+      - constant
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: Frodo Baggins
+  method: GET
+  target: http://localhost:8099/employees/1
+  address: http://localhost:8099/employees/1
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T05:29:15.930330Z'
+ms: 4
+mode: script
+say: return to {address}
+line: 6
+within: 5
+params:
+  address: http://localhost:8099/employees?name=Frodo
+outcome: done
+address: http://localhost:8099/employees?name=Frodo
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Frodo Baggins
+---
+at: '2026-11-02T05:29:15.934780Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 5
+within: 4
+params:
+  address: http://localhost:8099/
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null

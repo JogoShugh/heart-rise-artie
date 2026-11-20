@@ -1,0 +1,275 @@
+---
+run:
+  inputs:
+    owner:
+      value: JogoShugh
+      given: given
+      question: Whose repository?
+    repo:
+      value: heart-github-test
+      given: default
+      default: heart-github-test
+      question: Which repository?
+  usage:
+    calls: 0
+    input: 0
+    output: 0
+    cache_read: 0
+    cache_write: 0
+---
+at: '2026-10-27T21:33:32.069968Z'
+ms: 189
+mode: script
+say: enter {entry}
+line: 11
+params:
+  entry: https://localhost:8392/
+opens: true
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-27T21:33:32.264341Z'
+ms: 329
+mode: script
+say: act {relation}, owner {owner}, repo {repo}
+intent: get repository JogoShugh/heart-github-test
+line: 12
+within: 11
+params:
+  relation: github:repos-get
+  owner: JogoShugh
+  repo: heart-github-test
+values:
+  owner:
+    value: JogoShugh
+    type: string
+    from:
+      - input: owner
+  repo:
+    value: heart-github-test
+    type: string
+    from:
+      - input: repo
+opens: true
+chose:
+  kind: form
+  relation: github:repos-get
+  title: Get a repository
+  method: GET
+  target: /repos/{owner}/{repo}
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test
+now:
+  state:
+    id: 1422841381
+    node_id: R_kgDOVM7WJQ
+    name: heart-github-test
+    full_name: JogoShugh/heart-github-test
+    private: false
+    description: null
+    fork: false
+    created_at: '2026-10-17T01:37:34Z'
+    updated_at: '2026-10-23T11:55:40Z'
+    pushed_at: '2026-10-27T21:33:07Z'
+    homepage: null
+    size: 232
+    stargazers_count: 0
+    watchers_count: 0
+    language: null
+    has_issues: true
+    has_projects: true
+    has_downloads: false
+    has_wiki: true
+    has_pages: false
+    has_discussions: false
+    forks_count: 0
+    mirror_url: null
+    archived: false
+    disabled: false
+    open_issues_count: 164
+    license: null
+    allow_forking: true
+    is_template: false
+    web_commit_signoff_required: false
+    has_pull_requests: true
+    pull_request_creation_policy: all
+    topics: []
+    visibility: public
+    forks: 0
+    open_issues: 164
+    watchers: 0
+    default_branch: main
+    permissions:
+      admin: true
+      maintain: true
+      push: true
+      triage: true
+      pull: true
+    allow_squash_merge: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_auto_merge: true
+    delete_branch_on_merge: false
+    allow_update_branch: false
+    use_squash_pr_title_as_default: false
+    squash_merge_commit_message: COMMIT_MESSAGES
+    squash_merge_commit_title: COMMIT_OR_PR_TITLE
+    merge_commit_message: PR_TITLE
+    merge_commit_title: MERGE_MESSAGE
+    security_and_analysis:
+      secret_scanning:
+        status: enabled
+      secret_scanning_push_protection:
+        status: enabled
+      dependabot_security_updates:
+        status: disabled
+      secret_scanning_non_provider_patterns:
+        status: disabled
+      secret_scanning_validity_checks:
+        status: disabled
+    network_count: 0
+    subscribers_count: 0
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+  forms:
+    - github:open-issue
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:repos-list-branches:
+      - null
+    alternate:
+      - null
+    github:forks:
+      - null
+    github:keys:
+      - null
+    github:collaborators:
+      - null
+    github:teams:
+      - null
+    github:hooks:
+      - null
+    github:issue-events:
+      - null
+    github:events:
+      - null
+    github:assignees:
+      - null
+    github:branches:
+      - null
+    github:tags:
+      - null
+    github:blobs:
+      - null
+    github:git-tags:
+      - null
+    github:git-refs:
+      - null
+    github:trees:
+      - null
+    github:statuses:
+      - null
+    github:languages:
+      - null
+    github:stargazers:
+      - null
+    github:contributors:
+      - null
+    github:subscribers:
+      - null
+    github:subscription:
+      - null
+    github:commits:
+      - null
+    github:git-commits:
+      - null
+    github:comments:
+      - null
+    github:issue-comment:
+      - null
+    github:contents:
+      - null
+    github:compare:
+      - null
+    github:merges:
+      - null
+    github:archive:
+      - null
+    github:downloads:
+      - null
+    github:issues:
+      - null
+    github:pulls:
+      - null
+    github:milestones:
+      - null
+    github:notifications:
+      - null
+    github:labels:
+      - null
+    github:releases:
+      - null
+    github:deployments:
+      - null
+    github:git:
+      - null
+    github:ssh:
+      - null
+    github:clone:
+      - null
+    github:svn:
+      - null
+  embedded:
+    github:owner:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false

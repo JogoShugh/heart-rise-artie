@@ -1,0 +1,72 @@
+diff --git a/exhibits/mcp-over-openapi/artie/t1.kept.heart.yaml b/exhibits/mcp-over-openapi/artie/t1.kept.heart.yaml
+index 66c1646..f968b14 100644
+--- a/exhibits/mcp-over-openapi/artie/t1.kept.heart.yaml
++++ b/exhibits/mcp-over-openapi/artie/t1.kept.heart.yaml
+@@ -11,7 +11,7 @@ steps:
+     fields:
+       firstName: Samwise
+       lastName: Gamgee
+-      role: gardener
++      position: gardener
+     intent: Hire Samwise Gamgee as a gardener
+     then:
+       - sync: true
+@@ -19,7 +19,7 @@ steps:
+         fields:
+           firstName: Samwise
+           lastName: Gamgee
+-          role: gardener, mayor
++          position: gardener, mayor
+         intent: Change his role to "gardener, mayor"
+         then: []
+   - act: staff:search-employees
+diff --git a/exhibits/mcp-over-openapi/artie/t1.kept.pins.yaml b/exhibits/mcp-over-openapi/artie/t1.kept.pins.yaml
+index 01e6f2e..9c0be58 100644
+--- a/exhibits/mcp-over-openapi/artie/t1.kept.pins.yaml
++++ b/exhibits/mcp-over-openapi/artie/t1.kept.pins.yaml
+@@ -5,14 +5,15 @@ rung: L2
+ digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+ forms:
+   staff:hire:
+-    integrity: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
++    integrity: sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=
+     method: POST
+     sets: []
+   staff:update:
+-    integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
++    integrity: sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
+     method: PUT
+     sets:
+       - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
++      - sha256-ela8MpSsfC3GERfq+rm0Ti5a4+/nWyO/8GG5LJtCGw4=
+   staff:search-employees:
+     integrity: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+     method: GET
+diff --git a/exhibits/mcp-over-openapi/artie/t3.kept.heart.yaml b/exhibits/mcp-over-openapi/artie/t3.kept.heart.yaml
+index 9476059..21134f2 100644
+--- a/exhibits/mcp-over-openapi/artie/t3.kept.heart.yaml
++++ b/exhibits/mcp-over-openapi/artie/t3.kept.heart.yaml
+@@ -26,6 +26,6 @@ steps:
+                   fields:
+                     firstName: Frodo
+                     lastName: Baggins
+-                    role: ${state.role}, retired
++                    position: ${state.role}, retired
+                   intent: Add ", retired" to the end of his current role, keeping the rest of it as it is
+                   then: []
+diff --git a/exhibits/mcp-over-openapi/artie/t3.kept.pins.yaml b/exhibits/mcp-over-openapi/artie/t3.kept.pins.yaml
+index b224892..4ad2e59 100644
+--- a/exhibits/mcp-over-openapi/artie/t3.kept.pins.yaml
++++ b/exhibits/mcp-over-openapi/artie/t3.kept.pins.yaml
+@@ -9,9 +9,10 @@ forms:
+     method: GET
+     sets: []
+   staff:update:
+-    integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
++    integrity: sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
+     method: PUT
+     sets:
+       - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
++      - sha256-ela8MpSsfC3GERfq+rm0Ti5a4+/nWyO/8GG5LJtCGw4=
+ links:
+   item: ''

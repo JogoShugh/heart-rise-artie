@@ -1,0 +1,91 @@
+{
+  "name": "what-carries",
+  "title": "What Lets HAL-FORMS Carry the Release",
+  "part": "HAL-FORMS",
+  "kicker": "Three things the parties do in HAL-FORMS",
+  "tone": "light",
+  "number": 15,
+  "of": 19,
+  "html": "<h2>What Lets HAL-FORMS Carry the Release</h2>\n<div class=\"cast6\" style=\"grid-template-columns: repeat(3, minmax(0, 1fr))\">\n  <div><b>Named by relation</b><code>scm:merge</code><span>Every template is keyed by the act's relation, as a form is in HAL Schema Forms. One vocabulary for both dialects.</span></div>\n  <div><b>Lookups as link templates</b><code>scm:pulls-get</code><span><code>/repos/{owner}/{repo}/pulls/{pull_number}</code>: a HAL-FORMS target can't hold variables; ARTIE fills the link template as a GET form.</span></div>\n  <div><b>Choices filled in</b><code>library:report-problem</code><span>The problem kinds live inside another resource; the server lists them in the template.</span></div>\n</div>\n<p class=\"lead\">The watcher, the CI wrapper over Jenkins, the preview, Dev and the smoke script: unchanged.</p>\n<p class=\"refs\"><deck-ref name=\"scm\"></deck-ref> <deck-ref name=\"hypertext\"></deck-ref></p>\n",
+  "say": "Three things make HAL-FORMS carry the whole release. One: every template is named by its relation, the same names as in HAL Schema Forms, so one vocabulary serves both. Two: a HAL-FORMS target can't hold variables, so a lookup like get pull request comes as a link template, and ARTIE fills it like a GET form. Three: where an act's choices live inside another resource, like the library's problem kinds, the server fills them into the template, since HAL-FORMS can't point inside a document. The smoke script, the watcher, Jenkins, Dev: all unchanged.",
+  "sources": [
+    {
+      "label": "SPEC §6, HAL-FORMS templates keyed by relation",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "what-carries.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "drift.json",
+      "title": "When the Server Changes a Form"
+    },
+    "next": {
+      "href": "gaps.json",
+      "title": "What HAL-FORMS Doesn't Carry Today"
+    },
+    "alternate": {
+      "href": "what-carries.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "scm",
+        "kind": "part",
+        "label": "scm:",
+        "title": "scm: one set of typed relations, two forges",
+        "summary": "scm:merge, scm:comment, scm:close and the rest: relation names defined by meaning, not by one server's endpoints. GitHub and GitLab both answer to them, so a kept script runs on either.",
+        "cite": "heart-gateway connectors",
+        "_links": {
+          "self": {
+            "href": "../refs/scm.json",
+            "title": "scm:"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors",
+            "title": "heart-gateway connectors"
+          }
+        }
+      },
+      {
+        "name": "hypertext",
+        "kind": "comment",
+        "label": "HYPERTEXT",
+        "title": "What hypertext means",
+        "summary": "His definition: information and controls, presented together. Machines can follow links too.",
+        "quote": "<p>“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions. Hypermedia is just an expansion on what text means to include temporal anchors within a media stream; most researchers have dropped the distinction.</p><p>Hypertext does not need to be HTML on a browser. Machines can follow links when they understand the data format and relationship types.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/hypertext.json",
+            "title": "HYPERTEXT"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-718",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      }
+    ]
+  }
+}

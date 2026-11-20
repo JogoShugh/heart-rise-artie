@@ -1,0 +1,55 @@
+{
+  "name": "sync-reason-act",
+  "title": "Sync, Reason, Act, on the Wire",
+  "part": "The goal",
+  "kicker": "One line of the goal, played over pull request 501 as the forge served it",
+  "tone": "light",
+  "number": 4,
+  "of": 19,
+  "html": "<h2>Sync, Reason, Act, on the Wire</h2>\n<div class=\"sra\">\n  <div class=\"pic-two\">\n    <pre class=\"offer\">GET /repos/acme/web/pulls/501   200 application/hal+json\n{\n  \"number\": 501,\n  \"state\": \"open\",\n  \"merged\": false,\n  \"_forms\": {\n    \"scm:close\": { … },\n    \"scm:merge\": { \"method\": \"PUT\",\n      \"schema\": { \"method\": { \"enum\": [\"merge\", \"squash\", \"rebase\"] } },\n      \"hr:integrity\": \"sha256-sGUdrPfH…\" },\n    \"scm:comment\": { … }, \"scm:label\": { … }, \"scm:edit\": { … },\n    \"scm:request-review\": { … }, \"scm:update-branch\": { … }\n  }\n}</pre>\n    <ol class=\"lsteps\">\n      <li><b>Sync</b> read 501 and its seven offers</li>\n      <li><b>Reason</b> walk: Claude picks <code>scm:merge</code>, squash · replay: the pin holds</li>\n      <li><b>Act</b> <code>PUT …/actions/merge {\"method\": \"squash\"}</code>, 200</li>\n      <li><b>Sync</b> merged; <code>scm:merge</code> no longer offered</li>\n    </ol>\n  </div>\n</div>\n",
+  "say": "Zoom into one line of the goal: merge it by squashing. Sync: ARTIE gets pull request 501 and reads what it is and what it offers, seven forms, each with its hash. Reason: on the walk, Claude reads the goal's words against those seven and picks scm:merge, method squash, because I said by squashing. Act: fill the form the server offered, send it to its target. And sync again: the answer is the next state. Merged, closed, and scm:merge is gone; you can't merge twice because nobody offers it. Now flip to the replay: the reason step is a pin snapping shut. No model.",
+  "sources": [
+    {
+      "label": "The run's trace, pull request 501",
+      "href": "../merge-watch-two-dialects/runs/hsf/pr-501.html"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "sync-reason-act.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "activity.json",
+      "title": "The Goal Becomes an Activity"
+    },
+    "next": {
+      "href": "map.json",
+      "title": "The Release as a Map of Resources"
+    },
+    "alternate": {
+      "href": "sync-reason-act.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ],
+    "deck:code": {
+      "href": "../code/scenes.js",
+      "type": "text/javascript",
+      "title": "Plays sync, reason and act over the representation, walked and replayed",
+      "integrity": "sha256-IZzksm3SQJ1xfjWn+9TB93ISP/A9AJRjuo6PZAioe40="
+    }
+  }
+}

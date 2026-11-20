@@ -1,0 +1,71 @@
+[
+  {
+    "request": {
+      "method": "GET",
+      "url": "/",
+      "authorized": true,
+      "ifMatch": null,
+      "ifNoneMatch": null,
+      "preferred": null,
+      "body": ""
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache",
+        "content-length": "938",
+        "content-type": "application/prs.hal-forms+json",
+        "etag": "\"index-hf-33f2f1e16236a9dc\"",
+        "link": "<https://w3id.org/heart-rise/hal-forms>; rel=\"profile\", <https://w3id.org/heart-rise>; rel=\"profile\", </openapi.json>; rel=\"service-desc\"; type=\"application/vnd.oai.openapi+json;version=3.1\"",
+        "vary": "Accept, Accept-Profile"
+      },
+      "body": "{\"title\":\"Garden beds\",\"_links\":{\"self\":{\"href\":\"/\"},\"service-desc\":{\"href\":\"/openapi.json\",\"type\":\"application/vnd.oai.openapi+json;version=3.1\"}},\"_templates\":{\"searchBeds\":{\"title\":\"Find beds by name\",\"method\":\"GET\",\"target\":\"/beds\",\"properties\":[{\"name\":\"name\",\"type\":\"search\",\"required\":true,\"minLength\":1,\"prompt\":\"Part of the bed's name; case is ignored\"}]},\"getBed\":{\"title\":\"Get a bed by its id\",\"method\":\"GET\",\"target\":\"/beds\",\"properties\":[{\"name\":\"id\",\"type\":\"number\",\"required\":true,\"min\":1,\"prompt\":\"Bed id\"}]},\"buildBed\":{\"title\":\"Build a bed\",\"method\":\"POST\",\"contentType\":\"application/json\",\"target\":\"/actions/build-bed\",\"properties\":[{\"name\":\"label\",\"prompt\":\"Name\",\"required\":true,\"type\":\"text\",\"minLength\":1,\"regex\":\"[\\\\s\\\\S]*\\\\S[\\\\s\\\\S]*\"},{\"name\":\"widthFt\",\"prompt\":\"Width\",\"required\":true,\"type\":\"number\",\"min\":1,\"max\":100},{\"name\":\"lengthFt\",\"prompt\":\"Length\",\"required\":true,\"type\":\"number\",\"min\":1,\"max\":100}]}}}"
+    }
+  },
+  {
+    "request": {
+      "method": "GET",
+      "url": "/beds?id=2",
+      "authorized": true,
+      "ifMatch": null,
+      "ifNoneMatch": null,
+      "preferred": null,
+      "body": ""
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache",
+        "content-length": "297",
+        "content-type": "application/prs.hal-forms+json",
+        "etag": "\"page.hf.4d97eb19f7851906\"",
+        "link": "<https://w3id.org/heart-rise/hal-forms>; rel=\"profile\", <https://w3id.org/heart-rise>; rel=\"profile\"",
+        "vary": "Accept, Accept-Profile"
+      },
+      "body": "{\"count\":1,\"_links\":{\"self\":{\"href\":\"/beds?id=2\"},\"item\":[{\"href\":\"/beds/2\",\"title\":\"bed-2\"}]},\"_embedded\":{\"item\":[{\"id\":2,\"label\":\"bed-2\",\"widthFt\":4,\"lengthFt\":8,\"status\":\"PLANTED\",\"cropName\":\"tomato\",\"growthPoints\":80,\"moistureLevel\":40,\"_links\":{\"self\":{\"href\":\"/beds/2\",\"title\":\"bed-2\"}}}]}}"
+    }
+  },
+  {
+    "request": {
+      "method": "GET",
+      "url": "/beds/2",
+      "authorized": true,
+      "ifMatch": null,
+      "ifNoneMatch": null,
+      "preferred": null,
+      "body": ""
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache",
+        "content-length": "417",
+        "content-type": "application/prs.hal-forms+json",
+        "etag": "\"seq-3.hf.L0.08de52df5625f248\"",
+        "link": "<https://w3id.org/heart-rise/hal-forms>; rel=\"profile\", <https://w3id.org/heart-rise>; rel=\"profile\"",
+        "vary": "Accept, Accept-Profile"
+      },
+      "body": "{\"id\":2,\"label\":\"bed-2\",\"widthFt\":4,\"lengthFt\":8,\"status\":\"PLANTED\",\"cropName\":\"tomato\",\"growthPoints\":80,\"moistureLevel\":40,\"_links\":{\"self\":{\"href\":\"/beds/2\"}},\"_templates\":{\"waterCell\":{\"title\":\"Water the bed\",\"method\":\"POST\",\"contentType\":\"application/json\",\"target\":\"/beds/2/actions/water-cell\",\"properties\":[{\"name\":\"milliliters\",\"prompt\":\"Water per cell\",\"required\":true,\"type\":\"number\",\"min\":1,\"max\":1000}]}}}"
+    }
+  }
+]

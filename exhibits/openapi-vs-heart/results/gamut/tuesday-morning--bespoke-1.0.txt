@@ -1,0 +1,71 @@
+Failures:
+
+1) Scenario: After the frost, a frozen bed shows it is frozen # features/garden-care.feature:33
+   ✔ Before # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:16
+   ✔ Given the garden is at its seed state # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:25
+   ✔ Given a hard frost has hit the garden # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:29
+   ✔ When the operator opens bed 2 # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:37
+   ✖ Then bed 2's status reads frozen # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:60
+       AssertionError [ERR_ASSERTION]: the status reads "undefined"
+           at World.<anonymous> (file:///Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:62:12)
+
+2) Scenario: After the frost, a frozen bed offers thaw, and not water # features/garden-care.feature:39
+   ✔ Before # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:16
+   ✔ Given the garden is at its seed state # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:25
+   ✔ Given a hard frost has hit the garden # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:29
+   ✔ When the operator opens bed 2 # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:37
+   ✖ Then bed 2 shows exactly the buttons "Thaw the bed" # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:51
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+       + actual - expected
+
+         [
+       +   'Water the bed'
+       -   'Thaw the bed'
+         ]
+           + expected - actual
+
+            [
+           -  "Water the bed"
+           +  "Thaw the bed"
+            ]
+
+           at World.<anonymous> (file:///Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:53:12)
+           at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+3) Scenario: Thawing a frozen bed lets it be watered again # features/garden-care.feature:45
+   ✔ Before # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:16
+   ✔ Given the garden is at its seed state # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:25
+   ✔ Given a hard frost has hit the garden # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:29
+   ✔ When the operator opens bed 2 # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:37
+   ✖ And the operator presses "Thaw the bed" on bed 2 # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:41
+       Error: no "Thaw the bed" button; the bed shows Water the bed
+           at Object.press (file:///Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/pages.mjs:29:22)
+           at World.<anonymous> (file:///Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:42:34)
+   - Then bed 2 shows exactly the buttons "Water the bed" # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:51
+   - And the dashboard sent nothing the garden refused # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:65
+
+4) Scenario: Every button a frozen bed shows is one the garden accepts # features/garden-care.feature:53
+   ✔ Before # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:16
+   ✔ Given the garden is at its seed state # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:25
+   ✔ Given a hard frost has hit the garden # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:29
+   ✔ When the operator opens bed 2 # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:37
+   ✔ And the operator presses every button bed 2 shows # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:45
+   ✖ Then the dashboard sent nothing the garden refused # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:65
+       AssertionError [ERR_ASSERTION]: requests the garden refused
+           + expected - actual
+
+           -[
+           -  {
+           -    "method": "POST"
+           -    "path": "/beds/2/actions/water-cell"
+           -    "status": 409
+           -  }
+           -]
+           +[]
+
+           at World.<anonymous> (file:///Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:67:12)
+           at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+7 scenarios (4 failed, 3 passed)
+34 steps (4 failed, 2 skipped, 28 passed)
+0m01.402s (executing steps: 0m01.387s)

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Smoke Script, Found by Link · Claude and Git Hooks, Together · 3.0</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Steps 5 and 6 · ci:build, then ci:smoke-test</span></header>
+<h2>The Smoke Script, Found by Link</h2>
+<div class="split">
+  <div class="rows">
+    <div><h3>Jenkins Tells the CI Service</h3><p>Its notification plugin posts each build event; the CI service answers ARTIE’s reply, signed, linking the build.</p></div>
+    <div><h3>The Build Links What It Made</h3><p><code>ci:deployment</code>: where it runs. <code>ci:smoke-test</code>: the scenarios it shipped with.</p></div>
+    <div><h3>ARTIE Follows, Then Runs</h3><p>Neither address is in the script. Both came in the answer.</p></div>
+    <p class="refs"><a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc">RISE</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">NO-FIXED-URIS</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-753">FOLLOW-NOSE</a></p>
+  </div>
+  <div class="card dark" style="align-self: center">
+    <span class="label">From the kept script</span>
+    <pre style="margin: .4rem 0 0; white-space: pre-wrap; font-size: .9rem">- enter: ${jenkins}
+  steps:
+    - ask: ci:build
+      fields:
+        commit: ${merged.merge_commit_sha}
+      reply: build
+- once-answered:
+    reply: build
+    steps:
+      - follow: hr:in-reply-to
+        then:
+          - run-script: ci:smoke-test
+            on-link: ci:deployment
+            as: smoke</pre>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/watcher.html" rel="prev"><small>Back</small><b>The Watcher: Tell Me When It Offers Merge</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#smoke-by-link">with heart-ts</a></span>
+<a href="deck/dev-or-comment.html" rel="next"><small>Next</small><b>Promoted to Dev, or Told Why</b></a></nav>
+</main></div></body></html>

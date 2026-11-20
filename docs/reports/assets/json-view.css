@@ -1,0 +1,22 @@
+/* The JSON viewer (json-view.js): collapsed boxes, line diffs, unchanged runs folded behind buttons. */
+/* A column of boxes. */
+.stack { display: grid; gap: 0.5rem; min-width: 0; }
+details.jv { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 0.45rem 0.75rem; min-width: 0; }
+details.jv > summary { cursor: pointer; font-size: 0.9rem; }
+details.jv[open] > summary { margin-bottom: 0.5rem; }
+.jv-body { display: grid; gap: 0.35rem; min-width: 0; }
+.jv-label { margin: 0; font: 500 0.75rem var(--mono); color: var(--muted); white-space: pre; }
+.jv-doc { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 6px; padding: 0.5rem 0.6rem;
+  font: 0.78rem/1.45 var(--mono); }
+.jv-doc .ln { display: block; white-space: pre; }
+.jv-doc .ln.add { background: color-mix(in srgb, var(--leaf) 16%, transparent); }
+.jv-doc .ln.del { background: color-mix(in srgb, var(--gate) 16%, transparent); }
+.jv-doc .ln.note { color: var(--muted); }
+.jv-gap, .jv-full { font: 500 0.75rem var(--mono); color: var(--muted); background: none; border: 1px dashed var(--rule);
+  border-radius: 4px; padding: 0.1rem 0.5rem; margin: 0.15rem 0; cursor: pointer; }
+.jv-gap { display: block; }
+.jv-gap:hover, .jv-full:hover { color: var(--fg); border-style: solid; }
+.jv-tools { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+.jv-full[disabled] { opacity: 0.5; cursor: default; }
+.jv-req { margin: 0 0 0.35rem; font-size: 0.82rem; overflow-x: auto; white-space: nowrap; }
+.jv-req .who { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.4rem; }

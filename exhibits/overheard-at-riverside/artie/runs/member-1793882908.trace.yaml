@@ -1,0 +1,514 @@
+---
+run:
+  inputs:
+    member:
+      value: Ana Torres
+      given: given
+---
+at: '2026-11-05T12:48:28.710124Z'
+ms: 52
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8140/
+opens: true
+outcome: done
+address: http://localhost:8140/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        library:get-account:
+          - sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
+        library:get-loan:
+          - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
+        library:get-member:
+          - sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+        library:search-loans:
+          - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+        library:search-members:
+          - sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=
+      digest: sha256-viVvUdXDJxsJSdeEfpXwMcaD/BvyU7VOTC/AOkeeKRA=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-05T12:48:28.769755Z'
+ms: 47
+mode: script
+say: act {relation}, name {name}
+inferred: search accounts for the member named Ana Torres
+fromIntent: Find the account of the member named Ana Torres
+params:
+  relation: library:search-accounts
+  name: Ana Torres
+values:
+  name:
+    value: Ana Torres
+    type: string
+    from:
+      - input: member
+opens: true
+chose:
+  kind: form
+  relation: library:search-accounts
+  title: Find accounts by name
+  method: GET
+  target: /accounts{?name}
+  address: http://localhost:8140/accounts?name=Ana%20Torres
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+  act: sha256-84l87SPLMqthzrommJhIneB8EYxHzlgOWdoIBhaXsFM=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8140/accounts?name=Ana+Torres
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Ana Torres
+---
+at: '2026-11-05T12:48:28.819075Z'
+ms: 4
+mode: script
+say: follow {relation}, titled {title}
+intent: Find the account of the member named Ana Torres
+params:
+  relation: item
+  title: Ana Torres
+values:
+  title:
+    value: Ana Torres
+    from:
+      - input: member
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: Ana Torres
+  method: GET
+  target: http://localhost:8140/accounts/21000451
+  address: http://localhost:8140/accounts/21000451
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/accounts/21000451
+now:
+  state:
+    id: 21000451
+    name: Ana Torres
+    booksOut: 3
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Hobbit
+      - Matilda
+      - Charlotte's Web
+---
+at: '2026-11-05T12:48:28.825282Z'
+ms: 6
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: The Hobbit
+values:
+  title:
+    value: The Hobbit
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: The Hobbit
+  method: GET
+  target: http://localhost:8140/loans/3310
+  address: http://localhost:8140/loans/3310
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3310
+now:
+  state:
+    id: 3310
+    title: The Hobbit
+    author: J. R. R. Tolkien
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T12:48:28.833579Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts/21000451
+outcome: done
+address: http://localhost:8140/accounts/21000451
+now:
+  state:
+    id: 21000451
+    name: Ana Torres
+    booksOut: 3
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Hobbit
+      - Matilda
+      - Charlotte's Web
+---
+at: '2026-11-05T12:48:28.836745Z'
+ms: 3
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Matilda
+values:
+  title:
+    value: Matilda
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Matilda
+  method: GET
+  target: http://localhost:8140/loans/3311
+  address: http://localhost:8140/loans/3311
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-11-12'
+    renewals: 0
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T12:48:28.841580Z'
+ms: 4
+mode: script
+say: act {relation}
+inferred: renew this book (Matilda)
+fromIntent: 'For each book they have out: renew it if renewing is offered; otherwise say why it can''t be renewed'
+params:
+  relation: library:renew
+opens: true
+chose:
+  kind: form
+  relation: library:renew
+  title: Renew
+  method: POST
+  target: /loans/{id}/actions/renew
+  address: http://localhost:8140/loans/3311/actions/renew
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8140/affordance-sets/292caa98b3e91085
+    integrity: sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU=
+  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+  schema:
+    href: http://localhost:8140/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.2629c3eaec56fcf7"'
+  checked: lenient
+  warning: 'the set holding library:renew changed: pinned sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=, offered sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU='
+  held: form
+offered:
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8140/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T12:48:28.846493Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/loans/3311
+outcome: done
+address: http://localhost:8140/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T12:48:28.848892Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts/21000451
+outcome: done
+address: http://localhost:8140/accounts/21000451
+now:
+  state:
+    id: 21000451
+    name: Ana Torres
+    booksOut: 3
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Hobbit
+      - Matilda
+      - Charlotte's Web
+---
+at: '2026-11-05T12:48:28.851276Z'
+ms: 3
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Charlotte's Web
+values:
+  title:
+    value: Charlotte's Web
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Charlotte's Web
+  method: GET
+  target: http://localhost:8140/loans/3312
+  address: http://localhost:8140/loans/3312
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3312
+now:
+  state:
+    id: 3312
+    title: Charlotte's Web
+    author: E. B. White
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T12:48:28.855749Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts/21000451
+outcome: done
+address: http://localhost:8140/accounts/21000451
+now:
+  state:
+    id: 21000451
+    name: Ana Torres
+    booksOut: 3
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Hobbit
+      - Matilda
+      - Charlotte's Web
+---
+at: '2026-11-05T12:48:28.858353Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts?name=Ana+Torres
+outcome: done
+address: http://localhost:8140/accounts?name=Ana+Torres
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Ana Torres
+---
+at: '2026-11-05T12:48:28.860135Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/
+outcome: done
+address: http://localhost:8140/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        library:get-account:
+          - sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
+        library:get-loan:
+          - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
+        library:get-member:
+          - sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+        library:search-loans:
+          - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+        library:search-members:
+          - sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=
+      digest: sha256-viVvUdXDJxsJSdeEfpXwMcaD/BvyU7VOTC/AOkeeKRA=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+  links:
+    self:
+      - null
+    service-desc:
+      - null

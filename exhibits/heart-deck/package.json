@@ -1,0 +1,8 @@
+{
+  "name": "heart-deck",
+  "private": true,
+  "type": "module",
+  "description": "Builds a deck as static HEART resources, and the page that reads them with heart-ts. Shared by every deck under exhibits/.",
+  "bin": { "heart-deck": "build.mjs" },
+  "devDependencies": { "esbuild": "0.28.2", "yaml": "2.6.1" }
+}

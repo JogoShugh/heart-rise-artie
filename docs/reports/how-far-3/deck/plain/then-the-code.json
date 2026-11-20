@@ -1,0 +1,17 @@
+{
+  "name": "then-the-code",
+  "title": "Then the Code, Then Green",
+  "part": "One behavior, start to finish",
+  "kicker": "The smallest change that makes the table pass",
+  "tone": "light",
+  "number": 10,
+  "of": 30,
+  "html": "<h2>Then the Code, Then Green</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 7fr) minmax(0, 5fr)\">\n  <div class=\"card dark\">\n    <pre style=\"margin: 0; white-space: pre-wrap; font-size: .9rem\">data class LibraryPolicy(\n    val renewalWeeks: Long = DEFAULT_RENEWAL_WEEKS,\n) {\n    companion object {\n        const val DEFAULT_RENEWAL_WEEKS = 3L\n\n        fun of(text: String): LibraryPolicy {\n            val read = Properties().apply { load(text.reader()) }\n            return LibraryPolicy(\n                renewalWeeks = read.getProperty(\"renewal.weeks\")\n                    ?.trim()?.toLong() ?: DEFAULT_RENEWAL_WEEKS,\n            )\n        }\n    }\n}</pre>\n  </div>\n  <div class=\"rows\">\n    <div><h3>One Rule</h3><p><code>renewal.weeks</code>, read from the library’s policy file. Left out: three weeks.</p></div>\n    <div><h3>A Renewal Uses It</h3><p>The due date moves by the policy’s weeks.</p></div>\n    <div><h3>Green, Logged</h3><p>All four rows pass, through the runner.</p></div>\n    <p class=\"refs\"><deck-ref name=\"repeatability\"></deck-ref> <deck-fragment name=\"policy\">LibraryPolicy.kt</deck-fragment></p>\n  </div>\n</div>\n",
+  "say": "Only now does the code change, and the hook lets it, because a feature file changed first. Here's the heart of it, from the real commit. A policy, read from a properties file, with one rule: renewal.weeks. If the file leaves it out, three weeks. And a renewal now moves the due date by however many weeks the policy says. That's it. Then the suite runs again, through the runner, and all four rows pass. Green, logged.",
+  "sources": [
+    {
+      "label": "LibraryPolicy.kt",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/LibraryPolicy.kt"
+    }
+  ]
+}

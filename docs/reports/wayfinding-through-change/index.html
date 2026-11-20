@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wayfinding Through Change</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Our Own Controls' column and palette, for the same series: leaf green for right, amber for a note, red for wrong. */
+:root {
+  --bg: #f5f6f3; --surface: #ffffff; --fg: #1b211c; --muted: #58625a; --rule: #d6dcd4;
+  --leaf: #2f7d32; --leaf-bg: #e3f1e2; --hold: #9a5b00; --hold-bg: #fbf1df; --link: #2f5f8f; --code-bg: #eaeee8;
+  --bad: #b3261e; --bad-bg: #fbe4e1; --comment: #6b7a6d;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+    --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+    --bad: #f2a19a; --bad-bg: #3a1d1a; --comment: #8a9a8c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+  --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+  --bad: #f2a19a; --bad-bg: #3a1d1a; --comment: #8a9a8c;
+  color-scheme: dark;
+}
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.7 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--bg); border-bottom: 1px solid var(--rule); }
+.top-in { max-width: 48rem; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-block: 0.55rem; }
+.eyebrow { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.theme { flex: none; font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.theme:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+main { max-width: 48rem; margin: 0 auto; padding-block: 2.5rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.4rem; }
+h1, h2 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.3rem, 7vw, 3.3rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.45rem; margin-top: 1.3rem; }
+h3 { font: 600 1rem/1.4 var(--body); margin: 0; }
+p, li { max-width: 70ch; }
+p { margin: 0; }
+.dek { font-family: var(--display); font-weight: 500; font-size: 1.22rem; line-height: 1.5; color: var(--muted); margin-top: -0.5rem; }
+a { color: var(--link); text-underline-offset: 2px; }
+ul, ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 0.4rem; }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.9rem 1rem; font: 0.78rem/1.6 var(--mono); max-height: 32rem; }
+pre code { background: none; padding: 0; font-size: 1em; overflow-wrap: normal; }
+pre .c { color: var(--comment); font-style: italic; }
+pre .hl { background: var(--hold-bg); color: var(--hold); border-radius: 3px; padding: 0 0.15em; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 36rem; font-size: 0.9rem; line-height: 1.5; }
+th, td { text-align: left; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--rule); vertical-align: top; font-variant-numeric: tabular-nums; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tbody th { font-weight: 600; }
+td.num { text-align: right; white-space: nowrap; }
+.ok { color: var(--leaf); font-weight: 600; }
+.bad { color: var(--bad); font-weight: 600; }
+.mid { color: var(--hold); font-weight: 600; }
+.short { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 1rem 1.2rem; }
+.short ul { gap: 0.55rem; }
+.note { font-size: 0.9rem; color: var(--muted); }
+/* The run-by-run grid: one cell per run, right or wrong, and the model's input tokens for it. */
+table.grid { min-width: 40rem; font-size: 0.8rem; }
+table.grid th, table.grid td { padding: 0.4rem 0.35rem; text-align: center; }
+table.grid tbody th { text-align: left; white-space: nowrap; padding-left: 0.8rem; font-size: 0.85rem; }
+table.grid thead .phase th { text-transform: none; letter-spacing: 0; font-size: 0.78rem; color: var(--fg); border-bottom: 0; padding-bottom: 0; }
+table.grid td span { display: block; border-radius: 6px; padding: 0.3rem 0.1rem; font-family: var(--mono); line-height: 1.3; }
+table.grid td span b { display: block; font-family: var(--body); font-size: 0.95rem; }
+table.grid td.y span { background: var(--leaf-bg); color: var(--leaf); }
+table.grid td.n span { background: var(--bad-bg); color: var(--bad); }
+table.grid td.y.t span { box-shadow: inset 0 0 0 1.5px var(--hold); }
+table.grid .split { border-left: 2px solid var(--rule); }
+details.src { border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+details.src > summary { cursor: pointer; padding: 0.7rem 1rem; list-style: none; font: 600 0.93rem/1.4 var(--body); color: var(--link); }
+details.src > summary::-webkit-details-marker { display: none; }
+details.src > summary::before { content: "+"; display: inline-block; width: 1.2rem; font-family: var(--mono); }
+details.src[open] > summary::before { content: "−"; }
+details.src > summary small { font-weight: 400; color: var(--muted); margin-left: 0.3rem; }
+details.src .in { padding: 0 1rem 1rem; display: grid; gap: 0.7rem; min-width: 0; }
+details.src .in > ul { font-size: 0.92rem; line-height: 1.55; }
+.file { font: 500 0.78rem var(--mono); color: var(--muted); margin-bottom: -0.35rem; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.8rem; }
+.pair > div { display: grid; gap: 0.5rem; align-content: start; min-width: 0; }
+.diagram { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.6rem; overflow-x: auto; }
+.diagram pre.mermaid { background: none; padding: 0; margin: 0; max-height: none; font: 0.85rem/1.4 var(--body); text-align: center; }
+ol.notes { font-size: 0.88rem; line-height: 1.5; gap: 0.25rem; color: var(--muted); }
+ol.notes b { color: var(--fg); }
+.scale { display: grid; gap: 0.7rem; }
+.scale .headline { font-family: var(--display); font-size: 1.15rem; line-height: 1.45; }
+.scale .table-scroll { background: var(--bg); }
+.scale tr.us th, .scale tr.us td { background: var(--leaf-bg); color: var(--leaf); font-weight: 600; }
+.stack { display: grid; gap: 0.6rem; }
+footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; display: grid; gap: 0.4rem; }
+footer ul { gap: 0.2rem; }
+</style>
+</head>
+<body>
+
+<div class="top"><div class="top-in">
+  <span class="eyebrow">HEART · employees service · 3 November 2026</span>
+  <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
+</div></div>
+
+<main>
+  <h1>Wayfinding Through Change</h1>
+  <p class="dek">One business process, run again and again while the service changes under it. Two architectures: a bag of endpoints, where a model writes code against operations, and hypermedia, where a client follows the controls the server offers. Two places for the model: in the middle of every run, or at the edges, to find the way once and to repair after a change.</p>
+
+  <div class="short frame">
+    <h2 style="margin-top:0">The work this is about</h2>
+    <ul>
+      <li><b>Work done in bulk, again and again:</b> the same business process over many records, every day, for months.</li>
+      <li><b>Its shape can be found up front.</b> One exploratory run with the model finds the way: which links, which forms, which values. Records in different states take different paths, but a few known ones, not a new one each time.</li>
+      <li><b>Inference spent once, to make the work deterministic.</b> The way is kept and run with no model, held to the server's controls. The model comes back only at the edges: where the service changed, or a record is in a state not met before.</li>
+      <li><b>Not infinite novelty.</b> Tasks that are new in every run are another matter; there, a model in the middle of every run earns its keep.</li>
+    </ul>
+  </div>
+
+  <div class="short scale">
+    <h2 style="margin-top:0">At scale: 100 to 1,000,000 runs</h2>
+    <p class="headline">At 1,000,000 runs, every run right: <b>ARTIE, 46,864 input tokens</b>; <b>a harness running ARTIE, code mode only when ARTIE fails, 56,366</b>; code mode with ARTIE as its tool, 3.08 billion; code mode alone, 7.95 to 32.8 billion. Saved code mode, the fewest tokens of the code: <b>12 runs right, 0.0012%</b>.</p>
+    <h3>Input tokens</h3>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Client</th><th>Right of 20, measured</th><th>20 runs, measured</th><th>100 runs</th><th>1,000 runs</th><th>100,000 runs</th><th>1,000,000 runs</th></tr></thead>
+      <tbody>
+        <tr class="us"><th>ARTIE as data</th><td>20 (100%)</td><td>46,864</td><td>46,864</td><td>46,864</td><td>46,864</td><td>46,864</td></tr>
+        <tr class="us"><th>A harness running ARTIE, code mode when it fails</th><td>20 (100%)</td><td>56,366</td><td>56,366</td><td>56,366</td><td>56,366</td><td>56,366</td></tr>
+        <tr><th>Code mode with ARTIE as its tool</th><td>20 (100%)</td><td>107,607</td><td>354,235</td><td>3.13 million</td><td>308 million</td><td>3.08 billion</td></tr>
+        <tr><th>Code mode, fresh (endpoints)</th><td>20 (100%)</td><td>158,995</td><td>794,975</td><td>7.9 million</td><td>795 million</td><td>7.95 billion</td></tr>
+        <tr><th>Code mode, keeping skills (endpoints)</th><td>20 (100%)</td><td>188,747</td><td>845,282</td><td>8.23 million</td><td>821 million</td><td>8.21 billion</td></tr>
+        <tr><th>Code mode on HEART, HAL-FORMS alone</th><td>20 (100%)</td><td>316,303</td><td>1.6 million</td><td>15.8 million</td><td>1.58 billion</td><td>15.8 billion</td></tr>
+        <tr><th>Code mode on HEART, as it answers</th><td>20 (100%)</td><td>456,893</td><td>2.3 million</td><td>22.8 million</td><td>2.28 billion</td><td>22.8 billion</td></tr>
+        <tr><th>Code mode on HEART, HSF</th><td><span class="bad">19 (95%)</span></td><td>460,370</td><td>2.3 million</td><td>23.0 million</td><td>2.30 billion</td><td>23.0 billion</td></tr>
+        <tr><th>Code mode on HEART, L2, 16 turns</th><td>20 (100%)</td><td>656,688</td><td>3.3 million</td><td>32.8 million</td><td>3.28 billion</td><td>32.8 billion</td></tr>
+        <tr><th>Code mode, saved</th><td><span class="bad">12 (60%)</span></td><td>16,004</td><td>16,004</td><td>16,004</td><td>16,004</td><td>16,004</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Runs right</h3>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Client</th><th>At 100</th><th>At 1,000</th><th>At 100,000</th><th>At 1,000,000</th><th>Tokens per right run at 1,000,000, averaged</th></tr></thead>
+      <tbody>
+        <tr class="us"><th>ARTIE as data</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>0.05</td></tr>
+        <tr class="us"><th>A harness running ARTIE, code mode when it fails</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>0.06</td></tr>
+        <tr><th>Code mode with ARTIE as its tool</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>3,083</td></tr>
+        <tr><th>Code mode, fresh (endpoints)</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>7,950</td></tr>
+        <tr><th>Code mode, keeping skills (endpoints)</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>8,207</td></tr>
+        <tr><th>Code mode on HEART, HAL-FORMS alone</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>15,815</td></tr>
+        <tr><th>Code mode on HEART, as it answers</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>22,845</td></tr>
+        <tr><th>Code mode on HEART, HSF</th><td><span class="bad">95 (95%)</span></td><td><span class="bad">950 (95%)</span></td><td><span class="bad">95,000 (95%)</span></td><td><span class="bad">950,000 (95%)</span></td><td>24,230</td></tr>
+        <tr><th>Code mode on HEART, L2, 16 turns</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>32,834</td></tr>
+        <tr><th>Code mode, saved</th><td><span class="bad">12 (12%)</span></td><td><span class="bad">12 (1.2%)</span></td><td><span class="bad">12 (0.012%)</span></td><td><span class="bad">12 (0.0012%)</span></td><td>1,334</td></tr>
+      </tbody>
+    </table></div>
+    <h3>At 1,000,000 runs</h3>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Client</th><th>Input, priced with the cache</th><th>Model calls</th><th>Sandbox start time</th><th>Hosted sandbox price</th></tr></thead>
+      <tbody>
+        <tr class="us"><th>ARTIE as data</th><td>18,115</td><td>20</td><td>none</td><td>none</td></tr>
+        <tr class="us"><th>A harness running ARTIE, code mode when it fails</th><td>21,849</td><td>25</td><td>none</td><td>none</td></tr>
+        <tr><th>Code mode with ARTIE as its tool</th><td>590 million</td><td>2.0 million</td><td>none: no code a model wrote</td><td>none</td></tr>
+        <tr><th>Code mode, fresh (endpoints)</th><td>1.76 billion</td><td>4.95 million</td><td>260 hours</td><td>$153</td></tr>
+        <tr><th>Code mode, keeping skills (endpoints)</th><td>1.81 billion</td><td>3.8 million</td><td>190 hours</td><td>$141</td></tr>
+        <tr><th>Code mode on HEART, HAL-FORMS alone</th><td>6.19 billion</td><td>6.5 million</td><td>365 hours</td><td>$255</td></tr>
+        <tr><th>Code mode on HEART, as it answers</th><td>8.49 billion</td><td>6.3 million</td><td>352 hours</td><td>$290</td></tr>
+        <tr><th>Code mode on HEART, HSF</th><td>8.94 billion</td><td>7.0 million</td><td>398 hours</td><td>$338</td></tr>
+        <tr><th>Code mode on HEART, L2, 16 turns</th><td>11.15 billion</td><td>8.5 million</td><td>507 hours</td><td>$439</td></tr>
+        <tr><th>Code mode, saved</th><td>2,717</td><td>10</td><td>198 hours</td><td>$20</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="note">
+      <li>Projected from the measured runs, not run: the same two tasks, and one release in the period, as here.</li>
+      <li>Code mode finds its way in every run, so its measured cost per run is paid each time. Keeping skills and with ARTIE as its tool, it still reads the task and chooses each run: the 20 measured, then each further run at their quiet runs' mean, with no teammate and no release (8,207 and 3,083).</li>
+      <li>The harness running ARTIE calls no model in a quiet run: code mode was called in the first run of each task, to give ARTIE the goal, and ARTIE's own reasoner once per kept script at the release. Like ARTIE alone, it adds about 4.4k per release, not per run.</li>
+      <li>ARTIE pays once: its wayfinding (one goal run per task, 42,483) and the first run after the release (4,381: three steps repaired, then kept). Every other run uses no model. A further release that changes a form the scripts use adds its repair once, in the first run after it: here about 4.4k per release, not per run. With such a release every 1,000 runs, ARTIE would take about 4.4 million at 1,000,000 runs.</li>
+      <li>Right runs: each client's measured rate, held. Saved code mode is right only before the release (6 runs per task, as here) and wrong, silently, in every run after it: 12 at any count. HSF's 1 miss in 20 was a lost update: about 50,000 in 1,000,000.</li>
+      <li>Tokens per right run is an average: ARTIE spends its tokens in its first runs and in the first run after the release, and none in the others.</li>
+      <li>Priced with the cache: cache reads at a tenth of the input price and cache writes at 1.25, as these runs used them.</li>
+      <li>Sandbox, measured here: a locked-down container starts in 0.255 s against 0.018 s for the same program with none, about 0.24 s more for each program; code mode ran 3 to 8 programs a run. Published: a Firecracker microVM boots in about 125 ms with under 5 MiB of overhead (<a href="https://northflank.com/blog/what-is-aws-firecracker">Northflank</a>); one benchmark puts Docker starts at 180 to 450 ms (<a href="https://dev.to/adwitiya/how-i-built-sandboxes-that-boot-in-28ms-using-firecracker-snapshots-i0k">dev.to</a>). Hosted price at <a href="https://e2b.dev/pricing">E2B's</a> per-second rates ($0.000014 a vCPU, $0.0000045 a GiB), for 1 vCPU and 256 MB kept for the run's median time. ARTIE runs no sandbox; its own start, the JVM, is 0.19 s a run.</li>
+    </ul>
+  </div>
+
+  <div class="short">
+    <h2 style="margin-top:0">In short</h2>
+    <ul>
+      <li><b>The question:</b> as a service evolves, which architecture keeps a repeated process right, safe and auditable, and where must the model sit for that?</li>
+      <li><b>Nine clients, two choices.</b> The architecture: a bag of endpoints, or hypermedia. Where the model sits: in every run, or at the edges. Code mode ran on both architectures, writing programs, keeping them as skills, or handing the work to ARTIE; ARTIE on hypermedia, with the model at the edges.</li>
+      <li><b>Code mode and ARTIE together.</b> Told to give ARTIE a goal once and run what ARTIE keeps, code mode wrote no program and needed no sandbox: right 20 of 20 on 107,607 tokens, about 3.1k a run choosing which kept script fits. With a harness running the kept scripts and calling code mode only when ARTIE fails: 56,366, the model in the first run of each task and ARTIE's own reasoner at the release, about ARTIE alone.</li>
+      <li><b>Code kept well.</b> Kept as skills that take arguments and raise on a status they didn't expect, code mode's programs were right 20 of 20: each failure showed, and the model wrote the skill again. It paid about 8.2k every run to read the task and fill the skill's arguments, and ran 59 programs in a sandbox.</li>
+      <li><b>Wayfinding.</b> From endpoints, the client builds every address itself. Code mode worked the way out again each run (27 programs for two tasks), or froze it (saved programs with employee IDs and an ETag written in). From hypermedia, told nothing but the address, code mode found its way every run, about 100 different programs per variant: through the links and forms, and, as the service answers by itself, also through the OpenAPI description its index links to (19 of 20 runs). With that withheld, HAL-FORMS alone was enough: 20 of 20. ARTIE's kept script follows what the server hands it: the search's <code>item</code> link titled "Bilbo Baggins", the new employee's <code>Location</code>.</li>
+      <li><b>Evolution.</b> A release renamed a field. The frozen code broke silently, 8 runs of 8, each exit 0. Fresh code adapted on either architecture, by reading the service again every run. ARTIE's pins noticed the changed form before any write; the model repaired that one step, once, and the repair was kept.</li>
+      <li><b>Controls.</b> The endpoint side had no conditional writes until we added them to its OpenAPI twin, and using them stays the client's choice. The HEART side refuses a write without <code>If-Match</code> (428): code mode on it met 57 of those refusals, then sent the ETag. A control guards only what the client pairs with it: one program sent a fresh ETag with a role computed before the teammate's change, and wrote over it. ARTIE takes both from the representation it acts on, and kept the teammate's change every time.</li>
+      <li><b>Security.</b> Code mode ran model-written code every run, so it needed a sandbox every run. ARTIE ran none: its script is data in a closed vocabulary.</li>
+      <li><b>Compliance.</b> ARTIE's process is one kept script a person can review, pinned to the server's forms, with a trace of every refusal and its reason; a release changed it by a few lines of diff. Code mode's was a different program almost every run.</li>
+      <li><b>The model at the edges.</b> ARTIE called it once per task to find the way, and once after the release to repair: 2 runs of 20, 4,381 tokens, plus 42,483 once for its wayfinding. Code mode called it in every run: 158,995 tokens with a library made for it, 456,893 to 551,629 finding its way through the hypermedia. Priced with the prompt cache, as the API bills it: ARTIE 2,958; code mode 35,117 with a library, 123,786 to 178,872 on HEART.</li>
+    </ul>
+  </div>
+
+  <h2>Fielding, in brief</h2>
+  <ul>
+    <li><b>The complaint (2008):</b> most "REST APIs" are a list of operations a client must know in advance. "That is RPC. It screams RPC."</li>
+    <li><b>Enter knowing almost nothing:</b> "A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types…"</li>
+    <li><b>Information and controls together:</b> "When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions."</li>
+    <li><b>For change over time:</b> "REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution."</li>
+    <li>More, with his six rules verbatim: <a href="https://jogoshugh.github.io/heart-rise-artie/reports/information-and-controls/">Information and Controls</a>.</li>
+  </ul>
+
+  <h2>HEART, ARTIE and the formats, in brief</h2>
+  <ul>
+    <li><b>HEART</b> (Hypermedia Enforced Agentic Reliable Transactions): a protocol profile for APIs. Each answer carries, or links to, the actions its resource allows in its state now; an action not offered is not allowed, and the answer can say why. Every write sends the ETag it read (<code>If-Match</code>): a stale one is refused 412, a missing one 428.</li>
+    <li><b>ARTIE</b> (Autonomous Restful Traversal and Interactive Engine): HEART's reference client. Generic, like a browser: coupled to the formats below, not to any API. It follows links and forms, sends the ETag, and caches what it may. It runs a goal written in plain words with a model, and a kept script (<code>.heart.yaml</code>) with none.</li>
+  </ul>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Format</th><th>What an answer holds</th><th>Here</th></tr></thead>
+    <tbody>
+      <tr><th>HAL</th><td>The resource's state, and <code>_links</code>: related resources by relation</td><td>The base of the two below</td></tr>
+      <tr><th>HAL-FORMS</th><td>HAL, and <code>_templates</code>: each action's method, target and fields</td><td>Spring HATEOAS's format, widely used; what this service answers when a client asks for nothing in particular</td></tr>
+      <tr><th>HAL Schema Forms</th><td>HAL, and <code>_forms</code>: each action's method, a link to its target, and a JSON Schema for what it takes</td><td>HEART's reference format, with its profile: forms named as link relations, and integrity hashes a client can check</td></tr>
+      <tr><th>OpenAPI</th><td>Not an answer: a separate description of every endpoint, its path, method and body</td><td>The same service's endpoints, as code mode uses them</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><b>Rungs:</b> at L0 the forms and their schemas are inside each answer. At L2 they are linked: the forms for one state published once at their own address, shared by every resource in that state, and cached for a year. A client asks with <code>Prefer: forms=link, schema=link</code>.</li>
+    <li><b>Kept script and pins:</b> a run's way written as data, run again with no model; its pins record the forms the run was offered, so a changed form is caught before any request.</li>
+    <li><b>A pin holds what a form does, not where it is:</b> each form's act (method, content type, template pointers and schema), its target set aside. ARTIE never builds an address, so a form the server moves goes on with no model; a new method or a renamed field is a new act, and stops the step. Strict stops at any change.</li>
+    <li><b>Code mode:</b> a model writing programs against an API, run in a sandbox (Anthropic's "code execution with MCP", Cloudflare's Code Mode).</li>
+  </ul>
+
+  <h2>Two architectures</h2>
+  <div class="pair">
+    <div>
+      <h3>A bag of endpoints</h3>
+      <div class="diagram"><pre class="mermaid">
+flowchart TD
+  D["1 Description: every operation"] --> M{{"2 Model writes code"}}
+  M --> P["3 Program builds URLs"]
+  P --> S[("Service")]
+  S -- "4 status, body" --> P
+</pre></div>
+      <ol class="notes">
+        <li>The client is told every operation up front: paths, methods, bodies.</li>
+        <li>The model works out the way and writes the code: every run (fresh), or once (saved).</li>
+        <li>The program builds each address itself, from path templates and IDs.</li>
+        <li>The server's rules show only after the call: a changed operation is an error, if the program reads it.</li>
+      </ol>
+    </div>
+    <div>
+      <h3>Hypermedia</h3>
+      <div class="diagram"><pre class="mermaid">
+flowchart TD
+  B(["1 Bookmark"]) --> R["2 State + controls now"]
+  R --> C{{"3 Client picks a control"}}
+  C -- "act + If-Match" --> S[("Service")]
+  S -- "4 next state or refusal" --> R
+</pre></div>
+      <ol class="notes">
+        <li>The client enters at a bookmark, knowing only media types.</li>
+        <li>Each answer carries what is true now and what can be done now: the links, the forms this state allows, an ETag.</li>
+        <li>The client selects a link or a form; an act carries the ETag it read.</li>
+        <li>The server answers with the next state, or refuses with a reason: 409 not offered, 412 stale, 428 no validator, 422 doesn't fit.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>How ARTIE uses the model</h2>
+  <div class="pair">
+    <div>
+      <h3>Wayfinding: sync, reason, act</h3>
+      <div class="diagram"><pre class="mermaid">
+flowchart TD
+  W(["Goal words"]) --> Y["1 Sync"]
+  Y --> Q{{"2 Reason: model"}}
+  Q --> A["3 Act"]
+  A --> Y
+  A -. "4 trace" .-> G["artie generate"]
+  G --> K[".heart.yaml + pins"]
+</pre></div>
+      <ol class="notes">
+        <li><b>Sync, no model:</b> read the representation; fetch its forms and schemas by link; revalidate them with their ETags.</li>
+        <li><b>Reason, the model:</b> it sees only the state, the forms offered now and the step's words, and picks one form and its values. ARTIE checks the values against the form's schema.</li>
+        <li><b>Act, no model:</b> send it with <code>If-Match</code>. A 412 reads again and decides again.</li>
+        <li>Every exchange is traced. <code>artie generate</code> turns the trace into a kept script and its pins.</li>
+      </ol>
+    </div>
+    <div>
+      <h3>A kept run: the model only where something changed</h3>
+      <div class="diagram"><pre class="mermaid">
+flowchart TD
+  T(["Next step"]) --> Y["1 Sync"]
+  Y --> P{"2 Pin holds?"}
+  P -- "yes" --> A["3 Act, no model"]
+  P -- "changed" --> F{{"4 Words: model"}}
+  F --> A
+  A --> T
+  A -. "5 after the run" .-> K["Keep the repair"]
+</pre></div>
+      <ol class="notes">
+        <li><b>Sync:</b> the same deterministic read as above.</li>
+        <li><b>Guard:</b> the form the step uses is held to its pin before any request.</li>
+        <li><b>Act:</b> the script's own values, with <code>If-Match</code>; no model.</li>
+        <li><b>A changed form:</b> the step falls back to its words, and the model chooses from what is offered now.</li>
+        <li><b>Keep:</b> a repair that worked, every value the script's own, is written into the script and its pins, so the next run needs no model.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>The clients</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Client</th><th>Architecture</th><th>How it finds its way</th><th>Who holds the controls</th><th>Where the model sits</th></tr></thead>
+    <tbody>
+      <tr><th>Code mode, fresh</th><td>endpoints: the OpenAPI twin</td><td>The model reads every operation and writes a program, each run</td><td>The client: it sends <code>If-Match</code> if it chooses to</td><td>the middle of every run</td></tr>
+      <tr><th>Code mode, saved</th><td>endpoints</td><td>The programs from run 1, with the way frozen in them</td><td>The client, as written in run 1</td><td>run 1; again only if a program exits nonzero</td></tr>
+      <tr><th>Code mode, keeping skills</th><td>endpoints</td><td>A skill it saved: a function taking the values a person would change, looking up IDs and ETags each run, raising on a status it didn't expect, with a SKILL.md. Each run the model reads the skill and fills its arguments</td><td>The client, as the skill was written</td><td>every run, to choose and fill the skill; again to write it where it fails</td></tr>
+      <tr><th>Code mode on HEART</th><td>hypermedia, as the service answers by itself (HAL-FORMS)</td><td>The model reads <code>/</code> and follows the links and forms it finds, each run; in 19 of 20 runs also the OpenAPI description <code>/</code> links to (<code>service-desc</code>)</td><td>The server: forms allowed now, ETags, 428 without one, 412 when stale. The client picks the values</td><td>the middle of every run</td></tr>
+      <tr><th>Code mode on HEART, HSF</th><td>hypermedia: HAL Schema Forms, forms and schemas in the answer</td><td>The same</td><td>The same</td><td>the middle of every run</td></tr>
+      <tr><th>Code mode on HEART, L2</th><td>hypermedia: HAL Schema Forms, forms and schemas by link</td><td>The same, fetching each form set and schema by its link</td><td>The same</td><td>the middle of every run</td></tr>
+      <tr><th>ARTIE as data</th><td>hypermedia: HAL Schema Forms, by link</td><td>The kept script follows the links and forms offered now, by relation and title</td><td>The server: what is offered now, ETags, refusals with reasons. ARTIE holds its script to its pins</td><td>the edges: once to find the way; once per change to repair a step, and the repair is kept</td></tr>
+      <tr><th>Code mode with ARTIE as its tool</th><td>hypermedia, through ARTIE in its own container</td><td>The model gives ARTIE the task as a goal in plain words once; ARTIE finds the way and keeps it. After that the model runs the kept script that fits, and reads what ARTIE says its last act left</td><td>The server, as for ARTIE; the model holds neither the token nor a program</td><td>every run, to choose the kept script; ARTIE's model at the edges</td></tr>
+      <tr><th>A harness running ARTIE, code mode when it fails</th><td>hypermedia, through ARTIE</td><td>The first run as above; after it, the harness runs the kept scripts that did the task, with no model, and calls code mode only when ARTIE exits nonzero</td><td>The server, as for ARTIE</td><td>the edges: the first run; ARTIE's model at a change</td></tr>
+    </tbody>
+  </table></div>
+  <div class="table-scroll"><table class="matrix">
+    <thead><tr><th></th><th>The model in every run</th><th>The model at the edges</th></tr></thead>
+    <tbody>
+      <tr><th>A bag of endpoints</th><td>Code mode, fresh; keeping skills</td><td>Code mode, saved: the model writes once, nothing notices a change</td></tr>
+      <tr><th>Hypermedia</th><td>Code mode on HEART, three ways; code mode with ARTIE as its tool</td><td>ARTIE as data, and a harness running ARTIE: the way found once, repaired once per change</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="note">
+    <li>One service, the same operations on both sides: heart-sims' employees service, its HEART side and its OpenAPI twin. One model, Sonnet 5.5. The same task words.</li>
+    <li>t1: "Hire Samwise Gamgee as a gardener. Then change Samwise's role to "gardener, mayor". Then dismiss Bilbo Baggins." t3: "Frodo Baggins is retiring: add ", retired" to the end of his current role, keeping the rest of it as it is."</li>
+    <li>Code mode on endpoints, steelmanned: a Python library made from the description on each run, <code>If-Match</code> wherever the description offers it. On HEART: no library and no description, told only the address and the token; HSF and L2 told also the headers that ask for them. Every code-mode client: the same locked-down sandbox, up to 8 turns.</li>
+  </ul>
+
+  <h2>Wayfinding</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Code mode, fresh</th><th>Code mode, saved</th><th>Code mode on HEART, three ways</th><th>ARTIE as data</th></tr></thead>
+    <tbody>
+      <tr><th>Addresses</th><td>Built by the program from path templates and IDs</td><td>Built, with IDs 3 and 2 written in</td><td>Found from <code>/</code>: links and form targets. Told nothing, it also guessed: 5 answered 404</td><td>Handed over by the server: links, forms, <code>Location</code></td></tr>
+      <tr><th>Finding Bilbo</th><td>Search, read his ID, build <code>/employees/2</code></td><td><code>/employees/2</code>, written in</td><td>The search form it found, then his record</td><td>Follow <code>item</code> titled "Bilbo Baggins"</td></tr>
+      <tr><th>The ETag it sends</th><td>Read in this run</td><td>In t1's dismiss, one written in from run 1</td><td>Learned from a 428, or from the OpenAPI description; then read in this run</td><td>Read in this run, with the form it acts on</td></tr>
+      <tr><th>The way, across 20 runs</th><td>27 different programs</td><td>6 programs, frozen</td><td>99, 95 and 103 different programs</td><td>2 kept scripts; after the release, the same scripts with the renamed field</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>The service changes</h2>
+  <div class="table-scroll"><table class="grid">
+    <thead>
+      <tr class="phase"><th></th><th colspan="3">as they are</th><th colspan="3" class="split">teammate (t3 only)</th><th colspan="4" class="split">field renamed</th></tr>
+      <tr><th></th><th>1</th><th>2</th><th>3</th><th class="split">4</th><th>5</th><th>6</th><th class="split">7</th><th>8</th><th>9</th><th>10</th></tr>
+    </thead>
+    <tbody>
+      <tr><th>fresh · t1</th><td class="y"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>8.6k</span></td><td class="y split"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>8.6k</span></td><td class="y split"><span><b>✓</b>8.5k</span></td><td class="y"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>8.7k</span></td><td class="y"><span><b>✓</b>6.6k</span></td></tr>
+      <tr><th>fresh · t3</th><td class="y"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>7.4k</span></td><td class="y t split"><span><b>✓</b>7.4k</span></td><td class="y t"><span><b>✓</b>7.8k</span></td><td class="y t"><span><b>✓</b>7.4k</span></td><td class="y split"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>7.9k</span></td><td class="y"><span><b>✓</b>7.4k</span></td></tr>
+      <tr><th>saved · t1</th><td class="y"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="n split"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td></tr>
+      <tr><th>saved · t3</th><td class="y"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y t split"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="n split"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td></tr>
+      <tr><th>on HEART · t1</th><td class="y"><span><b>✓</b>32.5k</span></td><td class="y"><span><b>✓</b>25.9k</span></td><td class="y"><span><b>✓</b>41.7k</span></td><td class="y split"><span><b>✓</b>23.7k</span></td><td class="y"><span><b>✓</b>25.0k</span></td><td class="y"><span><b>✓</b>39.7k</span></td><td class="y split"><span><b>✓</b>17.0k</span></td><td class="y"><span><b>✓</b>25.8k</span></td><td class="y"><span><b>✓</b>44.7k</span></td><td class="y"><span><b>✓</b>38.2k</span></td></tr>
+      <tr><th>on HEART · t3</th><td class="y"><span><b>✓</b>10.5k</span></td><td class="y"><span><b>✓</b>15.4k</span></td><td class="y"><span><b>✓</b>15.5k</span></td><td class="y t split"><span><b>✓</b>17.4k</span></td><td class="y t"><span><b>✓</b>16.4k</span></td><td class="y t"><span><b>✓</b>15.0k</span></td><td class="y split"><span><b>✓</b>15.7k</span></td><td class="y"><span><b>✓</b>15.6k</span></td><td class="y"><span><b>✓</b>10.4k</span></td><td class="y"><span><b>✓</b>10.5k</span></td></tr>
+      <tr><th>on HEART, HSF · t1</th><td class="y"><span><b>✓</b>23.7k</span></td><td class="y"><span><b>✓</b>24.5k</span></td><td class="y"><span><b>✓</b>23.5k</span></td><td class="y split"><span><b>✓</b>24.6k</span></td><td class="y"><span><b>✓</b>24.9k</span></td><td class="y"><span><b>✓</b>25.0k</span></td><td class="y split"><span><b>✓</b>24.2k</span></td><td class="y"><span><b>✓</b>23.9k</span></td><td class="y"><span><b>✓</b>24.0k</span></td><td class="y"><span><b>✓</b>24.1k</span></td></tr>
+      <tr><th>on HEART, HSF · t3</th><td class="y"><span><b>✓</b>21.1k</span></td><td class="y"><span><b>✓</b>21.1k</span></td><td class="y"><span><b>✓</b>21.2k</span></td><td class="y t split"><span><b>✓</b>26.5k</span></td><td class="n t"><span><b>✗</b>20.3k</span></td><td class="y t"><span><b>✓</b>22.2k</span></td><td class="y split"><span><b>✓</b>21.4k</span></td><td class="y"><span><b>✓</b>20.6k</span></td><td class="y"><span><b>✓</b>21.3k</span></td><td class="y"><span><b>✓</b>22.2k</span></td></tr>
+      <tr><th>on HEART, L2 · t1</th><td class="y"><span><b>✓</b>24.6k</span></td><td class="y"><span><b>✓</b>35.5k</span></td><td class="y"><span><b>✓</b>32.5k</span></td><td class="y split"><span><b>✓</b>27.7k</span></td><td class="y"><span><b>✓</b>30.2k</span></td><td class="y"><span><b>✓</b>29.5k</span></td><td class="y split"><span><b>✓</b>35.0k</span></td><td class="y"><span><b>✓</b>33.2k</span></td><td class="y"><span><b>✓</b>31.3k</span></td><td class="y"><span><b>✓</b>34.8k</span></td></tr>
+      <tr><th>on HEART, L2 · t3</th><td class="n"><span><b>✗</b>24.4k</span></td><td class="n"><span><b>✗</b>23.6k</span></td><td class="y"><span><b>✓</b>23.6k</span></td><td class="n t split"><span><b>✗</b>23.6k</span></td><td class="n t"><span><b>✗</b>23.6k</span></td><td class="n t"><span><b>✗</b>23.9k</span></td><td class="y split"><span><b>✓</b>23.8k</span></td><td class="y"><span><b>✓</b>23.8k</span></td><td class="y"><span><b>✓</b>23.2k</span></td><td class="y"><span><b>✓</b>23.8k</span></td></tr>
+      <tr><th>ARTIE · t1</th><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>3.1k</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td></tr>
+      <tr><th>ARTIE · t3</th><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y t split"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>1.3k</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Each cell: right (✓) or wrong (✗), and the model's input tokens for that run. An amber outline marks a run the teammate changed Frodo in. The teammate acts in t3 only; t1's runs 4 to 6 are runs as they are.</p>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Change</th><th>Code mode, fresh</th><th>Code mode, saved</th><th>Code mode on HEART, three ways</th><th>ARTIE as data</th></tr></thead>
+    <tbody>
+      <tr><th>A teammate sets Frodo's role to "keeper of the Red Book" right after the client's first read</th><td>Read Frodo again before writing; that read already held the teammate's role. Wrote with its ETag: 200, "keeper of the Red Book, retired"</td><td>The same: its kept program reads again before writing. 200</td><td>Mostly the same. <span class="bad">HSF, run 5:</span> a fresh ETag with the role computed before the change: the teammate's change written over. <span class="bad">L2, runs 4 to 6:</span> 8 turns used up, every write refused 428; nothing written</td><td>Read once, wrote with that ETag: <b>412</b>. <code>decide</code> read again and wrote ", retired" on the new role: 200</td></tr>
+      <tr><th>A release renames <code>role</code> to <code>position</code> in the hire and update forms</th><td>Its library and docs are made from the description each run, so the model wrote <code>position</code> from the start. No refusal</td><td class="bad">Sent <code>role</code>: 422 "required property 'position' not found". Printed it, exit 0. t1 went on: update 404, then dismissed Bilbo</td><td>Read the changed forms each run, and sent <code>position</code>: no 422, right in every renamed run</td><td>Held each form to its pin; hire and update had changed, so it sent nothing and fell back to the step's words. The model chose <code>position</code> (2 calls in t1, 1 in t3), and the repair was kept: runs 8 to 10 needed no model</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Who holds which control</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Control</th><th>Endpoint side: the OpenAPI twin</th><th>HEART side</th></tr></thead>
+    <tbody>
+      <tr><th>Conditional writes</th><td>An ETag on reads and an optional <code>If-Match</code>, added for this comparison (spec/SPEC.md, 2026-11-02). A write without one goes through</td><td>An ETag with every representation. A write without one is refused 428: code mode on HEART met 57 of them, then sent it. A stale one is refused 412. ARTIE sent one with every act, 43 of 43</td></tr>
+      <tr><th>An ETag sent with the values read with it</th><td>Up to each program</td><td>Up to the client too. One code-mode program fetched a fresh ETag and sent a role computed before the teammate's change: written over, and no server can see it. ARTIE takes both from the representation it acts on</td></tr>
+      <tr><th>What can be done now</th><td>Every operation, always listed; the server refuses after the call</td><td>Only the forms the state allows are offered</td></tr>
+      <tr><th>A changed operation noticed</th><td>By the server's 422, if the program reads it</td><td>By the client's pins, before any request</td></tr>
+      <tr><th>Deciding again on new state</th><td>Up to each program</td><td><code>decide</code> reads again and runs its steps again</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Security and compliance</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Code mode, fresh</th><th>Code mode, saved</th><th>Code mode, keeping skills</th><th>Code mode on HEART, three ways</th><th>Code mode with ARTIE as its tool</th><th>A harness running ARTIE</th><th>ARTIE as data</th></tr></thead>
+    <tbody>
+      <tr><th>Runs that executed model-written code</th><td>20</td><td>20</td><td>20</td><td>60</td><td class="ok">0</td><td class="ok">0</td><td class="ok">0</td></tr>
+      <tr><th>Sandbox</th><td>every run</td><td>every run</td><td>every run: 59 programs and skills</td><td>every run</td><td class="ok">none needed</td><td class="ok">none needed</td><td class="ok">none needed</td></tr>
+      <tr><th>What a reviewer approves</th><td>A new program most runs: 27 in 20</td><td>6 programs, with IDs and an ETag frozen in</td><td>2 skills in Python, each written again where it failed: t1's twice, t3's three times</td><td>A new program almost every run: about 100 per variant</td><td colspan="2">2 kept scripts ARTIE wrote from code mode's goals, one per task: data in a closed vocabulary, pinned to the server's forms</td><td>2 kept scripts: data in a closed vocabulary, pinned to the server's forms; per release, a diff of a few lines</td></tr>
+      <tr><th>How a failure shows</th><td>The model says so in words</td><td class="bad">Exit 0 and a printed 422</td><td>An exception and a nonzero exit; the model writes the skill again</td><td>In words; <span class="bad">L2: 5 runs ended out of turns, saying nothing</span></td><td colspan="2">ARTIE's exit code and reason; a YAML trace of each refusal</td><td>An exit code and reason; a YAML trace of each refusal</td></tr>
+      <tr><th>Partial work left behind</th><td>none</td><td class="bad">t1: Bilbo dismissed, Samwise not hired</td><td>none: each skill raised before its next write</td><td class="bad">HSF: the teammate's change written over, once</td><td>none</td><td>none</td><td>none</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Layers and boundaries</h2>
+  <p>A program written against endpoints ties the task to them, and leaves no layer between: a policy can only sit at the endpoint. A client that follows what the server offers leaves room for one in front of it, in it, and before it runs.</p>
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Code mode's programs</th><th>ARTIE's kept scripts</th></tr></thead>
+    <tbody>
+      <tr><th>Where the credential is</th><td>In the sandbox's environment (<code>API_TOKEN</code>), where model-written code can send it anywhere the network reaches</td><td>Added by ARTIE below its cache, only to the request's own origin, never over plain HTTP beyond the machine. It refused, here, to send it to the service's address on the container network. With ARTIE as code mode's tool, the model holds neither the token nor the model key</td></tr>
+      <tr><th>What a policy can read before it runs</th><td>Any program: about 100 different ones per variant on HEART</td><td>Data in a closed vocabulary, checked against a schema: which relations it acts by (<code>staff:dismiss</code>), which fields it sends, where values come from</td></tr>
+      <tr><th>Addresses</th><td>Worked out by the model and written in: of the 1,034 programs on HAL Schema Forms, none read the forms' <code>hr:templatePointers</code>; 155 wrote an act's address with an employee's number in it (<code>/employees/1/actions/update</code>)</td><td>None. A form's target, <code>/employees/{id}/actions/update</code>, is filled from the resource's state by its template pointer, <code>{"id": "/id"}</code>, at the moment it acts</td></tr>
+      <tr><th>A policy in front</th><td>Bypassed: a program calls the endpoints it was told. A proxy can refuse a URL after the program tries it</td><td>Followed: a gateway that doesn't offer merge stops the agent without changing it, since the agent acts only by what is offered</td></tr>
+      <tr><th>Where a policy can sit</th><td>The endpoint</td><td>Before the run (a person approves the script, or a repair: <code>keep: propose</code>); in the client (pins, <code>--guard strict</code>, the credential's rules, checks after each act); in front (a gateway); at the server (forms by state)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Where the model sits</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Code mode, fresh</th><th>Code mode, saved</th><th>Keeping skills</th><th>On HEART</th><th>On HEART, HSF</th><th>On HEART, L2</th><th>With ARTIE as its tool</th><th>A harness running ARTIE</th><th>ARTIE as data</th></tr></thead>
+    <tbody>
+      <tr><th>Right</th><td class="ok">20 / 20</td><td class="bad">12 / 20</td><td class="ok">20 / 20</td><td class="ok">20 / 20</td><td class="bad">19 / 20</td><td class="bad">15 / 20</td><td class="ok">20 / 20</td><td class="ok">20 / 20</td><td class="ok">20 / 20</td></tr>
+      <tr><th>Runs that needed the model</th><td>20</td><td>2</td><td>20</td><td>20</td><td>20</td><td>20</td><td>20</td><td>4: code mode in the first run of each task, ARTIE's at the release</td><td>2, the first after the release</td></tr>
+      <tr><th>Model calls</th><td>99</td><td>10</td><td>83</td><td>126</td><td>140</td><td>157</td><td>60</td><td>25</td><td>3</td></tr>
+      <tr><th>Input tokens, cached or not</th><td>158,995</td><td>16,004 (run 1 only)</td><td>188,747</td><td>456,893</td><td>460,370</td><td>551,629</td><td>107,607, with its wayfinding</td><td class="ok">56,366, with its wayfinding</td><td class="ok">4,381 (run 7 only)</td></tr>
+      <tr><th>Output tokens</th><td>10,411</td><td>974</td><td>11,654</td><td>32,655</td><td>43,369</td><td>48,215</td><td>7,636</td><td>4,010</td><td>521</td></tr>
+      <tr><th>Input, priced as uncached</th><td>35,117</td><td>2,717</td><td>48,571</td><td>169,827</td><td>178,872</td><td>172,446</td><td>33,440</td><td class="ok">21,849</td><td class="ok">2,958</td></tr>
+      <tr><th>Before these runs</th><td>nothing</td><td>nothing (run 1 is its first write)</td><td>nothing (run 1 writes the skill)</td><td>nothing</td><td>nothing</td><td>nothing</td><td>nothing (run 1 finds the way)</td><td>nothing (run 1 finds the way)</td><td>one goal run per task to find the way: 42,483 input tokens</td></tr>
+      <tr><th>Seconds per run, median</th><td>10.1</td><td>1.3</td><td>9.3</td><td>19.2</td><td>22.4</td><td>24.2</td><td>9.6</td><td>5.6</td><td>0.9 (3.6 and 5.0 in run 7)</td></tr>
+      <tr><th>HTTP requests</th><td>114</td><td>110</td><td>157</td><td>220</td><td>226</td><td>265</td><td>305</td><td>298</td><td>272, 56 of them 304</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="note">
+    <li>With its wayfinding counted, ARTIE's model took 46,864 tokens against fresh code mode's 158,995. Saved code mode took the fewest, and was wrong after the release.</li>
+    <li>With ARTIE as its tool, code mode's model took 3.1k a quiet run, choosing which kept script fits; ARTIE took none. A teammate's change cost it nothing more: the kept script decided again on the 412. At the release, ARTIE's own reasoner repaired each kept script once (4,397 tokens) and kept the repair.</li>
+    <li>The harness running ARTIE called code mode in 2 runs of 20, the first of each task, and no model in 16; ARTIE seconds in its own container include the JVM's start, about 1 s.</li>
+    <li>On HEART, with no library made for it, code mode took about three times the tokens: it found its way again in every run. The hypermedia let it find the way; only a client that keeps the way spends the model once.</li>
+    <li>Every request counted reached the server. Code mode on HEART's reads of <code>/openapi.json</code> are not counted.</li>
+    <li>ARTIE's 56 304s are its state read again before each use (Layer 1 is <code>no-cache</code>): a conditional GET, answered with no body. Its 70 form-set and schema fetches are <code>immutable</code> for a year and served from its cache within a run; each run here started a new process with an empty cache, so each fetched them once. A cache kept between runs would take them to zero.</li>
+  </ul>
+
+  <h2>Code mode on HEART: what it needed</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Variant</th><th>Answers in</th><th>Told, beyond the address</th><th>Turns allowed (used: median, most)</th><th>Right</th><th>Why wrong</th><th>Input tokens</th><th>Priced as uncached</th></tr></thead>
+    <tbody>
+      <tr><th>As the service answers</th><td>HAL-FORMS</td><td>nothing; it read the OpenAPI description its index links to, in 19 of 20 runs</td><td>8 (6, 8)</td><td class="ok">20 / 20</td><td></td><td>456,893</td><td>169,827</td></tr>
+      <tr><th>Description withheld</th><td>HAL-FORMS</td><td>nothing; <code>/openapi.json</code> answers 404</td><td>8 (6.5, 7)</td><td class="ok">20 / 20</td><td></td><td>316,303</td><td>123,786</td></tr>
+      <tr><th>HSF</th><td>HAL Schema Forms, forms in the answer</td><td>the headers that ask for it</td><td>8 (7, 8)</td><td class="bad">19 / 20</td><td>1 lost update</td><td>460,370</td><td>178,872</td></tr>
+      <tr><th>HSF, with the format's document</th><td>the same</td><td>the headers; the document beside the program</td><td>8 (8, 8)</td><td class="bad">11 / 20</td><td>9 out of turns</td><td>951,909</td><td>301,545</td></tr>
+      <tr><th>HSF, the document in the prompt</th><td>the same</td><td>the headers; the document in the system prompt, cached</td><td>8 (6, 8)</td><td class="ok">20 / 20</td><td></td><td>1,245,587</td><td>265,448</td></tr>
+      <tr><th>L2</th><td>HAL Schema Forms, forms and schemas by link</td><td>the headers, and <code>Prefer: forms=link, schema=link</code></td><td>8 (8, 8)</td><td class="bad">15 / 20</td><td>5 out of turns</td><td>551,629</td><td>172,446</td></tr>
+      <tr><th>L2, with the format's document</th><td>the same</td><td>the same; the document beside the program</td><td>8 (8, 8)</td><td class="bad">1 / 20</td><td>19 out of turns</td><td>981,525</td><td>307,389</td></tr>
+      <tr><th>L2, the document in the prompt</th><td>the same</td><td>the same; the document in the system prompt, cached</td><td>8 (8, 8)</td><td class="bad">17 / 20</td><td>3 out of turns</td><td>1,625,453</td><td>313,935</td></tr>
+      <tr><th>L2, 16 turns</th><td>the same</td><td>the headers, and <code>Prefer</code></td><td>16 (8.5, 10)</td><td class="ok">20 / 20</td><td></td><td>656,688</td><td>222,950</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Priced as uncached: uncached input, with cache writes at 1.25 and cache reads at 0.1 of the input price, as the API bills them.</p>
+  <ul>
+    <li><b>Knowing the format is enough; the service needn't be known.</b> No model has seen this employees service. With its description withheld, code mode found its way by HAL-FORMS alone: right 20 of 20, in at most 7 turns, on fewer tokens than with the description.</li>
+    <li><b>Forms by link cost turns.</b> L2 needs 8 to 10: with 8, 5 runs ran out; with 16, none did, and none used more than 10. Its sharing and caching pay a client that keeps a cache; a new program every run pays each hop again.</li>
+    <li><b>The format's document helps in the prompt, and hurts in the sandbox.</b> In the system prompt, the same bytes every run and cached: HSF right 20 of 20, L2 17 of 20 in 8 turns, over 90% of their input read from the cache. Read inside the sandbox, through a 4,000-character window on each program's output, it used up the turns: HSF 11 of 20, L2 1. None of those misses wrote anything.</li>
+    <li><b>The server's control held for every variant.</b> In each, a write without <code>If-Match</code> was refused 428, and the program then sent the ETag. The one lost update was a value the client paired with a fresher ETag, which no server can see.</li>
+  </ul>
+
+  <h2>Many records, a few states</h2>
+  <p>The same service, one goal run over many employees, each in one of three states: a kept script that branches on what the server offers used no model at any size, and fetched one form set per state. Its own page: <a href="https://claude.ai/artifact/1keHg2DB916cgXdDE8CqZD">Many Records, a Few States</a>.</p>
+
+  <h2>Self-repair</h2>
+  <ul>
+    <li><b>At the release:</b> in run 7, ARTIE's pins refused the changed forms, each step fell back to its words, the model chose <code>position</code>, and the acts were done. After the run, the repairs were written into the kept scripts and their pins (<code>keep: auto</code>), so runs 8 to 10 ran with no model.</li>
+    <li><b>Kept without a person only where it is safe:</b> the run finished; the repair made the act the script was making; and every value it sent is one the script sent. Each is copied as the script wrote it, so an input stays an input and <code>${state.role}, retired</code> stays a reference, never the literal "ring bearer, retired".</li>
+    <li><b>Not kept automatically:</b> a value the script never sent, such as a new required <code>reason</code>; a repair that made another act; a run that didn't finish. <code>keep: propose</code> says what it would keep and writes nothing, where compliance asks for a person.</li>
+    <li><b>Moved, not changed:</b> a release that served the acts at new addresses, run on t1's kept script: each form's integrity changed and its act didn't, so hire, update and dismiss went on, held by their acts: 0 tokens, 2 runs of 2 right. A release that made update a PATCH changed its act: one model call, 1,265 tokens, and the repair was kept.</li>
+    <li><b>What a run can't tell by its pins:</b> that the meaning stayed when the name changed. <code>artie generate</code> writes a check after each act that changes the resource it holds, from what the first run saw it change (<code>status</code> becomes "on notice"): a release that changed what an act does stops the run there, as the scripts code mode had ARTIE keep do.</li>
+    <li><b>What a reviewer sees:</b> one line per field and one per pin. The hand-review comment in t3's script stays as it was.</li>
+  </ul>
+
+  <h2>Where code mode did well</h2>
+  <ul>
+    <li><b>Fresh code mode was right every time.</b> Every write to an existing record carried <code>If-Match</code>, 30 of 30, once the description offered it.</li>
+    <li><b>It adapts with no machinery of its own.</b> It reads the current description every run, so a rename costs it nothing extra. ARTIE needed its pins and a fallback for the same.</li>
+    <li><b>It found its way from a bookmark, told nothing.</b> Given only the address, it read <code>/</code> and used everything it found there: the links, the forms, and the OpenAPI description <code>/</code> links to. Right 20 of 20 as the service answers by itself, and 20 of 20 with the description withheld.</li>
+    <li><b>Kept as skills, its code recovered.</b> Saved with arguments in place of IDs and an exception on any status it didn't expect, a skill failed loudly where the frozen programs failed silently: at the teammate's change (a 412) and at the rename (a 422). The model wrote it again each time, and it was right 20 of 20.</li>
+    <li><b>Its sandbox held:</b> no network but the service, read-only, 1 CPU, 256 MB, 64 processes, 120 s.</li>
+    <li><b>It carries ARTIE.</b> Given ARTIE in a container as its one tool, code mode wrote no program: it gave ARTIE each task as a goal once, then ran what ARTIE kept, right 20 of 20. Its strength, reading a task in plain words, stays; the acts are ARTIE's, held to the server's controls.</li>
+  </ul>
+
+  <h2>The scripts</h2>
+  <p class="note">ARTIE's kept scripts, as generated from one goal run each and replayed in every ARTIE run; the program behind code mode's one lost update; and the programs code mode saved in run 1 and replayed in runs 2 to 10, as the model wrote them.</p>
+  <div class="stack">
+
+  <details class="src"><summary>ARTIE · t1.kept.heart.yaml <small>generated, not edited</small></summary>
+    <div class="in">
+<pre><code><span class="c"># Generated by artie generate from ../runs/artie/artie-goal-t1-20261102-003323.yaml, the run of t1.goal.md.
+# Every selection as that run made it, nested as it nested, with no model.
+# What it was offered is pinned in t1.kept.pins.yaml, held to before every act.
+#   artie run t1.kept.heart.yaml</span>
+heart: 1
+kind: kept
+start: http://localhost:8099/
+
+steps:
+  - act: staff:hire
+    fields:
+      firstName: Samwise
+      lastName: Gamgee
+      role: gardener
+    intent: Hire Samwise Gamgee as a gardener
+    then:
+      - sync: true
+      - act: staff:update
+        fields:
+          firstName: Samwise
+          lastName: Gamgee
+          role: gardener, mayor
+        intent: Change his role to "gardener, mayor"
+        then: []
+  - act: staff:search-employees
+    fields:
+      name: Baggins
+    intent: Find the employees named Baggins
+    then:
+      - follow: item
+        title: Bilbo Baggins
+        intent: Open Bilbo Baggins
+        then:
+          - act: staff:dismiss
+            intent: Dismiss him
+            then: []</code></pre>
+      <ul>
+        <li>No IDs and no ETags: it finds Bilbo by following the search's <code>item</code> link with his title, and each act sends the ETag of the state it was offered on.</li>
+        <li>Each <code>intent</code> is the step's words, kept for the fallback when a form changes.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>ARTIE · t3.kept.heart.yaml <small>generated, then reviewed once by hand</small></summary>
+    <div class="in">
+<pre><code><span class="c"># Generated by artie generate from ../runs/artie/artie-goal-t3-20261102-081644.yaml, the run of t3.goal.md.
+# Every selection as that run made it, nested as it nested, with no model.
+# What it was offered is pinned in t3.kept.pins.yaml, held to before every act.
+# A value marked "review:" holds a value the reasoner chose: check it before keeping the script.
+#   artie run t3.kept.heart.yaml</span>
+heart: 1
+kind: kept
+start: http://localhost:8099/
+
+steps:
+  - act: staff:search-employees
+    fields:
+      name: Baggins
+    intent: Find the employees named Baggins
+    then:
+      - follow: item
+        title: Frodo Baggins
+        intent: Open Frodo Baggins
+        then:
+          <span class="c"># Reviewed by hand (spec/PLAN-CODE-MODE-VS-HEART.md): the run's value was the reasoner's, from the role it
+          # read then; kept as the role read now, with ", retired" after it, as the words say, and decided again on
+          # what is there if a teammate changed it since.</span>
+          - <span class="hl">decide:</span>
+              steps:
+                - act: staff:update
+                  fields:
+                    firstName: Frodo
+                    lastName: Baggins
+                    role: <span class="hl">${state.role}, retired</span>
+                  intent: Add ", retired" to the end of his current role, keeping the rest of it as it is
+                  then: []</code></pre>
+      <ul>
+        <li>The review: the generated value was the literal the model chose then. A person made it <code>${state.role}, retired</code> and wrapped it in <code>decide</code>, so a 412 reads Frodo again and runs the step again.</li>
+        <li>That is the one hand edit in this comparison. Code mode's saved programs had none.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>ARTIE · pins and config <small>what each act is held to</small></summary>
+    <div class="in">
+      <div class="file">t1.kept.pins.yaml</div>
+<pre><code><span class="c"># What t1.kept.heart.yaml was recorded against, from ../runs/artie/artie-goal-t1-20261102-003323.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed; --guard strict
+# also refuses one offered in a set not recorded for it.</span>
+rung: L2
+digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+forms:
+  staff:hire:
+    integrity: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+    method: POST
+    sets: []
+  staff:update:
+    integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+    method: PUT
+    sets:
+      - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+  staff:search-employees:
+    integrity: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+    method: GET
+    sets: []
+  staff:dismiss:
+    integrity: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+    method: DELETE
+    sets:
+      - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+links:
+  item: ''</code></pre>
+      <div class="file">t3.kept.pins.yaml</div>
+<pre><code><span class="c"># What t3.kept.heart.yaml was recorded against, from ../runs/artie/artie-goal-t3-20261102-081644.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed; --guard strict
+# also refuses one offered in a set not recorded for it.</span>
+rung: L2
+digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+forms:
+  staff:search-employees:
+    integrity: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+    method: GET
+    sets: []
+  staff:update:
+    integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+    method: PUT
+    sets:
+      - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+links:
+  item: ''</code></pre>
+      <div class="file">t1.kept.config.yaml, t3.kept.config.yaml</div>
+<pre><code><span class="c"># A kept script held as data falls back to its words, with the model, only where a form changed.</span>
+on-change: intent
+<span class="c"># A repair that worked is kept in the script and its pins, where every value it sent is the script's own.</span>
+keep: auto</code></pre>
+    </div>
+  </details>
+
+  <details class="src"><summary>ARTIE · what keep wrote after the release <small>the diff a reviewer approves</small></summary>
+    <div class="in">
+      <div class="file">t1.kept.heart.yaml</div>
+<pre><code>@@ steps: staff:hire
+     fields:
+       firstName: Samwise
+       lastName: Gamgee
+<span class="hl">-      role: gardener</span>
+<span class="hl">+      position: gardener</span>
+     intent: Hire Samwise Gamgee as a gardener
+@@ steps: staff:update
+         fields:
+           firstName: Samwise
+           lastName: Gamgee
+<span class="hl">-          role: gardener, mayor</span>
+<span class="hl">+          position: gardener, mayor</span>
+         intent: Change his role to "gardener, mayor"</code></pre>
+      <div class="file">t3.kept.heart.yaml</div>
+<pre><code>                   fields:
+                     firstName: Frodo
+                     lastName: Baggins
+<span class="hl">-                    role: ${state.role}, retired</span>
+<span class="hl">+                    position: ${state.role}, retired</span>
+                   intent: Add ", retired" to the end of his current role, keeping the rest of it as it is</code></pre>
+      <div class="file">t1.kept.pins.yaml (t3's update pin changed the same way)</div>
+<pre><code>   staff:hire:
+<span class="hl">-    integrity: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=</span>
+<span class="hl">+    integrity: sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=</span>
+     method: POST
+     sets: []
+   staff:update:
+<span class="hl">-    integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=</span>
+<span class="hl">+    integrity: sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=</span>
+     method: PUT
+     sets:
+       - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+<span class="hl">+      - sha256-ela8MpSsfC3GERfq+rm0Ti5a4+/nWyO/8GG5LJtCGw4=</span></code></pre>
+      <ul>
+        <li>What the run said: <code>kept staff:hire: firstName, lastName, position (was role)</code>; <code>kept staff:update: firstName, lastName, position (was role)</code>.</li>
+        <li>The full diff is <code>runs/keep/kept-after-rename.diff</code>.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>Code mode on HEART, HSF · t3 run 5 <small>a fresh ETag with an old value</small></summary>
+    <div class="in">
+      <div class="file">its write, refused 428: no If-Match</div>
+<pre><code>import os,urllib.request,json
+h={&quot;Authorization&quot;:&quot;Bearer &quot;+os.environ[&quot;API_TOKEN&quot;],&quot;Accept&quot;:&quot;application/hal+json&quot;,&quot;Accept-Profile&quot;:&quot;&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;&quot;,&quot;Content-Type&quot;:&quot;application/json&quot;}
+d={&quot;firstName&quot;:&quot;Frodo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;ring bearer, retired&quot;}
+r=urllib.request.Request(os.environ[&quot;API_BASE&quot;]+&quot;/employees/1/actions/update&quot;,method=&quot;PUT&quot;,headers=h,data=json.dumps(d).encode())
+try:
+    x=urllib.request.urlopen(r);print(x.status,x.read().decode())
+except urllib.error.HTTPError as e: print(e.code,e.read().decode())</code></pre>
+      <div class="file">its next program: a fresh ETag, the same role</div>
+<pre><code>import os,urllib.request,json
+h={&quot;Authorization&quot;:&quot;Bearer &quot;+os.environ[&quot;API_TOKEN&quot;],&quot;Accept&quot;:&quot;application/hal+json&quot;,&quot;Accept-Profile&quot;:&quot;&lt;https://w3id.org/heart-rise/hal-schema-forms&gt;&quot;}
+x=urllib.request.urlopen(urllib.request.Request(os.environ[&quot;API_BASE&quot;]+&quot;/employees/1&quot;,headers=h))
+et=x.headers.get(&quot;ETag&quot;);print(et,dict(x.headers))
+h2=dict(h,**{&quot;Content-Type&quot;:&quot;application/json&quot;,&quot;If-Match&quot;:et})
+d={&quot;firstName&quot;:&quot;Frodo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;ring bearer, retired&quot;}
+r=urllib.request.Request(os.environ[&quot;API_BASE&quot;]+&quot;/employees/1/actions/update&quot;,method=&quot;PUT&quot;,headers=h2,data=json.dumps(d).encode())
+try:
+    y=urllib.request.urlopen(r);print(y.status,y.read().decode())
+except urllib.error.HTTPError as e: print(e.code,e.read().decode())</code></pre>
+      <div class="file">on the wire</div>
+<pre><code>GET / 200
+GET /employees?name=Baggins 200
+GET /employees?name=Frodo 200
+GET /employees/1 200
+PUT /employees/1/actions/update 428
+GET /employees/1 200
+PUT /employees/1/actions/update 200  If-Match: &quot;seq-2.hsf.L0.2ebd0296ab4b792a&quot;</code></pre>
+      <ul>
+        <li>The role it sends, "ring bearer, retired", was worked out before the teammate's change. The ETag it fetched is the state after it, so the server took the write: the teammate's "keeper of the Red Book" is gone.</li>
+        <li>ARTIE sends the values and the ETag of the same representation; after a 412 it reads again and works the values out again.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>Code mode, saved · t1 <small>three programs, as the model wrote them in run 1</small></summary>
+    <div class="in">
+      <div class="file">program 1</div>
+<pre><code>import api
+r=api.hire({"firstName":"Samwise","lastName":"Gamgee","role":"gardener"})
+print(r)
+s=api.searchEmployees(name="Bilbo Baggins")
+print(s)</code></pre>
+      <div class="file">program 2</div>
+<pre><code>import api
+g=api.getEmployee(<span class="hl">3</span>);print(g)
+u=api.update(<span class="hl">3</span>,{"firstName":"Samwise","lastName":"Gamgee","role":"gardener, mayor"},if_match=g['etag']);print(u)
+b=api.getEmployee(<span class="hl">2</span>);print(b)</code></pre>
+      <div class="file">program 3</div>
+<pre><code>import api
+print(api.dismiss(<span class="hl">2</span>,if_match=<span class="hl">'"seq-1.json.8b9e801bed8b4db8"'</span>))</code></pre>
+      <ul>
+        <li>Employee IDs 3 and 2, and in program 3 an ETag, are written in as run 1 saw them. They held in runs 2 to 6 only because the service starts each run from the same state.</li>
+        <li>No program checks a status. A refusal is printed, and the program exits 0.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>Code mode, saved · t3 <small>three programs, as the model wrote them in run 1</small></summary>
+    <div class="in">
+      <div class="file">program 1</div>
+<pre><code>import api
+r=api.searchEmployees(name="Frodo")
+print(r)</code></pre>
+      <div class="file">program 2</div>
+<pre><code>import api
+print(api.getEmployee(<span class="hl">1</span>))</code></pre>
+      <div class="file">program 3</div>
+<pre><code>import api
+r=api.getEmployee(<span class="hl">1</span>)
+b=r['body']
+print(api.update(1,{"firstName":b['firstName'],"lastName":b['lastName'],"role":b['role']+", retired"},if_match=r['etag']))
+print(api.getEmployee(1))</code></pre>
+      <ul>
+        <li>Program 3 reads Frodo again and writes with that read's ETag. That second read is why the teammate's change was kept: it landed before the read, not after.</li>
+        <li>It sends <code>role</code>; after the rename the service wants <code>position</code>.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>After the rename, what each printed <small>run 7</small></summary>
+    <div class="in">
+      <div class="file">Code mode, saved · t1 · exit 0</div>
+<pre><code>{'status': <span class="hl">422</span>, 'etag': None, 'body': {'type': 'https://w3id.org/heart-rise/problems/invalid-input', 'title': "The body does not match the form's schema", 'status': 422, 'detail': 'request body does not satisfy the affordance schema', 'violations': [{'pointer': '/position', 'message': "required property 'position' not found"}]}}
+{'status': 200, 'etag': None, 'body': {'count': 1, 'items': [{'id': 2, 'title': 'Bilbo Baggins'}]}}
+{'status': <span class="hl">404</span>, 'etag': None, 'body': {'error': 'no employee 3'}}
+{'status': <span class="hl">404</span>, 'etag': None, 'body': {'error': 'no employee 3'}}
+{'status': 200, 'etag': '"seq-1.json.8b9e801bed8b4db8"', 'body': {'id': 2, 'firstName': 'Bilbo', 'lastName': 'Baggins', 'role': 'burglar', 'status': 'working'}}
+{'status': 200, 'etag': '"seq-2.json.bba86145e7f63247"', 'body': {'id': 2, 'firstName': 'Bilbo', 'lastName': 'Baggins', 'role': 'burglar', 'status': <span class="hl">'dismissed'</span>}}</code></pre>
+      <div class="file">Code mode, saved · t3 · exit 0</div>
+<pre><code>{'status': 200, 'etag': None, 'body': {'count': 1, 'items': [{'id': 1, 'title': 'Frodo Baggins'}]}}
+{'status': 200, 'etag': '"seq-1.json.6b180d7809883934"', 'body': {'id': 1, 'firstName': 'Frodo', 'lastName': 'Baggins', 'role': 'ring bearer', 'status': 'working'}}
+{'status': <span class="hl">422</span>, 'etag': None, 'body': {'type': 'https://w3id.org/heart-rise/problems/invalid-input', 'title': "The body does not match the form's schema", 'status': 422, 'detail': 'request body does not satisfy the affordance schema', 'violations': [{'pointer': '/position', 'message': "required property 'position' not found"}]}}
+{'status': 200, 'etag': '"seq-1.json.6b180d7809883934"', 'body': {'id': 1, 'firstName': 'Frodo', 'lastName': 'Baggins', 'role': 'ring bearer', 'status': 'working'}}</code></pre>
+      <div class="file">ARTIE · t3 · from its trace</div>
+<pre><code>outcome: refused
+address: http://localhost:8099/employees/1
+refused:
+  kind: guard
+  by: the client
+  detail: 'staff:update changed: pinned sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=, offered sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I='
+---
+mode: intent
+say: Add ", retired" to the end of his current role, keeping the rest of it as it is
+params:
+  relation: staff:update
+  firstName: Frodo
+  lastName: Baggins
+  <span class="hl">position: ring bearer, retired</span></code></pre>
+    </div>
+  </details>
+
+  <details class="src"><summary>The teammate, in ARTIE's trace <small>t3, run 4</small></summary>
+    <div class="in">
+<pre><code>outcome: refused
+address: http://localhost:8099/employees/1
+refused:
+  kind: stale
+  by: the client
+  detail: since it was read, someone else changed role, which this act writes; sending it again would overwrite theirs
+---
+say: return to {address}
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: <span class="hl">keeper of the Red Book</span>
+    status: working
+---
+mode: script
+say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
+params:
+  relation: staff:update
+  firstName: Frodo
+  lastName: Baggins
+  role: <span class="hl">keeper of the Red Book, retired</span></code></pre>
+      <ul>
+        <li>Trimmed to the lines that matter; the full trace is <code>runs/artie/artie-data-t3-20261103-072940.yaml</code>.</li>
+        <li>On the wire: <code>PUT /employees/1/actions/update</code> with <code>If-Match: "seq-1.hsf.L2.a903f9549f3b7164"</code>, 412; then a read, then the same act with <code>"seq-2.hsf.L2.60e873853d6ada59"</code>, 200.</li>
+      </ul>
+    </div>
+  </details>
+  </div>
+
+  <details class="src"><summary>How it was run <small>service, sandbox, bench</small></summary>
+    <div class="in">
+      <ul>
+        <li><b>Service:</b> heart-sims' employees service (<code>employees.test</code>), reset before every run. ARTIE uses its HEART side; code mode uses its OpenAPI twin, the same operations.</li>
+        <li><b>The twin, made fair first:</b> plain JSON reads carry an <code>ETag</code> and answer 304 to <code>If-None-Match</code>; plain acts take an optional <code>If-Match</code> and refuse a stale one with 412; the description says so (spec/SPEC.md, decided 2026-11-02). Before that, code mode couldn't make a conditional write.</li>
+        <li><b>Code mode's library:</b> generated from the twin's description on each run: one function per operation, each answering status, ETag and body, with <code>if_match</code> where a write takes it, documented "refused 412 if the state moved since".</li>
+        <li><b>Sandbox:</b> <code>python:3.12-slim</code> in Docker on an internal network with only the service, read-only, 1 CPU, 256 MB, 64 processes, 120 s.</li>
+        <li><b>Teammate:</b> <code>PUT /_sim/employees/meddle</code>: right after Frodo is next read, his role becomes "keeper of the Red Book". <b>Rename:</b> <code>PUT /_sim/employees/changes</code>, <code>renamed</code>: hire and update take <code>position</code> for <code>role</code>.</li>
+        <li><b>ARTIE:</b> <code>artie generate --format yaml</code> from one goal run per task with the model (t1 25,390 input tokens, 10 calls; t3 17,093, 7 calls), then <code>artie run</code> on the <code>.heart.yaml</code>, its config <code>on-change: intent</code> and <code>keep: auto</code>, with the reasoner given only for the fallback.</li>
+        <li><b>Bench:</b> <code>exhibits/mcp-over-openapi/bench.py --tasks t1,t3 --reps 10 --sequence</code>, Sonnet 5.5, the same service, sequence and harness for every arm. Code mode on endpoints in <code>runs/code-vs-data-fresh.jsonl</code>; on HEART in <code>runs/code-heart.jsonl</code>, <code>runs/code-heart-hsf.jsonl</code> and <code>runs/code-heart-l2.jsonl</code>, with every program it ran; ARTIE's in <code>runs/artie-keep.jsonl</code>; saved programs in <code>runs/codemode/</code>; ARTIE's traces in <code>runs/artie/</code>.</li>
+        <li><b>Code mode on HEART, four more variants</b> (<code>runs/code-heart-more.jsonl</code>), each changing one thing: the OpenAPI description withheld by a proxy that answers <code>/openapi.json</code> 404 (<code>sandbox/no-openapi.conf</code>); the format's document, spec/HAL-SCHEMA-FORMS-HR.md, beside the program, with the prompt saying so (the sandbox reaches no other network); L2 with 16 turns. Two more (<code>runs/code-heart-docprompt.jsonl</code>): the same document in the system prompt, marked for the prompt cache.</li>
+        <li><b>Code mode on HEART, told:</b> "The service is at the address in the environment variable API_BASE; every request needs the header Authorization: Bearer followed by the environment variable API_TOKEN." HSF, also: "Accept: application/hal+json; Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;". L2, also: "Prefer: forms=link, schema=link".</li>
+        <li><b>Code mode, keeping skills</b> (<code>runs/skill-artie-sequence.jsonl</code>): the endpoint library and sandbox above, and two more tools, <code>save_skill</code> (a SKILL.md and a module defining <code>run(**arguments)</code>) and <code>run_skill</code>; told to save its work as a skill taking the values a person would change, looking up IDs and ETags each time and raising on a status it didn't expect, and to run a saved skill when one fits.</li>
+        <li><b>Code mode with ARTIE as its tool</b> (<code>runs/code-artie-sequence-final.jsonl</code>): three tools and no sandbox. <code>artie_find</code>: ARTIE runs a goal in plain words with its own reasoner, then <code>artie generate --format yaml</code> keeps it, with <code>on-change: intent</code> and <code>keep: auto</code>. <code>artie_run</code>: a kept script. <code>artie_look</code>: one address the service handed ARTIE, read with no model. ARTIE runs in its own container (Java 25), sharing the service container's network, so the service is at localhost; it holds the model key. Told how a goal is written: a sentence, then its steps, a step done for each of many saying so in its own words.</li>
+        <li><b>A harness running ARTIE</b> (<code>runs/escalate-sequence.jsonl</code>): the same tools for the first run; it records the kept scripts that did the task, runs them after with no model, and calls code mode with ARTIE's exit and reason only when one fails.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>Limits <small>said plainly</small></summary>
+    <div class="in">
+      <ul>
+        <li>One model, one service, two tasks, ten runs each.</li>
+        <li>Every code-mode client had 8 turns, but one variant with 16. On HEART at L2, fetching each form set and schema by link used them up in 5 t3 runs before a write landed.</li>
+        <li>A program's output reaches the model 4,000 characters at a time, so a document read in the sandbox takes several turns.</li>
+        <li>t3's kept script had one review by hand; the saved programs had none. A reviewer would likely have caught the fixed IDs and ETag, and might have added a status check.</li>
+        <li>Fresh and saved code mode's 412 path was never tested: their programs read Frodo again after the teammate, so no write of theirs was stale. A skill met one 412, raised, and was written again to read and retry.</li>
+        <li>The rename is one kind of change. A change the pins don't see (the same form, a new meaning) would pass ARTIE's guard too, unless a check after the act sees what it changed. ARTIE alone ran scripts with no such checks; the scripts code mode had ARTIE keep had them.</li>
+        <li>ARTIE's container shares the service container's network, so the service is at localhost: the one plain-HTTP address ARTIE sends a token to. A service elsewhere would be reached over HTTPS.</li>
+        <li>ARTIE's goal runs, which found the way, came from earlier benches: counted above, not in the 20 runs.</li>
+        <li>A repair is kept only where every value it sent was the script's own. A release that needs a new value, such as a required reason, sends ARTIE to the model on every run until a person keeps it.</li>
+      </ul>
+    </div>
+  </details>
+
+  <footer>
+    <ul>
+      <li>Built for this: the twin's validators (heart-core, both servers, the TCK); <code>artie generate --format yaml</code>; <code>artie run NAME.heart.yaml</code>, with <code>decide</code> held as data.</li>
+      <li>Credit: code mode as Anthropic ("Code execution with MCP") and Cloudflare (Code Mode) describe it.</li>
+    </ul>
+  </footer>
+</main>
+
+<!-- pages-only: on GitHub Pages the diagrams are drawn by Mermaid; an artifact draws them itself. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var dark = root.dataset.theme === 'dark' ||
+    (root.dataset.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+  mermaid.initialize({ startOnLoad: true, theme: dark ? 'dark' : 'neutral', securityLevel: 'strict',
+    fontFamily: 'IBM Plex Sans, system-ui, sans-serif', flowchart: { useMaxWidth: true } });
+})();
+</script>
+<!-- /pages-only -->
+
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+})();
+</script>
+</body>
+</html>

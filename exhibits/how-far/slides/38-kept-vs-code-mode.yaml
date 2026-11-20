@@ -1,0 +1,65 @@
+name: kept-vs-code-mode
+part: What it costs
+title: A kept script is data, not a program
+kicker: What gets kept
+say: "Code Mode (Cloudflare, September 2025; Anthropic's code execution with MCP, November 2025) has the model write TypeScript against tool APIs and runs it in a sandbox. That's a real improvement on stuffing tool lists into context. But what you keep is a program: it needs code review, a sandbox, dependency hygiene, and it can call anything its bindings expose. ARTIE keeps YAML: no loops you didn't capture, no imports, no eval. Every act names a relation, and before it's sent ARTIE checks the form is still offered and still matches its pin. A review is reading data."
+sources:
+  - ["Cloudflare: Code Mode (2025)", "https://blog.cloudflare.com/code-mode/"]
+  - ["Anthropic: Code execution with MCP", "https://www.anthropic.com/engineering/code-execution-with-mcp"]
+  - ["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]
+fragments:
+  - name: kept
+    label: The kept script (release.heart.yaml)
+    source: exhibits/merge-watch-release/release.heart.yaml
+    from: "steps:"
+    lang: yaml
+  - name: pins
+    label: What each form was, by hash (release.pins.yaml)
+    source: exhibits/merge-watch-release/release.pins.yaml
+    lang: yaml
+html: |
+  <h2>A kept script is data, not a program</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr)">
+    <div class="rows">
+      <pre># release.heart.yaml (excerpt), kept by artie generate
+  <b>heart: 1</b>
+  <b>kind: kept</b>
+  steps:
+    - act: scm:pulls-get
+      fields: {owner: ${owner}, repo: ${repo},
+               pull_number: ${pull}}
+      then: [keep-as: pr]
+    - enter: ${watcher}
+      steps:
+        - ask: watcher:watch
+          fields: {resource: ${pr.@self},
+                   offers: scm:merge}
+    - once-answered: {reply: watch, steps: […
+  <span class="add">      - act: scm:merge
+          fields: {method: squash}</span>
+  # release.pins.yaml: what each form was, by hash
+    scm:merge: {method: PUT,
+      integrity: sha256-sGUdrPfH…}</pre>
+      <p class="refs"><deck-fragment name="kept">release.heart.yaml</deck-fragment> <deck-fragment name="pins">release.pins.yaml</deck-fragment></p>
+    </div>
+    <div class="split" style="grid-template-columns: 1fr 1fr">
+      <div class="rows" style="gap: 0.4rem">
+        <h3 style="font: 650 1.5rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--leaf)">Kept YAML (ARTIE)</h3>
+        <ul>
+          <li>Data. No loops, imports or eval to review.</li>
+          <li>Every act names a relation the server must still offer.</li>
+          <li>Pinned by hash: a changed form stops the replay.</li>
+          <li>Runs with no model, in any HEART client.</li>
+        </ul>
+      </div>
+      <div class="rows" style="gap: 0.4rem">
+        <h3 style="font: 650 1.5rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--bad)">Code Mode</h3>
+        <ul>
+          <li>The model writes TypeScript or Python against tool APIs.</li>
+          <li>What you keep is a program: code review, sandbox, dependencies.</li>
+          <li>It can call anything its bindings expose, in any order.</li>
+          <li>A real step up from tool lists in context.</li>
+        </ul>
+      </div>
+    </div>
+  </div>

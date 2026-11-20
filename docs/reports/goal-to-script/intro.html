@@ -1,0 +1,37 @@
+  <p class="full more">Claude planned the goal below move by move against the live GitHub gateway (issue #144, pull request #145); each move is a line of github-task.goal.moves.kts, on the left, refused tries and detours included, which changed nothing. artie generate wrote github-task-from-goal.kts, on the right, from the run, leaving the detours out: each number marks one derivation on both sides, and its note says which rule bound it. That script then did the task again with no model, held strictly (#146, #147).</p>
+  <section class="goal"><h2>The goal: github-task.goal.yaml</h2>
+  <div class="explain">
+    <p class="brief">All a person writes: where to start, the inputs, and the goal in words.</p>
+    <div class="full">
+    <p>All a person writes. Three keys, nothing else:</p>
+    <ul>
+      <li><code>start</code>: the bookmark, the one address the run begins from. Every other address comes from what the server hands over.</li>
+      <li><code>inputs</code>: what varies per run, declared as a script&#x27;s <code>input()</code> would. A value given on the command line (<code>owner=JogoShugh</code>) wins, then the default, then the question. With none of these, and no one to answer, the run stops before its first request. Four forms: <code>name: value</code> (a default), <code>name:</code> (must be given), <code>name: {default, question}</code>, and <code>default: {now: PATTERN}</code>, a fresh value each run, as a java.time pattern.</li>
+      <li><code>goal</code>: the task in words, one paragraph or one step per line. <code>$name</code> reads an input.</li>
+    </ul>
+    <p>Run, then generate:</p>
+    <pre class="cmd">artie run github-task.goal.yaml owner=JogoShugh \
+  --reasoner claude --rung L2 --trace github-task.trace.yaml
+artie generate github-task.trace.yaml \
+  --out github-task-from-goal.kts --script github-task.goal.yaml</pre>
+    </div>
+  </div>
+  <pre class="yaml"><span class="y-k">start</span>: <span class="y-u">http://localhost:8392/</span>
+<span class="y-k">inputs</span>:
+  <span class="y-k">owner</span>:
+    <span class="y-k">question</span>: <span class="y-s">Whose repository?</span>
+  <span class="y-k">repo</span>:
+    <span class="y-k">default</span>: <span class="y-s">heart-github-test</span>
+    <span class="y-k">question</span>: <span class="y-s">Which repository?</span>
+  <span class="y-k">stamp</span>:
+    <span class="y-k">default</span>: { <span class="y-k">now</span>: <span class="y-s">MMdd-HHmmss</span> }
+<span class="y-k">goal</span>: <span class="y-p">|</span>
+<span class="y-s">  In <span class="y-v">$owner</span>/<span class="y-v">$repo</span>, open an issue titled &quot;Crash when a bed has no name (reasoned)&quot;, saying it was opened by a
+  HEART script.
+  From the main branch, start a new branch named fix-blank-names-reasoned-<span class="y-v">$stamp</span>, commit a file named
+  fix-reasoned-<span class="y-v">$stamp</span>.md to it saying &quot;Bed names may not be blank.&quot; with the message &quot;Refuse a bed with no name&quot;,
+  and open a pull request into main titled &quot;Refuse a bed with no name (reasoned)&quot;, saying it relates to the issue.
+  Wait until the pull request can be merged, merge it by squashing its commits, and make sure it merged.
+  Then go back to the issue, comment &quot;Fixed in 1.2 by #&lt;the pull request&#x27;s number&gt;.&quot;, and close it as completed.
+  Make sure it is closed as completed.</span>
+</pre></section>

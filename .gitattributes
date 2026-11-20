@@ -1,0 +1,21 @@
+# Files that run on Linux keep LF line endings on every checkout, Windows Git included (core.autocrlf=true).
+# A script checked out with CRLF fails in WSL and in Docker images with "cannot execute: required file not found".
+# Only these are listed, so recorded captures that hold CRLF on purpose stay as they are.
+*.sh        text eol=lf
+gradlew     text eol=lf
+*.py        text eol=lf
+*.cgi       text eol=lf
+*.mjs       text eol=lf
+*.groovy    text eol=lf
+*.template  text eol=lf
+Dockerfile  text eol=lf
+Dockerfile.* text eol=lf
+*.kts       text eol=lf
+*.properties text eol=lf
+*.env.example text eol=lf
+env.example text eol=lf
+kit/**      text eol=lf
+
+# Windows' own scripts are left exactly as stored (CRLF).
+*.bat       -text
+*.cmd       -text

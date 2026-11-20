@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session Handoff</title>
+<style>
+:root {
+  --bg: #f7f7f4; --panel: #ffffff; --ink: #1d2320; --muted: #5d6762; --line: #dcdfdb;
+  --accent: #1f7a5c; --accent-bg: #e3f3ec; --red: #b4232c; --red-bg: #fbe7e8; --amber: #8a5a00; --amber-bg: #fdf1d8;
+  --code-bg: #eef0ec; --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121715; --panel: #1a211e; --ink: #e6ebe8; --muted: #9aa6a0; --line: #2c3632;
+    --accent: #5cc9a0; --accent-bg: #173328; --red: #f08a8f; --red-bg: #3a1c1f; --amber: #f2c46b; --amber-bg: #3a2e14;
+    --code-bg: #222a27;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121715; --panel: #1a211e; --ink: #e6ebe8; --muted: #9aa6a0; --line: #2c3632;
+  --accent: #5cc9a0; --accent-bg: #173328; --red: #f08a8f; --red-bg: #3a1c1f; --amber: #f2c46b; --amber-bg: #3a2e14;
+  --code-bg: #222a27;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+header { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+h1 { font-size: 26px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 32px 0 10px; }
+.lede { color: var(--muted); margin: 0; max-width: 640px; }
+.mock { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--amber-bg); color: var(--amber); margin-bottom: 8px; }
+.theme { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+code, pre { font-family: var(--mono); font-size: 13px; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+pre { background: var(--code-bg); padding: 12px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; margin: 8px 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.resume { border: 2px solid var(--accent); }
+.resume h2 { margin-top: 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 18px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.tile b { display: block; font-size: 20px; }
+.tile span { color: var(--muted); font-size: 13px; }
+.tile.good { background: var(--accent-bg); border-color: var(--accent); }
+.tile.warn { background: var(--amber-bg); border-color: var(--amber); }
+details { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 16px; margin: 8px 0; }
+details > summary { cursor: pointer; font-weight: 600; }
+details[open] > summary { margin-bottom: 8px; }
+ul { padding-left: 20px; margin: 6px 0; }
+li { margin: 3px 0; }
+blockquote { margin: 8px 0; padding: 8px 14px; border-left: 3px solid var(--accent); background: var(--panel); border-radius: 0 8px 8px 0; }
+blockquote small { display: block; color: var(--muted); }
+.timeline { list-style: none; padding: 0; margin: 0; }
+.timeline > li { display: grid; grid-template-columns: 74px 92px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.timeline time { color: var(--muted); font-family: var(--mono); font-size: 13px; }
+.chip { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 1px 8px; border-radius: 999px; text-align: center; }
+.chip.feature { background: var(--code-bg); }
+.chip.red { background: var(--red-bg); color: var(--red); }
+.chip.green { background: var(--accent-bg); color: var(--accent); }
+.chip.code { background: var(--amber-bg); color: var(--amber); }
+.chip.commit { background: var(--ink); color: var(--bg); }
+.scen { width: 100%; border-collapse: collapse; font-size: 14px; }
+.scen td { padding: 6px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.scen td:last-child { white-space: nowrap; text-align: right; }
+.copy { float: right; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 6px; padding: 2px 10px; cursor: pointer; font-size: 12px; }
+footer { color: var(--muted); font-size: 13px; margin-top: 32px; }
+@media (max-width: 560px) {
+  .timeline > li { grid-template-columns: 1fr; gap: 2px; }
+  .kv { grid-template-columns: 1fr; }
+  .kv dt { margin-top: 6px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <span class="mock">Mockup: the format, filled with a real session</span>
+    <h1>Session handoff: the tolls domain</h1>
+    <p class="lede">One BDD session, the evening of 16 Nov 2026: an E-ZPass-style toll account built on HEART, Gherkin first, then its report. Everything a teammate needs to review it, or pick it up, from their own account.</p>
+  </div>
+  <button class="theme" id="theme" type="button">◐ Theme</button>
+</header>
+
+<div class="tiles">
+  <div class="tile good"><b>Done</b><span>pushed to <code>claude/auth-branch-4bnmhc</code></span></div>
+  <div class="tile good"><b>18 / 18</b><span>scenarios green, after 18 / 18 red first</span></div>
+  <div class="tile good"><b>Passed</b><span>pre-commit TDD order check, both commits</span></div>
+  <div class="tile"><b>36 · 5 skipped</b><span>HEART conformance scenarios</span></div>
+  <div class="tile"><b>6 → 0</b><span>Detekt findings, fixed before commit</span></div>
+  <div class="tile warn"><b>3 open</b><span>items for the next person</span></div>
+</div>
+
+<h2 id="resume">Resume here</h2>
+<div class="panel resume">
+  <dl class="kv">
+    <dt>Repository</dt><dd><code>JogoShugh/heart-rise-artie</code>, branch <code>claude/auth-branch-4bnmhc</code></dd>
+    <dt>Last commit</dt><dd><code>87ab7334</code> Report: Tolls, Live (on GitHub; nothing unpushed)</dd>
+    <dt>Working tree</dt><dd>clean for this work; run captures and scratch output are untracked and not part of it</dd>
+    <dt>Refactor mode</dt><dd>off</dd>
+    <dt>Red scenarios</dt><dd>none</dd>
+    <dt>Still running</dt><dd>the tolls server (8484) and its browser proxy (8485) on the author's Mac; stop them, or ignore them</dd>
+    <dt>Next step</dt><dd>Roles on the tolls account: the holder, a plaza, an agent and an auditor each offered only their own acts. Start with the Gherkin.</dd>
+  </dl>
+  <p><b>To resume in your own Claude Code session</b>, pull the branch and paste:</p>
+  <button class="copy" type="button" data-copy="prompt">Copy</button>
+  <pre id="prompt">Read docs/sessions/2026-11-16-tolls/HANDOFF.md and resume from "Next step".
+Follow the repo's BDD gates: feature first, a red run on behaviour, then code.
+Do not push without asking me.</pre>
+</div>
+
+<h2>What was asked</h2>
+<blockquote>“Just build an ezpass  and toll fare collection domain on heart”<small>the author</small></blockquote>
+<blockquote>“Create a report”<small>the author</small></blockquote>
+
+<h2>How it went, in order</h2>
+<div class="panel">
+<ol class="timeline">
+  <li><time>~20:24</time><span class="chip feature">feature</span><div><code>account.feature</code>: 12 scenarios, 18 with outline rows. New, open, low, suspended and closed accounts; fares; tags; disputes.</div></li>
+  <li><time>~20:25</time><span class="chip red">red</span><div><code>BDD_RUN FAIL module=tolls total=18 failures=18</code>: every step undefined, before any production code. <details><summary>Why this counts as red</summary>A compile error is not a red run. The first run had only the feature and a bare runner, so it failed on behaviour.</details></div></li>
+  <li><time>~20:31</time><span class="chip code">code</span><div>Domain: <code>Account.kt</code> (rules and fares), <code>AccountEvent.kt</code>, <code>AccountState.kt</code> (the fold), <code>AccountService.kt</code> (the rules a schema can't say).</div></li>
+  <li><time>~20:36</time><span class="chip code">code</span><div>Declaration: <code>TollsProfile.kt</code>, <code>Inputs.kt</code>, <code>AccountActs.kt</code>, <code>Accounts.kt</code> (acts per phase, the tag chosen from the account's own tags). Store, config, app, migration.</div></li>
+  <li><time>~20:40</time><span class="chip green">green</span><div><code>BDD_RUN PASS module=tolls total=18 failures=0</code> on the first run with code.</div></li>
+  <li><time>~20:46</time><span class="chip code">lint</span><div><code>check</code> failed on Detekt: 4 magic numbers in the fare table, 2 long lines. Fixed by naming the fares; tests reformatted by Detekt.</div></li>
+  <li><time>~20:52</time><span class="chip green">green</span><div><code>check</code> passed: 18 scenarios, 36 conformance (5 skipped), 2 architecture tests, Postgres in Testcontainers, Detekt.</div></li>
+  <li><time>21:00</time><span class="chip commit">commit</span><div><code>9a922819</code> Tolls: an E-ZPass-style toll account… <br><code>pre-commit: TDD ordering check passed.</code></div></li>
+  <li><time>~21:12</time><span class="chip green">run</span><div>The report's walk: 15 steps against the running server, 3 refused on purpose, all as expected.</div></li>
+  <li><time>21:18</time><span class="chip commit">commit</span><div><code>87ab7334</code> Report: Tolls, Live. Pushed on the author's “Push”.</div></li>
+</ol>
+</div>
+
+<h2>Scenarios</h2>
+<details>
+<summary>18 scenarios: all red first, then all green</summary>
+<table class="scen">
+  <tr><td>A new account offers only adding funds, and the rest say why not</td><td><span class="chip red">red</span> <span class="chip green">green</span></td></tr>
+  <tr><td>An account opens with at least $25</td><td><span class="chip red">red</span> <span class="chip green">green</span></td></tr>
+  <tr><td>Funds of $25 open the account: every act of an open account is offered</td><td><span class="chip red">red</span> <span class="chip green">green</span></td></tr>
+  <tr><td>A trip at a plaza by a class at a time costs its fare (6 rows)</td><td><span class="chip red">red</span> <span class="chip green">green</span></td></tr>
+  <tr><td>The tag charged is chosen from the account's own tags that are not lost</td><td><span class="chip red">red</span> <span class="chip green">green</span></td></tr>
+  <tr><td>A lost tag no longer pays: it is not one of the choices</td><td><span class="chip red">red</span> <span class="chip green">green</span></td></tr>
+  <tr><td>A tag already on the account is not added again</td><td><span class="chip red">red</span> <span class="chip green">green</span></td></tr>
+  <tr><td>A balance after a trip leaves the account active or low (2 rows)</td><td><span class="chip red">red</span> <span class="chip green">green</span></td></tr>
+  <tr><td>Below $0 the account is suspended: only funds and disputes are offered</td><td><span class="chip red">red</span> <span class="chip green">green</span></td></tr>
+  <tr><td>A disputed trip is refunded, once</td><td><span class="chip red">red</span> <span class="chip green">green</span></td></tr>
+  <tr><td>Only a trip can be disputed</td><td><span class="chip red">red</span> <span class="chip green">green</span></td></tr>
+  <tr><td>Closing the account refunds the balance, and then nothing is offered</td><td><span class="chip red">red</span> <span class="chip green">green</span></td></tr>
+</table>
+</details>
+
+<h2>Decisions, and why</h2>
+<details open>
+<summary>6 decisions a reviewer should check</summary>
+<ul>
+  <li><b>One resource, the account.</b> Trips, tags and payments are its statement, not resources of their own: the account's state decides every act, which is what HEART shows.</li>
+  <li><b>Money in whole cents.</b> No floating point anywhere; dollars only on the wire, as text.</li>
+  <li><b>A trip records the fare it was charged.</b> A later change to the fare table never rewrites a past trip.</li>
+  <li><b>The phase is computed, not stored.</b> Baseball, an hour earlier, broke when a computed property was written into the state's snapshot; the account's phase is a function for that reason.</li>
+  <li><b>Low balance offers the same acts as active.</b> It is a warning, not a restriction; only below $0 do the tags stop paying.</li>
+  <li><b>Roles left out on purpose.</b> One credential may do every act its phase offers. Roles are the next session (see Resume here).</li>
+</ul>
+</details>
+
+<h2>For the next person</h2>
+<details open>
+<summary>3 open items</summary>
+<ul>
+  <li><b>Roles on the tolls account</b>: the next step. The README's last section has the four roles.</li>
+  <li><b>The gate's lint and check lists don't include <code>domains/baseball</code> or <code>domains/tolls</code>.</b> Only the author changes the gate config; the skill's new <code>gradle-builds.sh</code> fixes this for good.</li>
+  <li><b>Stop the servers</b> on the author's Mac, or ignore them: nothing depends on them.</li>
+</ul>
+</details>
+
+<h2>The record</h2>
+<details>
+<summary>Files changed: 31 in the domain, 37 in the report</summary>
+<pre>domains/tolls/src/test/resources/features/account.feature   118 +
+domains/tolls/src/main/kotlin/com/artie/tolls/domain/…        4 files, 251 +
+domains/tolls/src/main/kotlin/com/artie/tolls/declaration/…   4 files, 257 +
+domains/tolls/src/main/kotlin/com/artie/tolls/{config,store}/ 3 files,  83 +
+domains/tolls/src/test/kotlin/…                               6 files, 414 +
+docs/reports/tolls-html-and-heart/                            index.html, 34 images</pre>
+</details>
+<details>
+<summary>Every gate event, as logged</summary>
+<pre>~20:24 FEATURE_WRITE domains/tolls/src/test/resources/features/account.feature
+~20:25 BDD_RUN FAIL module=tolls total=18 failures=18 errors=0
+~20:31 MAIN_WRITE domains/tolls/src/main/kotlin/com/artie/tolls/domain/Account.kt
+…  (17 more MAIN_WRITE lines)
+~20:40 BDD_RUN PASS module=tolls total=18 failures=0 errors=0
+~20:52 BDD_RUN PASS module=tolls total=18 failures=0 errors=0</pre>
+</details>
+<details>
+<summary>Reproduce it</summary>
+<pre>git checkout claude/auth-branch-4bnmhc && git pull
+cd domains/tolls && ./gradlew check          # 18 scenarios, conformance, architecture, Postgres
+./gradlew bootRun                            # needs Postgres and a token: see domains/tolls/README.md</pre>
+</details>
+
+<h2>How a teammate picks it up</h2>
+<div class="panel">
+<ul>
+  <li>The session writes this page and a <code>HANDOFF.md</code> to <code>docs/sessions/&lt;date&gt;-&lt;slug&gt;/</code> and commits them with the work. A teammate gets both with <code>git pull</code>, in their own clone, under their own Claude account: nothing is shared but the repository.</li>
+  <li><code>HANDOFF.md</code> is the same content, short, for a model to read: the ask in the author's words, the state, the decisions, the open items, the next step.</li>
+  <li>No transcript, no tokens, no secrets: built from git, the gate's event log and the session's own notes, and scanned for credentials before it is written.</li>
+  <li>On GitHub Pages too, once pushed, so a reviewer needs only a link.</li>
+</ul>
+</div>
+
+<footer>Mockup for review, 17 Nov 2026. The content is the real tolls session. The commit times are real; the other times are approximate and marked ~, and the event lines show the format: the real report reads every line from the gate's event log.</footer>
+</div>
+<script>
+(() => {
+  const root = document.documentElement, btn = document.getElementById("theme");
+  const apply = (t) => { if (t) root.dataset.theme = t; else delete root.dataset.theme; };
+  try { apply(localStorage.getItem("theme")); } catch (e) {}
+  btn.addEventListener("click", () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = dark ? "light" : "dark"; apply(next);
+    try { localStorage.setItem("theme", next); } catch (e) {}
+  });
+  document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", () => {
+    const text = document.getElementById(b.dataset.copy).textContent;
+    navigator.clipboard?.writeText(text).then(() => { b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 1500); });
+  }));
+})();
+</script>
+</body>
+</html>

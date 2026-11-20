@@ -1,0 +1,33 @@
+name: no-time
+part: "The question"
+title: No Time to Type
+kicker: Why this talk · the second ground has four legs
+say: "Have you ever tried to write code with a leash in one hand? I don't recommend it. Between family and a new dog, the time I used to spend at a keyboard is gone. Half of the answer was Claude Code's /remote-control. The session runs on my machine, and I steer it mostly by speech-to-text dictation into my phone, from wherever I am. Most evenings I send two messages: 'Please give me an update' and 'How's it going?' Fair enough, but that's only half. An agent I can't watch needs the three R's before anyone else's does: it has to follow BDD for real, and it has to do that the same way every time: Gherkin first, a red run, the code, a green run, and only then a commit. Can you get that by asking nicely? Probably not. Instructions to a model are advisory. So hooks enforce the order: a write out of turn is refused, every run is logged, and the commit gate checks the order before anything lands. I don't watch the agent; I read the record afterward. Notice that this is exactly what an agent calling an API needs, too: controls that still hold when nobody is watching. So who's really in charge here?"
+sources:
+  - ["Claude Code docs: /remote-control", "https://code.claude.com/docs/en/remote-control"]
+  - ["bdd-gates skill", "https://github.com/JogoShugh/bdd-gates-skill"]
+fragments:
+  - name: hooks
+    label: The hooks that gate every change (core/hooks.json)
+    source: bdd-gates:core/hooks.json
+    lang: json
+html: |
+  <h2>No Time to Type</h2>
+  <div class="split">
+    <div class="rows">
+      <p class="lead">Have you ever tried to write code with a leash in one hand? I don’t recommend it.</p>
+      <div><h3>Half the Answer: <code>/remote-control</code></h3><p>The session runs on my machine. I steer it mostly by dictating into my phone.</p></div>
+      <div><h3>The Other Half: Rigor Without Watching</h3><p>BDD for real, the same way every time: Gherkin, red, code, green, commit. <deck-ref name="right-behavior"></deck-ref> <deck-ref name="repeatability"></deck-ref></p></div>
+      <div><h3>Asking Nicely? Probably Not.</h3><p>Instructions are advisory, so hooks enforce the order. I read the record afterward.</p></div>
+      <p class="punch">Notice that an agent calling an API needs the same thing: controls that still hold when nobody is watching. <deck-ref name="no-time"></deck-ref> <deck-fragment name="hooks">hooks.json</deck-fragment></p>
+    </div>
+    <div class="phone">
+      <p class="phone-head">/remote-control</p>
+      <p class="me">Please give me an update</p>
+      <p class="it">Red run logged. Writing the fix.</p>
+      <p class="me">How’s it going?</p>
+      <p class="it">Green. Commit gate: TDD order checked.</p>
+      <p class="me">🐕 pulling. back in 20</p>
+      <p class="note">Illustrative, not a transcript. The two questions are the real ones, every evening. So is the dog.</p>
+    </div>
+  </div>

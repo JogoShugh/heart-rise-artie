@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Controls for Rules We Can't Set</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  --paper: #F7F3EA; --ink: #1D2128; --muted: #5B6370; --rule: #DDD5C6; --panel: #FFFDF8;
+  --accent: #A45F12; --accent-soft: #F6E3C2; --code: #EFE9DC; --mark: #F3D9A8;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A; --mark: #4A3714; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A; --mark: #4A3714; color-scheme: dark }
+body { background: var(--paper); color: var(--ink); margin: 0; font: 400 1.125rem/1.7 'Source Serif 4', Georgia, serif; }
+main { max-width: 42rem; margin: 0 auto; padding-block: 4rem 6rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.kicker { font: 600 0.8rem/1 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin: 0 0 1rem; }
+h1 { font: 600 clamp(2rem, 6.5vw, 3rem)/1.15 'IBM Plex Sans', system-ui, sans-serif; margin: 0 0 1.2rem; text-wrap: balance; }
+h1 .lo { font: 600 1.25em/1 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: 0.04em; color: var(--accent); }
+.dek { font-size: 1.3rem; line-height: 1.5; color: var(--muted); margin: 0 0 2.5rem; }
+h2 { font: 600 1.5rem/1.25 'IBM Plex Sans', system-ui, sans-serif; margin: 3.2rem 0 1rem; text-wrap: balance; }
+p { margin: 0 0 1.1rem; }
+blockquote { margin: 1.8rem 0; padding: 0.3rem 0 0.3rem 1.3rem; border-left: 3px solid var(--accent); font-size: 1.2rem; line-height: 1.55; }
+blockquote p { margin: 0 0 0.6rem; }
+cite { display: block; font: 400 0.88rem/1.5 'IBM Plex Sans', system-ui, sans-serif; font-style: normal; color: var(--muted); }
+code { font: 0.86em 'IBM Plex Mono', ui-monospace, monospace; background: var(--code); padding: 0.1em 0.3em; border-radius: 4px; }
+pre { background: var(--code); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1.4rem 0; font: 0.82rem/1.6 'IBM Plex Mono', ui-monospace, monospace; }
+pre code { background: none; padding: 0; font-size: inherit; }
+mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 0.15em; }
+.file { font: 500 0.78rem/1 'IBM Plex Mono', ui-monospace, monospace; color: var(--muted); margin: 1.4rem 0 -0.9rem; }
+.log { font: 0.95rem/1.6 'IBM Plex Mono', ui-monospace, monospace; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 0.9rem 1.1rem; margin: 1.4rem 0; }
+.log span { color: var(--muted); }
+ol.steps { padding-left: 1.3rem; } ol.steps li { margin: 0 0 0.5rem; }
+.table { overflow-x: auto; margin: 1.2rem 0 1.6rem; }
+table { border-collapse: collapse; width: 100%; font: 400 0.92rem/1.45 'IBM Plex Sans', system-ui, sans-serif; }
+th, td { text-align: left; vertical-align: top; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--rule); }
+th { font-weight: 600; color: var(--muted); }
+td.hl { color: var(--accent); font-weight: 600; }
+.next { margin-top: 2.4rem; padding: 1rem 1.2rem; border: 1px solid var(--accent); border-radius: 12px; background: var(--accent-soft); }
+.next > p { margin: 0 0 0.4rem; font-weight: 600; } .next ul { margin: 0; padding-left: 1.2rem; } .next li { margin: 0 0 0.3rem; } .next.prev { margin: 0 0 2.2rem; }
+details.deep { margin: 1rem 0 1.4rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); }
+details.deep > summary { cursor: pointer; padding: 0.7rem 1rem; font: 600 0.95rem/1.4 'IBM Plex Sans', system-ui, sans-serif; color: var(--accent); }
+details.deep > pre { margin: 0 0.8rem 0.8rem; max-height: 28rem; }
+details.deep > p { margin: 0 1rem 0.9rem; font: 400 0.92rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); }
+.file a { color: inherit; }
+figure.shot { margin: 1.2rem 0; } figure.shot img { display: block; max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 8px; background: #fff; }
+figure.shot figcaption { font: 400 0.88rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); margin-top: 0.4rem; }
+ol.four { font: 400 1rem/1.6 'IBM Plex Sans', system-ui, sans-serif; padding-left: 1.4rem; } ol.four li:last-child { color: var(--accent); font-weight: 600; }
+.sources { margin-top: 3.5rem; border-top: 1px solid var(--rule); padding-top: 1rem; font: 400 0.9rem/1.6 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); }
+.sources h2 { font-size: 1rem; margin: 0.5rem 0; }
+.sources ul { padding-left: 1.2rem; margin: 0; }
+.sources a, main a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<main>
+  <p class="kicker">Information and controls · part 1</p>
+  <h1>Controls for rules we can't set</h1>
+  <p class="dek">GitHub won't enforce our merge rule, so our own control in front of it does.</p>
+
+  <div class="next prev">
+    <p>Previously, in <a href="../part-0/">part 0: LO and behold</a></p>
+    <ul>
+      <li>The Web pairs information with controls, its links and forms, and one generic program, the browser, has worked with every site for decades.</li>
+      <li>Generative AI surprises us, for better and worse, yet we're still held to repeatability, reliability and right behavior.</li>
+      <li>The models were made from the Web's links, while APIs mostly kept the information and left the controls out.</li>
+      <li>This series puts hypermedia controls back into API design, and builds a generic client, heart-ts, a piece at a time.</li>
+    </ul>
+  </div>
+  <p>Now for a concrete case, one many teams will recognize.</p>
+
+  <h2>A setting we can't switch on</h2>
+  <p>Our team merges a steady stream of dependency bumps in a GitHub repository we don't administer, and our rule is never to merge a branch that's behind its base. GitHub's "Require branches to be up to date before merging" setting would enforce exactly that, so what was tested is what lands, but it belongs to the repository's owners, and they won't switch it on. That's common in large enterprises, where vendors under contract often run functions such as Cloud or DevOps, and any setting we'd like is a request, a negotiation or a no. So the rule is ours to keep, in our own tools.</p>
+  <p>More and more of those tools are AI. Some of their surprises are welcome, like a working dashboard in seconds. Some are costly, like an agent that merges a bump behind its base because GitHub lets it. We want our tools to do what our team allows, not merely what GitHub allows.</p>
+  <p>GitHub is our example because we don't own it: the technique works even in front of systems we don't control. In an API we do own, the same controls can be built in from the start, which is more powerful still, since every client, person, script or agent, then gets them in every answer.</p>
+
+  <h2>Lo and behold, a dashboard fragment</h2>
+  <p>So, a lo-and-behold moment of our own. We asked an assistant for a fragment for our review dashboard that lists our open bumps and offers a Merge control only where our rule allows. Lo and behold:</p>
+  <p class="file"><a href="https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/lo-to-heart/public/bumps.html">public/bumps.html</a></p>
+<pre><code>&lt;section id="bumps"&gt;&lt;/section&gt;
+
+&lt;style&gt; .held { color: firebrick } &lt;/style&gt;
+
+&lt;script type="module"&gt;
+const api = "/github/repos/JogoShugh/heart-github-test";
+const get = (path) =&gt; fetch(api + path).then((answer) =&gt; answer.json());
+const bumps = document.querySelector("#bumps");
+
+for (const { number } of await get("/issues?labels=bumps&amp;state=open")) {
+  const pull = await get(`/pulls/${number}`);
+  const compare = await get(`/compare/${pull.base.ref}...${pull.head.sha}`);
+  <mark>const behind = compare.behind_by &gt; 0;   // our rule, in our code</mark>
+  bumps.insertAdjacentHTML("beforeend", behind
+    ? `&lt;p class="held"&gt;#${number} ${pull.title}: behind its base, update it first&lt;/p&gt;`
+    : `&lt;p&gt;#${number} ${pull.title} &lt;button onclick="merge(this, ${number})"&gt;Merge&lt;/button&gt;&lt;/p&gt;`);
+}
+
+window.merge = async (button, number) =&gt; {
+  const answer = await fetch(`${api}/pulls/${number}/merge`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ merge_method: "squash" }),
+  });
+  button.replaceWith(answer.ok ? "merged" : `not merged: ${(await answer.json()).message}`);
+};
+&lt;/script&gt;</code></pre>
+  <h2>A server in the middle</h2>
+  <p>Its first draft kept a GitHub token in the browser. The team said no, so the page calls <code>/github/...</code> on the dashboard's own small server, which adds the token and forwards each call to GitHub unchanged (<a href="https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/lo-to-heart/server.ts"><code>server.ts</code></a>, fifteen lines). We ran it in a real browser against real pull requests. It offered Merge on <a href="https://github.com/JogoShugh/heart-github-test/pull/2116">#2116</a>, which was fresh, and the merge went through; it held back <a href="https://github.com/JogoShugh/heart-github-test/pull/2114">#2114</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/2111">#2111</a> and <a href="https://github.com/JogoShugh/heart-github-test/pull/2108">#2108</a>, each behind its base, and said why.</p>
+<figure class="shot"><img src="before.png" alt="The fragment: #2116 with a Merge button; #2114, #2111, #2108 in red, each behind its base, update it first" width="500" height="136"><figcaption>The fragment, as the browser showed it. Merge on #2116 only.</figcaption></figure>
+<figure class="shot"><img src="after.png" alt="After clicking Merge: #2116 merged; the others still held back" width="500" height="136"><figcaption>After clicking Merge.</figcaption></figure>
+<details class="deep"><summary>The squash merge of #2116: what the page sent</summary>
+<pre><code>PUT /github/repos/JogoShugh/heart-github-test/pulls/2116/merge HTTP/1.1
+Host: localhost:8500
+Referer: http://localhost:8500/bumps.html
+Content-Type: application/json
+
+{"merge_method":"squash"}</code></pre>
+<p>No token: the page never has one.</p></details>
+<details class="deep"><summary>What our server sent on to GitHub</summary>
+<pre><code>PUT /repos/JogoShugh/heart-github-test/pulls/2116/merge HTTP/1.1
+Host: api.github.com
+Authorization: Bearer &lt;token, redacted&gt;
+Content-Type: application/json
+
+{"merge_method":"squash"}</code></pre>
+<p>The same request, with <code>/github</code> taken off the path and the team's token added. That's all the server does. (Shown from its code; the run captured what the browser sent and what came back.)</p></details>
+<details class="deep"><summary>GitHub's answer, passed back unchanged</summary>
+<pre><code>HTTP/1.1 200 OK
+content-type: application/json; charset=utf-8
+date: Sun, 01 Nov 2026 03:15:38 GMT
+etag: W/"d6910369759a55eea12297db4a0760dc50643d01712e2f6c3ab508d05fe57c91"
+server: github.com
+x-accepted-github-permissions: contents=write
+x-github-api-version-selected: 2022-11-28
+x-github-media-type: github.v3; format=json
+x-github-request-id: EF1F:1083CD:7BD611E:1A2B22DD:6AE6AED8
+x-ratelimit-limit: 5000
+x-ratelimit-remaining: 4941
+
+{
+  "sha": "bec58f862cc3221b08437e392f6c6ac50a5ebfe2",
+  "merged": true,
+  "message": "Pull Request successfully merged"
+}</code></pre>
+<p>Headers abridged. The full exchange, and every other one in the run, is in <a href="https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/lo-to-heart/runs/part-0-202611010315.yaml"><code>runs/part-0-202611010315.yaml</code></a>.</p></details>
+  <h2>Level zero</h2>
+  <p>One file holds everything: the information, our Merge control and our rule, made for this repository, today. Call it level zero, L0, which looks like that first "LO" on purpose. It works, and it's what AI tools write by default. They can write generic, reusable work too, but only when we guide them there.</p>
+
+  <h2>Information without controls</h2>
+  <p>Look at what the fragment had to know: four addresses built from GitHub's documentation, that merging is a <code>PUT</code> and what it takes, and our rule. GitHub's answer for <a href="https://github.com/JogoShugh/heart-github-test/pull/2114">#2114</a>, held back for being a commit behind, says <code>"mergeable_state": "clean"</code>, with 159 links and not one control.</p>
+<details class="deep"><summary>GitHub's whole answer for #2114 (19 KB)</summary>
+<pre><code>{
+  "url": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114",
+  "id": 5103931634,
+  "node_id": "PR_kwDOVM7WJc8AAAABMDfQ8g",
+  "html_url": "https://github.com/JogoShugh/heart-github-test/pull/2114",
+  "diff_url": "https://github.com/JogoShugh/heart-github-test/pull/2114.diff",
+  "patch_url": "https://github.com/JogoShugh/heart-github-test/pull/2114.patch",
+  "issue_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/2114",
+  "commits_url": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114/commits",
+  "review_comments_url": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114/comments",
+  "review_comment_url": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/comments{/number}",
+  "comments_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/2114/comments",
+  "statuses_url": "https://api.github.com/repos/JogoShugh/heart-github-test/statuses/55f5f1501330c81f6bc1aad50514f004bf0a39c0",
+  "number": 2114,
+  "state": "open",
+  "locked": false,
+  "title": "Bump left-pad to 2.0.1 (1101031355)",
+  "user": {
+    "login": "JogoShugh",
+    "id": 1863005,
+    "node_id": "MDQ6VXNlcjE4NjMwMDU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1863005?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/JogoShugh",
+    "html_url": "https://github.com/JogoShugh",
+    "followers_url": "https://api.github.com/users/JogoShugh/followers",
+    "following_url": "https://api.github.com/users/JogoShugh/following{/other_user}",
+    "gists_url": "https://api.github.com/users/JogoShugh/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/JogoShugh/subscriptions",
+    "organizations_url": "https://api.github.com/users/JogoShugh/orgs",
+    "repos_url": "https://api.github.com/users/JogoShugh/repos",
+    "events_url": "https://api.github.com/users/JogoShugh/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/JogoShugh/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "body": "A Dependabot stand-in, for exhibits/allowed-now.",
+  "labels": [
+    {
+      "id": 12913232941,
+      "node_id": "LA_kwDOVM7WJc8AAAADAbBMLQ",
+      "url": "https://api.github.com/repos/JogoShugh/heart-github-test/labels/bumps",
+      "name": "bumps",
+      "description": null,
+      "color": "ededed",
+      "default": false,
+      "archived_at": null,
+      "archived_by": null
+    }
+  ],
+  "milestone": null,
+  "active_lock_reason": null,
+  "created_at": "2026-11-01T03:13:59Z",
+  "updated_at": "2026-11-01T03:14:00Z",
+  "closed_at": null,
+  "merged_at": null,
+  "merge_commit_sha": "65566298f628491dffb23aef9becc97302d0cd17",
+  "assignee": null,
+  "assignees": [],
+  "requested_reviewers": [],
+  "requested_teams": [],
+  "head": {
+    "label": "JogoShugh:deps/left-pad-2.0.1-1101031355",
+    "ref": "deps/left-pad-2.0.1-1101031355",
+    "repo": {
+      "id": 1422841381,
+      "node_id": "R_kgDOVM7WJQ",
+      "name": "heart-github-test",
+      "full_name": "JogoShugh/heart-github-test",
+      "owner": {
+        "login": "JogoShugh",
+        "id": 1863005,
+        "node_id": "MDQ6VXNlcjE4NjMwMDU=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1863005?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/JogoShugh",
+        "html_url": "https://github.com/JogoShugh",
+        "followers_url": "https://api.github.com/users/JogoShugh/followers",
+        "following_url": "https://api.github.com/users/JogoShugh/following{/other_user}",
+        "gists_url": "https://api.github.com/users/JogoShugh/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/JogoShugh/subscriptions",
+        "organizations_url": "https://api.github.com/users/JogoShugh/orgs",
+        "repos_url": "https://api.github.com/users/JogoShugh/repos",
+        "events_url": "https://api.github.com/users/JogoShugh/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/JogoShugh/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "private": false,
+      "fork": false,
+      "archived": false,
+      "disabled": false,
+      "description": null,
+      "homepage": null,
+      "language": null,
+      "visibility": "public",
+      "is_template": false,
+      "topics": [],
+      "forks_count": 0,
+      "forks": 0,
+      "stargazers_count": 0,
+      "watchers_count": 0,
+      "watchers": 0,
+      "open_issues_count": 630,
+      "open_issues": 630,
+      "size": 840,
+      "default_branch": "main",
+      "has_issues": true,
+      "has_projects": true,
+      "has_wiki": true,
+      "has_pages": false,
+      "has_downloads": false,
+      "has_discussions": false,
+      "has_pull_requests": true,
+      "pushed_at": "2026-11-01T03:14:45Z",
+      "created_at": "2026-10-17T01:37:34Z",
+      "updated_at": "2026-10-23T11:55:40Z",
+      "allow_forking": true,
+      "web_commit_signoff_required": false,
+      "pull_request_creation_policy": "all",
+      "license": null,
+      "url": "https://api.github.com/repos/JogoShugh/heart-github-test",
+      "html_url": "https://github.com/JogoShugh/heart-github-test",
+      "archive_url": "https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}",
+      "assignees_url": "https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}",
+      "blobs_url": "https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}",
+      "branches_url": "https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}",
+      "collaborators_url": "https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}",
+      "comments_url": "https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}",
+      "commits_url": "https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}",
+      "compare_url": "https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}",
+      "contents_url": "https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}",
+      "contributors_url": "https://api.github.com/repos/JogoShugh/heart-github-test/contributors",
+      "deployments_url": "https://api.github.com/repos/JogoShugh/heart-github-test/deployments",
+      "downloads_url": "https://api.github.com/repos/JogoShugh/heart-github-test/downloads",
+      "events_url": "https://api.github.com/repos/JogoShugh/heart-github-test/events",
+      "forks_url": "https://api.github.com/repos/JogoShugh/heart-github-test/forks",
+      "git_commits_url": "https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}",
+      "git_refs_url": "https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}",
+      "git_url": "git://github.com/JogoShugh/heart-github-test.git",
+      "issue_comment_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}",
+      "issue_events_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}",
+      "issues_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}",
+      "keys_url": "https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}",
+      "labels_url": "https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}",
+      "languages_url": "https://api.github.com/repos/JogoShugh/heart-github-test/languages",
+      "merges_url": "https://api.github.com/repos/JogoShugh/heart-github-test/merges",
+      "milestones_url": "https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}",
+      "pulls_url": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}",
+      "releases_url": "https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}",
+      "ssh_url": "git@github.com:JogoShugh/heart-github-test.git",
+      "stargazers_url": "https://api.github.com/repos/JogoShugh/heart-github-test/stargazers",
+      "statuses_url": "https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}",
+      "subscribers_url": "https://api.github.com/repos/JogoShugh/heart-github-test/subscribers",
+      "subscription_url": "https://api.github.com/repos/JogoShugh/heart-github-test/subscription",
+      "tags_url": "https://api.github.com/repos/JogoShugh/heart-github-test/tags",
+      "teams_url": "https://api.github.com/repos/JogoShugh/heart-github-test/teams",
+      "trees_url": "https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}",
+      "clone_url": "https://github.com/JogoShugh/heart-github-test.git",
+      "mirror_url": null,
+      "hooks_url": "https://api.github.com/repos/JogoShugh/heart-github-test/hooks",
+      "svn_url": "https://github.com/JogoShugh/heart-github-test"
+    },
+    "sha": "55f5f1501330c81f6bc1aad50514f004bf0a39c0",
+    "user": {
+      "login": "JogoShugh",
+      "id": 1863005,
+      "node_id": "MDQ6VXNlcjE4NjMwMDU=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1863005?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/JogoShugh",
+      "html_url": "https://github.com/JogoShugh",
+      "followers_url": "https://api.github.com/users/JogoShugh/followers",
+      "following_url": "https://api.github.com/users/JogoShugh/following{/other_user}",
+      "gists_url": "https://api.github.com/users/JogoShugh/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/JogoShugh/subscriptions",
+      "organizations_url": "https://api.github.com/users/JogoShugh/orgs",
+      "repos_url": "https://api.github.com/users/JogoShugh/repos",
+      "events_url": "https://api.github.com/users/JogoShugh/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/JogoShugh/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    }
+  },
+  "base": {
+    "label": "JogoShugh:deps-main",
+    "ref": "deps-main",
+    "repo": {
+      "id": 1422841381,
+      "node_id": "R_kgDOVM7WJQ",
+      "name": "heart-github-test",
+      "full_name": "JogoShugh/heart-github-test",
+      "owner": {
+        "login": "JogoShugh",
+        "id": 1863005,
+        "node_id": "MDQ6VXNlcjE4NjMwMDU=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1863005?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/JogoShugh",
+        "html_url": "https://github.com/JogoShugh",
+        "followers_url": "https://api.github.com/users/JogoShugh/followers",
+        "following_url": "https://api.github.com/users/JogoShugh/following{/other_user}",
+        "gists_url": "https://api.github.com/users/JogoShugh/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/JogoShugh/subscriptions",
+        "organizations_url": "https://api.github.com/users/JogoShugh/orgs",
+        "repos_url": "https://api.github.com/users/JogoShugh/repos",
+        "events_url": "https://api.github.com/users/JogoShugh/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/JogoShugh/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "private": false,
+      "fork": false,
+      "archived": false,
+      "disabled": false,
+      "description": null,
+      "homepage": null,
+      "language": null,
+      "visibility": "public",
+      "is_template": false,
+      "topics": [],
+      "forks_count": 0,
+      "forks": 0,
+      "stargazers_count": 0,
+      "watchers_count": 0,
+      "watchers": 0,
+      "open_issues_count": 630,
+      "open_issues": 630,
+      "size": 840,
+      "default_branch": "main",
+      "has_issues": true,
+      "has_projects": true,
+      "has_wiki": true,
+      "has_pages": false,
+      "has_downloads": false,
+      "has_discussions": false,
+      "has_pull_requests": true,
+      "pushed_at": "2026-11-01T03:14:45Z",
+      "created_at": "2026-10-17T01:37:34Z",
+      "updated_at": "2026-10-23T11:55:40Z",
+      "allow_forking": true,
+      "web_commit_signoff_required": false,
+      "pull_request_creation_policy": "all",
+      "license": null,
+      "url": "https://api.github.com/repos/JogoShugh/heart-github-test",
+      "html_url": "https://github.com/JogoShugh/heart-github-test",
+      "archive_url": "https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}",
+      "assignees_url": "https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}",
+      "blobs_url": "https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}",
+      "branches_url": "https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}",
+      "collaborators_url": "https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}",
+      "comments_url": "https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}",
+      "commits_url": "https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}",
+      "compare_url": "https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}",
+      "contents_url": "https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}",
+      "contributors_url": "https://api.github.com/repos/JogoShugh/heart-github-test/contributors",
+      "deployments_url": "https://api.github.com/repos/JogoShugh/heart-github-test/deployments",
+      "downloads_url": "https://api.github.com/repos/JogoShugh/heart-github-test/downloads",
+      "events_url": "https://api.github.com/repos/JogoShugh/heart-github-test/events",
+      "forks_url": "https://api.github.com/repos/JogoShugh/heart-github-test/forks",
+      "git_commits_url": "https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}",
+      "git_refs_url": "https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}",
+      "git_url": "git://github.com/JogoShugh/heart-github-test.git",
+      "issue_comment_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}",
+      "issue_events_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}",
+      "issues_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}",
+      "keys_url": "https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}",
+      "labels_url": "https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}",
+      "languages_url": "https://api.github.com/repos/JogoShugh/heart-github-test/languages",
+      "merges_url": "https://api.github.com/repos/JogoShugh/heart-github-test/merges",
+      "milestones_url": "https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}",
+      "pulls_url": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}",
+      "releases_url": "https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}",
+      "ssh_url": "git@github.com:JogoShugh/heart-github-test.git",
+      "stargazers_url": "https://api.github.com/repos/JogoShugh/heart-github-test/stargazers",
+      "statuses_url": "https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}",
+      "subscribers_url": "https://api.github.com/repos/JogoShugh/heart-github-test/subscribers",
+      "subscription_url": "https://api.github.com/repos/JogoShugh/heart-github-test/subscription",
+      "tags_url": "https://api.github.com/repos/JogoShugh/heart-github-test/tags",
+      "teams_url": "https://api.github.com/repos/JogoShugh/heart-github-test/teams",
+      "trees_url": "https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}",
+      "clone_url": "https://github.com/JogoShugh/heart-github-test.git",
+      "mirror_url": null,
+      "hooks_url": "https://api.github.com/repos/JogoShugh/heart-github-test/hooks",
+      "svn_url": "https://github.com/JogoShugh/heart-github-test"
+    },
+    "sha": "24f32584b6d49e80f82921898d457c8b9f63fe0f",
+    "user": {
+      "login": "JogoShugh",
+      "id": 1863005,
+      "node_id": "MDQ6VXNlcjE4NjMwMDU=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1863005?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/JogoShugh",
+      "html_url": "https://github.com/JogoShugh",
+      "followers_url": "https://api.github.com/users/JogoShugh/followers",
+      "following_url": "https://api.github.com/users/JogoShugh/following{/other_user}",
+      "gists_url": "https://api.github.com/users/JogoShugh/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/JogoShugh/subscriptions",
+      "organizations_url": "https://api.github.com/users/JogoShugh/orgs",
+      "repos_url": "https://api.github.com/users/JogoShugh/repos",
+      "events_url": "https://api.github.com/users/JogoShugh/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/JogoShugh/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    }
+  },
+  "_links": {
+    "comments": {
+      "href": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/2114/comments"
+    },
+    "commits": {
+      "href": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114/commits"
+    },
+    "statuses": {
+      "href": "https://api.github.com/repos/JogoShugh/heart-github-test/statuses/55f5f1501330c81f6bc1aad50514f004bf0a39c0"
+    },
+    "html": {
+      "href": "https://github.com/JogoShugh/heart-github-test/pull/2114"
+    },
+    "issue": {
+      "href": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/2114"
+    },
+    "review_comments": {
+      "href": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114/comments"
+    },
+    "review_comment": {
+      "href": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/comments{/number}"
+    },
+    "self": {
+      "href": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114"
+    }
+  },
+  "author_association": "OWNER",
+  "auto_merge": null,
+  "draft": false,
+  "merged": false,
+  "mergeable": true,
+  "rebaseable": false,
+  "mergeable_state": "clean",
+  "merged_by": null,
+  "comments": 0,
+  "review_comments": 0,
+  "maintainer_can_modify": false,
+  "commits": 1,
+  "additions": 1,
+  "deletions": 0,
+  "changed_files": 1
+}</code></pre></details>
+<details class="deep"><summary>Its 159 links, and not one control</summary>
+<pre><code>url                                https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114
+html_url                           https://github.com/JogoShugh/heart-github-test/pull/2114
+diff_url                           https://github.com/JogoShugh/heart-github-test/pull/2114.diff
+patch_url                          https://github.com/JogoShugh/heart-github-test/pull/2114.patch
+issue_url                          https://api.github.com/repos/JogoShugh/heart-github-test/issues/2114
+commits_url                        https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114/commits
+review_comments_url                https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114/comments
+review_comment_url                 https://api.github.com/repos/JogoShugh/heart-github-test/pulls/comments{/number}
+comments_url                       https://api.github.com/repos/JogoShugh/heart-github-test/issues/2114/comments
+statuses_url                       https://api.github.com/repos/JogoShugh/heart-github-test/statuses/55f5f1501330c81f6bc1aad50514f004bf0a39c0
+user.avatar_url                    https://avatars.githubusercontent.com/u/1863005?v=4
+user.url                           https://api.github.com/users/JogoShugh
+user.html_url                      https://github.com/JogoShugh
+user.followers_url                 https://api.github.com/users/JogoShugh/followers
+user.following_url                 https://api.github.com/users/JogoShugh/following{/other_user}
+user.gists_url                     https://api.github.com/users/JogoShugh/gists{/gist_id}
+user.starred_url                   https://api.github.com/users/JogoShugh/starred{/owner}{/repo}
+user.subscriptions_url             https://api.github.com/users/JogoShugh/subscriptions
+user.organizations_url             https://api.github.com/users/JogoShugh/orgs
+user.repos_url                     https://api.github.com/users/JogoShugh/repos
+user.events_url                    https://api.github.com/users/JogoShugh/events{/privacy}
+user.received_events_url           https://api.github.com/users/JogoShugh/received_events
+labels.0.url                       https://api.github.com/repos/JogoShugh/heart-github-test/labels/bumps
+head.repo.owner.avatar_url         https://avatars.githubusercontent.com/u/1863005?v=4
+head.repo.owner.url                https://api.github.com/users/JogoShugh
+head.repo.owner.html_url           https://github.com/JogoShugh
+head.repo.owner.followers_url      https://api.github.com/users/JogoShugh/followers
+head.repo.owner.following_url      https://api.github.com/users/JogoShugh/following{/other_user}
+head.repo.owner.gists_url          https://api.github.com/users/JogoShugh/gists{/gist_id}
+head.repo.owner.starred_url        https://api.github.com/users/JogoShugh/starred{/owner}{/repo}
+head.repo.owner.subscriptions_url  https://api.github.com/users/JogoShugh/subscriptions
+head.repo.owner.organizations_url  https://api.github.com/users/JogoShugh/orgs
+head.repo.owner.repos_url          https://api.github.com/users/JogoShugh/repos
+head.repo.owner.events_url         https://api.github.com/users/JogoShugh/events{/privacy}
+head.repo.owner.received_events_url https://api.github.com/users/JogoShugh/received_events
+head.repo.url                      https://api.github.com/repos/JogoShugh/heart-github-test
+head.repo.html_url                 https://github.com/JogoShugh/heart-github-test
+head.repo.archive_url              https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}
+head.repo.assignees_url            https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}
+head.repo.blobs_url                https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}
+head.repo.branches_url             https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}
+head.repo.collaborators_url        https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}
+head.repo.comments_url             https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}
+head.repo.commits_url              https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}
+head.repo.compare_url              https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}
+head.repo.contents_url             https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}
+head.repo.contributors_url         https://api.github.com/repos/JogoShugh/heart-github-test/contributors
+head.repo.deployments_url          https://api.github.com/repos/JogoShugh/heart-github-test/deployments
+head.repo.downloads_url            https://api.github.com/repos/JogoShugh/heart-github-test/downloads
+head.repo.events_url               https://api.github.com/repos/JogoShugh/heart-github-test/events
+head.repo.forks_url                https://api.github.com/repos/JogoShugh/heart-github-test/forks
+head.repo.git_commits_url          https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}
+head.repo.git_refs_url             https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}
+head.repo.git_tags_url             https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}
+head.repo.issue_comment_url        https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}
+head.repo.issue_events_url         https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}
+head.repo.issues_url               https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}
+head.repo.keys_url                 https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}
+head.repo.labels_url               https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}
+head.repo.languages_url            https://api.github.com/repos/JogoShugh/heart-github-test/languages
+head.repo.merges_url               https://api.github.com/repos/JogoShugh/heart-github-test/merges
+head.repo.milestones_url           https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}
+head.repo.notifications_url        https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}
+head.repo.pulls_url                https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}
+head.repo.releases_url             https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}
+head.repo.stargazers_url           https://api.github.com/repos/JogoShugh/heart-github-test/stargazers
+head.repo.statuses_url             https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}
+head.repo.subscribers_url          https://api.github.com/repos/JogoShugh/heart-github-test/subscribers
+head.repo.subscription_url         https://api.github.com/repos/JogoShugh/heart-github-test/subscription
+head.repo.tags_url                 https://api.github.com/repos/JogoShugh/heart-github-test/tags
+head.repo.teams_url                https://api.github.com/repos/JogoShugh/heart-github-test/teams
+head.repo.trees_url                https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}
+head.repo.clone_url                https://github.com/JogoShugh/heart-github-test.git
+head.repo.hooks_url                https://api.github.com/repos/JogoShugh/heart-github-test/hooks
+head.repo.svn_url                  https://github.com/JogoShugh/heart-github-test
+head.user.avatar_url               https://avatars.githubusercontent.com/u/1863005?v=4
+head.user.url                      https://api.github.com/users/JogoShugh
+head.user.html_url                 https://github.com/JogoShugh
+head.user.followers_url            https://api.github.com/users/JogoShugh/followers
+head.user.following_url            https://api.github.com/users/JogoShugh/following{/other_user}
+head.user.gists_url                https://api.github.com/users/JogoShugh/gists{/gist_id}
+head.user.starred_url              https://api.github.com/users/JogoShugh/starred{/owner}{/repo}
+head.user.subscriptions_url        https://api.github.com/users/JogoShugh/subscriptions
+head.user.organizations_url        https://api.github.com/users/JogoShugh/orgs
+head.user.repos_url                https://api.github.com/users/JogoShugh/repos
+head.user.events_url               https://api.github.com/users/JogoShugh/events{/privacy}
+head.user.received_events_url      https://api.github.com/users/JogoShugh/received_events
+base.repo.owner.avatar_url         https://avatars.githubusercontent.com/u/1863005?v=4
+base.repo.owner.url                https://api.github.com/users/JogoShugh
+base.repo.owner.html_url           https://github.com/JogoShugh
+base.repo.owner.followers_url      https://api.github.com/users/JogoShugh/followers
+base.repo.owner.following_url      https://api.github.com/users/JogoShugh/following{/other_user}
+base.repo.owner.gists_url          https://api.github.com/users/JogoShugh/gists{/gist_id}
+base.repo.owner.starred_url        https://api.github.com/users/JogoShugh/starred{/owner}{/repo}
+base.repo.owner.subscriptions_url  https://api.github.com/users/JogoShugh/subscriptions
+base.repo.owner.organizations_url  https://api.github.com/users/JogoShugh/orgs
+base.repo.owner.repos_url          https://api.github.com/users/JogoShugh/repos
+base.repo.owner.events_url         https://api.github.com/users/JogoShugh/events{/privacy}
+base.repo.owner.received_events_url https://api.github.com/users/JogoShugh/received_events
+base.repo.url                      https://api.github.com/repos/JogoShugh/heart-github-test
+base.repo.html_url                 https://github.com/JogoShugh/heart-github-test
+base.repo.archive_url              https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}
+base.repo.assignees_url            https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}
+base.repo.blobs_url                https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}
+base.repo.branches_url             https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}
+base.repo.collaborators_url        https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}
+base.repo.comments_url             https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}
+base.repo.commits_url              https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}
+base.repo.compare_url              https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}
+base.repo.contents_url             https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}
+base.repo.contributors_url         https://api.github.com/repos/JogoShugh/heart-github-test/contributors
+base.repo.deployments_url          https://api.github.com/repos/JogoShugh/heart-github-test/deployments
+base.repo.downloads_url            https://api.github.com/repos/JogoShugh/heart-github-test/downloads
+base.repo.events_url               https://api.github.com/repos/JogoShugh/heart-github-test/events
+base.repo.forks_url                https://api.github.com/repos/JogoShugh/heart-github-test/forks
+base.repo.git_commits_url          https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}
+base.repo.git_refs_url             https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}
+base.repo.git_tags_url             https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}
+base.repo.issue_comment_url        https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}
+base.repo.issue_events_url         https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}
+base.repo.issues_url               https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}
+base.repo.keys_url                 https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}
+base.repo.labels_url               https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}
+base.repo.languages_url            https://api.github.com/repos/JogoShugh/heart-github-test/languages
+base.repo.merges_url               https://api.github.com/repos/JogoShugh/heart-github-test/merges
+base.repo.milestones_url           https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}
+base.repo.notifications_url        https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}
+base.repo.pulls_url                https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}
+base.repo.releases_url             https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}
+base.repo.stargazers_url           https://api.github.com/repos/JogoShugh/heart-github-test/stargazers
+base.repo.statuses_url             https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}
+base.repo.subscribers_url          https://api.github.com/repos/JogoShugh/heart-github-test/subscribers
+base.repo.subscription_url         https://api.github.com/repos/JogoShugh/heart-github-test/subscription
+base.repo.tags_url                 https://api.github.com/repos/JogoShugh/heart-github-test/tags
+base.repo.teams_url                https://api.github.com/repos/JogoShugh/heart-github-test/teams
+base.repo.trees_url                https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}
+base.repo.clone_url                https://github.com/JogoShugh/heart-github-test.git
+base.repo.hooks_url                https://api.github.com/repos/JogoShugh/heart-github-test/hooks
+base.repo.svn_url                  https://github.com/JogoShugh/heart-github-test
+base.user.avatar_url               https://avatars.githubusercontent.com/u/1863005?v=4
+base.user.url                      https://api.github.com/users/JogoShugh
+base.user.html_url                 https://github.com/JogoShugh
+base.user.followers_url            https://api.github.com/users/JogoShugh/followers
+base.user.following_url            https://api.github.com/users/JogoShugh/following{/other_user}
+base.user.gists_url                https://api.github.com/users/JogoShugh/gists{/gist_id}
+base.user.starred_url              https://api.github.com/users/JogoShugh/starred{/owner}{/repo}
+base.user.subscriptions_url        https://api.github.com/users/JogoShugh/subscriptions
+base.user.organizations_url        https://api.github.com/users/JogoShugh/orgs
+base.user.repos_url                https://api.github.com/users/JogoShugh/repos
+base.user.events_url               https://api.github.com/users/JogoShugh/events{/privacy}
+base.user.received_events_url      https://api.github.com/users/JogoShugh/received_events
+_links.comments.href               https://api.github.com/repos/JogoShugh/heart-github-test/issues/2114/comments
+_links.commits.href                https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114/commits
+_links.statuses.href               https://api.github.com/repos/JogoShugh/heart-github-test/statuses/55f5f1501330c81f6bc1aad50514f004bf0a39c0
+_links.html.href                   https://github.com/JogoShugh/heart-github-test/pull/2114
+_links.issue.href                  https://api.github.com/repos/JogoShugh/heart-github-test/issues/2114
+_links.review_comments.href        https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114/comments
+_links.review_comment.href         https://api.github.com/repos/JogoShugh/heart-github-test/pulls/comments{/number}
+_links.self.href                   https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114</code></pre></details>
+  <p>The browser running the fragment knows none of this, yet works with every site, because every site sends its own controls:</p>
+  <blockquote><p>How many Web browsers are aware of the distinction between an online-banking resource and a Wiki resource? None of them. They don't need to be aware of the resource types. What they need to be aware of is the potential state transitions — the links and forms — and what semantics/actions are implied by traversing those links. […] Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.</p><cite>Roy T. Fielding, comment under "REST APIs must be hypertext-driven", 20 October 2008</cite></blockquote>
+
+  <p>That's what GitHub's answers lack, and what our fragment had to make up for in its own code: controls in the answer, the "instructions received just before acting" Fielding described in part 0, where every tool can look and see them.</p>
+
+  <p class="next">Next, part 2: a merge script arrives, and copies our rule.</p>
+
+  <section class="sources">
+    <h2>Sources</h2>
+    <ul>
+      <li>Roy T. Fielding, <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be hypertext-driven"</a>, 2008, and its comments.</li>
+      <li>The code: <a href="https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/lo-to-heart/"><code>exhibits/lo-to-heart</code></a> in heart-rise-artie. The run: <a href="https://github.com/JogoShugh/heart-github-test/pull/2116">#2116</a> merged, <a href="https://github.com/JogoShugh/heart-github-test/pull/2114">#2114</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/2111">#2111</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/2108">#2108</a> held back, on JogoShugh/heart-github-test, 1 November 2026.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

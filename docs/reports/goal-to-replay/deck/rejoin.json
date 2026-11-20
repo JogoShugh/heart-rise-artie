@@ -1,0 +1,163 @@
+{
+  "name": "rejoin",
+  "title": "The Rejoin: GitHub's Merge Docs Move into the Answer",
+  "part": "Why it works",
+  "kicker": "Information and controls, together again",
+  "tone": "light",
+  "number": 6,
+  "of": 17,
+  "html": "<h2>The Rejoin: GitHub's Merge Docs Move into the Answer</h2>\n<div class=\"morph\" data-start=\"apart\" data-cycles='[{\"to\": \"married\", \"label\": \"Into the answer\", \"head\": \"The Rejoin: GitHub&apos;s Merge Docs Move into the Answer\"}]'>\n  <div class=\"mo-stage\">\n    <section class=\"mo-scene\" data-scene=\"apart\">\n      <div class=\"aw-apart\">\n        <div class=\"hl\">\n          <span class=\"hl-label\">GitHub’s answer · GET /repos/acme/web/pulls/501 · application/vnd.github+json</span>\n          <span class=\"tk\" data-token=\"number\">number: 501</span>\n          <span class=\"tk\" data-token=\"title\">title: \"Renewals: two weeks for short loans\"</span>\n          <span class=\"tk\" data-token=\"state\">state: open</span>\n          <span class=\"tk rel\" data-token=\"mergeable\">mergeable: true</span>\n          <span class=\"tk\" data-token=\"etag\">ETag: W/\"…\"</span>\n          <span class=\"k\">_links:</span>\n          <span class=\"i1 tk\" data-token=\"self\">self: {href: /repos/acme/web/pulls/501}</span>\n          <span class=\"i1\">comments: {href: …/issues/501/comments}</span>\n          <span class=\"hl-note\">It says it can be merged. Not how.</span>\n        </div>\n        <p class=\"aw-gap\"><span>A developer reads this, then codes it into a client</span></p>\n        <div class=\"aw\">\n          <div class=\"aw-bar\">api.github.com.json · OpenAPI 3.0 <em>excerpt</em></div>\n          <div class=\"aw-page\">\n            <pre class=\"aw-code\"><span class=\"tk\" data-token=\"target\">/repos/{owner}/{repo}/pulls/{pull_number}/merge</span>:\n  <span class=\"tk aw-m\" data-token=\"method\">put</span>:\n    summary: <span class=\"tk\" data-token=\"form-title\">Merge a pull request</span>\n    operationId: pulls/merge\n    requestBody:\n      content:\n        <span class=\"tk\" data-token=\"ct\">application/json</span>:\n          schema:\n            properties:\n              <span class=\"tk\" data-token=\"commit-title\">commit_title</span>: {type: string}\n              <span class=\"tk\" data-token=\"commit-message\">commit_message</span>: {type: string}\n              <span class=\"tk\" data-token=\"enum\">merge_method: {enum: [merge, squash, rebase]}</span>\n              <span class=\"tk\" data-token=\"sha\">sha: {description: SHA that pull request head must match}</span>\n    responses:\n      '200': if merge was successful\n      '405': Method Not Allowed if merge cannot be performed\n      '409': Conflict if sha was provided and pull request head did not match</pre>\n          </div>\n        </div>\n      </div>\n    </section>\n    <section class=\"mo-scene\" data-scene=\"married\">\n      <div class=\"hl hl-one\">\n        <span class=\"hl-label\">The answer, HEART · GET /repos/acme/web/pulls/501 · application/hal+json; profile: hal-schema-forms</span>\n        <div class=\"hl-cols\">\n          <div>\n            <span class=\"tk\" data-token=\"number\">number: 501</span>\n            <span class=\"tk\" data-token=\"title\">title: \"Renewals: two weeks for short loans\"</span>\n            <span class=\"tk\" data-token=\"state\">state: open</span>\n            <span class=\"tk\" data-token=\"mergeable\">mergeable: true</span>\n            <span class=\"tk\" data-token=\"etag\">ETag: \"seq-0.hsf.L0.4dc4714549…\"</span>\n            <span class=\"k\">_links:</span>\n            <span class=\"i1 tk\" data-token=\"self\">self: {href: /repos/acme/web/pulls/501}</span>\n            <span class=\"hl-note\">Sent back as <span class=\"tk\" data-token=\"sha\">If-Match: the ETag</span>. A stale view gets 412.</span>\n          </div>\n          <div>\n            <span class=\"k add\">_forms:</span>\n            <span class=\"i1 rel\">scm:merge:</span>\n            <span class=\"i2\">title: <span class=\"tk\" data-token=\"form-title\">Merge</span></span>\n            <span class=\"i2\">_links: {target: {href: <span class=\"tk\" data-token=\"target\">/repos/acme/web/pulls/501/actions/merge</span>}}</span>\n            <span class=\"i2\">method: <span class=\"tk aw-m\" data-token=\"method\">PUT</span></span>\n            <span class=\"i2\">contentType: <span class=\"tk\" data-token=\"ct\">application/json</span></span>\n            <span class=\"i2\">schema:</span>\n            <span class=\"i3\">required: [method]</span>\n            <span class=\"i3\">properties:</span>\n            <span class=\"i4 tk\" data-token=\"enum\">method: {enum: [merge, squash, rebase]}</span>\n            <span class=\"i4\"><span class=\"tk\" data-token=\"commit-title\">commit_title</span>: {type: string}</span>\n            <span class=\"i4\"><span class=\"tk\" data-token=\"commit-message\">commit_message</span>: {type: string}</span>\n            <span class=\"i2\">hr:integrity: sha256-sGUdrPfH…</span>\n          </div>\n        </div>\n        <span class=\"hl-note\">Offered only while the pull request can be merged, at its own address. The same name, <code>scm:merge</code>, on GitLab.</span>\n      </div>\n    </section>\n  </div>\n</div>\n<p class=\"refs\"><deck-ref name=\"rule-3\"></deck-ref> <deck-ref name=\"in-band\"></deck-ref> <deck-ref name=\"hypertext\"></deck-ref> <deck-ref name=\"scm\"></deck-ref> <deck-ref name=\"gateway\"></deck-ref></p>\n",
+  "say": "On the left, GitHub's own answer for pull request 501: its state, and that it's mergeable. Mergeable how? That's in the other window: the OpenAPI description of the merge operation. PUT, an address template you fill in, a body with a commit title, a message, a merge method out of three, and a sha the head must match. A developer reads that and codes it into a client. Now watch. Each of those values leaves the docs and lands in the answer, as a form. The address is this pull request's own. The three merge methods come with the schema. The sha guard becomes If-Match, on the ETag the answer already carries. And the form is only there while the pull request can be merged. That's what our gateway serves for GitHub, and for GitLab, under one name: scm:merge. Nothing moved that GitHub doesn't already publish; it moved to where the client already is.",
+  "sources": [
+    {
+      "label": "GitHub REST API: Merge a pull request",
+      "href": "https://docs.github.com/en/rest/pulls/pulls#merge-a-pull-request"
+    },
+    {
+      "label": "GitHub OpenAPI description",
+      "href": "https://github.com/github/rest-api-description"
+    },
+    {
+      "label": "HAL Schema Forms",
+      "href": "https://github.com/jbadeau/hal-schema-forms"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "rejoin.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "divorce.json",
+      "title": "The Divorce: Data in the Answer, Controls Elsewhere"
+    },
+    "next": {
+      "href": "zero-token.json",
+      "title": "Zero Token Architecture"
+    },
+    "alternate": {
+      "href": "rejoin.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ],
+    "deck:code": {
+      "href": "../../assets/morph.js",
+      "type": "text/javascript",
+      "title": "Animates the slide's stills, as its HTML says",
+      "integrity": "sha256-n/8WDjNJTX+FOZAtR6z1Nm86LmktlquonTGj2BCtjZ0="
+    }
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "rule-3",
+        "kind": "rule",
+        "label": "MEDIA-TYPES",
+        "title": "Spend the effort on media types",
+        "summary": "In brief: describe media types and relations, not which methods go to which URIs. This is what HEART's spec is.",
+        "quote": "<p>“A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types. Any effort spent describing what methods to use on what URIs of interest should be entirely defined within the scope of the processing rules for a media type (and, in most cases, already defined by existing media types). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>",
+        "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/rule-3.json",
+            "title": "MEDIA-TYPES"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+            "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "in-band",
+        "kind": "comment",
+        "label": "IN-BAND",
+        "title": "Instructions in every representation",
+        "summary": "The media type is learned once; each representation carries the transitions available at that point.",
+        "quote": "<p>“The media type identifies a specification that defines how a representation is to be processed. That is out-of-band information (all communication is dependent on some prior knowledge). What you are missing is that each representation contains the specific instructions for interfacing with a given service, provided in-band. The media type is a generic processing model that every agent can learn if there aren’t too many of them (hence the need for standards). The representation is specific to the application being performed by the agent. Each representation therefore provides the transitions that are available at that point in the application.</p><p>When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "23 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/in-band.json",
+            "title": "IN-BAND"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "hypertext",
+        "kind": "comment",
+        "label": "HYPERTEXT",
+        "title": "What hypertext means",
+        "summary": "His definition: information and controls, presented together. Machines can follow links too.",
+        "quote": "<p>“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions. Hypermedia is just an expansion on what text means to include temporal anchors within a media stream; most researchers have dropped the distinction.</p><p>Hypertext does not need to be HTML on a browser. Machines can follow links when they understand the data format and relationship types.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/hypertext.json",
+            "title": "HYPERTEXT"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-718",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "scm",
+        "kind": "part",
+        "label": "scm:",
+        "title": "scm: one set of typed relations, two forges",
+        "summary": "scm:merge, scm:comment, scm:close and the rest: relation names defined by meaning, not by one server's endpoints. GitHub and GitLab both answer to them, so a kept script runs on either.",
+        "cite": "heart-gateway connectors",
+        "_links": {
+          "self": {
+            "href": "../refs/scm.json",
+            "title": "scm:"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors",
+            "title": "heart-gateway connectors"
+          }
+        }
+      },
+      {
+        "name": "gateway",
+        "kind": "part",
+        "label": "GATEWAY",
+        "title": "The gateway: our controls in front of theirs",
+        "summary": "A small server, on a laptop, in front of an API we don't control (GitHub, a local GitLab). YAML connectors map each act onto the native call and say when it is offered; the gateway answers in HEART.",
+        "cite": "heart-gateway connectors",
+        "_links": {
+          "self": {
+            "href": "../refs/gateway.json",
+            "title": "GATEWAY"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors",
+            "title": "heart-gateway connectors"
+          }
+        }
+      }
+    ]
+  }
+}

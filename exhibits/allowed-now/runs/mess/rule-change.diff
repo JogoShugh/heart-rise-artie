@@ -1,0 +1,13 @@
+diff --git a/exhibits/allowed-now/proxy.ts b/exhibits/allowed-now/proxy.ts
+index e794f7e..9426a9b 100644
+--- a/exhibits/allowed-now/proxy.ts
++++ b/exhibits/allowed-now/proxy.ts
+@@ -26,6 +26,8 @@ app.get("/allowed-now/repos/:owner/:repo/pulls/:number", async (req, res) => {
+   else if (pull.mergeable === false) notAllowed["pulls/merge"] = "The branch has conflicts; resolve them first.";
+   // Our own rule, which this repository's settings don't enforce.
+   else if (compare.behind_by > 0) notAllowed["pulls/merge"] = "The branch is behind its base; update it first.";
++  // A new rule, added after the first runs: someone has approved it.
++  else if (!pull.labels.some((label) => label.name === "approved")) notAllowed["pulls/merge"] = "It needs the label approved first.";
+   if (compare.behind_by === 0) notAllowed["pulls/update-branch"] = "The branch is already up to date.";
+ 
+   const allowed = ["pulls/merge", "pulls/update-branch"].filter((operation) => !(operation in notAllowed));

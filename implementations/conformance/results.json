@@ -1,0 +1,2153 @@
+[
+  {
+    "description": "  HAL-SCHEMA-FORMS-HR Rule 8: a property of a form may take its choices from\n  state, with hr:options. They come from the resource that offers the form,\n  at a JSON Pointer that may name another field of the same form, or from\n  another resource, read like any Layer 1 resource. Only items whose members\n  equal every one of \"where\" are choices. A client offers only those, and\n  sends no value outside them.\n\n  The service here is a small one the steps serve. It has one game. The\n  game's sport is basketball. Its home players are 4 Ana and 9 Cy, and 7 Bea,\n  who has fouled out; its away player is 3 Dee. Its agents are Priya and Lena,\n  on duty, and Marco, off duty, all for basketball, and Tom for football.\n  The game offers record-foul, whose playerNumber is one of the chosen team's\n  players who have not fouled out, and call-agent, whose agent is one of the\n  agents for the game's sport who are on duty.",
+    "elements": [
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;a-choice-that-depends-on-another-field:-the-chosen-team's-players-who-have-not-fouled-out",
+        "keyword": "Scenario",
+        "line": 22,
+        "name": "A choice that depends on another field: the chosen team's players who have not fouled out",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 360874
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1668749
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 73958
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 14186125
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "team",
+                      "value",
+                      "prompt"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "home",
+                      "4",
+                      "Ana"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "home",
+                      "9",
+                      "Cy"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "away",
+                      "3",
+                      "Dee"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Then ",
+            "line": 23,
+            "name": "the choices for \"playerNumber\" of \"record-foul\", by \"team\", are",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:263"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 556375
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 155792
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;choices-from-another-resource,-its-address-filled-from-the-game's-state",
+        "keyword": "Scenario",
+        "line": 29,
+        "name": "Choices from another resource, its address filled from the game's state",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 14708
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 270749
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 26959
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2108249
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "value",
+                      "prompt"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "priya",
+                      "Priya"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "lena",
+                      "Lena"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Then ",
+            "line": 30,
+            "name": "the choices for \"agent\" of \"call-agent\" are",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:272"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1363166
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 34,
+            "name": "the agents were read at \"/agents?skill=basketball\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:277"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 46915
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 45249
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;the-other-resource-is-revalidated,-not-read-again-in-full",
+        "keyword": "Scenario",
+        "line": 36,
+        "name": "The other resource is revalidated, not read again in full",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 11499
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 147334
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 40917
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1212416
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 37,
+            "name": "it resolves the choices for \"agent\" of \"call-agent\" twice",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:281"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1507374
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 38,
+            "name": "the second read of the agents carried the ETag of the first, and was answered 304",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:286"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 33458
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 36207
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;a-value-outside-the-choices-is-refused-before-anything-is-sent:-a-player-who-fouled-out",
+        "keyword": "Scenario Outline",
+        "line": 46,
+        "name": "A value outside the choices is refused before anything is sent: a player who fouled out",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 18875
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 169708
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 33915
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1256208
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 41,
+            "name": "it tries to submit \"record-foul\" with {\"team\": \"home\", \"playerNumber\": 7}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:58"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 269499
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 42,
+            "name": "it was refused before sending, because \"playerNumber: 7 is not one of the choices\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:118"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 34207
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 30917
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;a-value-outside-the-choices-is-refused-before-anything-is-sent:-a-player-of-the-other-team",
+        "keyword": "Scenario Outline",
+        "line": 47,
+        "name": "A value outside the choices is refused before anything is sent: a player of the other team",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 6541
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 95083
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 12875
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1015625
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 41,
+            "name": "it tries to submit \"record-foul\" with {\"team\": \"away\", \"playerNumber\": 4}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:58"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 61333
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 42,
+            "name": "it was refused before sending, because \"playerNumber: 4 is not one of the choices\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:118"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 20999
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 36500
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;a-value-outside-the-choices-is-refused-before-anything-is-sent:-an-agent-off-duty",
+        "keyword": "Scenario Outline",
+        "line": 48,
+        "name": "A value outside the choices is refused before anything is sent: an agent off duty",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 6334
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 85457
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 12666
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1128958
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 41,
+            "name": "it tries to submit \"call-agent\" with {\"agent\": \"marco\"}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:58"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1280874
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 42,
+            "name": "it was refused before sending, because \"agent: marco is not one of the choices\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:118"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 28500
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 36750
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;a-value-among-the-choices-is-sent",
+        "keyword": "Scenario",
+        "line": 50,
+        "name": "A value among the choices is sent",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 6416
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 88707
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 54083
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 985749
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 51,
+            "name": "it submits \"record-foul\" with {\"team\": \"home\", \"playerNumber\": 9}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2535749
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 52,
+            "name": "the act \"record-foul\" was sent once",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:294"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 30958
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 31958
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "a-form's-choices-from-state",
+    "line": 1,
+    "keyword": "Feature",
+    "name": "A form's choices from state",
+    "tags": [],
+    "uri": "features/choices.feature"
+  },
+  {
+    "description": "  The client side of HEART conformance, written from the specification and\n  the Internet-Draft. Any client can be held to it; heart-ts is the first\n  run against it. The service is the reference garden: bed 1 is empty, bed 2\n  is planted with tomato at moisture 40, and every request needs the garden's\n  credential. Nothing here names a URI the client should build: it enters at\n  the bookmark and goes on from what each representation offers.",
+    "elements": [
+      {
+        "description": "",
+        "id": "what-a-heart-client-must-do,-against-a-real-heart-service;from-the-bookmark,-find-bed-2-and-read-what-it-offers,-at-l0",
+        "keyword": "Scenario Outline",
+        "line": 23,
+        "name": "From the bookmark, find bed 2 and read what it offers, at L0",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 12957
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "the garden is at its seed state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 118511500
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 13,
+            "name": "a client at rung L0 with the garden's credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 85332
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 14,
+            "name": "it enters at the bookmark",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:45"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 35740667
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 15,
+            "name": "it submits \"garden:get-bed\" with {\"id\": 2}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 180757832
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 16,
+            "name": "the state's \"status\" is \"PLANTED\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:74"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 66707
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 17,
+            "name": "the representation is at rung L0",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:82"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 17249
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 18,
+            "name": "it offers exactly \"garden:water-cell\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:86"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 37000
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "every shared layer it fetched matched the integrity of its link",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:90"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 82333
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3417
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "what-a-heart-client-must-do,-against-a-real-heart-service;from-the-bookmark,-find-bed-2-and-read-what-it-offers,-at-l2",
+        "keyword": "Scenario Outline",
+        "line": 24,
+        "name": "From the bookmark, find bed 2 and read what it offers, at L2",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 21666
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "the garden is at its seed state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 106940749
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 13,
+            "name": "a client at rung L2 with the garden's credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 64042
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 14,
+            "name": "it enters at the bookmark",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:45"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2328499
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 15,
+            "name": "it submits \"garden:get-bed\" with {\"id\": 2}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 19073125
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 16,
+            "name": "the state's \"status\" is \"PLANTED\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:74"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 37166
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 17,
+            "name": "the representation is at rung L2",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:82"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 10292
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 18,
+            "name": "it offers exactly \"garden:water-cell\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:86"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 20791
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "every shared layer it fetched matched the integrity of its link",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:90"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 23790
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3209
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "what-a-heart-client-must-do,-against-a-real-heart-service;an-act-is-conditional,-and-its-answer-is-the-resource's-new-state",
+        "keyword": "Scenario",
+        "line": 26,
+        "name": "An act is conditional, and its answer is the resource's new state",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3958
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "the garden is at its seed state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 90663957
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 27,
+            "name": "a client at rung L2 with the garden's credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 70249
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 28,
+            "name": "it enters at the bookmark",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:45"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2143875
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 29,
+            "name": "it submits \"garden:get-bed\" with {\"id\": 2}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 10160291
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 30,
+            "name": "it submits \"garden:water-cell\" with {\"milliliters\": 250}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 68546458
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 31,
+            "name": "the act carried If-Match with the validator it read",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:97"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 69624
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 32,
+            "name": "the state's \"moistureLevel\" is 65",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 35833
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 33,
+            "name": "it offers exactly \"garden:harvest\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:86"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 21833
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3832
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "what-a-heart-client-must-do,-against-a-real-heart-service;when-someone-else-acts-first,-the-act-is-stale:-re-read,-never-resent",
+        "keyword": "Scenario",
+        "line": 35,
+        "name": "When someone else acts first, the act is stale: re-read, never resent",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3249
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "the garden is at its seed state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 100500874
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 36,
+            "name": "a client at rung L0 with the garden's credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 82541
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 37,
+            "name": "another client at rung L0 with the garden's credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:37"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 65708
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 38,
+            "name": "it enters at the bookmark",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:45"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2083249
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 39,
+            "name": "it submits \"garden:get-bed\" with {\"id\": 2}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 9953875
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 40,
+            "name": "the other client waters bed 2 with 100 ml",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:64"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 29571374
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 41,
+            "name": "it tries to submit \"garden:water-cell\" with {\"milliliters\": 100}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:58"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 29513250
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 42,
+            "name": "it was refused as \"stale\" with status 412",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:103"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 65499
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 43,
+            "name": "the water act was sent once",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:114"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 31082
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 44,
+            "name": "the state's \"moistureLevel\" is 50",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:78"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 13500
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 6540
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "what-a-heart-client-must-do,-against-a-real-heart-service;a-body-the-server-refuses-is-told-apart-from-one-a-rule-refuses:-breaks-the-schema",
+        "keyword": "Scenario Outline",
+        "line": 56,
+        "name": "A body the server refuses is told apart from one a rule refuses: breaks the schema",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3041
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "the garden is at its seed state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 93769082
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 47,
+            "name": "a client at rung L0 with the garden's credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 57624
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 48,
+            "name": "it enters at the bookmark",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:45"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1866999
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 49,
+            "name": "it submits \"garden:get-bed\" with {\"id\": 2}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 8749249
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 50,
+            "name": "it tries to submit \"garden:water-cell\" with {\"milliliters\": 0}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:58"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 14178167
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 51,
+            "name": "it was refused as \"invalid-input\" with status 422",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:103"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 35249
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 52,
+            "name": "the refusal says \"milliliters\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:109"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 40124
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 7458
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "what-a-heart-client-must-do,-against-a-real-heart-service;a-body-the-server-refuses-is-told-apart-from-one-a-rule-refuses:-refused-by-a-rule",
+        "keyword": "Scenario Outline",
+        "line": 57,
+        "name": "A body the server refuses is told apart from one a rule refuses: refused by a rule",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3500
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "the garden is at its seed state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 98225333
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 47,
+            "name": "a client at rung L0 with the garden's credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 45916
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 48,
+            "name": "it enters at the bookmark",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:45"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1849082
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 49,
+            "name": "it submits \"garden:get-bed\" with {\"id\": 2}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 8804999
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 50,
+            "name": "it tries to submit \"garden:water-cell\" with {\"milliliters\": 700}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:58"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 9315749
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 51,
+            "name": "it was refused as \"rule-refused\" with status 422",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:103"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 30416
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 52,
+            "name": "the refusal says \"The bed would be waterlogged: at most 600 ml now.\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:109"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 18791
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3166
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "what-a-heart-client-must-do,-against-a-real-heart-service;an-act-the-representation-does-not-offer-is-refused-before-anything-is-sent",
+        "keyword": "Scenario",
+        "line": 59,
+        "name": "An act the representation does not offer is refused before anything is sent",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3332
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "the garden is at its seed state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 106515333
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 60,
+            "name": "a client at rung L0 with the garden's credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 62750
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 61,
+            "name": "it enters at the bookmark",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:45"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2053750
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 62,
+            "name": "it submits \"garden:get-bed\" with {\"id\": 1}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 9635582
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 63,
+            "name": "it tries to submit \"garden:harvest\" with {}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:58"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 91083
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 64,
+            "name": "it was refused before sending, because \"garden:harvest is not offered now\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:118"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 29915
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 4250
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "what-a-heart-client-must-do,-against-a-real-heart-service;a-link-is-followed-by-its-relation-and-title",
+        "keyword": "Scenario",
+        "line": 66,
+        "name": "A link is followed by its relation and title",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3791
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "the garden is at its seed state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 93312375
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 67,
+            "name": "a client at rung L0 with the garden's credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 51875
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 68,
+            "name": "it enters at the bookmark",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:45"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1688791
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 69,
+            "name": "it submits \"garden:search-beds\" with {\"name\": \"bed-2\"}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 45506957
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 70,
+            "name": "it follows the \"item\" link titled \"bed-2\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:70"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 8363916
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 71,
+            "name": "the state's \"label\" is \"bed-2\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:74"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 53040
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 6832
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "what-a-heart-client-must-do,-against-a-real-heart-service;without-a-credential,-the-service-refuses",
+        "keyword": "Scenario",
+        "line": 73,
+        "name": "Without a credential, the service refuses",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3332
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "the garden is at its seed state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 98154457
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 74,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 46374
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 75,
+            "name": "it tries to enter at the bookmark",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:49"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1348250
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 76,
+            "name": "it was refused as \"not-authenticated\" with status 401",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:103"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 26624
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 5959
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "what-a-heart-client-must-do,-against-a-real-heart-service;a-shared-layer-whose-bytes-do-not-match-its-link's-integrity-is-refused",
+        "keyword": "Scenario",
+        "line": 78,
+        "name": "A shared layer whose bytes do not match its link's integrity is refused",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3500
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "the garden is at its seed state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 101116209
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 79,
+            "name": "a service whose affordance set does not match the integrity of its link",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:128"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 346334
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 80,
+            "name": "a client at rung L2 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 23875
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 81,
+            "name": "it tries to enter that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:142"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2051832
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 82,
+            "name": "it refused the affordance set for its integrity",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:186"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 27334
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 90875
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "what-a-heart-client-must-do,-against-a-real-heart-service;a-search's-embedded-beds-are-read-in-place,-with-no-request-per-bed",
+        "keyword": "Scenario",
+        "line": 84,
+        "name": "A search's embedded beds are read in place, with no request per bed",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3750
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "the garden is at its seed state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 102370625
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 85,
+            "name": "a client at rung L0 with the garden's credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:33"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 55375
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 86,
+            "name": "it enters at the bookmark",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:45"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1828500
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 87,
+            "name": "it submits \"garden:search-beds\" with {\"name\": \"bed-2\"}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 8512500
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "relation",
+                      "title",
+                      "status"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "item",
+                      "bed-2",
+                      "PLANTED"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Then ",
+            "line": 88,
+            "name": "it holds these embedded resources",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:148"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 125792
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 91,
+            "name": "it read no bed on its own",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:153"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 93542
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 4333
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "what-a-heart-client-must-do,-against-a-real-heart-service;state-is-the-body-without-exactly-four-members;-an-embedded-resource-is-followed-to-act",
+        "keyword": "Scenario",
+        "line": 93,
+        "name": "State is the body without exactly four members; an embedded resource is followed to act",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 3834
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 10,
+            "name": "the garden is at its seed state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:24"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 107353791
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 94,
+            "name": "a service whose resource embeds its author, and keeps a member named \"_note\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:158"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 316832
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 95,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 17624
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 96,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1037291
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "member"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "number"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "_note"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Then ",
+            "line": 97,
+            "name": "the state has exactly these members",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:182"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 43125
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 101,
+            "name": "it follows the \"author\" link titled \"Ada\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:70"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 679542
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 102,
+            "name": "the state's \"name\" is \"Ada Lovelace\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:74"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 20416
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 103,
+            "name": "it offers exactly \"befriend\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:86"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 18917
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 41832
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "what-a-heart-client-must-do,-against-a-real-heart-service",
+    "line": 1,
+    "keyword": "Feature",
+    "name": "What a HEART client must do, against a real HEART service",
+    "tags": [],
+    "uri": "features/client.feature"
+  }
+]

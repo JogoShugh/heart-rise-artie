@@ -1,0 +1,78 @@
+# The Merge Watch release, on any machine with Docker: kit/release.sh runs it (kit/README.md, "The release").
+# Jenkins and GitLab share the release container's network, so every party reaches every other at localhost, as on
+# the machine the release was made on. Each port answers this machine only.
+name: heart-release
+
+services:
+  release:
+    build:
+      context: ../..
+      dockerfile: kit/release/Dockerfile
+    image: heart-release
+    container_name: heart-release
+    command: ["/kit/in-release.sh", "serve"]
+    environment:
+      - GITHUB_TOKEN
+      - OWNER
+      - REPO
+    # The Jenkins job reaches GitLab at host.docker.internal: here, that is this network.
+    extra_hosts:
+      - "host.docker.internal:127.0.0.1"
+    ports:
+      - "127.0.0.1:8098:8098"   # the small GitHub
+      - "127.0.0.1:8099:8099"   # the offer watcher
+      - "127.0.0.1:8160:8160"   # the release desk and its replies
+      - "127.0.0.1:8170:8170"   # the CI wrapper
+      - "127.0.0.1:8171:8171"   # Jenkins
+      - "127.0.0.1:8180:8180"   # the preview Jenkins deploys
+      - "127.0.0.1:8190:8190"   # Dev
+      - "127.0.0.1:8093:8093"   # the gateway to real GitHub
+      - "127.0.0.1:8094:8094"   # the gateway to GitLab
+      - "127.0.0.1:8929:8929"   # GitLab
+    volumes:
+      - app:/artie/exhibits/merge-watch-release/work
+      - sims:/shared/sims
+      - ${KIT_WORK:-./work}:/work
+      # Seeding GitLab uses its Rails console, through Docker.
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  jenkins:
+    build:
+      context: ../../exhibits/merge-watch-release/jenkins
+      args:
+        HOOK_URL: "http://localhost:8170/hooks/jenkins?secret=hook-7c1e2a9b"
+    image: heart-release-jenkins
+    container_name: heart-release-jenkins
+    network_mode: "service:release"
+    depends_on: [release]
+    # Test values, as exhibits/merge-watch-release/jenkins/jenkins.env.example: this Jenkins answers this machine only.
+    environment:
+      JENKINS_ADMIN_USER: artie
+      JENKINS_ADMIN_PASSWORD: 67a87770f0b757a756abce6e
+      JENKINS_OPTS: "--httpPort=8171"
+    volumes:
+      - app:/repos:ro
+      - sims:/sims:ro
+
+  gitlab:
+    image: gitlab/gitlab-ce:17.11.1-ce.0
+    container_name: merge-release-gitlab
+    profiles: [gitlab]
+    network_mode: "service:release"
+    depends_on: [release]
+    shm_size: 256m
+    environment:
+      GITLAB_OMNIBUS_CONFIG: >-
+        external_url 'http://localhost:8929';
+        puma['worker_processes'] = 0; sidekiq['concurrency'] = 5;
+        prometheus_monitoring['enable'] = false; gitlab_rails['usage_ping_enabled'] = false;
+        gitlab_kas['enable'] = false;
+    volumes:
+      - gitlab-config:/etc/gitlab
+      - gitlab-data:/var/opt/gitlab
+
+volumes:
+  app:
+  sims:
+  gitlab-config:
+  gitlab-data:

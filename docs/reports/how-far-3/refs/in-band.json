@@ -1,0 +1,22 @@
+{
+  "name": "in-band",
+  "kind": "comment",
+  "label": "IN-BAND",
+  "title": "Instructions in every representation",
+  "summary": "The media type is learned once; each representation carries the transitions available at that point.",
+  "quote": "<p>“The media type identifies a specification that defines how a representation is to be processed. That is out-of-band information (all communication is dependent on some prior knowledge). What you are missing is that each representation contains the specific instructions for interfacing with a given service, provided in-band. The media type is a generic processing model that every agent can learn if there aren’t too many of them (hence the need for standards). The representation is specific to the application being performed by the agent. Each representation therefore provides the transitions that are available at that point in the application.</p><p>When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p>",
+  "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+  "date": "23 October 2008",
+  "_links": {
+    "describedby": {
+      "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754",
+      "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+    },
+    "self": {
+      "href": "in-band.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

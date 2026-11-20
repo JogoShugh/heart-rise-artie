@@ -1,0 +1,14 @@
+1 enter http://localhost:8181/: done
+2 act basketball:get-game, id 2: done
+3 act basketball:record-foul, team home, playerNumber 8, kind personal: done
+4 act basketball:record-foul, team home, playerNumber 8, kind personal: done
+5 act basketball:record-foul, team home, playerNumber 8, kind personal: done
+6 act basketball:record-foul, team home, playerNumber 8, kind personal: done
+note: Rowan has {"name":"Hornets","score":2,"teamFouls":5,"inBonus":false,"players":[{"number":5,"name":"Kai","points":0,"fouls":0,"fouledOut":false},{"number":8,"name":"Rowan","points":0,"fouls":5,"fouledOut":true},{"number":12,"name":"Ellis","points":0,"fouls":0,"fouledOut":false},{"number":24,"name":"Harper","points":2,"fouls":0,"fouledOut":false},{"number":33,"name":"Finley","points":0,"fouls":0,"fouledOut":false}]}
+7 act basketball:record-foul, team home, playerNumber 8, kind personal: refused
+note: by script: not a choice, refused by the client: "playerNumber: 8 is not one of the choices"
+8 record a personal foul on Rowan of the Hornets: refused
+note: in words, for Rowan: unclear to the reasoner, refused by the client: "Rowan (#8) has already fouled out with 5 fouls, so a foul can't be recorded on him. Did you mean a different Hornets player: Kai (5), Ellis (12), Harper (24) or Finley (33)?"
+9 record a personal foul on Kai of the Hornets: done
+10 return to http://localhost:8181/: done
+finished, 10 steps

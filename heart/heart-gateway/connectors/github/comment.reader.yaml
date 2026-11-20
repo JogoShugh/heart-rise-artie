@@ -1,0 +1,8 @@
+# A comment has no state to choose by: its author, or anyone with push access, may edit it.
+matches:
+  path: /repos/{owner}/{repo}/issues/comments/{comment_id}
+allowed:
+  always: [edit]
+  rules:
+    - when: { /user/login: { not-same-as: "user:/login" }, "repository:/permissions/push": false }
+      absent: { edit: "Only the comment's author or someone with push access can edit it." }

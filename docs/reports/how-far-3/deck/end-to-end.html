@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Script, End to End · Claude and Git Hooks, Together · 3.0</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">The whole release, on one slide</span></header>
+<h2>One Script, End to End</h2>
+<div class="table-scroll"><table>
+  <thead><tr><th></th><th>Service</th><th>Relation</th><th>What happens</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Release desk</td><td><code>desk:release</code></td><td>A person asks; the desk starts ARTIE on the kept script</td></tr>
+    <tr><td>2</td><td>Gateway</td><td><code>scm:pulls-get</code></td><td>Open the pull request</td></tr>
+    <tr><td>3</td><td>Offer watch</td><td><code>watcher:watch</code></td><td>Tell me when it offers <code>scm:merge</code>; wait for the reply</td></tr>
+    <tr><td>4</td><td>Gateway</td><td><code>scm:merge</code></td><td>Merge by squashing; check it’s merged</td></tr>
+    <tr><td>5</td><td>CI · Jenkins</td><td><code>ci:build</code></td><td>Build the merge commit; wait for the reply</td></tr>
+    <tr><td>6</td><td>CI · Jenkins</td><td><code>ci:smoke-test</code></td><td>Run the build’s own smoke scenarios against its deployment</td></tr>
+    <tr><td>7</td><td>Dev, or the gateway</td><td><code>env:promote</code> or <code>scm:comment</code></td><td>All passed: promote. One failed: say why on the pull request</td></tr>
+  </tbody>
+</table></div>
+<p class="punch">Five services, one script written as data, one generic client.</p>
+<p class="refs"><a class="ref-plain" href="deck/three-rs-one-behavior.html">RIGHT-BEHAVIOR</a> <a class="ref-plain" href="deck/three-rs-one-behavior.html">REPEATABILITY</a> <a class="ref-plain" href="deck/three-rs-one-behavior.html">RESILIENCE</a> <a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc">RISE</a></p>
+</article>
+<nav class="foot"><a href="deck/dev-or-comment.html" rel="prev"><small>Back</small><b>Promoted to Dev, or Told Why</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#end-to-end">with heart-ts</a></span>
+<a href="deck/one-media-type.html" rel="next"><small>Next</small><b>One Media Type, Five Services</b></a></nav>
+</main></div></body></html>

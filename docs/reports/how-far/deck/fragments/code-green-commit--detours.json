@@ -1,0 +1,21 @@
+{
+  "name": "detours",
+  "label": "Detours.kt, keep a read another step names",
+  "lang": "kotlin",
+  "path": "client/artie-cli/src/main/kotlin/heart/cli/generate/Detours.kt",
+  "lines": "63–70",
+  "of": 84,
+  "text": "private fun named(capture: Capture): Set<Int> {\n    val marks = capture.steps.associateWith { capture.marks(it) }\n    return marks.filter { (step, own) ->\n        val name = own[\"as\"]?.toString() ?: return@filter false\n        val mention = Regex(\"\"\"\\{$name[.}]\"\"\")\n        marks.any { (other, its) -> other.line != step.line && its.values.any { mention.containsMatchIn(\"$it\") } }\n    }.keys.map { it.number }.toSet()\n}",
+  "_links": {
+    "self": {
+      "href": "code-green-commit--detours.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/client/artie-cli/src/main/kotlin/heart/cli/generate/Detours.kt#L63-L70",
+      "title": "client/artie-cli/src/main/kotlin/heart/cli/generate/Detours.kt, lines 63–70"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

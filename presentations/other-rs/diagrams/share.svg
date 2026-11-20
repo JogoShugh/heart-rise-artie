@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="share-title share-desc">
+<title id="share-title">How many steps asked the model</title>
+<desc id="share-desc">Goal run 1: 444 steps, 13 model calls. Goal run 2: 538 steps, 12. The generated script over an hour: 2,740 steps, 5 model calls, all at the line marked reasoned.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="share-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="t" x="20" y="76" text-anchor="start">Goal run 1, 13 minutes</text>
+<rect class="box" x="250" y="50" width="76" height="40" rx="6"/>
+<rect class="a" x="250" y="50" width="3" height="40" rx="3"/>
+<text class="s" x="336" y="76" text-anchor="start">444 steps · 13 model calls</text>
+<text class="t" x="20" y="156" text-anchor="start">Goal run 2, 10 minutes</text>
+<rect class="box" x="250" y="130" width="92" height="40" rx="6"/>
+<rect class="a" x="250" y="130" width="3" height="40" rx="3"/>
+<text class="s" x="352" y="156" text-anchor="start">538 steps · 12 model calls</text>
+<text class="t" x="20" y="236" text-anchor="start">Script, one hour</text>
+<rect class="box" x="250" y="210" width="470" height="40" rx="6"/>
+<rect class="a" x="250" y="210" width="3" height="40" rx="3"/>
+<text class="s" x="730" y="236" text-anchor="start">2740 steps · 5 model calls</text>
+<text class="s" x="480" y="290" text-anchor="middle">Orange: steps that asked the model. The rest ran on kept decisions and the server's controls.</text>
+</svg>

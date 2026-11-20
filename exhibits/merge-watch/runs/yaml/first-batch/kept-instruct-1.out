@@ -1,0 +1,4 @@
+1 enter https://localhost:8393/: done
+2 act github:repos-get, owner JogoShugh, repo heart-github-test: done
+3 act github:open-issue, title Merge watch, body Close this issue to stop the watch.: refused
+stopped at step 2, "github:open-issue": guard, refused by the client: "github:open-issue changed: pinned sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI=, offered sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI="

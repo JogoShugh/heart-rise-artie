@@ -1,0 +1,51 @@
+# An issue says nothing about what is allowed, so the rules are written here:
+# first by its state, then by the rules below, in order, each with its reason.
+matches:
+  path: /repos/{owner}/{repo}/issues/{issue_number}
+allowed:
+  table: /state
+  rows:
+    open:
+      allow:
+        [close, close-not-planned, close-duplicate, edit, lock, unlock, label, unlabel, assign, unassign, set-milestone,
+         comment, add-sub-issue, remove-sub-issue]
+      absent: { reopen: The issue is already open. }
+    closed:
+      allow:
+        [reopen, edit, lock, unlock, label, unlabel, assign, unassign, set-milestone, comment, add-sub-issue,
+         remove-sub-issue]
+      absent:
+        close: The issue is already closed.
+        close-not-planned: The issue is already closed.
+        close-duplicate: The issue is already closed.
+  rules:
+    - when: { /locked: true }
+      absent: { lock: The conversation is already locked. }
+    - when: { /locked: false }
+      absent: { unlock: "The conversation isn't locked." }
+    # Who may do what (GitHub's roles): the issue's author, or triage, closes and reopens; triage labels,
+    # assigns and sets the milestone; the author, or push, edits; push locks and unlocks.
+    - when: { /user/login: { not-same-as: "user:/login" }, "repository:/permissions/triage": false }
+      absent:
+        close: "Only the issue's author or someone with triage access can close or reopen it."
+        close-not-planned: "Only the issue's author or someone with triage access can close or reopen it."
+        close-duplicate: "Only the issue's author or someone with triage access can close or reopen it."
+        reopen: "Only the issue's author or someone with triage access can close or reopen it."
+    - when: { /user/login: { not-same-as: "user:/login" }, "repository:/permissions/push": false }
+      absent: { edit: "Only the issue's author or someone with push access can edit it." }
+    - when: { "repository:/permissions/triage": false }
+      absent:
+        label: You need triage access to this repository.
+        unlabel: You need triage access to this repository.
+        assign: You need triage access to this repository.
+        unassign: You need triage access to this repository.
+        set-milestone: You need triage access to this repository.
+        add-sub-issue: You need triage access to this repository.
+        remove-sub-issue: You need triage access to this repository.
+    - when: { "repository:/permissions/push": false }
+      absent:
+        lock: You need push access to lock or unlock the conversation.
+        unlock: You need push access to lock or unlock the conversation.
+    # A locked conversation takes comments only from collaborators with push access.
+    - when: { /locked: true, "repository:/permissions/push": false }
+      absent: { comment: The conversation is locked; only collaborators can comment. }

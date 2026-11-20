@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="once-title once-desc">
+<title id="once-title">Decided once by the model, replayed with no model</title>
+<desc id="once-desc">The first time a step is needed, the model reads the goal's words against what the server offers and decides; the decision is kept. Every later time it is replayed, and the server's own offers say whether it applies.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="once-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="30" y="40" text-anchor="start">The first time a step is needed</text>
+<rect class="box" x="30" y="64" width="170" height="76" rx="10"/>
+<text class="h" x="115" y="97" text-anchor="middle">The goal's words</text>
+<text class="s" x="115" y="117" text-anchor="middle">“merge it by squashing”</text>
+<path class="line" d="M200 102 L248 102" marker-end="url(#once-head)"/>
+<rect class="hl" x="250" y="64" width="190" height="76" rx="10"/>
+<text class="h" x="345" y="97" text-anchor="middle">The model</text>
+<text class="s" x="345" y="117" text-anchor="middle">reads what is offered</text>
+<path class="line" d="M440 102 L488 102" marker-end="url(#once-head)"/>
+<rect class="box" x="490" y="64" width="210" height="76" rx="10"/>
+<text class="h" x="595" y="97" text-anchor="middle">A decision</text>
+<text class="s" x="595" y="117" text-anchor="middle">github:merge, squash</text>
+<path class="line" d="M700 102 L748 102" marker-end="url(#once-head)"/>
+<rect class="box" x="750" y="64" width="180" height="76" rx="10"/>
+<text class="h" x="840" y="97" text-anchor="middle">Kept</text>
+<text class="s" x="840" y="117" text-anchor="middle">in the run's capture</text>
+<text class="h" x="330" y="224" text-anchor="start">Every later time, for every pull request</text>
+<path class="dash" d="M840 140 L840 188 L300 188 L300 236" marker-end="url(#once-head)"/>
+<rect class="box" x="200" y="238" width="200" height="76" rx="10"/>
+<text class="h" x="300" y="271" text-anchor="middle">Replay</text>
+<text class="s" x="300" y="291" text-anchor="middle">the kept decision</text>
+<path class="line" d="M400 276 L448 276" marker-end="url(#once-head)"/>
+<rect class="box" x="450" y="238" width="210" height="76" rx="10"/>
+<text class="h" x="555" y="271" text-anchor="middle">The server</text>
+<text class="s" x="555" y="291" text-anchor="middle">still offers merge here?</text>
+<path class="line" d="M660 276 L708 276" marker-end="url(#once-head)"/>
+<rect class="box" x="710" y="238" width="220" height="76" rx="10"/>
+<text class="h" x="820" y="271" text-anchor="middle">Act</text>
+<text class="s" x="820" y="291" text-anchor="middle">or wait, or give up</text>
+<rect class="ghost" x="30" y="238" width="140" height="76" rx="10"/>
+<text class="t" x="100" y="270" text-anchor="middle">no model</text>
+<text class="s" x="100" y="290" text-anchor="middle">asked</text>
+<text class="s" x="480" y="380" text-anchor="middle">The server's offers check each replay: a decision is used only where its act is offered now.</text>
+</svg>

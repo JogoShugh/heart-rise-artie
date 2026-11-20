@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How an OpenAPI client that reads its spec live closes its last gap with one link per response, and why that is HATEOAS.">
+<title>In the end we wind up with HATEOAS anyway</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; the final client's request cycle and its code break out wider; the earlier steps sit small and quiet at the end. */
+:root {
+  --bg: #f3f6f5;
+  --surface: #ffffff;
+  --fg: #17211d;
+  --muted: #55645d;
+  --rule: #d3ddd8;
+  --leaf: #2b7a4b;
+  --link: #2f5f8f;
+  --refuse: #a3442e;
+  --code-bg: #e9efec;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732;
+    --leaf: #6cc690; --link: #8ab8e6; --refuse: #e58a72; --code-bg: #1d2723; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732;
+  --leaf: #6cc690; --link: #8ab8e6; --refuse: #e58a72; --code-bg: #1d2723; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font: 16px/1.65 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 44rem; margin: 0 auto; padding-block: 3rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
+.wide { margin-inline: calc((44rem - min(62rem, 100%)) / 2); }
+@media (max-width: 62rem) { .wide { margin-inline: 0; } }
+h1, h2, h3 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.1rem, 5.5vw, 3.2rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.55rem; }
+h3 { font-size: 1.1rem; }
+p, li { max-width: 65ch; }
+p { margin: 0; }
+section { display: grid; gap: 1rem; min-width: 0; }
+.eyebrow { font: 600 0.74rem/1 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.15rem; color: var(--muted); }
+.thesis { font-family: var(--display); font-weight: 500; font-size: 1.3rem; line-height: 1.45; border-left: 3px solid var(--leaf); padding-left: 1rem; }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.9rem 1rem; font: 0.8rem/1.6 var(--mono); }
+pre code { background: none; padding: 0; font-size: 1em; }
+.k { color: var(--link); }
+.g { color: var(--leaf); }
+a { color: var(--link); }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.4rem; }
+.note { color: var(--muted); font-size: 0.92rem; }
+
+/* The request cycle: real HTTP exchanges, in order, because order is the point. */
+.cycle { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; counter-reset: step; }
+.cycle li { counter-increment: step; display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: 0.8rem; max-width: none; }
+.cycle li::before { content: counter(step); font: 600 0.95rem/2rem var(--display); width: 2rem; height: 2rem; text-align: center; border-radius: 50%; border: 1px solid var(--rule); color: var(--muted); background: var(--surface); }
+.cycle li.hyper::before { border-color: var(--leaf); color: var(--leaf); }
+.cycle .body { display: grid; gap: 0.45rem; min-width: 0; }
+.cycle .who { font: 600 0.72rem/1 var(--body); letter-spacing: 0.08em; text-transform: uppercase; }
+.cycle .who.oas { color: var(--link); }
+.cycle .who.hm { color: var(--leaf); }
+
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1rem; }
+.split > div { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 1rem 1.1rem; display: grid; gap: 0.45rem; align-content: start; }
+.split b { font-family: var(--display); font-size: 1.05rem; }
+.split .oas { border-top: 3px solid var(--link); }
+.split .hm { border-top: 3px solid var(--leaf); }
+
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 36rem; font-size: 0.93rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tbody th { font-weight: 500; }
+.hl { background: color-mix(in srgb, var(--leaf) 10%, transparent); }
+.pass { color: var(--leaf); font-weight: 600; }
+.fail { color: var(--refuse); font-weight: 600; }
+
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1rem; }
+figure { margin: 0; display: grid; gap: 0.4rem; min-width: 0; }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 8px; background: #fff; }
+figcaption { font-size: 0.88rem; color: var(--muted); }
+figcaption b { color: var(--fg); }
+
+.road { display: grid; gap: 0.5rem; }
+.road div { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 0.8rem; font-size: 0.93rem; padding-block: 0.5rem; border-top: 1px solid var(--rule); }
+.road div:first-child { border-top: 0; }
+.road span { color: var(--muted); }
+@media (max-width: 30rem) { .road div { grid-template-columns: 1fr; gap: 0.15rem; } }
+footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; display: grid; gap: 0.35rem; }
+</style>
+
+</head>
+<body>
+<main class="wrap">
+  <header style="display:grid;gap:0.9rem">
+    <span class="eyebrow">OpenAPI vs HEART · the final client · 15 October 2026</span>
+    <h1>In the end we wind up with HATEOAS anyway</h1>
+    <p class="lede">We kept improving an OpenAPI client until it survived every change our garden server could throw at it. Its last fix was a link in the response: the Web's own mechanism.</p>
+  </header>
+
+  <p class="thesis">An OpenAPI description can tell a client what the API can ever do. Only the response can tell it what this resource allows right now. Carry that in a link, and the client is a hypermedia client.</p>
+
+  <section>
+    <h2>The final form, in one paragraph</h2>
+    <p>The client has no generated code. It reads the garden's OpenAPI description while it runs, for names, titles, schemas and paths. Every plain JSON answer about a bed carries one extra header: a <code>Link</code> to the affordance set for that bed's current state. The client follows the link, checks the set's integrity, and shows only the operations a form in that set names. Everything else on the page still comes from OpenAPI.</p>
+  </section>
+
+  <section class="wide">
+    <h2>One cycle, request by request</h2>
+    <p>Blue steps are OpenAPI doing what it's good at. Green steps are the hypermedia that closes the gap.</p>
+    <ol class="cycle">
+      <li><div class="body">
+        <span class="who oas">OpenAPI</span>
+        <p><b>Read the description</b>, revalidated by its <code>ETag</code> each time. It names every operation, its title, its path template and its request schema. One extension tells the client where to find what's allowed now:</p>
+<pre><code><span class="k">"x-heart-affordances"</span>: {
+  <span class="k">"header"</span>: "Link",
+  <span class="k">"rel"</span>:    "https://w3id.org/heart-rise/rels/forms",
+  <span class="k">"match"</span>:  "method and path template"
+}</code></pre>
+      </div></li>
+      <li><div class="body">
+        <span class="who oas">OpenAPI</span>
+        <p><b>Read the bed</b> with the one operation the client was told about, <code>getBed</code>. The body is the plain state, exactly as a typical JSON API returns it.</p>
+<pre><code>GET /beds/2                     Accept: application/json
+
+200 OK
+<span class="g">Link: &lt;/affordance-sets/…&gt;; rel="https://w3id.org/heart-rise/rels/forms";
+      type="application/hal+json"; integrity="sha256-…"</span>
+{"id":2,"label":"bed-2","status":"FROZEN","cropName":"tomato","moistureLevel":40, …}</code></pre>
+      </div></li>
+      <li class="hyper"><div class="body">
+        <span class="who hm">Hypermedia</span>
+        <p><b>Follow the link</b> to the affordance set. It's content-addressed and immutable, so the client fetches each one once and checks its bytes against the link's <code>integrity</code>. Every bed in the same state shares it. A frozen bed's set holds one form:</p>
+<pre><code>GET /affordance-sets/…          Accept: application/hal+json
+
+{"_forms": {
+  "garden:thaw": { "title": "Thaw the bed", "method": "POST",
+                   "_links": { "target": { "href": "/beds/{id}/actions/thaw", "templated": true } }, … }
+}}</code></pre>
+      </div></li>
+      <li class="hyper"><div class="body">
+        <span class="who hm">Hypermedia</span>
+        <p><b>Keep only what the set names.</b> An operation stays if a form has the same method and the same path template, ignoring variable names. No operation names, no prose, no rules about statuses in the client:</p>
+<pre><code><span class="k">const</span> shape = (t) =&gt; t.replace(/\{[^}]+\}/g, "{}");
+<span class="k">const</span> allowedNow = operations.filter((op) =&gt;
+    forms.some((f) =&gt; f.method === op.method &amp;&amp; shape(f.target) === shape(op.path)));</code></pre>
+      </div></li>
+      <li><div class="body">
+        <span class="who oas">OpenAPI</span>
+        <p><b>Draw the buttons</b> from what's left. Each title is the operation's <code>summary</code>, and each field comes from the operation's request schema, with its defaults, examples and limits. A frozen bed gets one button: Thaw the bed.</p>
+      </div></li>
+      <li class="hyper"><div class="body">
+        <span class="who hm">Both</span>
+        <p><b>Act, and start again.</b> The client posts JSON to the operation's path. The answer is the bed's new state with a new <code>Link</code>, to the set for its new state, so the next screen is already right. After thawing, the bed's set offers Water, and only Water.</p>
+      </div></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Who does what</h2>
+    <div class="split">
+      <div class="oas"><b>OpenAPI keeps</b><ul><li>operation names and titles</li><li>request schemas, defaults, examples, limits</li><li>path templates</li><li>documentation for people</li></ul></div>
+      <div class="hm"><b>The link carries</b><ul><li>which operations this resource allows now</li><li>as an immutable, cacheable, integrity-checked set</li><li>the same set HEART's own clients follow</li><li>nothing the client must hard-code</li></ul></div>
+    </div>
+  </section>
+
+  <section class="wide">
+    <h2>What it scored</h2>
+    <p>The same tests every client faced, scored by the garden's own records. Highlighted: the final form.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">Test</th><th scope="col">Generated client</th><th scope="col">Spec-reading</th><th scope="col" class="hl">Spec-reading + link</th><th scope="col">HEART dashboard</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Frost suite, Monday</th><td class="pass">3 of 3</td><td class="fail">0 of 3</td><td class="pass hl">3 of 3</td><td class="pass">3 of 3</td></tr>
+          <tr><th scope="row">Frost suite, Tuesday</th><td class="fail">3 of 7</td><td class="fail">1 of 7</td><td class="pass hl">7 of 7</td><td class="pass">7 of 7</td></tr>
+          <tr><th scope="row">Six breaking changes</th><td>4 of 6</td><td class="pass">6 of 6</td><td class="pass hl">6 of 6</td><td class="pass">6 of 6</td></tr>
+          <tr><th scope="row">Three careful changes</th><td class="pass">3 of 3</td><td class="pass">3 of 3</td><td class="pass hl">3 of 3</td><td class="pass">3 of 3</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="shots">
+      <figure><img src="tuesday-live.png" alt="The spec-reading client on a frozen bed: Harvest, Sow, Thaw and Water buttons" width="820" height="620"><figcaption><b>Before the link.</b> A frozen bed, with every act the description lists.</figcaption></figure>
+      <figure><img src="tuesday-afford.png" alt="The final client on a frozen bed: only a Thaw the bed button" width="820" height="620"><figcaption><b>With the link.</b> Only Thaw, because that's all the bed allows.</figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why it had to be a link</h2>
+    <p>A description describes the API. It can't know that bed 2 froze overnight. "Only allowed when status is PLANTED" is the best OpenAPI can do, and it's a sentence. A client can parse that prose, copy the rule into code, or try the act and take the 409. All three bind the client to rules the server may change.</p>
+    <p>The only thing that knows what bed 2 allows now is the answer about bed 2. So the answer has to carry it, or point to it. That is Fielding's sixth rule: from the first URL on, every step is a choice among options the server sent with the state.</p>
+    <p>OpenAPI's maintainers say "HTTP APIs" on purpose, and they're honest about the scope. It leaves this gap open by design. Closing it doesn't mean throwing OpenAPI away. It means adding the one piece of hypermedia that carries the truth about this moment. Here that piece is HEART's affordance set, which is HEART's L1 rung, reached from the other side.</p>
+  </section>
+
+  <section>
+    <h2>How we got here</h2>
+    <div class="road">
+      <div><b>Generated client</b><span>Built once from Monday's spec. Broke on a moved path, a renamed field and new input, and offered Water on a frozen bed.</span></div>
+      <div><b>Careful changes</b><span>With old paths and fields kept and new input optional, even the generated client survived. The cost moved to the server team.</span></div>
+      <div><b>Spec-reading client</b><span>Reads the description while it runs. Survived every change to the API's shape, but showed every act in every state.</span></div>
+      <div><b>Plus the link</b><span>One header in each answer, one set of forms behind it. Survived everything, including the frost.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What's still bound in</h2>
+    <ul>
+      <li>The client still knows three things in advance: the garden's address, where the description lives, and <code>getBed</code>.</li>
+      <li>It matches forms to operations by path template. A form whose target the description doesn't list would be dropped. Following the form's own target would fix that, and would be one more step toward a plain HEART client.</li>
+      <li>The link is opt-in on the server, because it changes the description's bytes. The garden marks it in its version, <code>1.0.0+affordance-links</code>, so the published 1.0.0 stays as it was.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>From the OpenAPI-vs-HEART exhibit: <code>exhibits/openapi-vs-heart/openapi-affordances/</code>, run with <code>HEART_AFFORDANCE_LINKS=true</code>.</span>
+    <span>Rule 6, paraphrased from Roy T. Fielding, <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be hypertext-driven"</a> (2008).</span>
+  </footer>
+</main>
+</body>
+</html>

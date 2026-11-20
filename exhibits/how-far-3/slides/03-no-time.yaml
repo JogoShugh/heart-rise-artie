@@ -1,0 +1,33 @@
+name: no-time
+part: "The problem"
+title: "No Time to Type"
+kicker: Why I needed it twice over
+say: "Here's the 'twice over'. Have you ever tried to write code with a leash in one hand? I don't recommend it. Between family and a new dog, the time I used to spend at a keyboard is gone. Most of my work now is speech-to-text, dictated into my phone, through Claude Code's /remote-control, while the session runs on my machine. So I needed two things I could trust without watching. An agent that does the right thing, the same way, every time. And a way of building it where Claude does the right thing, in the right order, every time, while I'm not looking. Let's take the agent first: what did I want it to be?"
+sources:
+  - ["Claude Code docs: /remote-control", "https://code.claude.com/docs/en/remote-control"]
+  - ["bdd-gates skill", "https://github.com/JogoShugh/bdd-gates-skill"]
+fragments:
+  - name: hooks
+    label: The hooks that gate every change (core/hooks.json)
+    source: bdd-gates:core/hooks.json
+    lang: json
+html: |
+  <h2>No Time to Type</h2>
+  <div class="split">
+    <div class="rows">
+      <p class="lead">Have you ever tried to write code with a leash in one hand? I don’t recommend it.</p>
+      <div><h3>Half the Answer: <code>/remote-control</code></h3><p>The session runs on my machine. I steer it mostly by dictating into my phone.</p></div>
+      <div><h3>The Other Half: Rigor Without Watching</h3><p>BDD for real, the same way every time: Gherkin, red, code, green, commit. <deck-ref name="right-behavior"></deck-ref> <deck-ref name="repeatability"></deck-ref></p></div>
+      <div><h3>Asking Nicely? Probably Not.</h3><p>Instructions are advisory, so hooks enforce the order. I read the record afterward.</p></div>
+      <p class="punch">Notice that an agent calling an API needs the same thing: controls that still hold when nobody is watching. <deck-ref name="no-time"></deck-ref> <deck-fragment name="hooks">hooks.json</deck-fragment></p>
+    </div>
+    <div class="phone">
+      <p class="phone-head">/remote-control</p>
+      <p class="me">Please give me an update</p>
+      <p class="it">Red run logged. Writing the fix.</p>
+      <p class="me">How’s it going?</p>
+      <p class="it">Green. Commit gate: TDD order checked.</p>
+      <p class="me">🐕 pulling. back in 20</p>
+      <p class="note">Illustrative, not a transcript. The two questions are the real ones, every evening. So is the dog.</p>
+    </div>
+  </div>

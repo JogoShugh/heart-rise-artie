@@ -1,0 +1,21 @@
+{
+  "name": "scenario-first",
+  "title": "Claude Writes the Scenario First",
+  "part": "One behavior, start to finish",
+  "kicker": "A hook blocks production code until a feature file changes",
+  "tone": "light",
+  "number": 8,
+  "of": 30,
+  "html": "<h2>Claude Writes the Scenario First</h2>\n<div class=\"card dark\">\n  <pre style=\"margin: 0; white-space: pre-wrap; font-size: 1rem\">Scenario Outline: A library whose policy file renews &lt;weeks&gt; weeks at a time\n                  moves the due date that far\n  Given the library's policy file reads \"&lt;policy&gt;\"\n  When Ana renews loan 3311\n  Then the answer is 200\n  And loan 3311 is due \"&lt;due&gt;\", renewed 1 time\n\n  Examples:\n    | policy           | weeks | due        |\n    | renewal.weeks=3  | 3     | 2026-12-03 |\n    | <b style=\"color: #e3b341\">renewal.weeks=0  | 0     | 2026-11-12</b> |\n    | renewal.weeks=6  | 6     | 2026-12-24 |\n    | # no rules       | 3     | 2026-12-03 |</pre>\n</div>\n<p class=\"punch\">Four rows anyone can read. Remember the zero-weeks row.</p>\n<p class=\"refs\"><deck-ref name=\"right-behavior\"></deck-ref> <deck-fragment name=\"gherkin-first\">gherkin-first.sh</deck-fragment></p>\n",
+  "say": "Here's what came back first: not code, a scenario. And it's a table, which is the point. Four rows. A policy of three weeks moves the due date three weeks. Zero weeks doesn't move it at all. Six weeks moves it six. And a policy file with no rule keeps three. Anyone in this room can read that, and so can a librarian. Could Claude have skipped this and gone straight to the code? It could have tried. A hook runs before every edit: if the file is production code and no feature file has changed, the edit is refused, and the model reads why. Remember that zero-weeks row. It comes back at the end.",
+  "sources": [
+    {
+      "label": "library.feature",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/heart/heart-sims/src/test/resources/features/library.feature"
+    },
+    {
+      "label": "bdd-gates skill",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    }
+  ]
+}

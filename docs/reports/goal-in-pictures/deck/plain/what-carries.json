@@ -1,0 +1,17 @@
+{
+  "name": "what-carries",
+  "title": "What Lets HAL-FORMS Carry the Release",
+  "part": "HAL-FORMS",
+  "kicker": "Three things the parties do in HAL-FORMS",
+  "tone": "light",
+  "number": 15,
+  "of": 19,
+  "html": "<h2>What Lets HAL-FORMS Carry the Release</h2>\n<div class=\"cast6\" style=\"grid-template-columns: repeat(3, minmax(0, 1fr))\">\n  <div><b>Named by relation</b><code>scm:merge</code><span>Every template is keyed by the act's relation, as a form is in HAL Schema Forms. One vocabulary for both dialects.</span></div>\n  <div><b>Lookups as link templates</b><code>scm:pulls-get</code><span><code>/repos/{owner}/{repo}/pulls/{pull_number}</code>: a HAL-FORMS target can't hold variables; ARTIE fills the link template as a GET form.</span></div>\n  <div><b>Choices filled in</b><code>library:report-problem</code><span>The problem kinds live inside another resource; the server lists them in the template.</span></div>\n</div>\n<p class=\"lead\">The watcher, the CI wrapper over Jenkins, the preview, Dev and the smoke script: unchanged.</p>\n<p class=\"refs\"><deck-ref name=\"scm\"></deck-ref> <deck-ref name=\"hypertext\"></deck-ref></p>\n",
+  "say": "Three things make HAL-FORMS carry the whole release. One: every template is named by its relation, the same names as in HAL Schema Forms, so one vocabulary serves both. Two: a HAL-FORMS target can't hold variables, so a lookup like get pull request comes as a link template, and ARTIE fills it like a GET form. Three: where an act's choices live inside another resource, like the library's problem kinds, the server fills them into the template, since HAL-FORMS can't point inside a document. The smoke script, the watcher, Jenkins, Dev: all unchanged.",
+  "sources": [
+    {
+      "label": "SPEC §6, HAL-FORMS templates keyed by relation",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md"
+    }
+  ]
+}

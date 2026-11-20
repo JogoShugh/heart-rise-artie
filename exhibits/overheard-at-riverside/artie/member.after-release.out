@@ -1,0 +1,16 @@
+1 enter http://localhost:8140/: done
+2 act library:search-accounts, name Ana Torres: done
+3 follow item, titled Ana Torres: done
+4 follow item, titled The Hobbit: done
+note: none of these acts is offered here
+5 return to http://localhost:8140/accounts/21000451: done
+6 follow item, titled Matilda: done
+7 act library:renew: done
+8 return to http://localhost:8140/loans/3311: done
+9 return to http://localhost:8140/accounts/21000451: done
+10 follow item, titled Charlotte's Web: done
+note: none of these acts is offered here
+11 return to http://localhost:8140/accounts/21000451: done
+12 return to http://localhost:8140/accounts?name=Ana+Torres: done
+13 return to http://localhost:8140/: done
+finished, 13 steps; acted: library:search-accounts 1, library:renew 1; noted 2

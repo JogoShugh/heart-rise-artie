@@ -1,0 +1,7 @@
+intent-instruct-1 | model=qwen3:30b-a3b-instruct-2507-q4_K_M | bump #2120 merged=true | draft #2121 told=1 | watch #2122 | 482s | calls=8 output=418 | finished, 324 steps; acted: github:repos-get 1, github:open-issue 1, github:pulls-list 3, github:merge 1, github:label 1, github:comment 1; noted 70
+intent-instruct-2 | model=qwen3:30b-a3b-instruct-2507-q4_K_M | bump #2127 merged=false | draft #2128 told=0 | watch #none | 32s | calls=? output=? | 	at heart.cli.MainKt.main(Main.kt:11)
+intent-instruct-3: staging failed (bump=2129 draft=)
+intent-thinking-1 | model=qwen3:30b-a3b | bump #2130 merged=false | draft #2131 told=0 | watch #none | 48s | calls=? output=? | 	at heart.cli.MainKt.main(Main.kt:11)
+intent-thinking-2 | model=qwen3:30b-a3b | bump #2132 merged=false | draft #2133 told=0 | watch #none | 64s | calls=? output=? | 	at heart.cli.MainKt.main(Main.kt:11)
+intent-thinking-3 | model=qwen3:30b-a3b | bump #2135 merged=false | draft #2136 told=0 | watch #none | 32s | calls=? output=? | 	at heart.cli.MainKt.main(Main.kt:11)
+kept-instruct-1 | model=qwen3:30b-a3b-instruct-2507-q4_K_M | bump #2137 merged=false | draft #2138 told=0 | watch #none | 16s | calls=0 output=0 | stopped at step 2, "github:open-issue": guard, refused by the client: "github:open-issue changed: pinned sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI=, offered sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI="

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run It Yourself · One Goal, Walked Once, Replayed Free</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">The kit, and the walk</span></header>
+<h2>Run It Yourself</h2>
+<div class="split" style="grid-template-columns: 1fr 1.25fr">
+  <div class="card">
+    <span class="label">Walk once (tokens)</span>
+    <pre class="cmd">exhibits/merge-watch-release/capture-release.sh 501</pre>
+    <p>A model key and Jenkins. Writes <code>release.heart.yaml</code> and <code>release.pins.yaml</code>. The kit already ships both, so this step is optional.</p>
+  </div>
+  <div class="card">
+    <span class="label">Replay (zero tokens) · only Docker</span>
+    <pre class="cmd">kit/release.sh up              <span># the parties and Jenkins</span>
+kit/release.sh run github      <span># five releases, a small GitHub in the kit</span>
+kit/release.sh up gitlab       <span># and GitLab too (about 4 GB)</span>
+kit/release.sh run gitlab      <span># the same five, at GitLab</span>
+kit/release.sh run github-live <span># at OWNER/REPO on real GitHub</span>
+kit/release.sh down</pre>
+    <p>Each release’s trace lands in <code>work/runs/&lt;scm&gt;/pr-N.yaml</code>.</p>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/two-forges.html" rel="prev"><small>Back</small><b>One Script, Two Forges</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#run-it">with heart-ts</a></span>
+<a href="deck/close.html" rel="next"><small>Next</small><b>Walked Once. Replayed Free.</b></a></nav>
+</main></div></body></html>

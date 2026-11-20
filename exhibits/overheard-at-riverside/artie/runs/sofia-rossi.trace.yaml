@@ -1,0 +1,569 @@
+---
+run:
+  inputs:
+    member:
+      value: Sofia Rossi
+      given: given
+---
+at: '2026-11-05T01:47:49.467564Z'
+ms: 44
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8140/
+opens: true
+outcome: done
+address: http://localhost:8140/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        library:get-account:
+          - sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
+        library:get-loan:
+          - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+        library:search-loans:
+          - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+      digest: sha256-XDzrMkZrDTnosldep8wEIt8luy6Eh8HYT1/3wADSO1c=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-loans
+    - library:get-loan
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-05T01:47:49.518528Z'
+ms: 41
+mode: script
+say: act {relation}, name {name}
+inferred: search accounts for the member named Sofia Rossi
+fromIntent: Find the account of the member named Sofia Rossi
+params:
+  relation: library:search-accounts
+  name: Sofia Rossi
+values:
+  name:
+    value: Sofia Rossi
+    type: string
+    from:
+      - input: member
+opens: true
+chose:
+  kind: form
+  relation: library:search-accounts
+  title: Find accounts by name
+  method: GET
+  target: /accounts{?name}
+  address: http://localhost:8140/accounts?name=Sofia%20Rossi
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+  act: sha256-84l87SPLMqthzrommJhIneB8EYxHzlgOWdoIBhaXsFM=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:search-accounts
+    - library:search-loans
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8140/accounts?name=Sofia+Rossi
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Sofia Rossi
+---
+at: '2026-11-05T01:47:49.562359Z'
+ms: 4
+mode: script
+say: follow {relation}, titled {title}
+intent: Find the account of the member named Sofia Rossi
+params:
+  relation: item
+  title: Sofia Rossi
+values:
+  title:
+    value: Sofia Rossi
+    from:
+      - input: member
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: Sofia Rossi
+  method: GET
+  target: http://localhost:8140/accounts/21000455
+  address: http://localhost:8140/accounts/21000455
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/accounts/21000455
+now:
+  state:
+    id: 21000455
+    name: Sofia Rossi
+    booksOut: 3
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Giver
+      - Frindle
+      - Number the Stars
+---
+at: '2026-11-05T01:47:49.568963Z'
+ms: 6
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: The Giver
+values:
+  title:
+    value: The Giver
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: The Giver
+  method: GET
+  target: http://localhost:8140/loans/3318
+  address: http://localhost:8140/loans/3318
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3318
+now:
+  state:
+    id: 3318
+    title: The Giver
+    author: Lois Lowry
+    due: '2026-11-12'
+    renewals: 0
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T01:47:49.576758Z'
+ms: 4
+mode: script
+say: act {relation}
+inferred: renew this book (Matilda)
+fromIntent: 'For each book they have out: renew it if renewing is offered; otherwise say why it can''t be renewed'
+params:
+  relation: library:renew
+opens: true
+chose:
+  kind: form
+  relation: library:renew
+  title: Renew
+  method: POST
+  target: /loans/{id}/actions/renew
+  address: http://localhost:8140/loans/3318/actions/renew
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
+    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
+  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+  schema:
+    href: http://localhost:8140/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.df0c62886d233a32"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - library:renew
+    - library:return
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8140/loans/3318
+now:
+  state:
+    id: 3318
+    title: The Giver
+    author: Lois Lowry
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T01:47:49.582321Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/loans/3318
+outcome: done
+address: http://localhost:8140/loans/3318
+now:
+  state:
+    id: 3318
+    title: The Giver
+    author: Lois Lowry
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T01:47:49.585718Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts/21000455
+outcome: done
+address: http://localhost:8140/accounts/21000455
+now:
+  state:
+    id: 21000455
+    name: Sofia Rossi
+    booksOut: 3
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Giver
+      - Frindle
+      - Number the Stars
+---
+at: '2026-11-05T01:47:49.588314Z'
+ms: 4
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Frindle
+values:
+  title:
+    value: Frindle
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Frindle
+  method: GET
+  target: http://localhost:8140/loans/3319
+  address: http://localhost:8140/loans/3319
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3319
+now:
+  state:
+    id: 3319
+    title: Frindle
+    author: Andrew Clements
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+  forms:
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T01:47:49.593362Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts/21000455
+outcome: done
+address: http://localhost:8140/accounts/21000455
+now:
+  state:
+    id: 21000455
+    name: Sofia Rossi
+    booksOut: 3
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Giver
+      - Frindle
+      - Number the Stars
+---
+at: '2026-11-05T01:47:49.596545Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Number the Stars
+values:
+  title:
+    value: Number the Stars
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Number the Stars
+  method: GET
+  target: http://localhost:8140/loans/3320
+  address: http://localhost:8140/loans/3320
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3320
+now:
+  state:
+    id: 3320
+    title: Number the Stars
+    author: Lois Lowry
+    due: '2026-11-12'
+    renewals: 2
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T01:47:49.599883Z'
+ms: 4
+mode: script
+say: act {relation}
+inferred: renew this book (Matilda)
+fromIntent: 'For each book they have out: renew it if renewing is offered; otherwise say why it can''t be renewed'
+params:
+  relation: library:renew
+opens: true
+chose:
+  kind: form
+  relation: library:renew
+  title: Renew
+  method: POST
+  target: /loans/{id}/actions/renew
+  address: http://localhost:8140/loans/3320/actions/renew
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
+    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
+  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+  schema:
+    href: http://localhost:8140/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.ab28d7dee16d24b5"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - library:renew
+    - library:return
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8140/loans/3320
+now:
+  state:
+    id: 3320
+    title: Number the Stars
+    author: Lois Lowry
+    due: '2026-12-03'
+    renewals: 3
+    standing: renewed the most allowed
+  forms:
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T01:47:49.604522Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/loans/3320
+outcome: done
+address: http://localhost:8140/loans/3320
+now:
+  state:
+    id: 3320
+    title: Number the Stars
+    author: Lois Lowry
+    due: '2026-12-03'
+    renewals: 3
+    standing: renewed the most allowed
+  forms:
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T01:47:49.607269Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts/21000455
+outcome: done
+address: http://localhost:8140/accounts/21000455
+now:
+  state:
+    id: 21000455
+    name: Sofia Rossi
+    booksOut: 3
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Giver
+      - Frindle
+      - Number the Stars
+---
+at: '2026-11-05T01:47:49.610108Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts?name=Sofia+Rossi
+outcome: done
+address: http://localhost:8140/accounts?name=Sofia+Rossi
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Sofia Rossi
+---
+at: '2026-11-05T01:47:49.611837Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/
+outcome: done
+address: http://localhost:8140/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        library:get-account:
+          - sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
+        library:get-loan:
+          - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+        library:search-loans:
+          - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+      digest: sha256-XDzrMkZrDTnosldep8wEIt8luy6Eh8HYT1/3wADSO1c=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-loans
+    - library:get-loan
+  links:
+    self:
+      - null
+    service-desc:
+      - null

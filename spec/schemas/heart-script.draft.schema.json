@@ -1,0 +1,356 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JogoShugh/heart-rise-artie/spec/schemas/heart-script.draft.schema.json",
+  "title": "A generated HEART script, as data (draft, spec/PLAN-KEPT-SCRIPTS-AS-DATA.md step 0c)",
+  "description": "An intent or kept script that artie generate writes, held as data. The vocabulary is closed: no key outside it is accepted, and no value is evaluated. Rules the schema can't hold (kind: intent has no act; kind: kept says reasoned: true on every step without one) are the runner's to check.",
+  "type": "object",
+  "required": ["heart", "kind", "start", "steps"],
+  "additionalProperties": false,
+  "properties": {
+    "heart": { "const": 1 },
+    "kind": { "enum": ["intent", "kept"] },
+    "start": { "$ref": "#/$defs/text" },
+    "inputs": {
+      "description": "Each input by its name: nothing for one that must be given, else its default and question.",
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/name" },
+      "additionalProperties": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/input" }] }
+    },
+    "steps": { "$ref": "#/$defs/steps" }
+  },
+  "$defs": {
+    "name": { "type": "string", "pattern": "^[a-z][A-Za-z0-9]*$" },
+    "relation": { "type": "string", "minLength": 1 },
+    "text": {
+      "description": "Text, with ${…} references: an input or kept name, or a dotted path from one (state.title, why). Nothing else is filled; nothing is evaluated.",
+      "type": "string",
+      "pattern": "^([^$]|\\$(?!\\{)|\\$\\{[a-z][A-Za-z0-9]*(\\.[A-Za-z0-9_:-]+)*\\})*$"
+    },
+    "value": {
+      "anyOf": [
+        { "$ref": "#/$defs/text" },
+        { "type": ["number", "boolean", "null"] },
+        { "type": "array", "items": { "$ref": "#/$defs/value" } }
+      ]
+    },
+    "values": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/value" }
+    },
+    "duration": { "type": "string", "pattern": "^[1-9][0-9]*(s|m|h)$" },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "question": { "type": "string" },
+        "type": {
+          "description": "The type a field takes the input as, where it isn't text: the input, given as text, is read as one wherever it is a whole value.",
+          "enum": ["integer", "number", "boolean"]
+        },
+        "default": {
+          "anyOf": [
+            { "type": ["string", "number", "boolean"] },
+            {
+              "description": "A named generator, as goal files have: the time now, in a pattern.",
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["now"],
+              "properties": { "now": { "type": "string" } }
+            }
+          ]
+        }
+      }
+    },
+    "fact": {
+      "description": "A member of the state held (or of the kept resource named in at), equal to a value or holding one.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field"],
+      "oneOf": [{ "required": ["is"] }, { "required": ["has"] }],
+      "properties": {
+        "at": { "$ref": "#/$defs/name" },
+        "field": { "type": "string", "minLength": 1 },
+        "is": { "$ref": "#/$defs/value" },
+        "has": { "$ref": "#/$defs/value" }
+      }
+    },
+    "facts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/fact" } },
+    "steps": { "type": "array", "items": { "$ref": "#/$defs/step" } },
+    "step": {
+      "type": "object",
+      "oneOf": [
+        { "$ref": "#/$defs/act" },
+        { "$ref": "#/$defs/reasoned" },
+        { "$ref": "#/$defs/follow" },
+        { "$ref": "#/$defs/actOnce" },
+        { "$ref": "#/$defs/keepAs" },
+        { "$ref": "#/$defs/sync" },
+        { "$ref": "#/$defs/check" },
+        { "$ref": "#/$defs/until" },
+        { "$ref": "#/$defs/watch" },
+        { "$ref": "#/$defs/at" },
+        { "$ref": "#/$defs/listeners" },
+        { "$ref": "#/$defs/whenever" },
+        { "$ref": "#/$defs/for-each" },
+        { "$ref": "#/$defs/has" },
+        { "$ref": "#/$defs/madeBy" },
+        { "$ref": "#/$defs/saying" },
+        { "$ref": "#/$defs/leaveWhere" },
+        { "$ref": "#/$defs/once" },
+        { "$ref": "#/$defs/given" },
+        { "$ref": "#/$defs/doing" },
+        { "$ref": "#/$defs/doneWhere" },
+        { "$ref": "#/$defs/note" },
+        { "$ref": "#/$defs/decide" },
+        { "$ref": "#/$defs/whenOffered" }
+      ]
+    },
+    "whenOffered": {
+      "description": "when-offered: the first case whose act is offered here, else otherwise. The server decided the state; the offer says it (spec/PLAN-COST-FOLLOWS-STATES.md).",
+      "type": "object",
+      "required": ["when-offered"],
+      "additionalProperties": false,
+      "properties": {
+        "when-offered": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/act" } },
+        "intent": { "$ref": "#/$defs/text" },
+        "inferred": { "$ref": "#/$defs/text" },
+        "from-intent": { "$ref": "#/$defs/text" },
+        "otherwise": { "$ref": "#/$defs/steps" }
+      }
+    },
+    "decide": {
+      "description": "decide(tries) { … }: its steps, run again on the state read again when an act in them is refused as stale; for a kept script a person reviewed.",
+      "type": "object",
+      "required": ["decide"],
+      "additionalProperties": false,
+      "properties": {
+        "decide": {
+          "type": "object",
+          "required": ["steps"],
+          "additionalProperties": false,
+          "properties": {
+            "tries": { "type": "integer", "minimum": 1 },
+            "steps": { "$ref": "#/$defs/steps" }
+          }
+        }
+      }
+    },
+    "act": {
+      "description": "act(rel, …): pinned, no model. With then, the script visits what the act led to and returns, even with no steps in it.",
+      "type": "object",
+      "required": ["act"],
+      "additionalProperties": false,
+      "properties": {
+        "act": { "$ref": "#/$defs/relation" },
+        "fields": { "$ref": "#/$defs/values" },
+        "intent": { "$ref": "#/$defs/text" },
+        "inferred": { "$ref": "#/$defs/text" },
+        "from-intent": { "$ref": "#/$defs/text" },
+        "then": { "$ref": "#/$defs/steps" }
+      }
+    },
+    "reasoned": {
+      "description": "act(intent = …) with no relation: the model chooses what is offered here, on every run.",
+      "type": "object",
+      "additionalProperties": false,
+      "anyOf": [{ "required": ["intent"] }, { "required": ["inferred"] }],
+      "not": { "anyOf": [{ "required": ["act"] }, { "required": ["follow"] }] },
+      "properties": {
+        "intent": { "$ref": "#/$defs/text" },
+        "inferred": { "$ref": "#/$defs/text" },
+        "from-intent": { "$ref": "#/$defs/text" },
+        "reasoned": { "const": true },
+        "then": { "$ref": "#/$defs/steps" }
+      }
+    },
+    "follow": {
+      "type": "object",
+      "required": ["follow"],
+      "additionalProperties": false,
+      "properties": {
+        "follow": { "$ref": "#/$defs/relation" },
+        "title": { "$ref": "#/$defs/text" },
+        "intent": { "$ref": "#/$defs/text" },
+        "inferred": { "$ref": "#/$defs/text" },
+        "from-intent": { "$ref": "#/$defs/text" },
+        "then": { "$ref": "#/$defs/steps" }
+      }
+    },
+    "actOnce": {
+      "description": "actOnce: say it, unless it's said already in the list at listed-in.",
+      "type": "object",
+      "required": ["act-once", "listed-in"],
+      "additionalProperties": false,
+      "properties": {
+        "act-once": { "$ref": "#/$defs/relation" },
+        "fields": { "$ref": "#/$defs/values" },
+        "listed-in": { "$ref": "#/$defs/relation" }
+      }
+    },
+    "keepAs": {
+      "type": "object", "required": ["keep-as"], "additionalProperties": false,
+      "properties": { "keep-as": { "$ref": "#/$defs/name" } }
+    },
+    "sync": {
+      "type": "object", "required": ["sync"], "additionalProperties": false,
+      "properties": { "sync": { "const": true } }
+    },
+    "check": {
+      "type": "object", "required": ["check"], "additionalProperties": false,
+      "properties": { "check": { "$ref": "#/$defs/facts" } }
+    },
+    "until": {
+      "description": "until(tries, every) { … }: wait for a relation to be offered, or for facts to hold.",
+      "type": "object",
+      "required": ["until"],
+      "additionalProperties": false,
+      "properties": {
+        "until": {
+          "type": "object",
+          "additionalProperties": false,
+          "oneOf": [{ "required": ["offered"] }, { "required": ["facts"] }],
+          "properties": {
+            "offered": { "$ref": "#/$defs/relation" },
+            "facts": { "$ref": "#/$defs/facts" }
+          }
+        },
+        "tries": { "type": "integer", "minimum": 1 },
+        "every": { "$ref": "#/$defs/duration" }
+      }
+    },
+    "watch": {
+      "type": "object",
+      "required": ["watch"],
+      "additionalProperties": false,
+      "properties": {
+        "watch": {
+          "type": "object",
+          "required": ["steps"],
+          "additionalProperties": false,
+          "properties": {
+            "until": { "$ref": "#/$defs/facts" },
+            "every": { "$ref": "#/$defs/duration" },
+            "at-most": { "$ref": "#/$defs/duration" },
+            "steps": { "$ref": "#/$defs/steps" }
+          }
+        }
+      }
+    },
+    "at": {
+      "description": "at(address) { … }: the steps, where a kept name or an address leads.",
+      "type": "object", "required": ["at", "steps"], "additionalProperties": false,
+      "properties": { "at": { "$ref": "#/$defs/text" }, "steps": { "$ref": "#/$defs/steps" } }
+    },
+    "listeners": {
+      "type": "object",
+      "required": ["listeners"],
+      "additionalProperties": false,
+      "properties": {
+        "listeners": {
+          "type": "object",
+          "required": ["listen"],
+          "additionalProperties": false,
+          "properties": {
+            "until": { "$ref": "#/$defs/facts" },
+            "every": { "$ref": "#/$defs/duration" },
+            "at-most": { "$ref": "#/$defs/duration" },
+            "listen": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["match", "steps"],
+                "additionalProperties": false,
+                "properties": {
+                  "match": { "$ref": "#/$defs/text" },
+                  "from": { "$ref": "#/$defs/text" },
+                  "steps": { "$ref": "#/$defs/steps" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "whenever": {
+      "description": "whenever { … }: the steps, for each member of the list held, its turn when it changes.",
+      "type": "object", "required": ["whenever"], "additionalProperties": false,
+      "properties": { "whenever": { "$ref": "#/$defs/steps" } }
+    },
+    "for-each": {
+      "description": "each(named) { … }: the steps, for each member the list held links under follow (item unless it says), page after page, the member kept by this name while they run: ${name.field}.",
+      "type": "object", "required": ["for-each"], "additionalProperties": false,
+      "properties": {
+        "for-each": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" },
+        "follow": { "$ref": "#/$defs/relation" },
+        "then": { "$ref": "#/$defs/steps" }
+      }
+    },
+    "has": {
+      "type": "object", "required": ["has"], "additionalProperties": false,
+      "properties": { "has": { "$ref": "#/$defs/facts" } }
+    },
+    "madeBy": {
+      "type": "object", "required": ["made-by"], "additionalProperties": false,
+      "properties": { "made-by": { "$ref": "#/$defs/text" } }
+    },
+    "saying": {
+      "type": "object", "required": ["saying"], "additionalProperties": false,
+      "properties": { "saying": { "$ref": "#/$defs/text" } }
+    },
+    "leaveWhere": {
+      "type": "object",
+      "required": ["leave-where"],
+      "additionalProperties": false,
+      "properties": {
+        "leave-where": {
+          "type": "object",
+          "required": ["say", "facts"],
+          "additionalProperties": false,
+          "properties": {
+            "say": { "$ref": "#/$defs/text" },
+            "facts": { "$ref": "#/$defs/facts" }
+          }
+        }
+      }
+    },
+    "once": {
+      "type": "object",
+      "required": ["once"],
+      "additionalProperties": false,
+      "properties": {
+        "once": {
+          "type": "object",
+          "required": ["offered", "steps"],
+          "additionalProperties": false,
+          "properties": {
+            "offered": { "$ref": "#/$defs/relation" },
+            "give-up": { "$ref": "#/$defs/duration" },
+            "every": { "$ref": "#/$defs/duration" },
+            "steps": { "$ref": "#/$defs/steps" },
+            "otherwise": {
+              "description": "The steps when the wait gives up; ${why} is the server's reason, or \"no reason given\".",
+              "$ref": "#/$defs/steps"
+            }
+          }
+        }
+      }
+    },
+    "given": {
+      "type": "object", "required": ["given", "then"], "additionalProperties": false,
+      "properties": { "given": { "$ref": "#/$defs/facts" }, "then": { "$ref": "#/$defs/steps" } }
+    },
+    "doing": {
+      "type": "object", "required": ["doing", "steps"], "additionalProperties": false,
+      "properties": { "doing": { "$ref": "#/$defs/text" }, "steps": { "$ref": "#/$defs/steps" } }
+    },
+    "doneWhere": {
+      "type": "object", "required": ["done-where"], "additionalProperties": false,
+      "properties": { "done-where": { "$ref": "#/$defs/facts" } }
+    },
+    "note": {
+      "type": "object", "required": ["note"], "additionalProperties": false,
+      "properties": { "note": { "$ref": "#/$defs/text" } }
+    }
+  }
+}

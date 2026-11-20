@@ -1,0 +1,29 @@
+name: what-i-say
+part: "One behavior, start to finish"
+title: "What I Actually Say"
+kicker: Dictation, through /remote-control · AI in the loop, in practice
+say: "Mostly, I talk. Most evenings it's the same two questions into my phone: 'Please give me an update', and 'How's it going?' Dictation has opinions of its own; it hears 'BDD gates' as 'bed gates' about half the time. Claude knows what I mean, and the gates don't care either way. What I don't do is approve every step. I own the goal, I say it in a sentence, and afterward I read the record: which scenario, which red run, which green run, which commit. People call that AI in the loop: the person in control, the AI in support. So what did months of that produce?"
+sources:
+  - ["Claude Code docs: /remote-control", "https://code.claude.com/docs/en/remote-control"]
+  - ["Natarajan et al.: Human-in-the-loop or AI-in-the-loop? (arXiv, 2024)", "https://arxiv.org/abs/2412.14232"]
+html: |
+  <h2>What I Actually Say</h2>
+  <div class="split">
+    <div class="rows">
+      <p class="lead">Mostly, I talk. Speech-to-text, into a phone, through <code>/remote-control</code>.</p>
+      <div><h3>I Own the Goal</h3><p>One sentence, said out loud.</p></div>
+      <div><h3>I Don’t Approve Every Step</h3><p>The hooks hold the order while nobody watches.</p></div>
+      <div><h3>I Read the Record Afterward</h3><p>Which scenario, which red run, which green run, which commit.</p></div>
+      <p class="refs"><deck-ref name="no-time"></deck-ref> <deck-ref name="ai-in-the-loop"></deck-ref></p>
+    </div>
+    <div class="phone">
+      <p class="phone-head">/remote-control</p>
+      <p class="me">Please give me an update</p>
+      <p class="it">Red run logged: 3 failures, on behavior. Writing the fix.</p>
+      <p class="me">How’s it going?</p>
+      <p class="it">Green. Commit gate: TDD order checked.</p>
+      <p class="me">go deep on bed gates skill</p>
+      <p class="it">The bdd-gates skill, understood.</p>
+      <p class="note">Illustrative, not a transcript. The two questions are the real ones. So is “bed gates”.</p>
+    </div>
+  </div>

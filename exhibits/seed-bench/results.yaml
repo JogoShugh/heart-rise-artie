@@ -1,0 +1,148 @@
+# What the seed bench did, 2026-10-24, on JogoShugh/heart-github-test. report.kts lays this out.
+# Outcomes are from the runs' outputs (runs/*.out) and what GitHub held after each run.
+# tone: good (did the right thing), safe (stopped, and said why), bad (did harm).
+
+asOf: "2026-10-24"
+goalFile: ../goal-syntax/goals/seed-bench.goal.md
+generated: generated/seed-bench.kts
+
+# The proof, end to end: Claude decides once, the decisions become a script, the script runs with no model.
+proof:
+  - step: Run b20, with Claude
+    what: >-
+      Claude decided every part of the watch, the first time each was needed: how to answer an alert, how to
+      merge a plan that fits, what to say on a plan that can't be merged, and how to close a tray once it is
+      transplanted.
+    showed: >-
+      Closed the transplanted tray #783. Merged the plan that fits. Told the new alert it was seen, once, and
+      assigned it. Gave up on the plan with 60 trays after 5 minutes and said why, once, in GitHub's own words.
+  - step: artie generate
+    what: >-
+      Wrote the run's decisions as a script, generated/seed-bench.kts: plain heart-script, no intent, no model.
+      The repository's owner, the grower and the hold label are inputs; the forms it uses are pinned in a lock
+      file beside it.
+    showed: The script opens the watch issue, then listens for alerts, sowing plans and trays, as the run did.
+  - step: Run g4, the script alone
+    what: The generated script run with artie run and no --reasoner.
+    showed: >-
+      Closed the transplanted tray #788. Merged the new plan that fits (#790). Told the new alert #789 it was
+      seen, once, and assigned it. 229 steps, none of them reasoned, no model called.
+
+runs:
+  - run: b1
+    tone: bad
+    found: >-
+      Merged the plan that fits (#732), left the held one alone (#735), said why on the one too big (#734), closed
+      tray #730. But alert #733 was told it was seen 18 more times: the check "is it said already?" came after the
+      comment, so nothing kept the comment from being made again.
+    fixed: A check made after the act it guards is kept before it.
+  - run: b2
+    tone: bad
+    found: Stopped while assigning alert #738 a third time; a read just after each assign didn't show it yet.
+    fixed: A step that says "unless" can't be done until its check is made; the planner is told an act the server answered is done.
+  - run: b3
+    tone: safe
+    found: No alert told twice; #739 merged; tray #731 closed. A new alert, #741, was assigned but never told.
+    fixed: "-"
+  - run: b4
+    tone: bad
+    found: Claude decided comment, read, assign, then check. The check was kept before the assign only, so #733 and #738 were told again.
+    fixed: A check is kept before the first act that writes since the last check, with the reads it is made on.
+  - run: b5
+    tone: safe
+    found: >-
+      No alert told twice, but the new alert #745 was never told. Claude checked "the comments number 1", and the
+      first alert's own comment count was also 1, so the check was tied to it and held on every alert.
+    fixed: A check's values come from the run's inputs or stay as Claude said them; an act made twice in a row is kept once.
+  - run: b6
+    tone: bad
+    found: Three alerts told again; the guard stopped the run, and the stop left no trace to learn from.
+    fixed: A run's trace is written when the process is told to stop.
+  - run: b7
+    tone: safe
+    found: Claude read the comments as an act that opens, so on a new alert it was asked inside the comments list, found no way to comment there, and stopped.
+    fixed: A link followed in a chain is a read; the acts after it are made on the alert.
+  - run: b8
+    tone: bad
+    found: Claude checked a "comments" member the comments list doesn't have. That check could never hold, so every replay commented again.
+    fixed: A check made right after the acts it guards must hold there, or it is refused.
+  - run: b9
+    tone: safe
+    found: A read kept on the alert showed Claude nothing, so it read the comments again and again until the run's move limit.
+    fixed: Claude is told what a read reached.
+  - run: b10
+    tone: safe
+    found: Claude saw the words already there, checked a relation the list doesn't have, and said done. Nothing was decided for a new alert.
+    fixed: A step is not done where its last check fails with nothing done after it.
+  - run: b11
+    tone: safe
+    found: The refusal held, but Claude guessed at the right check five times and ran out of moves.
+    fixed: A refused check tells where it is made, what is there, and how a fact names a link's title.
+  - run: b12
+    tone: bad
+    found: Claude checked "github:comments" again; the check failed, and #752 was told twice.
+    fixed: A check naming something its resource doesn't hold is refused; Claude is told what it holds.
+  - run: b13
+    tone: good
+    found: Every alert's comments read and checked; none told twice. The new alert #756 told once and assigned.
+    fixed: "-"
+  - run: b14
+    tone: good
+    found: The plan that fits merged (#758), the plans too big said why (#759, #734), the held one left alone. One comment said its reason twice.
+    fixed: The server's reason is added to Claude's words only when they don't say it already; an act asked again just after it was made is refused.
+  - run: b15
+    tone: good
+    found: Every part decided, and the first script made from a run. The grower's name was tied to the owner, both being the same person.
+    fixed: A value two inputs hold is tied to the input the step's words name.
+  - run: g1
+    tone: good
+    found: The first script run alone. Told the new alert #765 once and assigned it; 217 steps, none reasoned.
+    fixed: "-"
+  - run: b16
+    tone: safe
+    found: The script read the grower and the hold label as inputs. Bench 2 was full from earlier plans, so no plan could merge and the script had no merge.
+    fixed: Every check a watch decides reads its inputs again; bench-clear.kts empties the bench.
+  - run: g2
+    tone: good
+    found: The script alone, given hold=paused. Left the alert labelled paused (#770); told and assigned the one labelled hold (#771).
+    fixed: "-"
+  - run: b17
+    tone: safe
+    found: A read Claude chose wrongly was refused; asked again in the same words, it was refused as an act just made, though nothing was made.
+    fixed: Only an act the server answered counts as just made.
+  - run: b18
+    tone: safe
+    found: Told the new alert #775 once, then checked "comments" six times on a list that doesn't have it.
+    fixed: A refused check shows one fact that holds there, made from the resource itself.
+  - run: b19
+    tone: good
+    found: Every part decided at the first try. Merged #774, told #778, said why on #779.
+    fixed: "-"
+  - run: g3
+    tone: good
+    found: The script made from b19, alone. Merged #780, told and assigned #781; 168 steps, none reasoned.
+    fixed: >-
+      Then, with no run to find them: the goal's closing checks are made on every member a watch answered, not
+      at the start; an Until that can never hold is refused; the trace keeps Claude's words alone; a read no
+      check is made on is left out.
+  - run: b20
+    tone: safe
+    found: >-
+      Every part decided, the tray included: #783 closed once transplanted. The closing check "every alert is
+      assigned to the grower" was made on all 17 alerts, and held on none, though each was assigned: an embedded
+      user has no title and no name, only a login.
+    fixed: A value names an embedded resource when it is its title, or one of its own values.
+  - run: g4
+    tone: good
+    found: The script made from b20, alone, with every listener. Closed tray #788, merged #790, told and assigned #789; 229 steps, none reasoned.
+    fixed: "-"
+
+gaps:
+  - where: Done when
+    what: >-
+      "Says it was seen, once" needs the comments read on each alert; a closing check is made on the member
+      alone.
+  - where: The script
+    what: A check can keep text copied from an earlier run's comment, word for word.
+  - where: Old runs
+    what: The alerts told twice by the runs that went wrong still carry the extra comments.

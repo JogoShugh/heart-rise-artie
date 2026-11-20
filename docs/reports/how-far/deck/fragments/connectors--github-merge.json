@@ -1,0 +1,21 @@
+{
+  "name": "github-merge",
+  "label": "GitHub's merge act (github-scm/pull.resource.yaml)",
+  "lang": "yaml",
+  "path": "heart/heart-gateway/connectors/github-scm/pull.resource.yaml",
+  "lines": "31–52",
+  "of": 109,
+  "text": "merge:\n  operation: pulls/merge\n  title: Merge\n  description: Merge the pull request into its base branch.\n  fields: [commit_title, commit_message]\n  # scm's method, as GitHub's merge_method takes it.\n  inputs:\n    method:\n      type: string\n      enum: [merge, squash, rebase]\n      title: Merge method\n      description: The merge method to use.\n  values:\n    method:\n      merge: { merge_method: merge }\n      squash: { merge_method: squash }\n      rebase: { merge_method: rebase }\n  # GitHub merges only if the head is still at this sha: the head the client's view had.\n  bind: { sha: /head/sha }\n  # GitHub's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.\n  stale: 409\n  refused: 405",
+  "_links": {
+    "self": {
+      "href": "connectors--github-merge.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-gateway/connectors/github-scm/pull.resource.yaml#L31-L52",
+      "title": "heart/heart-gateway/connectors/github-scm/pull.resource.yaml, lines 31–52"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

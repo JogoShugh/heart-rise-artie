@@ -1,0 +1,23 @@
+# The release's image needs the heart library, ARTIE, the report assets, the release exhibit and this folder.
+*
+!build-logic
+!heart
+!client
+!docs/reports/assets
+!exhibits/merge-watch-release
+!kit/release
+build-logic/build
+heart/build
+heart/*/build
+client/build
+client/*/build
+**/.gradle
+**/node_modules
+client/runs
+client/scripts
+# Made on each machine, never sent: the app repository, recorded calls, GitLab's password and token, PlantUML.
+exhibits/merge-watch-release/work
+exhibits/merge-watch-release/gitlab/gitlab.env
+exhibits/merge-watch-release/jenkins/jenkins.env
+exhibits/merge-watch-release/tools
+exhibits/merge-watch-release/smoke/runs

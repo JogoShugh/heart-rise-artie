@@ -1,0 +1,518 @@
+---
+run:
+  inputs:
+    member:
+      value: David Miller
+      given: given
+---
+at: '2026-11-05T03:45:28.252969Z'
+ms: 69
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8140/
+opens: true
+outcome: done
+address: http://localhost:8140/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        library:get-account:
+          - sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
+        library:get-loan:
+          - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
+        library:get-member:
+          - sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:renew-for-member:
+          - sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+        library:search-loans:
+          - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+        library:search-members:
+          - sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=
+      digest: sha256-JuAynvKvR5okL1mQT70mjefY45UZaIrAREdufhkWIYI=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-05T03:45:28.329166Z'
+ms: 46
+mode: script
+say: act {relation}, name {name}
+inferred: search accounts for the member named David Miller
+fromIntent: Find the account of the member named David Miller
+params:
+  relation: library:search-accounts
+  name: David Miller
+values:
+  name:
+    value: David Miller
+    type: string
+    from:
+      - input: member
+opens: true
+chose:
+  kind: form
+  relation: library:search-accounts
+  title: Find accounts by name
+  method: GET
+  target: /accounts{?name}
+  address: http://localhost:8140/accounts?name=David%20Miller
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+  act: sha256-84l87SPLMqthzrommJhIneB8EYxHzlgOWdoIBhaXsFM=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8140/accounts?name=David+Miller
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - David Miller
+---
+at: '2026-11-05T03:45:28.377186Z'
+ms: 5
+mode: script
+say: follow {relation}, titled {title}
+intent: Find the account of the member named David Miller
+params:
+  relation: item
+  title: David Miller
+values:
+  title:
+    value: David Miller
+    from:
+      - input: member
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: David Miller
+  method: GET
+  target: http://localhost:8140/accounts/21000452
+  address: http://localhost:8140/accounts/21000452
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/accounts/21000452
+now:
+  state:
+    id: 21000452
+    name: David Miller
+    booksOut: 2
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Secret Garden
+      - Holes
+---
+at: '2026-11-05T03:45:28.383736Z'
+ms: 6
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: The Secret Garden
+values:
+  title:
+    value: The Secret Garden
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: The Secret Garden
+  method: GET
+  target: http://localhost:8140/loans/3313
+  address: http://localhost:8140/loans/3313
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3313
+now:
+  state:
+    id: 3313
+    title: The Secret Garden
+    author: Frances Hodgson Burnett
+    due: '2026-11-12'
+    renewals: 0
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T03:45:28.391375Z'
+ms: 6
+mode: script
+say: act {relation}
+inferred: renew this book (The Secret Garden)
+fromIntent: 'For each book they have out: renew it if renewing is offered; otherwise say why it can''t be renewed'
+params:
+  relation: library:renew
+opens: true
+chose:
+  kind: form
+  relation: library:renew
+  title: Renew
+  method: POST
+  target: /loans/{id}/actions/renew
+  address: http://localhost:8140/loans/3313/actions/renew
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8140/affordance-sets/955c6a8017de7ac9
+    integrity: sha256-lVxqgBfeesmABq8V3/zL4n7e7kPhJxI/5SEM+XEt5e4=
+  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+  schema:
+    href: http://localhost:8140/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.b6e3cbf5bd55f722"'
+  checked: lenient
+  warning: 'the set holding library:renew changed: pinned sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=, offered sha256-lVxqgBfeesmABq8V3/zL4n7e7kPhJxI/5SEM+XEt5e4='
+  held: form
+offered:
+  forms:
+    - library:renew
+    - library:return
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8140/loans/3313
+now:
+  state:
+    id: 3313
+    title: The Secret Garden
+    author: Frances Hodgson Burnett
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T03:45:28.398221Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/loans/3313
+outcome: done
+address: http://localhost:8140/loans/3313
+now:
+  state:
+    id: 3313
+    title: The Secret Garden
+    author: Frances Hodgson Burnett
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T03:45:28.402107Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts/21000452
+outcome: done
+address: http://localhost:8140/accounts/21000452
+now:
+  state:
+    id: 21000452
+    name: David Miller
+    booksOut: 2
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Secret Garden
+      - Holes
+---
+at: '2026-11-05T03:45:28.406211Z'
+ms: 3
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Holes
+values:
+  title:
+    value: Holes
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Holes
+  method: GET
+  target: http://localhost:8140/loans/3314
+  address: http://localhost:8140/loans/3314
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3314
+now:
+  state:
+    id: 3314
+    title: Holes
+    author: Louis Sachar
+    due: '2026-11-12'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T03:45:28.410387Z'
+ms: 3
+mode: script
+say: act {relation}
+inferred: renew this book (Holes)
+fromIntent: 'For each book they have out: renew it if renewing is offered; otherwise say why it can''t be renewed'
+params:
+  relation: library:renew
+opens: true
+chose:
+  kind: form
+  relation: library:renew
+  title: Renew
+  method: POST
+  target: /loans/{id}/actions/renew
+  address: http://localhost:8140/loans/3314/actions/renew
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8140/affordance-sets/955c6a8017de7ac9
+    integrity: sha256-lVxqgBfeesmABq8V3/zL4n7e7kPhJxI/5SEM+XEt5e4=
+  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+  schema:
+    href: http://localhost:8140/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.de12bdd68865e210"'
+  checked: lenient
+  warning: 'the set holding library:renew changed: pinned sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=, offered sha256-lVxqgBfeesmABq8V3/zL4n7e7kPhJxI/5SEM+XEt5e4='
+  held: form
+offered:
+  forms:
+    - library:renew
+    - library:return
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8140/loans/3314
+now:
+  state:
+    id: 3314
+    title: Holes
+    author: Louis Sachar
+    due: '2026-12-03'
+    renewals: 2
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T03:45:28.414131Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/loans/3314
+outcome: done
+address: http://localhost:8140/loans/3314
+now:
+  state:
+    id: 3314
+    title: Holes
+    author: Louis Sachar
+    due: '2026-12-03'
+    renewals: 2
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T03:45:28.416957Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts/21000452
+outcome: done
+address: http://localhost:8140/accounts/21000452
+now:
+  state:
+    id: 21000452
+    name: David Miller
+    booksOut: 2
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Secret Garden
+      - Holes
+---
+at: '2026-11-05T03:45:28.420587Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts?name=David+Miller
+outcome: done
+address: http://localhost:8140/accounts?name=David+Miller
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - David Miller
+---
+at: '2026-11-05T03:45:28.422830Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/
+outcome: done
+address: http://localhost:8140/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        library:get-account:
+          - sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
+        library:get-loan:
+          - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
+        library:get-member:
+          - sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:renew-for-member:
+          - sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+        library:search-loans:
+          - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+        library:search-members:
+          - sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=
+      digest: sha256-JuAynvKvR5okL1mQT70mjefY45UZaIrAREdufhkWIYI=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+  links:
+    self:
+      - null
+    service-desc:
+      - null

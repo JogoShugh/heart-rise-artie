@@ -1,0 +1,13 @@
+# A repository says whether it takes issues in has_issues and archived; the rules are written here.
+matches:
+  path: /repos/{owner}/{repo}
+allowed:
+  table: /has_issues
+  rows:
+    "true":
+      allow: [open-issue]
+    "false":
+      absent: { open-issue: Issues are turned off for this repository. }
+  rules:
+    - when: { /archived: true }
+      absent: { open-issue: The repository is archived; it takes no issues. }

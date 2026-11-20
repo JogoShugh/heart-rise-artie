@@ -1,0 +1,56 @@
+name: step-3-forms
+part: "For real: two forges, one vocabulary"
+title: "Forms: what you can do now, and how"
+kicker: Building it back up · Step 3 of 5 · HEART L0, simplified
+say: "The open pull request offers seven forms. scm:merge in full: its target, method, content type and JSON Schema, from GitHub's own description, with the merge method as scm's input. scm:comment needs one field, body. These are real, from the L0 run on GitHub."
+sources:
+  - ["HAL Schema Forms", "https://github.com/jbadeau/hal-schema-forms"]
+  - ["JSON Schema 2020-12", "https://json-schema.org/draft/2020-12"]
+  - ["GitHub REST: merge a pull request", "https://docs.github.com/en/rest/pulls/pulls#merge-a-pull-request"]
+html: |
+  <h2>Forms: what you can do now, and how</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr)">
+    <pre><b>_forms:</b>
+    scm:close: {…}
+    <span class="add">scm:merge:</span>
+      title: Merge
+      description: Merge the pull request into its base branch.
+      _links:
+        target:
+          href: /repos/JogoShugh/heart-github-test/
+                pulls/2325/actions/merge
+      method: PUT
+      contentType: application/json
+      schema:
+        type: object
+        additionalProperties: false
+        required: [method]
+        properties:
+          method:
+            title: Merge method
+            enum: [merge, squash, rebase]
+          commit_title:
+            type: string
+          commit_message:
+            type: string</pre>
+    <pre>  <span class="add">scm:comment:</span>
+      title: Comment
+      _links:
+        target:
+          href: /repos/JogoShugh/heart-github-test/
+                pulls/2325/actions/comment
+      method: POST
+      contentType: application/json
+      schema:
+        type: object
+        required: [body]
+        properties:
+          body:
+            type: string
+            description: The contents of the comment.
+    scm:label: {…}
+    scm:edit: {…}
+    scm:request-review: {…}
+    scm:update-branch: {…}
+  # 7 forms, while open</pre>
+  </div>

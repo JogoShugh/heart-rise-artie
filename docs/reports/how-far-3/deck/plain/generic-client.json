@@ -1,0 +1,25 @@
+{
+  "name": "generic-client",
+  "title": "A Browser, for APIs",
+  "part": "What I wanted the agent to be",
+  "kicker": "ARTIE, in one sentence",
+  "tone": "light",
+  "number": 5,
+  "of": 30,
+  "html": "<h2>A Browser, for APIs</h2>\n<div class=\"flow\">\n  <div class=\"box\"><h3>Web browser</h3><p>one generic client, for every site</p></div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"panel\"><span class=\"label\">Speaks, and is coupled to</span><span class=\"big\">text/html<br>+ HTTP</span><span class=\"faint\">image/jpeg · image/png · text/css · text/javascript · image/svg+xml · font/woff2</span></div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"tiles\"><div>An online bank</div><div>A wiki</div><div>A shop</div><div class=\"ghost\">Any site not yet built</div></div>\n\n  <div class=\"box green\"><h3>ARTIE</h3><p>one generic client, for every API</p></div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"panel\"><span class=\"label\">Speaks, and is coupled to</span><span class=\"big\">application/hal+json<br>+ HEART profile + HTTP</span><span class=\"faint\">application/schema+json · application/problem+json · application/yaml</span></div>\n  <span class=\"arrow\" aria-hidden=\"true\"></span>\n  <div class=\"tiles\"><div>A library</div><div>GitHub</div><div>GitLab</div><div class=\"ghost\">Any API not yet built</div></div>\n</div>\n<p class=\"verdict\"><span class=\"yes\">Coupled to:</span> the media type and the protocol. <span class=\"no\">Not coupled to:</span> loans, pull requests, merge rules, URL layouts, or which acts exist today. Zero domain code.</p>\n<p class=\"refs\"><deck-ref name=\"think-of-the-web\"></deck-ref> <deck-ref name=\"uniform-interface\"></deck-ref></p>\n",
+  "say": "It's a browser. Your browser knows HTML and HTTP, and nothing about your bank: not your account numbers, not its URLs, not which buttons exist today. That's why your bank can change its site without shipping you a new browser. ARTIE is that, for APIs. It knows one media type, HEART, which carries the data and the forms for whatever the current state allows, and it knows nothing about any one service. Let me show you what 'whatever the current state allows' looks like, with an example we'll follow for the rest of the talk.",
+  "sources": [
+    {
+      "label": "Fielding, dissertation, ch. 5",
+      "href": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"
+    },
+    {
+      "label": "HAL Schema Forms",
+      "href": "https://github.com/jbadeau/hal-schema-forms"
+    },
+    {
+      "label": "artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    }
+  ]
+}

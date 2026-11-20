@@ -1,0 +1,98 @@
+# GitHub's REST API: pull requests and issues (spec/PLAN-GITHUB-PULLS.md, spec/PLAN-GITHUB-ISSUES.md).
+# Run the gateway with GATEWAY_CONNECTOR pointing here, UPSTREAM_URL=https://api.github.com,
+# UPSTREAM_SPEC at GitHub's description (github/rest-api-description, api.github.com.json),
+# and UPSTREAM_AUTH=caller, so GitHub is called as each caller, with their own token.
+profile: github
+# Only these operations of GitHub's description are read; the rest is left out before parsing.
+include:
+  - pulls/list
+  - pulls/get
+  - pulls/update
+  - pulls/merge
+  - pulls/update-branch
+  - pulls/request-reviewers
+  - issues/list-for-repo
+  - issues/get
+  - issues/create
+  - issues/update
+  - issues/lock
+  - issues/unlock
+  - issues/add-labels
+  - issues/remove-label
+  - issues/add-assignees
+  - issues/remove-assignees
+  - issues/list-comments
+  - issues/get-comment
+  - issues/update-comment
+  - issues/create-comment
+  - issues/list-sub-issues
+  - issues/add-sub-issue
+  - issues/remove-sub-issue
+  - repos/get
+  - repos/compare-commits
+  - repos/list-for-user
+  - users/get-authenticated
+  - repos/get-branch
+  - repos/list-branches
+  - git/create-ref
+  - repos/create-or-update-file-contents
+  - pulls/create
+# Every call to GitHub names the API version it was written against.
+headers:
+  X-GitHub-Api-Version: "2022-11-28"
+resources:
+  - pull.resource.yaml
+  - issue.resource.yaml
+  - repository.resource.yaml
+  - comment.resource.yaml
+  - branch.resource.yaml
+readers:
+  - pull.reader.yaml
+  - issue.reader.yaml
+  - repository.reader.yaml
+  - comment.reader.yaml
+  - branch.reader.yaml
+# GitHub puts its links in the state, as members named *_url, and on a pull request also in its own _links.
+# Each becomes a HEART link and leaves the state (spec/PLAN-GATEWAY-URL-LINKS.md). Only these members are
+# read: no other data is scanned for addresses. A link into GitHub's API that the gateway serves is rewritten
+# to the gateway's address; any other keeps GitHub's, typed. Nested users, repositories, labels and
+# milestones are resources of their own, embedded. Nothing is dropped.
+links:
+  # Every address is a link: *_url and url, and the two GitHub names otherwise (a repository's homepage,
+  # a user's blog).
+  members: ["*_url", url, homepage, blog]
+  self: url
+  upstream: _links
+  relations:
+    html_url: alternate
+    avatar_url: icon
+    # Who opened an issue, a pull request or a comment, and who made a milestone: IANA's author (RFC 8288).
+    user: author
+    creator: author
+  api: application/vnd.github+json
+  types:
+    - { host: github.com, suffix: .diff, type: text/x-diff }
+    - { host: github.com, suffix: .patch, type: text/x-patch }
+    - { host: github.com, suffix: .gif, type: image/gif }
+    - { host: github.com, suffix: .png, type: image/png }
+    - { host: github.com, type: text/html }
+    - { host: avatars.githubusercontent.com, type: "image/*" }
+  embed: [user, owner, assignee, assignees, closed_by, merged_by, creator, milestone, labels,
+          requested_reviewers, head/user, head/repo, base/user, base/repo, author, committer,
+          parent, source, template_repository, repository, organization, pull_request,
+          performed_via_github_app, auto_merge/enabled_by, license, code_of_conduct, commit]
+  # What a repository embedded in another resource keeps, besides its links and its owner: what names it. Its
+  # counts and times (open_issues, pushed_at) change with everything that happens in it, and would change every
+  # pull request with them; they are at its self, one link away.
+  summary:
+    base/repo: &repository [id, node_id, name, full_name, private, fork, default_branch]
+    head/repo: *repository
+    repository: *repository
+# GitHub reads the gateway passes through without modelling them (spec/PLAN-GATEWAY-URL-LINKS.md): served at
+# GitHub's own path, as the caller, links lifted, no forms; a list as a HEART collection, each member titled
+# by its pointer. Links to them are named after the member they were (github:followers). No other GitHub
+# read is served: links to them keep GitHub's address.
+passthrough:
+  users/get-by-username: {}
+  users/list-followers-for-user: { title: /login }
+  pulls/list-commits: { title: /commit/message }

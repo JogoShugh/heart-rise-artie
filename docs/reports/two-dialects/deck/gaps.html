@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What HAL-FORMS Doesn't Carry Today · One Goal, Two Dialects</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Beyond caching, what a replay loses</span></header>
+<h2>What HAL-FORMS Doesn't Carry Today</h2>
+<div class="table-scroll"><table>
+  <thead><tr><th>Gap</th><th>What it costs</th><th>An extension could add</th></tr></thead>
+  <tbody>
+    <tr><td>No integrity per template</td><td>The kept script pins no form (here: 0 forms, 2 links); a replay can't tell a form changed under it</td><td><code>hr:integrity</code> per template</td></tr>
+    <tr><td>HTML input types only</td><td>No integer, no object or array; an object's shape comes from the goal's words</td><td>a JSON Schema per template, by link</td></tr>
+    <tr><td>Fewer checks before sending</td><td>More mistakes caught only by the server</td><td>the same schema</td></tr>
+    <tr><td>No description of the act</td><td>The model chooses with less</td><td><code>description</code>, a link to the ALPS descriptor</td></tr>
+  </tbody>
+</table></div>
+<p class="note">HAL-FORMS's spec allows extensions that add optional properties, which plain clients ignore. Not a commitment: HAL Schema Forms already carries all four, and is the more robust choice for replays with no model. HAL-FORMS stays the L0 on-ramp.</p>
+<p class="refs"><a class="ref-plain" href="deck/three-rs-one-behavior.html">RESILIENCE</a> <a class="ref-plain" href="deck/three-rs-one-behavior.html">REPEATABILITY</a></p>
+</article>
+<nav class="foot"><a href="deck/kept.html" rel="prev"><small>Back</small><b>Kept by the Generator Alone</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#gaps">with heart-ts</a></span>
+<a href="deck/message-by-message.html" rel="next"><small>Next</small><b>The Release, Message by Message</b></a></nav>
+</main></div></body></html>

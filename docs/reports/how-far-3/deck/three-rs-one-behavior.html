@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From One Test to a Whole System · Claude and Git Hooks, Together · 3.0</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">From one test to a whole system</span></header>
+<h2>From One Test to a Whole System</h2>
+<div class="split" style="grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);">
+  <figure>
+    <svg viewBox="0 0 400 400" role="img" aria-label="Three nested circles. Innermost: one behavior, Gherkin, red, code, green, commit. Middle: generic components, ARTIE, the gateway, heart-mcp, Buster. Outer: the system, a real merge on two forges, Jenkins and Dev. The same three R's hold at every ring.">
+      <circle cx="200" cy="200" r="190" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="200" cy="230" r="140" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="200" cy="250" r="58" fill="#2f9e5b" fill-opacity="0.25" stroke="#2f9e5b" stroke-width="2.5"/>
+      <text x="200" y="46" text-anchor="middle" fill="currentColor" font-size="15" font-weight="700">The system</text>
+      <text x="200" y="66" text-anchor="middle" fill="currentColor" font-size="12">a real merge, two forges, Jenkins, Dev</text>
+      <text x="200" y="134" text-anchor="middle" fill="currentColor" font-size="15" font-weight="700">Generic components</text>
+      <text x="200" y="153" text-anchor="middle" fill="currentColor" font-size="12">ARTIE · gateway</text>
+      <text x="200" y="169" text-anchor="middle" fill="currentColor" font-size="12">heart-mcp · Buster</text>
+      <text x="200" y="244" text-anchor="middle" fill="currentColor" font-size="15" font-weight="700">One behavior</text>
+      <text x="200" y="264" text-anchor="middle" fill="currentColor" font-size="11">Gherkin · red · code</text>
+      <text x="200" y="279" text-anchor="middle" fill="currentColor" font-size="11">green · commit</text>
+    </svg>
+    <figcaption>The same three R’s at every ring.</figcaption>
+  </figure>
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>One behavior</th><th>Components and the system</th></tr></thead>
+    <tbody>
+      <tr><td><a class="ref-plain" href="deck/three-rs-one-behavior.html">RIGHT-BEHAVIOR</a></td><td>Gherkin says what right means before the code exists</td><td>Only the acts the state allows; a reason when not</td></tr>
+      <tr><td><a class="ref-plain" href="deck/three-rs-one-behavior.html">REPEATABILITY</a></td><td>The scenario runs the same way on every change</td><td>A kept script replays the same way, with no model</td></tr>
+      <tr><td><a class="ref-plain" href="deck/three-rs-one-behavior.html">RESILIENCE</a></td><td>A break goes red, and the gate refuses the commit, even the model’s</td><td>Buster tampers on purpose; ARTIE takes the right failure path</td></tr>
+    </tbody>
+  </table></div>
+</div>
+<p class="punch">One test at a time, for components and systems that are themselves right, repeatable and resilient.</p>
+</article>
+<nav class="foot"><a href="deck/walk-the-dog.html" rel="prev"><small>Back</small><b>Back to the Dog: Buster</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#three-rs-one-behavior">with heart-ts</a></span>
+<a href="deck/renewal-prs.html" rel="next"><small>Next</small><b>Five Pull Requests Change the Policy</b></a></nav>
+</main></div></body></html>

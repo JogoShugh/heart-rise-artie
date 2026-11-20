@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Published at https://claude.ai/artifact/EvvnwUrTPUtHSJswMEfXGh (v2, Part 2 of 12 October 2026). -->
+<title>Roy Bott Reviews HEART</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column of dialogue; wire evidence sits in dark "terminal" panes inside each turn; a scorecard leads. */
+:root {
+  --paper: #f2f4f3;
+  --card: #ffffff;
+  --ink: #18211f;
+  --muted: #56625f;
+  --rule: #d5dcda;
+  --josh: #0f6b5c;
+  --josh-soft: #e2f0ec;
+  --roy: #8a4b12;
+  --roy-soft: #f6ebdf;
+  --term-bg: #15201e;
+  --term-fg: #d8e4e0;
+  --term-dim: #8fa5a0;
+  --term-key: #8fd3c1;
+  --term-str: #f0c58c;
+  --ok: #1d7a3e;
+  --part: #a26a00;
+  --bad: #b3261e;
+  --display: "Newsreader", Georgia, "Times New Roman", serif;
+  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121816; --card: #1a2220; --ink: #e3ebe8; --muted: #9db0ab; --rule: #2c3836;
+    --josh: #6fd0bb; --josh-soft: #17322c; --roy: #e9a866; --roy-soft: #33261a;
+    --term-bg: #0b1110; --term-fg: #d8e4e0; --term-dim: #7d918c; --term-key: #8fd3c1; --term-str: #f0c58c;
+    --ok: #5ccf84; --part: #e2b04a; --bad: #f2867e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121816; --card: #1a2220; --ink: #e3ebe8; --muted: #9db0ab; --rule: #2c3836;
+  --josh: #6fd0bb; --josh-soft: #17322c; --roy: #e9a866; --roy-soft: #33261a;
+  --term-bg: #0b1110; --term-fg: #d8e4e0; --term-dim: #7d918c; --term-key: #8fd3c1; --term-str: #f0c58c;
+  --ok: #5ccf84; --part: #e2b04a; --bad: #f2867e; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 16px/1.6 var(--body); padding-inline: 16px; padding-block: 0 64px; }
+.wrap { max-width: 780px; margin: 0 auto; }
+header.top { padding-block: 48px 20px; }
+.eyebrow { font: 600 12px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h1 { font: 600 clamp(32px, 6vw, 48px)/1.1 var(--display); margin: 12px 0 14px; text-wrap: balance; }
+h2 { font: 600 28px/1.2 var(--display); margin: 56px 0 8px; text-wrap: balance; }
+h3 { font: 600 21px/1.3 var(--display); margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.lede { font: 400 19px/1.55 var(--display); color: var(--muted); max-width: 64ch; }
+code { font: 0.86em var(--mono); background: var(--josh-soft); padding: 0 4px; border-radius: 3px; overflow-wrap: anywhere; }
+a { color: var(--josh); }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--roy); outline-offset: 2px; }
+
+.notice { margin-top: 24px; border: 1px solid var(--roy); background: var(--roy-soft); border-radius: 6px; padding: 14px 16px; font-size: 14.5px; display: grid; gap: 6px; }
+.notice strong { color: var(--roy); }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 18px; font: 13px var(--mono); color: var(--muted); }
+.facts span b { color: var(--ink); font-weight: 600; }
+
+/* scorecard */
+.score { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.score-box { overflow-x: auto; margin-top: 14px; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; }
+.score th, .score td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.score th { font: 600 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.score tr:last-child td { border-bottom: 0; }
+.score td.v { white-space: nowrap; }
+.pill { display: inline-block; font: 600 12px/1 var(--body); padding: 4px 8px; border-radius: 99px; border: 1px solid currentColor; white-space: nowrap; }
+.pill.ok { color: var(--ok); } .pill.part { color: var(--part); } .pill.bad { color: var(--bad); }
+.score .group td { background: var(--paper); font: 600 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+/* items */
+section.item { margin-top: 44px; scroll-margin-top: 16px; }
+.item-head { display: grid; gap: 6px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+.item-head .tag { font: 600 12px var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--roy); }
+blockquote.fielding { margin: 14px 0 0; padding: 0 0 0 16px; border-left: 3px solid var(--roy); font: italic 400 18px/1.5 var(--display); }
+blockquote.fielding cite { display: block; font: 400 13px var(--body); font-style: normal; color: var(--muted); margin-top: 6px; }
+
+.talk { display: grid; gap: 14px; margin-top: 18px; }
+.turn { display: grid; grid-template-columns: 78px 1fr; gap: 12px; }
+.turn > * { min-width: 0; }
+.who { font: 700 12px/1.9 var(--body); letter-spacing: .08em; text-transform: uppercase; }
+.turn.josh .who { color: var(--josh); }
+.turn.roy .who { color: var(--roy); }
+.turn .say { display: grid; gap: 10px; }
+.turn.roy .say > p { font-family: var(--display); font-size: 17.5px; }
+@media (max-width: 520px) { .turn { grid-template-columns: 1fr; gap: 2px; } }
+
+pre.wire { margin: 0; background: var(--term-bg); color: var(--term-fg); font: 12.5px/1.55 var(--mono); padding: 12px 14px; border-radius: 6px; overflow-x: auto; white-space: pre; }
+pre.wire .d { color: var(--term-dim); } pre.wire .k { color: var(--term-key); } pre.wire .s { color: var(--term-str); }
+pre.wire .h { background: rgba(240, 197, 140, .16); }
+.cap { font: 12px var(--body); color: var(--muted); margin-top: -4px; }
+
+.verdict { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; padding: 12px 14px; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; }
+.verdict p { flex: 1 1 280px; min-width: 0; font-size: 15px; }
+.short .talk { gap: 10px; }
+
+.diagram { margin-top: 6px; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 10px; overflow-x: auto; }
+.diagram pre.mermaid { margin: 0; background: transparent; }
+
+.findings { display: grid; gap: 10px; margin-top: 14px; padding: 0; list-style: none; }
+.findings li { background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px; display: grid; gap: 4px; }
+.findings li b { font-family: var(--display); font-size: 17px; }
+.findings li span { color: var(--muted); font-size: 14.5px; }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 13.5px; display: grid; gap: 8px; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">A review in conversation · garden server at commit 6a587d8 · 11 October 2026</div>
+  <h1>Roy Bott Reviews HEART</h1>
+  <p class="lede">Josh walks a reviewer through his six rules and his replies from 2008. Every answer is checked against the live garden server, ARTIE and the test suites, run tonight.</p>
+  <div class="notice" role="note">
+    <p><strong>Roy Bott is fictional.</strong> He is a reviewer persona modelled on Roy T. Fielding's published views. The quoted passages are Fielding's own words, from <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be hypertext-driven"</a> (20 October 2008) and his replies in its comments. Everything else Roy Bott says is written for this review. Fielding has not seen or endorsed this work.</p>
+  </div>
+  <div class="facts">
+    <span>commit <b>6a587d8</b></span>
+    <span>garden suite <b>15/15</b></span>
+    <span>HEART TCK <b>14 pass, 4 n/a</b></span>
+    <span>ARTIE live <b>24/24</b></span>
+    <span>Buster <b>120/120, 0 FAIL</b></span>
+    <span><a href="#part2">Part 2, 12 October ↓</a></span>
+  </div>
+</header>
+
+<h2 id="scorecard">Scorecard</h2>
+<p>Left: the verdict in <code>spec/FIELDING-REVIEW.md</code>, written at <code>b7f4d00</code>. Right: Roy Bott's verdict tonight, at <code>6a587d8</code>.</p>
+<div class="score-box">
+<table class="score">
+  <thead><tr><th>Item</th><th>Review doc</th><th>Roy Bott</th></tr></thead>
+  <tbody>
+    <tr class="group"><td colspan="3">The six rules</td></tr>
+    <tr><td><a href="#r1">1. Any protocol, any URI scheme</a></td><td class="v"><span class="pill ok">✓ Supports</span></td><td class="v"><span class="pill ok">✓ Supports</span></td></tr>
+    <tr><td><a href="#r2">2. No changes to the protocols</a></td><td class="v"><span class="pill ok">✓ Supports</span></td><td class="v"><span class="pill ok">✓ Supports</span></td></tr>
+    <tr><td><a href="#r3">3. Effort goes into media types and relations</a></td><td class="v"><span class="pill ok">✓ Supports</span></td><td class="v"><span class="pill ok">✓ Supports</span></td></tr>
+    <tr><td><a href="#r4">4. No fixed names; the server teaches URIs</a></td><td class="v"><span class="pill ok">✓ Supports</span></td><td class="v"><span class="pill ok">✓ Supports</span> <span class="pill part">doc out of date</span></td></tr>
+    <tr><td><a href="#r5">5. No typed resources</a></td><td class="v"><span class="pill ok">✓ Supports</span></td><td class="v"><span class="pill ok">✓ Supports</span></td></tr>
+    <tr><td><a href="#r6">6. Bookmark and media types only</a></td><td class="v"><span class="pill ok">✓ Supports</span></td><td class="v"><span class="pill ok">✓ Supports</span></td></tr>
+    <tr class="group"><td colspan="3">His replies in the comments</td></tr>
+    <tr><td><a href="#hypertext">Information becomes the affordance</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr><td><a href="#typed-relations">Typed relations guide agents</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr><td><a href="#interface">The interface is in the hypertext</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr><td><a href="#client-decides">The client picks the transition, not the interface</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr><td><a href="#cool-uris">Cool URIs don't change</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr><td><a href="#post-meaning">The resource says what POST means</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr><td><a href="#prior-knowledge">Prior knowledge, concentrated</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr><td><a href="#no-batch">No batch operations</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr><td><a href="#follow-nose">Follow your nose</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr><td><a href="#key-off-content">Key off the content, not assumed structure</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr><td><a href="#app-state">Application state is not resource state</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr><td><a href="#public-ids">Identifiers are public</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr><td><a href="#ai-driven">AI-driven clients</a></td><td class="v"><span class="pill ok">✓</span></td><td class="v"><span class="pill ok">✓</span></td></tr>
+    <tr class="group"><td colspan="3">Beyond the post</td></tr>
+    <tr><td><a href="#model-quality">How well a model chooses</a></td><td class="v"><span class="pill part">◐ Partly</span></td><td class="v"><span class="pill part">◐ Partly</span></td></tr>
+  </tbody>
+</table>
+</div>
+<p class="cap" style="margin-top:8px">No verdict changed. Roy Bott found five smaller things, listed <a href="#findings">at the end</a>.</p>
+
+<!-- ===================== RULES ===================== -->
+<h2 id="rules">The six rules</h2>
+<p>Full exchanges. Each one starts from the rule as Fielding wrote it.</p>
+
+<section class="item" id="r1">
+  <div class="item-head"><span class="tag">Rule 1</span><h3>Any protocol, any URI scheme</h3></div>
+  <blockquote class="fielding">"A REST API should not be dependent on any single communication protocol … any protocol element that uses a URI for identification must allow any URI scheme to be used"<cite>Fielding, 20 Oct 2008, rule 1</cite></blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Every example you've ever shown me is HTTP. Is the HTTP-only part your examples, or your client?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>It's just the examples. The spec has a protocol-neutral core: read, act, validator, stale, not offered, invalid. Each of those maps to a binding. ARTIE picks the binding from the URI's scheme. Tonight's live run took bed 1 through sow, water and harvest over CoAP on UDP 5683. Here's ARTIE's own decision log from that run:</p>
+<pre class="wire"><span class="d">// server-spring/build/artie-events.jsonl, 01:05:58Z</span>
+{<span class="k">"event_name"</span>:<span class="s">"act.sent"</span>,
+ <span class="k">"body"</span>:<span class="s">"sent garden:sow-seed with validator da37a3acbb86a10d"</span>,
+ <span class="k">"attributes"</span>:{<span class="k">"url.full"</span>:<span class="s h">"coap://localhost:5683/beds/1/actions/sow-seed"</span>,
+   <span class="k">"heart.method"</span>:<span class="s">"POST"</span>, <span class="k">"heart.if_match"</span>:<span class="s">"da37a3acbb86a10d"</span>,
+   <span class="k">"heart.code"</span>:<span class="s h">"2.04"</span>}}</pre>
+<p>That scenario ends by checking that nothing went over HTTP. It passed, and so did the CoAP version at L2 and the one from the CoAP bookmark.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>An 8-byte validator. HTTP gives you more than that. Are these the same ETags in a shorter coat?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Yes. Eight bytes is CoAP's limit, so the binding uses a short form of the same validator. The refusals are the same problem types under CoAP codes: 4.12, 4.09, 4.22. The client tests check that each one maps to the same refusal in the core.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>And the options that carry your profile and Prefer? CoAP has no such options.</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>We put them in the experimental range, one for one with their HTTP headers:</p>
+<pre class="wire"><span class="d">// client/src/main/kotlin/heart/CoapBinding.kt:79</span>
+val ACCEPT_PROFILE = StringOptionDefinition(<span class="h">65_000</span>, "Accept-Profile", …)
+val NO_CACHE = EmptyOptionDefinition(<span class="h">65_003</span>, "No-Cache")
+val PREFER = StringOptionDefinition(<span class="h">65_004</span>, "Prefer", …)</pre>
+<p>They aren't registered with IANA, there's no <code>coaps</code>, and HAL-FORMS isn't served over CoAP. Also, the log shows <code>"span_id":""</code> on the CoAP lines, because a CoAP request carries no trace context yet.</p></div></div>
+  </div>
+  <div class="diagram"><pre class="mermaid">
+flowchart LR
+  A["ARTIE core<br/>enter · act · follow"] --> B{"URI scheme"}
+  B -- "http:" --> H["HttpBinding<br/>headers, 412/409/422/428"]
+  B -- "coap:" --> C["CoapBinding<br/>options 65000+, 4.12/4.09/4.22"]
+  B -- "other" --> X["refused before sending"]
+  H --> S["garden server<br/>same services, same act checks"]
+  C --> S
+  </pre></div>
+  <div class="verdict"><span class="pill ok">✓ Supports</span><p>Two real bindings, picked by scheme, live tonight. The gaps are about registration and hardening, not about the rule: unregistered option numbers, no <code>coaps</code>, and no trace context over CoAP.</p></div>
+</section>
+
+<section class="item" id="r2">
+  <div class="item-head"><span class="tag">Rule 2</span><h3>No changes to the protocols</h3></div>
+  <blockquote class="fielding">"A REST API should not contain any changes to the communication protocols aside from filling-out or fixing the details of underspecified bits of standard protocols"<cite>Fielding, 20 Oct 2008, rule 2</cite></blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Show me a response and I'll tell you which headers you invented.</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Bed 1, asking for L2:</p>
+<pre class="wire"><span class="d">$ curl -si localhost:8080/beds/1 -H 'Accept: application/hal+json' -H 'Prefer: forms=link, schema=link'</span>
+HTTP/1.1 200 OK
+<span class="k">Content-Type:</span> application/hal+json
+<span class="k">ETag:</span> "seq-0.hsf.L2"
+<span class="k">Cache-Control:</span> no-cache
+<span class="k">Link:</span> &lt;…/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;…/heart-rise&gt;; rel="profile"
+<span class="k">Vary:</span> Accept, Prefer, Accept-Profile
+<span class="k h">Preference-Applied:</span><span class="h"> forms=link, schema=link</span></pre>
+<p>Every header there is a standard. <code>Prefer</code> and <code>Preference-Applied</code> are RFC 7240, which allows tokens of your own. The profile link is the W3C profile-negotiation draft. The rest is RFC 9110 and 9111.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Acts are where people usually bend things. What does a stale write get back?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Bed 2 was at <code>seq-3</code>, and I sent the old <code>seq-0</code>:</p>
+<pre class="wire"><span class="d">$ curl -si -X POST localhost:8080/beds/2/actions/water-cell -H 'If-Match: "seq-0.hsf.L0"' …</span>
+HTTP/1.1 412 Precondition Failed
+<span class="k">Content-Type:</span> application/problem+json
+
+{<span class="k">"type"</span>:<span class="s">"…/heart-rise/problems/stale"</span>,<span class="k">"title"</span>:<span class="s">"The act is stale: the state has changed"</span>,<span class="k">"status"</span>:412,
+ <span class="k">"detail"</span>:<span class="s">"the validator does not match the current one of the selected representation"</span>}</pre>
+<p>The comparison is strong, over the whole ETag, as RFC 9110 §13.1.1 says. We used to read only the state number inside it. That was a narrowing of the standard, so we removed it in <code>e2a773f</code>.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>And the drafts?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p><code>Accept-Profile</code> is a W3C draft. JSON Home and link hints are Internet-Drafts. Using a draft doesn't change the protocol, but a draft can move under us.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓ Supports</span><p>Standard mechanisms used as written, and the one narrowing is gone. Keep an eye on the drafts.</p></div>
+</section>
+
+<section class="item" id="r3">
+  <div class="item-head"><span class="tag">Rule 3</span><h3>Effort goes into media types and relations</h3></div>
+  <blockquote class="fielding">"A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types."<cite>Fielding, 20 Oct 2008, rule 3</cite></blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>How many endpoints does your spec document?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>None. It defines a profile of HAL Schema Forms, two relations (<code>hr:forms</code> and <code>hr:unavailable</code>), and the rules for processing the layers. The garden adds its own relations, each named by a CURIE that expands to a fragment of its profile:</p>
+<pre class="wire"><span class="k">"curies"</span>:[{<span class="k">"name"</span>:<span class="s">"garden"</span>,<span class="k">"href"</span>:<span class="s">"/profiles/garden#{rel}"</span>,<span class="k">"templated"</span>:true},
+          {<span class="k">"name"</span>:<span class="s">"hr"</span>,<span class="k">"href"</span>:<span class="s">"https://github.com/jogoshugh/heart-rise/rels/{rel}"</span>,…}],
+<span class="k">"_forms"</span>:{<span class="k h">"garden:sow-seed"</span>:{<span class="k">"title"</span>:<span class="s">"Sow a seed"</span>,<span class="k">"method"</span>:<span class="s">"POST"</span>, …}}</pre></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>So <code>/beds</code> and <code>/actions</code> are the garden's business, not the spec's?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Yes. The same HEART library also runs a basketball game and a ticket desk, on different paths, and each runs the same conformance features. Tonight I ran them against the garden only.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓ Supports</span><p>The descriptive effort goes into a profile, relations and processing rules. Paths belong to the example.</p></div>
+</section>
+
+<section class="item" id="r4">
+  <div class="item-head"><span class="tag">Rule 4</span><h3>No fixed names; the server teaches URIs</h3></div>
+  <blockquote class="fielding">"A REST API must not define fixed resource names or hierarchies … allow servers to instruct clients on how to construct appropriate URIs, such as is done in HTML forms and URI templates"<cite>Fielding, 20 Oct 2008, rule 4</cite></blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Your L2 affordance set is shared by many beds, so its target can't name one bed. Who fills in the <code>{id}</code>?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>The form says how:</p>
+<pre class="wire"><span class="d">$ curl -si localhost:8080/affordance-sets/588773b4c4ba671e</span>
+<span class="k">Cache-Control:</span> public, max-age=31536000, immutable
+{<span class="k">"_forms"</span>:{<span class="k">"garden:sow-seed"</span>:{
+   <span class="k">"_links"</span>:{<span class="k">"target"</span>:{<span class="k">"href"</span>:<span class="s">"/beds/{id}/actions/sow-seed"</span>,<span class="k">"templated"</span>:true}},
+   <span class="k h">"hr:templatePointers"</span><span class="h">:{"id":"/id"}</span>,
+   <span class="k">"schema"</span>:{<span class="k">"$ref"</span>:<span class="s">"/schemas/8547ad80c90a3125"</span>,<span class="k">"hr:integrity"</span>:<span class="s">"sha256-hUet…/s="</span>}, …}}}</pre>
+<p><code>/id</code> is a JSON Pointer into the bed's own representation, and the idea comes from JSON Hyper-Schema's <code>templatePointers</code>. ARTIE's <code>act()</code> takes a relation name and a body, never a URL.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Those addresses, <code>588773b4c4ba671e</code>, look like hashes. Does your client read them?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>No, it reads nothing from a URL. It checks the bytes against the <code>integrity</code> the link carried:</p>
+<pre class="wire"><span class="d">$ curl -s localhost:8080/affordance-sets/588773b4c4ba671e | openssl dgst -sha256 -binary | base64</span>
+<span class="h">WIdztMS6Zx56SESW+RccbZJiq08B5t1TG6arfbMFom4=</span>
+<span class="d"># the hr:forms link on bed 1 said:</span> "integrity":"sha256-<span class="h">WIdztMS6Zx56SESW+RccbZJiq08B5t1TG6arfbMFom4=</span>"</pre>
+<p>As of today the address is only a short name the server picked. Integrity is the only check. The client tests include a URL shaped like a hash, and ARTIE ignores it.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Then your review document is wrong. It still says the reference server uses <code>/sha256-</code> paths.</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Fair. We dropped the prefix in <code>dce1fa9</code>, and the review still cites <code>b7f4d00</code>. The rule holds, but the document needs updating.</p></div></div>
+  </div>
+  <div class="diagram"><pre class="mermaid">
+flowchart TB
+  L1["Layer 1: /beds/1<br/>state + hr:forms link<br/>integrity sha256-WIdz…"] -->|"bytes must hash to"| L2["Layer 2: /affordance-sets/588773b4c4ba671e<br/>immutable · forms + templatePointers"]
+  L2 -->|"schema.$ref + hr:integrity sha256-hUet…"| L3["Layer 3: /schemas/8547ad80c90a3125<br/>immutable · JSON Schema 2020-12"]
+  L2 -->|"hr:unavailable + integrity sha256-0Zla…"| U["/unavailable/d1995ab17483fab3<br/>why water and harvest are absent"]
+  </pre></div>
+  <div class="verdict"><span class="pill ok">✓ Supports</span><p>The server teaches every URI, through templates and pointers. The client reads nothing from a URL. One fix needed: §Rule 4 of <code>FIELDING-REVIEW.md</code> still describes <code>/sha256-</code> paths.</p></div>
+</section>
+
+<section class="item" id="r5">
+  <div class="item-head"><span class="tag">Rule 5</span><h3>No typed resources</h3></div>
+  <blockquote class="fielding">"A REST API should never have “typed” resources that are significant to the client … The only types that are significant to a client are the current representation’s media type and standardized relation names."<cite>Fielding, 20 Oct 2008, rule 5</cite></blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Does ARTIE know it's looking at a bed?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>No. It branches on two things only: the dialect, from the media type plus the profile, and the relations. State is JSON it carries without interpreting. The word "bed" appears only in test data. The architecture test that ran tonight also checks that only the Transport and Binding classes import network libraries.</p>
+<pre class="wire"><span class="d">// client/src/main/kotlin/heart/Dialect.kt</span>
+enum class Dialect(val mediaType: String, val profile: String, val maxRung: Rung) {
+    HAL_SCHEMA_FORMS(HAL_JSON, HAL_SCHEMA_FORMS_PROFILE, Rung.L2),
+    HAL_FORMS("application/prs.hal-forms+json", "…/heart-rise/hal-forms", Rung.L0),
+}</pre></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>A bed's <code>status</code> says <code>READY_TO_HARVEST</code>. Does ARTIE ever read it to decide something?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Only the tests read it, to check results. ARTIE decides from what's in <code>_forms</code>. When the bed is ready, the only form left is <code>garden:harvest</code>.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓ Supports</span><p>The only types the client cares about are the media type, the profile and the relations.</p></div>
+</section>
+
+<section class="item" id="r6">
+  <div class="item-head"><span class="tag">Rule 6</span><h3>Bookmark and media types only</h3></div>
+  <blockquote class="fielding">"A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience … From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations."<cite>Fielding, 20 Oct 2008, rule 6</cite></blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Give me only <code>/</code>. How do I get to bed 1?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>The bookmark offers two GET forms:</p>
+<pre class="wire"><span class="d">$ curl -si localhost:8080/ -H 'Accept: application/hal+json'</span>
+<span class="k">ETag:</span> "index-hsf-a3ccaf8cf64d5ccc"
+{<span class="k">"title"</span>:<span class="s">"Garden beds"</span>,
+ <span class="k">"_forms"</span>:{<span class="k">"garden:search-beds"</span>:{<span class="k">"_links"</span>:{<span class="k">"target"</span>:{<span class="k">"href"</span>:<span class="s h">"/beds{?name}"</span>,<span class="k">"templated"</span>:true}},<span class="k">"method"</span>:<span class="s">"GET"</span>,…},
+           <span class="k">"garden:get-bed"</span>:{<span class="k">"_links"</span>:{<span class="k">"target"</span>:{<span class="k">"href"</span>:<span class="s h">"/beds/{id}"</span>,<span class="k">"templated"</span>:true}},<span class="k">"method"</span>:<span class="s">"GET"</span>,…}}}
+
+<span class="d">$ curl -si 'localhost:8080/beds?name=BED-1' -H 'Accept: application/hal+json'</span>
+{<span class="k">"count"</span>:1,<span class="k">"_links"</span>:{<span class="k">"self"</span>:{…},<span class="k">"item"</span>:[{<span class="k">"href"</span>:<span class="s">"/beds/1"</span>,<span class="k">"title"</span>:<span class="s h">"bed-1"</span>}]}}</pre>
+<p>ARTIE fills the form, then follows <code>item</code> by its title. Tonight that path passed live at L0 and L2, in HAL-FORMS, and over CoAP.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>You said "no prior knowledge", but you asked with <code>Prefer: forms=link, schema=link</code>. How did you know to ask for that?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>The bookmark told us. Asked for JSON Home, the same <code>/</code> answers:</p>
+<pre class="wire"><span class="d">$ curl -si localhost:8080/ -H 'Accept: application/json-home'</span>
+"hints":{"formats":{"application/prs.hal-forms+json":…,"application/hal+json":…},
+         <span class="h">"accept-prefer":["forms=link","schema=link"]</span>,
+         "precondition-req":["etag"]}</pre>
+<p>After that, ARTIE trusts each response's <code>Preference-Applied</code> over the promise. A server that says nothing gets used at L0.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Then what's left is my first sentence: "standardized media types". Is HAL Schema Forms standardized?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Not yet. HAL is an IETF draft, HAL Schema Forms is published but not standardized, and the HEART profile is ours. A plain HAL Schema Forms client can work at L0. L1 and L2 need the profile.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>That's a question of adoption, not a broken rule. Your client does what the rule asks. Whether the world knows your media type is a different question.</p></div></div>
+  </div>
+  <div class="diagram"><pre class="mermaid">
+sequenceDiagram
+  participant A as ARTIE
+  participant S as Garden server
+  A->>S: GET / (Accept: application/json-home)
+  S-->>A: formats, accept-prefer, precondition-req
+  A->>S: GET / (Accept: application/hal+json)
+  S-->>A: _forms garden:search-beds, garden:get-bed
+  A->>S: GET /beds?name=BED-1 (filled from the form)
+  S-->>A: item → /beds/1 "bed-1"
+  A->>S: GET /beds/1 (Prefer: forms=link, schema=link)
+  S-->>A: state + hr:forms + Preference-Applied
+  A->>S: POST target from the set, If-Match: held ETag
+  S-->>A: 200, Content-Location: /beds/1, new state + forms
+  </pre></div>
+  <div class="verdict"><span class="pill ok">✓ Supports</span><p>One bookmark reaches everything, and every step is a choice the server offered. Still open: the media type and profile are published but not standardized.</p></div>
+</section>
+
+<!-- ===================== REPLIES ===================== -->
+<h2 id="replies">His replies, briefly</h2>
+<p>Fielding answered readers in the comments for three weeks. These are shorter exchanges.</p>
+
+<section class="item short" id="hypertext">
+  <div class="item-head"><span class="tag">Reply to llimllib and Bjorg, 20 Oct</span><h3>Information becomes the affordance</h3></div>
+  <blockquote class="fielding">"the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions"</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>An empty bed. What can't I do, and does the representation say so?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Bed 1 offers only <code>garden:sow-seed</code>. Its <code>hr:unavailable</code> link explains the rest:</p>
+<pre class="wire"><span class="d">$ curl -s localhost:8080/unavailable/d1995ab17483fab3</span>
+{<span class="k">"unavailable"</span>:[
+  {<span class="k">"rel"</span>:<span class="s">"/profiles/garden#water-cell"</span>,<span class="k">"reason"</span>:<span class="s h">"Nothing is planted yet; sow a seed first."</span>},
+  {<span class="k">"rel"</span>:<span class="s">"/profiles/garden#harvest"</span>,<span class="k">"reason"</span>:<span class="s h">"Nothing is growing yet; sow a seed and water it until it is ready."</span>}]}</pre></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>The state and the controls arrive together. The missing controls are information too, and now come with reasons.</p></div>
+</section>
+
+<section class="item short" id="typed-relations">
+  <div class="item-head"><span class="tag">Reply to snoopdave, 20 Oct</span><h3>Typed relations guide agents</h3></div>
+  <blockquote class="fielding">"Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents."</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Is <code>garden:water-cell</code> a typed relation, or just a key with a colon in it?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>It expands to <code>/profiles/garden#water-cell</code>, and that address is an ALPS descriptor: <code>"type":"unsafe"</code>, <code>"title":"Water the bed"</code>, plus a description. The client finds it through the CURIE in the representation, while it's interacting. The TCK checks that the profile describes every relation the forms use.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Fine. But if two gardens both say "water", is it the same relation?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Not yet. Relations shared across services are the RISE vocabulary work, which is parked.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>Typed, described where they're defined, and checked. Sharing them across services is future scope, not a defect.</p></div>
+</section>
+
+<section class="item short" id="interface">
+  <div class="item-head"><span class="tag">Reply to nkallen, 21 Oct</span><h3>The interface is in the hypertext</h3></div>
+  <blockquote class="fielding">"The interface doesn’t need to be discovered. It is defined right there in the hypertext. The representation tells the client how to compose all transitions to the next application state."</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>"Right there" at L2 means three fetches. Isn't that discovery by another name?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>It's one representation, split into resources that can be cached. Beds 2 and 4 are in the same state, and both link <code>/affordance-sets/aab67c2bd106ace1</code>. The live L3 scenario passed tonight: two clients behind one cache, one fetch of the set. A re-sync of an unchanged bed is one request, answered 304.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>Each form carries the target, method, content type and schema. Linking them in costs a fetch once, not on every read.</p></div>
+</section>
+
+<section class="item short" id="client-decides">
+  <div class="item-head"><span class="tag">Reply to TheOtherMarcus, 21 Oct</span><h3>The client picks the transition, not the interface</h3></div>
+  <blockquote class="fielding">"The client (user or agent) has to decide what transition to take, not what interface to use."</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Your model chooses. What can it choose?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>This, and nothing else:</p>
+<pre class="wire"><span class="d">// client/src/main/kotlin/heart/Reasoning.kt</span>
+<span class="d">/** The Reason step's entire output space. It has no field for a URI, method, header or precondition. */</span>
+sealed interface Selection {
+    data class Act(val affordance: String, val fields: JsonObject) : Selection
+    data class Follow(val rel: String, val title: String?) : Selection
+    data class Describe(val affordance: String) : Selection
+    data class Explain(val affordance: String) : Selection
+    data class Clarify(val question: String) : Selection
+}</pre></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>The model picks the transition. Deterministic code builds the target, method, <code>If-Match</code> and body.</p></div>
+</section>
+
+<section class="item short" id="cool-uris">
+  <div class="item-head"><span class="tag">Reply to TheOtherMarcus, 21 Oct</span><h3>Cool URIs don't change</h3></div>
+  <blockquote class="fielding">"Because implementations change, but cool URIs don’t."</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>You renamed every content address today. That sounds like URIs changing.</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>It is. We aren't in production yet, so we let them change. Once a server is running, an address is tied to its bytes and served <code>immutable</code>, so it can't change while the bytes stay the same. Bed URIs stayed the same through the move from Tomcat to Netty.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>Addresses are fixed for a given body. Today's rename happened before release, on purpose.</p></div>
+</section>
+
+<section class="item short" id="post-meaning">
+  <div class="item-head"><span class="tag">Reply to TheOtherMarcus, 21 Oct</span><h3>The resource says what POST means</h3></div>
+  <blockquote class="fielding">"You don’t get to decide what POST means — that is decided by the resource. Its purpose is supposed to be described in the same context in which you found the URI that you are posting to."</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Show me a POST, and what came back.</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>I watered bed 2 with 100 ml:</p>
+<pre class="wire"><span class="d">$ curl -si -X POST localhost:8080/beds/2/actions/water-cell -H 'If-Match: "seq-3.hsf.L0"' -d '{"milliliters":100}' …</span>
+HTTP/1.1 200 OK
+<span class="k h">Content-Location:</span><span class="h"> /beds/2</span>
+<span class="k">ETag:</span> "seq-4.hsf.L0"
+{<span class="k">"status"</span>:<span class="s">"READY_TO_HARVEST"</span>,<span class="k">"growthPoints"</span>:100,<span class="k">"moistureLevel"</span>:50, …
+ <span class="k">"_forms"</span>:{<span class="k h">"garden:harvest"</span>:{<span class="k">"title"</span>:<span class="s">"Harvest the crop"</span>, …}}}</pre>
+<p>The form's title and description sit next to its target. The answer is the bed itself, showing what happened and what can be done next.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>The purpose is stated where the target is found, and the response is the next hypertext.</p></div>
+</section>
+
+<section class="item short" id="prior-knowledge">
+  <div class="item-head"><span class="tag">Reply to jdubray, 22 Oct</span><h3>Prior knowledge, concentrated</h3></div>
+  <blockquote class="fielding">"Of course the client has prior knowledge. … What REST does is concentrate that need for prior knowledge into readily standardizable forms."</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>List what ARTIE knows before it starts.</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>HTTP and CoAP. HAL, HAL Schema Forms and HAL-FORMS. JSON Schema, problem details and JSON Home. Two profile URIs. Two relations, <code>hr:forms</code> and <code>hr:unavailable</code>. Two <code>Prefer</code> tokens. What 409, 412, 422 and 428 mean. Plus its bookmark and its goal.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>And the ALPS profile, and <code>garden:</code>?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Those aren't prior knowledge. The representation hands them over: the CURIE comes in <code>_links.curies</code>, and the profile is fetched from where it points. ARTIE knows the ALPS format, not this profile's contents.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Agreed. Context the server teaches during the interaction is the point of hypertext. Everything on your list is a format or a code that can be standardized. None of it is about gardens.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>Prior knowledge is formats, relations and codes. Domain meaning arrives through the representations.</p></div>
+</section>
+
+<section class="item short" id="no-batch">
+  <div class="item-head"><span class="tag">Reply to tlainhart, 22 Oct</span><h3>No batch operations</h3></div>
+  <blockquote class="fielding">"If you find yourself in need of a batch operation, then most likely you just haven’t defined enough resources."</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Isn't L0, with everything in one response, a batch?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>No, it's a rendering of the same resource, picked with <code>Prefer</code>. The ETag says which: <code>seq-0.hsf.L0</code> versus <code>seq-0.hsf.L2</code>. The layers are extra resources, which is what you asked for.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>More resources, no bulk endpoint.</p></div>
+</section>
+
+<section class="item short" id="follow-nose">
+  <div class="item-head"><span class="tag">Reply to Robert Cerny, 23 Oct</span><h3>Follow your nose</h3></div>
+  <blockquote class="fielding">"follow your nose … Basically, how far ahead is the client looking?"</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>How far ahead does ARTIE look?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Zero steps. It decides each act from the manifest it holds now. Buster, our adversarial proxy, planted a stale ETag 19 times right where ARTIE would act next. Every time, the act was refused with 412, ARTIE re-synced, and it never resent the old act. Tonight I resent a used ETag by hand and got the same 412.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>No script of steps. Every act comes from the current manifest.</p></div>
+</section>
+
+<section class="item short" id="key-off-content">
+  <div class="item-head"><span class="tag">Reply to Robert Cerny, 23 Oct</span><h3>Key off the content, not assumed structure</h3></div>
+  <blockquote class="fielding">"If they are keying off of something unique within the content … then it’s okay. Usually, however, what they do is assume that the response has a specific structure beyond that defined by the media type."</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Does ARTIE read <code>_forms</code> before it knows it's allowed to?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>No. With no hal-schema-forms <code>Link: rel="profile"</code>, it refuses the response; a client test covers each of three cases. Buster also attacked the content from the server side: it dropped curies, lied in <code>Preference-Applied</code>, stripped integrity and flipped bytes, 46 times. Every verdict was pass, and 44 of them were attested by ARTIE's own log.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>The structure is read only after the profile vouches for it, and checked bytes back it up.</p></div>
+</section>
+
+<section class="item short" id="app-state">
+  <div class="item-head"><span class="tag">Reply to TheOtherMarcus, 22 Oct</span><h3>Application state is not resource state</h3></div>
+  <blockquote class="fielding">"Don’t confuse application state (the state of the user’s application of computing to a given task) with resource state (the state of the world as exposed by a given service)."</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Where's the line in your system?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Resource state is the bed, versioned by <code>seq-N</code> in the ETag. Application state is the representation and manifest ARTIE holds. A 412 is the moment the two drift apart, and ARTIE handles it by fetching fresh application state, not by forcing the old intent through.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>And past states? Your history shows old beds without their forms.</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>That's a design question we've parked: showing a past state with the acts it offered then, inert. Notes are in <code>spec/ideas/past-states-as-mementos.md</code>.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>The two are kept apart, and 412 is where they meet.</p></div>
+</section>
+
+<section class="item short" id="public-ids">
+  <div class="item-head"><span class="tag">Reply to Dima, 1 Nov</span><h3>Identifiers are public</h3></div>
+  <blockquote class="fielding">"Identifiers are public information."</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Your content addresses are hashes. Does anyone treat them as secret?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>No. SPEC §6.5 says an address must never be used as a capability. Since today, it also says a server SHOULD use the full digest when others can influence the content.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>Stated in the spec, with the consequences worked through.</p></div>
+</section>
+
+<section class="item short" id="ai-driven">
+  <div class="item-head"><span class="tag">Reply to billburke, 8 Nov</span><h3>AI-driven clients</h3></div>
+  <blockquote class="fielding">"All it needs to know is the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of AI-driven."</blockquote>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Has a real model done it against the real server?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Once, on 10 October. Asked to "water bed 2 with 250 ml", Claude picked <code>garden:water-cell</code> with 250, and the server's history recorded it. I didn't rerun it tonight, because it needs an API key in the environment. That scenario was skipped in tonight's run.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓</span><p>The client knows the meaning of the instructions and has a purpose, as the reply asks. Today's evidence for the model is from 10 October.</p></div>
+</section>
+
+<h2 id="beyond">Beyond the post</h2>
+<section class="item short" id="model-quality">
+  <div class="item-head"><span class="tag">The project's own question</span><h3>How well a model chooses</h3></div>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>This isn't my rule. How often does the model choose well?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>We don't know yet. There are two passing real-model cases, and that's no rate. <code>spec/EVAL-L6.md</code> plans five domains, renamed copies of each, and a pass bar agreed before the first run.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill part">◐ Partly</span><p>Shown working, not measured.</p></div>
+</section>
+
+<h2 id="findings">What Roy Bott noticed</h2>
+<p>None of these changes a verdict. They're listed for the review. Nothing has been fixed.</p>
+<ul class="findings">
+  <li><b>The review document is out of date.</b><span><code>FIELDING-REVIEW.md</code> cites <code>b7f4d00</code>, and Rule 4 still describes <code>/sha256-</code> paths. Since <code>dce1fa9</code> addresses are 16 hex characters with no prefix.</span></li>
+  <li><b>Problem details name Kotlin act names.</b><span>The 409 says <code>"sowSeed is not in the resource's current affordance set (key PLANTED)"</code>, and the 428 says <code>"waterCell needs a validator…"</code>. The 409 also carries <code>"rel":"/profiles/garden#sow-seed"</code>, which is what a client keys off, so the <code>detail</code> text only matters to a human reader. It leaks an implementation name and an internal key.</span></li>
+  <li><b>No trace context over CoAP.</b><span>ARTIE's log has <code>"span_id":""</code> on every CoAP line. Already listed as open under Rule 1.</span></li>
+  <li><b>The garden never shows rule-refused.</b><span>The basketball and tickets domains test the 422 <code>rule-refused</code> type. The garden has no rule that a valid body can break, so tonight's evidence could only show the schema 422.</span></li>
+  <li><b>Four TCK scenarios don't apply to the garden.</b><span>They test an act on the bookmark that brings a resource into being (201 with <code>Location</code>). The garden's bookmark offers only safe GET forms, so they were skipped, not failed.</span></li>
+</ul>
+
+<footer>
+  <p><strong>Evidence.</strong> Run on 11 October 2026 against <code>~/repos/artie</code> at <code>6a587d8</code>. The garden server ran locally on HTTP 8080 and CoAP 5683, with Postgres reset to its seed data. Wire excerpts are trimmed with "…" but otherwise as received. Garden suite: 15 scenarios passed. HEART TCK against the garden: 14 passed, 4 not applicable. ARTIE live suite: 24 scenarios passed, with the real-model scenario skipped. Buster campaign report, written after that commit: 22 rounds, 120 planned mutations, all made, 70 pass, 50 pass (attested), 0 FAIL, no holes.</p>
+  <p><strong>Source.</strong> Roy T. Fielding, <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be hypertext-driven"</a>, Untangled, 20 October 2008, and his comments on it. The quotes are his. Roy Bott and his lines are fictional.</p>
+</footer>
+</div>
+
+<div class="wrap" id="part2">
+<header class="top">
+  <div class="eyebrow">Part 2 · garden server at commit a7831ce · 12 October 2026</div>
+  <h1>Roy Bott Comes Back</h1>
+  <p class="lede">The next day Roy Bott returns to check his five findings. Josh shows each fix on the live server, and the suites and a fresh Buster campaign are run again. Then Roy looks for what the fixes broke.</p>
+  <div class="facts">
+    <span>commit <b>a7831ce</b></span>
+    <span>garden suite <b>17/17</b></span>
+    <span>HEART TCK <b>18/18, none skipped</b></span>
+    <span>ARTIE live <b>26/26</b></span>
+    <span>Buster <b>125/125, 0 FAIL</b></span>
+  </div>
+</header>
+
+<h2 id="p2-scorecard">His five findings, a day later</h2>
+<div class="score-box">
+<table class="score">
+  <thead><tr><th>Finding</th><th>11 Oct</th><th>12 Oct</th><th>Commit</th></tr></thead>
+  <tbody>
+    <tr><td><a href="#p2-doc">The review document is out of date</a></td><td class="v"><span class="pill part">open</span></td><td class="v"><span class="pill ok">✓ fixed</span></td><td><code>d81cad7</code>, <code>4e4db9d</code></td></tr>
+    <tr><td><a href="#p2-detail">Problem details name Kotlin act names</a></td><td class="v"><span class="pill part">open</span></td><td class="v"><span class="pill ok">✓ fixed</span></td><td><code>a70ecc2</code></td></tr>
+    <tr><td><a href="#p2-trace">No trace context over CoAP</a></td><td class="v"><span class="pill part">open</span></td><td class="v"><span class="pill ok">✓ fixed</span></td><td><code>25dcf48</code></td></tr>
+    <tr><td><a href="#p2-rule">The garden never shows rule-refused</a></td><td class="v"><span class="pill part">open</span></td><td class="v"><span class="pill ok">✓ fixed</span></td><td><code>1835ac3</code></td></tr>
+    <tr><td><a href="#p2-bookmark">Four TCK scenarios don't apply to the garden</a></td><td class="v"><span class="pill part">open</span></td><td class="v"><span class="pill ok">✓ fixed</span></td><td><code>2122e9d</code></td></tr>
+  </tbody>
+</table>
+</div>
+<p class="cap" style="margin-top:8px">No verdict in Part 1 changes. Rule 1 loses one stated gap. Roy Bott found five new things, listed <a href="#p2-findings">at the end</a>.</p>
+
+<section class="item short" id="p2-doc">
+  <div class="item-head"><span class="tag">Finding 1</span><h3>The review document is out of date</h3></div>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Yesterday your review still described <code>/sha256-</code> paths and cited <code>b7f4d00</code>. Today?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>It was re-checked live twice. Once at <code>a70ecc2</code> last night, and again today at <code>a7831ce</code>, after the fixes below. Each check got its own scorecard column. Rule 4 now describes the 16-hex names, and every cited test file is one that exists. The published review is at version 16, and <code>spec/FIELDING-REVIEW.md</code> matches it.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓ fixed</span><p>The document and the code agree as of today's commit.</p></div>
+</section>
+
+<section class="item" id="p2-detail">
+  <div class="item-head"><span class="tag">Finding 2</span><h3>Problem details name Kotlin act names</h3></div>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Yesterday a 409 said <code>sowSeed is not in the resource's current affordance set (key PLANTED)</code>. That's your code talking, not the resource. Show me today's.</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Same request, bed 2, which is planted:</p>
+<pre class="wire"><span class="d">$ curl -i -X POST -H 'If-Match: "seq-3.hsf.L0"' -d '{"seedType":"kale"}' …/beds/2/actions/sow-seed</span>
+HTTP/1.1 <span class="h">409 Conflict</span>
+Content-Type: application/problem+json
+
+{<span class="k">"type"</span>:<span class="s">"…/problems/not-offered"</span>,
+ <span class="k">"title"</span>:<span class="s">"The act is not offered in the resource's current state"</span>,
+ <span class="k">"detail"</span>:<span class="s h">"garden:sow-seed is not offered now: The bed is already planted."</span>,
+ <span class="k">"rel"</span>:<span class="s">"/profiles/garden#sow-seed"</span>}</pre>
+<p>And a write with no validator:</p>
+<pre class="wire"><span class="d">$ curl -i -X POST -d '{"milliliters":250}' …/beds/2/actions/water-cell</span>
+HTTP/1.1 <span class="h">428 Precondition Required</span>
+
+{<span class="k">"type"</span>:<span class="s">"…/problems/precondition-required"</span>,
+ <span class="k">"detail"</span>:<span class="s h">"garden:water-cell needs a validator: the current one of the resource offering it"</span>}</pre>
+<p>The act is named the way the form names it, by its relation. The reason is the one the server gives when it explains absent acts, so a person reading the problem sees the domain's words, not a key from the code.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Is that only true for the garden?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>No, it's in the library. <code>ActPipeline</code> builds both details for every resource type and binding. The scenario that pins it is in heart-core's <code>acts.feature</code>, and it uses a lamp, not a bed. I wrote it first, ran it red, and then changed the code.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓ fixed</span><p>Details now speak in the hypertext's terms: the relation and the resource's own reason.</p></div>
+</section>
+
+<section class="item" id="p2-trace">
+  <div class="item-head"><span class="tag">Finding 3</span><h3>No trace context over CoAP</h3></div>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Your log had <code>"span_id":""</code> on every CoAP line. Trace Context defines no CoAP carrier. Did you invent one?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Yes, the same way we carry the profile and the preference: an option from the experimental range, one for one with the HTTP header, with the same value. We searched first. No IETF document defines a CoAP option for <code>traceparent</code>.</p>
+<pre class="wire"><span class="d">// client/src/main/kotlin/heart/CoapBinding.kt</span>
+<span class="d">/** Elective, safe to forward, and no part of the cache key (RFC 7252 §5.4.6) */</span>
+val TRACEPARENT = StringOptionDefinition(<span class="h">65_020</span>, "traceparent", true, 1, TEXT_MAX)
+…
+val span = trace.newSpan(url)
+request.options.addOption(Option(TRACEPARENT, "00-${trace.traceId}-$span-01"))</pre></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Why 65020 and not 65016?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>In CoAP, an option's number sets its properties. 65020 is even, so it's elective: a server that doesn't know it ignores it. Its second bit is clear, so it's safe to forward. Its bits 2 to 4 are <code>111</code>, so it's not part of the cache key, and a trace never splits a cache. 65016 would have been part of the key. SPEC §6.0.1 used to say "Not carried"; it now names the option and says it's experimental like the others.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>And the log?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>Today's live run:</p>
+<pre class="wire"><span class="d">// server-spring/build/artie-events.jsonl, 11:14:59Z</span>
+{<span class="k">"trace_id"</span>:<span class="s">"a75baf680757c2ac032336f5d8de5dc5"</span>, <span class="k">"span_id"</span>:<span class="s h">"672cce8955146516"</span>,
+ <span class="k">"event_name"</span>:<span class="s">"act.sent"</span>,
+ <span class="k">"body"</span>:<span class="s">"sent garden:sow-seed with validator da37a3acbb86a10d"</span>,
+ <span class="k">"attributes"</span>:{<span class="k">"url.full"</span>:<span class="s">"coap://localhost:5683/beds/1/actions/sow-seed"</span>, <span class="k">"heart.code"</span>:<span class="s">"2.04"</span>}}</pre>
+<p>That's 30 CoAP events, and none has an empty span. One thing went wrong on the way. The first version passed against the test CoAP server but left every live span empty. Californium rewrites the URI and drops the default port 5683, so the span was saved under a different key from the one the log looks up. A live scenario now checks that every event names a span. It failed first, and it passes now.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓ fixed</span><p>Each CoAP request carries its trace, and each event points at the request it is about. The option is unregistered, like the binding's others.</p></div>
+</section>
+
+<section class="item" id="p2-rule">
+  <div class="item-head"><span class="tag">Finding 4</span><h3>The garden never shows rule-refused</h3></div>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Your spec separates a body the schema refuses from a body the resource refuses. The garden only ever showed the first.</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>It had no rule a valid body could break. Water over the limit was quietly trimmed at moisture 100. Now the bed refuses it. Bed 2 is at moisture 40, and 1000 ml passes the schema (maximum 1000):</p>
+<pre class="wire"><span class="d">$ curl -i -X POST -H 'If-Match: "seq-3.hsf.L0"' -d '{"milliliters":1000}' …/beds/2/actions/water-cell</span>
+HTTP/1.1 <span class="h">422 Unprocessable Entity</span>
+Content-Type: application/problem+json
+
+{<span class="k">"type"</span>:<span class="s h">"…/problems/rule-refused"</span>,
+ <span class="k">"title"</span>:<span class="s">"A rule of the resource refuses the act"</span>,
+ <span class="k">"violations"</span>:[{<span class="k">"pointer"</span>:<span class="s">"/milliliters"</span>,
+   <span class="k">"message"</span>:<span class="s h">"The bed would be waterlogged: at most 600 ml now."</span>}]}</pre>
+<p>A schema can't say "at most 600 ml now", because the limit depends on the bed's current state. That's exactly the case <code>rule-refused</code> is for.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Moisture only ever went up in your model. Doesn't a bed fill up and stop growing?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>It would have, after two crops. So harvesting now leaves the bed dry: the crop drank the water. That reverses a decision from the day before, and I'll say plainly that it was made to keep the rule from leaving a bed stuck, not for gardening reasons. The better rule, crop rotation, is parked in <code>spec/ideas/crop-rotation-rule.md</code>.</p></div></div>
+  </div>
+  <div class="verdict"><span class="pill ok">✓ fixed</span><p>The garden shows both kinds of 422. The rule needed a change to the domain, which is recorded as such.</p></div>
+</section>
+
+<section class="item" id="p2-bookmark">
+  <div class="item-head"><span class="tag">Finding 5</span><h3>An act on the bookmark that brings a resource into being</h3></div>
+  <div class="talk">
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Four conformance scenarios were skipped because the garden's bookmark offered only searches. Did you just add a create endpoint?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>No, a domain act, offered by the bookmark: build a bed. It's a form like any other, with a relation, a title and a schema:</p>
+<pre class="wire"><span class="d">$ curl -H 'Accept: application/hal+json' …/   →  _forms["garden:build-bed"]</span>
+{<span class="k">"_links"</span>:{<span class="k">"target"</span>:{<span class="k">"href"</span>:<span class="s">"/actions/build-bed"</span>}}, <span class="k">"method"</span>:<span class="s">"POST"</span>,
+ <span class="k">"title"</span>:<span class="s">"Build a bed"</span>,
+ <span class="k">"description"</span>:<span class="s">"Builds a new, empty bed with a name and a size in feet."</span>,
+ <span class="k">"schema"</span>:{<span class="k">"required"</span>:[<span class="s">"label"</span>,<span class="s">"lengthFt"</span>,<span class="s">"widthFt"</span>],
+   <span class="k">"properties"</span>:{<span class="k">"widthFt"</span>:{<span class="k">"title"</span>:<span class="s">"Width"</span>,<span class="k">"type"</span>:<span class="s">"integer"</span>,<span class="k">"minimum"</span>:1,<span class="k">"maximum"</span>:100}, …}}}</pre>
+<p>Following it with the bookmark's validator:</p>
+<pre class="wire"><span class="d">$ curl -i -X POST -H 'If-Match: "index-hsf-6a8b39b76b567229"' \
+       -d '{"label":"Herbs","widthFt":4,"lengthFt":8}' …/actions/build-bed</span>
+HTTP/1.1 <span class="h">201 Created</span>
+<span class="h">Location: /beds/5</span>
+Content-Location: /beds/5
+ETag: "seq-0.hsf.L0"
+
+{<span class="k">"id"</span>:5, <span class="k">"label"</span>:<span class="s">"Herbs"</span>, <span class="k">"widthFt"</span>:4, <span class="k">"lengthFt"</span>:8, <span class="k">"status"</span>:<span class="s">"EMPTY"</span>, …
+ <span class="k">"_forms"</span>:{<span class="k">"garden:sow-seed"</span>:{<span class="k">"title"</span>:<span class="s">"Sow a seed"</span>, …}}}</pre>
+<p>The answer is the new bed's hypertext, so the client's next step is already in hand.</p></div></div>
+    <div class="turn roy"><div class="who">Roy Bott</div><div class="say"><p>Does ARTIE use it, or only curl?</p></div></div>
+    <div class="turn josh"><div class="who">Josh</div><div class="say"><p>ARTIE does. A new live scenario gives it only <code>/</code>. It builds "Herbs", lands on the new bed from the response, and sows thyme there, without any URI of its own. In today's Buster campaign, that scenario was attacked five times: an offered act dropped twice, a stale validator planted twice, and the bed's freshness relaxed once. All five were passes, and one was attested by ARTIE's own log. The conformance suite now runs all 18 scenarios against the garden, including 201, 428, 412 and 422 on the bookmark's act.</p></div></div>
+  </div>
+  <div class="diagram"><pre class="mermaid">
+sequenceDiagram
+  participant A as ARTIE
+  participant S as garden server
+  A->>S: GET /
+  S-->>A: index, ETag, form garden:build-bed
+  A->>S: POST /actions/build-bed, If-Match: index ETag
+  S-->>A: 201, Location /beds/5, the new bed with garden:sow-seed
+  A->>S: POST /beds/5/actions/sow-seed, If-Match: "seq-0.hsf.L0"
+  S-->>A: bed 5 planted, with garden:water-cell
+  </pre></div>
+  <div class="verdict"><span class="pill ok">✓ fixed</span><p>A new resource comes from an act the bookmark offers, described where it's found, and its answer is the next hypertext.</p></div>
+</section>
+
+<h2 id="p2-findings">What Roy Bott noticed this time</h2>
+<p>None of these changes a verdict. They're listed for the review. Nothing has been fixed.</p>
+<ul class="findings">
+  <li><b>A built bed has a past from before it was built.</b><span><code>GET /beds/5?asOf=2026-01-01T00:00:00Z</code> answers 200 with an empty bed named "Herbs", although bed 5 was built at 11:15 on 12 October. Building a bed writes a row, not an event, so the event history has nothing to say it didn't exist yet. A 404 is the honest answer for a time before the bed existed.</span></li>
+  <li><b>Buster never touches CoAP.</b><span>Buster is an HTTP filter. All 125 of today's mutations were on HTTP, and no CoAP scenario appears in its matrix. The CoAP binding is tested by the client suite against a scripted server and by the live scenarios, but no adversary has attacked it.</span></li>
+  <li><b>The rule-refused detail repeats its title.</b><span>The <code>detail</code> reads "a rule of the resource refuses the act: The bed would be waterlogged…", which repeats the <code>title</code>. The 409 and 428 details no longer do this.</span></li>
+  <li><b>Dry soil after harvest is a modelling choice.</b><span>It was made to keep the new rule from leaving a bed unable to grow, and it reverses the 11 October decision. Crop rotation is parked as the better rule.</span></li>
+  <li><b>A stale script.</b><span><code>server-spring/script.sh</code> still writes to the event tables that migration V2 replaced, so it fails if run.</span></li>
+</ul>
+
+<footer>
+  <p><strong>Evidence for Part 2.</strong> Run on 12 October 2026 against <code>~/repos/artie</code> at <code>a7831ce</code>. The garden server ran locally on HTTP 8080 and CoAP 5683, with Postgres reset to its seed data before the wire excerpts. Excerpts are trimmed with "…" but otherwise as received. Garden suite: 17 scenarios passed. HEART TCK against the garden: 18 of 18 passed, none skipped. ARTIE live suite: 26 scenarios passed, with the real-model scenario skipped. Buster campaign at that commit: 22 rounds, 125 planned mutations, all made, 74 pass, 51 pass (attested), 0 FAIL, no holes.</p>
+  <p>Roy Bott is still fictional, and Fielding has still not seen this work.</p>
+</footer>
+</div>
+
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "neutral" });
+mermaid.run({ querySelector: "pre.mermaid:not([data-processed])" });
+</script>

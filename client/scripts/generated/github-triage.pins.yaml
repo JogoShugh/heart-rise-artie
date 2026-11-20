@@ -1,0 +1,82 @@
+# What generated/github-triage.kts was recorded against, from generated/github-triage.trace.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed; --guard strict
+# also refuses one offered in a set not recorded for it.
+rung: L2
+forms:
+  github:repos-get:
+    integrity: sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+    method: GET
+    sets: []
+  github:open-issue:
+    integrity: sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI=
+    method: POST
+    sets:
+      - sha256-t8352b0vFug59dPyOrG80DIEf+lWTm4RO0sUfhLHR+Y=
+  github:label:
+    integrity: sha256-8R+R85FzQjiJVpZak/M1sl6QjftjUVxwEERrkW5FzPc=
+    method: POST
+    sets:
+      - sha256-e4WqIpsdR41ubEY4SSx18ueTbsZXnin0GaU2OSy4kPE=
+  github:assign:
+    integrity: sha256-VscVtuEo5Tk2ZKoux1zt3PeDF2khsJ/DkO2uKd3V7GQ=
+    method: POST
+    sets:
+      - sha256-e4WqIpsdR41ubEY4SSx18ueTbsZXnin0GaU2OSy4kPE=
+  github:branch-from-here:
+    integrity: sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+    method: POST
+    sets:
+      - sha256-CrE1GC69qIrIcfOYj1LItvRJl2l6+ahefGhs1QAd11E=
+  github:commit-file:
+    integrity: sha256-VU+w5uVUgaj2J43DM9jlUCmIZ1jNGPlRKajRrAlQN9Y=
+    method: PUT
+    sets:
+      - sha256-CrE1GC69qIrIcfOYj1LItvRJl2l6+ahefGhs1QAd11E=
+  github:open-pull-request:
+    integrity: sha256-PE4HJf8D9pKBuS8GjywYA5kUlxGDtzJU9LtqfoDdBMI=
+    method: POST
+    sets:
+      - sha256-CrE1GC69qIrIcfOYj1LItvRJl2l6+ahefGhs1QAd11E=
+  github:edit:
+    integrity: sha256-PPOR0s5dm5evRf0IV5+78ZnwNxK8GtbKkmEJJlgFdB0=
+    method: PATCH
+    sets:
+      - sha256-h6MMpfeYJTsEkF5VbKXG0d1L+dUe526SPYy/c/4JI00=
+  github:merge:
+    integrity: sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk=
+    method: PUT
+    sets:
+      - sha256-SEkUvDDm26VvDpv2jdsfdBUxa7xoVdTvgNvxRB5DC8Q=
+  github:issues-get:
+    integrity: sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+    method: GET
+    sets: []
+  github:add-sub-issue:
+    integrity: sha256-CP30wrvSlg+x9cHdEAsLY7mNqe2ooV3jA3MIzZYKhP0=
+    method: POST
+    sets:
+      - sha256-ofqOEjf+BDhfudqRP1SnJgHpZUleKf6YeibKODntxz0=
+  github:comment:
+    integrity: sha256-rEchf4MSX+3aH4c5JE6jPFuMsn5M7PMYR4os6ETeizk=
+    method: POST
+    sets:
+      - sha256-ofqOEjf+BDhfudqRP1SnJgHpZUleKf6YeibKODntxz0=
+      - sha256-e4WqIpsdR41ubEY4SSx18ueTbsZXnin0GaU2OSy4kPE=
+  github:lock:
+    integrity: sha256-0Qx8Y7uXinYvK/l+ZHWQZXllV0ZEbKtebqCkP3RRTUk=
+    method: PUT
+    sets:
+      - sha256-ofqOEjf+BDhfudqRP1SnJgHpZUleKf6YeibKODntxz0=
+  github:close:
+    integrity: sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+    method: PATCH
+    sets:
+      - sha256-e4WqIpsdR41ubEY4SSx18ueTbsZXnin0GaU2OSy4kPE=
+  github:close-duplicate:
+    integrity: sha256-8xYNSPPYgL5MSeRaWzu7n/xQ4HcNumYS0qQV34gRiQI=
+    method: PATCH
+    sets:
+      - sha256-e4WqIpsdR41ubEY4SSx18ueTbsZXnin0GaU2OSy4kPE=
+links:
+  github:repos-list-branches: ''
+  item: ''

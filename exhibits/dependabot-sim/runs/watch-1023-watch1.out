@@ -1,0 +1,14 @@
+1 enter https://localhost:8392/: done
+2 act github:repos-get, owner JogoShugh, repo heart-github-test: done
+3 act github:open-issue, title Auto-merge watch (1023-watch1), body Pull requests labelled `dependabot` are merged once they can be; `hold` keeps one back. Close this issue to stop the watch.: new resource
+4 return to https://localhost:8392/repos/JogoShugh/heart-github-test: done
+5 return to https://localhost:8392/: done
+6 act github:pulls-list, owner JogoShugh, repo heart-github-test, state open, sort updated, direction desc: done
+7 follow item, titled Bump left-pad from 1.0.0 to 1.0.1 (1023-120459): done
+8 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&sort=updated&direction=desc: done
+9 follow item, titled Refuse a bed with no name (1023-075716): done
+10 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&sort=updated&direction=desc: done
+11 follow item, titled Refuse a bed with no name (1023-075557): done
+12 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&sort=updated&direction=desc: done
+13 follow item, titled Refuse a bed with no name (1022-172405): done
+the script failed: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&sort=updated&direction=desc could not be read: the binding answered 500

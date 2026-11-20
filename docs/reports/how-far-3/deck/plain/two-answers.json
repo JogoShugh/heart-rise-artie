@@ -1,0 +1,12 @@
+{
+  "name": "two-answers",
+  "title": "Same Question, Two Answers",
+  "part": "The problem",
+  "kicker": "The problem, in one sentence",
+  "tone": "light",
+  "number": 2,
+  "of": 30,
+  "html": "<h2>Same Question, Two Answers</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch\">\n  <div class=\"panel\">\n    <span class=\"label\">Fine to vary</span>\n    <p class=\"lead\" style=\"margin: .3rem 0\">Suggest a name for this variable.</p>\n    <p>Two different answers? No harm done.</p>\n  </div>\n  <div class=\"panel\" style=\"border-color: var(--bad)\">\n    <span class=\"label\" style=\"color: var(--bad)\">Not fine to vary</span>\n    <p class=\"lead\" style=\"margin: .3rem 0\">Renew a library book. Merge a pull request. Promote a build.</p>\n    <p>Two different answers is a defect, or worse.</p>\n  </div>\n</div>\n<p class=\"punch\">The right thing, the same way, every time, and the right thing when something goes wrong.</p>\n<p class=\"refs\"><deck-ref name=\"right-behavior\"></deck-ref> <deck-ref name=\"repeatability\"></deck-ref> <deck-ref name=\"resilience\"></deck-ref></p>\n",
+  "say": "Here's the problem in one sentence. Ask an AI agent to do the same job twice, and you can get two different answers. Sometimes that's fine. If the job is to suggest a name for a variable, I don't care. But if the job is to renew a library book, merge a pull request, or promote a build to an environment other people use, I care a great deal. I need it to do the right thing, the same way, every time, and to do the right thing when something goes wrong. And I needed that twice over, because of how I work. Let me explain.",
+  "sources": []
+}

@@ -1,0 +1,27 @@
+name: replay
+part: "Zero-token replay"
+tone: dark
+title: "Replay: Every Pull Request, No Model"
+kicker: One script, five releases
+say: "Now the desk runs the kept script for each pull request. Only the inputs change. Open it, wait until it offers merge, merge it, have Jenkins build it, smoke-test the preview. If every scenario passes, promote to Dev. If not, comment on the pull request and say which failed. Five pull requests: four pass and go to Dev. The fifth, Renewals: none during the audit, breaks the renewal scenario, and gets the comment instead. That's the release catching a bad change before it reaches anyone, with zero tokens. And before every act, the guard: is the form still what was pinned?"
+sources:
+  - ["variants.sh", "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/variants.sh"]
+html: |
+  <h2>Replay: Every Pull Request, No Model</h2>
+  <div class="rflow">
+    <div>Open pull request <i>N</i></div><span aria-hidden="true">➜</span>
+    <div class="wait">◷ Watcher: once it offers <code>scm:merge</code></div><span aria-hidden="true">➜</span>
+    <div>Merge, by squashing</div><span aria-hidden="true">➜</span>
+    <div class="wait">◷ Jenkins: build, deploy a preview</div><span aria-hidden="true">➜</span>
+    <div>Smoke script, on the preview</div>
+  </div>
+  <div class="rsplit">
+    <div class="r-yes"><b>All scenarios pass</b><span>Promote the commit to Dev</span><em>501, 502, 503, 505</em></div>
+    <div class="r-no"><b>A scenario fails</b><span>Comment on the pull request: “Not promoted to Dev: smoke scenarios … failed.”</span><em>504 · “Renewals: none during the audit”</em></div>
+  </div>
+  <p class="guardline"><b>Before every act:</b> is the form on offer still the one pinned? If not, stop, and send nothing.</p>
+  <div class="stats">
+    <div class="stat"><b>0</b><span>model calls, per release</span></div>
+    <div class="stat"><b>4 of 5</b><span>promoted to Dev</span></div>
+    <div class="stat"><b>18–22 s</b><span>per release, 56 to 61 steps</span></div>
+  </div>

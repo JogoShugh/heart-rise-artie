@@ -1,0 +1,18 @@
+name: the-desk
+part: "The release, in the order it runs"
+title: "A Person Asks the Release Desk"
+kicker: Step 1 · desk:release
+say: "A release starts with a person, at the release desk. The desk is a small service, and it speaks HEART, the same as the library: here it is in a browser, as plain HTML, because a HEART service can answer a person too. Its one act: release a pull request. Fill in which one, and send. The desk hands the job to ARTIE, running the kept release script. From here on, ARTIE drives, and every step it takes is something the last answer offered. First stop: the forge, to open the pull request."
+sources:
+  - ["The kept release script (release.heart.yaml)", "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/merge-watch-release/release.heart.yaml"]
+html: |
+  <h2>A Person Asks the Release Desk</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 7fr) minmax(0, 5fr)">
+    <figure><img src="media/desk.png" alt="The release desk's text/html representation, offering Release a pull request"><figcaption>The release desk, as HTML for a person: “Release a pull request” is its act.</figcaption></figure>
+    <div class="rows">
+      <div><h3>One Act</h3><p><code>desk:release</code>: which pull request.</p></div>
+      <div><h3>It Speaks HEART</h3><p>The same media type as the library, and as HTML for a person.</p></div>
+      <div><h3>ARTIE Takes Over</h3><p>The desk starts ARTIE on the kept release script.</p></div>
+      <p class="refs"><deck-ref name="heart"></deck-ref> <deck-ref name="artie"></deck-ref></p>
+    </div>
+  </div>

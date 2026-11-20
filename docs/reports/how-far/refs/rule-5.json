@@ -1,0 +1,22 @@
+{
+  "name": "rule-5",
+  "kind": "rule",
+  "label": "Rule 5 · No typed resources",
+  "title": "No resource types the client depends on",
+  "summary": "In brief: the client knows media types and relation names, nothing about what kind of thing is behind them.",
+  "quote": "<p>“A REST API should never have “typed” resources that are significant to the client. Specification authors may use resource types for describing server implementation behind the interface, but those types must be irrelevant and invisible to the client. The only types that are significant to a client are the current representation’s media type and standardized relation names. [ditto]”</p>",
+  "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+  "date": "20 October 2008",
+  "_links": {
+    "describedby": {
+      "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+      "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+    },
+    "self": {
+      "href": "rule-5.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

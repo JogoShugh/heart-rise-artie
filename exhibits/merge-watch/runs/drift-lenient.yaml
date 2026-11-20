@@ -1,0 +1,6975 @@
+---
+run:
+  inputs:
+    owner:
+      value: JogoShugh
+      given: given
+      question: Whose repository?
+    repo:
+      value: heart-github-test
+      given: default
+      default: heart-github-test
+      question: Which repository?
+    label:
+      value: dependencies
+      given: default
+      default: dependencies
+      question: Which label marks a dependency bump?
+    hold:
+      value: hold
+      given: default
+      default: hold
+      question: Which label means a person objects?
+  usage:
+    calls: 0
+    input: 0
+    output: 0
+    cache_read: 0
+    cache_write: 0
+---
+at: '2026-10-27T22:33:39.755487Z'
+ms: 105
+mode: script
+say: enter {entry}
+line: 11
+params:
+  entry: https://localhost:8392/
+opens: true
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-27T22:33:39.865340Z'
+ms: 504
+mode: script
+say: act {relation}, owner {owner}, repo {repo}
+intent: get repository JogoShugh/heart-github-test
+line: 12
+within: 11
+params:
+  relation: github:repos-get
+  owner: JogoShugh
+  repo: heart-github-test
+values:
+  owner:
+    value: JogoShugh
+    type: string
+    from:
+      - input: owner
+  repo:
+    value: heart-github-test
+    type: string
+    from:
+      - input: repo
+opens: true
+chose:
+  kind: form
+  relation: github:repos-get
+  title: Get a repository
+  method: GET
+  target: /repos/{owner}/{repo}
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test
+now:
+  state:
+    id: 1422841381
+    node_id: R_kgDOVM7WJQ
+    name: heart-github-test
+    full_name: JogoShugh/heart-github-test
+    private: false
+    description: null
+    fork: false
+    created_at: '2026-10-17T01:37:34Z'
+    updated_at: '2026-10-23T11:55:40Z'
+    pushed_at: '2026-10-27T22:33:02Z'
+    homepage: null
+    size: 264
+    stargazers_count: 0
+    watchers_count: 0
+    language: null
+    has_issues: true
+    has_projects: true
+    has_downloads: false
+    has_wiki: true
+    has_pages: false
+    has_discussions: false
+    forks_count: 0
+    mirror_url: null
+    archived: false
+    disabled: false
+    open_issues_count: 169
+    license: null
+    allow_forking: true
+    is_template: false
+    web_commit_signoff_required: false
+    has_pull_requests: true
+    pull_request_creation_policy: all
+    topics: []
+    visibility: public
+    forks: 0
+    open_issues: 169
+    watchers: 0
+    default_branch: main
+    permissions:
+      admin: true
+      maintain: true
+      push: true
+      triage: true
+      pull: true
+    allow_squash_merge: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_auto_merge: true
+    delete_branch_on_merge: false
+    allow_update_branch: false
+    use_squash_pr_title_as_default: false
+    squash_merge_commit_message: COMMIT_MESSAGES
+    squash_merge_commit_title: COMMIT_OR_PR_TITLE
+    merge_commit_message: PR_TITLE
+    merge_commit_title: MERGE_MESSAGE
+    security_and_analysis:
+      secret_scanning:
+        status: enabled
+      secret_scanning_push_protection:
+        status: enabled
+      dependabot_security_updates:
+        status: disabled
+      secret_scanning_non_provider_patterns:
+        status: disabled
+      secret_scanning_validity_checks:
+        status: disabled
+    network_count: 0
+    subscribers_count: 0
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+  forms:
+    - github:open-issue
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:repos-list-branches:
+      - null
+    alternate:
+      - null
+    github:forks:
+      - null
+    github:keys:
+      - null
+    github:collaborators:
+      - null
+    github:teams:
+      - null
+    github:hooks:
+      - null
+    github:issue-events:
+      - null
+    github:events:
+      - null
+    github:assignees:
+      - null
+    github:branches:
+      - null
+    github:tags:
+      - null
+    github:blobs:
+      - null
+    github:git-tags:
+      - null
+    github:git-refs:
+      - null
+    github:trees:
+      - null
+    github:statuses:
+      - null
+    github:languages:
+      - null
+    github:stargazers:
+      - null
+    github:contributors:
+      - null
+    github:subscribers:
+      - null
+    github:subscription:
+      - null
+    github:commits:
+      - null
+    github:git-commits:
+      - null
+    github:comments:
+      - null
+    github:issue-comment:
+      - null
+    github:contents:
+      - null
+    github:compare:
+      - null
+    github:merges:
+      - null
+    github:archive:
+      - null
+    github:downloads:
+      - null
+    github:issues:
+      - null
+    github:pulls:
+      - null
+    github:milestones:
+      - null
+    github:notifications:
+      - null
+    github:labels:
+      - null
+    github:releases:
+      - null
+    github:deployments:
+      - null
+    github:git:
+      - null
+    github:ssh:
+      - null
+    github:clone:
+      - null
+    github:svn:
+      - null
+  embedded:
+    github:owner:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+keeps:
+  /hr:address/owner:
+    - 7
+  /_embedded/github:owner/0/login:
+    - 7
+  /name:
+    - 7
+  /hr:address/repo:
+    - 7
+---
+at: '2026-10-27T22:33:40.371521Z'
+ms: 1899
+mode: script
+say: act {relation}, title {title}, body {body}
+intent: Open an issue titled "Merge watch" with the body "Close this issue to stop the watch."
+line: 13
+within: 12
+params:
+  relation: github:open-issue
+  title: Merge watch
+  body: Close this issue to stop the watch.
+values:
+  title:
+    value: Merge watch
+    from:
+      - constant
+  body:
+    value: Close this issue to stop the watch.
+    type: string
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: github:open-issue
+  title: Open an issue
+  method: POST
+  target: /repos/{owner}/{repo}/actions/open-issue
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/actions/open-issue
+  picked: relation
+  not sent:
+    - assignees
+    - labels
+    - milestone
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/b7cdf9d9bd2f16e8
+    integrity: sha256-t8352b0vFug59dPyOrG80DIEf+lWTm4RO0sUfhLHR+Y=
+  form: sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI=
+  schema:
+    href: https://localhost:8392/schemas/f7a8db931b33fcf1
+    integrity: sha256-96jbkxsz/PG3PVDvXBkQMk/mpIId+DfmGRMwWHa2zQE=
+  if-match: '"seq-0.hsf.L2.2126562f96893b2e"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:open-issue
+  links:
+    - alternate
+    - github:archive
+    - github:assignees
+    - github:blobs
+    - github:branches
+    - github:clone
+    - github:collaborators
+    - github:comments
+    - github:commits
+    - github:compare
+    - github:contents
+    - github:contributors
+    - github:deployments
+    - github:downloads
+    - github:events
+    - github:forks
+    - github:git
+    - github:git-commits
+    - github:git-refs
+    - github:git-tags
+    - github:hooks
+    - github:issue-comment
+    - github:issue-events
+    - github:issues
+    - github:keys
+    - github:labels
+    - github:languages
+    - github:merges
+    - github:milestones
+    - github:notifications
+    - github:pulls
+    - github:releases
+    - github:repos-list-branches
+    - github:ssh
+    - github:stargazers
+    - github:statuses
+    - github:subscribers
+    - github:subscription
+    - github:svn
+    - github:tags
+    - github:teams
+    - github:trees
+    - hr:forms
+    - self
+outcome: new resource
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/854
+now:
+  state:
+    id: 6068892953
+    node_id: I_kwDOVM7WJc8AAAABabv1GQ
+    number: 854
+    title: Merge watch
+    labels: []
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: '2026-10-27T22:33:41Z'
+    updated_at: '2026-10-27T22:33:41Z'
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: Close this issue to stop the watch.
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '854'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+keeps:
+  /hr:address/owner:
+    - 7
+  /_embedded/author/0/login:
+    - 7
+  /hr:address/repo:
+    - 7
+---
+at: '2026-10-27T22:33:42.274884Z'
+ms: 301
+mode: script
+say: return to {address}
+line: 13
+within: 12
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test
+now:
+  state:
+    id: 1422841381
+    node_id: R_kgDOVM7WJQ
+    name: heart-github-test
+    full_name: JogoShugh/heart-github-test
+    private: false
+    description: null
+    fork: false
+    created_at: '2026-10-17T01:37:34Z'
+    updated_at: '2026-10-23T11:55:40Z'
+    pushed_at: '2026-10-27T22:33:02Z'
+    homepage: null
+    size: 264
+    stargazers_count: 0
+    watchers_count: 0
+    language: null
+    has_issues: true
+    has_projects: true
+    has_downloads: false
+    has_wiki: true
+    has_pages: false
+    has_discussions: false
+    forks_count: 0
+    mirror_url: null
+    archived: false
+    disabled: false
+    open_issues_count: 170
+    license: null
+    allow_forking: true
+    is_template: false
+    web_commit_signoff_required: false
+    has_pull_requests: true
+    pull_request_creation_policy: all
+    topics: []
+    visibility: public
+    forks: 0
+    open_issues: 170
+    watchers: 0
+    default_branch: main
+    permissions:
+      admin: true
+      maintain: true
+      push: true
+      triage: true
+      pull: true
+    allow_squash_merge: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_auto_merge: true
+    delete_branch_on_merge: false
+    allow_update_branch: false
+    use_squash_pr_title_as_default: false
+    squash_merge_commit_message: COMMIT_MESSAGES
+    squash_merge_commit_title: COMMIT_OR_PR_TITLE
+    merge_commit_message: PR_TITLE
+    merge_commit_title: MERGE_MESSAGE
+    security_and_analysis:
+      secret_scanning:
+        status: enabled
+      secret_scanning_push_protection:
+        status: enabled
+      dependabot_security_updates:
+        status: disabled
+      secret_scanning_non_provider_patterns:
+        status: disabled
+      secret_scanning_validity_checks:
+        status: disabled
+    network_count: 0
+    subscribers_count: 0
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+  forms:
+    - github:open-issue
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:repos-list-branches:
+      - null
+    alternate:
+      - null
+    github:forks:
+      - null
+    github:keys:
+      - null
+    github:collaborators:
+      - null
+    github:teams:
+      - null
+    github:hooks:
+      - null
+    github:issue-events:
+      - null
+    github:events:
+      - null
+    github:assignees:
+      - null
+    github:branches:
+      - null
+    github:tags:
+      - null
+    github:blobs:
+      - null
+    github:git-tags:
+      - null
+    github:git-refs:
+      - null
+    github:trees:
+      - null
+    github:statuses:
+      - null
+    github:languages:
+      - null
+    github:stargazers:
+      - null
+    github:contributors:
+      - null
+    github:subscribers:
+      - null
+    github:subscription:
+      - null
+    github:commits:
+      - null
+    github:git-commits:
+      - null
+    github:comments:
+      - null
+    github:issue-comment:
+      - null
+    github:contents:
+      - null
+    github:compare:
+      - null
+    github:merges:
+      - null
+    github:archive:
+      - null
+    github:downloads:
+      - null
+    github:issues:
+      - null
+    github:pulls:
+      - null
+    github:milestones:
+      - null
+    github:notifications:
+      - null
+    github:labels:
+      - null
+    github:releases:
+      - null
+    github:deployments:
+      - null
+    github:git:
+      - null
+    github:ssh:
+      - null
+    github:clone:
+      - null
+    github:svn:
+      - null
+  embedded:
+    github:owner:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-27T22:33:42.577698Z'
+ms: 6
+mode: script
+say: return to {address}
+line: 12
+within: 11
+params:
+  address: https://localhost:8392/
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-27T22:33:42.586574Z'
+ms: 1
+mode: script
+say: return to {address}
+line: 20
+within: 11
+params:
+  address: https://localhost:8392/
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-27T22:33:42.588608Z'
+ms: 353
+mode: script
+say: act {relation}, owner {owner}, repo {repo}, labels {labels}
+line: 21
+within: 20
+params:
+  relation: github:pulls-list
+  owner: JogoShugh
+  repo: heart-github-test
+  labels: dependencies
+values:
+  owner:
+    value: JogoShugh
+    type: string
+    from:
+      - input: owner
+      - step: 2
+        pointer: /hr:address/owner
+      - step: 2
+        pointer: /_embedded/github:owner/0/login
+      - step: 3
+        pointer: /hr:address/owner
+      - step: 3
+        pointer: /_embedded/author/0/login
+  repo:
+    value: heart-github-test
+    type: string
+    from:
+      - input: repo
+      - step: 2
+        pointer: /name
+      - step: 2
+        pointer: /hr:address/repo
+      - step: 3
+        pointer: /hr:address/repo
+  labels:
+    value: dependencies
+    type: string
+    from:
+      - input: label
+opens: true
+chose:
+  kind: form
+  relation: github:pulls-list
+  title: List pull requests
+  method: GET
+  target: /repos/{owner}/{repo}/pulls{?state,sort,direction,labels}
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+  picked: relation
+  not sent:
+    - state
+    - sort
+    - direction
+guard:
+  rung: L0
+  form: sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 17
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 21.0.0 (1027-183300)
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:33:42.952751Z'
+ms: 1109
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 21.0.0 (1027-183300)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 21.0.0 (1027-183300)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 21.0.0 (1027-183300)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/853
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/853
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/853
+now:
+  state:
+    id: 5042110949
+    node_id: PR_kwDOVM7WJc8AAAABLIiB5Q
+    number: 853
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 21.0.0 (1027-183300)
+    body: Bumps left-pad from 1.0.0 to 21.0.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    created_at: '2026-10-27T22:33:03Z'
+    updated_at: '2026-10-27T22:33:04Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: a184666e37e36b95a2268c50bbc010dc9cd9d349
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:deps/left-pad-21.0.0-1027-183300
+      ref: deps/left-pad-21.0.0-1027-183300
+      sha: d6a2b8eebd99f89fe5d6b48c1cb78ba7e38a291a
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: d284ae975f0a084552dc2338888b2278ccd11ce5
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: false
+    mergeable: true
+    rebaseable: true
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '853'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          color: ededed
+          default: false
+          description: null
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          mirror_url: null
+          license: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          mirror_url: null
+          license: null
+          default_branch: main
+---
+at: '2026-10-27T22:33:44.066569Z'
+ms: 5803
+mode: script
+say: act {relation}, merge_method {merge_method}
+line: 28
+within: 25
+params:
+  relation: github:merge
+  merge_method: squash
+values:
+  merge_method:
+    value: squash
+    type: string
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: github:merge
+  title: Merge
+  method: PUT
+  target: /repos/{owner}/{repo}/pulls/{pull_number}/actions/merge
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/853/actions/merge
+  picked: relation
+  not sent:
+    - commit_message
+    - commit_title
+guard:
+  rung: L2
+  set:
+    href: https://localhost:8392/affordance-sets/11ac04861a9ed71a
+    integrity: sha256-EawEhhqe1xqklC3RiwND4hdXzIf6BV2eHVy95ktgot0=
+  form: sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk=
+  schema:
+    href: https://localhost:8392/schemas/0f68e71ca6a8837d
+    integrity: sha256-D2jnHKaog30eN9l15vAwZrWapDF8CrLyMG7Tzd7mK7c=
+  if-match: '"seq-0.hsf.L2.d40d76d77a5b9a95"'
+  checked: lenient
+  warning: 'the set holding github:merge changed: pinned sha256-tB6evjRCMG+5AEO3aa+kdDiMRyv3wmGN9LfZkHAT888=, offered sha256-EawEhhqe1xqklC3RiwND4hdXzIf6BV2eHVy95ktgot0='
+  held: form
+offered:
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    - alternate
+    - github:commits
+    - github:diff
+    - github:issues-get
+    - github:issues-list-comments
+    - github:patch
+    - github:review-comment
+    - github:review-comments
+    - github:statuses
+    - hr:forms
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/853
+now:
+  state:
+    id: 5042110949
+    node_id: PR_kwDOVM7WJc8AAAABLIiB5Q
+    number: 853
+    state: closed
+    locked: false
+    title: Bump left-pad from 1.0.0 to 21.0.0 (1027-183300)
+    body: Bumps left-pad from 1.0.0 to 21.0.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    created_at: '2026-10-27T22:33:03Z'
+    updated_at: '2026-10-27T22:33:48Z'
+    closed_at: '2026-10-27T22:33:48Z'
+    merged_at: '2026-10-27T22:33:47Z'
+    merge_commit_sha: f8c000094ed569425826f1bc1072ff9f463615fc
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:deps/left-pad-21.0.0-1027-183300
+      ref: deps/left-pad-21.0.0-1027-183300
+      sha: d6a2b8eebd99f89fe5d6b48c1cb78ba7e38a291a
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: d284ae975f0a084552dc2338888b2278ccd11ce5
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: true
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '853'
+  forms:
+    - github:comment
+    - github:edit
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:merged-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          color: ededed
+          default: false
+          description: null
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          mirror_url: null
+          license: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          mirror_url: null
+          license: null
+          default_branch: main
+---
+at: '2026-10-27T22:33:49.872160Z'
+ms: 803
+mode: script
+say: return to {address}
+line: 28
+within: 25
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/853
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/853
+now:
+  state:
+    id: 5042110949
+    node_id: PR_kwDOVM7WJc8AAAABLIiB5Q
+    number: 853
+    state: closed
+    locked: false
+    title: Bump left-pad from 1.0.0 to 21.0.0 (1027-183300)
+    body: Bumps left-pad from 1.0.0 to 21.0.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    created_at: '2026-10-27T22:33:03Z'
+    updated_at: '2026-10-27T22:33:48Z'
+    closed_at: '2026-10-27T22:33:48Z'
+    merged_at: '2026-10-27T22:33:47Z'
+    merge_commit_sha: f8c000094ed569425826f1bc1072ff9f463615fc
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:deps/left-pad-21.0.0-1027-183300
+      ref: deps/left-pad-21.0.0-1027-183300
+      sha: d6a2b8eebd99f89fe5d6b48c1cb78ba7e38a291a
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: d284ae975f0a084552dc2338888b2278ccd11ce5
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: true
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '853'
+  forms:
+    - github:comment
+    - github:edit
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:merged-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          color: ededed
+          default: false
+          description: null
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          mirror_url: null
+          license: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          mirror_url: null
+          license: null
+          default_branch: main
+---
+at: '2026-10-27T22:33:50.675939Z'
+ms: 771
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/853
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/853
+now:
+  state:
+    id: 5042110949
+    node_id: PR_kwDOVM7WJc8AAAABLIiB5Q
+    number: 853
+    state: closed
+    locked: false
+    title: Bump left-pad from 1.0.0 to 21.0.0 (1027-183300)
+    body: Bumps left-pad from 1.0.0 to 21.0.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    created_at: '2026-10-27T22:33:03Z'
+    updated_at: '2026-10-27T22:33:48Z'
+    closed_at: '2026-10-27T22:33:48Z'
+    merged_at: '2026-10-27T22:33:47Z'
+    merge_commit_sha: f8c000094ed569425826f1bc1072ff9f463615fc
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:deps/left-pad-21.0.0-1027-183300
+      ref: deps/left-pad-21.0.0-1027-183300
+      sha: d6a2b8eebd99f89fe5d6b48c1cb78ba7e38a291a
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: d284ae975f0a084552dc2338888b2278ccd11ce5
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: true
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '853'
+  forms:
+    - github:comment
+    - github:edit
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:merged-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          color: ededed
+          default: false
+          description: null
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          mirror_url: null
+          license: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          mirror_url: null
+          license: null
+          default_branch: main
+---
+at: '2026-10-27T22:33:51.447809Z'
+ms: 2214
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:33:53.662679Z'
+ms: 1050
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/851
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/851
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/851
+now:
+  state:
+    id: 5042047094
+    node_id: PR_kwDOVM7WJc8AAAABLIeIdg
+    number: 851
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+    body: Bumps left-pad from 1.0.0 to 20.0.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T22:26:31Z'
+    updated_at: '2026-10-27T22:26:32Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: acbeb6ae4564e02f7b3aafdb3032158dc2f558a7
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-20.0.0-1027-182628
+      ref: deps/left-pad-20.0.0-1027-182628
+      sha: 23c2670c531173bcf1af6369a1ec61f7ee52639a
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: d284ae975f0a084552dc2338888b2278ccd11ce5
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '851'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:33:54.714718Z'
+ms: 868
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/851
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/851
+now:
+  state:
+    id: 5042047094
+    node_id: PR_kwDOVM7WJc8AAAABLIeIdg
+    number: 851
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+    body: Bumps left-pad from 1.0.0 to 20.0.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T22:26:31Z'
+    updated_at: '2026-10-27T22:26:32Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: acbeb6ae4564e02f7b3aafdb3032158dc2f558a7
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-20.0.0-1027-182628
+      ref: deps/left-pad-20.0.0-1027-182628
+      sha: 23c2670c531173bcf1af6369a1ec61f7ee52639a
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: d284ae975f0a084552dc2338888b2278ccd11ce5
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '851'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:33:55.583360Z'
+ms: 325
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:33:55.909516Z'
+ms: 966
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/849
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/849
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/849
+now:
+  state:
+    id: 5041737704
+    node_id: PR_kwDOVM7WJc8AAAABLILP6A
+    number: 849
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+    body: Bumps left-pad from 1.0.0 to 15.1.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T21:57:54Z'
+    updated_at: '2026-10-27T22:30:49Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: b1356af8545324e42e005f4be5353e33afb2f4c4
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-15.1.0-1027-175750
+      ref: deps/left-pad-15.1.0-1027-175750
+      sha: 3bb130fc36e4bcaf509e75558653bc8c57f86ffa
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 5697ff3fe3f419b3becaaa2467dbc3a67098cc61
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 2
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 1
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '849'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:33:56.877639Z'
+ms: 848
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/849
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/849
+now:
+  state:
+    id: 5041737704
+    node_id: PR_kwDOVM7WJc8AAAABLILP6A
+    number: 849
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+    body: Bumps left-pad from 1.0.0 to 15.1.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T21:57:54Z'
+    updated_at: '2026-10-27T22:30:49Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: b1356af8545324e42e005f4be5353e33afb2f4c4
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-15.1.0-1027-175750
+      ref: deps/left-pad-15.1.0-1027-175750
+      sha: 3bb130fc36e4bcaf509e75558653bc8c57f86ffa
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 5697ff3fe3f419b3becaaa2467dbc3a67098cc61
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 2
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 1
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '849'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:33:57.727841Z'
+ms: 308
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:33:58.036976Z'
+ms: 1019
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/846
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/846
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/846
+now:
+  state:
+    id: 5041663696
+    node_id: PR_kwDOVM7WJc8AAAABLIGu0A
+    number: 846
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+    body: Bumps left-pad from 1.0.0 to 14.1.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T21:51:16Z'
+    updated_at: '2026-10-27T22:30:59Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 206874ccdca1c2f10482235fdf0a5b7aa17ce101
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-14.1.0-1027-175113
+      ref: deps/left-pad-14.1.0-1027-175113
+      sha: f499c9a27e9ce4197fbf1bda43530b68c108c055
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 627f46d6752e3b37fada46fed419c981cc9a6f68
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 3
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 1
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '846'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:33:59.059397Z'
+ms: 891
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/846
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/846
+now:
+  state:
+    id: 5041663696
+    node_id: PR_kwDOVM7WJc8AAAABLIGu0A
+    number: 846
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+    body: Bumps left-pad from 1.0.0 to 14.1.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T21:51:16Z'
+    updated_at: '2026-10-27T22:30:59Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 206874ccdca1c2f10482235fdf0a5b7aa17ce101
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-14.1.0-1027-175113
+      ref: deps/left-pad-14.1.0-1027-175113
+      sha: f499c9a27e9ce4197fbf1bda43530b68c108c055
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 627f46d6752e3b37fada46fed419c981cc9a6f68
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 3
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 1
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '846'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:33:59.951367Z'
+ms: 662
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:00.614635Z'
+ms: 1007
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/843
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/843
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/843
+now:
+  state:
+    id: 5041590468
+    node_id: PR_kwDOVM7WJc8AAAABLICQxA
+    number: 843
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+    body: Bumps left-pad from 1.0.0 to 13.1.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T21:44:40Z'
+    updated_at: '2026-10-27T22:31:10Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 2e22190a9be4f1ce84aad774713ed7d13a6dc3ca
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-13.1.0-1027-174436
+      ref: deps/left-pad-13.1.0-1027-174436
+      sha: 09623a32c6c0e01085e7fa80d9df88dc34dd9a7a
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 8c390bc88e4962741f4473565ae59917d368c2dc
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 4
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 1
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '843'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:01.624192Z'
+ms: 957
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/843
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/843
+now:
+  state:
+    id: 5041590468
+    node_id: PR_kwDOVM7WJc8AAAABLICQxA
+    number: 843
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+    body: Bumps left-pad from 1.0.0 to 13.1.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T21:44:40Z'
+    updated_at: '2026-10-27T22:31:10Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 2e22190a9be4f1ce84aad774713ed7d13a6dc3ca
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-13.1.0-1027-174436
+      ref: deps/left-pad-13.1.0-1027-174436
+      sha: 09623a32c6c0e01085e7fa80d9df88dc34dd9a7a
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 8c390bc88e4962741f4473565ae59917d368c2dc
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 4
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 1
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '843'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:02.583710Z'
+ms: 398
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:02.982292Z'
+ms: 901
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/841
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/841
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/841
+now:
+  state:
+    id: 5041449051
+    node_id: PR_kwDOVM7WJc8AAAABLH5oWw
+    number: 841
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+    body: Bumps left-pad from 1.0.0 to 12.1.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T21:32:41Z'
+    updated_at: '2026-10-27T22:31:21Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: c9e8b97b175a0f684175c5c814fa57a1e2807b8c
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-12.1.0-1027-173239
+      ref: deps/left-pad-12.1.0-1027-173239
+      sha: 29990b348dec7753e5f015618d40856544971bdb
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 5edbddb3a48c7b7ad2183ad1e44c7bd31ff8f8a8
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 4
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 1
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '841'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:03.886332Z'
+ms: 877
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/841
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/841
+now:
+  state:
+    id: 5041449051
+    node_id: PR_kwDOVM7WJc8AAAABLH5oWw
+    number: 841
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+    body: Bumps left-pad from 1.0.0 to 12.1.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T21:32:41Z'
+    updated_at: '2026-10-27T22:31:21Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: c9e8b97b175a0f684175c5c814fa57a1e2807b8c
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-12.1.0-1027-173239
+      ref: deps/left-pad-12.1.0-1027-173239
+      sha: 29990b348dec7753e5f015618d40856544971bdb
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 5edbddb3a48c7b7ad2183ad1e44c7bd31ff8f8a8
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: true
+    mergeable_state: clean
+    merged_by: null
+    comments: 4
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 1
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '841'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:04.764275Z'
+ms: 262
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:05.027004Z'
+ms: 830
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/838
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/838
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/838
+now:
+  state:
+    id: 5041307789
+    node_id: PR_kwDOVM7WJc8AAAABLHxAjQ
+    number: 838
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+    body: Bumps left-pad from 1.0.0 to 11.1.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T21:20:59Z'
+    updated_at: '2026-10-27T22:31:35Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 40cb8df235f97a527dbf4efe4d19a398ffb91d9d
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-11.1.0-1027-172055
+      ref: deps/left-pad-11.1.0-1027-172055
+      sha: 6344e8d5ff596bb5b0a8874e5c453625ac78ca84
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 824a5a5e94186888c15ff5b17d9811d9ac9ca3f1
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 4
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 1
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '838'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:05.861059Z'
+ms: 888
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/838
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/838
+now:
+  state:
+    id: 5041307789
+    node_id: PR_kwDOVM7WJc8AAAABLHxAjQ
+    number: 838
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+    body: Bumps left-pad from 1.0.0 to 11.1.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T21:20:59Z'
+    updated_at: '2026-10-27T22:31:35Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 40cb8df235f97a527dbf4efe4d19a398ffb91d9d
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-11.1.0-1027-172055
+      ref: deps/left-pad-11.1.0-1027-172055
+      sha: 6344e8d5ff596bb5b0a8874e5c453625ac78ca84
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 824a5a5e94186888c15ff5b17d9811d9ac9ca3f1
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 4
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 1
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '838'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:06.754012Z'
+ms: 276
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:07.031319Z'
+ms: 952
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/835
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/835
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/835
+now:
+  state:
+    id: 5040995441
+    node_id: PR_kwDOVM7WJc8AAAABLHd8cQ
+    number: 835
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+    body: Bumps left-pad from 1.0.0 to 10.1.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T20:56:58Z'
+    updated_at: '2026-10-27T22:31:45Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 1c0ebc3073ca600ca17fe8581026ba4aacdacd05
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-10.1.0-1027-165654
+      ref: deps/left-pad-10.1.0-1027-165654
+      sha: dd5fe1c95126fa3e4faff20068d6aeaff7d106eb
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: c433f5e4a4d5707d52c0d4d573adbae032f50281
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 6
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 1
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '835'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:07.985405Z'
+ms: 819
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/835
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/835
+now:
+  state:
+    id: 5040995441
+    node_id: PR_kwDOVM7WJc8AAAABLHd8cQ
+    number: 835
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+    body: Bumps left-pad from 1.0.0 to 10.1.0. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-27T20:56:58Z'
+    updated_at: '2026-10-27T22:31:45Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 1c0ebc3073ca600ca17fe8581026ba4aacdacd05
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-10.1.0-1027-165654
+      ref: deps/left-pad-10.1.0-1027-165654
+      sha: dd5fe1c95126fa3e4faff20068d6aeaff7d106eb
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: c433f5e4a4d5707d52c0d4d573adbae032f50281
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 6
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 1
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '835'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:08.805601Z'
+ms: 325
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:09.131027Z'
+ms: 948
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/823
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/823
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/823
+now:
+  state:
+    id: 5016646686
+    node_id: PR_kwDOVM7WJc8AAAABKwP0Hg
+    number: 823
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+    body: Bumps left-pad from 1.0.0 to 5.0.2. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T11:28:08Z'
+    updated_at: '2026-10-27T22:31:56Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 280aac2003aa0aac92ea28b660b48e7bb956ac62
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-5.0.2-1026-072805
+      ref: deps/left-pad-5.0.2-1026-072805
+      sha: 59b9081826bbd63adfe1918bb7d4ecb445ad8fa0
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 1565976ddc491413432dfc1eedb2571a2cb4c953
+    author_association: OWNER
+    auto_merge: null
+    draft: true
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 10
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '823'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:10.080908Z'
+ms: 816
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/823
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/823
+now:
+  state:
+    id: 5016646686
+    node_id: PR_kwDOVM7WJc8AAAABKwP0Hg
+    number: 823
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+    body: Bumps left-pad from 1.0.0 to 5.0.2. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T11:28:08Z'
+    updated_at: '2026-10-27T22:31:56Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 280aac2003aa0aac92ea28b660b48e7bb956ac62
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-5.0.2-1026-072805
+      ref: deps/left-pad-5.0.2-1026-072805
+      sha: 59b9081826bbd63adfe1918bb7d4ecb445ad8fa0
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 1565976ddc491413432dfc1eedb2571a2cb4c953
+    author_association: OWNER
+    auto_merge: null
+    draft: true
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 10
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '823'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:10.897695Z'
+ms: 308
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:11.206431Z'
+ms: 1018
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/822
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/822
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/822
+now:
+  state:
+    id: 5016632759
+    node_id: PR_kwDOVM7WJc8AAAABKwO9tw
+    number: 822
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+    body: Bumps left-pad from 1.0.0 to 5.0.1. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T11:27:00Z'
+    updated_at: '2026-10-26T11:27:01Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 5e277481678cbe20923aef9e969f212603fd5af5
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-5.0.1-1026-072656
+      ref: deps/left-pad-5.0.1-1026-072656
+      sha: d8965ed0875e456d0190aaa7055da0dd4d4a1437
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 1565976ddc491413432dfc1eedb2571a2cb4c953
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '822'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12809872792
+          node_id: LA_kwDOVM7WJc8AAAAC-4clmA
+          name: hold
+          description: null
+          color: b60205
+          default: false
+          archived_at: null
+          archived_by: null
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:12.226941Z'
+ms: 339
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:12.566429Z'
+ms: 969
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/817
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/817
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/817
+now:
+  state:
+    id: 5012358377
+    node_id: PR_kwDOVM7WJc8AAAABKsKE6Q
+    number: 817
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+    body: Bumps left-pad from 1.0.0 to 3.0.9. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T05:06:39Z'
+    updated_at: '2026-10-27T22:32:06Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 06506bc4913fc80b639496c02cade093ec35d976
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-3.0.9-1026-010636
+      ref: deps/left-pad-3.0.9-1026-010636
+      sha: 8d94e2045d2d7e7131ed0b50a1b998e5617d4aed
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 6ab62d7faa4ab6b28dd3f2bb76ee53b0a332c16f
+    author_association: OWNER
+    auto_merge: null
+    draft: true
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 11
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '817'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:13.539289Z'
+ms: 1023
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/817
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/817
+now:
+  state:
+    id: 5012358377
+    node_id: PR_kwDOVM7WJc8AAAABKsKE6Q
+    number: 817
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+    body: Bumps left-pad from 1.0.0 to 3.0.9. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T05:06:39Z'
+    updated_at: '2026-10-27T22:32:06Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 06506bc4913fc80b639496c02cade093ec35d976
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-3.0.9-1026-010636
+      ref: deps/left-pad-3.0.9-1026-010636
+      sha: 8d94e2045d2d7e7131ed0b50a1b998e5617d4aed
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 6ab62d7faa4ab6b28dd3f2bb76ee53b0a332c16f
+    author_association: OWNER
+    auto_merge: null
+    draft: true
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 11
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '817'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:14.563580Z'
+ms: 313
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:14.877133Z'
+ms: 1011
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/813
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/813
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/813
+now:
+  state:
+    id: 5012164468
+    node_id: PR_kwDOVM7WJc8AAAABKr-PdA
+    number: 813
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+    body: Bumps left-pad from 1.0.0 to 3.0.5. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T04:41:09Z'
+    updated_at: '2026-10-27T22:32:15Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: null
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-3.0.5-1026-004106
+      ref: deps/left-pad-3.0.5-1026-004106
+      sha: 423fa508caa9972536f874311a62b2d9bac2f159
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 3082e89bcf3a1d29686da1bde42c9328a6e2e01b
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    merged_by: null
+    comments: 10
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '813'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:15.890818Z'
+ms: 1041
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/813
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/813
+now:
+  state:
+    id: 5012164468
+    node_id: PR_kwDOVM7WJc8AAAABKr-PdA
+    number: 813
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+    body: Bumps left-pad from 1.0.0 to 3.0.5. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T04:41:09Z'
+    updated_at: '2026-10-27T22:32:15Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: null
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-3.0.5-1026-004106
+      ref: deps/left-pad-3.0.5-1026-004106
+      sha: 423fa508caa9972536f874311a62b2d9bac2f159
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 3082e89bcf3a1d29686da1bde42c9328a6e2e01b
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: false
+    rebaseable: false
+    mergeable_state: dirty
+    merged_by: null
+    comments: 10
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '813'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:16.932404Z'
+ms: 330
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:17.263693Z'
+ms: 926
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/811
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/811
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/811
+now:
+  state:
+    id: 5012119516
+    node_id: PR_kwDOVM7WJc8AAAABKr7f3A
+    number: 811
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+    body: Bumps left-pad from 1.0.0 to 3.0.3. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T04:35:54Z'
+    updated_at: '2026-10-27T22:32:28Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: d5ca0b33efb0bbd50c2cad4d68f337c5b9c65846
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-3.0.3-1026-003551
+      ref: deps/left-pad-3.0.3-1026-003551
+      sha: bbd71eeffdc6d0de34961b376f8fd17062c92908
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 3082e89bcf3a1d29686da1bde42c9328a6e2e01b
+    author_association: OWNER
+    auto_merge: null
+    draft: true
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 10
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '811'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:18.191912Z'
+ms: 865
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/811
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/811
+now:
+  state:
+    id: 5012119516
+    node_id: PR_kwDOVM7WJc8AAAABKr7f3A
+    number: 811
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+    body: Bumps left-pad from 1.0.0 to 3.0.3. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T04:35:54Z'
+    updated_at: '2026-10-27T22:32:28Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: d5ca0b33efb0bbd50c2cad4d68f337c5b9c65846
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-3.0.3-1026-003551
+      ref: deps/left-pad-3.0.3-1026-003551
+      sha: bbd71eeffdc6d0de34961b376f8fd17062c92908
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 3082e89bcf3a1d29686da1bde42c9328a6e2e01b
+    author_association: OWNER
+    auto_merge: null
+    draft: true
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 10
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '811'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:19.057732Z'
+ms: 321
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:19.379613Z'
+ms: 1120
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/810
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/810
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/810
+now:
+  state:
+    id: 5012083627
+    node_id: PR_kwDOVM7WJc8AAAABKr5Tqw
+    number: 810
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+    body: Bumps left-pad from 1.0.0 to 3.0.2. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T04:31:46Z'
+    updated_at: '2026-10-26T04:31:48Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 5646767843a7bd4044bf824588ef82ab52c0e0ba
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-3.0.2-1026-003143
+      ref: deps/left-pad-3.0.2-1026-003143
+      sha: cf7692763706c37dbd856674b729c821cd175294
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: 3082e89bcf3a1d29686da1bde42c9328a6e2e01b
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '810'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12809872792
+          node_id: LA_kwDOVM7WJc8AAAAC-4clmA
+          name: hold
+          description: null
+          color: b60205
+          default: false
+          archived_at: null
+          archived_by: null
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:20.502716Z'
+ms: 331
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:20.834834Z'
+ms: 950
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/806
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/806
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/806
+now:
+  state:
+    id: 5011082165
+    node_id: PR_kwDOVM7WJc8AAAABKq8LtQ
+    number: 806
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+    body: Bumps left-pad from 1.0.0 to 2.0.4. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T02:24:00Z'
+    updated_at: '2026-10-27T22:32:38Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: null
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-2.0.4-1025-222357
+      ref: deps/left-pad-2.0.4-1025-222357
+      sha: 347ea8cc5122464e5b4f6a8b728d4eabc7a19b2b
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: d5fff55f643529b32e79714bcc0cacda3f15ff9b
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    merged_by: null
+    comments: 11
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '806'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:21.787814Z'
+ms: 809
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/806
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/806
+now:
+  state:
+    id: 5011082165
+    node_id: PR_kwDOVM7WJc8AAAABKq8LtQ
+    number: 806
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+    body: Bumps left-pad from 1.0.0 to 2.0.4. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T02:24:00Z'
+    updated_at: '2026-10-27T22:32:38Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: null
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-2.0.4-1025-222357
+      ref: deps/left-pad-2.0.4-1025-222357
+      sha: 347ea8cc5122464e5b4f6a8b728d4eabc7a19b2b
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: d5fff55f643529b32e79714bcc0cacda3f15ff9b
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: false
+    rebaseable: false
+    mergeable_state: dirty
+    merged_by: null
+    comments: 11
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '806'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:22.598457Z'
+ms: 290
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:22.889767Z'
+ms: 989
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/805
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/805
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/805
+now:
+  state:
+    id: 5011072679
+    node_id: PR_kwDOVM7WJc8AAAABKq7mpw
+    number: 805
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+    body: Bumps left-pad from 1.0.0 to 2.0.3. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T02:22:53Z'
+    updated_at: '2026-10-26T02:22:54Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: c6d090a09aa6e5ab0ba209d7fd0ecaace3846448
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-2.0.3-1025-222249
+      ref: deps/left-pad-2.0.3-1025-222249
+      sha: bbb54687847950e4c16c52cdff9f4f416aee29dd
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: d5fff55f643529b32e79714bcc0cacda3f15ff9b
+    author_association: OWNER
+    auto_merge: null
+    draft: false
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '805'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12809872792
+          node_id: LA_kwDOVM7WJc8AAAAC-4clmA
+          name: hold
+          description: null
+          color: b60205
+          default: false
+          archived_at: null
+          archived_by: null
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:23.881992Z'
+ms: 331
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:24.214204Z'
+ms: 876
+mode: script
+say: follow {relation}, titled {title}
+line: 22
+within: 21
+params:
+  relation: item
+  title: Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+values:
+  title:
+    value: Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+  method: GET
+  target: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/803
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/803
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/803
+now:
+  state:
+    id: 5011054513
+    node_id: PR_kwDOVM7WJc8AAAABKq6fsQ
+    number: 803
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+    body: Bumps left-pad from 1.0.0 to 2.0.2. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T02:20:41Z'
+    updated_at: '2026-10-27T22:32:49Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: c4d2f74f1d3daeb43566e8d74cae25af519446fb
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-2.0.2-1025-222037
+      ref: deps/left-pad-2.0.2-1025-222037
+      sha: 2ae2a73ba8594fd50f047eae702143622c764a36
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: adbe83ed14fba5cb2ab65213ab0a78c32b7fb0b0
+    author_association: OWNER
+    auto_merge: null
+    draft: true
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 11
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '803'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:25.094563Z'
+ms: 772
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/803
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/803
+now:
+  state:
+    id: 5011054513
+    node_id: PR_kwDOVM7WJc8AAAABKq6fsQ
+    number: 803
+    state: open
+    locked: false
+    title: Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+    body: Bumps left-pad from 1.0.0 to 2.0.2. Opened by a Dependabot stand-in (exhibits/dependabot-sim).
+    milestone: null
+    active_lock_reason: null
+    created_at: '2026-10-26T02:20:41Z'
+    updated_at: '2026-10-27T22:32:49Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: c4d2f74f1d3daeb43566e8d74cae25af519446fb
+    assignee: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    head:
+      label: JogoShugh:deps/left-pad-2.0.2-1025-222037
+      ref: deps/left-pad-2.0.2-1025-222037
+      sha: 2ae2a73ba8594fd50f047eae702143622c764a36
+    base:
+      label: JogoShugh:deps-main
+      ref: deps-main
+      sha: adbe83ed14fba5cb2ab65213ab0a78c32b7fb0b0
+    author_association: OWNER
+    auto_merge: null
+    draft: true
+    merged: false
+    mergeable: true
+    rebaseable: false
+    mergeable_state: clean
+    merged_by: null
+    comments: 11
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '803'
+  forms:
+    - github:close
+    - github:comment
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-comments:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:labels:
+      - title: null
+        state:
+          id: 12835848326
+          node_id: LA_kwDOVM7WJc8AAAAC_ROAhg
+          name: dependencies
+          description: null
+          color: ededed
+          default: false
+          archived_at: null
+          archived_by: null
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          homepage: null
+          license: null
+          mirror_url: null
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          fork: false
+          homepage: null
+          default_branch: main
+          license: null
+          mirror_url: null
+---
+at: '2026-10-27T22:34:25.867889Z'
+ms: 250
+mode: script
+say: return to {address}
+line: 22
+within: 21
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?labels=dependencies
+now:
+  state:
+    count: 16
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Bump left-pad from 1.0.0 to 20.0.0 (1027-182628)
+      - Bump left-pad from 1.0.0 to 15.1.0 (1027-175750)
+      - Bump left-pad from 1.0.0 to 14.1.0 (1027-175113)
+      - Bump left-pad from 1.0.0 to 13.1.0 (1027-174436)
+      - Bump left-pad from 1.0.0 to 12.1.0 (1027-173239)
+      - Bump left-pad from 1.0.0 to 11.1.0 (1027-172055)
+      - Bump left-pad from 1.0.0 to 10.1.0 (1027-165654)
+      - Bump left-pad from 1.0.0 to 5.0.2 (1026-072805)
+      - Bump left-pad from 1.0.0 to 5.0.1 (1026-072656)
+      - Bump left-pad from 1.0.0 to 3.0.9 (1026-010636)
+      - Bump left-pad from 1.0.0 to 3.0.5 (1026-004106)
+      - Bump left-pad from 1.0.0 to 3.0.3 (1026-003551)
+      - Bump left-pad from 1.0.0 to 3.0.2 (1026-003143)
+      - Bump left-pad from 1.0.0 to 2.0.4 (1025-222357)
+      - Bump left-pad from 1.0.0 to 2.0.3 (1025-222249)
+      - Bump left-pad from 1.0.0 to 2.0.2 (1025-222037)
+---
+at: '2026-10-27T22:34:26.119086Z'
+ms: 4
+mode: script
+say: return to {address}
+line: 21
+within: 20
+params:
+  address: https://localhost:8392/
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-27T22:34:26.124069Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 20
+within: 11
+params:
+  address: https://localhost:8392/
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-27T22:34:26.127123Z'
+ms: 686
+mode: script
+say: return to {address}
+line: 20
+within: 11
+params:
+  address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/854
+outcome: done
+address: https://localhost:8392/repos/JogoShugh/heart-github-test/issues/854
+now:
+  state:
+    id: 6068892953
+    node_id: I_kwDOVM7WJc8AAAABabv1GQ
+    number: 854
+    title: Merge watch
+    labels: []
+    state: closed
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: '2026-10-27T22:33:41Z'
+    updated_at: '2026-10-27T22:33:50Z'
+    closed_at: '2026-10-27T22:33:50Z'
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: Close this issue to stop the watch.
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: completed
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '854'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    author:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:closed-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-27T22:34:26.814594Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 20
+within: 11
+params:
+  address: https://localhost:8392/
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null

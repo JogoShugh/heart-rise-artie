@@ -1,0 +1,416 @@
+---
+run:
+  inputs:
+    member:
+      value: Grace Okafor
+      given: given
+---
+at: '2026-11-05T01:47:47.761641Z'
+ms: 64
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8140/
+opens: true
+outcome: done
+address: http://localhost:8140/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        library:get-account:
+          - sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
+        library:get-loan:
+          - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+        library:search-loans:
+          - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+      digest: sha256-XDzrMkZrDTnosldep8wEIt8luy6Eh8HYT1/3wADSO1c=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-loans
+    - library:get-loan
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-05T01:47:47.832471Z'
+ms: 41
+mode: script
+say: act {relation}, name {name}
+inferred: search accounts for the member named Grace Okafor
+fromIntent: Find the account of the member named Grace Okafor
+params:
+  relation: library:search-accounts
+  name: Grace Okafor
+values:
+  name:
+    value: Grace Okafor
+    type: string
+    from:
+      - input: member
+opens: true
+chose:
+  kind: form
+  relation: library:search-accounts
+  title: Find accounts by name
+  method: GET
+  target: /accounts{?name}
+  address: http://localhost:8140/accounts?name=Grace%20Okafor
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+  act: sha256-84l87SPLMqthzrommJhIneB8EYxHzlgOWdoIBhaXsFM=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:search-accounts
+    - library:search-loans
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8140/accounts?name=Grace+Okafor
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Grace Okafor
+---
+at: '2026-11-05T01:47:47.876042Z'
+ms: 5
+mode: script
+say: follow {relation}, titled {title}
+intent: Find the account of the member named Grace Okafor
+params:
+  relation: item
+  title: Grace Okafor
+values:
+  title:
+    value: Grace Okafor
+    from:
+      - input: member
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: Grace Okafor
+  method: GET
+  target: http://localhost:8140/accounts/21000453
+  address: http://localhost:8140/accounts/21000453
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/accounts/21000453
+now:
+  state:
+    id: 21000453
+    name: Grace Okafor
+    booksOut: 2
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - Wonder
+      - Hatchet
+---
+at: '2026-11-05T01:47:47.882794Z'
+ms: 5
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Wonder
+values:
+  title:
+    value: Wonder
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Wonder
+  method: GET
+  target: http://localhost:8140/loans/3315
+  address: http://localhost:8140/loans/3315
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3315
+now:
+  state:
+    id: 3315
+    title: Wonder
+    author: R. J. Palacio
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+  forms:
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T01:47:47.890171Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts/21000453
+outcome: done
+address: http://localhost:8140/accounts/21000453
+now:
+  state:
+    id: 21000453
+    name: Grace Okafor
+    booksOut: 2
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - Wonder
+      - Hatchet
+---
+at: '2026-11-05T01:47:47.894185Z'
+ms: 3
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Hatchet
+values:
+  title:
+    value: Hatchet
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Hatchet
+  method: GET
+  target: http://localhost:8140/loans/3316
+  address: http://localhost:8140/loans/3316
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3316
+now:
+  state:
+    id: 3316
+    title: Hatchet
+    author: Gary Paulsen
+    due: '2026-11-12'
+    renewals: 0
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T01:47:47.898830Z'
+ms: 3
+mode: script
+say: act {relation}
+inferred: renew this book (Matilda)
+fromIntent: 'For each book they have out: renew it if renewing is offered; otherwise say why it can''t be renewed'
+params:
+  relation: library:renew
+opens: true
+chose:
+  kind: form
+  relation: library:renew
+  title: Renew
+  method: POST
+  target: /loans/{id}/actions/renew
+  address: http://localhost:8140/loans/3316/actions/renew
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
+    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
+  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+  schema:
+    href: http://localhost:8140/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.22202aba187631cd"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - library:renew
+    - library:return
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8140/loans/3316
+now:
+  state:
+    id: 3316
+    title: Hatchet
+    author: Gary Paulsen
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T01:47:47.903251Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/loans/3316
+outcome: done
+address: http://localhost:8140/loans/3316
+now:
+  state:
+    id: 3316
+    title: Hatchet
+    author: Gary Paulsen
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T01:47:47.906178Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts/21000453
+outcome: done
+address: http://localhost:8140/accounts/21000453
+now:
+  state:
+    id: 21000453
+    name: Grace Okafor
+    booksOut: 2
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - Wonder
+      - Hatchet
+---
+at: '2026-11-05T01:47:47.909045Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts?name=Grace+Okafor
+outcome: done
+address: http://localhost:8140/accounts?name=Grace+Okafor
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Grace Okafor
+---
+at: '2026-11-05T01:47:47.911212Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/
+outcome: done
+address: http://localhost:8140/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        library:get-account:
+          - sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
+        library:get-loan:
+          - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+        library:search-loans:
+          - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+      digest: sha256-XDzrMkZrDTnosldep8wEIt8luy6Eh8HYT1/3wADSO1c=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-loans
+    - library:get-loan
+  links:
+    self:
+      - null
+    service-desc:
+      - null

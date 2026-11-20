@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>One Bookmark, Real GitHub</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; the run and the script sit wide, theory and primer in narrower prose. */
+:root {
+  --bg: #f6f5f1; --fg: #1d221f; --muted: #5f6a63; --surface: #ffffff; --rule: #dcdcd4; --code-bg: #f0efe9;
+  --leaf: #2f7d4f; --gate: #b0641c; --mark: #e6efe0; --mark-fg: #1f5a36;
+  --kw: #8a3f8f; --str: #2f6f3f; --cm: #7b847e; --fn: #1f5a8a;
+  --body: "IBM Plex Sans", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --display: "Literata", Georgia, serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131816; --fg: #e4e8e3; --muted: #97a39c; --surface: #1b211e; --rule: #2e3732; --code-bg: #1f2622;
+    --leaf: #7fcf98; --gate: #e6a35c; --mark: #24402e; --mark-fg: #bfe8cc;
+    --kw: #d79ad9; --str: #9fd6ac; --cm: #7f8b84; --fn: #8cc0ea; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131816; --fg: #e4e8e3; --muted: #97a39c; --surface: #1b211e; --rule: #2e3732; --code-bg: #1f2622;
+  --leaf: #7fcf98; --gate: #e6a35c; --mark: #24402e; --mark-fg: #bfe8cc;
+  --kw: #d79ad9; --str: #9fd6ac; --cm: #7f8b84; --fn: #8cc0ea; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); margin: 0; }
+.wrap { max-width: 940px; margin: 0 auto; padding-block: 2.5rem 5rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.eyebrow { font: 600 0.74rem var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--leaf); }
+h1 { font: 650 clamp(2rem, 5vw, 3rem)/1.1 var(--display); margin: 0.3rem 0 0.8rem; text-wrap: balance; }
+h2 { font: 650 1.55rem/1.25 var(--display); margin: 3rem 0 0.6rem; text-wrap: balance; }
+h3 { font: 600 1rem var(--body); margin: 1.6rem 0 0.4rem; }
+p, li { max-width: 68ch; }
+.lede { font-size: 1.12rem; color: var(--muted); max-width: 62ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 0.4rem 1.6rem; margin: 1.4rem 0 0; padding: 0; list-style: none;
+  font-size: 0.9rem; color: var(--muted); }
+.facts b { color: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+code { font: 0.9em var(--mono); background: var(--code-bg); padding: 0.05em 0.3em; border-radius: 4px; }
+pre { font: 0.86rem/1.55 var(--mono); background: var(--code-bg); border: 1px solid var(--rule); border-radius: 8px;
+  padding: 1rem 1.1rem; overflow-x: auto; margin: 0.8rem 0; }
+pre code { background: none; padding: 0; font-size: 1em; }
+.kw { color: var(--kw); } .str { color: var(--str); } .cm { color: var(--cm); font-style: italic; } .fn { color: var(--fn); }
+.term .ok { color: var(--leaf); } .term .no { color: var(--gate); } .term .dim { color: var(--muted); }
+figure { margin: 1.2rem 0; }
+figure img { display: block; max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 8px; }
+figcaption { font-size: 0.86rem; color: var(--muted); margin-top: 0.4rem; }
+.table-wrap { overflow-x: auto; margin: 0.8rem 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--rule); }
+th { font: 600 0.74rem var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+td code { white-space: nowrap; }
+blockquote { margin: 1rem 0; padding: 0.2rem 0 0.2rem 1rem; border-left: 3px solid var(--leaf);
+  font: 500 1.05rem/1.55 var(--display); max-width: 64ch; }
+blockquote cite { display: block; font: 0.84rem var(--body); color: var(--muted); font-style: normal; margin-top: 0.3rem; }
+.callout { background: var(--mark); color: var(--mark-fg); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1.2rem 0; max-width: 72ch; }
+.callout p { margin: 0.3rem 0; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 1rem; }
+.grid2 > div { min-width: 0; }
+.grid2 h3 { margin-top: 0.4rem; }
+a { color: var(--leaf); }
+a:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
+footer { margin-top: 3rem; font-size: 0.85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="eyebrow">HEART · heart-script · live run, October 17, 2026</div>
+  <h1>One bookmark, real GitHub</h1>
+  <p class="lede">A twenty-line Kotlin script knew one address. It read a GitHub issue, commented on it, edited the comment, checked the result, and found out that reopening wasn't on offer, all against real GitHub. Every other address it used, GitHub's server handed it.</p>
+  <ul class="facts">
+    <li>Repository <b>JogoShugh/heart-github-test</b></li>
+    <li>Issue <b><a href="https://github.com/JogoShugh/heart-github-test/issues/10">#10</a></b></li>
+    <li>Steps <b>8</b></li>
+    <li>Addresses typed into the script <b>1</b></li>
+    <li>Exit <b>0</b></li>
+  </ul>
+
+  <h2>The script</h2>
+  <p><code>client/scripts/tests/github-comment.kts</code>, exactly as it ran. There are no URLs past the first line inside <code>heart(…)</code>, and no HTTP methods or status codes anywhere.</p>
+<pre><code><span class="cm">// Comment on an open issue through the HEART gateway for GitHub, edit the comment, and show that</span>
+<span class="cm">// reopening an open issue is not offered. Writes only to the repository it is given.</span>
+<span class="cm">//   artie run tests/github-comment.kts owner=JogoShugh repo=heart-github-test number=10</span>
+<span class="kw">val</span> owner <span class="kw">by</span> <span class="fn">input</span>()
+<span class="kw">val</span> repo <span class="kw">by</span> <span class="fn">input</span>()
+<span class="kw">val</span> number <span class="kw">by</span> <span class="fn">input</span>()
+<span class="kw">val</span> body <span class="kw">by</span> <span class="fn">input</span>(default = <span class="str">"Commented by a HEART script."</span>)
+
+<span class="fn">heart</span>(<span class="str">"http://localhost:8392/"</span>) {
+    <span class="fn">act</span>(<span class="str">"github:issues-get"</span>, <span class="str">"owner"</span> <span class="kw">to</span> owner, <span class="str">"repo"</span> <span class="kw">to</span> repo, <span class="str">"issue_number"</span> <span class="kw">to</span> number.toInt())
+    <span class="fn">check</span>(state[<span class="str">"/state"</span>] == <span class="str">"open"</span>) { <span class="str">"the issue should be open"</span> }
+    <span class="fn">expect</span>(NewResource) {
+        <span class="fn">act</span>(<span class="str">"github:comment"</span>, <span class="str">"body"</span> <span class="kw">to</span> body) {
+            <span class="fn">act</span>(<span class="str">"github:edit"</span>, <span class="str">"body"</span> <span class="kw">to</span> <span class="str">"$body (edited)"</span>)
+            <span class="fn">check</span>(state[<span class="str">"/body"</span>] == <span class="str">"$body (edited)"</span>) { <span class="str">"the comment should be edited"</span> }
+        }
+    }
+    <span class="fn">expect</span>(NotOffered) { <span class="fn">act</span>(<span class="str">"github:reopen"</span>) }
+}</code></pre>
+
+  <h2>The run</h2>
+  <p>Run with the installed command. ARTIE was the client, found on the classpath, and talked to the HEART gateway on port 8392, which spoke to <code>api.github.com</code> with the caller's own token.</p>
+<pre class="term"><code><span class="dim">$</span> artie run tests/github-comment.kts owner=JogoShugh repo=heart-github-test number=10
+1 enter http://localhost:8392/: <span class="ok">done</span>
+2 act github:issues-get, owner JogoShugh, repo heart-github-test, issue_number 10: <span class="ok">done</span>
+3 check: <span class="ok">held</span>
+4 act github:comment, body Commented by a HEART script.: <span class="ok">new resource</span>
+5 act github:edit, body Commented by a HEART script. (edited): <span class="ok">done</span>
+6 check: <span class="ok">held</span>
+7 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/10: <span class="ok">done</span>
+8 act github:reopen: <span class="no">refused</span>
+finished, 8 steps
+<span class="dim">exit 0</span></code></pre>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Step</th><th>Took</th><th>What the client then held</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Enter the bookmark</td><td>62 ms</td><td>The gateway's home: 6 forms</td></tr>
+      <tr><td>2</td><td>Read the issue, from the home's <code>github:issues-get</code> form</td><td>973 ms</td><td>Issue #10, open: 13 forms</td></tr>
+      <tr><td>4</td><td>Comment, from the issue's <code>github:comment</code> form</td><td>3,051 ms</td><td>The new comment, at the address GitHub gave it (expected: new resource)</td></tr>
+      <tr><td>5</td><td>Edit, from the comment's own <code>github:edit</code> form</td><td>2,572 ms</td><td>The comment, edited</td></tr>
+      <tr><td>7</td><td>Back to the issue the block started on, read again</td><td>562 ms</td><td>Issue #10: 13 forms</td></tr>
+      <tr><td>8</td><td><code>github:reopen</code></td><td>0 ms</td><td>Refused by the client, before sending anything: “The issue is already open.” (expected: not offered)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>What GitHub shows</h2>
+  <p>Screenshots of github.com, taken right after the run, signed out (the repository is public).</p>
+  <figure>
+    <img src="issue-comment.png" alt="GitHub comment by JogoShugh reading 'Commented by a HEART script. (edited)', marked Last edited by JogoShugh" width="960" height="130">
+    <figcaption>The comment the script made, then edited. GitHub marks it “Last edited”. <a href="https://github.com/JogoShugh/heart-github-test/issues/10#issuecomment-6241457535">See it on GitHub</a>.</figcaption>
+  </figure>
+  <figure>
+    <img src="issue-top.png" alt="GitHub issue #10 'Weed the paths', open, with the script's comment at the bottom of the conversation" width="1280" height="960">
+    <figcaption>Issue #10, “Weed the paths”, still open, because the script never closes it. The issue itself was opened earlier through the gateway's own form (“Opened through the HEART gateway's form.”).</figcaption>
+  </figure>
+
+  <h2>What Fielding asked for</h2>
+  <p>In 2008 Roy Fielding wrote <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">“REST APIs must be hypertext-driven”</a>, aimed squarely at HTTP APIs that called themselves REST. A few of its rules, and where they turn up in this script:</p>
+
+  <blockquote>A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience.<cite>On entry: the bookmark</cite></blockquote>
+  <p>That is <code>heart("http://localhost:8392/")</code>, the only address in the script. The issue's address came from a form on the home resource. The comment's address came from GitHub, in the answer to the act that brought it into being. The way back to the issue was an address the client already held.</p>
+
+  <blockquote>A REST API should never have “typed” resources that are significant to the client. … The only types that are significant to a client are the current representation's media type and standardized relation names.<cite>On types: relations and media types, not resource types</cite></blockquote>
+  <p>The script never says “this is an Issue object” or “this is a Comment object”. It says relation names: <code>github:issues-get</code>, <code>github:comment</code>, <code>github:edit</code>, <code>github:reopen</code>. What it then holds is a representation: state it can read by JSON Pointer (<code>state["/body"]</code>), and whatever forms and links come with it. The <code>github:</code> names are defined by the gateway's profile, a vocabulary the server publishes. They are not addresses.</p>
+
+  <blockquote>From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user's manipulation of those representations.<cite>On entry, continued: hypermedia drives state</cite></blockquote>
+  <p>Every <code>act</code> selects a form the server offered in the representation the client holds. If the form isn't there, the script doesn't guess. Step 8 is the proof. Issue #10 is open, so the server didn't offer <code>github:reopen</code>, and ARTIE refused it from the manifest in 0 ms, without sending a request, quoting the server's own reason: “The issue is already open.”</p>
+
+  <blockquote>A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state …<cite>On description: media types, not URIs</cite></blockquote>
+  <p>HEART is that effort: a media type with forms, a manifest of what is offered now and why the rest isn't, and a binding-neutral meaning for “done”, “new resource” and each kind of refusal. The script's outcomes come from it. <code>expect(NewResource)</code> means a new resource came into being, whatever protocol carried it. <code>expect(NotOffered)</code> means the act wasn't among the server's choices.</p>
+
+  <h2>Meanwhile, the same task without HEART</h2>
+  <p>GitHub calls its API REST. To do these four things with GitHub's own API, a client is written against GitHub's documentation:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>To</th><th>GitHub's documented request</th><th>This script</th></tr></thead>
+    <tbody>
+      <tr><td>Read the issue</td><td><code>GET /repos/{owner}/{repo}/issues/{issue_number}</code></td><td><code>act("github:issues-get", …)</code></td></tr>
+      <tr><td>Comment</td><td><code>POST /repos/{owner}/{repo}/issues/{issue_number}/comments</code></td><td><code>act("github:comment", …)</code></td></tr>
+      <tr><td>Edit the comment</td><td><code>PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}</code></td><td><code>act("github:edit", …)</code>, on the comment it holds</td></tr>
+      <tr><td>Reopen</td><td><code>PATCH /repos/{owner}/{repo}/issues/{issue_number}</code> with <code>"state": "open"</code>, whether or not that makes sense right now</td><td>Not offered while the issue is open, with the reason</td></tr>
+    </tbody>
+  </table></div>
+  <p>That is four URI templates and three HTTP methods compiled into the client, plus one identifier (<code>comment_id</code>) the client has to fish out of a response and splice into the next template. That is exactly the out-of-band knowledge Fielding's post objects to. The HEART client holds none of it. If GitHub moved comments to a new path tomorrow, the gateway's representations would carry the new addresses, and this script would run unchanged.</p>
+  <div class="callout">
+    <p><b>Gloating, a bit.</b> An eighteen-year-old blog post that most of the industry filed under “purist” now runs as working code, against one of the most-used APIs there is, through a gateway that GitHub doesn't know exists. GitHub didn't have to change anything. The hypertext was always one translation layer away.</p>
+  </div>
+
+  <h2>A small primer on Kotlin DSLs</h2>
+  <p>The script is ordinary Kotlin, compiled and run as a script (<code>.kts</code>). It reads like a language of its own because of five Kotlin features:</p>
+  <div class="grid2">
+    <div>
+      <h3>Trailing lambdas</h3>
+      <p>When a function's last parameter is a function, the braces can follow the call. <code>heart("…") { … }</code> is a call to <code>heart(entry, block)</code>, with the block written outside the parentheses.</p>
+    </div>
+    <div>
+      <h3>Lambdas with receivers</h3>
+      <p><code>block: Here.() -&gt; Unit</code> runs the block as if inside a <code>Here</code>, the representation the script holds. So <code>act</code>, <code>check</code> and <code>state</code> need no prefix. A nested block gets a new <code>Here</code>: inside <code>act("github:comment") { … }</code>, <code>state</code> is the comment's.</p>
+    </div>
+    <div>
+      <h3>Infix functions</h3>
+      <p><code>"body" to body</code> is <code>"body".to(body)</code>, which makes a <code>Pair</code>. Fields read as name and value with no map-building syntax.</p>
+    </div>
+    <div>
+      <h3>Property delegation</h3>
+      <p><code>val owner by input()</code> hands the property to a delegate. Declaring it registers the input, so the runner knows what the script needs before its first request, and <code>artie run --inputs-of</code> can list them. Reading it supplies the value: given, defaulted, or asked of a person (only with <code>--interactive</code>).</p>
+    </div>
+    <div>
+      <h3>Scope control (<code>@DslMarker</code>)</h3>
+      <p>Inside a nested block, Kotlin won't let the script call <code>act</code> on an outer <code>Here</code> by accident. A selection is always made on the representation the client holds now, never on a stale one.</p>
+    </div>
+    <div>
+      <h3>Add-ons are just imports</h3>
+      <p><code>expect</code> isn't part of the DSL. It is an extension function on <code>Here</code> in <code>heart-script-test</code>. Everyday scripts never see it, and test scripts import it.</p>
+    </div>
+  </div>
+
+  <h2>What's honest to add</h2>
+  <ul>
+    <li>The gateway is ours. It turns GitHub's OpenAPI description plus a small connector into HEART representations. GitHub itself serves no forms.</li>
+    <li>The script knows GitHub's relation names and field names (<code>issue_number</code>, <code>body</code>). Fielding allows that: it is the vocabulary of the media type and profile. It is knowledge of meaning, not of addresses.</li>
+    <li><code>number.toInt()</code>: inputs arrive as text. A typed layer on top of the DSL, still at the ideas stage, would remove that.</li>
+    <li>The script ran with ARTIE, but the DSL isn't ARTIE's. Any HEART client that implements its small <code>Navigator</code> interface runs the same script.</li>
+  </ul>
+
+  <p>Every step, its outcome and what the client held, as a run report: <a href="run/">GitHub Comment, Scripted</a>.</p>
+
+  <footer>Trace: <code>client/scripts/runs/github-comment.trace.json</code> (secrets written as <code>&lt;token&gt;</code>; scanned, none present). Spec: <code>spec/PLAN-ARTIE-SCRIPTS.md</code>. Screenshots: headless Chrome, 17:50 EDT.</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+# What t1.kept.heart.yaml was recorded against, from /Users/josh/repos/artie/exhibits/mcp-over-openapi/runs/artie/artie-data-t1-20261104-074512.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its
+# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
+# one offered in a set not recorded for it.
+rung: L2
+digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+forms:
+  staff:hire:
+    integrity: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+    act: sha256-Q1omdyU/xBCpvWs5Vxq2pxOd31LpBmeC2lRk4hCLLVI=
+    method: POST
+    sets: []
+  staff:update:
+    integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+    act: sha256-dcPlshlvSPAuy+JBP6+XShdiSIudx10WKEAYsRTSvsU=
+    method: PUT
+    sets:
+      - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+  staff:search-employees:
+    integrity: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+    act: sha256-SuZJJhcHAykYlOwyZDbIZs20aftRgSCC2jfMQFw0gzI=
+    method: GET
+    sets: []
+  staff:dismiss:
+    integrity: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+    act: sha256-JFTaN7/EZb29hhvhsPg58mMqleyI/RWM1i4adkFHxJw=
+    method: DELETE
+    sets:
+      - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+links:
+  item: ''

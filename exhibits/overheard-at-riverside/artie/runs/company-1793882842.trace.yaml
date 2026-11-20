@@ -1,0 +1,501 @@
+---
+run:
+  inputs:
+    company:
+      value: credit union
+      given: given
+---
+at: '2026-11-05T12:47:22.807794Z'
+ms: 117
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8140/
+opens: true
+outcome: done
+address: http://localhost:8140/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        library:get-account:
+          - sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
+        library:get-loan:
+          - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
+        library:get-member:
+          - sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+        library:search-loans:
+          - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+        library:search-members:
+          - sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=
+      digest: sha256-viVvUdXDJxsJSdeEfpXwMcaD/BvyU7VOTC/AOkeeKRA=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-05T12:47:22.932271Z'
+ms: 44
+mode: script
+say: act {relation}, company {company}
+intent: Find the members of the company group credit union
+params:
+  relation: library:search-members
+  company: credit union
+values:
+  company:
+    value: credit union
+    type: string
+    from:
+      - input: company
+opens: true
+chose:
+  kind: form
+  relation: library:search-members
+  title: Find members by company
+  method: GET
+  target: /members{?company}
+  address: http://localhost:8140/members?company=credit%20union
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=
+  act: sha256-/50a/XL6rQnGSnjrMrUsHbt42BMdurLB0H/Cj/3PrbI=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-account
+    - library:get-loan
+    - library:get-member
+    - library:search-accounts
+    - library:search-loans
+    - library:search-members
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8140/members?company=credit+union
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Owen Hughes
+      - Mei Tanaka
+---
+at: '2026-11-05T12:47:22.979360Z'
+ms: 5
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Owen Hughes
+values:
+  title:
+    value: Owen Hughes
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Owen Hughes
+  method: GET
+  target: http://localhost:8140/members/21000471
+  address: http://localhost:8140/members/21000471
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/members/21000471
+now:
+  state:
+    id: 21000471
+    name: Owen Hughes
+    company: Riverside Credit Union
+    booksOut: 1
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - James and the Giant Peach
+---
+at: '2026-11-05T12:47:22.985746Z'
+ms: 6
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: James and the Giant Peach
+values:
+  title:
+    value: James and the Giant Peach
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: James and the Giant Peach
+  method: GET
+  target: http://localhost:8140/loans/3344
+  address: http://localhost:8140/loans/3344
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3344
+now:
+  state:
+    id: 3344
+    title: James and the Giant Peach
+    author: Roald Dahl
+    due: '2026-11-12'
+    renewals: 0
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T12:47:22.993481Z'
+ms: 5
+mode: script
+say: act {relation}
+inferred: renew this book
+fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
+params:
+  relation: library:renew
+opens: true
+chose:
+  kind: form
+  relation: library:renew
+  title: Renew
+  method: POST
+  target: /loans/{id}/actions/renew
+  address: http://localhost:8140/loans/3344/actions/renew
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8140/affordance-sets/292caa98b3e91085
+    integrity: sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU=
+  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+  schema:
+    href: http://localhost:8140/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.869e5ba4be532eb5"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8140/loans/3344
+now:
+  state:
+    id: 3344
+    title: James and the Giant Peach
+    author: Roald Dahl
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T12:47:22.999923Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/loans/3344
+outcome: done
+address: http://localhost:8140/loans/3344
+now:
+  state:
+    id: 3344
+    title: James and the Giant Peach
+    author: Roald Dahl
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T12:47:23.003032Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/members/21000471
+outcome: done
+address: http://localhost:8140/members/21000471
+now:
+  state:
+    id: 21000471
+    name: Owen Hughes
+    company: Riverside Credit Union
+    booksOut: 1
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - James and the Giant Peach
+---
+at: '2026-11-05T12:47:23.005397Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/members?company=credit+union
+outcome: done
+address: http://localhost:8140/members?company=credit+union
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Owen Hughes
+      - Mei Tanaka
+---
+at: '2026-11-05T12:47:23.007214Z'
+ms: 2
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Mei Tanaka
+values:
+  title:
+    value: Mei Tanaka
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Mei Tanaka
+  method: GET
+  target: http://localhost:8140/members/21000472
+  address: http://localhost:8140/members/21000472
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/members/21000472
+now:
+  state:
+    id: 21000472
+    name: Mei Tanaka
+    company: Riverside Credit Union
+    booksOut: 1
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Lion, the Witch and the Wardrobe
+---
+at: '2026-11-05T12:47:23.010155Z'
+ms: 3
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: The Lion, the Witch and the Wardrobe
+values:
+  title:
+    value: The Lion, the Witch and the Wardrobe
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: The Lion, the Witch and the Wardrobe
+  method: GET
+  target: http://localhost:8140/loans/3345
+  address: http://localhost:8140/loans/3345
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3345
+now:
+  state:
+    id: 3345
+    title: The Lion, the Witch and the Wardrobe
+    author: C. S. Lewis
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+  forms:
+    - library:report-problem
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T12:47:23.014915Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/members/21000472
+outcome: done
+address: http://localhost:8140/members/21000472
+now:
+  state:
+    id: 21000472
+    name: Mei Tanaka
+    company: Riverside Credit Union
+    booksOut: 1
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Lion, the Witch and the Wardrobe
+---
+at: '2026-11-05T12:47:23.017549Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/members?company=credit+union
+outcome: done
+address: http://localhost:8140/members?company=credit+union
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Owen Hughes
+      - Mei Tanaka
+---
+at: '2026-11-05T12:47:23.019434Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/
+outcome: done
+address: http://localhost:8140/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        library:get-account:
+          - sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
+        library:get-loan:
+          - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
+        library:get-member:
+          - sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:report-problem:
+          - sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
+        library:search-loans:
+          - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+        library:search-members:
+          - sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=
+      digest: sha256-viVvUdXDJxsJSdeEfpXwMcaD/BvyU7VOTC/AOkeeKRA=
+  forms:
+    - library:search-accounts
+    - library:get-account
+    - library:search-members
+    - library:get-member
+    - library:search-loans
+    - library:get-loan
+  links:
+    self:
+      - null
+    service-desc:
+      - null

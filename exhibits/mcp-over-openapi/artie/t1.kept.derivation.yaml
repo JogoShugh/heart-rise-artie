@@ -1,0 +1,67 @@
+# How t1.kept.kts was derived from ../runs/artie/artie-goal-t1-20261102-003323.yaml: each derivation, numbered
+# in the order t1.kept.kts first shows it, with the rule of spec/PLAN-SCRIPT-GENERATOR.md that bound it, and where it
+# stands in both scripts (line and column, from 1); rows: where each step of the run begins in both.
+script: 't1.kept.kts'
+capture: '../runs/artie/artie-goal-t1-20261102-003323.yaml'
+rows:
+  - {at: '1', source: null, generated: 6}
+  - {at: '2', source: 1, generated: 7}
+  - {at: '3', source: 2, generated: 13}
+  - {at: '6', source: 3, generated: 19}
+  - {at: '7', source: 4, generated: 20}
+  - {at: '8', source: 5, generated: 21}
+derivations:
+  - n: 1
+    kind: relation
+    rule: '9'
+    title: 'The relation each reason step chose, named'
+    why: 'Where the run''s script reasoned, the reasoner chose among the forms and links offered. The generated script names the relation it chose; the lock file pins what was offered with it.'
+    source: []
+    generated:
+      - {line: 7, column: 9, text: '"staff:hire"'}
+      - {line: 13, column: 13, text: '"staff:update"'}
+      - {line: 19, column: 9, text: '"staff:search-employees"'}
+      - {line: 20, column: 16, text: '"item"'}
+      - {line: 21, column: 17, text: '"staff:dismiss"'}
+  - n: 2
+    kind: words
+    rule: '2.2'
+    title: '"Samwise", as the words wrote it'
+    why: 'Written in the words, outside any slot: a constant, never read from an answer.'
+    source: []
+    generated:
+      - {line: 8, column: 24, text: '"Samwise"'}
+      - {line: 14, column: 28, text: '"Samwise"'}
+  - n: 3
+    kind: words
+    rule: '2.2'
+    title: '"Gamgee", as the words wrote it'
+    why: 'Written in the words, outside any slot: a constant, never read from an answer.'
+    source: []
+    generated:
+      - {line: 9, column: 23, text: '"Gamgee"'}
+      - {line: 15, column: 27, text: '"Gamgee"'}
+  - n: 4
+    kind: words
+    rule: '2.2'
+    title: '"gardener", as the words wrote it'
+    why: 'Written in the words, outside any slot: a constant, never read from an answer.'
+    source: []
+    generated:
+      - {line: 10, column: 19, text: '"gardener"'}
+  - n: 5
+    kind: words
+    rule: '2.2'
+    title: '"gardener, mayor", as the words wrote it'
+    why: 'Written in the words, outside any slot: a constant, never read from an answer.'
+    source: []
+    generated:
+      - {line: 16, column: 23, text: '"gardener, mayor"'}
+  - n: 6
+    kind: words
+    rule: '2.2'
+    title: '"Baggins", as the words wrote it'
+    why: 'Written in the words, outside any slot: a constant, never read from an answer.'
+    source: []
+    generated:
+      - {line: 19, column: 45, text: '"Baggins"'}

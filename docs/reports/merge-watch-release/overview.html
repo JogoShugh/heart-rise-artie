@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Release, Overview</title>
+<style>
+  :root { --bg: #f6f5f1; --fg: #1d211f; --soft: #5b625e; --line: #dcdcd4; --card: #ffffff; --code: #f0efe9;
+    --pass: #e6f4ea; --pass-edge: #2f6b4f; --stop: #fdecea; --stop-edge: #a33a3a; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+      --code: #1f2522; --pass: #16321f; --pass-edge: #7cc4a0; --stop: #3a1b1b; --stop-edge: #f0a0a0; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #151816; --fg: #e4e8e5; --soft: #9aa39e; --line: #2f3632; --card: #1d2220;
+    --code: #1f2522; --pass: #16321f; --pass-edge: #7cc4a0; --stop: #3a1b1b; --stop-edge: #f0a0a0; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1000px; margin: 0 auto; padding: 1rem max(16px, env(safe-area-inset-left, 0px)) 3rem; }
+  h1 { font-size: 1.5rem; margin: .2rem 0 .3rem; text-wrap: balance; }
+  h2 { font-size: 1.1rem; margin: 1.6rem 0 .5rem; }
+  p, li { color: var(--soft); max-width: 78ch; }
+  code { font: .88em ui-monospace, Menlo, monospace; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: .6rem; margin: 1rem 0; }
+  .tile { border-radius: 8px; padding: .7rem .8rem; border: 1px solid; }
+  .tile.pass { background: var(--pass); border-color: var(--pass-edge); }
+  .tile.stop { background: var(--stop); border-color: var(--stop-edge); }
+  .tile b { display: block; font-size: 1.1rem; }
+  .tile span { color: var(--soft); font-size: .9rem; }
+  .wrap { overflow-x: auto; }
+  figure.diagram { margin: .8rem 0 1rem; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .5rem; }
+  figure.diagram svg { display: block; width: 100%; min-width: 720px; height: auto; }
+  figure.diagram figcaption { color: var(--soft); font-size: .9rem; padding: .5rem .3rem .2rem; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); font-size: .9rem; }
+  th, td { text-align: left; vertical-align: top; border: 1px solid var(--line); padding: .4rem .55rem; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; margin: .5rem 0; }
+  summary { cursor: pointer; padding: .55rem .8rem; font-weight: 600; }
+  pre { margin: 0; padding: .7rem .8rem; background: var(--code); overflow-x: auto; font: 12.5px/1.45 ui-monospace, Menlo, monospace; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<main>
+  <h1>The Merge Watch Release</h1>
+  <p>A pull request released to Dev across five parties.</p>
+  <p><b>Next:</b> <a href="../merge-watch-release-captured/" target="_top">the whole release captured once with Claude</a>,
+    then replayed for five pull requests with no model.</p>
+  <ul>
+    <li>Each party is its own HEART service at its own address:
+      <ul>
+        <li>GitHub, through the gateway</li>
+        <li>an offer watch</li>
+        <li>a real Jenkins, behind a wrapper</li>
+        <li>the preview Jenkins deploys</li>
+        <li>Dev</li>
+      </ul>
+    </li>
+    <li>Every wait is a RISE reply. ARTIE makes the reply before it asks; the party it asks answers it, signed.</li>
+    <li>Every address after a party's entry is handed over by an answer's links.</li>
+  </ul>
+
+  <h2>Reason once, then run again and again with other inputs, no model</h2>
+  <ul>
+    <li><b>One inference run.</b> ARTIE walked the smoke test's plain-text goal once, Claude (claude-sonnet-5-5)
+      planning each move, against a preview known to be good: 23 model calls, 34,029 input tokens, 3,467 output,
+      44,321 read from cache. <a href="runs/smoke-capture.html">The capture</a>.</li>
+    <li><b>Kept as a script with slots.</b> <code>artie generate</code> wrote the walk as <code>smoke.heart.yaml</code>:
+      every value the model used is the input or the name it came from (<code>${book}</code>,
+      <code>${renewable}</code>, <code>${before.due}</code>, <code>${problem}</code>), none left to review. The stale
+      renewal of S4 is kept as an act as of the version read before, its refusal expected.</li>
+    <li><b>Five releases, five sets of inputs, zero model calls.</b> Each a different pull request and policy change,
+      and a different book, problem and comment for the smoke test, run by ARTIE in the release desk through the
+      real Jenkins. The same kept scripts every time; only the inputs vary.</li>
+  </ul>
+  <div class="wrap"><table>
+    <tr><th>Pull request</th><th>Its change</th><th>Smoke test given</th><th>Smoke</th><th>Model calls</th><th>Outcome</th></tr>
+    <tr><td><a href="runs/pr-501.html">501</a></td><td>renewals: 2 weeks</td><td>Charlotte's Web · E. B. White · damaged · "Spine cracked."</td><td>5 of 5</td><td>0</td><td>promoted to Dev</td></tr>
+    <tr><td><a href="runs/pr-502.html">502</a></td><td>renewals: 4 weeks</td><td>The Hobbit · J. R. R. Tolkien · wrong-book · "This is the sequel."</td><td>5 of 5</td><td>0</td><td>promoted to Dev</td></tr>
+    <tr><td><a href="runs/pr-503.html">503</a></td><td>renewals: 1 week</td><td>Matilda · Roald Dahl · lost · "Not on the shelf at home."</td><td>5 of 5</td><td>0</td><td>promoted to Dev</td></tr>
+    <tr><td><a href="runs/pr-504.html">504</a></td><td>renewals: none (0 weeks)</td><td>Charlotte's Web · E. B. White · missing-pages · "Pages 40 to 44."</td><td>4 of 5: S3 failed</td><td>0</td><td>stopped, as it should: not promoted; ARTIE says why on the pull request</td></tr>
+    <tr><td><a href="runs/pr-505.html">505</a></td><td>a README line only</td><td>The Hobbit · J. R. R. Tolkien · damaged · "Water damage on the cover."</td><td>5 of 5</td><td>0</td><td>promoted to Dev</td></tr>
+  </table></div>
+  <p>S3 and S4 renew a loan, and the test member has one loan that can be renewed, Matilda, so those two read it on
+    every run; the book each run searches for, reads and reports on is its own.</p>
+
+  <h2>The flow</h2>
+  <figure class="diagram">
+    <div class="wrap">
+    <svg viewBox="0 0 900 880" role="img" style="color: var(--fg)" font-family="system-ui, -apple-system, sans-serif"
+      aria-label="Activity diagram: ARTIE opens the pull request, asks the offer watch, which answers when it can be merged; ARTIE merges, asks CI to build, which answers after Jenkins deploys the preview; ARTIE runs the smoke script against the preview, then promotes to Dev if all pass or comments on the pull request if any fail.">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+        <marker id="aha" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" style="fill: var(--pass-edge)"/>
+        </marker>
+      </defs>
+      <!-- lanes -->
+      <g style="fill: var(--code)">
+        <rect x="150" y="0" width="150" height="880"/><rect x="450" y="0" width="150" height="880"/>
+        <rect x="750" y="0" width="150" height="880"/>
+      </g>
+      <g font-size="12.5" font-weight="600" text-anchor="middle" fill="currentColor">
+        <text x="75" y="20">Release desk</text><text x="225" y="20">GitHub</text><text x="375" y="20">Offer watch</text>
+        <text x="525" y="20">CI + Jenkins</text><text x="675" y="20">Preview</text><text x="825" y="20">Dev</text>
+      </g>
+      <g font-size="10" text-anchor="middle" style="fill: var(--soft)" font-family="ui-monospace, Menlo, monospace">
+        <text x="75" y="35">ARTIE, replies :8160</text><text x="225" y="35">gateway :8098</text><text x="375" y="35">:8099</text>
+        <text x="525" y="35">:8170 / :8171</text><text x="675" y="35">:8180</text><text x="825" y="35">:8190</text>
+      </g>
+      <line x1="0" y1="44" x2="900" y2="44" style="stroke: var(--line)"/>
+
+      <!-- start -->
+      <circle cx="75" cy="66" r="7" fill="currentColor"/>
+
+      <!-- actions -->
+      <g fill="none" stroke="currentColor" stroke-width="1.2">
+        <rect x="11" y="90" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="161" y="90" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="150" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="210" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="311" y="210" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="161" y="270" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="311" y="270" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="330" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="311" y="330" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="390" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="161" y="390" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="450" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="461" y="450" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="461" y="510" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="611" y="510" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="570" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="461" y="570" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <path d="M75,632 L93,650 L75,668 L57,650 Z" style="fill: var(--card)"/>
+        <rect x="161" y="630" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="11" y="690" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <rect x="611" y="690" width="128" height="40" rx="10" style="fill: var(--card)"/>
+        <path d="M75,752 L93,770 L75,788 L57,770 Z" style="fill: var(--card)"/>
+        <rect x="761" y="750" width="128" height="40" rx="10" style="fill: var(--pass); stroke: var(--pass-edge)"/>
+        <rect x="161" y="810" width="128" height="40" rx="10" style="fill: var(--stop); stroke: var(--stop-edge)"/>
+      </g>
+      <g font-size="12" text-anchor="middle" fill="currentColor">
+        <text x="75" y="107">Open the PR</text><text x="225" y="107">The PR</text>
+        <text x="75" y="167">Make reply r1</text>
+        <text x="75" y="227">Ask the watch</text><text x="375" y="227">Watch the PR</text>
+        <text x="225" y="287">The PR</text><text x="375" y="287">Look every 3 s</text>
+        <text x="75" y="347">Once r1 completed</text><text x="375" y="347">Answer r1</text>
+        <text x="75" y="407">Merge, squashing</text><text x="225" y="407">Merge commit</text>
+        <text x="75" y="467">Make r2, ask build</text><text x="525" y="467">Start Jenkins job</text>
+        <text x="525" y="527">Jenkins builds</text><text x="675" y="527">Preview up</text>
+        <text x="75" y="587">Once r2 answered</text><text x="525" y="587">Answer r2</text>
+        <text x="225" y="647">Comment on PR</text>
+        <text x="75" y="707">Run smoke script</text><text x="675" y="707">S1 to S5</text>
+        <text x="825" y="767">Promote</text>
+        <text x="225" y="827">Comment on PR</text>
+      </g>
+      <g font-size="10" text-anchor="middle" style="fill: var(--soft)" font-family="ui-monospace, Menlo, monospace">
+        <text x="75" y="122">by links</text><text x="225" y="122">not yet mergeable</text>
+        <text x="75" y="182">hr:reply-to</text>
+        <text x="75" y="242">watcher:watch</text><text x="375" y="242">for github:merge</text>
+        <text x="225" y="302">now offers merge</text><text x="375" y="302">GET the PR</text>
+        <text x="75" y="362">follow its link</text><text x="375" y="362">completed, links PR</text>
+        <text x="75" y="422">github:merge</text><text x="225" y="422">real git, main</text>
+        <text x="75" y="482">ci:build {sha}</text><text x="525" y="482">SHA, reply r2</text>
+        <text x="525" y="542">clone, test, deploy</text><text x="675" y="542">that commit</text>
+        <text x="75" y="602">build state</text><text x="525" y="602">on Jenkins' webhook</text>
+        <text x="225" y="662">stage, ci:log</text>
+        <text x="75" y="722">ci:smoke-test</text><text x="675" y="722">on ci:deployment</text>
+        <text x="825" y="782">env:promote</text>
+        <text x="225" y="842">failed scenarios</text>
+      </g>
+
+      <!-- control flow and requests -->
+      <g fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#ah)">
+        <line x1="75" y1="73" x2="75" y2="90"/>
+        <line x1="139" y1="110" x2="161" y2="110"/>
+        <line x1="75" y1="130" x2="75" y2="150"/>
+        <line x1="75" y1="190" x2="75" y2="210"/>
+        <line x1="139" y1="230" x2="311" y2="230"/>
+        <line x1="375" y1="250" x2="375" y2="270"/>
+        <line x1="311" y1="290" x2="289" y2="290"/>
+        <path d="M439,282 C474,282 474,298 439,298"/>
+        <line x1="375" y1="310" x2="375" y2="330"/>
+        <line x1="75" y1="370" x2="75" y2="390"/>
+        <line x1="139" y1="410" x2="161" y2="410"/>
+        <line x1="75" y1="430" x2="75" y2="450"/>
+        <line x1="139" y1="470" x2="461" y2="470"/>
+        <line x1="525" y1="490" x2="525" y2="510"/>
+        <line x1="589" y1="530" x2="611" y2="530"/>
+        <line x1="525" y1="550" x2="525" y2="570"/>
+        <line x1="75" y1="610" x2="75" y2="632"/>
+        <line x1="93" y1="650" x2="161" y2="650"/>
+        <line x1="289" y1="650" x2="319" y2="650"/>
+        <line x1="75" y1="668" x2="75" y2="690"/>
+        <line x1="139" y1="710" x2="611" y2="710"/>
+        <line x1="75" y1="730" x2="75" y2="752"/>
+        <line x1="93" y1="770" x2="761" y2="770"/>
+        <line x1="825" y1="790" x2="825" y2="812"/>
+        <polyline points="75,788 75,830 161,830"/>
+        <line x1="289" y1="830" x2="319" y2="830"/>
+      </g>
+      <!-- RISE answers -->
+      <g fill="none" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#aha)" style="stroke: var(--pass-edge)">
+        <line x1="311" y1="350" x2="139" y2="350"/>
+        <line x1="461" y1="590" x2="139" y2="590"/>
+      </g>
+      <g font-size="11" text-anchor="middle" fill="currentColor">
+        <text x="225" y="223">asks, reply r1</text>
+        <text x="300" y="463">asks, reply r2</text>
+        <text x="375" y="703">runs against the preview</text>
+        <text x="427" y="763">all 5 passed (501, 502, 503, 505)</text>
+        <text x="127" y="643" font-style="italic">failed</text>
+        <text x="478" y="294" text-anchor="start" font-style="italic">until offered</text>
+        <text x="82" y="684" text-anchor="start" font-style="italic">succeeded</text>
+        <text x="82" y="812" text-anchor="start" font-style="italic">S3 failed (504)</text>
+      </g>
+      <g font-size="11" text-anchor="middle" font-weight="600" style="fill: var(--pass-edge)">
+        <text x="225" y="343">signed PATCH to r1</text>
+        <text x="300" y="583">signed PATCH to r2, links</text>
+      </g>
+
+      <!-- ends -->
+      <g fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="330" cy="650" r="9"/><circle cx="825" cy="823" r="9"/><circle cx="330" cy="830" r="9"/>
+      </g>
+      <g fill="currentColor">
+        <circle cx="330" cy="650" r="5"/><circle cx="825" cy="823" r="5"/><circle cx="330" cy="830" r="5"/>
+      </g>
+    </svg>
+    </div>
+    <figcaption>One column per party, time going down. ARTIE asks twice and waits twice. Each wait ends with a signed
+      answer to the reply the desk keeps (dashed), the party's own ARTIE answering. Pull requests 501, 502, 503 and 505
+      end promoted to Dev; 504 ends with a comment.</figcaption>
+  </figure>
+
+  <h2>The parties</h2>
+  <div class="wrap"><table>
+    <tr><th>Party</th><th>Address</th><th>What it is</th><th>What it offers</th></tr>
+    <tr><td>GitHub</td><td><code>:8098</code></td><td>heart-gateway with its GitHub connector, in front of the small GitHub, which keeps acme/web's pull requests as branches of a real git repository</td><td><code>github:merge</code> once GitHub has worked out a pull request can be merged; <code>github:comment</code></td></tr>
+    <tr><td>Offer watch</td><td><code>:8099</code></td><td>a RISE service that tells a reply when a resource offers an act, by HEART alone</td><td><code>watcher:watch</code></td></tr>
+    <tr><td>Release desk</td><td><code>:8160</code></td><td>runs ARTIE inside it to release a pull request by the kept release script, and keeps the replies that run asks with (heart-core's reply resource: each act on a reply must be signed by a key the request it answers links); wakes the run when one is answered</td><td><code>desk:release</code>, a pull request and its smoke inputs; each release at <code>/releases/{n}</code>, its trace linked</td></tr>
+    <tr><td>CI</td><td><code>:8170</code></td><td>the wrapper, in front of the real Jenkins (<code>jenkins/jenkins:lts-jdk21</code>, Notification plugin) on <code>:8171</code></td><td><code>ci:build</code>; a succeeded build links <code>ci:deployment</code>, <code>ci:smoke-test</code>, <code>ci:log</code></td></tr>
+    <tr><td>Preview</td><td><code>:8180</code></td><td>Riverside Public Library at the built commit, started by the Jenkins job, its rules from the commit's policy file</td><td>search, renew, report a problem</td></tr>
+    <tr><td>Dev</td><td><code>:8190</code></td><td>the environment a release ends in</td><td><code>env:promote</code>, citing the smoke run; refused by rule unless every scenario passed</td></tr>
+  </table></div>
+
+  <h2>What happens in a release, in order</h2>
+  <ol>
+    <li>A person asks the desk to release a pull request, giving the smoke test's inputs. The desk starts ARTIE on
+      the kept release script with those inputs.</li>
+    <li>ARTIE opens the pull request through the gateway, asks the offer watch to be told on a reply the desk keeps
+      when it offers <code>github:merge</code>, and waits. The watch answers the reply, signed; the desk wakes the run.</li>
+    <li>ARTIE follows the links the answer hands over to the pull request and merges it by squashing: a real commit.</li>
+    <li>It asks the CI wrapper to build that commit, on another reply. Jenkins builds and deploys the preview; its
+      notifications reach the wrapper, whose ARTIE answers the reply, signed, linking the deployment and the smoke
+      script the build archived.</li>
+    <li>ARTIE runs that smoke script, the one captured with Claude, against the deployment, with the release's inputs.</li>
+    <li>Every scenario passed: it promotes the merged commit to Dev, citing the smoke run. Not all: it comments on the
+      pull request with the scenarios that failed.</li>
+  </ol>
+
+  <h2>The smoke scenarios, as the goal says them</h2>
+  <div class="wrap"><table>
+    <tr><th></th><th>Scenario</th><th>Kept as</th></tr>
+    <tr><td>S1</td><td>Search the loans for {book}, and open it</td><td>search with <code>${book}</code>, follow the item titled <code>${book}</code></td></tr>
+    <tr><td>S2</td><td>… and its author is {author}</td><td>a check: <code>author</code> is <code>${author}</code></td></tr>
+    <tr><td>S3</td><td>Renew {renewable}: its due date moves</td><td>keep it as <code>before</code>, renew, check <code>due</code> is not <code>${before.due}</code></td></tr>
+    <tr><td>S4</td><td>Renew it again as of the version read before: refused as stale</td><td>renew <code>as-of: read</code>, <code>refused-as: stale</code></td></tr>
+    <tr><td>S5</td><td>Report {problem} on {book}, saying {comment}: the loan shows it</td><td>report with <code>${problem}</code>, <code>${comment}</code>; check <code>/reported/problem</code></td></tr>
+  </table></div>
+  <p>S3 checks that renewing moves the due date at all, not that it moves three weeks: a captured date would hold
+    on one day only, while "moved" holds on every run, and a policy of zero weeks still fails it (504).</p>
+
+  <h2>What is ARTIE's, and what is not yet</h2>
+  <ul>
+    <li><b>ARTIE runs every release</b>, inside the release desk, and answers every reply, inside the offer watch and
+      the CI wrapper, each signing with its own key. No party is a scripted stand-in.</li>
+    <li><b>The smoke script was captured from one run with Claude.</b> The release script,
+      <code>release.heart.yaml</code>, is still written by hand from <code>release.goal.md</code>: capturing it too
+      needs the goal grammar to say "At {party}", "asking to be told", and "Once {reply} …". That is the next step.</li>
+    <li>GitHub's working out whether a pull request can be merged is set through the small GitHub's control route by
+      the script that asks for each release (<code>variants.sh</code>), as GitHub would on its own time.</li>
+  </ul>
+
+  <h2>The goals, and the scripts kept from them</h2>
+  <details><summary>smoke.goal.md, the plain-text goal Claude walked once</summary><pre>---
+start: "{deployed}"
+inputs:
+  deployed: { question: "Which deployment of the library?" }
+  book: { default: "The Hobbit" }
+  author: { default: "J. R. R. Tolkien" }
+  renewable: { default: "Matilda" }
+  problem: { default: "missing-pages" }
+  comment: { default: "Pages 12 to 14." }
+---
+
+Check that the library works as a member would use it. Each scenario starts at the library's entry.
+
+- Search the loans for "{book}", and open {book} `as found` `scenario S1`
+- Search the loans for "{book}", and open {book} `as loan` `scenario S2`
+  - Verify: author is {author}
+- Search the loans for "{renewable}", and open {renewable} `as before` `scenario S3`
+  - Renew it
+  - Verify: due is not {before.due}
+- Search the loans for "{renewable}", and open {renewable} `as read` `scenario S4`
+  - Renew it
+  - Renew it again as of {read}: it should be refused as stale
+- Search the loans for "{book}", and open {book} `as reported` `scenario S5`
+  - Report {problem} on it, saying "{comment}"
+  - Verify: reported.problem is {problem}</pre></details>
+  <details><summary>smoke.heart.yaml, kept from that walk by artie generate: archived by each build, run by every release</summary><pre># Generated by artie generate from smoke.capture.yaml, the run of smoke.goal.md.
+# Every selection as that run made it, nested as it nested, with no model.
+# What it was offered is pinned in smoke.pins.yaml, held to before every act.
+#   artie run smoke.heart.yaml deployed=http://localhost:8185/
+heart: 1
+kind: kept
+start: ${deployed}
+
+inputs:
+  deployed:
+    question: Which deployment of the library?
+  book:
+    default: The Hobbit
+  author:
+    default: J. R. R. Tolkien
+  renewable:
+    default: Matilda
+  problem:
+    default: missing-pages
+  comment:
+    default: Pages 12 to 14.
+
+steps:
+  - scenario: S1
+    steps:
+      - act: library:search-loans
+        fields:
+          name: ${book}
+        inferred: search the loans for "${book}"
+        from-intent: Search the loans for "${book}", and open ${book}
+        then:
+          - follow: item
+            title: ${book}
+            intent: Search the loans for "${book}", and open ${book}
+            then: []
+  - scenario: S2
+    steps:
+      - act: library:search-loans
+        fields:
+          name: ${book}
+        inferred: search the loans for "${book}"
+        from-intent: Search the loans for "${book}", and open ${book}
+        then:
+          - follow: item
+            title: ${book}
+            intent: Search the loans for "${book}", and open ${book}
+            then:
+              - check:
+                  - field: author
+                    is: ${author}
+  - scenario: S3
+    steps:
+      - act: library:search-loans
+        fields:
+          name: ${renewable}
+        inferred: search the loans for "${renewable}"
+        from-intent: Search the loans for "${renewable}", and open ${renewable}
+        then:
+          - follow: item
+            title: ${renewable}
+            intent: Search the loans for "${renewable}", and open ${renewable}
+            then:
+              - keep-as: before
+              - act: library:renew
+                intent: Renew it
+                then: []
+              - check:
+                  - field: due
+                    is-not: ${before.due}
+  - scenario: S4
+    steps:
+      - act: library:search-loans
+        fields:
+          name: ${renewable}
+        inferred: search the loans for "${renewable}"
+        from-intent: Search the loans for "${renewable}", and open ${renewable}
+        then:
+          - follow: item
+            title: ${renewable}
+            intent: Search the loans for "${renewable}", and open ${renewable}
+            then:
+              - keep-as: read
+              - act: library:renew
+                intent: Renew it
+                then: []
+              - act: library:renew
+                inferred: renew the loan
+                as-of: read
+                refused-as: stale
+  - scenario: S5
+    steps:
+      - act: library:search-loans
+        fields:
+          name: ${book}
+        inferred: search the loans for "${book}"
+        from-intent: Search the loans for "${book}", and open ${book}
+        then:
+          - follow: item
+            title: ${book}
+            intent: Search the loans for "${book}", and open ${book}
+            then:
+              - act: library:report-problem
+                fields:
+                  problem: ${problem}
+                  comment: ${comment}
+                intent: Report ${problem} on it, saying "${comment}"
+                then: []
+              - check:
+                  - field: /reported/problem
+                    is: ${problem}</pre></details>
+  <details><summary>release.goal.md</summary><pre>---
+start: http://localhost:8098/
+inputs:
+  owner:   { default: acme }
+  repo:    { default: web }
+  pull:    { question: "Which pull request?" }
+  watcher: { default: http://localhost:8099/ }
+  jenkins: { default: http://localhost:8170/ }
+  dev:     { default: http://localhost:8190/ }
+---
+
+Release a pull request to Dev once it can be merged and its build passes its smoke test.
+
+- In {owner}/{repo}, open pull request {pull} `as pr`
+- At {watcher}, ask to be told when {pr} offers `github:merge` `as watch`
+- Once {watch} says it does, follow the pull request it links, and merge it by squashing `as merged`
+  Or give up after 30 minutes, and comment on {pr} why.
+- At {jenkins}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`
+- Once {build} has succeeded:
+  - Follow its `ci:deployment` link `as preview`
+  - Run the smoke script {build} links as `ci:smoke-test`, with deployed = {preview} `as smoke`
+  Or, once {build} has failed, comment on {pr} with the stage that failed, linking the log {build} links as `ci:log`.
+- At {dev}, open Dev; if {smoke.passed}, promote commit {merged.merge_commit_sha}, citing {smoke} `as promotion`
+  Otherwise, comment on {pr} with the scenarios that failed and why.</pre></details>
+  <details><summary>release.heart.yaml, written by hand from it, until its own capture</summary><pre># The release, kept as a script held as data: release.goal.md, as the release desk's ARTIE runs it. Every value
+# flows by name (`keep-as`, `${name.member}`); every wait is a reply the desk keeps (`ask`, `once-answered`); every
+# address after a party's entry is one an answer handed over, followed by its link or read where it was kept. Each
+# step goes on only from the one before it: the build is asked for once merged, the smoke run once built.
+heart: 1
+kind: kept
+inputs:
+  pull: {type: integer}
+  owner: {default: acme}
+  repo: {default: web}
+  github: {default: "http://192.168.1.18:8098"}
+  watcher: {default: "http://192.168.1.18:8099"}
+  ci: {default: "http://192.168.1.18:8170"}
+  dev: {default: "http://192.168.1.18:8190"}
+  # What the smoke test is given on this release: the slots its captured script fills, a value each.
+  book: {default: "The Hobbit"}
+  author: {default: "J. R. R. Tolkien"}
+  renewable: {default: "Matilda"}
+  problem: {default: "missing-pages"}
+  comment: {default: "Pages 12 to 14."}
+start: ${github}/
+steps:
+  # In {owner}/{repo}, open pull request {pull} `as pr`
+  - act: github:pulls-get
+    fields: {owner: "${owner}", repo: "${repo}", pull_number: "${pull}"}
+  - keep-as: pr
+  # At {watcher}, ask to be told when {pr} offers `github:merge` `as watch`
+  - enter: ${watcher}/
+    steps:
+      - ask: watcher:watch
+        fields: {resource: "${pr.@self}", offers: "github:merge", looks: 600}
+        reply: watch
+      # Once {watch} says it does, follow the pull request it links, and merge it by squashing `as merged`
+      - once-answered:
+          reply: watch
+          give-up: 30m
+          steps:
+            - follow: hr:in-reply-to
+            - follow: about
+            - act: github:merge
+              fields: {merge_method: squash}
+            - at: ${pr.@self}
+              steps:
+                - keep-as: merged
+            # At {ci}, build commit {merged.merge_commit_sha}, asking to be told how it goes `as build`
+            - enter: ${ci}/
+              steps:
+                - ask: ci:build
+                  fields: {commit: "${merged.merge_commit_sha}"}
+                  reply: build
+                - once-answered:
+                    reply: build
+                    give-up: 20m
+                    # Once {build} has succeeded: run the smoke script it links on the deployment it links `as smoke`
+                    steps:
+                      - follow: hr:in-reply-to
+                      - run-script: ci:smoke-test
+                        inputs:
+                          deployed: "${build.result._links.ci:deployment.href}"
+                          book: "${book}"
+                          author: "${author}"
+                          renewable: "${renewable}"
+                          problem: "${problem}"
+                          comment: "${comment}"
+                        as: smoke
+                      - note: "Smoke: ${smoke.passing} of ${smoke.of} passed. Failed: ${smoke.failed}"
+                      # At {dev}, if {smoke.passed}, promote the merged commit, citing {smoke} `as promotion`
+                      - given: [{at: smoke, field: passed, is: true}]
+                        then:
+                          - enter: ${dev}/
+                            steps:
+                              - act: env:get-environment
+                                fields: {id: 1}
+                              - act: env:promote
+                                fields:
+                                  commit: "${merged.merge_commit_sha}"
+                                  smoke: {passed: "${smoke.passing}", of: "${smoke.of}"}
+                                  _links:
+                                    "env:smoke-run": {href: "http://192.168.1.18:8200/reports/merge-watch-release/"}
+                              - keep-as: promotion
+                              - note: "Released: promoted ${merged.merge_commit_sha} to Dev."
+                        # Otherwise, comment on {pr} with the scenarios that failed.
+                        otherwise:
+                          - at: ${pr.@self}
+                            steps:
+                              - act: github:comment
+                                fields: {body: "Not promoted to Dev: smoke scenarios ${smoke.failed} failed."}
+                          - note: "Stopped as it should: smoke ${smoke.failed} failed, so not promoted; said why on the pull request."
+                    # Or, once {build} has failed, comment on {pr} with what failed, linking the log.
+                    failed:
+                      - at: ${pr.@self}
+                        steps:
+                          - act: github:comment
+                            fields: {body: "Not released: ${build.detail}. Log: ${build._links.ci:log.href}"}
+          # The watch gave up: say so on {pr}.
+          failed:
+            - at: ${pr.@self}
+              steps:
+                - act: github:comment
+                  fields: {body: "Not released: ${watch.detail}."}
+          # Or give up after 30 minutes, and comment on {pr} why.
+          otherwise:
+            - at: ${pr.@self}
+              steps:
+                - act: github:comment
+                  fields: {body: "Not released: ${why}."}</pre></details>
+
+  <h2>Run it again</h2>
+  <details><summary>Commands</summary><pre>./gradlew -p heart :heart-sims:installSims
+./gradlew -p client :artie-cli:installDist :artie-release:installDist
+sh exhibits/merge-watch-release/jenkins/run.sh
+# Once, with a model key: the smoke test's capture, on a preview known to be good (library on 8185).
+sh exhibits/merge-watch-release/smoke/capture.sh http://localhost:8185/
+# Every release after: no model.
+sh exhibits/merge-watch-release/variants.sh
+sh docs/reports/merge-watch-release/build.sh</pre></details>
+</main>
+</body>
+</html>

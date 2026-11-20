@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="gateway-title gateway-desc">
+<title id="gateway-title">A front for an old system, then and now</title>
+<desc id="gateway-desc">In the 1990s a web front end put HTML in front of a mainframe application so any browser could use it. Now a HEART gateway puts HEART in front of GitHub's REST API so ARTIE can use it.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="gateway-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="t" x="40" y="88" text-anchor="start">The 1990s</text>
+<rect class="box" x="170" y="50" width="210" height="76" rx="10"/>
+<text class="h" x="275" y="93" text-anchor="middle">A browser</text>
+<path class="line" d="M382 88 L428 88" marker-end="url(#gateway-head)"/>
+<rect class="hl" x="430" y="50" width="230" height="76" rx="10"/>
+<text class="h" x="545" y="83" text-anchor="middle">A web front end</text>
+<text class="s" x="545" y="103" text-anchor="middle">renders HTML from it</text>
+<path class="line" d="M662 88 L708 88" marker-end="url(#gateway-head)"/>
+<rect class="box" x="710" y="50" width="210" height="76" rx="10"/>
+<text class="h" x="815" y="93" text-anchor="middle">A mainframe app</text>
+<text class="t" x="40" y="208" text-anchor="start">Now</text>
+<rect class="box" x="170" y="170" width="210" height="76" rx="10"/>
+<text class="h" x="275" y="213" text-anchor="middle">ARTIE</text>
+<path class="line" d="M382 208 L428 208" marker-end="url(#gateway-head)"/>
+<rect class="hl" x="430" y="170" width="230" height="76" rx="10"/>
+<text class="h" x="545" y="203" text-anchor="middle">A HEART gateway</text>
+<text class="s" x="545" y="223" text-anchor="middle">renders HEART from it</text>
+<path class="line" d="M662 208 L708 208" marker-end="url(#gateway-head)"/>
+<rect class="box" x="710" y="170" width="210" height="76" rx="10"/>
+<text class="h" x="815" y="213" text-anchor="middle">GitHub's REST API</text>
+<text class="s" x="480" y="286" text-anchor="middle">The old system stays as it is. A new front speaks the generic client's media type.</text>
+</svg>

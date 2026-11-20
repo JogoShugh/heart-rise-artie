@@ -1,0 +1,96 @@
+{
+  "name": "commit-proves-order",
+  "title": "The Commit Has to Prove the Order",
+  "part": "One behavior, start to finish",
+  "kicker": "git pre-commit reads the log, line by line",
+  "tone": "light",
+  "number": 11,
+  "of": 30,
+  "html": "<h2>The Commit Has to Prove the Order</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <div><h3>A Feature File, First?</h3><p>Before the first production write.</p></div>\n    <div><h3>A Failing Run, Before the Code?</h3><p>Red, logged, before that write.</p></div>\n    <div><h3>Green, Last?</h3><p>The final run passed.</p></div>\n    <p class=\"punch\">Any “no”, and there’s no commit, whoever is committing.</p>\n    <p class=\"refs\"><deck-ref name=\"repeatability\"></deck-ref> <deck-fragment name=\"pre-commit\">pre-commit</deck-fragment></p>\n  </div>\n  <div class=\"card dark\" style=\"align-self: center\">\n    <span class=\"label\">The commit</span>\n    <p style=\"font-family: var(--mono); margin: .4rem 0\">e3dbaca4 · 11 Nov 2026</p>\n    <p>The library’s rules come from its policy file, and the simulator serves the library alone by one, as a preview</p>\n    <p class=\"note\">7 files: the feature, its steps, the policy, and where it’s used.</p>\n  </div>\n</div>\n",
+  "say": "Last step: the commit. And here the git pre-commit hook reads the log since the last commit, in order. Did a feature file change before the first production write? Was there a failing run before that write? Was the last run green? If any answer is no, there's no commit, whoever is committing: Claude, me, anyone. This one passed. It's commit e3dbaca4, on the 11th of November: the library's rules come from its policy file. Seven files, the feature, its steps, the policy and the three places that use it. One sentence from me; one behavior, in the right order, on the record.",
+  "sources": [
+    {
+      "label": "Commit e3dbaca4",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/commit/e3dbaca4"
+    },
+    {
+      "label": "bdd-gates skill",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "commit-proves-order.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "then-the-code.json",
+      "title": "Then the Code, Then Green"
+    },
+    "next": {
+      "href": "hooks.json",
+      "title": "How the Order Is Enforced"
+    },
+    "alternate": {
+      "href": "commit-proves-order.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "repeatability",
+        "kind": "measure",
+        "label": "REPEATABILITY",
+        "title": "Repeatability: the same goal, the same result, every time",
+        "summary": "Given the same inputs, the same outputs, call after call. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
+        "cite": "The second of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/repeatability.json",
+            "title": "REPEATABILITY"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The second of the three R's"
+          }
+        }
+      }
+    ],
+    "deck:fragment": [
+      {
+        "name": "pre-commit",
+        "label": "The ordering check (core/pre-commit)",
+        "lang": "bash",
+        "path": "bdd-gates: core/pre-commit",
+        "lines": "1–127",
+        "of": 127,
+        "text": "#!/usr/bin/env bash\n# Gherkin-first ordering check for any commit that touches production code.\n# Installed by the bdd-gates skill. Activate once with:\n#   git config core.hooksPath .githooks\n# Tool-agnostic: runs for a plain terminal `git commit` too.\n#\n# Since the last commit, the event log must show:\n#   1. a FEATURE_WRITE before the first MAIN_WRITE,\n#   2. a failing BDD run before the first MAIN_WRITE,\n#   3. a passing final BDD run.\n# Or, when the author switched refactor mode on (scripts/refactor-mode), the\n# refactor terms below instead.\n# Order is taken from line order in the append-only log, so events in the same\n# second still compare correctly. Timestamps only bound the \"since\" window.\n# Known simplification: ordering is global per commit, not per scenario.\nset -o pipefail\n\nroot=$(git rev-parse --show-toplevel)\nexport BDD_GATES_ROOT=$root\n. \"$root/.claude/bdd-gates/lib.sh\"\nbdd_has_config || exit 0\nbdd_load\n\nstaged_prod=()\nwhile IFS= read -r f; do\n  bdd_is_prod \"$f\" && staged_prod+=(\"$f\")\ndone < <(git diff --cached --name-only --diff-filter=ACMR)\n[ ${#staged_prod[@]} -gt 0 ] || exit 0\n\nlog=$(bdd_log)\n\n# Refactor mode: switched on by the author (scripts/refactor-mode), for one\n# commit on the HEAD it names. Production code may change with no feature\n# change and no red run, but only on these terms:\n#   1. no feature file and no test file differs from HEAD, staged or not;\n#   2. a BDD run passed after the mode was switched on, before the first\n#      production write, and the last run passed, after the last write.\nif bdd_refactor_present; then\n  if ! bdd_refactor_on; then\n    echo \"pre-commit: refactor mode was switched on for $(bdd_refactor_field head), but HEAD is now $(git rev-parse HEAD).\" >&2\n    echo \"  The author switches it off (scripts/refactor-mode off) or on again.\" >&2\n    exit 1\n  fi\n  reasons=()\n  while IFS= read -r line; do\n    p=${line:3}\n    p=${p##* -> }\n    bdd_is_test \"$p\" && reasons+=(\"a refactor leaves tests and features as they are, but $p differs from HEAD\")\n  done < <(git status --porcelain -uall)\n  head=$(bdd_refactor_field head)\n  window=$(awk -v on=\"REFACTOR_ON head=$head\" 'index($0, on) { buf = \"\"; found = 1; next } found { buf = buf $0 \"\\n\" } END { printf \"%s\", buf }' \"$log\" 2>/dev/null)\n  first_line() { printf '%b' \"$window\" | grep -nE -- \"$1\" | head -1 | cut -d: -f1; }\n  last_line() { printf '%b' \"$window\" | grep -nE -- \"$1\" | tail -1 | cut -d: -f1; }\n  pass=$(first_line ' BDD_RUN PASS ')\n  main=$(first_line ' MAIN_WRITE ')\n  last_main=$(last_line ' MAIN_WRITE ')\n  last_run=$(last_line ' BDD_RUN ')\n  [ -n \"$pass\" ] || reasons+=(\"no passing BDD run since refactor mode was switched on (green before the change)\")\n  if [ -n \"$pass\" ] && [ -n \"$main\" ] && [ \"$pass\" -gt \"$main\" ]; then\n    reasons+=(\"production code was written before the suite was seen green\")\n  fi\n  case \"$(printf '%b' \"$window\" | grep -E ' BDD_RUN ' | tail -1)\" in\n    *\" PASS\"*) ;;\n    *) reasons+=(\"the latest BDD run is not PASS (green after the change)\") ;;\n  esac\n  if [ -n \"$last_main\" ] && [ -n \"$last_run\" ] && [ \"$last_run\" -lt \"$last_main\" ]; then\n    reasons+=(\"production code was written after the last BDD run\")\n  fi\n  if [ ${#reasons[@]} -gt 0 ]; then\n    echo \"pre-commit: refactor check FAILED:\" >&2\n    printf '  - %s\\n' \"${reasons[@]}\" >&2\n    exit 1\n  fi\n  echo \"pre-commit: refactor check passed ($(bdd_refactor_field reason)).\"\n  exit 0\nfi\n\nif [ ! -f \"$log\" ]; then\n  echo \"pre-commit: no TDD event log ($log), but this commit touches production code:\" >&2\n  printf '  %s\\n' \"${staged_prod[@]}\" >&2\n  exit 1\nfi\n\n# The log stamps UTC; convert the last commit time to UTC before comparing.\ncommit_epoch=$(git log -1 --format=%ct 2>/dev/null || echo 0)\nsince=$(date -u -r \"$commit_epoch\" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \\\n  || date -u -d \"@$commit_epoch\" +%Y-%m-%dT%H:%M:%SZ)\nrecent=$(awk -v since=\"$since\" '$1 > since' \"$log\")\n\nif [ -z \"$recent\" ]; then\n  echo \"pre-commit: no TDD events since the last commit, but this commit touches production code.\" >&2\n  exit 1\nfi\n\n# CUCUMBER_RUN is accepted as a legacy name for BDD_RUN.\nrun_re=' (BDD_RUN|CUCUMBER_RUN) '\nfirst_line() { printf '%s\\n' \"$recent\" | grep -nE -- \"$1\" | head -1 | cut -d: -f1; }\nfeature=$(first_line ' FEATURE_WRITE ')\nfail=$(first_line \"${run_re}FAIL\")\nmain=$(first_line ' MAIN_WRITE ')\nlast_run=$(printf '%s\\n' \"$recent\" | grep -E -- \"$run_re\" | tail -1)\n\nreasons=()\n[ -n \"$feature\" ] || reasons+=(\"no FEATURE_WRITE since the last commit\")\n[ -n \"$fail\" ] || reasons+=(\"no failing BDD run since the last commit (the scenario was never seen red)\")\nif [ -n \"$feature\" ] && [ -n \"$main\" ] && [ \"$feature\" -gt \"$main\" ]; then\n  reasons+=(\"production code was written before any feature file\")\nfi\nif [ -n \"$fail\" ] && [ -n \"$main\" ] && [ \"$fail\" -gt \"$main\" ]; then\n  reasons+=(\"production code was written before the BDD suite was seen failing\")\nfi\ncase \"$last_run\" in\n  *\" PASS\"*) ;;\n  *) reasons+=(\"the latest BDD run since the last commit is not PASS\") ;;\nesac\n\nif [ ${#reasons[@]} -gt 0 ]; then\n  echo \"pre-commit: TDD ordering check FAILED:\" >&2\n  printf '  - %s\\n' \"${reasons[@]}\" >&2\n  echo \"\" >&2\n  echo \"Events since the last commit:\" >&2\n  printf '%s\\n' \"$recent\" | sed 's/^/  /' >&2\n  exit 1\nfi\n\necho \"pre-commit: TDD ordering check passed.\"\nexit 0",
+        "_links": {
+          "self": {
+            "href": "fragments/commit-proves-order--pre-commit.json",
+            "title": "The ordering check (core/pre-commit)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/pre-commit",
+            "title": "core/pre-commit, lines 1–127"
+          }
+        }
+      }
+    ]
+  }
+}

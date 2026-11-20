@@ -1,0 +1,59 @@
+{
+  "name": "drift",
+  "title": "When the Server Changes a Form",
+  "part": "Why it holds",
+  "kicker": "The pin catches it, the run stops clean, a walk repairs it",
+  "tone": "light",
+  "number": 14,
+  "of": 19,
+  "html": "<h2>When the Server Changes a Form</h2>\n<div class=\"pic pic-drift\" data-steps=\"6\" data-intro=\"Press play: a replay meets a changed form.\" data-captions='[\"Replay, no model: 501 opened, the watch asked.\", \"The forge changes scm:merge: sha is now required. (An illustrated change.)\", \"Before acting, ARTIE holds the offered form to its pin. It differs.\", \"The guard stops the run at step 3. 501 is still open: nothing merged, built or promoted.\", \"Repair: walk the goal again with Claude. It reads the new form and fills sha from 501&#39;s head.\", \"Kept again, with a new pin. Every replay after asks no model.\"]'>\n  <div class=\"pic-two\">\n    <ol class=\"drift-steps\">\n      <li><code>scm:pulls-get</code><i class=\"ok\" data-at=\"1\">✓</i></li>\n      <li><code>watcher:watch</code><i class=\"ok\" data-at=\"1\">✓</i></li>\n      <li class=\"hot\"><code>scm:merge</code><i class=\"x\" data-at=\"3\">✕</i><i class=\"ok\" data-at=\"6\">✓</i></li>\n      <li><code>ci:build</code><i class=\"ok\" data-at=\"6\">✓</i></li>\n      <li><code>hr:in-reply-to</code><i class=\"ok\" data-at=\"6\">✓</i></li>\n      <li><code>ci:smoke-test</code><i class=\"ok\" data-at=\"6\">✓</i></li>\n      <li><code>env:promote</code><i class=\"ok\" data-at=\"6\">✓</i></li>\n    </ol>\n    <div class=\"drift-side\">\n      <div class=\"drift-card\" data-at=\"2\"><b>The forge changed <code>scm:merge</code></b> <span class=\"tag\">illustrated</span>\n        <pre class=\"diff\">  schema:\n    required:\n      - method\n<ins>+     - sha</ins>\n    properties:\n<ins>+     sha: { type: string }</ins></pre></div>\n      <div class=\"drift-card\" data-at=\"3\"><b>Held to its pin</b>\n        <pre class=\"diff\">pinned   sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pw…\noffered  <del>a different hash</del>   ≠</pre></div>\n      <div class=\"drift-card stop\" data-at=\"4\"><b>stopped at step 3 by its guard</b><span>scm:merge changed since the lock file. 501 still open.</span></div>\n      <div class=\"drift-card fix\" data-at=\"5\"><b><span class=\"claude\">Claude</span> walks it again</b>\n        <pre class=\"diff\">PUT /repos/acme/web/pulls/501/actions/merge\n{ \"method\": \"squash\", \"sha\": \"dafbbfee1f2a…\" }   ← 501's head.sha</pre></div>\n      <div class=\"drift-card ok-card\" data-at=\"6\"><b>Kept again, new pin</b><span>Replays: 0 model calls.</span></div>\n    </div>\n  </div>\n</div>\n",
+  "say": "What if the server changes under a kept script? Here's an illustrated change: the forge makes sha required on scm:merge. The replay runs: pull request opened, watch asked. At the merge, before acting, ARTIE hashes the form it's offered and holds it to the pin. It differs. The guard stops the run at step three. Nothing half-done: 501 is still open, nothing built, nothing promoted. Then the repair: walk the goal again with Claude. Claude reads the new form and fills sha from the pull request's own head. The generator keeps the script again, with a new pin, and every replay after that asks no model. AI at the edge, only where something changed.",
+  "sources": [
+    {
+      "label": "release.pins.yaml",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.pins.yaml"
+    },
+    {
+      "label": "script-guard.feature, ARTIE's guard",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/client/artie/src/test/resources/features/script-guard.feature"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "drift.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "coupling.json",
+      "title": "Wired to a Media Type, Not a Site"
+    },
+    "next": {
+      "href": "what-carries.json",
+      "title": "What Lets HAL-FORMS Carry the Release"
+    },
+    "alternate": {
+      "href": "drift.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ],
+    "deck:code": {
+      "href": "../code/pictures.js",
+      "type": "text/javascript",
+      "title": "Steps through the change, the stop and the repair",
+      "integrity": "sha256-ObrrpjxhxUoEBQ3RyPvzmQcE1s2JQ/wFAV1MQCjjEtE="
+    }
+  }
+}

@@ -1,0 +1,16 @@
+# HEART (Hypermedia Engine for Agentic Resource Transitions) identifiers.
+# Each https://w3id.org/heart-rise/... identifier redirects to the page that
+# defines it, on the project's GitHub Pages site.
+# Source: https://github.com/JogoShugh/heart-rise-artie (standards/identifiers.json)
+
+Options +FollowSymLinks
+RewriteEngine on
+
+# The base profile: the index of every identifier.
+RewriteRule ^$ https://jogoshugh.github.io/heart-rise-artie/ [R=302,L]
+
+# Home document variables (vars/{noun}-id, vars/{noun}-name) share one page.
+RewriteRule ^vars/.*$ https://jogoshugh.github.io/heart-rise-artie/vars/ [R=302,L]
+
+# Every other identifier has its own page at the same path.
+RewriteRule ^(.+?)/?$ https://jogoshugh.github.io/heart-rise-artie/$1/ [R=302,L]

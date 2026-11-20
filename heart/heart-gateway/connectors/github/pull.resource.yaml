@@ -1,0 +1,97 @@
+# A pull request: read by pulls/get, a repository's listed by pulls/list.
+noun: pull
+collection: pulls
+read: pulls/get
+search: pulls/list
+# A pull request's repository is embedded (connector.yaml, links), so its owner and name aren't in the state:
+# the gateway reads the read's path variables from its own URL, and keeps them in the state as hr:address.
+address: /url
+# The list's query parameters a search form offers; GitHub pages with Link, so page and per_page are not.
+filters: [state, sort, direction]
+# GitHub's pull request list has no label filter; its issue list has, and lists every pull request as an issue too.
+# A search by labels is made there: the pull requests kept, each at its own address, the issues left out.
+searched-by:
+  labels:
+    operation: issues/list-for-repo
+    keep: { /pull_request: { present: true } }
+    address: /pull_request/url
+title: /title
+# Acts, each a projection of one of GitHub's operations.
+acts:
+  close:
+    operation: pulls/update
+    title: Close
+    description: Close it; a pull request unmerged, an issue as completed.
+    body: { state: closed }
+  reopen:
+    operation: pulls/update
+    title: Reopen
+    description: Open it again.
+    body: { state: open }
+  merge:
+    operation: pulls/merge
+    title: Merge
+    description: Merge the pull request into its base branch.
+    fields: [merge_method, commit_title, commit_message]
+    # GitHub merges only if the head is still at this sha: the head the client's view had.
+    bind: { sha: /head/sha }
+    # GitHub's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.
+    stale: 409
+    refused: 405
+  comment:
+    operation: issues/create-comment
+    title: Comment
+    description: Add a comment to the pull request's conversation.
+    fields: [body]
+    # GitHub keeps a pull request's conversation on the issue it also is, numbered as it is.
+    bind: { issue_number: /number }
+    # GitHub answers with the new comment; the gateway answers 201, with the comment's address in Location.
+    creates: comment
+  label:
+    operation: issues/add-labels
+    title: Label
+    description: Add labels to the pull request.
+    fields: [labels]
+    # GitHub keeps a pull request's labels on the issue it also is, numbered as it is.
+    bind: { issue_number: /number }
+  edit:
+    operation: pulls/update
+    title: Edit
+    description: Change its title or description.
+    fields: [title, body]
+  request-review:
+    operation: pulls/request-reviewers
+    title: Request a review
+    description: Ask people or teams to review the pull request.
+    fields: [reviewers, team_reviewers]
+    describe:
+      reviewers:
+        description: The people to ask, by their logins, such as octocat.
+      team_reviewers:
+        description: The teams to ask, by their slugs, such as maintainers.
+  update-branch:
+    operation: pulls/update-branch
+    title: Update the branch
+    description: Bring the latest changes from the base branch into this one.
+    # GitHub updates the branch only if its head is still the one the client's view had.
+    bind: { expected_head_sha: /head/sha }
+    # GitHub's 422 here: the branch is already up to date, or the head moved; either way, not now, in its words.
+    refused: 422
+# Other answers the reader's rules read: the repository says whether the caller may push.
+facts:
+  repository:
+    operation: repos/get
+    pointers:
+      owner: /base/repo/owner/login
+      repo: /base/repo/name
+  # GitHub's compare of the base branch with the head: behind_by counts the base's commits the branch lacks.
+  compare:
+    operation: repos/compare-commits
+    pointers:
+      owner: /base/repo/owner/login
+      repo: /base/repo/name
+      basehead: "{/base/ref}...{/head/sha}"
+# Members GitHub works out by itself, in the background, with no write: a new pull request reads
+# "mergeable": null, then true a second later. They don't make the state an act was checked against stale;
+# the act must instead still be offered.
+volatile: [/mergeable, /mergeable_state, /merge_commit_sha, /rebaseable]

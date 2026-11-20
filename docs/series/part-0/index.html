@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LO and behold: the generic AI agent RESTing patiently since 2000</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  --paper: #F7F3EA; --ink: #1D2128; --muted: #5B6370; --rule: #DDD5C6; --panel: #FFFDF8;
+  --accent: #A45F12; --accent-soft: #F6E3C2; --code: #EFE9DC; --mark: #F3D9A8;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A; --mark: #4A3714; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A; --mark: #4A3714; color-scheme: dark }
+body { background: var(--paper); color: var(--ink); margin: 0; font: 400 1.125rem/1.7 'Source Serif 4', Georgia, serif; }
+main { max-width: 42rem; margin: 0 auto; padding-block: 4rem 6rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.kicker { font: 600 0.8rem/1 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin: 0 0 1rem; }
+h1 { font: 600 clamp(2rem, 6.5vw, 3rem)/1.15 'IBM Plex Sans', system-ui, sans-serif; margin: 0 0 1.2rem; text-wrap: balance; }
+h1 .lo { font: 600 1.25em/1 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: 0.04em; color: var(--accent); }
+.dek { font-size: 1.3rem; line-height: 1.5; color: var(--muted); margin: 0 0 2.5rem; }
+h2 { font: 600 1.5rem/1.25 'IBM Plex Sans', system-ui, sans-serif; margin: 3.2rem 0 1rem; text-wrap: balance; }
+p { margin: 0 0 1.1rem; }
+blockquote { margin: 1.8rem 0; padding: 0.3rem 0 0.3rem 1.3rem; border-left: 3px solid var(--accent); font-size: 1.2rem; line-height: 1.55; }
+blockquote p { margin: 0 0 0.6rem; }
+cite { display: block; font: 400 0.88rem/1.5 'IBM Plex Sans', system-ui, sans-serif; font-style: normal; color: var(--muted); }
+code { font: 0.86em 'IBM Plex Mono', ui-monospace, monospace; background: var(--code); padding: 0.1em 0.3em; border-radius: 4px; }
+pre { background: var(--code); border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; margin: 1.4rem 0; font: 0.82rem/1.6 'IBM Plex Mono', ui-monospace, monospace; }
+pre code { background: none; padding: 0; font-size: inherit; }
+mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 0.15em; }
+.file { font: 500 0.78rem/1 'IBM Plex Mono', ui-monospace, monospace; color: var(--muted); margin: 1.4rem 0 -0.9rem; }
+.log { font: 0.95rem/1.6 'IBM Plex Mono', ui-monospace, monospace; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 0.9rem 1.1rem; margin: 1.4rem 0; }
+.log span { color: var(--muted); }
+ol.steps { padding-left: 1.3rem; } ol.steps li { margin: 0 0 0.5rem; }
+.table { overflow-x: auto; margin: 1.2rem 0 1.6rem; }
+table { border-collapse: collapse; width: 100%; font: 400 0.92rem/1.45 'IBM Plex Sans', system-ui, sans-serif; }
+th, td { text-align: left; vertical-align: top; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--rule); }
+th { font-weight: 600; color: var(--muted); }
+td.hl { color: var(--accent); font-weight: 600; }
+.next { margin-top: 2.4rem; padding: 1rem 1.2rem; border: 1px solid var(--accent); border-radius: 12px; background: var(--accent-soft); }
+.next > p { margin: 0 0 0.4rem; font-weight: 600; } .next ul { margin: 0; padding-left: 1.2rem; } .next li { margin: 0 0 0.3rem; } .next.prev { margin: 0 0 2.2rem; }
+details.deep { margin: 1rem 0 1.4rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); }
+details.deep > summary { cursor: pointer; padding: 0.7rem 1rem; font: 600 0.95rem/1.4 'IBM Plex Sans', system-ui, sans-serif; color: var(--accent); }
+details.deep > pre { margin: 0 0.8rem 0.8rem; max-height: 28rem; }
+details.deep > p { margin: 0 1rem 0.9rem; font: 400 0.92rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); }
+.file a { color: inherit; }
+figure.shot { margin: 1.2rem 0; } figure.shot img { display: block; max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 8px; background: #fff; }
+figure.shot figcaption { font: 400 0.88rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); margin-top: 0.4rem; }
+ol.four { font: 400 1rem/1.6 'IBM Plex Sans', system-ui, sans-serif; padding-left: 1.4rem; } ol.four li:last-child { color: var(--accent); font-weight: 600; }
+.sources { margin-top: 3.5rem; border-top: 1px solid var(--rule); padding-top: 1rem; font: 400 0.9rem/1.6 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); }
+.sources h2 { font-size: 1rem; margin: 0.5rem 0; }
+.sources ul { padding-left: 1.2rem; margin: 0; }
+.sources a, main a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<main>
+  <p class="kicker">Information and controls · part 0</p>
+  <h1><span class="lo">LO</span> and behold: the generic AI agent RESTing patiently since 2000</h1>
+  <p class="dek">Put your own controls in front of a system you can't change, so AI tools do what you want, not merely what they can. When you own the API, build the controls in from the start.</p>
+
+  <h2>Lo and behold, 1969</h2>
+  <p>To set the stage, let's go back to one of the founding moments of Internet lore. At 10:30 on the evening of 29 October 1969, Charley Kline at UCLA tried to log in to a computer at the Stanford Research Institute. He typed <code>L</code>, then <code>O</code>, and the system crashed.</p>
+  <blockquote><p>Hence, the first message on the Internet was "lo", as in "lo and behold!"</p><cite>Leonard Kleinrock, "The First Words on the Internet"</cite></blockquote>
+  <p>"Lo and behold" marks surprise, wonder, an unexpected turn; literally, it means "look and see!" Twenty years after that first "lo", Tim Berners-Lee gave us the World Wide Web, and we've used it the same way ever since. Neither you nor your browser knows what the next answer will hold, not its information and not its controls, the links and forms that say what you can do next. You look and you see, and one generic program has worked that way with every site for more than thirty-five years. Roy Fielding, who later described the Web's architecture, defined hypertext as exactly that pairing:</p>
+  <blockquote><p>When I say hypertext, I mean the simultaneous presentation of <mark>information and controls</mark> such that the information becomes the affordance through which the user <mark>(or automaton)</mark> obtains choices and selects actions.</p><cite>Roy T. Fielding, comment under "REST APIs must be hypertext-driven", 20 October 2008</cite></blockquote>
+  <p>APIs sit on that same Web. So why are they so much more brittle, and so tightly coupled to every client that calls them? Does it have to be that way?</p>
+
+  <h2>Lo and behold, generative AI</h2>
+  <p>Now the Web has a new kind of tool, and it gives us lo-and-behold moments of its own. We ask a generative AI tool for something, then look and see: sometimes something wonderful, sometimes something comically bad, when the tool "hallucinates" a function or a fact that never existed and presents it with full confidence.</p>
+  <p>Even self-styled experts will tell you that different results from identical inputs are simply the nature of a probabilistic model. That may explain the surprise. Yet most of us who build systems, even ones that use generative AI, are held to the expectations of decades: repeatability, reliability, reusability, right behavior. By another name, determinism. The model may be probabilistic; what it's allowed to do must not be.</p>
+
+  <h2>The forgotten structures that enabled Gen AI at all</h2>
+  <p>Look at how we ask, too. Most of our use of generative AI goes through a single control, a text area, where we type our intent with an outcome already in mind. The rest, skill files, handwritten prompts, even generated prompts, is mostly plain text as well: guardrails, rules and examples included, all embedded in prose. That's the Web turned inside out. Rather than lead with its own links and forms, the tool hands the lead to us: "Just tell me what you want, and I'll look at everything ever done before and try to make you happy."</p>
+  <p>Yet "everything ever done before" is only within reach because of links. A crawler such as Common Crawl, whose archive supplied most of the text the early large language models learned from, finds a page only by following a link to it from another. The models were made from the Web's graph. So it should be with APIs, built anew or adapted: an answer that carries its own context and controls gives a model what it needs at the moment it acts, rather than leaving it to training or fine-tuning.</p>
+
+  <h2>RESTing patiently since 2000</h2>
+  <p>The idea has a name, and a date. In 2000, Fielding's dissertation named the Web's architecture REST, and the browser's whole trick is one of its constraints: hypermedia as the engine of application state. Every page carries its own controls, and the browser offers only what the page offers. APIs mostly kept the information and left out the controls, so every client carries its own copy of what's allowed. An agent that looks at each answer and sees what's allowed, as a browser does, needs no such copy.</p>
+  <p>For APIs, that engine has been waiting ever since. In 2008, in the comments under the post that gave us his definition of hypertext, Fielding described the client we're after, and left room for AI:</p>
+  <blockquote><p>If a client is receiving instructions on how to interact with a resource just before acting only on those instructions, then the client doesn't care if the resource is a distributed queue. It simply doesn't need to know how the resource is implemented. All it needs to know is the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of AI-driven.</p><cite>Roy T. Fielding, comment of 8 November 2008, under "REST APIs must be hypertext-driven"</cite></blockquote>
+
+  <h2>Bringing information and controls back to API design for both humans and agents</h2>
+  <p>This is part 0 of a long series about putting hypermedia controls back at the front of API design, or, when the API isn't ours, about API adaptation: putting our own controls in front of it. Links and forms in every answer give people and agents the same structure: what can be done now, and how to ask for it. That structure is the foundation for better model responses, lower costs, with fewer tokens spent guessing, and more repeatability, reliability and right behavior.</p>
+  <p>Along the way, this series builds a client like the one Fielding described: heart-ts, a small TypeScript client that follows whatever links and forms each answer offers. Each part takes on a real pain, adds the small piece of the client that relieves it, and explains one or more of Fielding's six REST constraints, or the four of its uniform interface.</p>
+  <p>The first pain is one many teams know well: a rule we need, on a system we don't own, and AI tools that will do whatever that system lets them do.</p>
+
+  <div class="next">
+    <p>Next, part 1: <a href="../part-1/">Controls for rules we can't set</a></p>
+    <ul>
+      <li>A merge rule our team needs, and a GitHub setting we can't switch on.</li>
+      <li>An AI assistant writes a dashboard fragment that keeps the rule for us.</li>
+      <li>A small server of our own keeps GitHub's token out of the browser.</li>
+      <li>A real run: one bump merged, three held back, each with its reason.</li>
+      <li>What the fragment had to know, and what GitHub's answers lack: controls.</li>
+    </ul>
+  </div>
+
+  <section class="sources">
+    <h2>Sources</h2>
+    <ul>
+      <li>Leonard Kleinrock, <a href="https://www.lk.cs.ucla.edu/internet_first_words.html">"The First Words on the Internet"</a>.</li>
+      <li>Roy T. Fielding, <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be hypertext-driven"</a>, 2008, and its comments.</li>
+      <li>CERN, <a href="https://home.cern/science/computing/birth-web">"The birth of the Web"</a>.</li>
+      <li><a href="https://commoncrawl.org/">Common Crawl</a>; Tom B. Brown et al., <a href="https://arxiv.org/abs/2005.14165">"Language Models are Few-Shot Learners"</a>, 2020, table 2.2: filtered Common Crawl was 60% of GPT-3's training mix.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

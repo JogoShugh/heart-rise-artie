@@ -1,0 +1,26 @@
+name: title
+part: "The goal"
+tone: dark
+title: "One Goal, Two Dialects"
+kicker: The release, in HAL Schema Forms and in HAL-FORMS
+say: "Remember the release goal: release a pull request to Dev once it can be merged and its build passes its smoke test. Eight lines of plain words. We walked it once with Claude and kept it as a script, in HAL Schema Forms. Today the same goal again, but every party answers in HAL-FORMS, the on-ramp dialect, _templates only. Walked once more with Claude, kept by the generator alone, and released five times with no model. Same outcome. Let me show you how, and what HAL-FORMS doesn't carry."
+sources:
+  - ["release.goal.md", "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.goal.md"]
+fragments:
+  - name: goal
+    label: The goal, whole (release.goal.md)
+    source: exhibits/merge-watch-release/release.goal.md
+    from: "Release a pull request to Dev"
+    lang: markdown
+html: |
+  <h1>One Goal, Two Dialects</h1>
+  <div class="goal-hero">
+    <p class="goal-line">Release a pull request to Dev once it can be merged and its build passes its smoke test.</p>
+    <p class="refs"><deck-fragment name="goal">the goal, whole</deck-fragment></p>
+  </div>
+  <p class="lead">Walked once with Claude, kept as a script, and released with no model, in both of HEART's dialects: HAL Schema Forms, and HAL-FORMS.</p>
+  <div class="four" style="grid-template-columns: repeat(3, minmax(0, 1fr))">
+    <div><b>HAL Schema Forms</b><span>4 of 5 promoted, 0 model calls per release</span></div>
+    <div><b>HAL-FORMS</b><span>4 of 5 promoted, 0 model calls per release</span></div>
+    <div><b>504 stopped</b><span>by its smoke test, in both, as it should be</span></div>
+  </div>

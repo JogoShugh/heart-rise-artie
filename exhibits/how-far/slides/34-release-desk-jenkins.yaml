@@ -1,0 +1,15 @@
+name: release-desk-jenkins
+part: The whole release
+title: The release desk, and Jenkins, for real
+kicker: The whole release · 1 of 2
+say: "The release desk is a HEART service: a person, or ARTIE, asks it to release a pull request, and it runs the kept script. Its own text/html is shown here, after five releases on the GitHub test repository, run today. Jenkins is real, the official image, in a container on this Mac, building each merged commit and answering back through RISE when the build finishes."
+sources:
+  - ["Jenkins (official image)", "https://hub.docker.com/r/jenkins/jenkins"]
+  - ["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]
+html: |
+  <h2>The release desk, and Jenkins, for real</h2>
+  <div class="split">
+    <figure><img src="media/desk.png" alt="The release desk's text/html representation, offering Release a pull request"><figcaption>The release desk, as text/html: “Release a pull request” is its act.</figcaption></figure>
+    <figure><img src="media/jenkins.png" alt="Jenkins in a container listing builds #33 to #37"><figcaption>Jenkins in a container: builds #33 to #37, one per release (#33 failed).</figcaption></figure>
+  </div>
+  <p class="lead">Every party is a HEART service, read and acted on by the same client. Jenkins sits behind a thin HEART wrapper and answers back through RISE.</p>

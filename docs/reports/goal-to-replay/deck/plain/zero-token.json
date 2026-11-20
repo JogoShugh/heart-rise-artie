@@ -1,0 +1,21 @@
+{
+  "name": "zero-token",
+  "title": "Zero Token Architecture",
+  "part": "Why it works",
+  "kicker": "Kelsey Hightower · September 2026",
+  "tone": "light",
+  "number": 7,
+  "of": 17,
+  "html": "<h2>Zero Token Architecture</h2>\n<blockquote class=\"big\">“You are all having way too much fun burning way too many tokens”</blockquote>\n<p class=\"cite\"><b>Kelsey Hightower</b>, opening “ZTA: Zero Token Architecture”, 26 Sep 2026, as quoted by Daniel Cranney, WeAreDevelopers · <deck-ref name=\"zta\"></deck-ref></p>\n<div class=\"zta3\">\n  <div class=\"z-card bad\"><b>Every call</b><span>Inference on each run: tokens every time, a different answer each time, and a model in the trust path.</span></div>\n  <span class=\"larrow\" aria-hidden=\"true\">➜</span>\n  <div class=\"z-card good\"><b>Infer once</b><span>Then run the result as plain, deterministic code. Zero tokens per run.</span></div>\n  <span class=\"larrow\" aria-hidden=\"true\">➜</span>\n  <div class=\"z-card fielding\"><b>Once stays true</b><span>Every answer carries its controls, so the kept code checks its act is still offered. The check costs nothing.</span></div>\n</div>\n<p class=\"note\">The first two in my words, from the talk’s page and Cranney’s write-up. The third is Fielding’s part.</p>\n<p class=\"refs\"><deck-ref name=\"zta\"></deck-ref> <deck-ref name=\"rule-6\"></deck-ref> <deck-ref name=\"repeatability\"></deck-ref> <deck-ref name=\"resilience\"></deck-ref></p>\n",
+  "say": "Kelsey Hightower opened his talk on Zero Token Architecture with a line I won't forget: you are all having way too much fun burning way too many tokens. His point, in my words: an agent that runs inference on every call burns tokens, gets a different answer each time, and works against zero trust. Infer once. Then run the result as plain, deterministic code. Fair enough. But once has to stay true tomorrow, after the API changed. A script frozen against URLs it learned out of band either breaks, or pays tokens to learn them again. That's where Fielding comes back in: if every answer carries its controls, a kept script only has to check that the act it wants is still offered. That check is free.",
+  "sources": [
+    {
+      "label": "Hightower: ZTA, Zero Token Architecture (talk)",
+      "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"
+    },
+    {
+      "label": "Cranney: Infer Once, Run Everywhere",
+      "href": "https://www.wearedevelopers.com/magazine/783-infer-once-run-everywhere-zero-token-architecture"
+    }
+  ]
+}

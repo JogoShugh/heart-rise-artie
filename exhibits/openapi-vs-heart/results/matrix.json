@@ -1,0 +1,288 @@
+[
+  {
+    "release": "monday",
+    "client": "afford-1.0",
+    "passed": 3,
+    "of": 3,
+    "scenarios": [
+      {
+        "scenario": "A planted bed can be watered",
+        "passed": true
+      },
+      {
+        "scenario": "An empty bed can be sown, and not watered",
+        "passed": true
+      },
+      {
+        "scenario": "A ready bed can be harvested",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "release": "monday",
+    "client": "artie-1.0",
+    "passed": 3,
+    "of": 3,
+    "scenarios": [
+      {
+        "scenario": "A planted bed can be watered",
+        "passed": true
+      },
+      {
+        "scenario": "An empty bed can be sown, and not watered",
+        "passed": true
+      },
+      {
+        "scenario": "A ready bed can be harvested",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "release": "monday",
+    "client": "bespoke-1.0",
+    "passed": 3,
+    "of": 3,
+    "scenarios": [
+      {
+        "scenario": "A planted bed can be watered",
+        "passed": true
+      },
+      {
+        "scenario": "An empty bed can be sown, and not watered",
+        "passed": true
+      },
+      {
+        "scenario": "A ready bed can be harvested",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "release": "monday",
+    "client": "live-1.0",
+    "passed": 0,
+    "of": 3,
+    "scenarios": [
+      {
+        "scenario": "A planted bed can be watered",
+        "passed": false,
+        "failedAt": "bed 2 shows exactly the buttons \"Water the bed\"",
+        "why": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:"
+      },
+      {
+        "scenario": "An empty bed can be sown, and not watered",
+        "passed": false,
+        "failedAt": "bed 1 shows exactly the buttons \"Sow a seed\"",
+        "why": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:"
+      },
+      {
+        "scenario": "A ready bed can be harvested",
+        "passed": false,
+        "failedAt": "bed 3 shows exactly the buttons \"Harvest the crop\"",
+        "why": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:"
+      }
+    ]
+  },
+  {
+    "release": "tuesday-after-rework",
+    "client": "bespoke-1.1",
+    "passed": 7,
+    "of": 7,
+    "scenarios": [
+      {
+        "scenario": "A planted bed can be watered",
+        "passed": true
+      },
+      {
+        "scenario": "An empty bed can be sown, and not watered",
+        "passed": true
+      },
+      {
+        "scenario": "A ready bed can be harvested",
+        "passed": true
+      },
+      {
+        "scenario": "After the frost, a frozen bed shows it is frozen",
+        "passed": true
+      },
+      {
+        "scenario": "After the frost, a frozen bed offers thaw, and not water",
+        "passed": true
+      },
+      {
+        "scenario": "Thawing a frozen bed lets it be watered again",
+        "passed": true
+      },
+      {
+        "scenario": "Every button a frozen bed shows is one the garden accepts",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "release": "tuesday-morning",
+    "client": "afford-1.0",
+    "passed": 7,
+    "of": 7,
+    "scenarios": [
+      {
+        "scenario": "A planted bed can be watered",
+        "passed": true
+      },
+      {
+        "scenario": "An empty bed can be sown, and not watered",
+        "passed": true
+      },
+      {
+        "scenario": "A ready bed can be harvested",
+        "passed": true
+      },
+      {
+        "scenario": "After the frost, a frozen bed shows it is frozen",
+        "passed": true
+      },
+      {
+        "scenario": "After the frost, a frozen bed offers thaw, and not water",
+        "passed": true
+      },
+      {
+        "scenario": "Thawing a frozen bed lets it be watered again",
+        "passed": true
+      },
+      {
+        "scenario": "Every button a frozen bed shows is one the garden accepts",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "release": "tuesday-morning",
+    "client": "artie-1.0",
+    "passed": 7,
+    "of": 7,
+    "scenarios": [
+      {
+        "scenario": "A planted bed can be watered",
+        "passed": true
+      },
+      {
+        "scenario": "An empty bed can be sown, and not watered",
+        "passed": true
+      },
+      {
+        "scenario": "A ready bed can be harvested",
+        "passed": true
+      },
+      {
+        "scenario": "After the frost, a frozen bed shows it is frozen",
+        "passed": true
+      },
+      {
+        "scenario": "After the frost, a frozen bed offers thaw, and not water",
+        "passed": true
+      },
+      {
+        "scenario": "Thawing a frozen bed lets it be watered again",
+        "passed": true
+      },
+      {
+        "scenario": "Every button a frozen bed shows is one the garden accepts",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "release": "tuesday-morning",
+    "client": "bespoke-1.0",
+    "passed": 3,
+    "of": 7,
+    "scenarios": [
+      {
+        "scenario": "A planted bed can be watered",
+        "passed": true
+      },
+      {
+        "scenario": "An empty bed can be sown, and not watered",
+        "passed": true
+      },
+      {
+        "scenario": "A ready bed can be harvested",
+        "passed": true
+      },
+      {
+        "scenario": "After the frost, a frozen bed shows it is frozen",
+        "passed": false,
+        "failedAt": "bed 2's status reads frozen",
+        "why": "AssertionError [ERR_ASSERTION]: the status reads \"undefined\""
+      },
+      {
+        "scenario": "After the frost, a frozen bed offers thaw, and not water",
+        "passed": false,
+        "failedAt": "bed 2 shows exactly the buttons \"Thaw the bed\"",
+        "why": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:"
+      },
+      {
+        "scenario": "Thawing a frozen bed lets it be watered again",
+        "passed": false,
+        "failedAt": "the operator presses \"Thaw the bed\" on bed 2",
+        "why": "Error: no \"Thaw the bed\" button; the bed shows Water the bed"
+      },
+      {
+        "scenario": "Every button a frozen bed shows is one the garden accepts",
+        "passed": false,
+        "failedAt": "the dashboard sent nothing the garden refused",
+        "why": "AssertionError [ERR_ASSERTION]: requests the garden refused"
+      }
+    ]
+  },
+  {
+    "release": "tuesday-morning",
+    "client": "live-1.0",
+    "passed": 1,
+    "of": 7,
+    "scenarios": [
+      {
+        "scenario": "A planted bed can be watered",
+        "passed": false,
+        "failedAt": "bed 2 shows exactly the buttons \"Water the bed\"",
+        "why": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:"
+      },
+      {
+        "scenario": "An empty bed can be sown, and not watered",
+        "passed": false,
+        "failedAt": "bed 1 shows exactly the buttons \"Sow a seed\"",
+        "why": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:"
+      },
+      {
+        "scenario": "A ready bed can be harvested",
+        "passed": false,
+        "failedAt": "bed 3 shows exactly the buttons \"Harvest the crop\"",
+        "why": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:"
+      },
+      {
+        "scenario": "After the frost, a frozen bed shows it is frozen",
+        "passed": true
+      },
+      {
+        "scenario": "After the frost, a frozen bed offers thaw, and not water",
+        "passed": false,
+        "failedAt": "bed 2 shows exactly the buttons \"Thaw the bed\"",
+        "why": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:"
+      },
+      {
+        "scenario": "Thawing a frozen bed lets it be watered again",
+        "passed": false,
+        "failedAt": "bed 2 shows exactly the buttons \"Water the bed\"",
+        "why": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:"
+      },
+      {
+        "scenario": "Every button a frozen bed shows is one the garden accepts",
+        "passed": false,
+        "failedAt": "the dashboard sent nothing the garden refused",
+        "why": "AssertionError [ERR_ASSERTION]: requests the garden refused"
+      }
+    ]
+  }
+]

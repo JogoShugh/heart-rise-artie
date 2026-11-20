@@ -1,0 +1,15 @@
+1 enter http://localhost:8282/: done
+2 act support:get-ticket, id 1: done
+3 act support:assign, agent lena: refused
+note: by script, for Lena: not a choice, refused by the client: "agent: "lena" is not one of the choices"
+4 assign this ticket to Lena: refused
+note: in words, for Lena: unclear to the reasoner, refused by the client: "Lena isn't an available agent. Would you like to assign this ticket to priya or marco instead?"
+5 assign this ticket to Marco: done
+note: assigned to marco
+6 act support:change-priority, priority urgent: done
+7 give this ticket to Tom: refused
+note: in words, for Tom, once urgent: unclear to the reasoner, refused by the client: "Tom isn't available as an agent for this ticket. The only agent I can assign it to is priya. Do you want to assign it to priya instead?"
+8 reassign this urgent ticket to Priya: done
+note: assigned to priya
+9 return to http://localhost:8282/: done
+finished, 9 steps

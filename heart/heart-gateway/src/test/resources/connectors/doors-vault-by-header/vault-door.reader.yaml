@@ -1,0 +1,11 @@
+# A vault door is answered as its own media type; its rules are written here.
+matches:
+  mediaType: application/vnd.doors.vault+json
+allowed:
+  table: /status
+  rows:
+    CLOSED: { allow: [lock] }
+    LOCKED:
+      allow: [unlock]
+      absent: { open: "A vault door opens only with two keys." }
+hide: [/allowedActions]

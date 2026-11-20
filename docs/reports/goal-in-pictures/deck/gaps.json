@@ -1,0 +1,89 @@
+{
+  "name": "gaps",
+  "title": "What HAL-FORMS Doesn't Carry Today",
+  "part": "HAL-FORMS",
+  "kicker": "Beyond caching, what a replay loses",
+  "tone": "light",
+  "number": 16,
+  "of": 19,
+  "html": "<h2>What HAL-FORMS Doesn't Carry Today</h2>\n<div class=\"table-scroll\"><table>\n  <thead><tr><th>Gap</th><th>What it costs</th><th>An extension could add</th></tr></thead>\n  <tbody>\n    <tr><td>No integrity per template</td><td>The kept script pins no form (here: 0 forms, 2 links); a replay can't tell a form changed under it</td><td><code>hr:integrity</code> per template</td></tr>\n    <tr><td>HTML input types only</td><td>No integer, no object or array; an object's shape comes from the goal's words</td><td>a JSON Schema per template, by link</td></tr>\n    <tr><td>Fewer checks before sending</td><td>More mistakes caught only by the server</td><td>the same schema</td></tr>\n    <tr><td>No description of the act</td><td>The model chooses with less</td><td><code>description</code>, a link to the ALPS descriptor</td></tr>\n  </tbody>\n</table></div>\n<p class=\"note\">HAL-FORMS's spec allows extensions that add optional properties, which plain clients ignore. Not a commitment: HAL Schema Forms already carries all four, and is the more robust choice for replays with no model. HAL-FORMS stays the L0 on-ramp.</p>\n<p class=\"refs\"><deck-ref name=\"resilience\"></deck-ref> <deck-ref name=\"repeatability\"></deck-ref></p>\n",
+  "say": "Everything in this release works in HAL-FORMS. What it doesn't carry today is the safety and precision layer. No integrity hash on a template, so the kept script pins no form, and a replay can't tell that a form changed under it. No real types, so an integer is just text and an object can't be described. Fewer checks before sending. No description of the act for the model. Could HAL-FORMS be extended to carry these? Yes: its spec lets anyone add optional properties, and plain clients ignore what they don't know. An integrity per template, a description, a schema by link would close each gap. We're not committing to that. HAL Schema Forms already carries all of it, and it's the more robust choice for a replay with no model.",
+  "sources": [
+    {
+      "label": "HAL-FORMS, Extending the HAL-FORMS Document",
+      "href": "https://github.com/mamund/hal-forms/blob/master/index.asciidoc"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "gaps.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "what-carries.json",
+      "title": "What Lets HAL-FORMS Carry the Release"
+    },
+    "next": {
+      "href": "nothing-broke.json",
+      "title": "Nothing Broke in HAL Schema Forms"
+    },
+    "alternate": {
+      "href": "gaps.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "resilience",
+        "kind": "measure",
+        "label": "RESILIENCE",
+        "title": "Resilience: the server changes, the client doesn't break",
+        "summary": "When the server changes, or misbehaves on purpose, the client takes the failure path the spec names, re-syncs, and goes on; a model comes back only when the controls really changed, to repair. At the small scale it is the regression suite and the gates that hold, even against the model.",
+        "cite": "The third of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/resilience.json",
+            "title": "RESILIENCE"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The third of the three R's"
+          }
+        }
+      },
+      {
+        "name": "repeatability",
+        "kind": "measure",
+        "label": "REPEATABILITY",
+        "title": "Repeatability: the same goal, the same result, every time",
+        "summary": "Given the same inputs, the same outputs, call after call. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
+        "cite": "The second of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/repeatability.json",
+            "title": "REPEATABILITY"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The second of the three R's"
+          }
+        }
+      }
+    ]
+  }
+}

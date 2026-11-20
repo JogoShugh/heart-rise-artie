@@ -1,0 +1,20 @@
+name: the-library
+part: "What I wanted the agent to be"
+title: "Meet the Library"
+kicker: The example we'll follow all the way through
+say: "Let's make that concrete, with an example we'll follow for the rest of the talk. Riverside Public Library. Ana Torres has three books out. Matilda can be renewed: it offers renew, report a problem, and return. The Hobbit can't be renewed, because someone has a hold waiting for it. Charlotte's Web can't either: it's been renewed three times, the most allowed. Notice two things. First, what each loan offers depends on its state, and the library says so in every answer: the form to renew is there, or it isn't. Second, when it isn't, the library says why, in plain words. That's exactly what a browser shows a person. It's also exactly what an agent needs. Keep this library in mind; it's going to get a new renewal policy, and that policy is going to go all the way to a Dev environment."
+sources:
+  - ["library.feature", "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/heart/heart-sims/src/test/resources/features/library.feature"]
+html: |
+  <h2>Meet the Library</h2>
+  <p class="lead">Riverside Public Library. Ana Torres has three books out.</p>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Book</th><th>Renewals</th><th>Hold waiting</th><th>What the loan offers now</th><th>Why not renew</th></tr></thead>
+    <tbody>
+      <tr><td>Matilda</td><td>0</td><td>no</td><td>renew, report a problem, return</td><td></td></tr>
+      <tr><td>The Hobbit</td><td>0</td><td>yes</td><td>report a problem, return</td><td>“A hold is waiting for this book, so it can’t be renewed.”</td></tr>
+      <tr><td>Charlotte’s Web</td><td>3</td><td>no</td><td>report a problem, return</td><td>“It has been renewed 3 times, the most allowed.”</td></tr>
+    </tbody>
+  </table></div>
+  <p class="punch">What a loan offers depends on its state. When something isn’t offered, the library says why.</p>
+  <p class="refs"><deck-ref name="hypertext"></deck-ref> <deck-ref name="in-band"></deck-ref> <deck-ref name="right-behavior"></deck-ref></p>

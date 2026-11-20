@@ -1,0 +1,11 @@
+# A vault door says what it is in its body; its rules are written here.
+matches:
+  body: { /kind: vault-door }
+allowed:
+  table: /status
+  rows:
+    CLOSED: { allow: [lock] }
+    LOCKED:
+      allow: [unlock]
+      absent: { open: "A vault door opens only with two keys." }
+hide: [/allowedActions]

@@ -1,0 +1,99 @@
+{
+  "name": "kept-vs-code-mode",
+  "title": "A kept script is data, not a program",
+  "part": "What it costs",
+  "kicker": "What gets kept",
+  "tone": "light",
+  "number": 42,
+  "of": 54,
+  "html": "<h2>A kept script is data, not a program</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr)\">\n  <div class=\"rows\">\n    <pre># release.heart.yaml (excerpt), kept by artie generate\n<b>heart: 1</b>\n<b>kind: kept</b>\nsteps:\n  - act: scm:pulls-get\n    fields: {owner: ${owner}, repo: ${repo},\n             pull_number: ${pull}}\n    then: [keep-as: pr]\n  - enter: ${watcher}\n    steps:\n      - ask: watcher:watch\n        fields: {resource: ${pr.@self},\n                 offers: scm:merge}\n  - once-answered: {reply: watch, steps: […\n<span class=\"add\">      - act: scm:merge\n        fields: {method: squash}</span>\n# release.pins.yaml: what each form was, by hash\n  scm:merge: {method: PUT,\n    integrity: sha256-sGUdrPfH…}</pre>\n    <p class=\"refs\"><deck-fragment name=\"kept\">release.heart.yaml</deck-fragment> <deck-fragment name=\"pins\">release.pins.yaml</deck-fragment></p>\n  </div>\n  <div class=\"split\" style=\"grid-template-columns: 1fr 1fr\">\n    <div class=\"rows\" style=\"gap: 0.4rem\">\n      <h3 style=\"font: 650 1.5rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--leaf)\">Kept YAML (ARTIE)</h3>\n      <ul>\n        <li>Data. No loops, imports or eval to review.</li>\n        <li>Every act names a relation the server must still offer.</li>\n        <li>Pinned by hash: a changed form stops the replay.</li>\n        <li>Runs with no model, in any HEART client.</li>\n      </ul>\n    </div>\n    <div class=\"rows\" style=\"gap: 0.4rem\">\n      <h3 style=\"font: 650 1.5rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--bad)\">Code Mode</h3>\n      <ul>\n        <li>The model writes TypeScript or Python against tool APIs.</li>\n        <li>What you keep is a program: code review, sandbox, dependencies.</li>\n        <li>It can call anything its bindings expose, in any order.</li>\n        <li>A real step up from tool lists in context.</li>\n      </ul>\n    </div>\n  </div>\n</div>\n",
+  "say": "Code Mode (Cloudflare, September 2025; Anthropic's code execution with MCP, November 2025) has the model write TypeScript against tool APIs and runs it in a sandbox. That's a real improvement on stuffing tool lists into context. But what you keep is a program: it needs code review, a sandbox, dependency hygiene, and it can call anything its bindings expose. ARTIE keeps YAML: no loops you didn't capture, no imports, no eval. Every act names a relation, and before it's sent ARTIE checks the form is still offered and still matches its pin. A review is reading data.",
+  "sources": [
+    {
+      "label": "Cloudflare: Code Mode (2025)",
+      "href": "https://blog.cloudflare.com/code-mode/"
+    },
+    {
+      "label": "Anthropic: Code execution with MCP",
+      "href": "https://www.anthropic.com/engineering/code-execution-with-mcp"
+    },
+    {
+      "label": "artie (repository)",
+      "href": "https://github.com/JogoShugh/heart-rise-artie"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "kept-vs-code-mode.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "tokenomics.json",
+      "title": "Capture once with a model, replay with none"
+    },
+    "next": {
+      "href": "proof.json",
+      "title": "One script, real GitHub and a local GitLab"
+    },
+    "alternate": {
+      "href": "kept-vs-code-mode.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:fragment": [
+      {
+        "name": "kept",
+        "label": "The kept script (release.heart.yaml)",
+        "lang": "yaml",
+        "path": "exhibits/merge-watch-release/release.heart.yaml",
+        "lines": "41–125",
+        "of": 125,
+        "text": "steps:\n  - act: scm:pulls-get\n    fields:\n      owner: ${owner}\n      repo: ${repo}\n      pull_number: ${pull}\n    intent: Open pull request ${pull} of ${owner}/${repo}\n    then:\n      - keep-as: pr\n  - enter: ${watcher}\n    steps:\n      - ask: watcher:watch\n        fields:\n          resource: ${pr.@self}\n          offers: scm:merge\n        reply: watch\n  - once-answered:\n      reply: watch\n      steps:\n        - enter: ${pr.@self}\n          steps:\n            - act: scm:merge\n              fields:\n                method: squash\n              intent: merge it by squashing\n              then:\n                - check:\n                    - field: state\n                      is: closed\n                    - field: merged\n                      is: true\n                    - field: mergeable_state\n                      is: unknown\n                - keep-as: merged\n  - enter: ${jenkins}\n    steps:\n      - ask: ci:build\n        fields:\n          commit: ${merged.merge_commit_sha}\n        reply: build\n  - once-answered:\n      reply: build\n      steps:\n        - follow: hr:in-reply-to\n          intent: follow its in-reply-to link to the build\n          then:\n            - run-script: ci:smoke-test\n              on-link: ci:deployment\n              inputs:\n                book: ${book}\n                author: ${author}\n                renewable: ${renewable}\n                problem: ${problem}\n                comment: ${comment}\n              as: smoke\n  - given:\n      - at: smoke\n        field: passed\n        is: true\n    then:\n      - enter: ${dev}\n        steps:\n          - act: env:get-environment\n            fields:\n              id: ${environment}\n            inferred: get environment ${environment}\n            from-intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n            then:\n              - act: env:promote\n                fields:\n                  commit: ${merged.merge_commit_sha}\n                  smoke: # review: the reasoner chose it, asked \"promote commit 30a0fa96e3eed2ae20b2b5fa7613a115d56312a3, citing 5 of 5 scenarios passed\"\n                    passed: ${smoke.passing}\n                    of: ${smoke.of}\n                intent: open environment ${environment} and promote commit {merged.merge_commit_sha}, citing {smoke.passing} of {smoke.of} scenarios passed\n                then:\n                  - check:\n                      - field: commit\n                        is: ${merged.merge_commit_sha}\n    otherwise:\n      - at: ${pr.@self}\n        steps:\n          - act: scm:comment\n            fields:\n              body: \"Not promoted to Dev: smoke scenarios ${smoke.failed} failed.\"",
+        "_links": {
+          "self": {
+            "href": "fragments/kept-vs-code-mode--kept.json",
+            "title": "The kept script (release.heart.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.heart.yaml#L41-L125",
+            "title": "exhibits/merge-watch-release/release.heart.yaml, lines 41–125"
+          }
+        }
+      },
+      {
+        "name": "pins",
+        "label": "What each form was, by hash (release.pins.yaml)",
+        "lang": "yaml",
+        "path": "exhibits/merge-watch-release/release.pins.yaml",
+        "lines": "1–64",
+        "of": 64,
+        "text": "# What /Users/josh/repos/artie/exhibits/merge-watch-release/release.heart.yaml was recorded against, from /Users/josh/repos/artie/exhibits/merge-watch-release/release.capture.yaml. artie run holds the script to it before every act:\n# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its\n# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and\n# one offered in a set not recorded for it.\nrung: L2\ndigest: sha256-qKM7TXJvTtzvI3H416WCa/y5oYK6wvYch4GhbwCLhKc=\nforms:\n  scm:pulls-get:\n    integrity: sha256-h02WjR7vd61a3clH1/805IIXM3O8OwspKt3KHwUP7/s=\n    act: sha256-0vjYAyfZzEdAjZBvXTUMge5qmujg/1tlkot9bnCWtaI=\n    method: GET\n    sets:\n      - sha256-gImH34GdmXPjwBtQ7RNGKro/Tbf26SFredj/E+jK13c=\n  watcher:watch:\n    integrity: sha256-vfjsEUQ7/+mWV478GxTnnHzzo8rZLb+s3eHW4KJhRFw=\n    act: sha256-BQiZ8TwYquT9Wgp2yiw4eEIqY3c9/0IwgvhuCvV1KHg=\n    method: POST\n    sets:\n      - sha256-T8prIv6TSqXSB9HdposRpsV8AYFUzfYEqiUvr32dX10=\n  scm:merge:\n    integrity: sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pweUa6ioBBwF8=\n    act: sha256-s8/h0c399Nx7AL340i09iHi9+s/nSZ9R+q5MfjgiYUY=\n    method: PUT\n    sets:\n      - sha256-ARE/YVgALeTnzANV8TegQJiue3vljZt3onMex+jMsvs=\n  ci:build:\n    integrity: sha256-xo3vNZ/YJwDkXNstjxyOUmQHZdWN8PojyD9Ub3KzHGQ=\n    act: sha256-9MVTORRjzrcFoMzlwiQWRmnUPVD+jk4sNjjyGG2m4fI=\n    method: POST\n    sets:\n      - sha256-Uv4wXjFFrnajvow8ez6LM8naU0uFYIKuRdyKs4IQA3A=\n  library:search-loans:\n    integrity: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=\n    act: sha256-Z7N30vs6QUGs1xK2hP+w1F0UgY7gyXs1+HawMkOt274=\n    method: GET\n    sets:\n      - sha256-OO1MlqifBoCG+V9lYByf83cmOoCUf75taO/frDYwjWE=\n  library:renew:\n    integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=\n    act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=\n    method: POST\n    sets:\n      - sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU=\n  library:report-problem:\n    integrity: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=\n    act: sha256-Z+8E81vIjCh35uyOKsoSwVMDm2eCmJBVEcbO6oI3uD8=\n    method: POST\n    sets:\n      - sha256-04lPGu1h4kV3Ra9udmDg1UCTzHfqn47zOSXw6TDIKOQ=\n  env:get-environment:\n    integrity: sha256-UWb+xXKngRFe8ibTwO9SrpSUYNPBbji/5JjlwpAEKfQ=\n    act: sha256-myRjFFxsNF8ai44N4fdXgWOPGB3uRptbwrCqaA8yp6s=\n    method: GET\n    sets:\n      - sha256-sy8+OSs554Ilw4WUAs9A0ywntG59u2PLanv0jt/pId4=\n  env:promote:\n    integrity: sha256-TwXThZ20UPUIctrpRXRoHqarKKsEilvB0sVwvK1PY4s=\n    act: sha256-uhGb8WNCB9bBSTcSnGDncK5OOgbvor2iNrT+IZvrEFA=\n    method: POST\n    sets:\n      - sha256-Uk7KIVDEyuxx08fE2x1gvp0hjkFhpH/7gyFyP7k3Vb8=\nlinks:\n  hr:in-reply-to: ''\n  item: ''",
+        "_links": {
+          "self": {
+            "href": "fragments/kept-vs-code-mode--pins.json",
+            "title": "What each form was, by hash (release.pins.yaml)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.pins.yaml",
+            "title": "exhibits/merge-watch-release/release.pins.yaml, lines 1–64"
+          }
+        }
+      }
+    ]
+  }
+}

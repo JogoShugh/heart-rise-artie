@@ -1,0 +1,111 @@
+1 t1 artie-intent   done=True in=7254 out=607 calls=5 tools=9 http=18 4xx=0 
+1 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+1 t2 artie-intent   done=False in=3997 out=410 calls=3 tools=4 http=7 4xx=0 
+1 t3 artie-intent   done=True in=5599 out=763 calls=4 tools=8 http=16 4xx=1 
+2 t1 artie-intent   done=True in=7254 out=615 calls=5 tools=9 http=18 4xx=0 
+2 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+2 t2 artie-intent   done=True in=3997 out=519 calls=3 tools=4 http=7 4xx=0 
+2 t3 artie-intent   done=True in=5599 out=697 calls=4 tools=8 http=16 4xx=1 
+3 t1 artie-intent   done=True in=7254 out=608 calls=5 tools=9 http=18 4xx=0 
+3 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+3 t2 artie-intent   done=False in=3997 out=435 calls=3 tools=4 http=7 4xx=0 
+3 t3 artie-intent   done=True in=5599 out=746 calls=4 tools=8 http=16 4xx=1 
+4 t1 artie-intent   done=True in=7254 out=608 calls=5 tools=9 http=18 4xx=0 
+4 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+4 t2 artie-intent   done=False in=3997 out=528 calls=3 tools=4 http=8 4xx=0 
+4 t3 artie-intent   done=True in=5599 out=692 calls=4 tools=8 http=16 4xx=1 
+5 t1 artie-intent   done=True in=7254 out=608 calls=5 tools=9 http=18 4xx=0 
+5 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+5 t2 artie-intent   done=False in=3997 out=499 calls=3 tools=4 http=8 4xx=0 
+5 t3 artie-intent   done=True in=5599 out=684 calls=4 tools=8 http=16 4xx=1 
+written: runs/intent-kept-fixed-sonnet.jsonl
+start moved 1 t1 artie-intent   done=True in=7272 out=613 calls=5 tools=9 http=18 4xx=0 
+start moved 1 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+start moved 2 t1 artie-intent   done=True in=7272 out=601 calls=5 tools=9 http=18 4xx=0 
+start moved 2 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+start moved written: runs/changes-intent-kept-fixed-sonnet.jsonl
+start renamed 1 t1 artie-intent   done=True in=7268 out=551 calls=5 tools=9 http=18 4xx=0 
+start renamed 1 t1 artie-kept     done=False in=0 out=0 calls=0 tools=2 http=1 4xx=0 
+start renamed 2 t1 artie-intent   done=True in=7268 out=587 calls=5 tools=9 http=18 4xx=0 
+start renamed 2 t1 artie-kept     done=False in=0 out=0 calls=0 tools=2 http=1 4xx=0 
+start renamed written: runs/changes-intent-kept-fixed-sonnet.jsonl
+start required 1 t1 artie-intent   done=False in=3113 out=260 calls=2 tools=3 http=7 4xx=0 
+start required 1 t1 artie-kept     done=False in=0 out=0 calls=0 tools=4 http=6 4xx=0 
+start required 2 t1 artie-intent   done=False in=3113 out=260 calls=2 tools=3 http=7 4xx=0 
+start required 2 t1 artie-kept     done=False in=0 out=0 calls=0 tools=4 http=6 4xx=0 
+start required written: runs/changes-intent-kept-fixed-sonnet.jsonl
+start method 1 t1 artie-intent   done=True in=7242 out=530 calls=5 tools=9 http=18 4xx=0 
+start method 1 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+start method 2 t1 artie-intent   done=True in=7242 out=530 calls=5 tools=9 http=18 4xx=0 
+start method 2 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+start method written: runs/changes-intent-kept-fixed-sonnet.jsonl
+start notice 1 t1 artie-intent   done=False in=7350 out=671 calls=5 tools=7 http=15 4xx=0 
+start notice 1 t1 artie-kept     done=False in=0 out=0 calls=0 tools=9 http=12 4xx=0 
+start notice 2 t1 artie-intent   done=False in=7350 out=684 calls=5 tools=7 http=15 4xx=0 
+start notice 2 t1 artie-kept     done=False in=0 out=0 calls=0 tools=9 http=12 4xx=0 
+start notice written: runs/changes-intent-kept-fixed-sonnet.jsonl
+start all 1 t1 artie-intent   done=False in=3164 out=265 calls=2 tools=3 http=7 4xx=0 
+start all 1 t1 artie-kept     done=False in=0 out=0 calls=0 tools=2 http=1 4xx=0 
+start all 2 t1 artie-intent   done=False in=3164 out=280 calls=2 tools=3 http=7 4xx=0 
+start all 2 t1 artie-kept     done=False in=0 out=0 calls=0 tools=2 http=1 4xx=0 
+start all written: runs/changes-intent-kept-fixed-sonnet.jsonl
+midway moved 1 t1 artie-intent   done=True in=8644 out=860 calls=6 tools=11 http=23 4xx=1 
+midway moved 1 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+midway moved written: runs/changes-intent-kept-fixed-sonnet.jsonl
+midway renamed 1 t1 artie-intent   done=True in=8642 out=841 calls=6 tools=11 http=24 4xx=1 
+midway renamed 1 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=18 4xx=0 
+midway renamed written: runs/changes-intent-kept-fixed-sonnet.jsonl
+midway required 1 t1 artie-intent   done=False in=4489 out=548 calls=3 tools=5 http=13 4xx=1 
+midway required 1 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+midway required written: runs/changes-intent-kept-fixed-sonnet.jsonl
+midway method 1 t1 artie-intent   done=True in=8619 out=832 calls=6 tools=11 http=24 4xx=1 
+midway method 1 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+midway method written: runs/changes-intent-kept-fixed-sonnet.jsonl
+midway notice 1 t1 artie-intent   done=False in=8681 out=945 calls=6 tools=9 http=20 4xx=1 
+midway notice 1 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+midway notice written: runs/changes-intent-kept-fixed-sonnet.jsonl
+midway all 1 t1 artie-intent   done=False in=4477 out=624 calls=3 tools=5 http=13 4xx=1 
+midway all 1 t1 artie-kept     done=True in=0 out=0 calls=0 tools=12 http=16 4xx=0 
+midway all written: runs/changes-intent-kept-fixed-sonnet.jsonl
+1 t4 fastmcp        done=False in=5569 out=324 calls=4 tools=4 http=4 4xx=0 
+[11/02/26 05:41:22] WARNING  Argument 'text' not found in        director.py:267
+                             parameter map for searchEmployees                  
+1 t4 meta-tools     done=False in=8137 out=460 calls=6 tools=6 http=3 4xx=0 
+1 t4 heart-mcp-lean done=True in=11474 out=638 calls=6 tools=5 http=10 4xx=1 
+1 t4 artie-goal     done=False in=14209 out=740 calls=6 tools=7 http=14 4xx=0 
+1 t4 artie-intent   done=True in=5576 out=623 calls=4 tools=6 http=13 4xx=1 
+2 t4 fastmcp        done=False in=5089 out=274 calls=4 tools=3 http=3 4xx=0 
+[11/02/26 05:42:20] WARNING  Argument 'text' not found in        director.py:267
+                             parameter map for searchEmployees                  
+2 t4 meta-tools     done=False in=8137 out=463 calls=6 tools=6 http=3 4xx=0 
+2 t4 heart-mcp-lean done=True in=11458 out=635 calls=6 tools=5 http=10 4xx=1 
+2 t4 artie-goal     done=False in=14214 out=736 calls=6 tools=7 http=14 4xx=0 
+2 t4 artie-intent   done=True in=5576 out=594 calls=4 tools=6 http=13 4xx=1 
+3 t4 fastmcp        done=False in=5089 out=287 calls=4 tools=3 http=3 4xx=0 
+[11/02/26 05:43:13] WARNING  Argument 'text' not found in        director.py:267
+                             parameter map for searchEmployees                  
+3 t4 meta-tools     done=False in=8137 out=462 calls=6 tools=6 http=3 4xx=0 
+3 t4 heart-mcp-lean done=True in=11457 out=633 calls=6 tools=5 http=10 4xx=1 
+3 t4 artie-goal     done=False in=14238 out=794 calls=6 tools=7 http=14 4xx=0 
+3 t4 artie-intent   done=False in=4181 out=390 calls=3 tools=6 http=12 4xx=0 
+4 t4 fastmcp        done=False in=5569 out=326 calls=4 tools=4 http=4 4xx=0 
+[11/02/26 05:44:02] WARNING  Argument 'text' not found in        director.py:267
+                             parameter map for searchEmployees                  
+4 t4 meta-tools     done=False in=8137 out=463 calls=6 tools=6 http=3 4xx=0 
+4 t4 heart-mcp-lean done=True in=11443 out=628 calls=6 tools=5 http=10 4xx=1 
+4 t4 artie-goal     done=False in=14292 out=738 calls=6 tools=7 http=14 4xx=0 
+4 t4 artie-intent   done=True in=5576 out=638 calls=4 tools=6 http=13 4xx=1 
+5 t4 fastmcp        done=False in=5569 out=325 calls=4 tools=4 http=4 4xx=0 
+[11/02/26 05:45:00] WARNING  Argument 'text' not found in        director.py:267
+                             parameter map for searchEmployees                  
+5 t4 meta-tools     done=False in=8137 out=465 calls=6 tools=6 http=3 4xx=0 
+5 t4 heart-mcp-lean done=True in=11426 out=615 calls=6 tools=5 http=10 4xx=1 
+5 t4 artie-goal     done=False in=14269 out=776 calls=6 tools=7 http=14 4xx=0 
+5 t4 artie-intent   done=True in=5576 out=663 calls=4 tools=6 http=13 4xx=1 
+written: runs/t4-sonnet.jsonl
+1 t3 artie-goal     done=False in=14372 out=736 calls=6 tools=7 http=14 4xx=0 
+2 t3 artie-goal     done=False in=14397 out=704 calls=6 tools=7 http=14 4xx=0 
+3 t3 artie-goal     done=False in=14410 out=721 calls=6 tools=7 http=14 4xx=0 
+4 t3 artie-goal     done=False in=14420 out=763 calls=6 tools=7 http=14 4xx=0 
+5 t3 artie-goal     done=False in=14388 out=790 calls=6 tools=7 http=14 4xx=0 
+written: runs/goal-t3-fixed-sonnet.jsonl

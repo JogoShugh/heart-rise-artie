@@ -1,0 +1,95 @@
+{
+  "name": "what-i-say",
+  "title": "What I Actually Say",
+  "part": "One behavior, start to finish",
+  "kicker": "Dictation, through /remote-control · AI in the loop, in practice",
+  "tone": "light",
+  "number": 14,
+  "of": 30,
+  "html": "<h2>What I Actually Say</h2>\n<div class=\"split\">\n  <div class=\"rows\">\n    <p class=\"lead\">Mostly, I talk. Speech-to-text, into a phone, through <code>/remote-control</code>.</p>\n    <div><h3>I Own the Goal</h3><p>One sentence, said out loud.</p></div>\n    <div><h3>I Don’t Approve Every Step</h3><p>The hooks hold the order while nobody watches.</p></div>\n    <div><h3>I Read the Record Afterward</h3><p>Which scenario, which red run, which green run, which commit.</p></div>\n    <p class=\"refs\"><deck-ref name=\"no-time\"></deck-ref> <deck-ref name=\"ai-in-the-loop\"></deck-ref></p>\n  </div>\n  <div class=\"phone\">\n    <p class=\"phone-head\">/remote-control</p>\n    <p class=\"me\">Please give me an update</p>\n    <p class=\"it\">Red run logged: 3 failures, on behavior. Writing the fix.</p>\n    <p class=\"me\">How’s it going?</p>\n    <p class=\"it\">Green. Commit gate: TDD order checked.</p>\n    <p class=\"me\">go deep on bed gates skill</p>\n    <p class=\"it\">The bdd-gates skill, understood.</p>\n    <p class=\"note\">Illustrative, not a transcript. The two questions are the real ones. So is “bed gates”.</p>\n  </div>\n</div>\n",
+  "say": "Mostly, I talk. Most evenings it's the same two questions into my phone: 'Please give me an update', and 'How's it going?' Dictation has opinions of its own; it hears 'BDD gates' as 'bed gates' about half the time. Claude knows what I mean, and the gates don't care either way. What I don't do is approve every step. I own the goal, I say it in a sentence, and afterward I read the record: which scenario, which red run, which green run, which commit. People call that AI in the loop: the person in control, the AI in support. So what did months of that produce?",
+  "sources": [
+    {
+      "label": "Claude Code docs: /remote-control",
+      "href": "https://code.claude.com/docs/en/remote-control"
+    },
+    {
+      "label": "Natarajan et al.: Human-in-the-loop or AI-in-the-loop? (arXiv, 2024)",
+      "href": "https://arxiv.org/abs/2412.14232"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "what-i-say.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "gate-says-no.json",
+      "title": "The Gates Say No, Even to the Model"
+    },
+    "next": {
+      "href": "what-it-produced.json",
+      "title": "What It Produced"
+    },
+    "alternate": {
+      "href": "what-i-say.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "no-time",
+        "kind": "ground",
+        "label": "NO-TIME",
+        "title": "No time to type",
+        "summary": "Family and a new dog took the typing time: one hand on a leash, a phone in the other. Half the fix is Claude Code's /remote-control: the session runs on my machine, steered mostly by speech-to-text dictation. The other half is rigour without watching: the agent must behave the same way every time and follow BDD strictly (Gherkin, red, code, green, commit), so hooks enforce the order and log every run, and the record is read later instead of the agent being monitored. Controls that hold while nobody watches: what this talk asks of agents calling APIs too.",
+        "cite": "Claude Code docs: /remote-control, continue a local session from a phone or a browser",
+        "_links": {
+          "self": {
+            "href": "../refs/no-time.json",
+            "title": "NO-TIME"
+          },
+          "describedby": {
+            "href": "https://code.claude.com/docs/en/remote-control",
+            "title": "Claude Code docs: /remote-control, continue a local session from a phone or a browser"
+          }
+        }
+      },
+      {
+        "name": "ai-in-the-loop",
+        "kind": "loop",
+        "label": "AI-IN-THE-LOOP",
+        "title": "AI in the loop: the person in control, the AI in support",
+        "summary": "Natarajan, Mathur, Sidheekh, Stammer and Kersting contrast human-in-the-loop systems with AI-in-the-loop (AI²L) systems, where the human is in control of the system and the AI is there to support the human, and argue that evaluations should not judge the machine component alone.",
+        "quote": "<p>“We argue that existing evaluation methods often overemphasize the machine (learning) component's performance, neglecting the human expert's critical role.”</p>",
+        "cite": "Natarajan, Mathur, Sidheekh, Stammer and Kersting, “Human-in-the-loop or AI-in-the-loop? Automate or Collaborate?”, arXiv",
+        "date": "18 December 2024",
+        "_links": {
+          "self": {
+            "href": "../refs/ai-in-the-loop.json",
+            "title": "AI-IN-THE-LOOP"
+          },
+          "describedby": {
+            "href": "https://arxiv.org/abs/2412.14232",
+            "title": "Natarajan, Mathur, Sidheekh, Stammer and Kersting, “Human-in-the-loop or AI-in-the-loop? Automate or Collaborate?”, arXiv"
+          }
+        }
+      }
+    ]
+  }
+}

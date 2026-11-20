@@ -1,0 +1,9 @@
+# The default reader: the doors say nothing about what is allowed, so the rules are written here, by status.
+allowed:
+  table: /status
+  rows:
+    OPEN:   { allow: [close] }
+    CLOSED: { allow: [open, lock] }
+    LOCKED:
+      allow: [unlock]
+      absent: { open: "The door is locked; unlock it first.", close: "The door is already closed." }

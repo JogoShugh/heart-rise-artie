@@ -1,0 +1,32 @@
+name: kept
+part: "HAL-FORMS"
+title: "Kept by the Generator Alone"
+kicker: Two scripts, one vocabulary
+say: "artie generate kept the HAL-FORMS walk as a script with no hand edits. Line them up with the HAL Schema Forms script: the same relations, in the same order. The one value the reasoner chose, the smoke counts on the promote, is kept as an object, each count read from the smoke run as the goal's words say, and marked for review. HAL-FORMS says only that the field is text; the goal's own words say what goes in it."
+sources:
+  - ["release.heart.yaml", "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.heart.yaml"]
+fragments:
+  - name: hsf
+    label: Kept from the HAL Schema Forms walk (release.heart.yaml)
+    source: exhibits/merge-watch-release/release.heart.yaml
+    from: "steps:"
+    lang: yaml
+  - name: hf
+    label: Kept from the HAL-FORMS walk (hal-forms/release.heart.yaml)
+    source: exhibits/merge-watch-release/hal-forms/release.heart.yaml
+    from: "steps:"
+    lang: yaml
+  - name: hf-smoke
+    label: The promote, kept from the HAL-FORMS walk
+    source: exhibits/merge-watch-release/hal-forms/release.heart.yaml
+    from: "- act: env:promote"
+    count: 6
+    lang: yaml
+html: |
+  <h2>Kept by the Generator Alone</h2>
+  <div class="tiles" style="grid-template-columns: repeat(4, minmax(0, 1fr))">
+    <div><code>scm:pulls-get</code></div><div><code>watcher:watch</code></div><div><code>scm:merge</code></div><div><code>ci:build</code></div>
+    <div><code>hr:in-reply-to</code></div><div><code>ci:smoke-test</code></div><div><code>env:promote</code></div><div><code>scm:comment</code></div>
+  </div>
+  <p class="lead">Both scripts name the same relations, among them these. The promote's <code>smoke</code>, the one value the reasoner chose, is kept as an object, each count read from the smoke run, marked for review.</p>
+  <p class="refs"><deck-fragment name="hf-smoke">the promote, HAL-FORMS</deck-fragment> <deck-fragment name="hf">HAL-FORMS script, whole</deck-fragment> <deck-fragment name="hsf">HAL Schema Forms script, whole</deck-fragment></p>

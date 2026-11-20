@@ -1,0 +1,5 @@
+[
+  "import api\nr=api.searchEmployees(name=\"Frodo\")\nprint(r)",
+  "import api\nprint(api.getEmployee(1))",
+  "import api\nr=api.getEmployee(1)\nb=r['body']\nprint(api.update(1,{\"firstName\":b['firstName'],\"lastName\":b['lastName'],\"role\":b['role']+\", retired\"},if_match=r['etag']))\nprint(api.getEmployee(1))"
+]

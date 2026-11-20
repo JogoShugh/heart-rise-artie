@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="lifecycle-title lifecycle-desc">
+<title id="lifecycle-title">What the person wants done with each dependency bump</title>
+<desc id="lifecycle-desc">A bump labelled hold is left, said once. Otherwise the watch waits up to three minutes for merge to be offered and merges it; if it never is, the server's reason goes to the model, which writes one sentence to the author.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="lifecycle-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="hl" x="20" y="170" width="150" height="64" rx="10"/>
+<text class="h" x="95" y="197" text-anchor="middle">A bump opens</text>
+<text class="s" x="95" y="217" text-anchor="middle">labelled dependencies</text>
+<path class="line" d="M170 202 L208 202" marker-end="url(#lifecycle-head)"/>
+<rect class="box" x="210" y="170" width="160" height="64" rx="10"/>
+<text class="h" x="290" y="207" text-anchor="middle">Labelled hold?</text>
+<path class="line" d="M290 170 L290 116" marker-end="url(#lifecycle-head)"/>
+<text class="s" x="304" y="148" text-anchor="start">yes</text>
+<rect class="box" x="210" y="50" width="160" height="64" rx="10"/>
+<text class="h" x="290" y="77" text-anchor="middle">Leave it</text>
+<text class="s" x="290" y="97" text-anchor="middle">say so once</text>
+<path class="line" d="M370 202 L408 202" marker-end="url(#lifecycle-head)"/>
+<text class="s" x="389" y="194" text-anchor="middle">no</text>
+<rect class="box" x="410" y="170" width="170" height="64" rx="10"/>
+<text class="h" x="495" y="197" text-anchor="middle">Merge offered?</text>
+<text class="s" x="495" y="217" text-anchor="middle">wait up to 3 minutes</text>
+<path class="line" d="M495 170 L495 116" marker-end="url(#lifecycle-head)"/>
+<text class="s" x="509" y="148" text-anchor="start">yes</text>
+<rect class="box" x="410" y="50" width="170" height="64" rx="10"/>
+<text class="h" x="495" y="77" text-anchor="middle">Merge it</text>
+<text class="s" x="495" y="97" text-anchor="middle">by squashing</text>
+<path class="line" d="M580 202 L618 202" marker-end="url(#lifecycle-head)"/>
+<text class="s" x="599" y="194" text-anchor="middle">no</text>
+<rect class="box" x="620" y="170" width="150" height="64" rx="10"/>
+<text class="h" x="695" y="197" text-anchor="middle">Give up</text>
+<text class="s" x="695" y="217" text-anchor="middle">the server says why</text>
+<path class="line" d="M770 202 L798 202" marker-end="url(#lifecycle-head)"/>
+<rect class="hl" x="800" y="170" width="140" height="64" rx="10"/>
+<text class="h" x="870" y="197" text-anchor="middle">The model</text>
+<text class="s" x="870" y="217" text-anchor="middle">one sentence</text>
+<path class="line" d="M870 234 L870 278" marker-end="url(#lifecycle-head)"/>
+<rect class="box" x="780" y="280" width="160" height="64" rx="10"/>
+<text class="h" x="860" y="307" text-anchor="middle">Comment</text>
+<text class="s" x="860" y="327" text-anchor="middle">to its author</text>
+<text class="s" x="400" y="320" text-anchor="middle">All of it again whenever a pull request changes,</text>
+<text class="s" x="400" y="342" text-anchor="middle">until someone closes the watch's issue.</text>
+</svg>

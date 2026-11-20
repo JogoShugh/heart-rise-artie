@@ -1,0 +1,95 @@
+---
+run:
+  inputs:
+    play:
+      value: runs/play-l1.yaml
+      given: given
+      question: The events play.kts wrote?
+    owner:
+      value: JogoShugh
+      given: given
+      question: Whose repository?
+    repo:
+      value: heart-github-test
+      given: default
+      default: heart-github-test
+      question: Which repository?
+    out:
+      value: runs/reactions-l1.yaml
+      given: given
+      question: Where to write the reactions?
+---
+at: '2026-10-25T05:29:41.432674Z'
+ms: 623
+mode: script
+say: send {method} {url}
+line: 25
+within: 30
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/793/comments?per_page=100
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/793/comments?per_page=100
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/793/comments?per_page=100
+---
+at: '2026-10-25T05:29:42.078312Z'
+ms: 181
+mode: script
+say: send {method} {url}
+line: 25
+within: 34
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/795/comments?per_page=100
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/795/comments?per_page=100
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/795/comments?per_page=100
+---
+at: '2026-10-25T05:29:42.261059Z'
+ms: 194
+mode: script
+say: send {method} {url}
+line: 25
+within: 34
+params:
+  method: GET
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/796/comments?per_page=100
+values:
+  method:
+    value: GET
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/796/comments?per_page=100
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/796/comments?per_page=100

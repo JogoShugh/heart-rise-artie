@@ -1,0 +1,89 @@
+{
+  "name": "dev-or-comment",
+  "title": "Promoted to Dev, or Told Why",
+  "part": "The release, in the order it runs",
+  "kicker": "Step 7 · env:promote or scm:comment",
+  "tone": "light",
+  "number": 24,
+  "of": 30,
+  "html": "<h2>Promoted to Dev, or Told Why</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 6fr) minmax(0, 6fr)\">\n  <figure><img src=\"media/dev.png\" alt=\"The Dev environment's text/html representation showing a commit promoted\"><figcaption>Dev, as HTML for a person: a commit promoted, citing its smoke run.</figcaption></figure>\n  <div class=\"rows\">\n    <div><h3>All Passed: Promote</h3><p><code>env:promote</code>, citing how many passed. 501, 502, 503 and 505.</p></div>\n    <div><h3>504: Zero Weeks</h3><p>S3 checks that renewing moves the due date. It didn’t. 4 of 5.</p></div>\n    <div><h3>Not Promoted, and Told Why</h3><p><code>scm:comment</code> on the pull request: “Not promoted to Dev: smoke scenarios S3 failed.”</p></div>\n    <p class=\"punch\">Recall the zero-weeks row. The release caught it.</p>\n    <p class=\"refs\"><deck-ref name=\"right-behavior\"></deck-ref> <deck-ref name=\"resilience\"></deck-ref></p>\n  </div>\n</div>\n",
+  "say": "Last step. If every smoke scenario passed, ARTIE opens the Dev environment, another HEART service, and promotes the merged commit, citing how many passed. Dev has its own rule, too: it refuses a promotion whose smoke run didn't pass. Four of the five pull requests ended right there, promoted. And 504, the zero-week policy? Smoke scenario S3 checks that renewing a book moves its due date. With zero weeks, it doesn't move. Four of five passed, S3 failed. So ARTIE didn't promote. It went back to the pull request and said why, in a comment: not promoted to Dev, smoke scenarios S3 failed. Recall the zero-weeks row, back at the start? The library's code does exactly what that row says. It was the policy that was wrong for the people using it, and the release caught it before it reached Dev. Right behavior, at both scales, and nobody had to be watching.",
+  "sources": [
+    {
+      "label": "Report: Merge Watch release",
+      "href": "https://jogoshugh.github.io/heart-rise-artie/reports/merge-watch-release/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "dev-or-comment.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "smoke-by-link.json",
+      "title": "The Smoke Script, Found by Link"
+    },
+    "next": {
+      "href": "end-to-end.json",
+      "title": "One Script, End to End"
+    },
+    "alternate": {
+      "href": "dev-or-comment.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "right-behavior",
+        "kind": "measure",
+        "label": "RIGHT-BEHAVIOR",
+        "title": "Right behavior: only what the state allows, and a reason when not",
+        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
+        "cite": "The first of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/right-behavior.json",
+            "title": "RIGHT-BEHAVIOR"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The first of the three R's"
+          }
+        }
+      },
+      {
+        "name": "resilience",
+        "kind": "measure",
+        "label": "RESILIENCE",
+        "title": "Resilience: the server changes, the client doesn't break",
+        "summary": "When the server changes, or misbehaves on purpose, the client takes the failure path the spec names, re-syncs, and goes on; a model comes back only when the controls really changed, to repair. At the small scale it is the regression suite and the gates that hold, even against the model.",
+        "cite": "The third of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/resilience.json",
+            "title": "RESILIENCE"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The third of the three R's"
+          }
+        }
+      }
+    ]
+  }
+}

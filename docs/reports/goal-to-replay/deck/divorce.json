@@ -1,0 +1,115 @@
+{
+  "name": "divorce",
+  "title": "The Divorce: Data in the Answer, Controls Elsewhere",
+  "part": "Why it works",
+  "kicker": "The machine Web",
+  "tone": "light",
+  "number": 5,
+  "of": 17,
+  "html": "<h2>The Divorce: Data in the Answer, Controls Elsewhere</h2>\n<div class=\"split\" style=\"grid-template-columns: 1fr 1.1fr 1fr; align-items: stretch\">\n  <div class=\"panel\" style=\"padding: 1.4rem 1.5rem; gap: 0.8rem\"><h3 style=\"font: 650 1.6rem/1.15 var(--display); color: var(--leaf); margin: 0; text-transform: none; letter-spacing: 0\">The answer</h3><p style=\"font-size: 1.1rem\">Data only: state, ids, timestamps, maybe a few links. Nothing says what you may do next, or how.</p></div>\n  <div class=\"box\" style=\"padding: 1.4rem 1.5rem; gap: 0.8rem; align-content: start\"><h3>The controls, out of band</h3>\n    <ul style=\"margin: 0; font-size: 1.1rem\"><li>Docs, read by a person</li><li>OpenAPI descriptions</li><li>SDKs and custom clients, one per service</li><li>MCP tool lists, loaded up front</li></ul>\n  </div>\n  <div class=\"stats\" style=\"grid-template-columns: 1fr; align-content: start\"><div class=\"stat bad\"><b>13.5 MB</b><span style=\"display: block; margin-top: 0.6rem; font-size: 1rem; line-height: 1.5\">GitHub’s OpenAPI description, as one file. Every operation, whatever state the pull request is in.</span></div></div>\n</div>\n<blockquote class=\"big\">“Failure here implies that out-of-band information is driving interaction instead of hypertext.”</blockquote>\n<p class=\"cite\"><a href=\"https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven\" target=\"_blank\" rel=\"noopener\"><b>Roy T. Fielding</b></a>, “REST APIs must be hypertext-driven”, 2008</p>\n<p class=\"refs\"><deck-ref name=\"rule-3\"></deck-ref> <deck-ref name=\"in-band\"></deck-ref> <deck-ref name=\"right-behavior\"></deck-ref></p>\n",
+  "say": "Then APIs came along, and kept the data in the answer but moved the controls out. Into docs. Into OpenAPI descriptions. Into SDKs and custom clients, one per service. And now into MCP tool lists. A developer reads the docs and codes the method, the address and the body into a client; an agent gets the whole list loaded up front, whatever state the thing is in. GitHub's OpenAPI description is 13 and a half megabytes as one file. Fair enough, it's a big API. But nothing in a pull request's answer tells you whether you may merge it right now, or how. Fielding had a sentence for that, too.",
+  "sources": [
+    {
+      "label": "Fielding (2008)",
+      "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"
+    },
+    {
+      "label": "GitHub OpenAPI description",
+      "href": "https://github.com/github/rest-api-description"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "divorce.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "hateoas-human-web.json",
+      "title": "The Most Widely Used Application-Layer Constraint of All Time"
+    },
+    "next": {
+      "href": "rejoin.json",
+      "title": "The Rejoin: GitHub's Merge Docs Move into the Answer"
+    },
+    "alternate": {
+      "href": "divorce.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "rule-3",
+        "kind": "rule",
+        "label": "MEDIA-TYPES",
+        "title": "Spend the effort on media types",
+        "summary": "In brief: describe media types and relations, not which methods go to which URIs. This is what HEART's spec is.",
+        "quote": "<p>“A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types. Any effort spent describing what methods to use on what URIs of interest should be entirely defined within the scope of the processing rules for a media type (and, in most cases, already defined by existing media types). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>",
+        "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/rule-3.json",
+            "title": "MEDIA-TYPES"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+            "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "in-band",
+        "kind": "comment",
+        "label": "IN-BAND",
+        "title": "Instructions in every representation",
+        "summary": "The media type is learned once; each representation carries the transitions available at that point.",
+        "quote": "<p>“The media type identifies a specification that defines how a representation is to be processed. That is out-of-band information (all communication is dependent on some prior knowledge). What you are missing is that each representation contains the specific instructions for interfacing with a given service, provided in-band. The media type is a generic processing model that every agent can learn if there aren’t too many of them (hence the need for standards). The representation is specific to the application being performed by the agent. Each representation therefore provides the transitions that are available at that point in the application.</p><p>When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "23 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/in-band.json",
+            "title": "IN-BAND"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "right-behavior",
+        "kind": "measure",
+        "label": "RIGHT-BEHAVIOR",
+        "title": "Right behavior: only what the state allows, and a reason when not",
+        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
+        "cite": "The first of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/right-behavior.json",
+            "title": "RIGHT-BEHAVIOR"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The first of the three R's"
+          }
+        }
+      }
+    ]
+  }
+}

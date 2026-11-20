@@ -1,0 +1,23 @@
+# A repository: read by repos/get. It is where new issues come from: GitHub's issues/create
+# is an act the repository offers, and GitHub's answer is the new issue (spec/PLAN-GITHUB-ISSUES.md, I5).
+noun: repository
+collection: repos
+read: repos/get
+# Found from the bookmark, as issues and pull requests are: among a user's, or by its owner and name.
+search: repos/list-for-user
+filters: [type, sort, direction]
+title: /full_name
+# A repository's owner is embedded (connector.yaml, links): the gateway reads the read's path variables from
+# its own URL, and keeps them in the state as hr:address.
+address: /url
+# Its branches, which the branch resource file searches by: each branch offers new branches, commits and
+# pull requests (branch.resource.yaml).
+links: [repos/list-branches]
+acts:
+  open-issue:
+    operation: issues/create
+    title: Open an issue
+    description: Open a new issue in this repository.
+    fields: [title, body, assignees, labels, milestone]
+    # GitHub answers with the new issue; the gateway answers 201, with the issue's address in Location.
+    creates: issue

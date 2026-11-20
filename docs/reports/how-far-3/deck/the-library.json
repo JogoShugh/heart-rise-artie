@@ -1,0 +1,111 @@
+{
+  "name": "the-library",
+  "title": "Meet the Library",
+  "part": "What I wanted the agent to be",
+  "kicker": "The example we'll follow all the way through",
+  "tone": "light",
+  "number": 6,
+  "of": 30,
+  "html": "<h2>Meet the Library</h2>\n<p class=\"lead\">Riverside Public Library. Ana Torres has three books out.</p>\n<div class=\"table-scroll\"><table>\n  <thead><tr><th>Book</th><th>Renewals</th><th>Hold waiting</th><th>What the loan offers now</th><th>Why not renew</th></tr></thead>\n  <tbody>\n    <tr><td>Matilda</td><td>0</td><td>no</td><td>renew, report a problem, return</td><td></td></tr>\n    <tr><td>The Hobbit</td><td>0</td><td>yes</td><td>report a problem, return</td><td>“A hold is waiting for this book, so it can’t be renewed.”</td></tr>\n    <tr><td>Charlotte’s Web</td><td>3</td><td>no</td><td>report a problem, return</td><td>“It has been renewed 3 times, the most allowed.”</td></tr>\n  </tbody>\n</table></div>\n<p class=\"punch\">What a loan offers depends on its state. When something isn’t offered, the library says why.</p>\n<p class=\"refs\"><deck-ref name=\"hypertext\"></deck-ref> <deck-ref name=\"in-band\"></deck-ref> <deck-ref name=\"right-behavior\"></deck-ref></p>\n",
+  "say": "Let's make that concrete, with an example we'll follow for the rest of the talk. Riverside Public Library. Ana Torres has three books out. Matilda can be renewed: it offers renew, report a problem, and return. The Hobbit can't be renewed, because someone has a hold waiting for it. Charlotte's Web can't either: it's been renewed three times, the most allowed. Notice two things. First, what each loan offers depends on its state, and the library says so in every answer: the form to renew is there, or it isn't. Second, when it isn't, the library says why, in plain words. That's exactly what a browser shows a person. It's also exactly what an agent needs. Keep this library in mind; it's going to get a new renewal policy, and that policy is going to go all the way to a Dev environment.",
+  "sources": [
+    {
+      "label": "library.feature",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/heart/heart-sims/src/test/resources/features/library.feature"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "the-library.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "generic-client.json",
+      "title": "A Browser, for APIs"
+    },
+    "next": {
+      "href": "one-sentence.json",
+      "title": "It Starts With One Sentence"
+    },
+    "alternate": {
+      "href": "the-library.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "hypertext",
+        "kind": "comment",
+        "label": "HYPERTEXT",
+        "title": "What hypertext means",
+        "summary": "His definition: information and controls, presented together. Machines can follow links too.",
+        "quote": "<p>“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions. Hypermedia is just an expansion on what text means to include temporal anchors within a media stream; most researchers have dropped the distinction.</p><p>Hypertext does not need to be HTML on a browser. Machines can follow links when they understand the data format and relationship types.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "20 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/hypertext.json",
+            "title": "HYPERTEXT"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-718",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "in-band",
+        "kind": "comment",
+        "label": "IN-BAND",
+        "title": "Instructions in every representation",
+        "summary": "The media type is learned once; each representation carries the transitions available at that point.",
+        "quote": "<p>“The media type identifies a specification that defines how a representation is to be processed. That is out-of-band information (all communication is dependent on some prior knowledge). What you are missing is that each representation contains the specific instructions for interfacing with a given service, provided in-band. The media type is a generic processing model that every agent can learn if there aren’t too many of them (hence the need for standards). The representation is specific to the application being performed by the agent. Each representation therefore provides the transitions that are available at that point in the application.</p><p>When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p>",
+        "cite": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”",
+        "date": "23 October 2008",
+        "_links": {
+          "self": {
+            "href": "../refs/in-band.json",
+            "title": "IN-BAND"
+          },
+          "describedby": {
+            "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754",
+            "title": "Roy T. Fielding, comment on “REST APIs must be hypertext-driven”"
+          }
+        }
+      },
+      {
+        "name": "right-behavior",
+        "kind": "measure",
+        "label": "RIGHT-BEHAVIOR",
+        "title": "Right behavior: only what the state allows, and a reason when not",
+        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
+        "cite": "The first of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/right-behavior.json",
+            "title": "RIGHT-BEHAVIOR"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The first of the three R's"
+          }
+        }
+      }
+    ]
+  }
+}

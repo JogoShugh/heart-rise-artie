@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Rejoin: GitHub's Merge Docs Move into the Answer · One Goal, Walked Once, Replayed Free</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Information and controls, together again</span></header>
+<h2>The Rejoin: GitHub's Merge Docs Move into the Answer</h2>
+<div class="morph" data-start="apart" data-cycles='[{"to": "married", "label": "Into the answer", "head": "The Rejoin: GitHub&apos;s Merge Docs Move into the Answer"}]'>
+  <div class="mo-stage">
+    <section class="mo-scene" data-scene="apart">
+      <div class="aw-apart">
+        <div class="hl">
+          <span class="hl-label">GitHub’s answer · GET /repos/acme/web/pulls/501 · application/vnd.github+json</span>
+          <span class="tk" data-token="number">number: 501</span>
+          <span class="tk" data-token="title">title: "Renewals: two weeks for short loans"</span>
+          <span class="tk" data-token="state">state: open</span>
+          <span class="tk rel" data-token="mergeable">mergeable: true</span>
+          <span class="tk" data-token="etag">ETag: W/"…"</span>
+          <span class="k">_links:</span>
+          <span class="i1 tk" data-token="self">self: {href: /repos/acme/web/pulls/501}</span>
+          <span class="i1">comments: {href: …/issues/501/comments}</span>
+          <span class="hl-note">It says it can be merged. Not how.</span>
+        </div>
+        <p class="aw-gap"><span>A developer reads this, then codes it into a client</span></p>
+        <div class="aw">
+          <div class="aw-bar">api.github.com.json · OpenAPI 3.0 <em>excerpt</em></div>
+          <div class="aw-page">
+            <pre class="aw-code"><span class="tk" data-token="target">/repos/{owner}/{repo}/pulls/{pull_number}/merge</span>:
+  <span class="tk aw-m" data-token="method">put</span>:
+    summary: <span class="tk" data-token="form-title">Merge a pull request</span>
+    operationId: pulls/merge
+    requestBody:
+      content:
+        <span class="tk" data-token="ct">application/json</span>:
+          schema:
+            properties:
+              <span class="tk" data-token="commit-title">commit_title</span>: {type: string}
+              <span class="tk" data-token="commit-message">commit_message</span>: {type: string}
+              <span class="tk" data-token="enum">merge_method: {enum: [merge, squash, rebase]}</span>
+              <span class="tk" data-token="sha">sha: {description: SHA that pull request head must match}</span>
+    responses:
+      '200': if merge was successful
+      '405': Method Not Allowed if merge cannot be performed
+      '409': Conflict if sha was provided and pull request head did not match</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="mo-scene" data-scene="married">
+      <div class="hl hl-one">
+        <span class="hl-label">The answer, HEART · GET /repos/acme/web/pulls/501 · application/hal+json; profile: hal-schema-forms</span>
+        <div class="hl-cols">
+          <div>
+            <span class="tk" data-token="number">number: 501</span>
+            <span class="tk" data-token="title">title: "Renewals: two weeks for short loans"</span>
+            <span class="tk" data-token="state">state: open</span>
+            <span class="tk" data-token="mergeable">mergeable: true</span>
+            <span class="tk" data-token="etag">ETag: "seq-0.hsf.L0.4dc4714549…"</span>
+            <span class="k">_links:</span>
+            <span class="i1 tk" data-token="self">self: {href: /repos/acme/web/pulls/501}</span>
+            <span class="hl-note">Sent back as <span class="tk" data-token="sha">If-Match: the ETag</span>. A stale view gets 412.</span>
+          </div>
+          <div>
+            <span class="k add">_forms:</span>
+            <span class="i1 rel">scm:merge:</span>
+            <span class="i2">title: <span class="tk" data-token="form-title">Merge</span></span>
+            <span class="i2">_links: {target: {href: <span class="tk" data-token="target">/repos/acme/web/pulls/501/actions/merge</span>}}</span>
+            <span class="i2">method: <span class="tk aw-m" data-token="method">PUT</span></span>
+            <span class="i2">contentType: <span class="tk" data-token="ct">application/json</span></span>
+            <span class="i2">schema:</span>
+            <span class="i3">required: [method]</span>
+            <span class="i3">properties:</span>
+            <span class="i4 tk" data-token="enum">method: {enum: [merge, squash, rebase]}</span>
+            <span class="i4"><span class="tk" data-token="commit-title">commit_title</span>: {type: string}</span>
+            <span class="i4"><span class="tk" data-token="commit-message">commit_message</span>: {type: string}</span>
+            <span class="i2">hr:integrity: sha256-sGUdrPfH…</span>
+          </div>
+        </div>
+        <span class="hl-note">Offered only while the pull request can be merged, at its own address. The same name, <code>scm:merge</code>, on GitLab.</span>
+      </div>
+    </section>
+  </div>
+</div>
+<p class="refs"><a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">MEDIA-TYPES</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-754">IN-BAND</a> <a class="ref-plain" href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-718">HYPERTEXT</a> <a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors">scm:</a> <a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors">GATEWAY</a></p>
+</article>
+<nav class="foot"><a href="deck/divorce.html" rel="prev"><small>Back</small><b>The Divorce: Data in the Answer, Controls Elsewhere</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#rejoin">with heart-ts</a></span>
+<a href="deck/zero-token.html" rel="next"><small>Next</small><b>Zero Token Architecture</b></a></nav>
+</main></div></body></html>

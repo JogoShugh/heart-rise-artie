@@ -1,0 +1,14 @@
+  <div class="explain">
+    <p class="brief">All a person writes: where to start, the inputs, and the goal, in words or in steps.</p>
+    <div class="full">
+    <p>All a person writes (spec/PLAN-GOAL-MARKDOWN.md). A front matter, then the goal:</p>
+    <ul>
+      <li><code>start</code>: the bookmark, the one address the run begins from. Every other address comes from what the service hands over.</li>
+      <li><code>inputs</code>: what varies per run, as a script's <code>input()</code> declares it. A value given on the command line wins, then the default, then the question. <code>default: {now: PATTERN}</code> is fresh each run.</li>
+      <li><code>limits</code>: how many moves the run, and one step, may make.</li>
+      <li>The body: paragraphs, a goal in words; or paragraphs, then one list, a goal in steps. A step's sub-steps run inside what it led to. <code>Wait:</code> and <code>Verify:</code> are the two markers.</li>
+      <li><code>{name}</code> is an input, or a resource a step named with <code>as name</code>; <code>{name.member}</code> reads its state. <code>moves N</code> limits one step; <code>reasoned</code> keeps a step an intent in the script made from the run.</li>
+    </ul>
+    <p>Run, then generate: <code>artie run NAME.goal.md --reasoner claude</code>, then <code>artie generate CAPTURE --script NAME.goal.md</code>.</p>
+    </div>
+  </div>

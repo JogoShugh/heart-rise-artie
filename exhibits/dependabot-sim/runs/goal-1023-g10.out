@@ -1,0 +1,59 @@
+1 enter https://localhost:8392/: done
+2 get repository JogoShugh/heart-github-test: done
+3 Open an issue titled "Auto-merge watch" with the body: Close this issue to stop the watch.: new resource
+4 return to https://localhost:8392/repos/JogoShugh/heart-github-test: done
+5 return to https://localhost:8392/: done
+6 list pull requests of JogoShugh/heart-github-test filtered by label dependabot (open ones): done
+7 return to https://localhost:8392/: done
+8 return to https://localhost:8392/: done
+9 act github:pulls-list, owner JogoShugh, repo heart-github-test, state open, labels dependabot: done
+10 follow item, titled Bump left-pad from 1.6.0 to 1.7.0 (1023-224307): done
+11 Merge the pull request by squashing it (squash merge).: done
+12 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/710: done
+13 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+14 follow item, titled Bump left-pad from 1.0.5 to 1.3.3-broken (1023-162841): done
+15 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+16 follow item, titled Bump left-pad from 1.0.5 to 1.3.2 (1023-162832): done
+note: Left https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/696: leave it, and say so once.
+17 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+18 follow item, titled Bump left-pad from 1.0.5 to 1.3.1 (1023-162824): done
+19 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+20 follow item, titled Bump left-pad from 1.0.5 to 1.1.1 (1023-125149): done
+note: Left https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/689: leave it, and say so once.
+21 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+22 follow item, titled Bump left-pad from 1.0.5 to 1.1.0-broken (1023-125141): done
+23 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+24 follow item, titled Bump left-pad from 1.0.2 to 1.0.6 (1023-121034): done
+25 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+26 follow item, titled Bump left-pad from 1.0.2 to 1.0.4 (1023-121016): done
+27 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+28 follow item, titled Bump left-pad from 1.0.2 to 1.0.3 (1023-121008): done
+29 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+30 return to https://localhost:8392/: done
+31 return to https://localhost:8392/: done
+32 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/712: done
+33 return to https://localhost:8392/: done
+34 act github:pulls-list, owner JogoShugh, repo heart-github-test, state open, labels dependabot: done
+35 follow item, titled Bump left-pad from 1.0.5 to 1.3.3-broken (1023-162841): done
+36 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+37 follow item, titled Bump left-pad from 1.0.5 to 1.3.2 (1023-162832): done
+38 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+39 follow item, titled Bump left-pad from 1.0.5 to 1.3.1 (1023-162824): done
+40 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+41 follow item, titled Bump left-pad from 1.0.5 to 1.1.1 (1023-125149): done
+42 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+43 follow item, titled Bump left-pad from 1.0.5 to 1.1.0-broken (1023-125141): done
+44 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+45 follow item, titled Bump left-pad from 1.0.2 to 1.0.6 (1023-121034): done
+46 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+47 follow item, titled Bump left-pad from 1.0.2 to 1.0.4 (1023-121016): done
+48 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+49 follow item, titled Bump left-pad from 1.0.2 to 1.0.3 (1023-121008): done
+50 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open&labels=dependabot: done
+51 return to https://localhost:8392/: done
+52 return to https://localhost:8392/: done
+53 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/712: done
+54 return to https://localhost:8392/: done
+note: Not checked: Every pull request labelled dependabot during the watch is merged, or says why not: The held start resource has only a title and no state or embedded members that state whether the dependabot pull requests are merged, so there is nothing to check here. The watch has ended, and PR #710 was merged after it was labelled dependabot, was clean and had no hold label.
+note: Not checked: Nothing anyone else decided was undone: no pull request labelled hold was merged: The held start resource has no state or embedded members saying whether any pull request labelled hold was merged, so there is nothing to check. PR #710 was merged only after it was seen with no hold label.
+finished, 54 steps

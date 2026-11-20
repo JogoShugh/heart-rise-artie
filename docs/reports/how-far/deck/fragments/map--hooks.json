@@ -1,0 +1,21 @@
+{
+  "name": "hooks",
+  "label": "The hooks that gate every change (core/hooks.json)",
+  "lang": "json",
+  "path": "bdd-gates: core/hooks.json",
+  "lines": "1–77",
+  "of": 77,
+  "text": "{\n  \"UserPromptSubmit\": [\n    {\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/refactor-prompt.sh\",\n          \"timeout\": 15\n        }\n      ]\n    }\n  ],\n  \"PreToolUse\": [\n    {\n      \"matcher\": \"*\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/protect-gate.sh\",\n          \"timeout\": 10\n        }\n      ]\n    },\n    {\n      \"matcher\": \"Edit|Write|MultiEdit\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/gherkin-first.sh\",\n          \"timeout\": 15,\n          \"statusMessage\": \"Checking Gherkin-first ordering...\"\n        }\n      ]\n    },\n    {\n      \"matcher\": \"Bash\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/gate-bash.sh\",\n          \"timeout\": 10\n        }\n      ]\n    }\n  ],\n  \"PostToolUse\": [\n    {\n      \"matcher\": \"Edit|Write|MultiEdit\",\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/log-event.sh\",\n          \"timeout\": 15,\n          \"statusMessage\": \"Logging TDD event...\"\n        },\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/lint.sh\",\n          \"timeout\": 180,\n          \"statusMessage\": \"Running lint gate...\"\n        }\n      ]\n    }\n  ],\n  \"Stop\": [\n    {\n      \"hooks\": [\n        {\n          \"type\": \"command\",\n          \"command\": \"\\\"${CLAUDE_PROJECT_DIR}\\\"/.claude/bdd-gates/check.sh\",\n          \"timeout\": 600,\n          \"statusMessage\": \"Running full check gate...\"\n        }\n      ]\n    }\n  ]\n}",
+  "_links": {
+    "self": {
+      "href": "map--hooks.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/hooks.json",
+      "title": "core/hooks.json, lines 1–77"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

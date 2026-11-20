@@ -1,0 +1,5 @@
+[
+  "import api\nr=api.hire({\"firstName\":\"Samwise\",\"lastName\":\"Gamgee\",\"role\":\"gardener\"})\nprint(r)\ns=api.searchEmployees(name=\"Bilbo Baggins\")\nprint(s)",
+  "import api\ng=api.getEmployee(3);print(g)\nu=api.update(3,{\"firstName\":\"Samwise\",\"lastName\":\"Gamgee\",\"role\":\"gardener, mayor\"},if_match=g['etag']);print(u)\nb=api.getEmployee(2);print(b)",
+  "import api\nprint(api.dismiss(2,if_match='\"seq-1.json.8b9e801bed8b4db8\"'))"
+]

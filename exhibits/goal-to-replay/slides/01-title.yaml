@@ -1,0 +1,29 @@
+name: title
+part: "The goal"
+tone: dark
+title: "One Goal, Walked Once, Replayed Free"
+kicker: From plain words to a zero-token release
+say: "Have you ever wished you could just write down what a release should do, in plain words, and have it happen? Here's one. Release a pull request to Dev once it can be merged and its build passes its smoke test. Eight lines under it say how: open the pull request, wait until it can be merged, merge it, have Jenkins build it, smoke-test the preview, then promote to Dev, or say why not. No URLs, no HTTP methods, no Jenkins job names. Claude walks it once. After that it runs every release with no model at all, on GitHub or GitLab. Let me show you why that works, and then how."
+sources:
+  - ["release.goal.md", "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.goal.md"]
+fragments:
+  - name: goal
+    label: The goal, whole (release.goal.md)
+    source: exhibits/merge-watch-release/release.goal.md
+    from: "start:"
+    lang: markdown
+html: |
+  <h1>One Goal, Walked Once, Replayed Free</h1>
+  <div class="goal-hero">
+    <p class="goal-line">Release a pull request to Dev once it can be merged and its build passes its smoke test.</p>
+    <ol class="goal-steps">
+      <li>Open pull request <i>{pull}</i></li>
+      <li>Ask the watcher to say when it offers <code>scm:merge</code></li>
+      <li>Once answered, merge it by squashing</li>
+      <li>Ask Jenkins to build the merge commit, and to say how it goes</li>
+      <li>Once answered, run the smoke script the build links</li>
+      <li>If it passed, promote the commit to Dev; otherwise, comment why not</li>
+    </ol>
+  </div>
+  <p class="lead">Plain words. No URLs, no methods, no job names. Claude walks it once; every release after runs with no model, on GitHub or GitLab.</p>
+  <p class="refs"><deck-fragment name="goal">the goal, whole</deck-fragment> <deck-ref name="zta"></deck-ref> <deck-ref name="rule-6"></deck-ref></p>

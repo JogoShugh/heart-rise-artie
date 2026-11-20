@@ -1,0 +1,62 @@
+name: connectors
+part: "For real: two forges, one vocabulary"
+title: scm:merge, written once per forge
+kicker: For the engineers · The connectors
+say: "The merge act in each connector. Same relation, same input (method), same guard (the head sha the view had), same stale and refused codes. The upstream operation, the field names and the values differ, and only here."
+sources:
+  - ["artie (repository)", "https://github.com/JogoShugh/heart-rise-artie"]
+  - ["GitHub OpenAPI description", "https://github.com/github/rest-api-description"]
+  - ["GitLab merge requests API", "https://docs.gitlab.com/api/merge_requests/"]
+fragments:
+  - name: github-merge
+    label: GitHub's merge act (github-scm/pull.resource.yaml)
+    source: heart/heart-gateway/connectors/github-scm/pull.resource.yaml
+    from: "  merge:"
+    count: 22
+    lang: yaml
+  - name: gitlab-merge
+    label: GitLab's merge act (gitlab/pull.resource.yaml)
+    source: heart/heart-gateway/connectors/gitlab/pull.resource.yaml
+    from: "  merge:"
+    count: 21
+    lang: yaml
+html: |
+  <h2>scm:merge, written once per forge</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)">
+    <div>
+  <pre><code># github-scm/pull.resource.yaml
+  merge:
+    operation: pulls/merge
+    fields: [commit_title, commit_message]
+    inputs:
+      method:
+        enum: [merge, squash, rebase]
+  <span class="add">  values:
+      method:
+        merge:  {merge_method: merge}
+        squash: {merge_method: squash}
+        rebase: {merge_method: rebase}</span>
+    bind: {sha: /head/sha}
+    stale: 409
+    refused: 405</code></pre>
+      <p class="refs"><deck-fragment name="github-merge">the whole merge act</deck-fragment></p>
+    </div>
+    <div>
+  <pre><code># gitlab/pull.resource.yaml
+  merge:
+    operation: pulls/merge
+    fields: [merge_commit_message]
+    inputs:
+      method:
+        enum: [merge, squash]
+  <span class="add">  values:
+      method:
+        merge:  {squash: false}
+        squash: {squash: true}</span>
+    bind: {sha: /sha}
+    stale: 409
+    refused: 405
+  # + normal: state, merged, mergeable_state</code></pre>
+      <p class="refs"><deck-fragment name="gitlab-merge">the whole merge act</deck-fragment></p>
+    </div>
+  </div>

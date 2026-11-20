@@ -1,0 +1,117 @@
+[
+  {
+    "request": {
+      "method": "GET",
+      "url": "/",
+      "authorized": true,
+      "ifMatch": null,
+      "ifNoneMatch": null,
+      "preferred": null,
+      "body": ""
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache",
+        "content-length": "2614",
+        "content-type": "application/hal+json",
+        "etag": "\"index-hsf-38eeef393c14ad71\"",
+        "link": "<https://w3id.org/heart-rise/hal-schema-forms>; rel=\"profile\", <https://w3id.org/heart-rise>; rel=\"profile\", </openapi.json>; rel=\"service-desc\"; type=\"application/vnd.oai.openapi+json;version=3.1\"",
+        "vary": "Accept, Accept-Profile"
+      },
+      "body": "{\"title\":\"Garden beds\",\"_links\":{\"self\":{\"href\":\"/\"},\"service-desc\":{\"href\":\"/openapi.json\",\"type\":\"application/vnd.oai.openapi+json;version=3.1\"},\"curies\":[{\"name\":\"garden\",\"href\":\"/profiles/garden#{rel}\",\"templated\":true}]},\"_forms\":{\"garden:search-beds\":{\"_links\":{\"target\":{\"href\":\"/beds{?name}\",\"templated\":true}},\"method\":\"GET\",\"title\":\"Find beds by name\",\"description\":\"Lists the beds whose name contains the text given, ignoring case.\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"minLength\":1,\"title\":\"Name\",\"description\":\"Part of the bed's name; case is ignored\"}},\"required\":[\"name\"]},\"hr:integrity\":\"sha256-NGRUWSBr7T/trSunfj069J4i5SQaGz2MUwdHkkdNcak=\"},\"garden:get-bed\":{\"_links\":{\"target\":{\"href\":\"/beds/{id}\",\"templated\":true}},\"method\":\"GET\",\"title\":\"Get a bed by its id\",\"description\":\"Goes to one bed, given its id.\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1,\"title\":\"Bed id\",\"description\":\"The bed's number\"}},\"required\":[\"id\"]},\"hr:integrity\":\"sha256-AFb34JATuSJQYNqKsNUOme7ZwX2i9PGT7YTvGtoMAN4=\"},\"garden:build-bed\":{\"_links\":{\"target\":{\"href\":\"/actions/build-bed\"}},\"method\":\"POST\",\"contentType\":\"application/json\",\"title\":\"Build a bed\",\"description\":\"Builds a new, empty bed with a name and a size in feet.\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"properties\":{\"label\":{\"description\":\"What the bed is called\",\"examples\":[\"Herbs\"],\"minLength\":1,\"pattern\":\"[\\\\s\\\\S]*\\\\S[\\\\s\\\\S]*\",\"title\":\"Name\",\"type\":\"string\"},\"lengthFt\":{\"description\":\"How long the bed is, in feet\",\"examples\":[8],\"maximum\":100,\"minimum\":1,\"title\":\"Length\",\"type\":\"integer\"},\"widthFt\":{\"description\":\"How wide the bed is, in feet\",\"examples\":[4],\"maximum\":100,\"minimum\":1,\"title\":\"Width\",\"type\":\"integer\"}},\"required\":[\"label\",\"lengthFt\",\"widthFt\"],\"title\":\"Build Bed\",\"type\":\"object\",\"$id\":\"/schemas/d017ea1b10b893b8\"},\"hr:integrity\":\"sha256-1eHk2UR7YAEoI9Wo0kZgv8fljsItrvPrlg7adUORr1s=\"}},\"hr:manifest\":{\"forms\":{\"garden:build-bed\":[\"sha256-1eHk2UR7YAEoI9Wo0kZgv8fljsItrvPrlg7adUORr1s=\"],\"garden:get-bed\":[\"sha256-AFb34JATuSJQYNqKsNUOme7ZwX2i9PGT7YTvGtoMAN4=\"],\"garden:harvest\":[\"sha256-ctSw0zxmj1GCZRzqgkSl2rChcKAMvE87rlSooj2ZQyE=\"],\"garden:search-beds\":[\"sha256-NGRUWSBr7T/trSunfj069J4i5SQaGz2MUwdHkkdNcak=\"],\"garden:sow-seed\":[\"sha256-RzdrH62iji+iBA6Yun7ENeEny+4rJkrkdCqIFYTT0xE=\"],\"garden:water-cell\":[\"sha256-PNINjwmbImFF1BjHGk9F/t6JIDu+xde09JqZZ5PL4cA=\"]},\"digest\":\"sha256-n6KKKaMJuGITV+k4WQyxpDL0k267I46IqjTxVhPLDVE=\"}}"
+    }
+  },
+  {
+    "request": {
+      "method": "GET",
+      "url": "/beds/3",
+      "authorized": true,
+      "ifMatch": null,
+      "ifNoneMatch": null,
+      "preferred": null,
+      "body": ""
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache",
+        "content-length": "947",
+        "content-type": "application/hal+json",
+        "etag": "\"seq-3.hsf.L0.c7f6b84fe37f44af\"",
+        "link": "<https://w3id.org/heart-rise/hal-schema-forms>; rel=\"profile\", <https://w3id.org/heart-rise>; rel=\"profile\"",
+        "vary": "Accept, Prefer, Accept-Profile"
+      },
+      "body": "{\"id\":3,\"label\":\"bed-3\",\"widthFt\":3,\"lengthFt\":6,\"status\":\"READY_TO_HARVEST\",\"cropName\":\"basil\",\"growthPoints\":100,\"moistureLevel\":100,\"_links\":{\"self\":{\"href\":\"/beds/3\"},\"curies\":[{\"name\":\"garden\",\"href\":\"/profiles/garden#{rel}\",\"templated\":true},{\"name\":\"hr\",\"href\":\"https://w3id.org/heart-rise/rels/{rel}\",\"templated\":true}],\"hr:unavailable\":{\"href\":\"/unavailable/0b7168a23ddb1595\",\"type\":\"application/json\",\"integrity\":\"sha256-C3Fooj3bFZWkmnJK+qklt435QZ66sBzrL3fqv9NCKQM=\"}},\"_forms\":{\"garden:harvest\":{\"title\":\"Harvest the crop\",\"description\":\"Picks the crop from a bed that is ready. The bed becomes empty again.\",\"_links\":{\"target\":{\"href\":\"/beds/3/actions/harvest\"}},\"method\":\"POST\",\"contentType\":\"application/json\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"properties\":{},\"title\":\"Harvest\",\"type\":\"object\",\"$id\":\"/schemas/6efcb63a723f14bc\"},\"hr:integrity\":\"sha256-ctSw0zxmj1GCZRzqgkSl2rChcKAMvE87rlSooj2ZQyE=\"}}}"
+    }
+  },
+  {
+    "request": {
+      "method": "GET",
+      "url": "/",
+      "authorized": true,
+      "ifMatch": null,
+      "ifNoneMatch": null,
+      "preferred": null,
+      "body": ""
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache",
+        "content-length": "938",
+        "content-type": "application/prs.hal-forms+json",
+        "etag": "\"index-hf-33f2f1e16236a9dc\"",
+        "link": "<https://w3id.org/heart-rise/hal-forms>; rel=\"profile\", <https://w3id.org/heart-rise>; rel=\"profile\", </openapi.json>; rel=\"service-desc\"; type=\"application/vnd.oai.openapi+json;version=3.1\"",
+        "vary": "Accept, Accept-Profile"
+      },
+      "body": "{\"title\":\"Garden beds\",\"_links\":{\"self\":{\"href\":\"/\"},\"service-desc\":{\"href\":\"/openapi.json\",\"type\":\"application/vnd.oai.openapi+json;version=3.1\"}},\"_templates\":{\"searchBeds\":{\"title\":\"Find beds by name\",\"method\":\"GET\",\"target\":\"/beds\",\"properties\":[{\"name\":\"name\",\"type\":\"search\",\"required\":true,\"minLength\":1,\"prompt\":\"Part of the bed's name; case is ignored\"}]},\"getBed\":{\"title\":\"Get a bed by its id\",\"method\":\"GET\",\"target\":\"/beds\",\"properties\":[{\"name\":\"id\",\"type\":\"number\",\"required\":true,\"min\":1,\"prompt\":\"Bed id\"}]},\"buildBed\":{\"title\":\"Build a bed\",\"method\":\"POST\",\"contentType\":\"application/json\",\"target\":\"/actions/build-bed\",\"properties\":[{\"name\":\"label\",\"prompt\":\"Name\",\"required\":true,\"type\":\"text\",\"minLength\":1,\"regex\":\"[\\\\s\\\\S]*\\\\S[\\\\s\\\\S]*\"},{\"name\":\"widthFt\",\"prompt\":\"Width\",\"required\":true,\"type\":\"number\",\"min\":1,\"max\":100},{\"name\":\"lengthFt\",\"prompt\":\"Length\",\"required\":true,\"type\":\"number\",\"min\":1,\"max\":100}]}}}"
+    }
+  },
+  {
+    "request": {
+      "method": "GET",
+      "url": "/beds?id=3",
+      "authorized": true,
+      "ifMatch": null,
+      "ifNoneMatch": null,
+      "preferred": null,
+      "body": ""
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache",
+        "content-length": "307",
+        "content-type": "application/prs.hal-forms+json",
+        "etag": "\"page.hf.fbcbbd7ef34bbc8e\"",
+        "link": "<https://w3id.org/heart-rise/hal-forms>; rel=\"profile\", <https://w3id.org/heart-rise>; rel=\"profile\"",
+        "vary": "Accept, Accept-Profile"
+      },
+      "body": "{\"count\":1,\"_links\":{\"self\":{\"href\":\"/beds?id=3\"},\"item\":[{\"href\":\"/beds/3\",\"title\":\"bed-3\"}]},\"_embedded\":{\"item\":[{\"id\":3,\"label\":\"bed-3\",\"widthFt\":3,\"lengthFt\":6,\"status\":\"READY_TO_HARVEST\",\"cropName\":\"basil\",\"growthPoints\":100,\"moistureLevel\":100,\"_links\":{\"self\":{\"href\":\"/beds/3\",\"title\":\"bed-3\"}}}]}}"
+    }
+  },
+  {
+    "request": {
+      "method": "GET",
+      "url": "/beds/3",
+      "authorized": true,
+      "ifMatch": null,
+      "ifNoneMatch": null,
+      "preferred": null,
+      "body": ""
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache",
+        "content-length": "326",
+        "content-type": "application/prs.hal-forms+json",
+        "etag": "\"seq-3.hf.L0.0258a38d5066275e\"",
+        "link": "<https://w3id.org/heart-rise/hal-forms>; rel=\"profile\", <https://w3id.org/heart-rise>; rel=\"profile\"",
+        "vary": "Accept, Accept-Profile"
+      },
+      "body": "{\"id\":3,\"label\":\"bed-3\",\"widthFt\":3,\"lengthFt\":6,\"status\":\"READY_TO_HARVEST\",\"cropName\":\"basil\",\"growthPoints\":100,\"moistureLevel\":100,\"_links\":{\"self\":{\"href\":\"/beds/3\"}},\"_templates\":{\"harvest\":{\"title\":\"Harvest the crop\",\"method\":\"POST\",\"contentType\":\"application/json\",\"target\":\"/beds/3/actions/harvest\",\"properties\":[]}}}"
+    }
+  }
+]

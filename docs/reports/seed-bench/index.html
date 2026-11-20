@@ -1,0 +1,578 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body style="margin:0">
+<title>Seed Bench, Zero Tokens</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The look every generated report shares: tokens for light and dark, type, the column, tiles, tags, tables,
+   disclosures and the theme switch. A generator inlines this first, then only what its own page adds. */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2330; --muted: #5d6879; --rule: #dde2ea; --track: #eef1f5;
+  --accent: #4b4fc4;
+  --good: #1f7a3a; --good-bg: #e3f3e7; --safe: #2b5fa8; --safe-bg: #e3ecf8;
+  --warn: #8a5a00; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2; --quiet-bg: #eceff3;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; line-height: 1.15; } h2 { font-size: 21px; } h3 { font-size: 18px; }
+h4 { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+p { margin: 0; max-width: 72ch; }
+section { display: grid; gap: 12px; min-width: 0; }
+.sub, .none { color: var(--muted); font-size: 13px; }
+.mono { font-family: var(--mono); font-size: 13px; }
+.num { font-family: var(--mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* The title row: title and lede on the left, the theme switch on the right. */
+.top { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+.top > div { min-width: 0; }
+.lede { color: var(--muted); margin-top: 6px; }
+.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+
+/* Tones: a class that sets --c and --cbg, for tiles, tags and borders. */
+.good { --c: var(--good); --cbg: var(--good-bg); } .safe { --c: var(--safe); --cbg: var(--safe-bg); }
+.warn { --c: var(--warn); --cbg: var(--warn-bg); } .bad { --c: var(--bad); --cbg: var(--bad-bg); }
+.quiet { --c: var(--muted); --cbg: var(--quiet-bg); }
+.tag { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 10px; margin: 0 4px 4px 0;
+  color: var(--c, var(--muted)); background: var(--cbg, var(--quiet-bg)); white-space: nowrap; text-decoration: none; }
+
+/* Tiles: a number or a word on top, a label, a line under; a button tile filters. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.tile { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-top: 3px solid var(--c, var(--rule)); border-radius: 6px; padding: 12px 16px; display: grid; gap: 2px; }
+.tile b { font: 600 24px/1.2 var(--display); color: var(--c, var(--ink)); }
+.tile .name { font: 500 13px var(--mono); color: var(--muted); }
+button.tile { cursor: pointer; }
+button.tile[aria-pressed="true"] { background: var(--cbg, var(--panel)); }
+.chipbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.chipbar button { font: 500 12px var(--mono); border: 1px solid var(--rule); background: var(--panel); color: var(--ink);
+  border-radius: 12px; padding: 2px 10px; cursor: pointer; }
+
+/* Tables, each in its own sideways scroll. */
+.scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+thead th { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+tbody tr:last-child > * { border-bottom: 0; }
+
+/* Disclosures, and the source a page shows of itself. */
+details.box { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+details.box > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
+details.box > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
+
+.theme:focus-visible, summary:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* This page's own. */
+
+section, .tiles { margin-top: 28px; }
+.tile { cursor: default; }
+.flow { display: grid; gap: 6px; max-width: 760px; }
+.node { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px;
+  display: grid; gap: 6px; min-width: 0; }
+.node .outcome { color: var(--good); }
+.arrow { text-align: center; color: var(--muted); font-size: 20px; line-height: 1; }
+ol.pulls { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.pull { background: var(--panel); border: 1px solid var(--rule); border-left: 4px solid var(--c, var(--rule));
+  border-radius: 6px; padding: 12px 14px; display: grid; gap: 4px; min-width: 0; }
+.pull .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+ul.gaps { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+
+</style>
+<div class="wrap">
+  <div class="top"><div>
+    <h1>The seed bench: decided once, then run with no model</h1>
+    <p class="lede">A greenhouse bench watched through the HEART gateway on a scratch GitHub repository: Claude decides each part once, artie generate writes those decisions as a script, and the script does the work alone. Run 2026-10-24.</p>
+  </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
+
+  <div class="tiles"><div class="tile quiet"><b>20</b><span class="sub">live runs with Claude deciding</span></div><div class="tile good"><b>4</b><span class="sub">live runs of the script alone, no model</span></div><div class="tile safe"><b>18</b><span class="sub">things found and fixed, each with a test first</span></div><div class="tile good"><b>0</b><span class="sub">model calls in the runs of the script</span></div></div>
+  <section>
+    <h2>The idea, in three steps</h2>
+    <p>A goal file says, in plain words, what a watch over a greenhouse bench should do. Claude decides how to do
+    each part once, the first time it comes up. Those decisions are written down as a script. From then on the
+    script does the work by itself, with no model, and costs no tokens.</p>
+    <div class="flow"><div class="node"><b>Run b20, with Claude</b><div>Claude decided every part of the watch, the first time each was needed: how to answer an alert, how to merge a plan that fits, what to say on a plan that can't be merged, and how to close a tray once it is transplanted.</div><div class="outcome">Closed the transplanted tray #783. Merged the plan that fits. Told the new alert it was seen, once, and assigned it. Gave up on the plan with 60 trays after 5 minutes and said why, once, in GitHub's own words.</div></div><div class="arrow" aria-hidden="true">↓</div><div class="node"><b>artie generate</b><div>Wrote the run's decisions as a script, generated/seed-bench.kts: plain heart-script, no intent, no model. The repository's owner, the grower and the hold label are inputs; the forms it uses are pinned in a lock file beside it.</div><div class="outcome">The script opens the watch issue, then listens for alerts, sowing plans and trays, as the run did.</div></div><div class="arrow" aria-hidden="true">↓</div><div class="node"><b>Run g4, the script alone</b><div>The generated script run with artie run and no --reasoner.</div><div class="outcome">Closed the transplanted tray #788. Merged the new plan that fits (#790). Told the new alert #789 it was seen, once, and assigned it. 229 steps, none of them reasoned, no model called.</div></div></div>
+  </section>
+  <section>
+    <h2>What the goal says</h2>
+    <p>Alerts from the bench sensors are answered once and handed to the grower on duty. Sowing plans are merged
+    when they fit the bench, and told why when they don't. Trays are closed once transplanted. Anything a person
+    labels <span class="mono">hold</span> is left alone.</p>
+    <details class="box" open><summary>seed-bench.goal.md</summary><div class="scroll"><pre class="src">---
+start: https://localhost:8392/
+inputs:
+  owner:  { question: &quot;Whose repository?&quot; }
+  repo:   { default: heart-github-test, question: &quot;Which repository?&quot; }
+  week:   { default: &quot;43&quot;, question: &quot;Which sowing week?&quot; }
+  grower: { question: &quot;Who is on duty at the bench?&quot; }
+  hold:   { default: hold, question: &quot;Which label means a person objects?&quot; }
+manners: alongside-others
+---
+
+Keep the seed bench moving for week {week}: sow each plan once it passes the bench check, answer
+every alert once and hand it to the grower on duty, and close each tray once it is transplanted.
+Keep watching until the bench watch's own issue is closed.
+
+## Working alongside others
+
+Growers move trays, relabel them and write on them by hand. What they decide stands.
+
+- Don't undo or write over anything someone else changed since you looked.
+- Leave anything labelled {hold} alone, and say so once.
+- Nothing you write may claim something that isn't so: &quot;sown&quot; only once the plan is merged.
+- Don't say again what has already been said.
+
+## The work
+
+- In {owner}/{repo}
+  - Open an issue titled &quot;Bench watch, week {week}&quot;, saying &quot;Close this issue to stop the watch.&quot; `as watch`
+  - Whenever an issue labelled alert changes `as alert`
+    - If it's labelled {hold}, leave it, and say so once.
+    - Say on {alert} &quot;Seen by the bench watch; {grower} will check the tray today.&quot;, unless it's said already.
+    - Assign it to {grower}.
+  - Whenever a pull request labelled sowing changes `as plan`
+    - If it's labelled {hold}, leave it, and say so once.
+    - Once it can be merged, merge it by squashing.
+      Or give up after 5 minutes.
+      Otherwise, say on {plan} why it wasn't merged, unless it's said already.
+  - Whenever an issue labelled tray changes `as tray`
+    - If it's labelled transplanted, close it.
+- Until someone closes {watch}
+
+## Done when
+
+- Every alert during the watch says it was seen, once, and is assigned to {grower}
+- Every sowing plan is merged, or says why not
+- Nothing labelled {hold} was changed
+</pre></div></details>
+  </section>
+  <section>
+    <h2>The script made from the run</h2>
+    <p>What artie generate wrote from run b20. It reads values again where they came from: the grower and the hold
+    label are inputs, and the reason a merge gave up is the server's, read at the time.</p>
+    <details class="box"><summary>generated/seed-bench.kts</summary><div class="scroll"><pre class="src">// Generated by artie generate from runs/bench-1024-b20.yaml, the run of ../goal-syntax/goals/seed-bench.goal.md.
+// Every selection as that run made it, nested as it nested, with no model.
+// What it was offered is pinned in generated/seed-bench.pins.yaml, held to before every act.
+//   artie run generated/seed-bench.kts owner=JogoShugh grower=JogoShugh
+import kotlin.time.Duration.Companion.minutes
+val owner by input(question = &quot;Whose repository?&quot;)
+val repo by input(default = &quot;heart-github-test&quot;, question = &quot;Which repository?&quot;)
+val week by input(default = &quot;43&quot;, question = &quot;Which sowing week?&quot;)
+val grower by input(question = &quot;Who is on duty at the bench?&quot;)
+val hold by input(default = &quot;hold&quot;, question = &quot;Which label means a person objects?&quot;)
+
+heart(&quot;https://localhost:8392/&quot;) {
+    var watchAt = &quot;&quot;
+
+    act(&quot;github:repos-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, intent = &quot;get repository $owner/$repo&quot;) {
+        act(&quot;github:open-issue&quot;, intent = &quot;&quot;&quot;Open an issue titled &quot;Bench watch, week $week&quot; with the body &quot;Close this issue to stop the watch.&quot;&quot;&quot;&quot;, fields = {
+            &quot;title&quot; to &quot;Bench watch, week $week&quot;
+            &quot;body&quot; to &quot;Close this issue to stop the watch.&quot;
+        }) {
+            watchAt = held.address
+        }
+    }
+    listeners(until = { var over = false; at(watchAt) { over = holds(mapOf(&quot;state&quot; to &quot;closed&quot;)) }; over }) {
+        listen(&quot;an issue labelled alert changes&quot;, from = &quot;https://localhost:8392/&quot;) {
+            act(&quot;github:issues-list-for-repo&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, &quot;labels&quot; to &quot;alert&quot;) {
+                whenever {
+                    if (holds(mapOf(&quot;github:labels&quot; to listOf(&quot;alert&quot;)))) {
+                        if (holds(mapOf(&quot;github:labels&quot; to listOf(hold)))) note(&quot;Left ${held.address}: leave it, and say so once.&quot;) else {
+                            var undone1 = false
+                            follow(&quot;github:issues-list-comments&quot;) { undone1 = holds(mapOf(&quot;item&quot; to listOf(&quot;Seen by the bench watch; ${grower} will check the tray today.&quot;))) }
+                            if (!undone1) act(&quot;github:comment&quot;, &quot;body&quot; to &quot;Seen by the bench watch; ${grower} will check the tray today.&quot;) {}
+                            act(&quot;github:assign&quot;, &quot;assignees&quot; to listOf(grower)) {}
+                        }
+                    }
+                }
+            }
+        }
+        listen(&quot;a pull request labelled sowing changes&quot;, from = &quot;https://localhost:8392/&quot;) {
+            act(&quot;github:pulls-list&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, &quot;labels&quot; to &quot;sowing&quot;) {
+                whenever {
+                    if (holds(mapOf(&quot;github:labels&quot; to listOf(&quot;sowing&quot;)))) {
+                        if (holds(mapOf(&quot;github:labels&quot; to listOf(hold)))) note(&quot;Left ${held.address}: leave it, and say so once.&quot;) else {
+                            once(&quot;github:merge&quot;, giveUp = 5.minutes, otherwise = { why -&gt;
+                                var undone2 = false
+                                follow(&quot;github:issues-list-comments&quot;) { undone2 = holds(mapOf(&quot;item&quot; to listOf(&quot;Not merged: Branch protection blocks the merge: a required check or review is missing.&quot;))) }
+                                if (!undone2) act(&quot;github:comment&quot;, &quot;body&quot; to &quot;Not merged: ${why}&quot;) {}
+                            }) {
+                                act(&quot;github:merge&quot;, &quot;merge_method&quot; to &quot;squash&quot;) {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        listen(&quot;an issue labelled tray changes&quot;, from = &quot;https://localhost:8392/&quot;) {
+            act(&quot;github:issues-list-for-repo&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, &quot;labels&quot; to &quot;tray&quot;) {
+                whenever {
+                    if (holds(mapOf(&quot;github:labels&quot; to listOf(&quot;tray&quot;)))) {
+                        if (holds(mapOf(&quot;github:labels&quot; to listOf(&quot;transplanted&quot;)))) {
+                            act(&quot;github:close&quot;) {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+</pre></div></details>
+  </section>
+  <section>
+    <h2>Every run, in order</h2>
+    <p>Each run that went wrong showed one gap. Each gap was fixed with a test first, then run live again. A guard
+    beside every live run stopped it if anything was told twice.</p>
+    <ol class="pulls"><li class="pull bad"><div class="head"><b class="mono">b1</b> <span class="tag bad">told someone twice</span></div><div>Merged the plan that fits (#732), left the held one alone (#735), said why on the one too big (#734), closed tray #730. But alert #733 was told it was seen 18 more times: the check &quot;is it said already?&quot; came after the comment, so nothing kept the comment from being made again.</div><div class="sub">Fixed: A check made after the act it guards is kept before it.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">b2</b> <span class="tag bad">told someone twice</span></div><div>Stopped while assigning alert</div><div class="sub">Fixed: A step that says &quot;unless&quot; can't be done until its check is made; the planner is told an act the server answered is done.</div></li>
+<li class="pull safe"><div class="head"><b class="mono">b3</b> <span class="tag safe">stopped, nothing harmed</span></div><div>No alert told twice;</div></li>
+<li class="pull bad"><div class="head"><b class="mono">b4</b> <span class="tag bad">told someone twice</span></div><div>Claude decided comment, read, assign, then check. The check was kept before the assign only, so</div><div class="sub">Fixed: A check is kept before the first act that writes since the last check, with the reads it is made on.</div></li>
+<li class="pull safe"><div class="head"><b class="mono">b5</b> <span class="tag safe">stopped, nothing harmed</span></div><div>No alert told twice, but the new alert #745 was never told. Claude checked &quot;the comments number 1&quot;, and the first alert's own comment count was also 1, so the check was tied to it and held on every alert.</div><div class="sub">Fixed: A check's values come from the run's inputs or stay as Claude said them; an act made twice in a row is kept once.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">b6</b> <span class="tag bad">told someone twice</span></div><div>Three alerts told again; the guard stopped the run, and the stop left no trace to learn from.</div><div class="sub">Fixed: A run's trace is written when the process is told to stop.</div></li>
+<li class="pull safe"><div class="head"><b class="mono">b7</b> <span class="tag safe">stopped, nothing harmed</span></div><div>Claude read the comments as an act that opens, so on a new alert it was asked inside the comments list, found no way to comment there, and stopped.</div><div class="sub">Fixed: A link followed in a chain is a read; the acts after it are made on the alert.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">b8</b> <span class="tag bad">told someone twice</span></div><div>Claude checked a &quot;comments&quot; member the comments list doesn't have. That check could never hold, so every replay commented again.</div><div class="sub">Fixed: A check made right after the acts it guards must hold there, or it is refused.</div></li>
+<li class="pull safe"><div class="head"><b class="mono">b9</b> <span class="tag safe">stopped, nothing harmed</span></div><div>A read kept on the alert showed Claude nothing, so it read the comments again and again until the run's move limit.</div><div class="sub">Fixed: Claude is told what a read reached.</div></li>
+<li class="pull safe"><div class="head"><b class="mono">b10</b> <span class="tag safe">stopped, nothing harmed</span></div><div>Claude saw the words already there, checked a relation the list doesn't have, and said done. Nothing was decided for a new alert.</div><div class="sub">Fixed: A step is not done where its last check fails with nothing done after it.</div></li>
+<li class="pull safe"><div class="head"><b class="mono">b11</b> <span class="tag safe">stopped, nothing harmed</span></div><div>The refusal held, but Claude guessed at the right check five times and ran out of moves.</div><div class="sub">Fixed: A refused check tells where it is made, what is there, and how a fact names a link's title.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">b12</b> <span class="tag bad">told someone twice</span></div><div>Claude checked &quot;github:comments&quot; again; the check failed, and</div><div class="sub">Fixed: A check naming something its resource doesn't hold is refused; Claude is told what it holds.</div></li>
+<li class="pull good"><div class="head"><b class="mono">b13</b> <span class="tag good">did it right</span></div><div>Every alert's comments read and checked; none told twice. The new alert</div></li>
+<li class="pull good"><div class="head"><b class="mono">b14</b> <span class="tag good">did it right</span></div><div>The plan that fits merged (#758), the plans too big said why (#759,</div><div class="sub">Fixed: The server's reason is added to Claude's words only when they don't say it already; an act asked again just after it was made is refused.</div></li>
+<li class="pull good"><div class="head"><b class="mono">b15</b> <span class="tag good">did it right</span></div><div>Every part decided, and the first script made from a run. The grower's name was tied to the owner, both being the same person.</div><div class="sub">Fixed: A value two inputs hold is tied to the input the step's words name.</div></li>
+<li class="pull good"><div class="head"><b class="mono">g1</b> <span class="tag good">did it right</span></div><div>The first script run alone. Told the new alert</div></li>
+<li class="pull safe"><div class="head"><b class="mono">b16</b> <span class="tag safe">stopped, nothing harmed</span></div><div>The script read the grower and the hold label as inputs. Bench 2 was full from earlier plans, so no plan could merge and the script had no merge.</div><div class="sub">Fixed: Every check a watch decides reads its inputs again; bench-clear.kts empties the bench.</div></li>
+<li class="pull good"><div class="head"><b class="mono">g2</b> <span class="tag good">did it right</span></div><div>The script alone, given hold=paused. Left the alert labelled paused (#770); told and assigned the one labelled hold (#771).</div></li>
+<li class="pull safe"><div class="head"><b class="mono">b17</b> <span class="tag safe">stopped, nothing harmed</span></div><div>A read Claude chose wrongly was refused; asked again in the same words, it was refused as an act just made, though nothing was made.</div><div class="sub">Fixed: Only an act the server answered counts as just made.</div></li>
+<li class="pull safe"><div class="head"><b class="mono">b18</b> <span class="tag safe">stopped, nothing harmed</span></div><div>Told the new alert</div><div class="sub">Fixed: A refused check shows one fact that holds there, made from the resource itself.</div></li>
+<li class="pull good"><div class="head"><b class="mono">b19</b> <span class="tag good">did it right</span></div><div>Every part decided at the first try. Merged</div></li>
+<li class="pull good"><div class="head"><b class="mono">g3</b> <span class="tag good">did it right</span></div><div>The script made from b19, alone. Merged</div><div class="sub">Fixed: Then, with no run to find them: the goal's closing checks are made on every member a watch answered, not at the start; an Until that can never hold is refused; the trace keeps Claude's words alone; a read no check is made on is left out.</div></li>
+<li class="pull safe"><div class="head"><b class="mono">b20</b> <span class="tag safe">stopped, nothing harmed</span></div><div>Every part decided, the tray included: #783 closed once transplanted. The closing check &quot;every alert is assigned to the grower&quot; was made on all 17 alerts, and held on none, though each was assigned: an embedded user has no title and no name, only a login.</div><div class="sub">Fixed: A value names an embedded resource when it is its title, or one of its own values.</div></li>
+<li class="pull good"><div class="head"><b class="mono">g4</b> <span class="tag good">did it right</span></div><div>The script made from b20, alone, with every listener. Closed tray</div></li></ol>
+  </section>
+  <section>
+    <h2>Still missing</h2>
+    <ul class="gaps"><li><span class="tag quiet">Done when</span> &quot;Says it was seen, once&quot; needs the comments read on each alert; a closing check is made on the member alone.</li>
+<li><span class="tag quiet">The script</span> A check can keep text copied from an earlier run's comment, word for word.</li>
+<li><span class="tag quiet">Old runs</span> The alerts told twice by the runs that went wrong still carry the extra comments.</li></ul>
+  </section>
+  <section>
+    <h2>How this page is made</h2>
+    <details class="box"><summary>results.yaml: what happened</summary><div class="scroll"><pre class="src"># What the seed bench did, 2026-10-24, on JogoShugh/heart-github-test. report.kts lays this out.
+# Outcomes are from the runs' outputs (runs/*.out) and what GitHub held after each run.
+# tone: good (did the right thing), safe (stopped, and said why), bad (did harm).
+
+asOf: &quot;2026-10-24&quot;
+goalFile: ../goal-syntax/goals/seed-bench.goal.md
+generated: generated/seed-bench.kts
+
+# The proof, end to end: Claude decides once, the decisions become a script, the script runs with no model.
+proof:
+  - step: Run b20, with Claude
+    what: &gt;-
+      Claude decided every part of the watch, the first time each was needed: how to answer an alert, how to
+      merge a plan that fits, what to say on a plan that can't be merged, and how to close a tray once it is
+      transplanted.
+    showed: &gt;-
+      Closed the transplanted tray #783. Merged the plan that fits. Told the new alert it was seen, once, and
+      assigned it. Gave up on the plan with 60 trays after 5 minutes and said why, once, in GitHub's own words.
+  - step: artie generate
+    what: &gt;-
+      Wrote the run's decisions as a script, generated/seed-bench.kts: plain heart-script, no intent, no model.
+      The repository's owner, the grower and the hold label are inputs; the forms it uses are pinned in a lock
+      file beside it.
+    showed: The script opens the watch issue, then listens for alerts, sowing plans and trays, as the run did.
+  - step: Run g4, the script alone
+    what: The generated script run with artie run and no --reasoner.
+    showed: &gt;-
+      Closed the transplanted tray #788. Merged the new plan that fits (#790). Told the new alert #789 it was
+      seen, once, and assigned it. 229 steps, none of them reasoned, no model called.
+
+runs:
+  - run: b1
+    tone: bad
+    found: &gt;-
+      Merged the plan that fits (#732), left the held one alone (#735), said why on the one too big (#734), closed
+      tray #730. But alert #733 was told it was seen 18 more times: the check &quot;is it said already?&quot; came after the
+      comment, so nothing kept the comment from being made again.
+    fixed: A check made after the act it guards is kept before it.
+  - run: b2
+    tone: bad
+    found: Stopped while assigning alert #738 a third time; a read just after each assign didn't show it yet.
+    fixed: A step that says &quot;unless&quot; can't be done until its check is made; the planner is told an act the server answered is done.
+  - run: b3
+    tone: safe
+    found: No alert told twice; #739 merged; tray #731 closed. A new alert, #741, was assigned but never told.
+    fixed: &quot;-&quot;
+  - run: b4
+    tone: bad
+    found: Claude decided comment, read, assign, then check. The check was kept before the assign only, so #733 and #738 were told again.
+    fixed: A check is kept before the first act that writes since the last check, with the reads it is made on.
+  - run: b5
+    tone: safe
+    found: &gt;-
+      No alert told twice, but the new alert #745 was never told. Claude checked &quot;the comments number 1&quot;, and the
+      first alert's own comment count was also 1, so the check was tied to it and held on every alert.
+    fixed: A check's values come from the run's inputs or stay as Claude said them; an act made twice in a row is kept once.
+  - run: b6
+    tone: bad
+    found: Three alerts told again; the guard stopped the run, and the stop left no trace to learn from.
+    fixed: A run's trace is written when the process is told to stop.
+  - run: b7
+    tone: safe
+    found: Claude read the comments as an act that opens, so on a new alert it was asked inside the comments list, found no way to comment there, and stopped.
+    fixed: A link followed in a chain is a read; the acts after it are made on the alert.
+  - run: b8
+    tone: bad
+    found: Claude checked a &quot;comments&quot; member the comments list doesn't have. That check could never hold, so every replay commented again.
+    fixed: A check made right after the acts it guards must hold there, or it is refused.
+  - run: b9
+    tone: safe
+    found: A read kept on the alert showed Claude nothing, so it read the comments again and again until the run's move limit.
+    fixed: Claude is told what a read reached.
+  - run: b10
+    tone: safe
+    found: Claude saw the words already there, checked a relation the list doesn't have, and said done. Nothing was decided for a new alert.
+    fixed: A step is not done where its last check fails with nothing done after it.
+  - run: b11
+    tone: safe
+    found: The refusal held, but Claude guessed at the right check five times and ran out of moves.
+    fixed: A refused check tells where it is made, what is there, and how a fact names a link's title.
+  - run: b12
+    tone: bad
+    found: Claude checked &quot;github:comments&quot; again; the check failed, and #752 was told twice.
+    fixed: A check naming something its resource doesn't hold is refused; Claude is told what it holds.
+  - run: b13
+    tone: good
+    found: Every alert's comments read and checked; none told twice. The new alert #756 told once and assigned.
+    fixed: &quot;-&quot;
+  - run: b14
+    tone: good
+    found: The plan that fits merged (#758), the plans too big said why (#759, #734), the held one left alone. One comment said its reason twice.
+    fixed: The server's reason is added to Claude's words only when they don't say it already; an act asked again just after it was made is refused.
+  - run: b15
+    tone: good
+    found: Every part decided, and the first script made from a run. The grower's name was tied to the owner, both being the same person.
+    fixed: A value two inputs hold is tied to the input the step's words name.
+  - run: g1
+    tone: good
+    found: The first script run alone. Told the new alert #765 once and assigned it; 217 steps, none reasoned.
+    fixed: &quot;-&quot;
+  - run: b16
+    tone: safe
+    found: The script read the grower and the hold label as inputs. Bench 2 was full from earlier plans, so no plan could merge and the script had no merge.
+    fixed: Every check a watch decides reads its inputs again; bench-clear.kts empties the bench.
+  - run: g2
+    tone: good
+    found: The script alone, given hold=paused. Left the alert labelled paused (#770); told and assigned the one labelled hold (#771).
+    fixed: &quot;-&quot;
+  - run: b17
+    tone: safe
+    found: A read Claude chose wrongly was refused; asked again in the same words, it was refused as an act just made, though nothing was made.
+    fixed: Only an act the server answered counts as just made.
+  - run: b18
+    tone: safe
+    found: Told the new alert #775 once, then checked &quot;comments&quot; six times on a list that doesn't have it.
+    fixed: A refused check shows one fact that holds there, made from the resource itself.
+  - run: b19
+    tone: good
+    found: Every part decided at the first try. Merged #774, told #778, said why on #779.
+    fixed: &quot;-&quot;
+  - run: g3
+    tone: good
+    found: The script made from b19, alone. Merged #780, told and assigned #781; 168 steps, none reasoned.
+    fixed: &gt;-
+      Then, with no run to find them: the goal's closing checks are made on every member a watch answered, not
+      at the start; an Until that can never hold is refused; the trace keeps Claude's words alone; a read no
+      check is made on is left out.
+  - run: b20
+    tone: safe
+    found: &gt;-
+      Every part decided, the tray included: #783 closed once transplanted. The closing check &quot;every alert is
+      assigned to the grower&quot; was made on all 17 alerts, and held on none, though each was assigned: an embedded
+      user has no title and no name, only a login.
+    fixed: A value names an embedded resource when it is its title, or one of its own values.
+  - run: g4
+    tone: good
+    found: The script made from b20, alone, with every listener. Closed tray #788, merged #790, told and assigned #789; 229 steps, none reasoned.
+    fixed: &quot;-&quot;
+
+gaps:
+  - where: Done when
+    what: &gt;-
+      &quot;Says it was seen, once&quot; needs the comments read on each alert; a closing check is made on the member
+      alone.
+  - where: The script
+    what: A check can keep text copied from an earlier run's comment, word for word.
+  - where: Old runs
+    what: The alerts told twice by the runs that went wrong still carry the extra comments.
+</pre></div></details>
+    <details class="box"><summary>report.kts: the script that lays it out</summary><div class="scroll"><pre class="src">// The seed bench as a page: a goal file run by ARTIE with Claude, the script made from that run, and the script run
+// with no model. The facts live in results.yaml; this script only lays them out. The look comes from the reports'
+// shared assets (report-shell.html, report-base.css, theme-switch.js), inlined.
+//   artie run report.kts out=../../docs/reports/seed-bench/index.html artifact=/tmp/seed-bench.html
+// out gets a whole document for GitHub Pages; artifact, when given, the same page without the document skeleton.
+import java.io.File
+import org.yaml.snakeyaml.Yaml
+
+val data by input(default = &quot;results.yaml&quot;, question = &quot;Where are the results?&quot;)
+val out by input(question = &quot;Where to write the page?&quot;)
+val artifact by input(default = &quot;&quot;, question = &quot;Where to write the artifact copy, if anywhere?&quot;)
+val source by input(default = &quot;report.kts&quot;, question = &quot;Where is this script, to show it on the page?&quot;)
+val assets by input(default = &quot;../../docs/reports/assets&quot;, question = &quot;Where are the reports' shared assets?&quot;)
+
+fun Any?.map(): Map&lt;String, Any?&gt; = (this as? Map&lt;*, *&gt;).orEmpty().entries.associate { it.key.toString() to it.value }
+fun Any?.list(): List&lt;Map&lt;String, Any?&gt;&gt; = (this as? List&lt;*&gt;).orEmpty().map { it.map() }
+fun Map&lt;String, Any?&gt;.text(key: String) = this[key]?.toString().orEmpty()
+fun esc(s: String) = s.replace(&quot;&amp;&quot;, &quot;&amp;amp;&quot;).replace(&quot;&lt;&quot;, &quot;&amp;lt;&quot;).replace(&quot;&gt;&quot;, &quot;&amp;gt;&quot;).replace(&quot;\&quot;&quot;, &quot;&amp;quot;&quot;)
+
+val yaml = Yaml().load&lt;Any?&gt;(File(data).readText()).map()
+val runs = yaml[&quot;runs&quot;].list()
+val toneWords = mapOf(&quot;good&quot; to &quot;did it right&quot;, &quot;safe&quot; to &quot;stopped, nothing harmed&quot;, &quot;bad&quot; to &quot;told someone twice&quot;)
+
+fun tag(tone: String) = &quot;&quot;&quot;&lt;span class=&quot;tag $tone&quot;&gt;${esc(toneWords[tone] ?: tone)}&lt;/span&gt;&quot;&quot;&quot;
+val claudeRuns = runs.count { it.text(&quot;run&quot;).startsWith(&quot;b&quot;) }
+val scriptRuns = runs.count { it.text(&quot;run&quot;).startsWith(&quot;g&quot;) }
+val fixes = runs.count { it.text(&quot;fixed&quot;) != &quot;-&quot; }
+val tiles = listOf(
+    Triple(&quot;quiet&quot;, claudeRuns, &quot;live runs with Claude deciding&quot;),
+    Triple(&quot;good&quot;, scriptRuns, &quot;live runs of the script alone, no model&quot;),
+    Triple(&quot;safe&quot;, fixes, &quot;things found and fixed, each with a test first&quot;),
+    Triple(&quot;good&quot;, 0, &quot;model calls in the runs of the script&quot;),
+).joinToString(&quot;&quot;) { (tone, n, says) -&gt; &quot;&quot;&quot;&lt;div class=&quot;tile $tone&quot;&gt;&lt;b&gt;$n&lt;/b&gt;&lt;span class=&quot;sub&quot;&gt;${esc(says)}&lt;/span&gt;&lt;/div&gt;&quot;&quot;&quot; }
+
+val proof = yaml[&quot;proof&quot;].list().mapIndexed { i, p -&gt;
+    val arrow = if (i &gt; 0) &quot;&quot;&quot;&lt;div class=&quot;arrow&quot; aria-hidden=&quot;true&quot;&gt;↓&lt;/div&gt;&quot;&quot;&quot; else &quot;&quot;
+    &quot;&quot;&quot;$arrow&lt;div class=&quot;node&quot;&gt;&lt;b&gt;${esc(p.text(&quot;step&quot;))}&lt;/b&gt;&lt;div&gt;${esc(p.text(&quot;what&quot;))}&lt;/div&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;div class=&quot;outcome&quot;&gt;${esc(p.text(&quot;showed&quot;))}&lt;/div&gt;&lt;/div&gt;&quot;&quot;&quot;
+}.joinToString(&quot;&quot;)
+
+val runRows = runs.joinToString(&quot;\n&quot;) { r -&gt;
+    val tone = r.text(&quot;tone&quot;)
+    val fixed = r.text(&quot;fixed&quot;).takeIf { it != &quot;-&quot; }?.let { &quot;&quot;&quot;&lt;div class=&quot;sub&quot;&gt;Fixed: ${esc(it)}&lt;/div&gt;&quot;&quot;&quot; }.orEmpty()
+    &quot;&quot;&quot;&lt;li class=&quot;pull $tone&quot;&gt;&lt;div class=&quot;head&quot;&gt;&lt;b class=&quot;mono&quot;&gt;${esc(r.text(&quot;run&quot;))}&lt;/b&gt; ${tag(tone)}&lt;/div&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;div&gt;${esc(r.text(&quot;found&quot;))}&lt;/div&gt;$fixed&lt;/li&gt;&quot;&quot;&quot;
+}
+val gaps = yaml[&quot;gaps&quot;].list().joinToString(&quot;\n&quot;) { g -&gt;
+    &quot;&quot;&quot;&lt;li&gt;&lt;span class=&quot;tag quiet&quot;&gt;${esc(g.text(&quot;where&quot;))}&lt;/span&gt; ${esc(g.text(&quot;what&quot;))}&lt;/li&gt;&quot;&quot;&quot;
+}
+
+fun shown(name: String, path: String, open: Boolean = false) = &quot;&quot;&quot;&lt;details class=&quot;box&quot;${if (open) &quot; open&quot; else &quot;&quot;}&gt;&quot;&quot;&quot; +
+    &quot;&quot;&quot;&lt;summary&gt;$name&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;pre class=&quot;src&quot;&gt;${esc(File(path).readText())}&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;&quot;&quot;&quot;
+
+val style = &quot;&quot;&quot;
+section, .tiles { margin-top: 28px; }
+.tile { cursor: default; }
+.flow { display: grid; gap: 6px; max-width: 760px; }
+.node { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px;
+  display: grid; gap: 6px; min-width: 0; }
+.node .outcome { color: var(--good); }
+.arrow { text-align: center; color: var(--muted); font-size: 20px; line-height: 1; }
+ol.pulls { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.pull { background: var(--panel); border: 1px solid var(--rule); border-left: 4px solid var(--c, var(--rule));
+  border-radius: 6px; padding: 12px 14px; display: grid; gap: 4px; min-width: 0; }
+.pull .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+ul.gaps { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+&quot;&quot;&quot;
+
+val body = &quot;&quot;&quot;
+  &lt;div class=&quot;tiles&quot;&gt;$tiles&lt;/div&gt;
+  &lt;section&gt;
+    &lt;h2&gt;The idea, in three steps&lt;/h2&gt;
+    &lt;p&gt;A goal file says, in plain words, what a watch over a greenhouse bench should do. Claude decides how to do
+    each part once, the first time it comes up. Those decisions are written down as a script. From then on the
+    script does the work by itself, with no model, and costs no tokens.&lt;/p&gt;
+    &lt;div class=&quot;flow&quot;&gt;$proof&lt;/div&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;What the goal says&lt;/h2&gt;
+    &lt;p&gt;Alerts from the bench sensors are answered once and handed to the grower on duty. Sowing plans are merged
+    when they fit the bench, and told why when they don't. Trays are closed once transplanted. Anything a person
+    labels &lt;span class=&quot;mono&quot;&gt;hold&lt;/span&gt; is left alone.&lt;/p&gt;
+    ${shown(&quot;seed-bench.goal.md&quot;, yaml.text(&quot;goalFile&quot;), open = true)}
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;The script made from the run&lt;/h2&gt;
+    &lt;p&gt;What artie generate wrote from run b20. It reads values again where they came from: the grower and the hold
+    label are inputs, and the reason a merge gave up is the server's, read at the time.&lt;/p&gt;
+    ${shown(&quot;generated/seed-bench.kts&quot;, yaml.text(&quot;generated&quot;))}
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;Every run, in order&lt;/h2&gt;
+    &lt;p&gt;Each run that went wrong showed one gap. Each gap was fixed with a test first, then run live again. A guard
+    beside every live run stopped it if anything was told twice.&lt;/p&gt;
+    &lt;ol class=&quot;pulls&quot;&gt;$runRows&lt;/ol&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;Still missing&lt;/h2&gt;
+    &lt;ul class=&quot;gaps&quot;&gt;$gaps&lt;/ul&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;How this page is made&lt;/h2&gt;
+    ${shown(&quot;results.yaml: what happened&quot;, data)}
+    ${shown(&quot;report.kts: the script that lays it out&quot;, source)}
+  &lt;/section&gt;
+&quot;&quot;&quot;
+
+/** The page: the reports' shared shell, filled with this page's own parts. */
+val page = File(assets, &quot;report-shell.html&quot;).readText()
+    .replace(&quot;@@TITLE@@&quot;, &quot;Seed Bench, Zero Tokens&quot;)
+    .replace(&quot;@@HEADING@@&quot;, &quot;The seed bench: decided once, then run with no model&quot;)
+    .replace(&quot;@@LEDE@@&quot;, &quot;A greenhouse bench watched through the HEART gateway on a scratch GitHub repository: &quot; +
+        &quot;Claude decides each part once, artie generate writes those decisions as a script, and the script does &quot; +
+        &quot;the work alone. Run ${yaml.text(&quot;asOf&quot;)}.&quot;)
+    .replace(&quot;@@BASE@@&quot;, File(assets, &quot;report-base.css&quot;).readText())
+    .replace(&quot;@@THEME@@&quot;, File(assets, &quot;theme-switch.js&quot;).readText())
+    .replace(&quot;@@STYLE@@&quot;, style).replace(&quot;@@SCRIPT@@&quot;, &quot;&quot;).replace(&quot;@@BODY@@&quot;, body)
+
+File(out).apply { parentFile.mkdirs() }.writeText(
+    &quot;&lt;!doctype html&gt;&lt;html lang=\&quot;en\&quot;&gt;&lt;head&gt;&lt;meta charset=\&quot;utf-8\&quot;&gt;&quot; +
+        &quot;&lt;meta name=\&quot;viewport\&quot; content=\&quot;width=device-width,initial-scale=1,viewport-fit=cover\&quot;&gt;&lt;/head&gt;&quot; +
+        &quot;&lt;body style=\&quot;margin:0\&quot;&gt;\n&quot; + page + &quot;&lt;/body&gt;&lt;/html&gt;\n&quot;
+)
+if (artifact.isNotBlank()) File(artifact).writeText(page)
+println(&quot;wrote $out&quot; + if (artifact.isNotBlank()) &quot; and $artifact&quot; else &quot;&quot;)
+</pre></div></details>
+  </section>
+
+</div>
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+
+
+</script>
+</body></html>

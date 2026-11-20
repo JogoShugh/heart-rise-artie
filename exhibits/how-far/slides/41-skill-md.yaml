@@ -1,0 +1,54 @@
+name: skill-md
+part: How it was built
+title: The skill tells the model the loop, and that the gates win
+kicker: For the engineers · The prompt
+say: "The bdd-gates skill's own words, from SKILL.md. The skill is instructions, and instructions are advisory; that's why it installs hooks and says, in its first paragraph, that the hooks win."
+sources:
+  - ["bdd-gates skill (repository)", "https://github.com/JogoShugh/bdd-gates-skill"]
+  - ["Claude Code hooks", "https://code.claude.com/docs/en/hooks"]
+  - ["Gherkin reference", "https://cucumber.io/docs/gherkin/reference/"]
+fragments:
+  - name: opening
+    label: SKILL.md, the opening
+    source: bdd-gates:SKILL.md
+    from: Instructions are advisory. A model can drift past them.
+    count: 4
+    lang: markdown
+  - name: loop
+    label: SKILL.md, the work loop
+    source: bdd-gates:SKILL.md
+    from: 1. Write or change the `.feature` scenario.
+    count: 7
+    lang: markdown
+html: |
+  <h2>The skill tells the model the loop, and that the gates win</h2>
+  <div class="split" style="grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);">
+    <div class="rows">
+      <pre><code># SKILL.md, the opening
+  Instructions are advisory. A model can drift
+  past them. These gates are real processes with
+  real exit codes, so they hold even when
+  attention slips. This skill installs them and
+  explains the loop they enforce. **The skill
+  never replaces the hooks**: if a gate blocks
+  you, satisfy it; never edit it away.</code></pre>
+      <p class="refs"><deck-fragment name="opening">SKILL.md, the opening</deck-fragment></p>
+    </div>
+    <div class="rows">
+      <pre><code># SKILL.md, the work loop
+  1. Write or change the .feature scenario.
+     Use Scenario Outlines and data tables,
+     not repeated Given/When/Then blocks.
+  2. Run the BDD suite (native command, or
+     .claude/bdd-gates/bdd-run.sh on wrapper
+     stacks). See it fail for the right
+     reason: BDD_RUN FAIL.
+  3. Write step definitions, then production
+     code. The gate now allows it.
+  4. Run the suite until BDD_RUN PASS. Fix
+     lint findings as they appear.
+  5. End the turn. The Stop gate runs the
+     full check.</code></pre>
+      <p class="refs"><deck-fragment name="loop">SKILL.md, the work loop</deck-fragment></p>
+    </div>
+  </div>

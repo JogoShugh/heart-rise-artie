@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Replay: Every Pull Request, No Model · One Goal, Walked Once, Replayed Free</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">One script, five releases</span></header>
+<h2>Replay: Every Pull Request, No Model</h2>
+<div class="rflow">
+  <div>Open pull request <i>N</i></div><span aria-hidden="true">➜</span>
+  <div class="wait">◷ Watcher: once it offers <code>scm:merge</code></div><span aria-hidden="true">➜</span>
+  <div>Merge, by squashing</div><span aria-hidden="true">➜</span>
+  <div class="wait">◷ Jenkins: build, deploy a preview</div><span aria-hidden="true">➜</span>
+  <div>Smoke script, on the preview</div>
+</div>
+<div class="rsplit">
+  <div class="r-yes"><b>All scenarios pass</b><span>Promote the commit to Dev</span><em>501, 502, 503, 505</em></div>
+  <div class="r-no"><b>A scenario fails</b><span>Comment on the pull request: “Not promoted to Dev: smoke scenarios … failed.”</span><em>504 · “Renewals: none during the audit”</em></div>
+</div>
+<p class="guardline"><b>Before every act:</b> is the form on offer still the one pinned? If not, stop, and send nothing.</p>
+<div class="stats">
+  <div class="stat"><b>0</b><span>model calls, per release</span></div>
+  <div class="stat"><b>4 of 5</b><span>promoted to Dev</span></div>
+  <div class="stat"><b>18–22 s</b><span>per release, 56 to 61 steps</span></div>
+</div>
+</article>
+<nav class="foot"><a href="deck/pins.html" rel="prev"><small>Back</small><b>Pins: What Each Act Was Offered</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#replay">with heart-ts</a></span>
+<a href="deck/two-forges.html" rel="next"><small>Next</small><b>One Script, Two Forges</b></a></nav>
+</main></div></body></html>

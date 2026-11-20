@@ -1,0 +1,821 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body style="margin:0">
+<title>GitHub Automation Pains</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The look every generated report shares: tokens for light and dark, type, the column, tiles, tags, tables,
+   disclosures and the theme switch. A generator inlines this first, then only what its own page adds. */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2330; --muted: #5d6879; --rule: #dde2ea; --track: #eef1f5;
+  --accent: #4b4fc4;
+  --good: #1f7a3a; --good-bg: #e3f3e7; --safe: #2b5fa8; --safe-bg: #e3ecf8;
+  --warn: #8a5a00; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2; --quiet-bg: #eceff3;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; line-height: 1.15; } h2 { font-size: 21px; } h3 { font-size: 18px; }
+h4 { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+p { margin: 0; max-width: 72ch; }
+section { display: grid; gap: 12px; min-width: 0; }
+.sub, .none { color: var(--muted); font-size: 13px; }
+.mono { font-family: var(--mono); font-size: 13px; }
+.num { font-family: var(--mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* The title row: title and lede on the left, the theme switch on the right. */
+.top { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+.top > div { min-width: 0; }
+.lede { color: var(--muted); margin-top: 6px; }
+.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+
+/* Tones: a class that sets --c and --cbg, for tiles, tags and borders. */
+.good { --c: var(--good); --cbg: var(--good-bg); } .safe { --c: var(--safe); --cbg: var(--safe-bg); }
+.warn { --c: var(--warn); --cbg: var(--warn-bg); } .bad { --c: var(--bad); --cbg: var(--bad-bg); }
+.quiet { --c: var(--muted); --cbg: var(--quiet-bg); }
+.tag { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 10px; margin: 0 4px 4px 0;
+  color: var(--c, var(--muted)); background: var(--cbg, var(--quiet-bg)); white-space: nowrap; text-decoration: none; }
+
+/* Tiles: a number or a word on top, a label, a line under; a button tile filters. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.tile { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-top: 3px solid var(--c, var(--rule)); border-radius: 6px; padding: 12px 16px; display: grid; gap: 2px; }
+.tile b { font: 600 24px/1.2 var(--display); color: var(--c, var(--ink)); }
+.tile .name { font: 500 13px var(--mono); color: var(--muted); }
+button.tile { cursor: pointer; }
+button.tile[aria-pressed="true"] { background: var(--cbg, var(--panel)); }
+.chipbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.chipbar button { font: 500 12px var(--mono); border: 1px solid var(--rule); background: var(--panel); color: var(--ink);
+  border-radius: 12px; padding: 2px 10px; cursor: pointer; }
+
+/* Tables, each in its own sideways scroll. */
+.scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+thead th { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+tbody tr:last-child > * { border-bottom: 0; }
+
+/* Disclosures, and the source a page shows of itself. */
+details.box { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+details.box > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
+details.box > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
+
+.theme:focus-visible, summary:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* This page's own. */
+
+.conf { font: 11px var(--mono); padding: 0 6px; border-radius: 4px; border: 1px solid var(--rule); color: var(--muted); white-space: nowrap; }
+.conf.documented, .conf.probed { color: var(--good); border-color: var(--good); }
+.conf.secondhand { border-style: dashed; }
+td:first-child { min-width: 220px; }
+.pains { display: grid; gap: 14px; }
+.pain { background: var(--panel); border: 1px solid var(--rule); border-left: 4px solid var(--c); border-radius: 6px;
+  padding: 16px 18px; display: grid; gap: 12px; scroll-margin-top: 16px; }
+.pain > header { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; justify-content: space-between; }
+.pain .row { display: grid; gap: 2px; }
+.pain details summary { cursor: pointer; font-size: 14px; color: var(--muted); }
+.sources { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; }
+.says { color: var(--muted); max-width: 72ch; }
+
+</style>
+<div class="wrap">
+  <div class="top"><div>
+    <h1>Automating GitHub through its API: what hurts, and where HEART helps</h1>
+    <p class="lede">13 pains people meet when scripts, bots and agents drive GitHub, each with its sources, what our own runs showed, how HEART answers it, and what we would still have to build. Researched 2026-10-23; a tile filters the pains by fit.</p>
+  </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
+
+  <div class="tiles"><button class="tile good" type="button" data-fit="strong" aria-pressed="false"><b>4</b><span class="name">strong</span><span class="sub">HEART answers it directly</span></button><button class="tile safe" type="button" data-fit="medium" aria-pressed="false"><b>5</b><span class="name">medium</span><span class="sub">HEART helps; the pain stays</span></button><button class="tile bad" type="button" data-fit="against" aria-pressed="false"><b>1</b><span class="name">against</span><span class="sub">HEART makes it worse today</span></button><button class="tile quiet" type="button" data-fit="none" aria-pressed="false"><b>3</b><span class="name">none</span><span class="sub">not HEART's to answer</span></button></div>
+  <div class="chipbar" id="showing" hidden><span id="showing-text"></span><button type="button" id="clear">clear</button></div>
+  <section>
+    <h2>At a glance</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Pain</th><th>Fit</th><th>Seen in our runs</th><th>Sources</th></tr></thead>
+      <tbody>
+<tr data-fit="strong"><td><a href="#why-not-merge">Why can't I merge?</a></td><td><span class="tag good">strong</span></td><td>yes</td><td><span class="conf documented">documented</span> <span class="conf reported">reported</span></td></tr>
+<tr data-fit="medium"><td><a href="#mergeable-later">Mergeability arrives later</a></td><td><span class="tag safe">medium</span></td><td>yes</td><td><span class="conf documented">documented</span> <span class="conf reported">reported</span></td></tr>
+<tr data-fit="strong"><td><a href="#lost-updates">Two writers, one overwritten</a></td><td><span class="tag good">strong</span></td><td>yes</td><td><span class="conf probed">probed</span> <span class="conf documented">documented</span></td></tr>
+<tr data-fit="strong"><td><a href="#permissions">Resource not accessible by integration</a></td><td><span class="tag good">strong</span></td><td><span class="none">no</span></td><td><span class="conf reported">reported</span> <span class="conf reported">reported</span></td></tr>
+<tr data-fit="medium"><td><a href="#duplicate-creates">A retry makes a second issue</a></td><td><span class="tag safe">medium</span></td><td><span class="none">no</span></td><td><span class="conf reported">reported</span></td></tr>
+<tr data-fit="medium"><td><a href="#lists-lag">Lists and search lag writes</a></td><td><span class="tag safe">medium</span></td><td>yes</td><td><span class="conf reported">reported</span></td></tr>
+<tr data-fit="against"><td><a href="#rate-limits">Rate limits, especially on writes</a></td><td><span class="tag bad">against</span></td><td>yes</td><td><span class="conf documented">documented</span> <span class="conf documented">documented</span></td></tr>
+<tr data-fit="strong"><td><a href="#agent-tools">Too many tools for an agent</a></td><td><span class="tag good">strong</span></td><td>yes</td><td><span class="conf documented">documented</span> <span class="conf secondhand">secondhand</span></td></tr>
+<tr data-fit="medium"><td><a href="#agent-mistakes">Agents act on the wrong thing</a></td><td><span class="tag safe">medium</span></td><td>yes</td><td><span class="conf secondhand">secondhand</span> <span class="conf secondhand">secondhand</span></td></tr>
+<tr data-fit="none"><td><a href="#token-no-trigger">Actions' own writes don't start workflows</a></td><td><span class="tag quiet">none</span></td><td><span class="none">no</span></td><td><span class="conf documented">documented</span></td></tr>
+<tr data-fit="none"><td><a href="#merge-races">Two green pull requests, a red main</a></td><td><span class="tag quiet">none</span></td><td><span class="none">no</span></td><td><span class="conf secondhand">secondhand</span></td></tr>
+<tr data-fit="none"><td><a href="#backport-conflicts">Backports resolved silently and wrongly</a></td><td><span class="tag quiet">none</span></td><td><span class="none">no</span></td><td><span class="conf reported">reported</span></td></tr>
+<tr data-fit="medium"><td><a href="#webhooks">Events arrive twice, or out of order</a></td><td><span class="tag safe">medium</span></td><td><span class="none">no</span></td><td><span class="conf secondhand">secondhand</span></td></tr>
+      </tbody></table></div>
+    <p class="sub"><span class="conf documented">documented</span> GitHub's own docs <span class="conf probed">probed</span> we tried it against GitHub <span class="conf reported">reported</span> a public thread or issue <span class="conf secondhand">secondhand</span> a third party's account, not checked against GitHub</p>
+  </section>
+  <section>
+    <h2>The pains</h2>
+    <div class="pains">
+<article class="pain good" id="why-not-merge" data-fit="strong">
+      <header><h3>Why can't I merge?</h3><span class="tag good">strong</span></header>
+      <div class="row"><h4>What people hit</h4><p>The API says a pull request can't be merged, but not why. mergeable_state is a single undocumented word (blocked, behind, unstable, dirty, unknown), and the merge itself answers 405 for a draft, missing reviews, failing required checks or a ruleset alike. Each script works the reason out again from branch protection, reviews and checks, and each gets it slightly wrong.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>Under the meddler's M4 (the pull request turned into a draft), artie-bare sent the merge 30 times, a second apart, and got 405 &quot;Pull Request is still a draft&quot; each time before giving up after about 62 s.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>Offer the merge only when it would be taken, and say why it isn't in hr:unavailable: &quot;a draft&quot;, &quot;needs 1 approving review&quot;, &quot;check build is failing&quot;. One place works the reason out, the gateway, and every client reads it.</p></div>
+      <div class="row"><h4>Still to build</h4><p>The gateway's GitHub connector doesn't yet derive each blocking reason (draft, reviews, required checks, rulesets) from GitHub's data into hr:unavailable.</p></div>
+      <details><summary>Sources (2)</summary><ul class="sources"><li><a href="https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request" rel="noopener" target="_blank">GitHub REST docs: get a pull request, merge a pull request</a> <span class="conf documented">documented</span><div class="says">mergeable_state appears in the schema only as &quot;required, string&quot;, with no meanings. The merge endpoint answers &quot;405 Method Not Allowed if merge cannot be performed&quot;.</div></li><li><a href="https://github.com/orgs/community/discussions/21886" rel="noopener" target="_blank">GitHub Community #21886: the reason a pull request isn't mergeable</a> <span class="conf reported">reported</span><div class="says">GitHub staff, 2018: &quot;There isn't an API that summarizes why a PR is mergeable or not, only that it is or isn't.&quot; The asker fell back on the undocumented mergeable_state.</div></li></ul></details>
+    </article>
+<article class="pain safe" id="mergeable-later" data-fit="medium">
+      <header><h3>Mergeability arrives later</h3><span class="tag safe">medium</span></header>
+      <div class="row"><h4>What people hit</h4><p>Right after a pull request opens or its base moves, mergeable is null while GitHub works it out. Scripts poll with hand-written loops and backoff, and some read null as &quot;no&quot;.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>Claude's Python polls GET /pulls/N up to 30 times, 2 s apart. The careful ARTIE script says until(tries = 20) { offers(&quot;github:merge&quot;) }. artie-bare retries the merge itself.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>The wait is said once, in the task's words (&quot;once the merge is offered&quot;), not as a loop of field checks. The polling is still there underneath; HEART makes it one rule in one place, not faster.</p></div>
+      <div class="row"><h4>Still to build</h4><p>Backoff on the wait, and a wait that ends with the reason when the merge will never be offered (it's a draft), instead of running out of tries.</p></div>
+      <details><summary>Sources (2)</summary><ul class="sources"><li><a href="https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request" rel="noopener" target="_blank">GitHub REST docs: get a pull request</a> <span class="conf documented">documented</span><div class="says">&quot;If the value is null, then GitHub has started a background job to compute the mergeability. After giving the job time to complete, resubmit the request.&quot;</div></li><li><a href="https://opendev.org/zuul/zuul/commit/83281e33565dfe872c3b82bb4a80733971ff216e" rel="noopener" target="_blank">Zuul's GitHub driver</a> <span class="conf reported">reported</span><div class="says">Reading null during the calculation as &quot;not mergeable&quot; gave false negatives; Zuul stopped checking it and relied on branch protection instead.</div></li></ul></details>
+    </article>
+<article class="pain good" id="lost-updates" data-fit="strong">
+      <header><h3>Two writers, one overwritten</h3><span class="tag good">strong</span></header>
+      <div class="row"><h4>What people hit</h4><p>A bot and a person, or two bots, change the same issue or pull request. The later write wins and the earlier is lost without a word: labels flipped back, a description edit undone, an issue someone closed as not planned closed again as completed.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>In the meddler's storm (M1, M2, M3, M5), Claude's plain Python and artie-bare both did harm in 4 of 4 runs and exited 0. artie-goal did no harm: 4 of 5 runs succeeded and the fifth stopped safely.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>Every act carries the validator of the state it was chosen from, and a changed resource answers 412, so the client decides again on what is there now. The goal client then acts only on what is still offered.</p></div>
+      <div class="row"><h4>Still to build</h4><p>Honesty about the limit: GitHub can't check a condition atomically, so the gateway reads, compares, then writes. That narrows the window to milliseconds; it doesn't close it. Only the endpoints with a body sha (merge, file contents) are truly safe.</p></div>
+      <details><summary>Sources (2)</summary><ul class="sources"><li><a href="https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api#use-conditional-requests-if-appropriate" rel="noopener" target="_blank">Our probe of GitHub, 2026-10-23</a> <span class="conf probed">probed</span><div class="says">PATCH /issues/677 on the scratch repository with If-Match answered 400: &quot;Conditional request headers are not allowed in unsafe requests unless supported by the endpoint&quot;. The same PATCH without it: 200. GitHub has no general optimistic locking on writes.</div></li><li><a href="https://docs.github.com/en/rest/pulls/pulls#merge-a-pull-request" rel="noopener" target="_blank">GitHub REST docs: merge a pull request</a> <span class="conf documented">documented</span><div class="says">A few endpoints carry their own precondition in the body instead: the merge's sha (&quot;409 Conflict if sha was provided and pull request head did not match&quot;), and a file update's sha.</div></li></ul></details>
+    </article>
+<article class="pain good" id="permissions" data-fit="strong">
+      <header><h3>Resource not accessible by integration</h3><span class="tag good">strong</span></header>
+      <div class="row"><h4>What people hit</h4><p>A workflow or app gets a 403 and has to guess the cause: the GITHUB_TOKEN is read-only by default, scoped to the repository that triggered it, restricted on pull requests from forks, or an app's permissions changed. People widen permissions until it works.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>Not measured. Our runs use one personal token with full access to the scratch repository.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>The same as the merge: an act the token can't make isn't offered, and hr:unavailable says which permission is missing. A person or an agent sees &quot;contents: write needed&quot; before trying, not a 403 after.</p></div>
+      <div class="row"><h4>Still to build</h4><p>The gateway doesn't read what the caller's token may do. GitHub tells fine-grained tokens and apps which permissions an endpoint needs in a response header (X-Accepted-GitHub-Permissions, to be confirmed), which could feed this.</p></div>
+      <details><summary>Sources (2)</summary><ul class="sources"><li><a href="https://github.com/orgs/community/discussions/57878" rel="noopener" target="_blank">GitHub Community #57878</a> <span class="conf reported">reported</span><div class="says">One of many threads on the same 403 and the permissions block that fixes it.</div></li><li><a href="https://goreleaser.com/errors/resource-not-accessible-by-integration" rel="noopener" target="_blank">GoReleaser: resource not accessible by integration</a> <span class="conf reported">reported</span><div class="says">The GITHUB_TOKEN is scoped to the triggering repository, so writing to another one (a Homebrew tap) needs a personal access token.</div></li></ul></details>
+    </article>
+<article class="pain safe" id="duplicate-creates" data-fit="medium">
+      <header><h3>A retry makes a second issue</h3><span class="tag safe">medium</span></header>
+      <div class="row"><h4>What people hit</h4><p>A create times out, the script retries, and there are now two issues or two comments. GitHub's API takes no idempotency key, so careful bots embed a marker and look for it before resending.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>artie-bare retries a write only after an until step, and only the merge, which GitHub refuses twice. No run has timed out on a create yet, so we haven't seen it.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>An act answered 201 names what it made in Location; a client that lost the answer can ask the gateway what that act made. The gateway, not every script, keeps the key.</p></div>
+      <div class="row"><h4>Still to build</h4><p>Idempotent acts in the gateway: a key per act, kept with what it made. Not built.</p></div>
+      <details><summary>Sources (1)</summary><ul class="sources"><li><a href="https://packagist.org/packages/ashita-planning/laravel-error-monitor-github" rel="noopener" target="_blank">laravel-error-monitor-github</a> <span class="conf reported">reported</span><div class="says">A write whose answer never arrived may have succeeded, so it is never simply sent again: the package looks for its fingerprint in the repository's issue list first, not in search, which lags.</div></li></ul></details>
+    </article>
+<article class="pain safe" id="lists-lag" data-fit="medium">
+      <header><h3>Lists and search lag writes</h3><span class="tag safe">medium</span></header>
+      <div class="row"><h4>What people hit</h4><p>A script creates something, then looks for it in a list or search, and it isn't there yet. Scripts sleep, or pick the wrong item.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>The ladder waits 10 s before checking a run, because GitHub's lists catch up a few seconds late. The meddler reads each next issue number directly instead of listing.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>A HEART client follows the Location of what it made, not a list. The careful script never searches for its own issues.</p></div>
+      <div class="row"><h4>Still to build</h4><p>Nothing for our own writes. Someone else's new items still come through lists.</p></div>
+      <details><summary>Sources (1)</summary><ul class="sources"><li><a href="https://www.githubstatus.com/incidents/ccrzb3ms9j2d" rel="noopener" target="_blank">GitHub status, December 2025</a> <span class="conf reported">reported</span><div class="says">During an incident, search results could be up to three minutes old. Search is an index that can lag the write.</div></li></ul></details>
+    </article>
+<article class="pain bad" id="rate-limits" data-fit="against">
+      <header><h3>Rate limits, especially on writes</h3><span class="tag bad">against</span></header>
+      <div class="row"><h4>What people hit</h4><p>5000 requests an hour, plus secondary limits that change without notice: about 80 content-creating requests a minute and 500 an hour, writes costing 5 points to a read's 1, at most 100 at once.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>The careful run made 237 GitHub calls for the triage; the bare script made 19 for the same writes. Caution costs calls today.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>Not yet an answer. It could be: most of the careful run's extra calls are re-reads, and a re-read sent with If-None-Match and answered 304 is free.</p></div>
+      <div class="row"><h4>Still to build</h4><p>The gateway's re-reads as conditional requests, per token. A count of GitHub calls per arm on the care dial.</p></div>
+      <details><summary>Sources (2)</summary><ul class="sources"><li><a href="https://docs.github.com/en/enterprise-cloud@latest/rest/using-the-rest-api/rate-limits-for-the-rest-api" rel="noopener" target="_blank">GitHub REST docs: rate limits</a> <span class="conf documented">documented</span><div class="says">Secondary limits as above; they are subject to change without notice, and may apply for undisclosed reasons.</div></li><li><a href="https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api" rel="noopener" target="_blank">GitHub REST docs: best practices</a> <span class="conf documented">documented</span><div class="says">A conditional request answered 304, made with the same authorization, doesn't count against the primary limit.</div></li></ul></details>
+    </article>
+<article class="pain good" id="agent-tools" data-fit="strong">
+      <header><h3>Too many tools for an agent</h3><span class="tag good">strong</span></header>
+      <div class="row"><h4>What people hit</h4><p>GitHub's MCP server exposes about 100 tools. Loaded all at once they fill the context, exceed some clients' tool limits, and agents pick the wrong one. GitHub's answer is to let people switch toolsets and single tools on and off by hand.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>artie-goal, reasoning from what each representation offers, came through the storm without harm. It saw a handful of acts at a time, not 100 tools.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>The tools an agent sees are the acts this resource offers now. A closed issue offers no &quot;close&quot;; a draft offers no &quot;merge&quot;. The list is short because the state makes it short, not because someone configured it.</p></div>
+      <div class="row"><h4>Still to build</h4><p>A measured comparison: the same goal by an agent on GitHub's MCP server and on heart-mcp, counting tokens, tools seen and wrong calls.</p></div>
+      <details><summary>Sources (2)</summary><ul class="sources"><li><a href="https://github.blog/changelog/2025-12-10-the-github-mcp-server-adds-support-for-tool-specific-configuration-and-more" rel="noopener" target="_blank">GitHub changelog, 2025-12-10: tool-specific configuration</a> <span class="conf documented">documented</span><div class="says">An X-MCP-Tools header enables single tools, instead of the 27 two toolsets would bring in.</div></li><li><a href="https://www.arcade.dev/blog/enterprise-mcp-lessons-from-githubs-mcp-server-launch" rel="noopener" target="_blank">Arcade: lessons from GitHub's MCP server launch</a> <span class="conf secondhand">secondhand</span><div class="says">Users loaded every tool into their agent's context and were frustrated when the agent struggled.</div></li></ul></details>
+    </article>
+<article class="pain safe" id="agent-mistakes" data-fit="medium">
+      <header><h3>Agents act on the wrong thing</h3><span class="tag safe">medium</span></header>
+      <div class="row"><h4>What people hit</h4><p>Agents close issues as duplicates of issues that don't match, say an issue is solved when it isn't, or write a review without reading the pull request.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>Under M3 (the team says the duplicate is a different crash), the Python and bare runs closed it as a duplicate anyway. artie-goal kept the team's call.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>HEART can't make the judgement right. It can make acting on a changed state fail, and a goal's &quot;Done when&quot; can say what must be true afterwards, checked by code, not by the model's word.</p></div>
+      <div class="row"><h4>Still to build</h4><p>The goal grammar (&quot;Once…&quot;, &quot;Done when&quot;) in spec/ideas/goals-that-work-alongside-others.md, unbuilt.</p></div>
+      <details><summary>Sources (2)</summary><ul class="sources"><li><a href="https://claudeissues.com/issue/66135-bug-fix-github-action-bot-incorrectly-closing-feature-and-support-request" rel="noopener" target="_blank">A report about the Claude Code issue bot (third-party mirror)</a> <span class="conf secondhand">secondhand</span><div class="says">The bot closed issues as duplicates of issues that didn't match them.</div></li><li><a href="https://gigazine.net/gsc_news/en/20250522-github-copilot-coding-agent-error" rel="noopener" target="_blank">Gigazine on GitHub Copilot's coding agent, 2025</a> <span class="conf secondhand">secondhand</span><div class="says">In a Microsoft repository, the agent claimed to have solved issues it hadn't.</div></li></ul></details>
+    </article>
+<article class="pain quiet" id="token-no-trigger" data-fit="none">
+      <header><h3>Actions' own writes don't start workflows</h3><span class="tag quiet">none</span></header>
+      <div class="row"><h4>What people hit</h4><p>A pull request opened with the GITHUB_TOKEN doesn't start its checks (or starts them awaiting approval), so an auto-merge waits forever. People switch to an app token or a personal token.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>Not met: the scratch repository has no workflows.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>Nothing to fix; it's GitHub's rule against loops. At most, why-absent could say &quot;checks haven't started&quot; instead of the merge simply never appearing.</p></div>
+      
+      <details><summary>Sources (1)</summary><ul class="sources"><li><a href="https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow" rel="noopener" target="_blank">GitHub docs: triggering a workflow</a> <span class="conf documented">documented</span><div class="says">Events triggered by the GITHUB_TOKEN will not create a new workflow run, except workflow_dispatch and repository_dispatch.</div></li></ul></details>
+    </article>
+<article class="pain quiet" id="merge-races" data-fit="none">
+      <header><h3>Two green pull requests, a red main</h3><span class="tag quiet">none</span></header>
+      <div class="row"><h4>What people hit</h4><p>Each pull request passes on its own; together they break the main branch.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>Not met.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>GitHub's merge queue answers this. HEART would only drive it.</p></div>
+      
+      <details><summary>Sources (1)</summary><ul class="sources"><li><a href="https://graphite.dev/blog/what-is-a-merge-queue" rel="noopener" target="_blank">Graphite: what is a merge queue</a> <span class="conf secondhand">secondhand</span><div class="says">The merge race, and merge queues that test each change on top of the ones ahead of it.</div></li></ul></details>
+    </article>
+<article class="pain quiet" id="backport-conflicts" data-fit="none">
+      <header><h3>Backports resolved silently and wrongly</h3><span class="tag quiet">none</span></header>
+      <div class="row"><h4>What people hit</h4><p>Backport bots cherry-pick onto release branches; with conflicts resolved automatically, a backport can carry a line the original never had.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>Not met.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>A git content problem, not an API one. Out of HEART's reach.</p></div>
+      
+      <details><summary>Sources (1)</summary><ul class="sources"><li><a href="https://github.com/gophercloud/gophercloud/pull/2685" rel="noopener" target="_blank">gophercloud #2685</a> <span class="conf reported">reported</span><div class="says">Every cherry-pick used the 'theirs' strategy, which resolved conflicts automatically and put in a line the original didn't have.</div></li></ul></details>
+    </article>
+<article class="pain safe" id="webhooks" data-fit="medium">
+      <header><h3>Events arrive twice, or out of order</h3><span class="tag safe">medium</span></header>
+      <div class="row"><h4>What people hit</h4><p>A bot driven by webhooks gets the same delivery twice or events out of order, and acts on a state that has already moved.</p></div>
+      <div class="row"><h4>Our evidence</h4><p>Not met: our runs aren't driven by webhooks.</p></div>
+      <div class="row"><h4>How HEART answers</h4><p>Treat the event as a hint and act on the resource as it is now: read it, act with its validator. A stale or repeated event then finds nothing to do.</p></div>
+      <div class="row"><h4>Still to build</h4><p>Weak evidence: no GitHub-specific source checked. Worth confirming before it's claimed.</p></div>
+      <details><summary>Sources (1)</summary><ul class="sources"><li><a href="https://hookdeck.com/webhooks/guides/webhook-delivery-guarantees" rel="noopener" target="_blank">Hookdeck: delivery guarantees</a> <span class="conf secondhand">secondhand</span><div class="says">Webhooks are delivered at least once; exactly once is at least once with idempotent handling.</div></li></ul></details>
+    </article>
+    </div>
+  </section>
+  <section>
+    <h2>Workflows to prove it on</h2>
+    <p>Real things people automate, with the pains each meets and how many of them are a strong fit. The first is
+    the one to build: it meets the most, and it is the goal note's "Once…" in one sentence.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Workflow</th><th>Pains it meets</th><th class="num">Strong</th><th>What people use today</th></tr></thead>
+      <tbody>
+<tr><td><b>Merge Dependabot's pull requests once checks pass, unless a person objects</b><div class="sub">Among the most automated things on GitHub. It waits, it needs to know why it can't merge yet, and a person's &quot;request changes&quot; or a push must stop it. It's the goal note's &quot;Once…&quot; in one sentence.</div></td><td><a class="tag good" href="#why-not-merge">Why can't I merge?</a> <a class="tag safe" href="#mergeable-later">Mergeability arrives later</a> <a class="tag good" href="#lost-updates">Two writers, one overwritten</a> <a class="tag good" href="#permissions">Resource not accessible by integration</a> <a class="tag good" href="#agent-tools">Too many tools for an agent</a></td><td class="num">4</td><td class="sub">An Actions workflow with gh pr merge --auto, branch protection and a repository setting.</td></tr>
+<tr><td><b>Triage: label, assign, close duplicates</b><div class="sub">What our trial already does; where teammates and bots collide on the same issues.</div></td><td><a class="tag good" href="#lost-updates">Two writers, one overwritten</a> <a class="tag safe" href="#duplicate-creates">A retry makes a second issue</a> <a class="tag safe" href="#agent-mistakes">Agents act on the wrong thing</a> <a class="tag good" href="#agent-tools">Too many tools for an agent</a></td><td class="num">2</td><td class="sub">Probot apps, Actions with github-script, or an agent with GitHub's MCP server.</td></tr>
+<tr><td><b>Cut a release</b><div class="sub">Many writes in a row, where a retried step must not tag or publish twice.</div></td><td><a class="tag safe" href="#duplicate-creates">A retry makes a second issue</a> <a class="tag bad" href="#rate-limits">Rate limits, especially on writes</a> <a class="tag good" href="#permissions">Resource not accessible by integration</a></td><td class="num">1</td><td class="sub">release-please, semantic-release, goreleaser.</td></tr>
+<tr><td><b>Backport a fix</b><div class="sub">Its hard part is git, not the API; listed to say it isn't ours.</div></td><td><a class="tag quiet" href="#backport-conflicts">Backports resolved silently and wrongly</a></td><td class="num">0</td><td class="sub">korthout/backport-action, Mergify.</td></tr>
+      </tbody></table></div>
+  </section>
+  <section>
+    <h2>How this page is made</h2>
+    <details class="box"><summary>pains.yaml: the findings</summary><div class="scroll"><pre class="src"># What people automating GitHub through its API actually struggle with, and whether ARTIE and HEART answer it.
+# Each pain: what people hit, the sources (with how sure they are), our own evidence, how HEART answers it,
+# what we would still have to build, whether our own runs met it (seen), and a fit: strong, medium, none, or against (HEART makes it worse today).
+# Researched 2026-10-23. Confidence per source: documented (GitHub's docs), probed (we tried it against GitHub),
+# reported (a public thread or issue), secondhand (a third party's summary, not checked against GitHub).
+# pains.kts turns this into docs/reports/github-pains/.
+
+asOf: &quot;2026-10-23&quot;
+
+pains:
+  - id: why-not-merge
+    title: &quot;Why can't I merge?&quot;
+    fit: strong
+    seen: true
+    hit: &gt;-
+      The API says a pull request can't be merged, but not why. mergeable_state is a single undocumented word
+      (blocked, behind, unstable, dirty, unknown), and the merge itself answers 405 for a draft, missing reviews,
+      failing required checks or a ruleset alike. Each script works the reason out again from branch protection,
+      reviews and checks, and each gets it slightly wrong.
+    sources:
+      - label: &quot;GitHub REST docs: get a pull request, merge a pull request&quot;
+        url: https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request
+        confidence: documented
+        says: &gt;-
+          mergeable_state appears in the schema only as &quot;required, string&quot;, with no meanings. The merge
+          endpoint answers &quot;405 Method Not Allowed if merge cannot be performed&quot;.
+      - label: &quot;GitHub Community #21886: the reason a pull request isn't mergeable&quot;
+        url: https://github.com/orgs/community/discussions/21886
+        confidence: reported
+        says: &gt;-
+          GitHub staff, 2018: &quot;There isn't an API that summarizes why a PR is mergeable or not, only that it is
+          or isn't.&quot; The asker fell back on the undocumented mergeable_state.
+    ours: &gt;-
+      Under the meddler's M4 (the pull request turned into a draft), artie-bare sent the merge 30 times, a second
+      apart, and got 405 &quot;Pull Request is still a draft&quot; each time before giving up after about 62 s.
+    heart: &gt;-
+      Offer the merge only when it would be taken, and say why it isn't in hr:unavailable: &quot;a draft&quot;, &quot;needs 1
+      approving review&quot;, &quot;check build is failing&quot;. One place works the reason out, the gateway, and every client
+      reads it.
+    missing: &gt;-
+      The gateway's GitHub connector doesn't yet derive each blocking reason (draft, reviews, required checks,
+      rulesets) from GitHub's data into hr:unavailable.
+
+  - id: mergeable-later
+    title: &quot;Mergeability arrives later&quot;
+    fit: medium
+    seen: true
+    hit: &gt;-
+      Right after a pull request opens or its base moves, mergeable is null while GitHub works it out. Scripts poll
+      with hand-written loops and backoff, and some read null as &quot;no&quot;.
+    sources:
+      - label: &quot;GitHub REST docs: get a pull request&quot;
+        url: https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request
+        confidence: documented
+        says: &gt;-
+          &quot;If the value is null, then GitHub has started a background job to compute the mergeability. After
+          giving the job time to complete, resubmit the request.&quot;
+      - label: &quot;Zuul's GitHub driver&quot;
+        url: https://opendev.org/zuul/zuul/commit/83281e33565dfe872c3b82bb4a80733971ff216e
+        confidence: reported
+        says: &gt;-
+          Reading null during the calculation as &quot;not mergeable&quot; gave false negatives; Zuul stopped checking it
+          and relied on branch protection instead.
+    ours: &gt;-
+      Claude's Python polls GET /pulls/N up to 30 times, 2 s apart. The careful ARTIE script says
+      until(tries = 20) { offers(&quot;github:merge&quot;) }. artie-bare retries the merge itself.
+    heart: &gt;-
+      The wait is said once, in the task's words (&quot;once the merge is offered&quot;), not as a loop of field checks.
+      The polling is still there underneath; HEART makes it one rule in one place, not faster.
+    missing: &gt;-
+      Backoff on the wait, and a wait that ends with the reason when the merge will never be offered (it's a draft),
+      instead of running out of tries.
+
+  - id: lost-updates
+    title: &quot;Two writers, one overwritten&quot;
+    fit: strong
+    seen: true
+    hit: &gt;-
+      A bot and a person, or two bots, change the same issue or pull request. The later write wins and the
+      earlier is lost without a word: labels flipped back, a description edit undone, an issue someone closed as
+      not planned closed again as completed.
+    sources:
+      - label: &quot;Our probe of GitHub, 2026-10-23&quot;
+        url: https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api#use-conditional-requests-if-appropriate
+        confidence: probed
+        says: &gt;-
+          PATCH /issues/677 on the scratch repository with If-Match answered 400: &quot;Conditional request headers
+          are not allowed in unsafe requests unless supported by the endpoint&quot;. The same PATCH without it: 200.
+          GitHub has no general optimistic locking on writes.
+      - label: &quot;GitHub REST docs: merge a pull request&quot;
+        url: https://docs.github.com/en/rest/pulls/pulls#merge-a-pull-request
+        confidence: documented
+        says: &gt;-
+          A few endpoints carry their own precondition in the body instead: the merge's sha (&quot;409 Conflict if
+          sha was provided and pull request head did not match&quot;), and a file update's sha.
+    ours: &gt;-
+      In the meddler's storm (M1, M2, M3, M5), Claude's plain Python and artie-bare both did harm in 4 of 4
+      runs and exited 0. artie-goal did no harm: 4 of 5 runs succeeded and the fifth stopped safely.
+    heart: &gt;-
+      Every act carries the validator of the state it was chosen from, and a changed resource answers 412, so the
+      client decides again on what is there now. The goal client then acts only on what is still offered.
+    missing: &gt;-
+      Honesty about the limit: GitHub can't check a condition atomically, so the gateway reads, compares, then
+      writes. That narrows the window to milliseconds; it doesn't close it. Only the endpoints with a body sha
+      (merge, file contents) are truly safe.
+
+  - id: permissions
+    title: &quot;Resource not accessible by integration&quot;
+    fit: strong
+    seen: false
+    hit: &gt;-
+      A workflow or app gets a 403 and has to guess the cause: the GITHUB_TOKEN is read-only by default, scoped to
+      the repository that triggered it, restricted on pull requests from forks, or an app's permissions changed.
+      People widen permissions until it works.
+    sources:
+      - label: &quot;GitHub Community #57878&quot;
+        url: https://github.com/orgs/community/discussions/57878
+        confidence: reported
+        says: &quot;One of many threads on the same 403 and the permissions block that fixes it.&quot;
+      - label: &quot;GoReleaser: resource not accessible by integration&quot;
+        url: https://goreleaser.com/errors/resource-not-accessible-by-integration
+        confidence: reported
+        says: &gt;-
+          The GITHUB_TOKEN is scoped to the triggering repository, so writing to another one (a Homebrew tap)
+          needs a personal access token.
+    ours: &quot;Not measured. Our runs use one personal token with full access to the scratch repository.&quot;
+    heart: &gt;-
+      The same as the merge: an act the token can't make isn't offered, and hr:unavailable says which permission
+      is missing. A person or an agent sees &quot;contents: write needed&quot; before trying, not a 403 after.
+    missing: &gt;-
+      The gateway doesn't read what the caller's token may do. GitHub tells fine-grained tokens and apps which
+      permissions an endpoint needs in a response header (X-Accepted-GitHub-Permissions, to be confirmed), which
+      could feed this.
+
+  - id: duplicate-creates
+    title: &quot;A retry makes a second issue&quot;
+    fit: medium
+    seen: false
+    hit: &gt;-
+      A create times out, the script retries, and there are now two issues or two comments. GitHub's API takes
+      no idempotency key, so careful bots embed a marker and look for it before resending.
+    sources:
+      - label: &quot;laravel-error-monitor-github&quot;
+        url: https://packagist.org/packages/ashita-planning/laravel-error-monitor-github
+        confidence: reported
+        says: &gt;-
+          A write whose answer never arrived may have succeeded, so it is never simply sent again: the package
+          looks for its fingerprint in the repository's issue list first, not in search, which lags.
+    ours: &gt;-
+      artie-bare retries a write only after an until step, and only the merge, which GitHub refuses twice. No run
+      has timed out on a create yet, so we haven't seen it.
+    heart: &gt;-
+      An act answered 201 names what it made in Location; a client that lost the answer can ask the gateway what
+      that act made. The gateway, not every script, keeps the key.
+    missing: &quot;Idempotent acts in the gateway: a key per act, kept with what it made. Not built.&quot;
+
+  - id: lists-lag
+    title: &quot;Lists and search lag writes&quot;
+    fit: medium
+    seen: true
+    hit: &gt;-
+      A script creates something, then looks for it in a list or search, and it isn't there yet. Scripts sleep,
+      or pick the wrong item.
+    sources:
+      - label: &quot;GitHub status, December 2025&quot;
+        url: https://www.githubstatus.com/incidents/ccrzb3ms9j2d
+        confidence: reported
+        says: &gt;-
+          During an incident, search results could be up to three minutes old. Search is an index that can lag
+          the write.
+    ours: &gt;-
+      The ladder waits 10 s before checking a run, because GitHub's lists catch up a few seconds late. The meddler
+      reads each next issue number directly instead of listing.
+    heart: &gt;-
+      A HEART client follows the Location of what it made, not a list. The careful script never searches for its
+      own issues.
+    missing: &quot;Nothing for our own writes. Someone else's new items still come through lists.&quot;
+
+  - id: rate-limits
+    title: &quot;Rate limits, especially on writes&quot;
+    fit: against
+    seen: true
+    hit: &gt;-
+      5000 requests an hour, plus secondary limits that change without notice: about 80 content-creating requests
+      a minute and 500 an hour, writes costing 5 points to a read's 1, at most 100 at once.
+    sources:
+      - label: &quot;GitHub REST docs: rate limits&quot;
+        url: https://docs.github.com/en/enterprise-cloud@latest/rest/using-the-rest-api/rate-limits-for-the-rest-api
+        confidence: documented
+        says: &quot;Secondary limits as above; they are subject to change without notice, and may apply for undisclosed reasons.&quot;
+      - label: &quot;GitHub REST docs: best practices&quot;
+        url: https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api
+        confidence: documented
+        says: &quot;A conditional request answered 304, made with the same authorization, doesn't count against the primary limit.&quot;
+    ours: &gt;-
+      The careful run made 237 GitHub calls for the triage; the bare script made 19 for the same writes. Caution
+      costs calls today.
+    heart: &gt;-
+      Not yet an answer. It could be: most of the careful run's extra calls are re-reads, and a re-read sent with
+      If-None-Match and answered 304 is free.
+    missing: &gt;-
+      The gateway's re-reads as conditional requests, per token. A count of GitHub calls per arm on the care dial.
+
+  - id: agent-tools
+    title: &quot;Too many tools for an agent&quot;
+    fit: strong
+    seen: true
+    hit: &gt;-
+      GitHub's MCP server exposes about 100 tools. Loaded all at once they fill the context, exceed some clients'
+      tool limits, and agents pick the wrong one. GitHub's answer is to let people switch toolsets and single tools
+      on and off by hand.
+    sources:
+      - label: &quot;GitHub changelog, 2025-12-10: tool-specific configuration&quot;
+        url: https://github.blog/changelog/2025-12-10-the-github-mcp-server-adds-support-for-tool-specific-configuration-and-more
+        confidence: documented
+        says: &quot;An X-MCP-Tools header enables single tools, instead of the 27 two toolsets would bring in.&quot;
+      - label: &quot;Arcade: lessons from GitHub's MCP server launch&quot;
+        url: https://www.arcade.dev/blog/enterprise-mcp-lessons-from-githubs-mcp-server-launch
+        confidence: secondhand
+        says: &quot;Users loaded every tool into their agent's context and were frustrated when the agent struggled.&quot;
+    ours: &gt;-
+      artie-goal, reasoning from what each representation offers, came through the storm without harm. It saw a
+      handful of acts at a time, not 100 tools.
+    heart: &gt;-
+      The tools an agent sees are the acts this resource offers now. A closed issue offers no &quot;close&quot;; a draft
+      offers no &quot;merge&quot;. The list is short because the state makes it short, not because someone configured it.
+    missing: &gt;-
+      A measured comparison: the same goal by an agent on GitHub's MCP server and on heart-mcp, counting tokens,
+      tools seen and wrong calls.
+
+  - id: agent-mistakes
+    title: &quot;Agents act on the wrong thing&quot;
+    fit: medium
+    seen: true
+    hit: &gt;-
+      Agents close issues as duplicates of issues that don't match, say an issue is solved when it isn't, or write
+      a review without reading the pull request.
+    sources:
+      - label: &quot;A report about the Claude Code issue bot (third-party mirror)&quot;
+        url: https://claudeissues.com/issue/66135-bug-fix-github-action-bot-incorrectly-closing-feature-and-support-request
+        confidence: secondhand
+        says: &quot;The bot closed issues as duplicates of issues that didn't match them.&quot;
+      - label: &quot;Gigazine on GitHub Copilot's coding agent, 2025&quot;
+        url: https://gigazine.net/gsc_news/en/20250522-github-copilot-coding-agent-error
+        confidence: secondhand
+        says: &quot;In a Microsoft repository, the agent claimed to have solved issues it hadn't.&quot;
+    ours: &gt;-
+      Under M3 (the team says the duplicate is a different crash), the Python and bare runs closed it as a
+      duplicate anyway. artie-goal kept the team's call.
+    heart: &gt;-
+      HEART can't make the judgement right. It can make acting on a changed state fail, and a goal's &quot;Done when&quot;
+      can say what must be true afterwards, checked by code, not by the model's word.
+    missing: &quot;The goal grammar (\&quot;Once…\&quot;, \&quot;Done when\&quot;) in spec/ideas/goals-that-work-alongside-others.md, unbuilt.&quot;
+
+  - id: token-no-trigger
+    title: &quot;Actions' own writes don't start workflows&quot;
+    fit: none
+    seen: false
+    hit: &gt;-
+      A pull request opened with the GITHUB_TOKEN doesn't start its checks (or starts them awaiting approval), so
+      an auto-merge waits forever. People switch to an app token or a personal token.
+    sources:
+      - label: &quot;GitHub docs: triggering a workflow&quot;
+        url: https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow
+        confidence: documented
+        says: &quot;Events triggered by the GITHUB_TOKEN will not create a new workflow run, except workflow_dispatch and repository_dispatch.&quot;
+    ours: &quot;Not met: the scratch repository has no workflows.&quot;
+    heart: &gt;-
+      Nothing to fix; it's GitHub's rule against loops. At most, why-absent could say &quot;checks haven't started&quot;
+      instead of the merge simply never appearing.
+    missing: &quot;-&quot;
+
+  - id: merge-races
+    title: &quot;Two green pull requests, a red main&quot;
+    fit: none
+    seen: false
+    hit: &quot;Each pull request passes on its own; together they break the main branch.&quot;
+    sources:
+      - label: &quot;Graphite: what is a merge queue&quot;
+        url: https://graphite.dev/blog/what-is-a-merge-queue
+        confidence: secondhand
+        says: &quot;The merge race, and merge queues that test each change on top of the ones ahead of it.&quot;
+    ours: &quot;Not met.&quot;
+    heart: &quot;GitHub's merge queue answers this. HEART would only drive it.&quot;
+    missing: &quot;-&quot;
+
+  - id: backport-conflicts
+    title: &quot;Backports resolved silently and wrongly&quot;
+    fit: none
+    seen: false
+    hit: &gt;-
+      Backport bots cherry-pick onto release branches; with conflicts resolved automatically, a backport can carry
+      a line the original never had.
+    sources:
+      - label: &quot;gophercloud #2685&quot;
+        url: https://github.com/gophercloud/gophercloud/pull/2685
+        confidence: reported
+        says: &quot;Every cherry-pick used the 'theirs' strategy, which resolved conflicts automatically and put in a line the original didn't have.&quot;
+    ours: &quot;Not met.&quot;
+    heart: &quot;A git content problem, not an API one. Out of HEART's reach.&quot;
+    missing: &quot;-&quot;
+
+  - id: webhooks
+    title: &quot;Events arrive twice, or out of order&quot;
+    fit: medium
+    seen: false
+    hit: &gt;-
+      A bot driven by webhooks gets the same delivery twice or events out of order, and acts on a state that has
+      already moved.
+    sources:
+      - label: &quot;Hookdeck: delivery guarantees&quot;
+        url: https://hookdeck.com/webhooks/guides/webhook-delivery-guarantees
+        confidence: secondhand
+        says: &quot;Webhooks are delivered at least once; exactly once is at least once with idempotent handling.&quot;
+    ours: &quot;Not met: our runs aren't driven by webhooks.&quot;
+    heart: &gt;-
+      Treat the event as a hint and act on the resource as it is now: read it, act with its validator. A stale or
+      repeated event then finds nothing to do.
+    missing: &quot;Weak evidence: no GitHub-specific source checked. Worth confirming before it's claimed.&quot;
+
+workflows:
+  - name: &quot;Merge Dependabot's pull requests once checks pass, unless a person objects&quot;
+    pains: [why-not-merge, mergeable-later, lost-updates, permissions, agent-tools]
+    why: &gt;-
+      Among the most automated things on GitHub. It waits, it needs to know why it can't merge yet, and a
+      person's &quot;request changes&quot; or a push must stop it. It's the goal note's &quot;Once…&quot; in one sentence.
+    today: &quot;An Actions workflow with gh pr merge --auto, branch protection and a repository setting.&quot;
+  - name: &quot;Triage: label, assign, close duplicates&quot;
+    pains: [lost-updates, duplicate-creates, agent-mistakes, agent-tools]
+    why: &quot;What our trial already does; where teammates and bots collide on the same issues.&quot;
+    today: &quot;Probot apps, Actions with github-script, or an agent with GitHub's MCP server.&quot;
+  - name: &quot;Cut a release&quot;
+    pains: [duplicate-creates, rate-limits, permissions]
+    why: &quot;Many writes in a row, where a retried step must not tag or publish twice.&quot;
+    today: &quot;release-please, semantic-release, goreleaser.&quot;
+  - name: &quot;Backport a fix&quot;
+    pains: [backport-conflicts]
+    why: &quot;Its hard part is git, not the API; listed to say it isn't ours.&quot;
+    today: &quot;korthout/backport-action, Mergify.&quot;
+</pre></div></details>
+    <details class="box"><summary>pains.kts: the script that lays them out</summary><div class="scroll"><pre class="src">// What people struggle with when they automate GitHub through its API, and where ARTIE and HEART answer it, as a page.
+// The findings live in pains.yaml; this script only lays them out. The look comes from the reports' shared assets
+// (report-shell.html, report-base.css, theme-switch.js), inlined, so the page needs nothing else at runtime.
+//   artie run pains.kts out=../../docs/reports/github-pains/index.html artifact=/tmp/github-pains.html
+// out gets a whole document for GitHub Pages; artifact, when given, the same page without the document skeleton.
+import java.io.File
+import org.yaml.snakeyaml.Yaml
+
+val data by input(default = &quot;pains.yaml&quot;, question = &quot;Where are the findings?&quot;)
+val out by input(question = &quot;Where to write the page?&quot;)
+val artifact by input(default = &quot;&quot;, question = &quot;Where to write the artifact copy, if anywhere?&quot;)
+val source by input(default = &quot;pains.kts&quot;, question = &quot;Where is this script, to show it on the page?&quot;)
+val assets by input(default = &quot;../../docs/reports/assets&quot;, question = &quot;Where are the reports' shared assets?&quot;)
+
+fun Any?.map(): Map&lt;String, Any?&gt; = (this as? Map&lt;*, *&gt;).orEmpty().entries.associate { it.key.toString() to it.value }
+fun Any?.list(): List&lt;Any?&gt; = (this as? List&lt;*&gt;).orEmpty()
+fun Map&lt;String, Any?&gt;.text(key: String) = this[key]?.toString().orEmpty()
+
+class Source(val label: String, val url: String, val confidence: String, val says: String)
+class Pain(
+    val id: String, val title: String, val fit: String, val hit: String, val sources: List&lt;Source&gt;,
+    val ours: String, val heart: String, val missing: String, val seen: Boolean,
+)
+class Workflow(val name: String, val pains: List&lt;String&gt;, val why: String, val today: String)
+
+val yaml = Yaml().load&lt;Any?&gt;(File(data).readText()).map()
+val pains = yaml[&quot;pains&quot;].list().map { it.map() }.map { p -&gt;
+    Pain(p.text(&quot;id&quot;), p.text(&quot;title&quot;), p.text(&quot;fit&quot;), p.text(&quot;hit&quot;),
+        p[&quot;sources&quot;].list().map { it.map() }.map { Source(it.text(&quot;label&quot;), it.text(&quot;url&quot;), it.text(&quot;confidence&quot;), it.text(&quot;says&quot;)) },
+        p.text(&quot;ours&quot;), p.text(&quot;heart&quot;), p.text(&quot;missing&quot;), p[&quot;seen&quot;] == true)
+}
+val workflows = yaml[&quot;workflows&quot;].list().map { it.map() }.map { w -&gt;
+    Workflow(w.text(&quot;name&quot;), w[&quot;pains&quot;].list().map { it.toString() }, w.text(&quot;why&quot;), w.text(&quot;today&quot;))
+}
+val byId = pains.associateBy { it.id }
+
+/** The fits in the order the page shows them: what each means, and the shared tone that colours it. */
+class Fit(val means: String, val tone: String)
+val fits = linkedMapOf(
+    &quot;strong&quot; to Fit(&quot;HEART answers it directly&quot;, &quot;good&quot;),
+    &quot;medium&quot; to Fit(&quot;HEART helps; the pain stays&quot;, &quot;safe&quot;),
+    &quot;against&quot; to Fit(&quot;HEART makes it worse today&quot;, &quot;bad&quot;),
+    &quot;none&quot; to Fit(&quot;not HEART's to answer&quot;, &quot;quiet&quot;),
+)
+val confidences = linkedMapOf(
+    &quot;documented&quot; to &quot;GitHub's own docs&quot;,
+    &quot;probed&quot; to &quot;we tried it against GitHub&quot;,
+    &quot;reported&quot; to &quot;a public thread or issue&quot;,
+    &quot;secondhand&quot; to &quot;a third party's account, not checked against GitHub&quot;,
+)
+
+fun esc(s: String) = s.replace(&quot;&amp;&quot;, &quot;&amp;amp;&quot;).replace(&quot;&lt;&quot;, &quot;&amp;lt;&quot;).replace(&quot;&gt;&quot;, &quot;&amp;gt;&quot;).replace(&quot;\&quot;&quot;, &quot;&amp;quot;&quot;)
+fun tone(fit: String) = fits[fit]?.tone ?: &quot;quiet&quot;
+fun fitTag(fit: String) = &quot;&quot;&quot;&lt;span class=&quot;tag ${tone(fit)}&quot;&gt;${esc(fit)}&lt;/span&gt;&quot;&quot;&quot;
+fun conf(c: String) = &quot;&quot;&quot;&lt;span class=&quot;conf $c&quot;&gt;$c&lt;/span&gt;&quot;&quot;&quot;
+
+val tiles = fits.entries.joinToString(&quot;&quot;) { (fit, f) -&gt;
+    &quot;&quot;&quot;&lt;button class=&quot;tile ${f.tone}&quot; type=&quot;button&quot; data-fit=&quot;$fit&quot; aria-pressed=&quot;false&quot;&gt;&lt;b&gt;${pains.count { it.fit == fit }}&lt;/b&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;span class=&quot;name&quot;&gt;$fit&lt;/span&gt;&lt;span class=&quot;sub&quot;&gt;${esc(f.means)}&lt;/span&gt;&lt;/button&gt;&quot;&quot;&quot;
+}
+
+val summaryRows = pains.joinToString(&quot;\n&quot;) { p -&gt;
+    &quot;&quot;&quot;&lt;tr data-fit=&quot;${p.fit}&quot;&gt;&lt;td&gt;&lt;a href=&quot;#${p.id}&quot;&gt;${esc(p.title)}&lt;/a&gt;&lt;/td&gt;&lt;td&gt;${fitTag(p.fit)}&lt;/td&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;td&gt;${if (p.seen) &quot;yes&quot; else &quot;&quot;&quot;&lt;span class=&quot;none&quot;&gt;no&lt;/span&gt;&quot;&quot;&quot;}&lt;/td&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;td&gt;${p.sources.joinToString(&quot; &quot;) { conf(it.confidence) }}&lt;/td&gt;&lt;/tr&gt;&quot;&quot;&quot;
+}
+
+val cards = pains.joinToString(&quot;\n&quot;) { p -&gt;
+    val sources = p.sources.joinToString(&quot;&quot;) { s -&gt;
+        &quot;&quot;&quot;&lt;li&gt;&lt;a href=&quot;${esc(s.url)}&quot; rel=&quot;noopener&quot; target=&quot;_blank&quot;&gt;${esc(s.label)}&lt;/a&gt; ${conf(s.confidence)}&quot;&quot;&quot; +
+            &quot;&quot;&quot;&lt;div class=&quot;says&quot;&gt;${esc(s.says)}&lt;/div&gt;&lt;/li&gt;&quot;&quot;&quot;
+    }
+    val missing = if (p.missing == &quot;-&quot;) &quot;&quot; else &quot;&quot;&quot;&lt;div class=&quot;row&quot;&gt;&lt;h4&gt;Still to build&lt;/h4&gt;&lt;p&gt;${esc(p.missing)}&lt;/p&gt;&lt;/div&gt;&quot;&quot;&quot;
+    &quot;&quot;&quot;&lt;article class=&quot;pain ${tone(p.fit)}&quot; id=&quot;${p.id}&quot; data-fit=&quot;${p.fit}&quot;&gt;
+      &lt;header&gt;&lt;h3&gt;${esc(p.title)}&lt;/h3&gt;${fitTag(p.fit)}&lt;/header&gt;
+      &lt;div class=&quot;row&quot;&gt;&lt;h4&gt;What people hit&lt;/h4&gt;&lt;p&gt;${esc(p.hit)}&lt;/p&gt;&lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;&lt;h4&gt;Our evidence&lt;/h4&gt;&lt;p&gt;${esc(p.ours)}&lt;/p&gt;&lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;&lt;h4&gt;How HEART answers&lt;/h4&gt;&lt;p&gt;${esc(p.heart)}&lt;/p&gt;&lt;/div&gt;
+      $missing
+      &lt;details&gt;&lt;summary&gt;Sources (${p.sources.size})&lt;/summary&gt;&lt;ul class=&quot;sources&quot;&gt;$sources&lt;/ul&gt;&lt;/details&gt;
+    &lt;/article&gt;&quot;&quot;&quot;
+}
+
+val workflowRows = workflows.joinToString(&quot;\n&quot;) { w -&gt;
+    val chips = w.pains.joinToString(&quot; &quot;) { id -&gt;
+        byId[id]?.let { &quot;&quot;&quot;&lt;a class=&quot;tag ${tone(it.fit)}&quot; href=&quot;#$id&quot;&gt;${esc(it.title)}&lt;/a&gt;&quot;&quot;&quot; } ?: esc(id)
+    }
+    &quot;&quot;&quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;${esc(w.name)}&lt;/b&gt;&lt;div class=&quot;sub&quot;&gt;${esc(w.why)}&lt;/div&gt;&lt;/td&gt;&lt;td&gt;$chips&lt;/td&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;td class=&quot;num&quot;&gt;${w.pains.count { byId[it]?.fit == &quot;strong&quot; }}&lt;/td&gt;&lt;td class=&quot;sub&quot;&gt;${esc(w.today)}&lt;/td&gt;&lt;/tr&gt;&quot;&quot;&quot;
+}
+
+val confidenceKey = confidences.entries.joinToString(&quot; &quot;) { (c, means) -&gt; &quot;${conf(c)} ${esc(means)}&quot; }
+
+val style = &quot;&quot;&quot;
+.conf { font: 11px var(--mono); padding: 0 6px; border-radius: 4px; border: 1px solid var(--rule); color: var(--muted); white-space: nowrap; }
+.conf.documented, .conf.probed { color: var(--good); border-color: var(--good); }
+.conf.secondhand { border-style: dashed; }
+td:first-child { min-width: 220px; }
+.pains { display: grid; gap: 14px; }
+.pain { background: var(--panel); border: 1px solid var(--rule); border-left: 4px solid var(--c); border-radius: 6px;
+  padding: 16px 18px; display: grid; gap: 12px; scroll-margin-top: 16px; }
+.pain &gt; header { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; justify-content: space-between; }
+.pain .row { display: grid; gap: 2px; }
+.pain details summary { cursor: pointer; font-size: 14px; color: var(--muted); }
+.sources { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; }
+.says { color: var(--muted); max-width: 72ch; }
+&quot;&quot;&quot;
+
+val body = &quot;&quot;&quot;
+  &lt;div class=&quot;tiles&quot;&gt;$tiles&lt;/div&gt;
+  &lt;div class=&quot;chipbar&quot; id=&quot;showing&quot; hidden&gt;&lt;span id=&quot;showing-text&quot;&gt;&lt;/span&gt;&lt;button type=&quot;button&quot; id=&quot;clear&quot;&gt;clear&lt;/button&gt;&lt;/div&gt;
+  &lt;section&gt;
+    &lt;h2&gt;At a glance&lt;/h2&gt;
+    &lt;div class=&quot;scroll&quot;&gt;&lt;table&gt;
+      &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Pain&lt;/th&gt;&lt;th&gt;Fit&lt;/th&gt;&lt;th&gt;Seen in our runs&lt;/th&gt;&lt;th&gt;Sources&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+      &lt;tbody&gt;
+$summaryRows
+      &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+    &lt;p class=&quot;sub&quot;&gt;$confidenceKey&lt;/p&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;The pains&lt;/h2&gt;
+    &lt;div class=&quot;pains&quot;&gt;
+$cards
+    &lt;/div&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;Workflows to prove it on&lt;/h2&gt;
+    &lt;p&gt;Real things people automate, with the pains each meets and how many of them are a strong fit. The first is
+    the one to build: it meets the most, and it is the goal note's &quot;Once…&quot; in one sentence.&lt;/p&gt;
+    &lt;div class=&quot;scroll&quot;&gt;&lt;table&gt;
+      &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Workflow&lt;/th&gt;&lt;th&gt;Pains it meets&lt;/th&gt;&lt;th class=&quot;num&quot;&gt;Strong&lt;/th&gt;&lt;th&gt;What people use today&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+      &lt;tbody&gt;
+$workflowRows
+      &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;How this page is made&lt;/h2&gt;
+    &lt;details class=&quot;box&quot;&gt;&lt;summary&gt;pains.yaml: the findings&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;pre class=&quot;src&quot;&gt;${esc(File(data).readText())}&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;
+    &lt;details class=&quot;box&quot;&gt;&lt;summary&gt;pains.kts: the script that lays them out&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;pre class=&quot;src&quot;&gt;${esc(File(source).readText())}&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;
+  &lt;/section&gt;
+&quot;&quot;&quot;
+
+val script = &quot;&quot;&quot;
+// The fit tiles: one pressed shows only its pains and rows; pressing it again, or clear, shows all.
+(function () {
+  var tiles = document.querySelectorAll('.tile[data-fit]'), bar = document.getElementById('showing');
+  function show(fit) {
+    tiles.forEach(function (t) { t.setAttribute('aria-pressed', String(t.dataset.fit === fit)); });
+    var shown = 0, all = 0;
+    document.querySelectorAll('.pain[data-fit], tbody tr[data-fit]').forEach(function (el) {
+      el.hidden = !!fit &amp;&amp; el.dataset.fit !== fit;
+      if (el.classList.contains('pain')) { all++; if (!el.hidden) shown++; }
+    });
+    bar.hidden = !fit;
+    document.getElementById('showing-text').textContent = fit ? 'showing ' + shown + ' of ' + all + ' pains: ' + fit : '';
+  }
+  tiles.forEach(function (t) {
+    t.addEventListener('click', function () { show(t.getAttribute('aria-pressed') === 'true' ? '' : t.dataset.fit); });
+  });
+  document.getElementById('clear').addEventListener('click', function () { show(''); });
+})();
+&quot;&quot;&quot;
+
+/** The page: the reports' shared shell, filled with this page's own parts. */
+val page = File(assets, &quot;report-shell.html&quot;).readText()
+    .replace(&quot;@@TITLE@@&quot;, &quot;GitHub Automation Pains&quot;)
+    .replace(&quot;@@HEADING@@&quot;, &quot;Automating GitHub through its API: what hurts, and where HEART helps&quot;)
+    .replace(&quot;@@LEDE@@&quot;, &quot;${pains.size} pains people meet when scripts, bots and agents drive GitHub, each with its &quot; +
+        &quot;sources, what our own runs showed, how HEART answers it, and what we would still have to build. Researched &quot; +
+        &quot;${yaml.text(&quot;asOf&quot;)}; a tile filters the pains by fit.&quot;)
+    .replace(&quot;@@BASE@@&quot;, File(assets, &quot;report-base.css&quot;).readText())
+    .replace(&quot;@@THEME@@&quot;, File(assets, &quot;theme-switch.js&quot;).readText())
+    .replace(&quot;@@STYLE@@&quot;, style).replace(&quot;@@SCRIPT@@&quot;, script).replace(&quot;@@BODY@@&quot;, body)
+
+File(out).apply { parentFile.mkdirs() }.writeText(
+    &quot;&lt;!doctype html&gt;&lt;html lang=\&quot;en\&quot;&gt;&lt;head&gt;&lt;meta charset=\&quot;utf-8\&quot;&gt;&quot; +
+        &quot;&lt;meta name=\&quot;viewport\&quot; content=\&quot;width=device-width,initial-scale=1,viewport-fit=cover\&quot;&gt;&lt;/head&gt;&quot; +
+        &quot;&lt;body style=\&quot;margin:0\&quot;&gt;\n&quot; + page + &quot;&lt;/body&gt;&lt;/html&gt;\n&quot;
+)
+if (artifact.isNotBlank()) File(artifact).writeText(page)
+println(&quot;wrote $out&quot; + if (artifact.isNotBlank()) &quot; and $artifact&quot; else &quot;&quot;)
+</pre></div></details>
+  </section>
+
+</div>
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+
+
+// The fit tiles: one pressed shows only its pains and rows; pressing it again, or clear, shows all.
+(function () {
+  var tiles = document.querySelectorAll('.tile[data-fit]'), bar = document.getElementById('showing');
+  function show(fit) {
+    tiles.forEach(function (t) { t.setAttribute('aria-pressed', String(t.dataset.fit === fit)); });
+    var shown = 0, all = 0;
+    document.querySelectorAll('.pain[data-fit], tbody tr[data-fit]').forEach(function (el) {
+      el.hidden = !!fit && el.dataset.fit !== fit;
+      if (el.classList.contains('pain')) { all++; if (!el.hidden) shown++; }
+    });
+    bar.hidden = !fit;
+    document.getElementById('showing-text').textContent = fit ? 'showing ' + shown + ' of ' + all + ' pains: ' + fit : '';
+  }
+  tiles.forEach(function (t) {
+    t.addEventListener('click', function () { show(t.getAttribute('aria-pressed') === 'true' ? '' : t.dataset.fit); });
+  });
+  document.getElementById('clear').addEventListener('click', function () { show(''); });
+})();
+
+</script>
+</body></html>

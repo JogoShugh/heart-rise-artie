@@ -1,0 +1,125 @@
+{
+  "name": "cast",
+  "title": "The Cast",
+  "part": "The release",
+  "kicker": "Six systems that know nothing of each other",
+  "tone": "light",
+  "number": 9,
+  "of": 17,
+  "html": "<h2>The Cast</h2>\n<div class=\"cast6\">\n  <div><b>Forge</b><code>scm:</code><span>GitHub or GitLab, behind a gateway that serves <code>scm:</code> forms</span></div>\n  <div><b>Watcher</b><code>watcher:</code><span>Waits until the pull request offers <code>scm:merge</code>, then answers</span></div>\n  <div><b>CI</b><code>ci:</code><span>A HEART face on a real Jenkins: builds, deploys, answers when done</span></div>\n  <div><b>Preview</b><code>library:</code><span>Where Jenkins deploys the build: the library app</span></div>\n  <div><b>Dev</b><code>env:</code><span>Where a commit that passed its smoke test is promoted</span></div>\n  <div><b>Release desk</b><code>hr:</code><span>Where a person asks for a release. ARTIE runs here, and the replies live here</span></div>\n</div>\n<p class=\"lead\">Each speaks HEART. ARTIE crosses between them by following links, and waits on two of them with RISE: an ask, and a reply resource the answer comes back to.</p>\n<p class=\"refs\"><deck-ref name=\"heart\"></deck-ref> <deck-ref name=\"rise\"></deck-ref> <deck-ref name=\"gateway\"></deck-ref> <deck-ref name=\"scm\"></deck-ref></p>\n",
+  "say": "Six systems, and none of them knows the others. The forge is GitHub or GitLab, behind a small gateway that serves scm: forms. The watcher waits until a pull request offers scm:merge, and then answers. CI is a HEART face on a real Jenkins. Preview is where Jenkins deploys the build. Dev is where a passing commit gets promoted. And the release desk is where a person asks for a release, and where ARTIE runs. Each one speaks HEART. ARTIE crosses between them by following links.",
+  "sources": [
+    {
+      "label": "Merge Watch release exhibit",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/tree/main/exhibits/merge-watch-release"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "cast.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "four-ideas.json",
+      "title": "Four Ideas, One Release"
+    },
+    "next": {
+      "href": "message-by-message.json",
+      "title": "The Release, Message by Message"
+    },
+    "alternate": {
+      "href": "cast.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "heart",
+        "kind": "part",
+        "label": "HEART",
+        "title": "HEART: one media type, information and controls together",
+        "summary": "Hypermedia Enforced Agentic Reliable Transactions. HAL with HAL Schema Forms, plus a small profile. Every answer carries the resource's data and the forms for the acts its state allows now, each with a method, an address and a JSON Schema; an act that isn't offered can say why (hr:unavailable).",
+        "cite": "HAL Schema Forms, the HEART profile",
+        "_links": {
+          "self": {
+            "href": "../refs/heart.json",
+            "title": "HEART"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/spec/HAL-SCHEMA-FORMS-HR.md",
+            "title": "HAL Schema Forms, the HEART profile"
+          }
+        }
+      },
+      {
+        "name": "rise",
+        "kind": "part",
+        "label": "RISE",
+        "title": "RISE: tell me when it's done",
+        "summary": "Reciprocal Interface for State Exchange. Replies for asynchronous work: ask now, be told later. A watcher or a build answers back when it is ready, as Jenkins does in the release.",
+        "cite": "heart-rise-artie (repository)",
+        "_links": {
+          "self": {
+            "href": "../refs/rise.json",
+            "title": "RISE"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc",
+            "title": "heart-rise-artie (repository)"
+          }
+        }
+      },
+      {
+        "name": "gateway",
+        "kind": "part",
+        "label": "GATEWAY",
+        "title": "The gateway: our controls in front of theirs",
+        "summary": "A small server, on a laptop, in front of an API we don't control (GitHub, a local GitLab). YAML connectors map each act onto the native call and say when it is offered; the gateway answers in HEART.",
+        "cite": "heart-gateway connectors",
+        "_links": {
+          "self": {
+            "href": "../refs/gateway.json",
+            "title": "GATEWAY"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors",
+            "title": "heart-gateway connectors"
+          }
+        }
+      },
+      {
+        "name": "scm",
+        "kind": "part",
+        "label": "scm:",
+        "title": "scm: one set of typed relations, two forges",
+        "summary": "scm:merge, scm:comment, scm:close and the rest: relation names defined by meaning, not by one server's endpoints. GitHub and GitLab both answer to them, so a kept script runs on either.",
+        "cite": "heart-gateway connectors",
+        "_links": {
+          "self": {
+            "href": "../refs/scm.json",
+            "title": "scm:"
+          },
+          "describedby": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors",
+            "title": "heart-gateway connectors"
+          }
+        }
+      }
+    ]
+  }
+}

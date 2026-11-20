@@ -1,0 +1,22 @@
+{
+  "name": "rule-3",
+  "kind": "rule",
+  "label": "Rule 3 · Describe the media type",
+  "title": "Spend the effort on media types",
+  "summary": "In brief: describe media types and relations, not which methods go to which URIs. This is what HEART's spec is.",
+  "quote": "<p>“A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types. Any effort spent describing what methods to use on what URIs of interest should be entirely defined within the scope of the processing rules for a media type (and, in most cases, already defined by existing media types). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>",
+  "cite": "Roy T. Fielding, “REST APIs must be hypertext-driven”",
+  "date": "20 October 2008",
+  "_links": {
+    "describedby": {
+      "href": "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven",
+      "title": "Roy T. Fielding, “REST APIs must be hypertext-driven”"
+    },
+    "self": {
+      "href": "rule-3.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

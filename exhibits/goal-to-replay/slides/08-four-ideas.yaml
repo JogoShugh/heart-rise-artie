@@ -1,0 +1,18 @@
+name: four-ideas
+part: "Why it works"
+tone: dark
+title: "Four Ideas, One Release"
+kicker: Before the code
+say: "Four ideas, and then we watch them run. One: a generic client runs one loop, read, think, act, and only thinking costs tokens. Two: Fielding says an API that isn't driven by hypertext isn't REST, period. Three: the human Web has always kept the controls in the answer, and the machine Web moved them out into docs; HEART puts them back. Four: Hightower says infer once, then run plain code, and Fielding's controls are what keep once true. Now the release itself."
+sources:
+  - ["Fielding (2008)", "https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"]
+  - ["Hightower: ZTA (talk)", "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"]
+html: |
+  <h2>Four Ideas, One Release</h2>
+  <div class="four">
+    <div><span class="n">1</span><b>Sync, Reason, Act</b><span>One loop, like a person in a browser. Only Reason costs tokens. Coupled to media types, never to a domain.</span></div>
+    <div><span class="n">2</span><b>Hypertext-driven</b><span>Fielding, 2008: if hypertext doesn’t drive it, it isn’t a REST API. Period.</span></div>
+    <div><span class="n">3</span><b>Controls in the answer</b><span>The human Web always kept them there. The machine Web moved them into docs. HEART rejoins them.</span></div>
+    <div><span class="n">4</span><b>Zero tokens</b><span>Hightower: infer once, then run plain code. The controls in each answer keep “once” true.</span></div>
+  </div>
+  <p class="punch">Next: one release, walked once with Claude, then replayed with no model.</p>

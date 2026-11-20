@@ -1,0 +1,161 @@
+{
+  "name": "three-rs",
+  "title": "More Than Tokens: The Three R’s",
+  "part": "The question",
+  "kicker": "What the business needs · and what everyone’s excited about",
+  "tone": "light",
+  "number": 3,
+  "of": 64,
+  "html": "<h2>More Than Tokens: The Three R’s</h2>\n<div class=\"rel-frame\">\n  <div class=\"rel-band\"><deck-ref name=\"reliability\">Reliability</deck-ref><small>All three together, or it isn’t reliable</small></div>\n  <div class=\"rel-cards\">\n    <div class=\"step\"><h3><deck-ref name=\"right-behavior\"></deck-ref></h3><p>Only what the state allows. When an act is absent, a reason.</p></div>\n    <div class=\"step\"><h3><deck-ref name=\"repeatability\"></deck-ref></h3><p>That right behavior, the same way, every time.</p><p class=\"note\">Given the same inputs, the same outputs, call after call.</p></div>\n    <div class=\"step\"><h3><deck-ref name=\"resilience\"></deck-ref></h3><p>The server changes, or misbehaves. The client takes the right failure path and carries on.</p></div>\n  </div>\n  <div class=\"rel-band bottom\"><deck-ref name=\"risk\">Risk Mitigation</deck-ref><small>Lose any one R, and its risk comes back</small></div>\n</div>\n<div class=\"reason-strip\"><deck-ref name=\"reason\"></deck-ref><span>is the hype. A reasoning model can stand in for a person in two places: <b>finding the way the first time</b>, and <b>repairing when the controls change</b>. In the middle, it’s the token maxing Hightower warned us about.</span></div>\n",
+  "say": "Ask anyone who runs a business process what they need from an agent, and I doubt they'll say 'more reasoning'. They need three R's, in this order. Right behavior first: the agent only does what the current state allows, and when it can't, it gets told why. Then repeatability: given the same inputs, the same outputs, call after call. Then resilience: when the server changes, or misbehaves, the agent takes the failure path it's supposed to and carries on. And reason? Reason is the hype. It's what everyone's excited about when they talk about agents. Reasoning models really can stand in for a person, in two places: finding the way the first time, and repairing when the controls change. In the middle, paying a model to reason through the same path again is the token maxing Hightower warned us about. Get all three and you have something people can rely on. Miss one and you don't. Keep these pills in mind; every part of this talk gets measured against these three. And what are they for? Ask anyone in insurance.",
+  "sources": [
+    {
+      "label": "Hightower: ZTA, Zero Token Architecture (talk)",
+      "href": "https://www.wearedevelopers.com/videos/100533-zta-zero-token-architecture"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "three-rs.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "token-maxing.json",
+      "title": "Hightower's ZTA: From Token Maxing to Tokenomics"
+    },
+    "next": {
+      "href": "risk.json",
+      "title": "Risk, Mitigated"
+    },
+    "alternate": {
+      "href": "three-rs.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "reliability",
+        "kind": "umbrella",
+        "label": "RELIABILITY",
+        "title": "Reliability: what the three R's add up to",
+        "summary": "Not a fourth R beside the others: the one over them. A system is reliable only when it behaves right, repeats that behavior given the same inputs, and stays right when things change or break. Miss any one and it isn't.",
+        "cite": "Over the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/reliability.json",
+            "title": "RELIABILITY"
+          },
+          "describedby": {
+            "href": "#three-rs",
+            "title": "Over the three R's"
+          }
+        }
+      },
+      {
+        "name": "right-behavior",
+        "kind": "measure",
+        "label": "RIGHT-BEHAVIOR",
+        "title": "Right behavior: only what the state allows, and a reason when not",
+        "summary": "The agent is offered only the acts the current state allows, sends each one with the validator from the state it read, and gets a reason when an act is absent. At the small scale it is a Gherkin scenario that says what right means before any code is written.",
+        "cite": "The first of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/right-behavior.json",
+            "title": "RIGHT-BEHAVIOR"
+          },
+          "describedby": {
+            "href": "#three-rs",
+            "title": "The first of the three R's"
+          }
+        }
+      },
+      {
+        "name": "repeatability",
+        "kind": "measure",
+        "label": "REPEATABILITY",
+        "title": "Repeatability: the same goal, the same result, every time",
+        "summary": "Given the same inputs, the same outputs, call after call. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
+        "cite": "The second of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/repeatability.json",
+            "title": "REPEATABILITY"
+          },
+          "describedby": {
+            "href": "#three-rs",
+            "title": "The second of the three R's"
+          }
+        }
+      },
+      {
+        "name": "resilience",
+        "kind": "measure",
+        "label": "RESILIENCE",
+        "title": "Resilience: the server changes, the client doesn't break",
+        "summary": "When the server changes, or misbehaves on purpose, the client takes the failure path the spec names, re-syncs, and goes on; a model comes back only when the controls really changed, to repair. At the small scale it is the regression suite and the gates that hold, even against the model.",
+        "cite": "The third of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/resilience.json",
+            "title": "RESILIENCE"
+          },
+          "describedby": {
+            "href": "#three-rs",
+            "title": "The third of the three R's"
+          }
+        }
+      },
+      {
+        "name": "risk",
+        "kind": "umbrella",
+        "label": "RISK",
+        "title": "Risk, mitigated: what reliability buys",
+        "summary": "Wrong acts on the wrong state, drift between runs, surprises when a service changes, unbounded spend, decisions nobody can reconstruct. Each is a risk; each is held down by one of the R's, or by the record they leave. Lose an R and the risk comes back.",
+        "cite": "What the R's are for",
+        "_links": {
+          "self": {
+            "href": "../refs/risk.json",
+            "title": "RISK"
+          },
+          "describedby": {
+            "href": "#risk",
+            "title": "What the R's are for"
+          }
+        }
+      },
+      {
+        "name": "reason",
+        "kind": "hype",
+        "label": "REASON",
+        "title": "Reason: the part everyone's excited about",
+        "summary": "Reasoning models can stand in for a person in two places: finding the way the first time, and repairing when the controls change. Everywhere else, paying a model to reason through the same path again is the token maxing Hightower warned about. Useful at the edges; wasted in the middle.",
+        "cite": "The hype, kept at the edges",
+        "_links": {
+          "self": {
+            "href": "../refs/reason.json",
+            "title": "REASON"
+          },
+          "describedby": {
+            "href": "#three-rs",
+            "title": "The hype, kept at the edges"
+          }
+        }
+      }
+    ]
+  }
+}

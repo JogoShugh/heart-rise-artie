@@ -1,0 +1,21 @@
+{
+  "name": "gitlab-merge",
+  "label": "GitLab's merge act (gitlab/pull.resource.yaml)",
+  "lang": "yaml",
+  "path": "heart/heart-gateway/connectors/gitlab/pull.resource.yaml",
+  "lines": "45–65",
+  "of": 82,
+  "text": "merge:\n  operation: pulls/merge\n  title: Merge\n  description: Merge the pull request into its target branch.\n  fields: [merge_commit_message]\n  # scm's method, as GitHub's merge takes it; GitLab squashes or not, and merges with a merge commit either way.\n  inputs:\n    method:\n      type: string\n      enum: [merge, squash]\n      title: Merge method\n      description: The merge method to use.\n  values:\n    method:\n      merge: { squash: false }\n      squash: { squash: true }\n  # GitLab merges only if the source branch's head is still at this sha: the head the client's view had.\n  bind: { sha: /sha }\n  # GitLab's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.\n  stale: 409\n  refused: 405",
+  "_links": {
+    "self": {
+      "href": "connectors--gitlab-merge.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-gateway/connectors/gitlab/pull.resource.yaml#L45-L65",
+      "title": "heart/heart-gateway/connectors/gitlab/pull.resource.yaml, lines 45–65"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

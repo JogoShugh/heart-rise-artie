@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Writes the Scenario First · Claude and Git Hooks, Together · 3.0</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">A hook blocks production code until a feature file changes</span></header>
+<h2>Claude Writes the Scenario First</h2>
+<div class="card dark">
+  <pre style="margin: 0; white-space: pre-wrap; font-size: 1rem">Scenario Outline: A library whose policy file renews &lt;weeks&gt; weeks at a time
+                  moves the due date that far
+  Given the library's policy file reads "&lt;policy&gt;"
+  When Ana renews loan 3311
+  Then the answer is 200
+  And loan 3311 is due "&lt;due&gt;", renewed 1 time
+
+  Examples:
+    | policy           | weeks | due        |
+    | renewal.weeks=3  | 3     | 2026-12-03 |
+    | <b style="color: #e3b341">renewal.weeks=0  | 0     | 2026-11-12</b> |
+    | renewal.weeks=6  | 6     | 2026-12-24 |
+    | # no rules       | 3     | 2026-12-03 |</pre>
+</div>
+<p class="punch">Four rows anyone can read. Remember the zero-weeks row.</p>
+<p class="refs"><a class="ref-plain" href="deck/three-rs-one-behavior.html">RIGHT-BEHAVIOR</a> <details class="fragment-plain"><summary>No production write until a feature file changes (core/gherkin-first.sh)</summary><pre><code>#!/usr/bin/env bash
+# PreToolUse (Edit|Write|MultiEdit). Blocks a write to production code unless
+# a feature file already has an in-flight change, or the author switched
+# refactor mode on (scripts/refactor-mode). Exit 2 blocks the tool call
+# and sends stderr back to Claude.
+set -o pipefail
+. &quot;$(dirname &quot;$0&quot;)/lib.sh&quot;
+
+file_path=$(bdd_hook_file_path)
+[ -n &quot;$file_path&quot; ] || exit 0
+bdd_has_config || exit 0
+bdd_load
+
+rel=$(bdd_rel &quot;$file_path&quot;)
+bdd_is_prod &quot;$rel&quot; || exit 0
+bdd_features_dirty &amp;&amp; exit 0
+# The author switched refactor mode on: pre-commit checks its own terms.
+bdd_refactor_on &amp;&amp; exit 0
+
+cat &gt;&amp;2 &lt;&lt;EOF
+Blocked: about to modify production code ($rel) with no feature file change in this changeset yet.
+Write or update the Gherkin scenario first, run the BDD suite to see it fail, then implement.
+Feature patterns: $(bdd_list featurePatterns | tr '\n' ' ')
+EOF
+exit 2</code></pre></details></p>
+</article>
+<nav class="foot"><a href="deck/one-sentence.html" rel="prev"><small>Back</small><b>It Starts With One Sentence</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#scenario-first">with heart-ts</a></span>
+<a href="deck/right-red.html" rel="next"><small>Next</small><b>Then It Has to Fail, for the Right Reason</b></a></nav>
+</main></div></body></html>

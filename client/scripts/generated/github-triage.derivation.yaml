@@ -1,0 +1,441 @@
+# How generated/github-triage.kts was derived from generated/github-triage.trace.yaml, the run of tests/github-triage.goal.md: each derivation, numbered
+# in the order generated/github-triage.kts first shows it, with the rule of spec/PLAN-SCRIPT-GENERATOR.md that bound it, and where it
+# stands in both scripts (line and column, from 1); rows: where each step of the run begins in both.
+script: 'generated/github-triage.kts'
+source: 'tests/github-triage.goal.md'
+capture: 'generated/github-triage.trace.yaml'
+rows:
+  - {at: 'inputs', source: null, generated: 5}
+  - {at: '1', source: null, generated: 10}
+  - {at: '2', source: 1, generated: 18}
+  - {at: '3', source: 2, generated: 19}
+  - {at: '4', source: 3, generated: 26}
+  - {at: '6', source: 4, generated: 27}
+  - {at: '8', source: 5, generated: 28}
+  - {at: '10', source: 6, generated: 30}
+  - {at: '12', source: 7, generated: 37}
+  - {at: '16', source: 9, generated: 43}
+  - {at: '17', source: 10, generated: 44}
+  - {at: '18', source: 11, generated: 45}
+  - {at: '19', source: 12, generated: 49}
+  - {at: '21', source: 13, generated: 54}
+  - {at: '23', source: 14, generated: 59}
+  - {at: '24', source: 15, generated: 66}
+  - {at: '26', source: 16, generated: 69}
+  - {at: '27', source: 17, generated: 70}
+  - {at: '29', source: 18, generated: 74}
+  - {at: '35', source: 19, generated: 80}
+  - {at: '36', source: 20, generated: 85}
+  - {at: '38', source: 21, generated: 88}
+  - {at: '40', source: 22, generated: 91}
+  - {at: '42', source: 23, generated: 92}
+  - {at: '44', source: 24, generated: 94}
+  - {at: '45', source: 25, generated: 99}
+  - {at: '47', source: 26, generated: 102}
+  - {at: '49', source: 27, generated: 103}
+  - {at: '51', source: 28, generated: 105}
+  - {at: '52', source: 29, generated: 110}
+  - {at: '54', source: 30, generated: 113}
+  - {at: '56', source: 31, generated: 116}
+derivations:
+  - n: 1
+    kind: input
+    rule: '1, 2.1'
+    title: 'owner, an input'
+    why: 'Declared as the run''s script declared it (rule 1); each value the run took from it is sent from it (rule 2.1).'
+    source:
+      - {line: 1, column: 34, text: '$owner'}
+      - {line: 19, column: 32, text: '$owner'}
+      - {line: 24, column: 32, text: '$owner'}
+      - {line: 28, column: 32, text: '$owner'}
+    generated:
+      - {line: 5, column: 1, text: 'val owner by input(question = "Whose repository?")'}
+      - {line: 18, column: 40, text: 'owner'}
+      - {line: 81, column: 20, text: 'owner'}
+      - {line: 95, column: 20, text: 'owner'}
+      - {line: 106, column: 20, text: 'owner'}
+  - n: 2
+    kind: input
+    rule: '1, 2.1'
+    title: 'repo, an input'
+    why: 'Declared as the run''s script declared it (rule 1); each value the run took from it is sent from it (rule 2.1).'
+    source:
+      - {line: 1, column: 41, text: '$repo'}
+      - {line: 19, column: 39, text: '$repo'}
+      - {line: 24, column: 39, text: '$repo'}
+      - {line: 28, column: 39, text: '$repo'}
+    generated:
+      - {line: 6, column: 1, text: 'val repo by input(default = "heart-github-test", question = "Which repository?")'}
+      - {line: 18, column: 57, text: 'repo'}
+      - {line: 82, column: 19, text: 'repo'}
+      - {line: 96, column: 19, text: 'repo'}
+      - {line: 107, column: 19, text: 'repo'}
+  - n: 3
+    kind: input
+    rule: '1, 2.1'
+    title: 'label, an input'
+    why: 'Declared as the run''s script declared it (rule 1); each value the run took from it is sent from it (rule 2.1).'
+    source: []
+    generated:
+      - {line: 7, column: 1, text: 'val label by input(default = "bug", question = "Which label marks a bug?")'}
+  - n: 4
+    kind: input
+    rule: '1, 2.1'
+    title: 'stamp, an input'
+    why: 'Declared as the run''s script declared it (rule 1); each value the run took from it is sent from it (rule 2.1).'
+    source: []
+    generated:
+      - {line: 8, column: 1, text: 'val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("MMdd-HHmmss")))'}
+  - n: 5
+    kind: answer
+    rule: '2.3'
+    title: 'issueNumber, read from step 3''s answer'
+    why: 'Step 3 brought /number into the run: declared once, read with state.long in that step''s block, and sent from it wherever the run sent its value.'
+    source: []
+    generated:
+      - {line: 11, column: 5, text: 'var issueNumber = 0L'}
+      - {line: 24, column: 13, text: 'issueNumber = state.long("number")'}
+      - {line: 83, column: 27, text: 'issueNumber'}
+  - n: 6
+    kind: answer
+    rule: '2.3'
+    title: 'testNumber, read from step 10''s answer'
+    why: 'Step 10 brought /number into the run: declared once, read with state.long in that step''s block, and sent from it wherever the run sent its value.'
+    source: []
+    generated:
+      - {line: 12, column: 5, text: 'var testNumber = 0L'}
+      - {line: 34, column: 13, text: 'testNumber = state.long("number")'}
+      - {line: 97, column: 27, text: 'testNumber'}
+  - n: 7
+    kind: answer
+    rule: '2.3'
+    title: 'prNumber, read from step 23''s answer'
+    why: 'Step 23 brought /number into the run: declared once, read with state.long in that step''s block, and sent from it wherever the run sent its value.'
+    source: []
+    generated:
+      - {line: 13, column: 5, text: 'var prNumber = 0L'}
+      - {line: 65, column: 25, text: 'prNumber = state.long("number")'}
+  - n: 8
+    kind: answer
+    rule: '2.3'
+    title: 'testId, read from step 10''s answer'
+    why: 'Step 10 brought /id into the run: declared once, read with state.long in that step''s block, and sent from it wherever the run sent its value.'
+    source: []
+    generated:
+      - {line: 14, column: 5, text: 'var testId = 0L'}
+      - {line: 35, column: 13, text: 'testId = state.long("id")'}
+      - {line: 86, column: 31, text: 'testId'}
+  - n: 9
+    kind: answer
+    rule: '2.3'
+    title: 'dupeNumber, read from step 12''s answer'
+    why: 'Step 12 brought /number into the run: declared once, read with state.long in that step''s block, and sent from it wherever the run sent its value.'
+    source: []
+    generated:
+      - {line: 15, column: 5, text: 'var dupeNumber = 0L'}
+      - {line: 41, column: 13, text: 'dupeNumber = state.long("number")'}
+      - {line: 108, column: 27, text: 'dupeNumber'}
+  - n: 10
+    kind: answer
+    rule: '2.3'
+    title: 'issueId, read from step 3''s answer'
+    why: 'Step 3 brought /id into the run: declared once, read with state.long in that step''s block, and sent from it wherever the run sent its value.'
+    source: []
+    generated:
+      - {line: 16, column: 5, text: 'var issueId = 0L'}
+      - {line: 25, column: 13, text: 'issueId = state.long("id")'}
+      - {line: 114, column: 37, text: 'issueId'}
+  - n: 11
+    kind: relation
+    rule: '9'
+    title: 'The relation each reason step chose, named'
+    why: 'Where the run''s script reasoned, the reasoner chose among the forms and links offered. The generated script names the relation it chose; the lock file pins what was offered with it.'
+    source:
+      - {line: 1, column: 1, text: 'act'}
+      - {line: 2, column: 1, text: 'act'}
+      - {line: 3, column: 1, text: 'act'}
+      - {line: 4, column: 1, text: 'act'}
+      - {line: 6, column: 1, text: 'act'}
+      - {line: 7, column: 1, text: 'act'}
+      - {line: 9, column: 1, text: 'act'}
+      - {line: 10, column: 1, text: 'act'}
+      - {line: 11, column: 1, text: 'act'}
+      - {line: 12, column: 1, text: 'act'}
+      - {line: 13, column: 1, text: 'act'}
+      - {line: 14, column: 1, text: 'act'}
+      - {line: 15, column: 1, text: 'act'}
+      - {line: 17, column: 1, text: 'act'}
+      - {line: 19, column: 1, text: 'act'}
+      - {line: 20, column: 1, text: 'act'}
+      - {line: 21, column: 1, text: 'act'}
+      - {line: 22, column: 1, text: 'act'}
+      - {line: 24, column: 1, text: 'act'}
+      - {line: 25, column: 1, text: 'act'}
+      - {line: 26, column: 1, text: 'act'}
+      - {line: 28, column: 1, text: 'act'}
+      - {line: 29, column: 1, text: 'act'}
+      - {line: 30, column: 1, text: 'act'}
+    generated:
+      - {line: 18, column: 9, text: '"github:repos-get"'}
+      - {line: 19, column: 13, text: '"github:open-issue"'}
+      - {line: 26, column: 17, text: '"github:label"'}
+      - {line: 27, column: 17, text: '"github:assign"'}
+      - {line: 30, column: 13, text: '"github:open-issue"'}
+      - {line: 37, column: 13, text: '"github:open-issue"'}
+      - {line: 43, column: 16, text: '"github:repos-list-branches"'}
+      - {line: 44, column: 20, text: '"item"'}
+      - {line: 45, column: 21, text: '"github:branch-from-here"'}
+      - {line: 49, column: 25, text: '"github:commit-file"'}
+      - {line: 54, column: 25, text: '"github:commit-file"'}
+      - {line: 59, column: 25, text: '"github:open-pull-request"'}
+      - {line: 66, column: 29, text: '"github:edit"'}
+      - {line: 70, column: 29, text: '"github:merge"'}
+      - {line: 80, column: 9, text: '"github:issues-get"'}
+      - {line: 85, column: 13, text: '"github:add-sub-issue"'}
+      - {line: 88, column: 13, text: '"github:comment"'}
+      - {line: 91, column: 13, text: '"github:lock"'}
+      - {line: 94, column: 9, text: '"github:issues-get"'}
+      - {line: 99, column: 13, text: '"github:comment"'}
+      - {line: 102, column: 13, text: '"github:close"'}
+      - {line: 105, column: 9, text: '"github:issues-get"'}
+      - {line: 110, column: 13, text: '"github:comment"'}
+      - {line: 113, column: 13, text: '"github:close-duplicate"'}
+  - n: 12
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source:
+      - {line: 2, column: 69, text: '$stamp'}
+    generated:
+      - {line: 20, column: 24, text: '"Crash when a bed has no name ($stamp)"'}
+  - n: 13
+    kind: paraphrase
+    rule: '4'
+    title: '"A bed with a blank name crashes the garden.", the words said again'
+    why: 'The words, "Open an issue titled "Crash when a bed has no name (1021-220221)" with body: A bed with a blank name crashes the garden.", said another way: a constant with no mark, since nothing was judged.'
+    source: []
+    generated:
+      - {line: 21, column: 23, text: '"A bed with a blank name crashes the garden."'}
+  - n: 14
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source:
+      - {line: 3, column: 24, text: '$label'}
+    generated:
+      - {line: 26, column: 45, text: 'listOf(label)'}
+  - n: 15
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source:
+      - {line: 4, column: 28, text: '$owner'}
+    generated:
+      - {line: 27, column: 49, text: 'listOf(owner)'}
+  - n: 16
+    kind: check
+    rule: '7'
+    title: 'Checks, as the run checked'
+    why: 'Copied from the run''s script, as written.'
+    source:
+      - {line: 5, column: 1, text: 'check("state" to "open")'}
+      - {line: 18, column: 1, text: 'check("merged" to true)'}
+      - {line: 23, column: 1, text: 'check("state" to "closed", "state_reason" to "completed", "locked" to true)'}
+      - {line: 27, column: 1, text: 'check("state" to "closed")'}
+      - {line: 31, column: 1, text: 'check("state" to "closed", "state_reason" to "duplicate")'}
+    generated:
+      - {line: 28, column: 13, text: 'check("state" to "open")'}
+      - {line: 74, column: 25, text: 'check("merged" to true)'}
+      - {line: 92, column: 9, text: 'check("state" to "closed", "state_reason" to "completed", "locked" to true)'}
+      - {line: 103, column: 9, text: 'check("state" to "closed")'}
+      - {line: 116, column: 9, text: 'check("state" to "closed", "state_reason" to "duplicate")'}
+  - n: 17
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source:
+      - {line: 6, column: 61, text: '$stamp'}
+    generated:
+      - {line: 31, column: 24, text: '"Test blank bed names ($stamp)"'}
+  - n: 18
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source: []
+    generated:
+      - {line: 32, column: 23, text: '"This is part of #$issueNumber."'}
+  - n: 19
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source:
+      - {line: 7, column: 76, text: '$stamp'}
+    generated:
+      - {line: 38, column: 24, text: '"Garden crashes on an empty bed name ($stamp)"'}
+  - n: 20
+    kind: paraphrase
+    rule: '4'
+    title: '"It was seen on the demo garden.", the words said again'
+    why: 'The words, "open an issue titled "Garden crashes on an empty bed name (1021-220221)" with body: It was seen on the demo garden.", said another way: a constant with no mark, since nothing was judged.'
+    source: []
+    generated:
+      - {line: 39, column: 23, text: '"It was seen on the demo garden."'}
+  - n: 21
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source:
+      - {line: 11, column: 66, text: '$stamp'}
+    generated:
+      - {line: 46, column: 31, text: '"fix-blank-names-$stamp"'}
+  - n: 22
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source: []
+    generated:
+      - {line: 50, column: 35, text: '"fix-$stamp.md"'}
+  - n: 23
+    kind: words
+    rule: '2.2'
+    title: '"Refuse a bed with no name", as the words wrote it'
+    why: 'Written in the words, outside any slot: a constant, never read from an answer.'
+    source:
+      - {line: 12, column: 123, text: 'Refuse a bed with no name'}
+    generated:
+      - {line: 51, column: 38, text: '"Refuse a bed with no name"'}
+  - n: 24
+    kind: words
+    rule: '2.2'
+    title: '"Bed names may not be blank.", as the words wrote it'
+    why: 'Written in the words, outside any slot: a constant, never read from an answer.'
+    source:
+      - {line: 12, column: 70, text: 'Bed names may not be blank.'}
+    generated:
+      - {line: 52, column: 38, text: '"Bed names may not be blank."'}
+  - n: 25
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source: []
+    generated:
+      - {line: 55, column: 35, text: '"test-$stamp.md"'}
+  - n: 26
+    kind: words
+    rule: '2.2'
+    title: '"Test that a blank bed name is refused", as the words wrote it'
+    why: 'Written in the words, outside any slot: a constant, never read from an answer.'
+    source:
+      - {line: 13, column: 132, text: 'Test that a blank bed name is refused'}
+    generated:
+      - {line: 56, column: 38, text: '"Test that a blank bed name is refused"'}
+  - n: 27
+    kind: words
+    rule: '2.2'
+    title: '"A bed with a blank name is refused.", as the words wrote it'
+    why: 'Written in the words, outside any slot: a constant, never read from an answer.'
+    source:
+      - {line: 13, column: 71, text: 'A bed with a blank name is refused.'}
+    generated:
+      - {line: 57, column: 38, text: '"A bed with a blank name is refused."'}
+  - n: 28
+    kind: words
+    rule: '2.2'
+    title: '"main", as the words wrote it'
+    why: 'Written in the words, outside any slot: a constant, never read from an answer.'
+    source:
+      - {line: 14, column: 42, text: 'main'}
+    generated:
+      - {line: 60, column: 35, text: '"main"'}
+  - n: 29
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source:
+      - {line: 14, column: 82, text: '$stamp'}
+    generated:
+      - {line: 61, column: 36, text: '"Refuse a bed with no name ($stamp)"'}
+  - n: 30
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source: []
+    generated:
+      - {line: 62, column: 35, text: '"This fixes #$issueNumber."'}
+  - n: 31
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source: []
+    generated:
+      - {line: 67, column: 39, text: '"This fixes #$issueNumber and is tested by #$testNumber."'}
+  - n: 32
+    kind: until
+    rule: '7'
+    title: 'Waits, as the run waited'
+    why: 'Copied from the run''s script, as written.'
+    source:
+      - {line: 16, column: 1, text: 'until(tries = 20) { offers("github:merge") }'}
+    generated:
+      - {line: 69, column: 25, text: 'until(tries = 20) { offers("github:merge") }'}
+  - n: 33
+    kind: paraphrase
+    rule: '4'
+    title: '"squash", the words said again'
+    why: 'The words, "merge it by squashing its commits, with the commit title "Refuse a bed with no name (#168)"", said another way: a constant with no mark, since nothing was judged.'
+    source: []
+    generated:
+      - {line: 71, column: 47, text: '"squash"'}
+  - n: 34
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source: []
+    generated:
+      - {line: 72, column: 47, text: '"Refuse a bed with no name (#$prNumber)"'}
+  - n: 35
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source: []
+    generated:
+      - {line: 89, column: 23, text: '"Fixed in #$prNumber, tested in #$testNumber."'}
+  - n: 36
+    kind: words
+    rule: '2.2'
+    title: '"resolved", as the words wrote it'
+    why: 'Written in the words, outside any slot: a constant, never read from an answer.'
+    source:
+      - {line: 22, column: 40, text: 'resolved'}
+    generated:
+      - {line: 91, column: 45, text: '"resolved"'}
+  - n: 37
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source: []
+    generated:
+      - {line: 100, column: 23, text: '"The test went in with #$prNumber."'}
+  - n: 38
+    kind: template
+    rule: '3'
+    title: 'A string, its values put back as their names'
+    why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
+    source: []
+    generated:
+      - {line: 111, column: 23, text: '"Same crash as #$issueNumber."'}

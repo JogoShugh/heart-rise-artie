@@ -1,0 +1,27 @@
+<section id="bumps"></section>
+
+<style> .held { color: firebrick } </style>
+
+<script type="module">
+const api = "/github/repos/JogoShugh/heart-github-test";
+const get = (path) => fetch(api + path).then((answer) => answer.json());
+const bumps = document.querySelector("#bumps");
+
+for (const { number } of await get("/issues?labels=bumps&state=open")) {
+  const pull = await get(`/pulls/${number}`);
+  const compare = await get(`/compare/${pull.base.ref}...${pull.head.sha}`);
+  const behind = compare.behind_by > 0;   // our rule, in our code
+  bumps.insertAdjacentHTML("beforeend", behind
+    ? `<p class="held">#${number} ${pull.title}: behind its base, update it first</p>`
+    : `<p>#${number} ${pull.title} <button onclick="merge(this, ${number})">Merge</button></p>`);
+}
+
+window.merge = async (button, number) => {
+  const answer = await fetch(`${api}/pulls/${number}/merge`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ merge_method: "squash" }),
+  });
+  button.replaceWith(answer.ok ? "merged" : `not merged: ${(await answer.json()).message}`);
+};
+</script>

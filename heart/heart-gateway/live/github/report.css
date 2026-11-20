@@ -1,0 +1,91 @@
+/* The Take HEART reports' look: one reading column, the paired exchanges break out wider. */
+:root {
+  --bg: #f3f6f5;
+  --surface: #ffffff;
+  --fg: #17211d;
+  --muted: #55645d;
+  --rule: #d3ddd8;
+  --leaf: #2b7a4b;
+  --link: #2f5f8f;
+  --gate: #7a5a1f;
+  --code-bg: #e9efec;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732;
+    --leaf: #6cc690; --link: #8ab8e6; --gate: #e0b866; --code-bg: #1d2723; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732;
+  --leaf: #6cc690; --link: #8ab8e6; --gate: #e0b866; --code-bg: #1d2723; color-scheme: dark;
+}
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 44rem; margin: 0 auto; padding-block: 3rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.6rem; }
+.wide { margin-inline: calc((44rem - min(76rem, 100vw - 32px)) / 2); }
+@media (max-width: 46rem) { .wide { margin-inline: 0; } }
+h1, h2 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.1rem, 5.5vw, 3.2rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; }
+p, li { max-width: 65ch; }
+p { margin: 0; }
+header, section { display: grid; gap: 1rem; min-width: 0; }
+.eyebrow { font: 600 0.74rem/1 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.15rem; color: var(--muted); }
+.thesis { font-family: var(--display); font-weight: 500; font-size: 1.3rem; line-height: 1.45; border-left: 3px solid var(--leaf); padding-left: 1rem; }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.75rem 0.9rem; font: 0.74rem/1.5 var(--mono); }
+pre code { background: none; padding: 0; font-size: 1em; display: block; min-width: max-content; }
+pre .ln { display: block; }
+pre .add, .addkey { background: color-mix(in srgb, var(--leaf) 24%, transparent); }
+.addkey { padding: 0 0.3em; border-radius: 3px; }
+.c { color: var(--muted); font-style: italic; }
+a { color: var(--link); }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.5rem; }
+.note { color: var(--muted); font-size: 0.9rem; }
+
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 34rem; font-size: 0.92rem; }
+th, td { text-align: left; padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tbody th { font-weight: 500; }
+
+/* One pull request: its page, then the same read two ways, side by side. */
+.pull { padding-top: 1.4rem; border-top: 2px solid var(--rule); }
+.pull .head { display: grid; gap: 0.35rem; }
+.pull .where { color: var(--muted); }
+.pull .where b { color: var(--leaf); }
+figure { margin: 0; display: grid; gap: 0.4rem; }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 8px; }
+figcaption { font-size: 0.86rem; color: var(--muted); }
+.shot { max-width: 44rem; }
+.pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+@media (max-width: 52rem) { .pair { grid-template-columns: minmax(0, 1fr); } }
+.side { display: grid; gap: 0.5rem; min-width: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.9rem; }
+.side.gh { border-top: 4px solid var(--link); }
+.side.hr { border-top: 4px solid var(--leaf); }
+.who { font: 600 0.78rem/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.ex { display: grid; gap: 0.5rem; margin-top: 0.4rem; }
+
+/* The collapsed optimization section. */
+details.advanced { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.9rem 1.1rem; }
+details.advanced > summary { cursor: pointer; font-family: var(--display); font-weight: 650; font-size: 1.2rem; }
+details.advanced[open] > summary { margin-bottom: 1rem; }
+.adv { display: grid; gap: 1rem; min-width: 0; }
+.adv .side { background: var(--bg); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.shared td, tr.shared th { background: color-mix(in srgb, var(--leaf) 12%, transparent); }
+
+/* Phase 10: the acts. */
+.acting { display: grid; gap: 1.4rem; padding-top: 1.4rem; border-top: 2px solid var(--rule); }
+.actstep { display: grid; gap: 0.6rem; }
+h3 { font-family: var(--display); font-weight: 650; font-size: 1.2rem; margin: 0; }

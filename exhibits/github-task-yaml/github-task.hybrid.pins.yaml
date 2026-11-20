@@ -1,0 +1,58 @@
+# What github-task.hybrid.heart.yaml was recorded against, from runs/goal-hv.trace.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its
+# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
+# one offered in a set not recorded for it.
+rung: L0
+digest: sha256-ZfehRBgN7cn1JmGaca69chw2YnbEaHmTOUgAeGjWolE=
+forms:
+  github:repos-get:
+    integrity: sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+    act: sha256-PrNDFZycQXO0vDomT70X2hUukyXEia4UgE6Z7EXsru0=
+    method: GET
+    sets: []
+  github:open-issue:
+    integrity: sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+    act: sha256-zSq9d1NxXf4kXLKZaTlHo/9x0j+E3X2SJkMhbOdk21U=
+    method: POST
+    sets: []
+  github:repos-get-branch:
+    integrity: sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+    act: sha256-0yNap57nnu1j7lbSNIJxFMUggZZHX9WimVBXpacrC7w=
+    method: GET
+    sets: []
+  github:branch-from-here:
+    integrity: sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+    act: sha256-bcbiOeQ4mMAyGe+3quMSGhHJweHjK9Bt4QzHtHvnGvM=
+    method: POST
+    sets: []
+  github:commit-file:
+    integrity: sha256-n0N4VR02NV4lwW+mwLQNOTDzO8TMtz4mYsf9FLYzFKE=
+    act: sha256-bBapaf9nUEFnZdqjDUhxwCd2BaZTFFvjOb7/EKyMM2o=
+    method: PUT
+    sets: []
+  github:open-pull-request:
+    integrity: sha256-SnWJmSXmU0eYofDBkBjXU7L01aeid01cB1hs2kp80Mg=
+    act: sha256-K8Wm0ctMEuHWjL7hNJRHz8gopJD0CWs+xlfzG6IW+Mg=
+    method: POST
+    sets: []
+  github:merge:
+    integrity: sha256-uJuM7+5OJxJsXKNcZdbkal4/RFX4qEFTyY86y4kzzLE=
+    act: sha256-rIPDcwcEW99MvpphQzxbgRrzOPoH90Q4lEQrZ+emAMo=
+    method: PUT
+    sets: []
+  github:issues-get:
+    integrity: sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+    act: sha256-x8jmTSymRfcuYSw09AZQT7LEHzZXzjMSqOposPPBSlI=
+    method: GET
+    sets: []
+  github:comment:
+    integrity: sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
+    act: sha256-hlKO8GQge5XCho1Q3O2p3EQT4tMnMfv7zt+tYAinXwc=
+    method: POST
+    sets: []
+  github:close:
+    integrity: sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+    act: sha256-BmEM+73tFo+qErhHcbEIRKAfY2IvtjU0a8yaCOUTgfs=
+    method: PATCH
+    sets: []
+links: {}

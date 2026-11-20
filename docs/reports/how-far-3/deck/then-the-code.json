@@ -1,0 +1,92 @@
+{
+  "name": "then-the-code",
+  "title": "Then the Code, Then Green",
+  "part": "One behavior, start to finish",
+  "kicker": "The smallest change that makes the table pass",
+  "tone": "light",
+  "number": 10,
+  "of": 30,
+  "html": "<h2>Then the Code, Then Green</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 7fr) minmax(0, 5fr)\">\n  <div class=\"card dark\">\n    <pre style=\"margin: 0; white-space: pre-wrap; font-size: .9rem\">data class LibraryPolicy(\n    val renewalWeeks: Long = DEFAULT_RENEWAL_WEEKS,\n) {\n    companion object {\n        const val DEFAULT_RENEWAL_WEEKS = 3L\n\n        fun of(text: String): LibraryPolicy {\n            val read = Properties().apply { load(text.reader()) }\n            return LibraryPolicy(\n                renewalWeeks = read.getProperty(\"renewal.weeks\")\n                    ?.trim()?.toLong() ?: DEFAULT_RENEWAL_WEEKS,\n            )\n        }\n    }\n}</pre>\n  </div>\n  <div class=\"rows\">\n    <div><h3>One Rule</h3><p><code>renewal.weeks</code>, read from the library’s policy file. Left out: three weeks.</p></div>\n    <div><h3>A Renewal Uses It</h3><p>The due date moves by the policy’s weeks.</p></div>\n    <div><h3>Green, Logged</h3><p>All four rows pass, through the runner.</p></div>\n    <p class=\"refs\"><deck-ref name=\"repeatability\"></deck-ref> <deck-fragment name=\"policy\">LibraryPolicy.kt</deck-fragment></p>\n  </div>\n</div>\n",
+  "say": "Only now does the code change, and the hook lets it, because a feature file changed first. Here's the heart of it, from the real commit. A policy, read from a properties file, with one rule: renewal.weeks. If the file leaves it out, three weeks. And a renewal now moves the due date by however many weeks the policy says. That's it. Then the suite runs again, through the runner, and all four rows pass. Green, logged.",
+  "sources": [
+    {
+      "label": "LibraryPolicy.kt",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/LibraryPolicy.kt"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "then-the-code.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "right-red.json",
+      "title": "Then It Has to Fail, for the Right Reason"
+    },
+    "next": {
+      "href": "commit-proves-order.json",
+      "title": "The Commit Has to Prove the Order"
+    },
+    "alternate": {
+      "href": "then-the-code.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:ref": [
+      {
+        "name": "repeatability",
+        "kind": "measure",
+        "label": "REPEATABILITY",
+        "title": "Repeatability: the same goal, the same result, every time",
+        "summary": "Given the same inputs, the same outputs, call after call. Found once with a model, then replayed with none: the same steps, the same checks, the same result, until the controls really change. At the small scale it is one scenario that runs the same way every time.",
+        "cite": "The second of the three R's",
+        "_links": {
+          "self": {
+            "href": "../refs/repeatability.json",
+            "title": "REPEATABILITY"
+          },
+          "describedby": {
+            "href": "#three-rs-one-behavior",
+            "title": "The second of the three R's"
+          }
+        }
+      }
+    ],
+    "deck:fragment": [
+      {
+        "name": "policy",
+        "label": "The library's policy (LibraryPolicy.kt)",
+        "lang": "kotlin",
+        "path": "heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/LibraryPolicy.kt",
+        "lines": "1–30",
+        "of": 30,
+        "text": "package com.artie.heart.sims.library\n\nimport java.nio.file.Files\nimport java.nio.file.Path\nimport java.util.Properties\n\n/**\n * The library's rules, as its policy file says them: a Java properties file kept with the library's code, so a\n * commit can change them and what a build deploys is what that commit says. A rule the file leaves out keeps its\n * default.\n */\ndata class LibraryPolicy(\n    /** How far a renewal moves a loan's due date: `renewal.weeks`. */\n    val renewalWeeks: Long = DEFAULT_RENEWAL_WEEKS,\n) {\n    companion object {\n        const val DEFAULT_RENEWAL_WEEKS = 3L\n\n        /** The policy [text] says, a properties file's lines. */\n        fun of(text: String): LibraryPolicy {\n            val read = Properties().apply { load(text.reader()) }\n            return LibraryPolicy(\n                renewalWeeks = read.getProperty(\"renewal.weeks\")?.trim()?.toLong() ?: DEFAULT_RENEWAL_WEEKS,\n            )\n        }\n\n        /** The policy in the file at [path]. */\n        fun read(path: Path): LibraryPolicy = of(Files.readString(path))\n    }\n}",
+        "_links": {
+          "self": {
+            "href": "fragments/then-the-code--policy.json",
+            "title": "The library's policy (LibraryPolicy.kt)"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/LibraryPolicy.kt",
+            "title": "heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/LibraryPolicy.kt, lines 1–30"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "name": "skill-md",
+  "title": "The skill tells the model the loop, and that the gates win",
+  "part": "How it was built",
+  "kicker": "For the engineers · The prompt",
+  "tone": "light",
+  "number": 45,
+  "of": 54,
+  "html": "<h2>The skill tells the model the loop, and that the gates win</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);\">\n  <div class=\"rows\">\n    <pre><code># SKILL.md, the opening\nInstructions are advisory. A model can drift\npast them. These gates are real processes with\nreal exit codes, so they hold even when\nattention slips. This skill installs them and\nexplains the loop they enforce. **The skill\nnever replaces the hooks**: if a gate blocks\nyou, satisfy it; never edit it away.</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"opening\">SKILL.md, the opening</deck-fragment></p>\n  </div>\n  <div class=\"rows\">\n    <pre><code># SKILL.md, the work loop\n1. Write or change the .feature scenario.\n   Use Scenario Outlines and data tables,\n   not repeated Given/When/Then blocks.\n2. Run the BDD suite (native command, or\n   .claude/bdd-gates/bdd-run.sh on wrapper\n   stacks). See it fail for the right\n   reason: BDD_RUN FAIL.\n3. Write step definitions, then production\n   code. The gate now allows it.\n4. Run the suite until BDD_RUN PASS. Fix\n   lint findings as they appear.\n5. End the turn. The Stop gate runs the\n   full check.</code></pre>\n    <p class=\"refs\"><deck-fragment name=\"loop\">SKILL.md, the work loop</deck-fragment></p>\n  </div>\n</div>\n",
+  "say": "The bdd-gates skill's own words, from SKILL.md. The skill is instructions, and instructions are advisory; that's why it installs hooks and says, in its first paragraph, that the hooks win.",
+  "sources": [
+    {
+      "label": "bdd-gates skill (repository)",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    },
+    {
+      "label": "Claude Code hooks",
+      "href": "https://code.claude.com/docs/en/hooks"
+    },
+    {
+      "label": "Gherkin reference",
+      "href": "https://cucumber.io/docs/gherkin/reference/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "skill-md.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "hooks.json",
+      "title": "Instructions are advisory. Hooks are not."
+    },
+    "next": {
+      "href": "hooks-wiring.json",
+      "title": "Five hook events, each a shell script"
+    },
+    "alternate": {
+      "href": "skill-md.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ]
+  },
+  "_embedded": {
+    "deck:fragment": [
+      {
+        "name": "opening",
+        "label": "SKILL.md, the opening",
+        "lang": "markdown",
+        "path": "bdd-gates: SKILL.md",
+        "lines": "8–11",
+        "of": 113,
+        "text": "Instructions are advisory. A model can drift past them. These gates are real\nprocesses with real exit codes, so they hold even when attention slips. This\nskill installs them and explains the loop they enforce. **The skill never\nreplaces the hooks**: if a gate blocks you, satisfy it; never edit it away.",
+        "_links": {
+          "self": {
+            "href": "fragments/skill-md--opening.json",
+            "title": "SKILL.md, the opening"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/SKILL.md#L8-L11",
+            "title": "SKILL.md, lines 8–11"
+          }
+        }
+      },
+      {
+        "name": "loop",
+        "label": "SKILL.md, the work loop",
+        "lang": "markdown",
+        "path": "bdd-gates: SKILL.md",
+        "lines": "65–71",
+        "of": 113,
+        "text": "1. Write or change the `.feature` scenario. Use Scenario Outlines and data\n   tables, not repeated Given/When/Then blocks.\n2. Run the BDD suite (native command, or `.claude/bdd-gates/bdd-run.sh` on\n   wrapper stacks). See it **fail** for the right reason: `BDD_RUN FAIL`.\n3. Write step definitions, then production code. The gate now allows it.\n4. Run the suite until `BDD_RUN PASS`. Fix lint findings as they appear.\n5. End the turn. The Stop gate runs the full check.",
+        "_links": {
+          "self": {
+            "href": "fragments/skill-md--loop.json",
+            "title": "SKILL.md, the work loop"
+          },
+          "via": {
+            "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/SKILL.md#L65-L71",
+            "title": "SKILL.md, lines 65–71"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When the Server Changes a Form · The Goal in Pictures</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">The pin catches it, the run stops clean, a walk repairs it</span></header>
+<h2>When the Server Changes a Form</h2>
+<div class="pic pic-drift" data-steps="6" data-intro="Press play: a replay meets a changed form." data-captions='["Replay, no model: 501 opened, the watch asked.", "The forge changes scm:merge: sha is now required. (An illustrated change.)", "Before acting, ARTIE holds the offered form to its pin. It differs.", "The guard stops the run at step 3. 501 is still open: nothing merged, built or promoted.", "Repair: walk the goal again with Claude. It reads the new form and fills sha from 501&#39;s head.", "Kept again, with a new pin. Every replay after asks no model."]'>
+  <div class="pic-two">
+    <ol class="drift-steps">
+      <li><code>scm:pulls-get</code><i class="ok" data-at="1">✓</i></li>
+      <li><code>watcher:watch</code><i class="ok" data-at="1">✓</i></li>
+      <li class="hot"><code>scm:merge</code><i class="x" data-at="3">✕</i><i class="ok" data-at="6">✓</i></li>
+      <li><code>ci:build</code><i class="ok" data-at="6">✓</i></li>
+      <li><code>hr:in-reply-to</code><i class="ok" data-at="6">✓</i></li>
+      <li><code>ci:smoke-test</code><i class="ok" data-at="6">✓</i></li>
+      <li><code>env:promote</code><i class="ok" data-at="6">✓</i></li>
+    </ol>
+    <div class="drift-side">
+      <div class="drift-card" data-at="2"><b>The forge changed <code>scm:merge</code></b> <span class="tag">illustrated</span>
+        <pre class="diff">  schema:
+    required:
+      - method
+<ins>+     - sha</ins>
+    properties:
+<ins>+     sha: { type: string }</ins></pre></div>
+      <div class="drift-card" data-at="3"><b>Held to its pin</b>
+        <pre class="diff">pinned   sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pw…
+offered  <del>a different hash</del>   ≠</pre></div>
+      <div class="drift-card stop" data-at="4"><b>stopped at step 3 by its guard</b><span>scm:merge changed since the lock file. 501 still open.</span></div>
+      <div class="drift-card fix" data-at="5"><b><span class="claude">Claude</span> walks it again</b>
+        <pre class="diff">PUT /repos/acme/web/pulls/501/actions/merge
+{ "method": "squash", "sha": "dafbbfee1f2a…" }   ← 501's head.sha</pre></div>
+      <div class="drift-card ok-card" data-at="6"><b>Kept again, new pin</b><span>Replays: 0 model calls.</span></div>
+    </div>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/coupling.html" rel="prev"><small>Back</small><b>Wired to a Media Type, Not a Site</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#drift">with heart-ts</a></span>
+<a href="deck/what-carries.html" rel="next"><small>Next</small><b>What Lets HAL-FORMS Carry the Release</b></a></nav>
+</main></div></body></html>

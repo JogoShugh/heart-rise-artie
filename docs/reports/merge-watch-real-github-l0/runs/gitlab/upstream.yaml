@@ -1,0 +1,3260 @@
+---
+at: 2026-11-13T12:46:57.762443Z
+ms: 133
+traceparent: 00-cc388dc297254f84091b3afefb61bd9b-c6e9c61ebf465158-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/501
+  headers:
+    Authorization: <token>
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2039
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:46:57 GMT"
+    etag: W/"d9d5fd68abfc943a570f6d57ea546f8d"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF4S867QJRRFK3NN3N0B0R\",\"version\":\"1\"}"
+    x-request-id: 01M7AF4S867QJRRFK3NN3N0B0R
+    x-runtime: 0.083895
+  body:
+    id: 41
+    iid: 501
+    project_id: 1
+    title: "Renewals: two weeks for short loans"
+    description: null
+    state: opened
+    created_at: 2026-11-13T12:46:54.842Z
+    updated_at: 2026-11-13T12:46:57.827Z
+    merged_by: null
+    merge_user: null
+    merged_at: null
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-501
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: checking
+    detailed_merge_status: checking
+    merge_after: null
+    sha: 1148f8bbed287c9e51c8a2fcbcf30982364eb409
+    merge_commit_sha: null
+    squash_commit_sha: null
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:46:57.820Z
+    reference: '!501'
+    references:
+      short: '!501'
+      relative: '!501'
+      full: acme/web!501
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/501
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: false
+    squash_on_merge: false
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: 5770b723194d62664043e9644f9ab9f619672664
+      head_sha: 1148f8bbed287c9e51c8a2fcbcf30982364eb409
+      start_sha: 5770b723194d62664043e9644f9ab9f619672664
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:47:00.204383Z
+ms: 73
+traceparent: null
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/501
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"d9d5fd68abfc943a570f6d57ea546f8d"
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2045
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:47:00 GMT"
+    etag: W/"6914ebdd4eb2c249825d06c65c06f28b"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF4VKA5QZ2Z69MJGQFNPP4\",\"version\":\"1\"}"
+    x-request-id: 01M7AF4VKA5QZ2Z69MJGQFNPP4
+    x-runtime: 0.067566
+  body:
+    id: 41
+    iid: 501
+    project_id: 1
+    title: "Renewals: two weeks for short loans"
+    description: null
+    state: opened
+    created_at: 2026-11-13T12:46:54.842Z
+    updated_at: 2026-11-13T12:46:57.827Z
+    merged_by: null
+    merge_user: null
+    merged_at: null
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-501
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: mergeable
+    merge_after: null
+    sha: 1148f8bbed287c9e51c8a2fcbcf30982364eb409
+    merge_commit_sha: null
+    squash_commit_sha: null
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:46:57.820Z
+    reference: '!501'
+    references:
+      short: '!501'
+      relative: '!501'
+      full: acme/web!501
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/501
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: false
+    squash_on_merge: false
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: 5770b723194d62664043e9644f9ab9f619672664
+      head_sha: 1148f8bbed287c9e51c8a2fcbcf30982364eb409
+      start_sha: 5770b723194d62664043e9644f9ab9f619672664
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:47:00.339054Z
+ms: 74
+traceparent: 00-cc388dc297254f84091b3afefb61bd9b-3723a71225cef390-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/501
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"6914ebdd4eb2c249825d06c65c06f28b"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:47:00 GMT"
+    etag: W/"6914ebdd4eb2c249825d06c65c06f28b"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF4VQHWT9F2MQ3WRVA0EB9\",\"version\":\"1\"}"
+    x-request-id: 01M7AF4VQHWT9F2MQ3WRVA0EB9
+    x-runtime: 0.070868
+---
+at: 2026-11-13T12:47:00.429932Z
+ms: 79
+traceparent: 00-cc388dc297254f84091b3afefb61bd9b-5b6a106330615eb6-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/501
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"6914ebdd4eb2c249825d06c65c06f28b"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:47:00 GMT"
+    etag: W/"6914ebdd4eb2c249825d06c65c06f28b"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF4VTBSY98AX1XNVNABG82\",\"version\":\"1\"}"
+    x-request-id: 01M7AF4VTBSY98AX1XNVNABG82
+    x-runtime: 0.075358
+---
+at: 2026-11-13T12:47:00.519692Z
+ms: 80
+traceparent: 00-cc388dc297254f84091b3afefb61bd9b-5b6a106330615eb6-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/501
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"6914ebdd4eb2c249825d06c65c06f28b"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:47:00 GMT"
+    etag: W/"6914ebdd4eb2c249825d06c65c06f28b"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF4VX5B2ZMBEJFQJ69RJGK\",\"version\":\"1\"}"
+    x-request-id: 01M7AF4VX5B2ZMBEJFQJ69RJGK
+    x-runtime: 0.076651
+---
+at: 2026-11-13T12:47:00.601614Z
+ms: 1231
+traceparent: 00-cc388dc297254f84091b3afefb61bd9b-5b6a106330615eb6-01
+request:
+  method: PUT
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/501/merge
+  headers:
+    Content-Type: application/json
+    Authorization: <token>
+    Accept: application/json
+  body:
+    squash: true
+    sha: 1148f8bbed287c9e51c8a2fcbcf30982364eb409
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2620
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:47:01 GMT"
+    etag: W/"276c9c220226996e46f3c9a290ea5053"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF4VZRYSX8JKV8S1FMM2GZ\",\"version\":\"1\"}"
+    x-request-id: 01M7AF4VZRYSX8JKV8S1FMM2GZ
+    x-runtime: 1.226289
+  body:
+    id: 41
+    iid: 501
+    project_id: 1
+    title: "Renewals: two weeks for short loans"
+    description: null
+    state: merged
+    created_at: 2026-11-13T12:46:54.842Z
+    updated_at: 2026-11-13T12:47:01.687Z
+    merged_by:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merge_user:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merged_at: 2026-11-13T12:47:01.741Z
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-501
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: not_open
+    merge_after: null
+    sha: 1148f8bbed287c9e51c8a2fcbcf30982364eb409
+    merge_commit_sha: 23658bddd75fba26dc3a5f0296adde4350754a87
+    squash_commit_sha: 1148f8bbed287c9e51c8a2fcbcf30982364eb409
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:46:57.820Z
+    reference: '!501'
+    references:
+      short: '!501'
+      relative: '!501'
+      full: acme/web!501
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/501
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: true
+    squash_on_merge: true
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: 5770b723194d62664043e9644f9ab9f619672664
+      head_sha: 1148f8bbed287c9e51c8a2fcbcf30982364eb409
+      start_sha: 5770b723194d62664043e9644f9ab9f619672664
+    merge_error: null
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:47:01.838608Z
+ms: 78
+traceparent: 00-cc388dc297254f84091b3afefb61bd9b-5b6a106330615eb6-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/501
+  headers:
+    Authorization: <token>
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2646
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:47:01 GMT"
+    etag: W/"f976f3e82f7645dc19942fee61a56964"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF4X6CPBBB2GS5BYMGYYVB\",\"version\":\"1\"}"
+    x-request-id: 01M7AF4X6CPBBB2GS5BYMGYYVB
+    x-runtime: 0.074017
+  body:
+    id: 41
+    iid: 501
+    project_id: 1
+    title: "Renewals: two weeks for short loans"
+    description: null
+    state: merged
+    created_at: 2026-11-13T12:46:54.842Z
+    updated_at: 2026-11-13T12:47:01.687Z
+    merged_by:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merge_user:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merged_at: 2026-11-13T12:47:01.741Z
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-501
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: not_open
+    merge_after: null
+    sha: 1148f8bbed287c9e51c8a2fcbcf30982364eb409
+    merge_commit_sha: 23658bddd75fba26dc3a5f0296adde4350754a87
+    squash_commit_sha: 1148f8bbed287c9e51c8a2fcbcf30982364eb409
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:46:57.820Z
+    reference: '!501'
+    references:
+      short: '!501'
+      relative: '!501'
+      full: acme/web!501
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/501
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: true
+    squash_on_merge: true
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: 5770b723194d62664043e9644f9ab9f619672664
+      head_sha: 1148f8bbed287c9e51c8a2fcbcf30982364eb409
+      start_sha: 5770b723194d62664043e9644f9ab9f619672664
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:47:01.944340Z
+ms: 77
+traceparent: 00-cc388dc297254f84091b3afefb61bd9b-e53577828fe437c2-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/501
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"f976f3e82f7645dc19942fee61a56964"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:47:02 GMT"
+    etag: W/"f976f3e82f7645dc19942fee61a56964"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF4X9PSYWS3X7DE8W23G5S\",\"version\":\"1\"}"
+    x-request-id: 01M7AF4X9PSYWS3X7DE8W23G5S
+    x-runtime: 0.073681
+---
+at: 2026-11-13T12:47:52.985695Z
+ms: 126
+traceparent: 00-e9e8c987793e3872d4e4e77155dc4d24-4b6a7a03cb7dd097-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/502
+  headers:
+    Authorization: <token>
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2018
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:47:53 GMT"
+    etag: W/"cf18e99acc6f74ec4e85973552cd68d0"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF6F60R67J4E65EEA5EJF8\",\"version\":\"1\"}"
+    x-request-id: 01M7AF6F60R67J4E65EEA5EJF8
+    x-runtime: 0.084919
+  body:
+    id: 47
+    iid: 502
+    project_id: 1
+    title: "Renewals: four weeks over the summer"
+    description: null
+    state: opened
+    created_at: 2026-11-13T12:47:50.259Z
+    updated_at: 2026-11-13T12:47:50.259Z
+    merged_by: null
+    merge_user: null
+    merged_at: null
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-502
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: checking
+    detailed_merge_status: checking
+    merge_after: null
+    sha: 128fcea0075400c59001895dc93f3ed9014357a8
+    merge_commit_sha: null
+    squash_commit_sha: null
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: null
+    reference: '!502'
+    references:
+      short: '!502'
+      relative: '!502'
+      full: acme/web!502
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/502
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: false
+    squash_on_merge: false
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: ea8f843ea351ed48b8e53c480a4c8675975029bc
+      head_sha: 128fcea0075400c59001895dc93f3ed9014357a8
+      start_sha: ea8f843ea351ed48b8e53c480a4c8675975029bc
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:47:55.407735Z
+ms: 80
+traceparent: null
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/502
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"cf18e99acc6f74ec4e85973552cd68d0"
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2046
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:47:55 GMT"
+    etag: W/"c3f567b97231e601f2ae38c46ba0b501"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF6HGH6ADMCWJ3KKJ0GDNF\",\"version\":\"1\"}"
+    x-request-id: 01M7AF6HGH6ADMCWJ3KKJ0GDNF
+    x-runtime: 0.074064
+  body:
+    id: 47
+    iid: 502
+    project_id: 1
+    title: "Renewals: four weeks over the summer"
+    description: null
+    state: opened
+    created_at: 2026-11-13T12:47:50.259Z
+    updated_at: 2026-11-13T12:47:53.143Z
+    merged_by: null
+    merge_user: null
+    merged_at: null
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-502
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: mergeable
+    merge_after: null
+    sha: 128fcea0075400c59001895dc93f3ed9014357a8
+    merge_commit_sha: null
+    squash_commit_sha: null
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:47:53.138Z
+    reference: '!502'
+    references:
+      short: '!502'
+      relative: '!502'
+      full: acme/web!502
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/502
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: false
+    squash_on_merge: false
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: ea8f843ea351ed48b8e53c480a4c8675975029bc
+      head_sha: 128fcea0075400c59001895dc93f3ed9014357a8
+      start_sha: ea8f843ea351ed48b8e53c480a4c8675975029bc
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:47:55.543416Z
+ms: 77
+traceparent: 00-e9e8c987793e3872d4e4e77155dc4d24-5cbe02c2f8396dbe-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/502
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"c3f567b97231e601f2ae38c46ba0b501"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:47:55 GMT"
+    etag: W/"c3f567b97231e601f2ae38c46ba0b501"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF6HMR2WZ90SFB922X3WDQ\",\"version\":\"1\"}"
+    x-request-id: 01M7AF6HMR2WZ90SFB922X3WDQ
+    x-runtime: 0.073476
+---
+at: 2026-11-13T12:47:55.632811Z
+ms: 72
+traceparent: 00-e9e8c987793e3872d4e4e77155dc4d24-f5c5a236bb06c135-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/502
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"c3f567b97231e601f2ae38c46ba0b501"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:47:55 GMT"
+    etag: W/"c3f567b97231e601f2ae38c46ba0b501"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF6HQHVY1RKJDJ2KG1005K\",\"version\":\"1\"}"
+    x-request-id: 01M7AF6HQHVY1RKJDJ2KG1005K
+    x-runtime: 0.068583
+---
+at: 2026-11-13T12:47:55.712974Z
+ms: 69
+traceparent: 00-e9e8c987793e3872d4e4e77155dc4d24-f5c5a236bb06c135-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/502
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"c3f567b97231e601f2ae38c46ba0b501"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:47:55 GMT"
+    etag: W/"c3f567b97231e601f2ae38c46ba0b501"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF6HT13X8F33KGMJM6X2ZA\",\"version\":\"1\"}"
+    x-request-id: 01M7AF6HT13X8F33KGMJM6X2ZA
+    x-runtime: 0.065623
+---
+at: 2026-11-13T12:47:55.783333Z
+ms: 1085
+traceparent: 00-e9e8c987793e3872d4e4e77155dc4d24-f5c5a236bb06c135-01
+request:
+  method: PUT
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/502/merge
+  headers:
+    Content-Type: application/json
+    Authorization: <token>
+    Accept: application/json
+  body:
+    squash: true
+    sha: 128fcea0075400c59001895dc93f3ed9014357a8
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2621
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:47:56 GMT"
+    etag: W/"99e71c0cfec09e5db4bbb9c5d128ddb1"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF6HW74QGVKZFAP7DR8512\",\"version\":\"1\"}"
+    x-request-id: 01M7AF6HW74QGVKZFAP7DR8512
+    x-runtime: 1.081628
+  body:
+    id: 47
+    iid: 502
+    project_id: 1
+    title: "Renewals: four weeks over the summer"
+    description: null
+    state: merged
+    created_at: 2026-11-13T12:47:50.259Z
+    updated_at: 2026-11-13T12:47:56.726Z
+    merged_by:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merge_user:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merged_at: 2026-11-13T12:47:56.781Z
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-502
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: not_open
+    merge_after: null
+    sha: 128fcea0075400c59001895dc93f3ed9014357a8
+    merge_commit_sha: 4eb34f0d2eb05dc8bf1133d52e70115459f617a5
+    squash_commit_sha: 128fcea0075400c59001895dc93f3ed9014357a8
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:47:53.138Z
+    reference: '!502'
+    references:
+      short: '!502'
+      relative: '!502'
+      full: acme/web!502
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/502
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: true
+    squash_on_merge: true
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: ea8f843ea351ed48b8e53c480a4c8675975029bc
+      head_sha: 128fcea0075400c59001895dc93f3ed9014357a8
+      start_sha: ea8f843ea351ed48b8e53c480a4c8675975029bc
+    merge_error: null
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:47:56.870976Z
+ms: 76
+traceparent: 00-e9e8c987793e3872d4e4e77155dc4d24-f5c5a236bb06c135-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/502
+  headers:
+    Authorization: <token>
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2647
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:47:56 GMT"
+    etag: W/"3662d0870ff0168c8d24d152b4002864"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF6JY8V6WFPKPZGN0DR4MX\",\"version\":\"1\"}"
+    x-request-id: 01M7AF6JY8V6WFPKPZGN0DR4MX
+    x-runtime: 0.071265
+  body:
+    id: 47
+    iid: 502
+    project_id: 1
+    title: "Renewals: four weeks over the summer"
+    description: null
+    state: merged
+    created_at: 2026-11-13T12:47:50.259Z
+    updated_at: 2026-11-13T12:47:56.726Z
+    merged_by:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merge_user:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merged_at: 2026-11-13T12:47:56.781Z
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-502
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: not_open
+    merge_after: null
+    sha: 128fcea0075400c59001895dc93f3ed9014357a8
+    merge_commit_sha: 4eb34f0d2eb05dc8bf1133d52e70115459f617a5
+    squash_commit_sha: 128fcea0075400c59001895dc93f3ed9014357a8
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:47:53.138Z
+    reference: '!502'
+    references:
+      short: '!502'
+      relative: '!502'
+      full: acme/web!502
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/502
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: true
+    squash_on_merge: true
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: ea8f843ea351ed48b8e53c480a4c8675975029bc
+      head_sha: 128fcea0075400c59001895dc93f3ed9014357a8
+      start_sha: ea8f843ea351ed48b8e53c480a4c8675975029bc
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:47:56.967716Z
+ms: 78
+traceparent: 00-e9e8c987793e3872d4e4e77155dc4d24-3057c4d1ac527b47-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/502
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"3662d0870ff0168c8d24d152b4002864"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:47:57 GMT"
+    etag: W/"3662d0870ff0168c8d24d152b4002864"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF6K188HGN0MNS8SGX38G8\",\"version\":\"1\"}"
+    x-request-id: 01M7AF6K188HGN0MNS8SGX38G8
+    x-runtime: 0.074747
+---
+at: 2026-11-13T12:48:45.861256Z
+ms: 105
+traceparent: 00-96e0bdd1730851dba958b7ec34a396df-20eeb7dc6fa848ff-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/503
+  headers:
+    Authorization: <token>
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2021
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:48:45 GMT"
+    etag: W/"fc715ac3a7c720b49d20670d1aaaeed6"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF82STPRB4BC9V57QEBZNR\",\"version\":\"1\"}"
+    x-request-id: 01M7AF82STPRB4BC9V57QEBZNR
+    x-runtime: 0.082022
+  body:
+    id: 53
+    iid: 503
+    project_id: 1
+    title: "Renewals: one week while stock is short"
+    description: null
+    state: opened
+    created_at: 2026-11-13T12:48:43.240Z
+    updated_at: 2026-11-13T12:48:43.240Z
+    merged_by: null
+    merge_user: null
+    merged_at: null
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-503
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: checking
+    detailed_merge_status: checking
+    merge_after: null
+    sha: 642f7c8b9ac08d64dd10b5aa16733f9cfa5a9327
+    merge_commit_sha: null
+    squash_commit_sha: null
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: null
+    reference: '!503'
+    references:
+      short: '!503'
+      relative: '!503'
+      full: acme/web!503
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/503
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: false
+    squash_on_merge: false
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: 432afaf8da367dbce8d29a725d9d0108255d9d50
+      head_sha: 642f7c8b9ac08d64dd10b5aa16733f9cfa5a9327
+      start_sha: 432afaf8da367dbce8d29a725d9d0108255d9d50
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:48:48.280271Z
+ms: 78
+traceparent: null
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/503
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"fc715ac3a7c720b49d20670d1aaaeed6"
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2049
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:48:48 GMT"
+    etag: W/"327d1b28506ec7498384846368d6680e"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF854TYSWY04X9DE1SNV9V\",\"version\":\"1\"}"
+    x-request-id: 01M7AF854TYSWY04X9DE1SNV9V
+    x-runtime: 0.071671
+  body:
+    id: 53
+    iid: 503
+    project_id: 1
+    title: "Renewals: one week while stock is short"
+    description: null
+    state: opened
+    created_at: 2026-11-13T12:48:43.240Z
+    updated_at: 2026-11-13T12:48:46.301Z
+    merged_by: null
+    merge_user: null
+    merged_at: null
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-503
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: mergeable
+    merge_after: null
+    sha: 642f7c8b9ac08d64dd10b5aa16733f9cfa5a9327
+    merge_commit_sha: null
+    squash_commit_sha: null
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:48:46.298Z
+    reference: '!503'
+    references:
+      short: '!503'
+      relative: '!503'
+      full: acme/web!503
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/503
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: false
+    squash_on_merge: false
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: 432afaf8da367dbce8d29a725d9d0108255d9d50
+      head_sha: 642f7c8b9ac08d64dd10b5aa16733f9cfa5a9327
+      start_sha: 432afaf8da367dbce8d29a725d9d0108255d9d50
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:48:48.410525Z
+ms: 74
+traceparent: 00-96e0bdd1730851dba958b7ec34a396df-f7f4db56703cf7ee-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/503
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"327d1b28506ec7498384846368d6680e"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:48:48 GMT"
+    etag: W/"327d1b28506ec7498384846368d6680e"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF858V9XCH5ZPYZQD5679A\",\"version\":\"1\"}"
+    x-request-id: 01M7AF858V9XCH5ZPYZQD5679A
+    x-runtime: 0.070488
+---
+at: 2026-11-13T12:48:48.496411Z
+ms: 75
+traceparent: 00-96e0bdd1730851dba958b7ec34a396df-1624e986d0910ef6-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/503
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"327d1b28506ec7498384846368d6680e"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:48:48 GMT"
+    etag: W/"327d1b28506ec7498384846368d6680e"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF85BHBF1JQD1DXKKDRTXT\",\"version\":\"1\"}"
+    x-request-id: 01M7AF85BHBF1JQD1DXKKDRTXT
+    x-runtime: 0.071606
+---
+at: 2026-11-13T12:48:48.580187Z
+ms: 70
+traceparent: 00-96e0bdd1730851dba958b7ec34a396df-1624e986d0910ef6-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/503
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"327d1b28506ec7498384846368d6680e"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:48:48 GMT"
+    etag: W/"327d1b28506ec7498384846368d6680e"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF85E400FKBZMH81K2Y83T\",\"version\":\"1\"}"
+    x-request-id: 01M7AF85E400FKBZMH81K2Y83T
+    x-runtime: 0.066475
+---
+at: 2026-11-13T12:48:48.651473Z
+ms: 1115
+traceparent: 00-96e0bdd1730851dba958b7ec34a396df-1624e986d0910ef6-01
+request:
+  method: PUT
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/503/merge
+  headers:
+    Content-Type: application/json
+    Authorization: <token>
+    Accept: application/json
+  body:
+    squash: true
+    sha: 642f7c8b9ac08d64dd10b5aa16733f9cfa5a9327
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2624
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:48:49 GMT"
+    etag: W/"770d36337a3db85ddcfd8a72e43e7cf4"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF85GCMBP47C6GQMXCZJJ5\",\"version\":\"1\"}"
+    x-request-id: 01M7AF85GCMBP47C6GQMXCZJJ5
+    x-runtime: 1.111326
+  body:
+    id: 53
+    iid: 503
+    project_id: 1
+    title: "Renewals: one week while stock is short"
+    description: null
+    state: merged
+    created_at: 2026-11-13T12:48:43.240Z
+    updated_at: 2026-11-13T12:48:49.605Z
+    merged_by:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merge_user:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merged_at: 2026-11-13T12:48:49.661Z
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-503
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: not_open
+    merge_after: null
+    sha: 642f7c8b9ac08d64dd10b5aa16733f9cfa5a9327
+    merge_commit_sha: bae0bc4e859e18d8e280c716076b92cdd3a759a1
+    squash_commit_sha: 642f7c8b9ac08d64dd10b5aa16733f9cfa5a9327
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:48:46.298Z
+    reference: '!503'
+    references:
+      short: '!503'
+      relative: '!503'
+      full: acme/web!503
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/503
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: true
+    squash_on_merge: true
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: 432afaf8da367dbce8d29a725d9d0108255d9d50
+      head_sha: 642f7c8b9ac08d64dd10b5aa16733f9cfa5a9327
+      start_sha: 432afaf8da367dbce8d29a725d9d0108255d9d50
+    merge_error: null
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:48:49.769058Z
+ms: 80
+traceparent: 00-96e0bdd1730851dba958b7ec34a396df-1624e986d0910ef6-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/503
+  headers:
+    Authorization: <token>
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2650
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:48:49 GMT"
+    etag: W/"e417aa9f8b837b13572d8c2016700832"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF86K92Q07C2D2NKHKJPZR\",\"version\":\"1\"}"
+    x-request-id: 01M7AF86K92Q07C2D2NKHKJPZR
+    x-runtime: 0.074897
+  body:
+    id: 53
+    iid: 503
+    project_id: 1
+    title: "Renewals: one week while stock is short"
+    description: null
+    state: merged
+    created_at: 2026-11-13T12:48:43.240Z
+    updated_at: 2026-11-13T12:48:49.605Z
+    merged_by:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merge_user:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merged_at: 2026-11-13T12:48:49.661Z
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-503
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: not_open
+    merge_after: null
+    sha: 642f7c8b9ac08d64dd10b5aa16733f9cfa5a9327
+    merge_commit_sha: bae0bc4e859e18d8e280c716076b92cdd3a759a1
+    squash_commit_sha: 642f7c8b9ac08d64dd10b5aa16733f9cfa5a9327
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:48:46.298Z
+    reference: '!503'
+    references:
+      short: '!503'
+      relative: '!503'
+      full: acme/web!503
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/503
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: true
+    squash_on_merge: true
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: 432afaf8da367dbce8d29a725d9d0108255d9d50
+      head_sha: 642f7c8b9ac08d64dd10b5aa16733f9cfa5a9327
+      start_sha: 432afaf8da367dbce8d29a725d9d0108255d9d50
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:48:49.865667Z
+ms: 80
+traceparent: 00-96e0bdd1730851dba958b7ec34a396df-9e43d3e5da0417ed-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/503
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"e417aa9f8b837b13572d8c2016700832"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:48:49 GMT"
+    etag: W/"e417aa9f8b837b13572d8c2016700832"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF86PABJ0D0VGXRRCBK3WB\",\"version\":\"1\"}"
+    x-request-id: 01M7AF86PABJ0D0VGXRRCBK3WB
+    x-runtime: 0.075866
+---
+at: 2026-11-13T12:49:35.842190Z
+ms: 80
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-c2761961dcd72884-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504
+  headers:
+    Authorization: <token>
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2014
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:49:35 GMT"
+    etag: W/"91fea8eb152427a3f86574daf57ed354"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF9KK3X9K8EABFGZM3ESFJ\",\"version\":\"1\"}"
+    x-request-id: 01M7AF9KK3X9K8EABFGZM3ESFJ
+    x-runtime: 0.076375
+  body:
+    id: 59
+    iid: 504
+    project_id: 1
+    title: "Renewals: none during the audit"
+    description: null
+    state: opened
+    created_at: 2026-11-13T12:49:33.314Z
+    updated_at: 2026-11-13T12:49:33.314Z
+    merged_by: null
+    merge_user: null
+    merged_at: null
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-504
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: checking
+    detailed_merge_status: preparing
+    merge_after: null
+    sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+    merge_commit_sha: null
+    squash_commit_sha: null
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: null
+    reference: '!504'
+    references:
+      short: '!504'
+      relative: '!504'
+      full: acme/web!504
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/504
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: false
+    squash_on_merge: false
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: a4b68eb9f919ec5b1d046bb5a4375bef18f1d527
+      head_sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+      start_sha: a4b68eb9f919ec5b1d046bb5a4375bef18f1d527
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:49:38.169160Z
+ms: 74
+traceparent: null
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"91fea8eb152427a3f86574daf57ed354"
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2041
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:49:38 GMT"
+    etag: W/"a8f28e350ede4418a441143e707d8877"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF9NVVN22NNPF3YXC6V5D0\",\"version\":\"1\"}"
+    x-request-id: 01M7AF9NVVN22NNPF3YXC6V5D0
+    x-runtime: 0.068719
+  body:
+    id: 59
+    iid: 504
+    project_id: 1
+    title: "Renewals: none during the audit"
+    description: null
+    state: opened
+    created_at: 2026-11-13T12:49:33.314Z
+    updated_at: 2026-11-13T12:49:36.410Z
+    merged_by: null
+    merge_user: null
+    merged_at: null
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-504
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: mergeable
+    merge_after: null
+    sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+    merge_commit_sha: null
+    squash_commit_sha: null
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:49:36.402Z
+    reference: '!504'
+    references:
+      short: '!504'
+      relative: '!504'
+      full: acme/web!504
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/504
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: false
+    squash_on_merge: false
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: a4b68eb9f919ec5b1d046bb5a4375bef18f1d527
+      head_sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+      start_sha: a4b68eb9f919ec5b1d046bb5a4375bef18f1d527
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:49:38.298385Z
+ms: 72
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-a23c605573a60f13-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"a8f28e350ede4418a441143e707d8877"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:49:38 GMT"
+    etag: W/"a8f28e350ede4418a441143e707d8877"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF9NZVDX714V7D1ZG6EKFC\",\"version\":\"1\"}"
+    x-request-id: 01M7AF9NZVDX714V7D1ZG6EKFC
+    x-runtime: 0.068438
+---
+at: 2026-11-13T12:49:38.383090Z
+ms: 68
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-a383245660cdc16f-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"a8f28e350ede4418a441143e707d8877"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:49:38 GMT"
+    etag: W/"a8f28e350ede4418a441143e707d8877"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF9P2FX8RRSB0JXAN6ZGS0\",\"version\":\"1\"}"
+    x-request-id: 01M7AF9P2FX8RRSB0JXAN6ZGS0
+    x-runtime: 0.064583
+---
+at: 2026-11-13T12:49:38.457709Z
+ms: 70
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-a383245660cdc16f-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"a8f28e350ede4418a441143e707d8877"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:49:38 GMT"
+    etag: W/"a8f28e350ede4418a441143e707d8877"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF9P4TR3A9TSECDDNH29E1\",\"version\":\"1\"}"
+    x-request-id: 01M7AF9P4TR3A9TSECDDNH29E1
+    x-runtime: 0.067177
+---
+at: 2026-11-13T12:49:38.529332Z
+ms: 1095
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-a383245660cdc16f-01
+request:
+  method: PUT
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504/merge
+  headers:
+    Content-Type: application/json
+    Authorization: <token>
+    Accept: application/json
+  body:
+    squash: true
+    sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2616
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:49:39 GMT"
+    etag: W/"266bb31f0502a1e5105c5fd427cfd831"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF9P72XD3P4V48S0H8YEBQ\",\"version\":\"1\"}"
+    x-request-id: 01M7AF9P72XD3P4V48S0H8YEBQ
+    x-runtime: 1.087138
+  body:
+    id: 59
+    iid: 504
+    project_id: 1
+    title: "Renewals: none during the audit"
+    description: null
+    state: merged
+    created_at: 2026-11-13T12:49:33.314Z
+    updated_at: 2026-11-13T12:49:39.479Z
+    merged_by:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merge_user:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merged_at: 2026-11-13T12:49:39.535Z
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-504
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: not_open
+    merge_after: null
+    sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+    merge_commit_sha: b86598e0ed6c62eb195a86cc372639507eadb9f1
+    squash_commit_sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:49:36.402Z
+    reference: '!504'
+    references:
+      short: '!504'
+      relative: '!504'
+      full: acme/web!504
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/504
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: true
+    squash_on_merge: true
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: a4b68eb9f919ec5b1d046bb5a4375bef18f1d527
+      head_sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+      start_sha: a4b68eb9f919ec5b1d046bb5a4375bef18f1d527
+    merge_error: null
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:49:39.626977Z
+ms: 87
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-a383245660cdc16f-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504
+  headers:
+    Authorization: <token>
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2642
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:49:39 GMT"
+    etag: W/"26fedec4329a5dd2c0941a8d6d4def15"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF9Q9GTPGWZ5470AEY68NB\",\"version\":\"1\"}"
+    x-request-id: 01M7AF9Q9GTPGWZ5470AEY68NB
+    x-runtime: 0.077833
+  body:
+    id: 59
+    iid: 504
+    project_id: 1
+    title: "Renewals: none during the audit"
+    description: null
+    state: merged
+    created_at: 2026-11-13T12:49:33.314Z
+    updated_at: 2026-11-13T12:49:39.479Z
+    merged_by:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merge_user:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merged_at: 2026-11-13T12:49:39.535Z
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-504
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: not_open
+    merge_after: null
+    sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+    merge_commit_sha: b86598e0ed6c62eb195a86cc372639507eadb9f1
+    squash_commit_sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:49:36.402Z
+    reference: '!504'
+    references:
+      short: '!504'
+      relative: '!504'
+      full: acme/web!504
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/504
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: true
+    squash_on_merge: true
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: a4b68eb9f919ec5b1d046bb5a4375bef18f1d527
+      head_sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+      start_sha: a4b68eb9f919ec5b1d046bb5a4375bef18f1d527
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:49:39.732686Z
+ms: 78
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-519f16105b4bc1d1-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"26fedec4329a5dd2c0941a8d6d4def15"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:49:39 GMT"
+    etag: W/"26fedec4329a5dd2c0941a8d6d4def15"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AF9QCPP0T5F6SPXSBWE2HE\",\"version\":\"1\"}"
+    x-request-id: 01M7AF9QCPP0T5F6SPXSBWE2HE
+    x-runtime: 0.074093
+---
+at: 2026-11-13T12:49:49.205373Z
+ms: 80
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-22c59f27ba6602d5-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"26fedec4329a5dd2c0941a8d6d4def15"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:49:49 GMT"
+    etag: W/"26fedec4329a5dd2c0941a8d6d4def15"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFA0MP8WHD4TGFVM3QXVME\",\"version\":\"1\"}"
+    x-request-id: 01M7AFA0MP8WHD4TGFVM3QXVME
+    x-runtime: 0.076380
+---
+at: 2026-11-13T12:49:49.293325Z
+ms: 74
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-41743a89b91a05fa-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"26fedec4329a5dd2c0941a8d6d4def15"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:49:49 GMT"
+    etag: W/"26fedec4329a5dd2c0941a8d6d4def15"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFA0QDZ6PX3SWGFEAK5HP6\",\"version\":\"1\"}"
+    x-request-id: 01M7AFA0QDZ6PX3SWGFEAK5HP6
+    x-runtime: 0.070635
+---
+at: 2026-11-13T12:49:49.371315Z
+ms: 68
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-41743a89b91a05fa-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"26fedec4329a5dd2c0941a8d6d4def15"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:49:49 GMT"
+    etag: W/"26fedec4329a5dd2c0941a8d6d4def15"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFA0SVGMYFGFXT01AKQ0GD\",\"version\":\"1\"}"
+    x-request-id: 01M7AFA0SVGMYFGFXT01AKQ0GD
+    x-runtime: 0.065553
+---
+at: 2026-11-13T12:49:49.441021Z
+ms: 85
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-41743a89b91a05fa-01
+request:
+  method: POST
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504/notes
+  headers:
+    Content-Type: application/json
+    Authorization: <token>
+    Accept: application/json
+  body:
+    body: "Not promoted to Dev: smoke scenarios S3 failed."
+response:
+  status: 201
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 641
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:49:49 GMT"
+    etag: W/"e305abba752536e8248857f71e36a011"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFA0W11NSSPTWVBNPT1H5S\",\"version\":\"1\"}"
+    x-request-id: 01M7AFA0W11NSSPTWVBNPT1H5S
+    x-runtime: 0.082433
+  body:
+    id: 63
+    type: null
+    body: "Not promoted to Dev: smoke scenarios S3 failed."
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    created_at: 2026-11-13T12:49:49.492Z
+    updated_at: 2026-11-13T12:49:49.492Z
+    system: false
+    noteable_id: 59
+    noteable_type: MergeRequest
+    project_id: 1
+    resolvable: false
+    confidential: false
+    internal: false
+    imported: false
+    imported_from: none
+    noteable_iid: 504
+    commands_changes: {}
+---
+at: 2026-11-13T12:49:49.527861Z
+ms: 89
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-41743a89b91a05fa-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/504
+  headers:
+    Authorization: <token>
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2642
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:49:49 GMT"
+    etag: W/"48a03cdc4eb9d93b66df7ccfccb74bd5"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFA0YR2ZC3ZY1M17WX78RV\",\"version\":\"1\"}"
+    x-request-id: 01M7AFA0YR2ZC3ZY1M17WX78RV
+    x-runtime: 0.086402
+  body:
+    id: 59
+    iid: 504
+    project_id: 1
+    title: "Renewals: none during the audit"
+    description: null
+    state: merged
+    created_at: 2026-11-13T12:49:33.314Z
+    updated_at: 2026-11-13T12:49:39.479Z
+    merged_by:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merge_user:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merged_at: 2026-11-13T12:49:39.535Z
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-504
+    user_notes_count: 1
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: not_open
+    merge_after: null
+    sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+    merge_commit_sha: b86598e0ed6c62eb195a86cc372639507eadb9f1
+    squash_commit_sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:49:36.402Z
+    reference: '!504'
+    references:
+      short: '!504'
+      relative: '!504'
+      full: acme/web!504
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/504
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: true
+    squash_on_merge: true
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 2
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: a4b68eb9f919ec5b1d046bb5a4375bef18f1d527
+      head_sha: 77e876ed8a5b5f97a7e2ff7a3364df0480383556
+      start_sha: a4b68eb9f919ec5b1d046bb5a4375bef18f1d527
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:49:49.627005Z
+ms: 52
+traceparent: 00-70ce2cf5fbbaed1c9521a6d9df096ea0-457d98904b1bf822-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/1/merge_requests/504/notes/63
+  headers:
+    Authorization: <token>
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 641
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:49:49 GMT"
+    etag: W/"e305abba752536e8248857f71e36a011"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFA11VEEVQXPQ4417DB3PE\",\"version\":\"1\"}"
+    x-request-id: 01M7AFA11VEEVQXPQ4417DB3PE
+    x-runtime: 0.048432
+  body:
+    id: 63
+    type: null
+    body: "Not promoted to Dev: smoke scenarios S3 failed."
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    created_at: 2026-11-13T12:49:49.492Z
+    updated_at: 2026-11-13T12:49:49.492Z
+    system: false
+    noteable_id: 59
+    noteable_type: MergeRequest
+    project_id: 1
+    resolvable: false
+    confidential: false
+    internal: false
+    imported: false
+    imported_from: none
+    noteable_iid: 504
+    commands_changes: {}
+---
+at: 2026-11-13T12:50:25.795657Z
+ms: 126
+traceparent: 00-6f24349b9eaf22098845e69acd53a039-6d67dcaf3f67eade-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/505
+  headers:
+    Authorization: <token>
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2012
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:50:25 GMT"
+    etag: W/"91f035f58664138d7ba27bbcd5f38cd9"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFB4DBWKW8JMEVT6S31ZDX\",\"version\":\"1\"}"
+    x-request-id: 01M7AFB4DBWKW8JMEVT6S31ZDX
+    x-runtime: 0.083518
+  body:
+    id: 65
+    iid: 505
+    project_id: 1
+    title: Say who to ask about renewals
+    description: null
+    state: opened
+    created_at: 2026-11-13T12:50:23.460Z
+    updated_at: 2026-11-13T12:50:23.460Z
+    merged_by: null
+    merge_user: null
+    merged_at: null
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-505
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: checking
+    detailed_merge_status: preparing
+    merge_after: null
+    sha: 51c02c5ecdd501e7ffca5ea2276bd3e682813a01
+    merge_commit_sha: null
+    squash_commit_sha: null
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: null
+    reference: '!505'
+    references:
+      short: '!505'
+      relative: '!505'
+      full: acme/web!505
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/505
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: false
+    squash_on_merge: false
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 1
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: a0a0a2d411ba88eb11af265f832ceb2ed03575c5
+      head_sha: 51c02c5ecdd501e7ffca5ea2276bd3e682813a01
+      start_sha: a0a0a2d411ba88eb11af265f832ceb2ed03575c5
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:50:28.235265Z
+ms: 77
+traceparent: null
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/505
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"91f035f58664138d7ba27bbcd5f38cd9"
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2039
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:50:28 GMT"
+    etag: W/"82644d9fbc231b61f2a5f54d51e976d8"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFB6RDKHXVT80DN0P9AAJG\",\"version\":\"1\"}"
+    x-request-id: 01M7AFB6RDKHXVT80DN0P9AAJG
+    x-runtime: 0.071971
+  body:
+    id: 65
+    iid: 505
+    project_id: 1
+    title: Say who to ask about renewals
+    description: null
+    state: opened
+    created_at: 2026-11-13T12:50:23.460Z
+    updated_at: 2026-11-13T12:50:26.536Z
+    merged_by: null
+    merge_user: null
+    merged_at: null
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-505
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: mergeable
+    merge_after: null
+    sha: 51c02c5ecdd501e7ffca5ea2276bd3e682813a01
+    merge_commit_sha: null
+    squash_commit_sha: null
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:50:26.528Z
+    reference: '!505'
+    references:
+      short: '!505'
+      relative: '!505'
+      full: acme/web!505
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/505
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: false
+    squash_on_merge: false
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 1
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: a0a0a2d411ba88eb11af265f832ceb2ed03575c5
+      head_sha: 51c02c5ecdd501e7ffca5ea2276bd3e682813a01
+      start_sha: a0a0a2d411ba88eb11af265f832ceb2ed03575c5
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:50:28.355991Z
+ms: 72
+traceparent: 00-6f24349b9eaf22098845e69acd53a039-d20fa73e69512d00-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/505
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"82644d9fbc231b61f2a5f54d51e976d8"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:50:28 GMT"
+    etag: W/"82644d9fbc231b61f2a5f54d51e976d8"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFB6W4976SKM7TZHY8TN4Z\",\"version\":\"1\"}"
+    x-request-id: 01M7AFB6W4976SKM7TZHY8TN4Z
+    x-runtime: 0.068702
+---
+at: 2026-11-13T12:50:28.438621Z
+ms: 72
+traceparent: 00-6f24349b9eaf22098845e69acd53a039-af0fe32c02ce78c9-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/505
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"82644d9fbc231b61f2a5f54d51e976d8"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:50:28 GMT"
+    etag: W/"82644d9fbc231b61f2a5f54d51e976d8"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFB6YQEKP0CF8JFFM1V7GD\",\"version\":\"1\"}"
+    x-request-id: 01M7AFB6YQEKP0CF8JFFM1V7GD
+    x-runtime: 0.068992
+---
+at: 2026-11-13T12:50:28.516080Z
+ms: 71
+traceparent: 00-6f24349b9eaf22098845e69acd53a039-af0fe32c02ce78c9-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/505
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"82644d9fbc231b61f2a5f54d51e976d8"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:50:28 GMT"
+    etag: W/"82644d9fbc231b61f2a5f54d51e976d8"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFB714WG8KW5RSG5CF451X\",\"version\":\"1\"}"
+    x-request-id: 01M7AFB714WG8KW5RSG5CF451X
+    x-runtime: 0.067921
+---
+at: 2026-11-13T12:50:28.588480Z
+ms: 1103
+traceparent: 00-6f24349b9eaf22098845e69acd53a039-af0fe32c02ce78c9-01
+request:
+  method: PUT
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/505/merge
+  headers:
+    Content-Type: application/json
+    Authorization: <token>
+    Accept: application/json
+  body:
+    squash: true
+    sha: 51c02c5ecdd501e7ffca5ea2276bd3e682813a01
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2614
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:50:29 GMT"
+    etag: W/"184f932733fcec699c2a9f4ee56b6045"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFB73D8DJFMTP6D4WRVVQ9\",\"version\":\"1\"}"
+    x-request-id: 01M7AFB73D8DJFMTP6D4WRVVQ9
+    x-runtime: 1.099486
+  body:
+    id: 65
+    iid: 505
+    project_id: 1
+    title: Say who to ask about renewals
+    description: null
+    state: merged
+    created_at: 2026-11-13T12:50:23.460Z
+    updated_at: 2026-11-13T12:50:29.552Z
+    merged_by:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merge_user:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merged_at: 2026-11-13T12:50:29.604Z
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-505
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: not_open
+    merge_after: null
+    sha: 51c02c5ecdd501e7ffca5ea2276bd3e682813a01
+    merge_commit_sha: 9282122289baa988e529042fef96492b370628f2
+    squash_commit_sha: 51c02c5ecdd501e7ffca5ea2276bd3e682813a01
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:50:26.528Z
+    reference: '!505'
+    references:
+      short: '!505'
+      relative: '!505'
+      full: acme/web!505
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/505
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: true
+    squash_on_merge: true
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 1
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: a0a0a2d411ba88eb11af265f832ceb2ed03575c5
+      head_sha: 51c02c5ecdd501e7ffca5ea2276bd3e682813a01
+      start_sha: a0a0a2d411ba88eb11af265f832ceb2ed03575c5
+    merge_error: null
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:50:29.694842Z
+ms: 78
+traceparent: 00-6f24349b9eaf22098845e69acd53a039-af0fe32c02ce78c9-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/505
+  headers:
+    Authorization: <token>
+    Accept: application/json
+response:
+  status: 200
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    content-length: 2640
+    content-type: application/json
+    date: "Fri, 13 Nov 2026 12:50:29 GMT"
+    etag: W/"0cfebe9cb61edb5924f85cea6a5ef323"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFB85Z3VEBJJ91AZ800N6W\",\"version\":\"1\"}"
+    x-request-id: 01M7AFB85Z3VEBJJ91AZ800N6W
+    x-runtime: 0.073389
+  body:
+    id: 65
+    iid: 505
+    project_id: 1
+    title: Say who to ask about renewals
+    description: null
+    state: merged
+    created_at: 2026-11-13T12:50:23.460Z
+    updated_at: 2026-11-13T12:50:29.552Z
+    merged_by:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merge_user:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    merged_at: 2026-11-13T12:50:29.604Z
+    closed_by: null
+    closed_at: null
+    target_branch: main
+    source_branch: pr-505
+    user_notes_count: 0
+    upvotes: 0
+    downvotes: 0
+    author:
+      id: 1
+      username: root
+      name: Administrator
+      state: active
+      locked: false
+      avatar_url: https://www.gravatar.com/avatar/b4e4f19c389d0a8250aedaace917a09c2fc70317057d6d6aed2152521276425b?s=80&d=identicon
+      web_url: http://192.168.1.18:8929/root
+    assignees: []
+    assignee: null
+    reviewers: []
+    source_project_id: 1
+    target_project_id: 1
+    labels: []
+    draft: false
+    imported: false
+    imported_from: none
+    work_in_progress: false
+    milestone: null
+    merge_when_pipeline_succeeds: false
+    merge_status: can_be_merged
+    detailed_merge_status: not_open
+    merge_after: null
+    sha: 51c02c5ecdd501e7ffca5ea2276bd3e682813a01
+    merge_commit_sha: 9282122289baa988e529042fef96492b370628f2
+    squash_commit_sha: 51c02c5ecdd501e7ffca5ea2276bd3e682813a01
+    discussion_locked: null
+    should_remove_source_branch: null
+    force_remove_source_branch: null
+    prepared_at: 2026-11-13T12:50:26.528Z
+    reference: '!505'
+    references:
+      short: '!505'
+      relative: '!505'
+      full: acme/web!505
+    web_url: http://192.168.1.18:8929/acme/web/-/merge_requests/505
+    time_stats:
+      time_estimate: 0
+      total_time_spent: 0
+      human_time_estimate: null
+      human_total_time_spent: null
+    squash: true
+    squash_on_merge: true
+    task_completion_status:
+      count: 0
+      completed_count: 0
+    has_conflicts: false
+    blocking_discussions_resolved: true
+    subscribed: true
+    changes_count: 1
+    latest_build_started_at: null
+    latest_build_finished_at: null
+    first_deployed_to_production_at: null
+    pipeline: null
+    head_pipeline: null
+    diff_refs:
+      base_sha: a0a0a2d411ba88eb11af265f832ceb2ed03575c5
+      head_sha: 51c02c5ecdd501e7ffca5ea2276bd3e682813a01
+      start_sha: a0a0a2d411ba88eb11af265f832ceb2ed03575c5
+    merge_error: null
+    first_contribution: true
+    user:
+      can_merge: true
+---
+at: 2026-11-13T12:50:29.788714Z
+ms: 76
+traceparent: 00-6f24349b9eaf22098845e69acd53a039-0bc8132c8ea131a0-01
+request:
+  method: GET
+  url: http://localhost:8929/api/v4/projects/acme%2Fweb/merge_requests/505
+  headers:
+    Authorization: <token>
+    Accept: application/json
+    If-None-Match: W/"0cfebe9cb61edb5924f85cea6a5ef323"
+response:
+  status: 304
+  headers:
+    cache-control: "max-age=0, private, must-revalidate"
+    connection: keep-alive
+    date: "Fri, 13 Nov 2026 12:50:29 GMT"
+    etag: W/"0cfebe9cb61edb5924f85cea6a5ef323"
+    nel: "{\"max_age\": 0}"
+    referrer-policy: strict-origin-when-cross-origin
+    server: nginx
+    strict-transport-security: max-age=63072000
+    vary: Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-gitlab-meta: "{\"correlation_id\":\"01M7AFB88X820N40PHBX6HB8PA\",\"version\":\"1\"}"
+    x-request-id: 01M7AFB88X820N40PHBX6HB8PA
+    x-runtime: 0.073250

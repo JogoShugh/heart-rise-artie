@@ -1,0 +1,43 @@
+note: 'Ana''s account as HAL Schema Forms: each book she has out, linked by its title.'
+request:
+  method: GET
+  url: /accounts/21000451
+  headers:
+    Accept: application/hal+json
+    Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>
+    Authorization: <Ana's card and PIN>
+response:
+  status: 200
+  headers:
+    Content-Type: application/hal+json
+    ETag: '"seq-6.hsf.L0.cf6957800b6dbbeb"'
+  body:
+    id: 21000451
+    name: Ana Torres
+    booksOut: 3
+    _links:
+      self:
+        href: /accounts/21000451
+      curies:
+      - name: library
+        href: /profiles/library#{rel}
+        templated: true
+      - name: hr
+        href: https://w3id.org/heart-rise/rels/{rel}
+        templated: true
+      hr:unavailable:
+        href: /unavailable/fc81f545088ea825
+        type: application/json
+        integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+      item:
+      - href: /loans/3310
+        title: The Hobbit
+      - href: /loans/3311
+        title: Matilda
+      - href: /loans/3312
+        title: Charlotte's Web
+    _forms: {}
+why absent:
+  url: /unavailable/fc81f545088ea825
+  body:
+    unavailable: []

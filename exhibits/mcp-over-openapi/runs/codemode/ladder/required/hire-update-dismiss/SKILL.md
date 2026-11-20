@@ -1,0 +1,2 @@
+Hires an employee with a role, updates their role (the update requires a reason; one is sent), then dismisses another employee found by name search. Raises on any unexpected status.
+Args: first, last, role, new_role, dismiss_name (e.g. "Bilbo Baggins"), reason (optional, default "role change").

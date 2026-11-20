@@ -1,0 +1,42 @@
+{
+  "name": "walk",
+  "title": "Walk Once with Claude, in HAL-FORMS",
+  "part": "HAL-FORMS",
+  "kicker": "The only run that costs tokens",
+  "tone": "light",
+  "number": 8,
+  "of": 19,
+  "html": "<h2>Walk Once with Claude, in HAL-FORMS</h2>\n<div class=\"stats\" style=\"grid-template-columns: repeat(4, minmax(0, 1fr))\">\n  <div class=\"stat\"><b>28</b><span>model calls, claude-sonnet-5-5</span></div>\n  <div class=\"stat\"><b>31,043</b><span>input tokens; 41,068 read from cache</span></div>\n  <div class=\"stat\"><b>4,901</b><span>output tokens</span></div>\n  <div class=\"stat\"><b>63</b><span>steps, in 68 s</span></div>\n</div>\n<p class=\"lead\">Watch, merge by squashing, build, smoke test (three renewals, one refused 412 on purpose, a problem report), promote: pull request 501 to Dev.</p>\n<p><a href=\"../merge-watch-two-dialects/runs/hal-forms/capture.html\" target=\"_blank\" rel=\"noopener\">The walk, step by step ↗</a></p>\n",
+  "say": "The walk: ARTIE took the goal line by line, every party answering in HAL-FORMS, and Claude chose among the templates on offer. Twenty-eight model calls, about thirty-one thousand input tokens, most read from cache, sixty-three steps in sixty-eight seconds. It merged, built, ran the smoke test, and promoted 501 to Dev.",
+  "sources": [
+    {
+      "label": "The walk, step by step",
+      "href": "../merge-watch-two-dialects/runs/hal-forms/capture.html"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "walk.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "two-ways.json",
+      "title": "One Pull Request, Two Dialects"
+    },
+    "next": {
+      "href": "kept.json",
+      "title": "Kept by the Generator Alone"
+    },
+    "alternate": {
+      "href": "walk.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

@@ -1,0 +1,1776 @@
+spike: 'Phase 0 of spec/PLAN-LOCAL-MODEL.md, 2026-10-30: three local models asked the reasoner and planner prompts, in their exact shape, through Ollama 0.40.13 at http://localhost:11434/v1/messages on an Apple M3 Max with 36 GB.'
+turns:
+  repo: 'the reasoner, first step of runs/first.yaml: intent "get repository JogoShugh/heart-github-test" at the bookmark'
+  merge: 'the reasoner at pull request 1781: intent "merge it by squashing"'
+  comment: the reasoner at the draft 1782, the reasoned line with the gateway reason
+  plan: the planner at the merge step, built by hand in the planner turn shape from the goal file and the pull request held at that step; max_tokens 1024
+  plan-4k: the same with max_tokens 4096
+  plan-nothink: the same with thinking disabled, as the Messages API says it
+  plan-budget: the same with a thinking budget of 300 tokens
+headers:
+  x-api-key: none
+  anthropic-version: "2023-06-01"
+  Content-Type: application/json
+requests:
+  repo:
+    model: <model>
+    max_tokens: 1024
+    tools:
+      - name: select
+        description: Select one offered action with its field values, ask for an action's detail, follow one offered link, or ask a question.
+        input_schema:
+          type: object
+          properties:
+            action:
+              type: string
+              enum:
+                - act
+                - describe
+                - explain
+                - follow
+                - clarify
+            affordance:
+              type: string
+            fields:
+              type: object
+            rel:
+              type: string
+            title:
+              type: string
+            question:
+              type: string
+          required:
+            - action
+        cache_control:
+          type: ephemeral
+    tool_choice:
+      type: auto
+    system:
+      - type: text
+        text: |
+          You choose what to do next for a user, from the actions a server offers right now.
+          The user message has four parts: <state> is the resource as it is now; <offers> maps each
+          action the server currently allows, by name, to its title, description and the JSON Schema
+          of its fields (and, if you asked for it, a longer detail); <links> lists the links the
+          resource offers, each by relation and title; <intent> is what the user asked for.
+          Call the select tool exactly once.
+          - If you need to know more about what an offered action does before choosing, answer
+            action "describe" with that action's exact name. You will be asked again with its detail.
+          - If the user asks why they cannot do something that is not in <offers>, answer action
+            "explain" with the name it would have, in the same form as the offered names
+            (for example "garden:harvest"). The server's own reason is then given to the user.
+          - If one offered action clearly matches the intent, and the intent gives every required
+            field, answer action "act" with that action's exact name and field values that satisfy
+            its schema.
+          - When a field takes words the intent describes, write them exactly as it describes them:
+            its length, its tone, what they say. "one sentence" is one sentence, never two, and has
+            nothing added that the intent doesn't ask for.
+          - If the intent is served by going to another resource first, answer action "follow"
+            with the exact rel and title of one link in <links>.
+          - If no offered action or link matches, or the intent is ambiguous, or a required value is
+            missing, answer action "clarify" with one short question for the user.
+          Never invent an action that is not in <offers>, or a link that is not in <links>. Never guess a required value.
+        cache_control:
+          type: ephemeral
+    messages:
+      - role: user
+        content:
+          - type: text
+            text: |
+              <state>
+              {"title":"GitHub v3 REST API","hr:manifest":{"forms":{"github:add-sub-issue":["sha256-CP30wrvSlg+x9cHdEAsLY7mNqe2ooV3jA3MIzZYKhP0="],"github:assign":["sha256-VscVtuEo5Tk2ZKoux1zt3PeDF2khsJ/DkO2uKd3V7GQ="],"github:branch-from-here":["sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo="],"github:close":["sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=","sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ="],"github:close-duplicate":["sha256-8xYNSPPYgL5MSeRaWzu7n/xQ4HcNumYS0qQV34gRiQI="],"github:close-not-planned":["sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04="],"github:comment":["sha256-hBIa40tU8EJokuebe8npx54kItbP3z/jGbJW8FsL26c=","sha256-rEchf4MSX+3aH4c5JE6jPFuMsn5M7PMYR4os6ETeizk="],"github:commit-file":["sha256-VU+w5uVUgaj2J43DM9jlUCmIZ1jNGPlRKajRrAlQN9Y="],"github:edit":["sha256-E4H5hyCvQ41/jggcRbdnIzO2KJ7hF8mZFzQ5WTIcjEE=","sha256-PPOR0s5dm5evRf0IV5+78ZnwNxK8GtbKkmEJJlgFdB0=","sha256-jV1Vwq/GYsRwOu5Btre2AF+MZ5QM6cr7vIATp0lgwnc="],"github:issues-get":["sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc="],"github:issues-get-comment":["sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk="],"github:issues-list-comments":["sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY="],"github:issues-list-for-repo":["sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw="],"github:label":["sha256-8R+R85FzQjiJVpZak/M1sl6QjftjUVxwEERrkW5FzPc=","sha256-E6Dht1OvjHWMm1Q2FD4+08H3pne+aT5TyvC+yzhrtHc="],"github:lock":["sha256-0Qx8Y7uXinYvK/l+ZHWQZXllV0ZEbKtebqCkP3RRTUk="],"github:merge":["sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk="],"github:open-issue":["sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI="],"github:open-pull-request":["sha256-PE4HJf8D9pKBuS8GjywYA5kUlxGDtzJU9LtqfoDdBMI="],"github:pulls-get":["sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE="],"github:pulls-list":["sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk="],"github:remove-sub-issue":["sha256-OmMvnlrMxK3VgvnyR9Boq72C5LK1WBqnkUU3+82t9Ac="],"github:reopen":["sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=","sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU="],"github:repos-get":["sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go="],"github:repos-get-branch":["sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg="],"github:repos-list-branches":["sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc="],"github:repos-list-for-user":["sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54="],"github:request-review":["sha256-B44QtOvTiCXyIHeLBhLV4dTAQT4IA7rQ6TxMzv2FQlc="],"github:set-milestone":["sha256-Cz3Pt5WA54VdrWrOZ1rm348aG0ySukdEgiNuzt1hims="],"github:unassign":["sha256-HjlVP3VFvX/IUvovwAeLMKUsMn8aVStBNa5hFXgCuAk="],"github:unlabel":["sha256-pINd//jITYqjkEyig0cZqL3w1dTiYSeYl/6e0A4I97E="],"github:unlock":["sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0="],"github:update-branch":["sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8="]},"digest":"sha256-iBmq8RVpA5my4yokZ0mDyF5Q/0BWxp2xdPGJuiI4POY="}}
+              </state>
+              <offers>
+              {"github:pulls-list":{"title":"List pull requests","description":"Lists pull requests in a specified repository.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"state":{"type":"string","default":"open","enum":["open","closed","all"],"title":"State","description":"Either `open`, `closed`, or `all` to filter by state."},"sort":{"type":"string","default":"created","enum":["created","updated","popularity","long-running"],"title":"Sort","description":"What to sort results by. `popularity` will sort by the number of comments. `long-running` will sort by date created and will limit the results to pull requests that have been open for more than a month and have had activity within the past month."},"direction":{"type":"string","enum":["asc","desc"],"title":"Direction","description":"The direction of the sort. Default: `desc` when sort is `created` or sort is not specified, otherwise `asc`."},"labels":{"type":"string","title":"Labels","description":"A list of comma separated label names. Example: `bug,ui,@high`"}},"required":["owner","repo"]}},"github:pulls-get":{"title":"Get a pull request","description":"Draft pull requests are available in public repositories with GitHub Free and GitHub Free for organizations, GitHub Pro, and legacy per-repository billing plans, and in public and private repositories with GitHub Team and GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"pull_number":{"type":"integer","title":"Pull_number","description":"The number that identifies the pull request."}},"required":["owner","repo","pull_number"]}},"github:issues-list-for-repo":{"title":"List repository issues","description":"List issues in a repository. Only open issues will be listed. Pull requests are left out: list them with github:pulls-list, which filters by labels too.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"state":{"type":"string","default":"open","enum":["open","closed","all"],"title":"State","description":"Indicates the state of the issues to return."},"labels":{"type":"string","title":"Labels","description":"A list of comma separated label names. Example: `bug,ui,@high`"},"assignee":{"type":"string","title":"Assignee","description":"Can be the name of a user. Pass in `none` for issues with no assigned user, and `*` for issues assigned to any user."},"creator":{"type":"string","title":"Creator","description":"The user that created the issue."},"mentioned":{"type":"string","title":"Mentioned","description":"A user that's mentioned in the issue."},"milestone":{"type":"string","title":"Milestone","description":"If an `integer` is passed, it should refer to a milestone by its `number` field. If the string `*` is passed, issues with any milestone are accepted. If the string `none` is passed, issues without milestones are returned."},"sort":{"type":"string","default":"created","enum":["created","updated","comments"],"title":"Sort","description":"What to sort results by."},"direction":{"type":"string","default":"desc","enum":["asc","desc"],"title":"Direction","description":"The direction to sort the results by."},"since":{"type":"string","format":"date-time","title":"Since","description":"Only show results that were last updated after the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`."}},"required":["owner","repo"]}},"github:issues-get":{"title":"Get an issue","description":"The API returns a [`301 Moved Permanently` status](https://docs.github.com/rest/guides/best-practices-for-using-the-rest-api#follow-redirects) if the issue was\n[transferred](https://docs.github.com/articles/transferring-an-issue-to-another-repository/) to another repository. If\nthe issue was transferred to or deleted from a repository where the authenticated user lacks read access, the API\nreturns a `404 Not Found` status. If the issue was deleted from a repository where the authenticated user has read\naccess, the API returns a `410 Gone` status. To receive webhook events for transferred and deleted issues, subscribe\nto the [`issues`](https://docs.github.com/webhooks/event-payloads/#issues) webhook.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"issue_number":{"type":"integer","title":"Issue_number","description":"The number that identifies the issue."}},"required":["owner","repo","issue_number"]}},"github:repos-list-for-user":{"title":"List repositories for a user","description":"Lists public repositories for the specified user.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"username":{"type":"string","title":"Username","description":"The handle for the GitHub user account."},"type":{"type":"string","default":"owner","enum":["all","owner","member"],"title":"Type","description":"Limit results to repositories of the specified type."},"sort":{"type":"string","default":"full_name","enum":["created","updated","pushed","full_name"],"title":"Sort","description":"The property to sort the results by."},"direction":{"type":"string","enum":["asc","desc"],"title":"Direction","description":"The order to sort by. Default: `asc` when using `full_name`, otherwise `desc`."}},"required":["username"]}},"github:repos-get":{"title":"Get a repository","description":"The `parent` and `source` objects are present when the repository is a fork. `parent` is the repository this repository was forked from, `source` is the ultimate source for the network.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."}},"required":["owner","repo"]}},"github:issues-list-comments":{"title":"List issue comments","description":"You can use the REST API to list comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"issue_number":{"type":"integer","title":"Issue_number","description":"The number that identifies the issue."},"since":{"type":"string","format":"date-time","title":"Since","description":"Only show results that were last updated after the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`."}},"required":["owner","repo","issue_number"]}},"github:issues-get-comment":{"title":"Get an issue comment","description":"You can use the REST API to get comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"comment_id":{"type":"integer","format":"int64","title":"Comment_id","description":"The unique identifier of the comment."}},"required":["owner","repo","comment_id"]}},"github:repos-list-branches":{"title":"List branches","description":"List branches","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"protected":{"type":"boolean","title":"Protected","description":"Setting to `true` returns only branches protected by branch protections or rulesets. When set to `false`, only unprotected branches are returned. Omitting this parameter returns all branches."}},"required":["owner","repo"]}},"github:repos-get-branch":{"title":"Get a branch","description":"Get a branch","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"branch":{"type":"string","title":"Branch","description":"The name of the branch. Cannot contain wildcard characters. To use wildcard characters in branch names, use [the GraphQL API](https://docs.github.com/graphql)."}},"required":["owner","repo","branch"]}}}
+              </offers>
+              <links>
+              []
+              </links>
+              <intent>
+              get repository JogoShugh/heart-github-test
+              </intent>
+  merge:
+    model: <model>
+    max_tokens: 1024
+    tools:
+      - name: select
+        description: Select one offered action with its field values, ask for an action's detail, follow one offered link, or ask a question.
+        input_schema:
+          type: object
+          properties:
+            action:
+              type: string
+              enum:
+                - act
+                - describe
+                - explain
+                - follow
+                - clarify
+            affordance:
+              type: string
+            fields:
+              type: object
+            rel:
+              type: string
+            title:
+              type: string
+            question:
+              type: string
+          required:
+            - action
+        cache_control:
+          type: ephemeral
+    tool_choice:
+      type: auto
+    system:
+      - type: text
+        text: |
+          You choose what to do next for a user, from the actions a server offers right now.
+          The user message has four parts: <state> is the resource as it is now; <offers> maps each
+          action the server currently allows, by name, to its title, description and the JSON Schema
+          of its fields (and, if you asked for it, a longer detail); <links> lists the links the
+          resource offers, each by relation and title; <intent> is what the user asked for.
+          Call the select tool exactly once.
+          - If you need to know more about what an offered action does before choosing, answer
+            action "describe" with that action's exact name. You will be asked again with its detail.
+          - If the user asks why they cannot do something that is not in <offers>, answer action
+            "explain" with the name it would have, in the same form as the offered names
+            (for example "garden:harvest"). The server's own reason is then given to the user.
+          - If one offered action clearly matches the intent, and the intent gives every required
+            field, answer action "act" with that action's exact name and field values that satisfy
+            its schema.
+          - When a field takes words the intent describes, write them exactly as it describes them:
+            its length, its tone, what they say. "one sentence" is one sentence, never two, and has
+            nothing added that the intent doesn't ask for.
+          - If the intent is served by going to another resource first, answer action "follow"
+            with the exact rel and title of one link in <links>.
+          - If no offered action or link matches, or the intent is ambiguous, or a required value is
+            missing, answer action "clarify" with one short question for the user.
+          Never invent an action that is not in <offers>, or a link that is not in <links>. Never guess a required value.
+        cache_control:
+          type: ephemeral
+    messages:
+      - role: user
+        content:
+          - type: text
+            text: |
+              <state>
+              {"id":5078425780,"node_id":"PR_kwDOVM7WJc8AAAABLrKgtA","number":1781,"state":"open","locked":false,"title":"Bump left-pad from 1.0.8 to 1.0.9 (1029-221447)","body":"Bumps left-pad from 1.0.8 to 1.0.9. Opened by a Dependabot stand-in (exhibits/dependabot-sim).","milestone":null,"active_lock_reason":null,"created_at":"2026-10-30T02:14:50Z","updated_at":"2026-10-30T02:14:51Z","closed_at":null,"merged_at":null,"merge_commit_sha":"a186ba848b6cbf99cc3cebb76d9a009c69056495","assignee":null,"assignees":[],"requested_reviewers":[],"requested_teams":[],"head":{"label":"JogoShugh:deps/left-pad-1.0.9-1029-221447","ref":"deps/left-pad-1.0.9-1029-221447","sha":"312a2bc7d98d50344acb1bcd3dc52063f59db577"},"base":{"label":"JogoShugh:deps-main","ref":"deps-main","sha":"74d8c49e8a37b9c68cc1e9ebc7813f28a3520857"},"author_association":"OWNER","auto_merge":null,"draft":false,"merged":false,"mergeable":true,"rebaseable":true,"mergeable_state":"clean","merged_by":null,"comments":0,"review_comments":0,"maintainer_can_modify":false,"commits":1,"additions":1,"deletions":1,"changed_files":1,"hr:address":{"owner":"JogoShugh","repo":"heart-github-test","pull_number":"1781"}}
+              </state>
+              <offers>
+              {"github:close":{"title":"Close","description":"Close it; a pull request unmerged, an issue as completed.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{},"required":[],"title":"Close","type":"object"}},"github:comment":{"title":"Comment","description":"Add a comment to the pull request's conversation.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"body":{"description":"The contents of the comment.","type":"string"}},"required":["body"],"title":"Comment","type":"object"}},"github:edit":{"title":"Edit","description":"Change its title or description.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"body":{"description":"The contents of the pull request.","type":"string"},"title":{"description":"The title of the pull request.","type":"string"}},"required":[],"title":"Edit","type":"object"}},"github:label":{"title":"Label","description":"Add labels to the pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"labels":{"description":"The labels to add to the issue's existing labels. You can also pass an `array` of labels directly, but GitHub recommends passing an object with the `labels` key. To replace all of the labels for an issue, use \"[Set labels for an issue](https://docs.github.com/rest/issues/labels#set-labels-for-an-issue).\"","items":{"oneOf":[{"type":"string"},{"properties":{"confidence":{"description":"The confidence level for this label choice.","enum":["low","medium","high"],"type":"string"},"name":{"description":"The name of the label to add.","type":"string"},"rationale":{"description":"Optional reasoning for adding this label.","type":"string"},"suggest":{"description":"If `true`, the label is stored as a pending suggestion for human review rather than applied directly.","type":"boolean"}},"required":["name"],"type":"object"}]},"minItems":1,"type":"array"}},"required":[],"title":"Label","type":"object"}},"github:merge":{"title":"Merge","description":"Merge the pull request into its base branch.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"commit_message":{"description":"Extra detail to append to automatic commit message.","type":"string"},"commit_title":{"description":"Title for the automatic commit message.","type":"string"},"merge_method":{"description":"The merge method to use.","enum":["merge","squash","rebase"],"type":"string"}},"required":[],"title":"Merge","type":"object"}},"github:request-review":{"title":"Request a review","description":"Ask people or teams to review the pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"anyOf":[{"required":["reviewers"]},{"required":["team_reviewers"]}],"properties":{"reviewers":{"description":"An array of user `login`s that will be requested.","items":{"type":"string"},"type":"array"},"team_reviewers":{"description":"An array of team `slug`s that will be requested.","items":{"type":"string"},"type":"array"}},"required":[],"title":"Request a review","type":"object"}},"github:update-branch":{"title":"Update the branch","description":"Bring the latest changes from the base branch into this one.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{},"required":[],"title":"Update the branch","type":"object"}}}
+              </offers>
+              <links>
+              [{"rel":"github:issues-list-comments"},{"rel":"github:commits"},{"rel":"github:issues-get"},{"rel":"author","state":{"login":"JogoShugh","id":1863005,"node_id":"MDQ6VXNlcjE4NjMwMDU=","gravatar_id":"","type":"User","user_view_type":"public","site_admin":false}},{"rel":"github:labels","state":{"id":12835848326,"node_id":"LA_kwDOVM7WJc8AAAAC_ROAhg","name":"dependencies","description":null,"color":"ededed","default":false,"archived_at":null,"archived_by":null}},{"rel":"github:head-user","state":{"login":"JogoShugh","id":1863005,"node_id":"MDQ6VXNlcjE4NjMwMDU=","gravatar_id":"","type":"User","user_view_type":"public","site_admin":false}},{"rel":"github:head-repo","state":{"homepage":null,"license":null,"mirror_url":null}},{"rel":"github:base-user","state":{"login":"JogoShugh","id":1863005,"node_id":"MDQ6VXNlcjE4NjMwMDU=","gravatar_id":"","type":"User","user_view_type":"public","site_admin":false}},{"rel":"github:base-repo","state":{"id":1422841381,"node_id":"R_kgDOVM7WJQ","name":"heart-github-test","full_name":"JogoShugh/heart-github-test","private":false,"fork":false,"homepage":null,"default_branch":"main","license":null,"mirror_url":null}}]
+              </links>
+              <intent>
+              merge it by squashing
+              </intent>
+  comment:
+    model: <model>
+    max_tokens: 1024
+    tools:
+      - name: select
+        description: Select one offered action with its field values, ask for an action's detail, follow one offered link, or ask a question.
+        input_schema:
+          type: object
+          properties:
+            action:
+              type: string
+              enum:
+                - act
+                - describe
+                - explain
+                - follow
+                - clarify
+            affordance:
+              type: string
+            fields:
+              type: object
+            rel:
+              type: string
+            title:
+              type: string
+            question:
+              type: string
+          required:
+            - action
+        cache_control:
+          type: ephemeral
+    tool_choice:
+      type: auto
+    system:
+      - type: text
+        text: |
+          You choose what to do next for a user, from the actions a server offers right now.
+          The user message has four parts: <state> is the resource as it is now; <offers> maps each
+          action the server currently allows, by name, to its title, description and the JSON Schema
+          of its fields (and, if you asked for it, a longer detail); <links> lists the links the
+          resource offers, each by relation and title; <intent> is what the user asked for.
+          Call the select tool exactly once.
+          - If you need to know more about what an offered action does before choosing, answer
+            action "describe" with that action's exact name. You will be asked again with its detail.
+          - If the user asks why they cannot do something that is not in <offers>, answer action
+            "explain" with the name it would have, in the same form as the offered names
+            (for example "garden:harvest"). The server's own reason is then given to the user.
+          - If one offered action clearly matches the intent, and the intent gives every required
+            field, answer action "act" with that action's exact name and field values that satisfy
+            its schema.
+          - When a field takes words the intent describes, write them exactly as it describes them:
+            its length, its tone, what they say. "one sentence" is one sentence, never two, and has
+            nothing added that the intent doesn't ask for.
+          - If the intent is served by going to another resource first, answer action "follow"
+            with the exact rel and title of one link in <links>.
+          - If no offered action or link matches, or the intent is ambiguous, or a required value is
+            missing, answer action "clarify" with one short question for the user.
+          Never invent an action that is not in <offers>, or a link that is not in <links>. Never guess a required value.
+        cache_control:
+          type: ephemeral
+    messages:
+      - role: user
+        content:
+          - type: text
+            text: |
+              <state>
+              {"id":5078426893,"node_id":"PR_kwDOVM7WJc8AAAABLrKlDQ","number":1782,"state":"open","locked":false,"title":"Bump left-pad from 1.0.0 to 1.0.1 (1029-221454)","body":"Bumps left-pad from 1.0.0 to 1.0.1. Opened by a Dependabot stand-in (exhibits/dependabot-sim).","created_at":"2026-10-30T02:14:58Z","updated_at":"2026-10-30T02:18:44Z","closed_at":null,"merged_at":null,"merge_commit_sha":"31f76892c8224f43ab932479ba9eac4fc1391a26","assignees":[],"requested_reviewers":[],"requested_teams":[],"milestone":null,"draft":true,"head":{"label":"JogoShugh:deps/left-pad-1.0.1-1029-221454","ref":"deps/left-pad-1.0.1-1029-221454","sha":"92d5dfb02484af66ac67ade693a6faec1c30dece"},"base":{"label":"JogoShugh:deps-main","ref":"deps-main","sha":"74d8c49e8a37b9c68cc1e9ebc7813f28a3520857"},"author_association":"OWNER","auto_merge":null,"assignee":null,"active_lock_reason":null,"merged":false,"mergeable":true,"rebaseable":true,"mergeable_state":"clean","merged_by":null,"comments":0,"review_comments":0,"maintainer_can_modify":false,"commits":1,"additions":1,"deletions":0,"changed_files":1,"hr:address":{"owner":"JogoShugh","repo":"heart-github-test","pull_number":"1782"}}
+              </state>
+              <offers>
+              {"github:close":{"title":"Close","description":"Close it; a pull request unmerged, an issue as completed.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{},"required":[],"title":"Close","type":"object"}},"github:comment":{"title":"Comment","description":"Add a comment to the pull request's conversation.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"body":{"description":"The contents of the comment.","type":"string"}},"required":["body"],"title":"Comment","type":"object"}},"github:edit":{"title":"Edit","description":"Change its title or description.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"body":{"description":"The contents of the pull request.","type":"string"},"title":{"description":"The title of the pull request.","type":"string"}},"required":[],"title":"Edit","type":"object"}},"github:label":{"title":"Label","description":"Add labels to the pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"labels":{"description":"The labels to add to the issue's existing labels. You can also pass an `array` of labels directly, but GitHub recommends passing an object with the `labels` key. To replace all of the labels for an issue, use \"[Set labels for an issue](https://docs.github.com/rest/issues/labels#set-labels-for-an-issue).\"","items":{"oneOf":[{"type":"string"},{"properties":{"confidence":{"description":"The confidence level for this label choice.","enum":["low","medium","high"],"type":"string"},"name":{"description":"The name of the label to add.","type":"string"},"rationale":{"description":"Optional reasoning for adding this label.","type":"string"},"suggest":{"description":"If `true`, the label is stored as a pending suggestion for human review rather than applied directly.","type":"boolean"}},"required":["name"],"type":"object"}]},"minItems":1,"type":"array"}},"required":[],"title":"Label","type":"object"}},"github:request-review":{"title":"Request a review","description":"Ask people or teams to review the pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"anyOf":[{"required":["reviewers"]},{"required":["team_reviewers"]}],"properties":{"reviewers":{"description":"An array of user `login`s that will be requested.","items":{"type":"string"},"type":"array"},"team_reviewers":{"description":"An array of team `slug`s that will be requested.","items":{"type":"string"},"type":"array"}},"required":[],"title":"Request a review","type":"object"}},"github:update-branch":{"title":"Update the branch","description":"Bring the latest changes from the base branch into this one.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{},"required":[],"title":"Update the branch","type":"object"}}}
+              </offers>
+              <links>
+              [{"rel":"github:issues-get"},{"rel":"github:issues-list-comments"},{"rel":"github:commits"},{"rel":"author","state":{"login":"JogoShugh","id":1863005,"node_id":"MDQ6VXNlcjE4NjMwMDU=","gravatar_id":"","type":"User","user_view_type":"public","site_admin":false}},{"rel":"github:labels","state":{"id":12835848326,"node_id":"LA_kwDOVM7WJc8AAAAC_ROAhg","name":"dependencies","color":"ededed","default":false,"description":null,"archived_at":null,"archived_by":null}},{"rel":"github:labels","state":{"id":12868225434,"node_id":"LA_kwDOVM7WJc8AAAAC_wGJmg","name":"watch-told","color":"ededed","default":false,"description":null,"archived_at":null,"archived_by":null}},{"rel":"github:head-user","state":{"login":"JogoShugh","id":1863005,"node_id":"MDQ6VXNlcjE4NjMwMDU=","gravatar_id":"","type":"User","user_view_type":"public","site_admin":false}},{"rel":"github:head-repo","state":{"homepage":null,"mirror_url":null,"license":null}},{"rel":"github:base-user","state":{"login":"JogoShugh","id":1863005,"node_id":"MDQ6VXNlcjE4NjMwMDU=","gravatar_id":"","type":"User","user_view_type":"public","site_admin":false}},{"rel":"github:base-repo","state":{"id":1422841381,"node_id":"R_kgDOVM7WJQ","name":"heart-github-test","full_name":"JogoShugh/heart-github-test","private":false,"fork":false,"homepage":null,"mirror_url":null,"license":null,"default_branch":"main"}}]
+              </links>
+              <intent>
+              tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first.
+              </intent>
+  plan:
+    model: <model>
+    max_tokens: 1024
+    tools:
+      - name: move
+        description: 'Make the next move of the task: one act, back, wait, check, done, finish, stop or a question.'
+        input_schema:
+          type: object
+          properties:
+            why:
+              type: string
+              description: Why this move, in one sentence, from what is held and the step now.
+            move:
+              type: string
+              enum:
+                - act
+                - back
+                - wait
+                - check
+                - done
+                - finish
+                - stop
+                - clarify
+            words:
+              type: string
+            sentence:
+              type: integer
+            opens:
+              type: boolean
+            to:
+              type: string
+            relation:
+              type: string
+            facts:
+              type: object
+            question:
+              type: string
+          required:
+            - why
+            - move
+        cache_control:
+          type: ephemeral
+    tool_choice:
+      type: auto
+    system:
+      - type: text
+        text: |
+          You plan a task for a user against a hypermedia service, one move at a time. The service offers,
+          at each resource, the actions allowed now (forms) and its links. A separate step carries out each
+          act: it reads your words, chooses the form and fills its fields. You choose what to do next.
+          The user message has parts: <goal> is the task, numbered by sentence, each marked [done] or [ ];
+          <inputs> are values the user gave, by name; <moves> are the moves made so far; <path> is the
+          resources the run is in, the start first and the one held last; <held> is the resource held now:
+          its address, <state>, <embedded>, what it embeds by relation, each resource by name (a pull
+          request's labels), the <forms> it offers by name, and its <links>; <answers> are the user's
+          answers to your questions.
+          Call the move tool exactly once, with one of these moves:
+          - "act": words for one act at the resource held, as a person would ask it, with every value the
+            act needs (for example "comment on it: Fixed in 1.2 by #132."). Write a value that is one of the
+            inputs as $name, never its value. Give the number of the sentence it serves. Set opens to
+            true when you will make more moves at what the act leads to, or will come back here after it
+            (an act that makes a new resource, such as a comment, leads to that resource).
+          - "back": to a resource on the <path>, by its address, closing what was opened since.
+          - "wait": until the resource held offers a form, before acting on it. Give the form's exact name,
+            as in <forms> or as it will be named there, in relation (for example "github:merge").
+          - "check": facts the goal asks to make sure of, each a member of <state>, or a relation in
+            <embedded>, whose value is the names listed there, and the value it must have; a list as the
+            value holds when every name in it is there.
+          - "done": a sentence is fully done, by its number. Mark each sentence done once it is.
+          - "finish": every sentence is done.
+          - "stop": the goal can't be done here, saying why.
+          - "clarify": one short question for the user, when the goal and what is offered leave the next
+            move open, or a value is missing. Never guess.
+          Only act on forms in <forms>. Do each sentence once, in order where order matters.
+          A move in <moves> marked refused changed nothing: try another way. The start, first on <path>,
+          often offers forms that go straight to a resource by its names or numbers (a repository, a branch,
+          an issue): go back to it when the resource held doesn't lead where you need.
+          A goal in steps comes as <context>, the user's words around the steps; <steps>, the steps so far as
+          a tree: [done] ones, [in] the steps the one now is inside, and [now], with how many sub-steps come
+          after it; <now>, the step to do now; and <named>, resources earlier steps named, each at its
+          address. Do only the step now: for an intent, act (as many times as it
+          takes) and then "done"; for "Wait: …", one "wait"; for "Verify: …", one "check" of its facts. The
+          runner moves from step to step: in a goal in steps every act leads on to what it led to (opens
+          needn't be set), the step's sub-steps run where the run is when it is done, and after the step the
+          runner comes back to where it began by itself: never "finish" in a goal in steps. For a step with sub-steps, act only to
+          reach the resource its sub-steps start from (an act that opens), then "done": never do a sub-step's
+          work early, since each comes next as a step of its own. Each act in <moves> says what was done:
+          "acted" a form, or "followed" a link, and what came of it. A follow moves you and makes nothing:
+          from a list, follow on to the item you need (a branch, an issue), then act there. Say "done" only
+          once a move did the step's work, never because a follow came back done. "back" goes to a resource on <path> this
+          step opened, or to where it began, no further.
+        cache_control:
+          type: ephemeral
+    messages:
+      - role: user
+        content:
+          - type: text
+            text: |
+              <context>
+              Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed.
+              </context>
+              <steps>
+              [in] In {owner}/{repo}
+                [done] Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+                [in] Whenever a pull request labelled {label} changes `as pr`
+                  [done] If it's labelled {hold}, leave it, and say so once.
+                  [done] If it's labelled {told}, leave it.
+                  [now] Once it can be merged, merge it by squashing. (2 sub-steps after)
+              </steps>
+              <now>
+              Once it can be merged, merge it by squashing.
+              </now>
+              <named>
+              watch = https://localhost:8392/repos/JogoShugh/heart-github-test/issues/1783
+              pr = https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+              </named>
+              <inputs>
+              $owner = JogoShugh
+              $repo = heart-github-test
+              $label = dependencies
+              $hold = hold
+              $told = watch-told
+              </inputs>
+              <moves>
+
+              </moves>
+              <path>
+              https://localhost:8392/
+              https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+              </path>
+              <held>
+              https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+              <state>
+              {"id":5078425780,"node_id":"PR_kwDOVM7WJc8AAAABLrKgtA","number":1781,"state":"open","locked":false,"title":"Bump left-pad from 1.0.8 to 1.0.9 (1029-221447)","body":"Bumps left-pad from 1.0.8 to 1.0.9. Opened by a Dependabot stand-in (exhibits/dependabot-sim).","milestone":null,"active_lock_reason":null,"created_at":"2026-10-30T02:14:50Z","updated_at":"2026-10-30T02:14:51Z","closed_at":null,"merged_at":null,"merge_commit_sha":"a186ba848b6cbf99cc3cebb76d9a009c69056495","assignee":null,"assignees":[],"requested_reviewers":[],"requested_teams":[],"head":{"label":"JogoShugh:deps/left-pad-1.0.9-1029-221447","ref":"deps/left-pad-1.0.9-1029-221447","sha":"312a2bc7d98d50344acb1bcd3dc52063f59db577"},"base":{"label":"JogoShugh:deps-main","ref":"deps-main","sha":"74d8c49e8a37b9c68cc1e9ebc7813f28a3520857"},"author_association":"OWNER","auto_merge":null,"draft":false,"merged":false,"mergeable":true,"rebaseable":true,"mergeable_state":"clean","merged_by":null,"comments":0,"review_comments":0,"maintainer_can_modify":false,"commits":1,"additions":1,"deletions":1,"changed_files":1,"hr:address":{"owner":"JogoShugh","repo":"heart-github-test","pull_number":"1781"}}
+              </state>
+              <embedded>
+              labels: dependencies
+              </embedded>
+              <forms>
+              github:close
+              github:comment
+              github:edit
+              github:label
+              github:merge
+              github:request-review
+              github:update-branch
+              </forms>
+              <links>
+              self
+              alternate "On GitHub"
+              github:issue "The pull request as an issue"
+              </links>
+              </held>
+              <answers>
+
+              </answers>
+  plan-4k:
+    model: <model>
+    max_tokens: 4096
+    tools:
+      - name: move
+        description: 'Make the next move of the task: one act, back, wait, check, done, finish, stop or a question.'
+        input_schema:
+          type: object
+          properties:
+            why:
+              type: string
+              description: Why this move, in one sentence, from what is held and the step now.
+            move:
+              type: string
+              enum:
+                - act
+                - back
+                - wait
+                - check
+                - done
+                - finish
+                - stop
+                - clarify
+            words:
+              type: string
+            sentence:
+              type: integer
+            opens:
+              type: boolean
+            to:
+              type: string
+            relation:
+              type: string
+            facts:
+              type: object
+            question:
+              type: string
+          required:
+            - why
+            - move
+        cache_control:
+          type: ephemeral
+    tool_choice:
+      type: auto
+    system:
+      - type: text
+        text: |
+          You plan a task for a user against a hypermedia service, one move at a time. The service offers,
+          at each resource, the actions allowed now (forms) and its links. A separate step carries out each
+          act: it reads your words, chooses the form and fills its fields. You choose what to do next.
+          The user message has parts: <goal> is the task, numbered by sentence, each marked [done] or [ ];
+          <inputs> are values the user gave, by name; <moves> are the moves made so far; <path> is the
+          resources the run is in, the start first and the one held last; <held> is the resource held now:
+          its address, <state>, <embedded>, what it embeds by relation, each resource by name (a pull
+          request's labels), the <forms> it offers by name, and its <links>; <answers> are the user's
+          answers to your questions.
+          Call the move tool exactly once, with one of these moves:
+          - "act": words for one act at the resource held, as a person would ask it, with every value the
+            act needs (for example "comment on it: Fixed in 1.2 by #132."). Write a value that is one of the
+            inputs as $name, never its value. Give the number of the sentence it serves. Set opens to
+            true when you will make more moves at what the act leads to, or will come back here after it
+            (an act that makes a new resource, such as a comment, leads to that resource).
+          - "back": to a resource on the <path>, by its address, closing what was opened since.
+          - "wait": until the resource held offers a form, before acting on it. Give the form's exact name,
+            as in <forms> or as it will be named there, in relation (for example "github:merge").
+          - "check": facts the goal asks to make sure of, each a member of <state>, or a relation in
+            <embedded>, whose value is the names listed there, and the value it must have; a list as the
+            value holds when every name in it is there.
+          - "done": a sentence is fully done, by its number. Mark each sentence done once it is.
+          - "finish": every sentence is done.
+          - "stop": the goal can't be done here, saying why.
+          - "clarify": one short question for the user, when the goal and what is offered leave the next
+            move open, or a value is missing. Never guess.
+          Only act on forms in <forms>. Do each sentence once, in order where order matters.
+          A move in <moves> marked refused changed nothing: try another way. The start, first on <path>,
+          often offers forms that go straight to a resource by its names or numbers (a repository, a branch,
+          an issue): go back to it when the resource held doesn't lead where you need.
+          A goal in steps comes as <context>, the user's words around the steps; <steps>, the steps so far as
+          a tree: [done] ones, [in] the steps the one now is inside, and [now], with how many sub-steps come
+          after it; <now>, the step to do now; and <named>, resources earlier steps named, each at its
+          address. Do only the step now: for an intent, act (as many times as it
+          takes) and then "done"; for "Wait: …", one "wait"; for "Verify: …", one "check" of its facts. The
+          runner moves from step to step: in a goal in steps every act leads on to what it led to (opens
+          needn't be set), the step's sub-steps run where the run is when it is done, and after the step the
+          runner comes back to where it began by itself: never "finish" in a goal in steps. For a step with sub-steps, act only to
+          reach the resource its sub-steps start from (an act that opens), then "done": never do a sub-step's
+          work early, since each comes next as a step of its own. Each act in <moves> says what was done:
+          "acted" a form, or "followed" a link, and what came of it. A follow moves you and makes nothing:
+          from a list, follow on to the item you need (a branch, an issue), then act there. Say "done" only
+          once a move did the step's work, never because a follow came back done. "back" goes to a resource on <path> this
+          step opened, or to where it began, no further.
+        cache_control:
+          type: ephemeral
+    messages:
+      - role: user
+        content:
+          - type: text
+            text: |
+              <context>
+              Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed.
+              </context>
+              <steps>
+              [in] In {owner}/{repo}
+                [done] Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+                [in] Whenever a pull request labelled {label} changes `as pr`
+                  [done] If it's labelled {hold}, leave it, and say so once.
+                  [done] If it's labelled {told}, leave it.
+                  [now] Once it can be merged, merge it by squashing. (2 sub-steps after)
+              </steps>
+              <now>
+              Once it can be merged, merge it by squashing.
+              </now>
+              <named>
+              watch = https://localhost:8392/repos/JogoShugh/heart-github-test/issues/1783
+              pr = https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+              </named>
+              <inputs>
+              $owner = JogoShugh
+              $repo = heart-github-test
+              $label = dependencies
+              $hold = hold
+              $told = watch-told
+              </inputs>
+              <moves>
+
+              </moves>
+              <path>
+              https://localhost:8392/
+              https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+              </path>
+              <held>
+              https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+              <state>
+              {"id":5078425780,"node_id":"PR_kwDOVM7WJc8AAAABLrKgtA","number":1781,"state":"open","locked":false,"title":"Bump left-pad from 1.0.8 to 1.0.9 (1029-221447)","body":"Bumps left-pad from 1.0.8 to 1.0.9. Opened by a Dependabot stand-in (exhibits/dependabot-sim).","milestone":null,"active_lock_reason":null,"created_at":"2026-10-30T02:14:50Z","updated_at":"2026-10-30T02:14:51Z","closed_at":null,"merged_at":null,"merge_commit_sha":"a186ba848b6cbf99cc3cebb76d9a009c69056495","assignee":null,"assignees":[],"requested_reviewers":[],"requested_teams":[],"head":{"label":"JogoShugh:deps/left-pad-1.0.9-1029-221447","ref":"deps/left-pad-1.0.9-1029-221447","sha":"312a2bc7d98d50344acb1bcd3dc52063f59db577"},"base":{"label":"JogoShugh:deps-main","ref":"deps-main","sha":"74d8c49e8a37b9c68cc1e9ebc7813f28a3520857"},"author_association":"OWNER","auto_merge":null,"draft":false,"merged":false,"mergeable":true,"rebaseable":true,"mergeable_state":"clean","merged_by":null,"comments":0,"review_comments":0,"maintainer_can_modify":false,"commits":1,"additions":1,"deletions":1,"changed_files":1,"hr:address":{"owner":"JogoShugh","repo":"heart-github-test","pull_number":"1781"}}
+              </state>
+              <embedded>
+              labels: dependencies
+              </embedded>
+              <forms>
+              github:close
+              github:comment
+              github:edit
+              github:label
+              github:merge
+              github:request-review
+              github:update-branch
+              </forms>
+              <links>
+              self
+              alternate "On GitHub"
+              github:issue "The pull request as an issue"
+              </links>
+              </held>
+              <answers>
+
+              </answers>
+  plan-nothink:
+    model: <model>
+    max_tokens: 1024
+    tools:
+      - name: move
+        description: 'Make the next move of the task: one act, back, wait, check, done, finish, stop or a question.'
+        input_schema:
+          type: object
+          properties:
+            why:
+              type: string
+              description: Why this move, in one sentence, from what is held and the step now.
+            move:
+              type: string
+              enum:
+                - act
+                - back
+                - wait
+                - check
+                - done
+                - finish
+                - stop
+                - clarify
+            words:
+              type: string
+            sentence:
+              type: integer
+            opens:
+              type: boolean
+            to:
+              type: string
+            relation:
+              type: string
+            facts:
+              type: object
+            question:
+              type: string
+          required:
+            - why
+            - move
+        cache_control:
+          type: ephemeral
+    tool_choice:
+      type: auto
+    system:
+      - type: text
+        text: |
+          You plan a task for a user against a hypermedia service, one move at a time. The service offers,
+          at each resource, the actions allowed now (forms) and its links. A separate step carries out each
+          act: it reads your words, chooses the form and fills its fields. You choose what to do next.
+          The user message has parts: <goal> is the task, numbered by sentence, each marked [done] or [ ];
+          <inputs> are values the user gave, by name; <moves> are the moves made so far; <path> is the
+          resources the run is in, the start first and the one held last; <held> is the resource held now:
+          its address, <state>, <embedded>, what it embeds by relation, each resource by name (a pull
+          request's labels), the <forms> it offers by name, and its <links>; <answers> are the user's
+          answers to your questions.
+          Call the move tool exactly once, with one of these moves:
+          - "act": words for one act at the resource held, as a person would ask it, with every value the
+            act needs (for example "comment on it: Fixed in 1.2 by #132."). Write a value that is one of the
+            inputs as $name, never its value. Give the number of the sentence it serves. Set opens to
+            true when you will make more moves at what the act leads to, or will come back here after it
+            (an act that makes a new resource, such as a comment, leads to that resource).
+          - "back": to a resource on the <path>, by its address, closing what was opened since.
+          - "wait": until the resource held offers a form, before acting on it. Give the form's exact name,
+            as in <forms> or as it will be named there, in relation (for example "github:merge").
+          - "check": facts the goal asks to make sure of, each a member of <state>, or a relation in
+            <embedded>, whose value is the names listed there, and the value it must have; a list as the
+            value holds when every name in it is there.
+          - "done": a sentence is fully done, by its number. Mark each sentence done once it is.
+          - "finish": every sentence is done.
+          - "stop": the goal can't be done here, saying why.
+          - "clarify": one short question for the user, when the goal and what is offered leave the next
+            move open, or a value is missing. Never guess.
+          Only act on forms in <forms>. Do each sentence once, in order where order matters.
+          A move in <moves> marked refused changed nothing: try another way. The start, first on <path>,
+          often offers forms that go straight to a resource by its names or numbers (a repository, a branch,
+          an issue): go back to it when the resource held doesn't lead where you need.
+          A goal in steps comes as <context>, the user's words around the steps; <steps>, the steps so far as
+          a tree: [done] ones, [in] the steps the one now is inside, and [now], with how many sub-steps come
+          after it; <now>, the step to do now; and <named>, resources earlier steps named, each at its
+          address. Do only the step now: for an intent, act (as many times as it
+          takes) and then "done"; for "Wait: …", one "wait"; for "Verify: …", one "check" of its facts. The
+          runner moves from step to step: in a goal in steps every act leads on to what it led to (opens
+          needn't be set), the step's sub-steps run where the run is when it is done, and after the step the
+          runner comes back to where it began by itself: never "finish" in a goal in steps. For a step with sub-steps, act only to
+          reach the resource its sub-steps start from (an act that opens), then "done": never do a sub-step's
+          work early, since each comes next as a step of its own. Each act in <moves> says what was done:
+          "acted" a form, or "followed" a link, and what came of it. A follow moves you and makes nothing:
+          from a list, follow on to the item you need (a branch, an issue), then act there. Say "done" only
+          once a move did the step's work, never because a follow came back done. "back" goes to a resource on <path> this
+          step opened, or to where it began, no further.
+        cache_control:
+          type: ephemeral
+    messages:
+      - role: user
+        content:
+          - type: text
+            text: |
+              <context>
+              Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed.
+              </context>
+              <steps>
+              [in] In {owner}/{repo}
+                [done] Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+                [in] Whenever a pull request labelled {label} changes `as pr`
+                  [done] If it's labelled {hold}, leave it, and say so once.
+                  [done] If it's labelled {told}, leave it.
+                  [now] Once it can be merged, merge it by squashing. (2 sub-steps after)
+              </steps>
+              <now>
+              Once it can be merged, merge it by squashing.
+              </now>
+              <named>
+              watch = https://localhost:8392/repos/JogoShugh/heart-github-test/issues/1783
+              pr = https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+              </named>
+              <inputs>
+              $owner = JogoShugh
+              $repo = heart-github-test
+              $label = dependencies
+              $hold = hold
+              $told = watch-told
+              </inputs>
+              <moves>
+
+              </moves>
+              <path>
+              https://localhost:8392/
+              https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+              </path>
+              <held>
+              https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+              <state>
+              {"id":5078425780,"node_id":"PR_kwDOVM7WJc8AAAABLrKgtA","number":1781,"state":"open","locked":false,"title":"Bump left-pad from 1.0.8 to 1.0.9 (1029-221447)","body":"Bumps left-pad from 1.0.8 to 1.0.9. Opened by a Dependabot stand-in (exhibits/dependabot-sim).","milestone":null,"active_lock_reason":null,"created_at":"2026-10-30T02:14:50Z","updated_at":"2026-10-30T02:14:51Z","closed_at":null,"merged_at":null,"merge_commit_sha":"a186ba848b6cbf99cc3cebb76d9a009c69056495","assignee":null,"assignees":[],"requested_reviewers":[],"requested_teams":[],"head":{"label":"JogoShugh:deps/left-pad-1.0.9-1029-221447","ref":"deps/left-pad-1.0.9-1029-221447","sha":"312a2bc7d98d50344acb1bcd3dc52063f59db577"},"base":{"label":"JogoShugh:deps-main","ref":"deps-main","sha":"74d8c49e8a37b9c68cc1e9ebc7813f28a3520857"},"author_association":"OWNER","auto_merge":null,"draft":false,"merged":false,"mergeable":true,"rebaseable":true,"mergeable_state":"clean","merged_by":null,"comments":0,"review_comments":0,"maintainer_can_modify":false,"commits":1,"additions":1,"deletions":1,"changed_files":1,"hr:address":{"owner":"JogoShugh","repo":"heart-github-test","pull_number":"1781"}}
+              </state>
+              <embedded>
+              labels: dependencies
+              </embedded>
+              <forms>
+              github:close
+              github:comment
+              github:edit
+              github:label
+              github:merge
+              github:request-review
+              github:update-branch
+              </forms>
+              <links>
+              self
+              alternate "On GitHub"
+              github:issue "The pull request as an issue"
+              </links>
+              </held>
+              <answers>
+
+              </answers>
+    thinking:
+      type: disabled
+  plan-budget:
+    model: <model>
+    max_tokens: 1024
+    tools:
+      - name: move
+        description: 'Make the next move of the task: one act, back, wait, check, done, finish, stop or a question.'
+        input_schema:
+          type: object
+          properties:
+            why:
+              type: string
+              description: Why this move, in one sentence, from what is held and the step now.
+            move:
+              type: string
+              enum:
+                - act
+                - back
+                - wait
+                - check
+                - done
+                - finish
+                - stop
+                - clarify
+            words:
+              type: string
+            sentence:
+              type: integer
+            opens:
+              type: boolean
+            to:
+              type: string
+            relation:
+              type: string
+            facts:
+              type: object
+            question:
+              type: string
+          required:
+            - why
+            - move
+        cache_control:
+          type: ephemeral
+    tool_choice:
+      type: auto
+    system:
+      - type: text
+        text: |
+          You plan a task for a user against a hypermedia service, one move at a time. The service offers,
+          at each resource, the actions allowed now (forms) and its links. A separate step carries out each
+          act: it reads your words, chooses the form and fills its fields. You choose what to do next.
+          The user message has parts: <goal> is the task, numbered by sentence, each marked [done] or [ ];
+          <inputs> are values the user gave, by name; <moves> are the moves made so far; <path> is the
+          resources the run is in, the start first and the one held last; <held> is the resource held now:
+          its address, <state>, <embedded>, what it embeds by relation, each resource by name (a pull
+          request's labels), the <forms> it offers by name, and its <links>; <answers> are the user's
+          answers to your questions.
+          Call the move tool exactly once, with one of these moves:
+          - "act": words for one act at the resource held, as a person would ask it, with every value the
+            act needs (for example "comment on it: Fixed in 1.2 by #132."). Write a value that is one of the
+            inputs as $name, never its value. Give the number of the sentence it serves. Set opens to
+            true when you will make more moves at what the act leads to, or will come back here after it
+            (an act that makes a new resource, such as a comment, leads to that resource).
+          - "back": to a resource on the <path>, by its address, closing what was opened since.
+          - "wait": until the resource held offers a form, before acting on it. Give the form's exact name,
+            as in <forms> or as it will be named there, in relation (for example "github:merge").
+          - "check": facts the goal asks to make sure of, each a member of <state>, or a relation in
+            <embedded>, whose value is the names listed there, and the value it must have; a list as the
+            value holds when every name in it is there.
+          - "done": a sentence is fully done, by its number. Mark each sentence done once it is.
+          - "finish": every sentence is done.
+          - "stop": the goal can't be done here, saying why.
+          - "clarify": one short question for the user, when the goal and what is offered leave the next
+            move open, or a value is missing. Never guess.
+          Only act on forms in <forms>. Do each sentence once, in order where order matters.
+          A move in <moves> marked refused changed nothing: try another way. The start, first on <path>,
+          often offers forms that go straight to a resource by its names or numbers (a repository, a branch,
+          an issue): go back to it when the resource held doesn't lead where you need.
+          A goal in steps comes as <context>, the user's words around the steps; <steps>, the steps so far as
+          a tree: [done] ones, [in] the steps the one now is inside, and [now], with how many sub-steps come
+          after it; <now>, the step to do now; and <named>, resources earlier steps named, each at its
+          address. Do only the step now: for an intent, act (as many times as it
+          takes) and then "done"; for "Wait: …", one "wait"; for "Verify: …", one "check" of its facts. The
+          runner moves from step to step: in a goal in steps every act leads on to what it led to (opens
+          needn't be set), the step's sub-steps run where the run is when it is done, and after the step the
+          runner comes back to where it began by itself: never "finish" in a goal in steps. For a step with sub-steps, act only to
+          reach the resource its sub-steps start from (an act that opens), then "done": never do a sub-step's
+          work early, since each comes next as a step of its own. Each act in <moves> says what was done:
+          "acted" a form, or "followed" a link, and what came of it. A follow moves you and makes nothing:
+          from a list, follow on to the item you need (a branch, an issue), then act there. Say "done" only
+          once a move did the step's work, never because a follow came back done. "back" goes to a resource on <path> this
+          step opened, or to where it began, no further.
+        cache_control:
+          type: ephemeral
+    messages:
+      - role: user
+        content:
+          - type: text
+            text: |
+              <context>
+              Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed.
+              </context>
+              <steps>
+              [in] In {owner}/{repo}
+                [done] Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+                [in] Whenever a pull request labelled {label} changes `as pr`
+                  [done] If it's labelled {hold}, leave it, and say so once.
+                  [done] If it's labelled {told}, leave it.
+                  [now] Once it can be merged, merge it by squashing. (2 sub-steps after)
+              </steps>
+              <now>
+              Once it can be merged, merge it by squashing.
+              </now>
+              <named>
+              watch = https://localhost:8392/repos/JogoShugh/heart-github-test/issues/1783
+              pr = https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+              </named>
+              <inputs>
+              $owner = JogoShugh
+              $repo = heart-github-test
+              $label = dependencies
+              $hold = hold
+              $told = watch-told
+              </inputs>
+              <moves>
+
+              </moves>
+              <path>
+              https://localhost:8392/
+              https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+              </path>
+              <held>
+              https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+              <state>
+              {"id":5078425780,"node_id":"PR_kwDOVM7WJc8AAAABLrKgtA","number":1781,"state":"open","locked":false,"title":"Bump left-pad from 1.0.8 to 1.0.9 (1029-221447)","body":"Bumps left-pad from 1.0.8 to 1.0.9. Opened by a Dependabot stand-in (exhibits/dependabot-sim).","milestone":null,"active_lock_reason":null,"created_at":"2026-10-30T02:14:50Z","updated_at":"2026-10-30T02:14:51Z","closed_at":null,"merged_at":null,"merge_commit_sha":"a186ba848b6cbf99cc3cebb76d9a009c69056495","assignee":null,"assignees":[],"requested_reviewers":[],"requested_teams":[],"head":{"label":"JogoShugh:deps/left-pad-1.0.9-1029-221447","ref":"deps/left-pad-1.0.9-1029-221447","sha":"312a2bc7d98d50344acb1bcd3dc52063f59db577"},"base":{"label":"JogoShugh:deps-main","ref":"deps-main","sha":"74d8c49e8a37b9c68cc1e9ebc7813f28a3520857"},"author_association":"OWNER","auto_merge":null,"draft":false,"merged":false,"mergeable":true,"rebaseable":true,"mergeable_state":"clean","merged_by":null,"comments":0,"review_comments":0,"maintainer_can_modify":false,"commits":1,"additions":1,"deletions":1,"changed_files":1,"hr:address":{"owner":"JogoShugh","repo":"heart-github-test","pull_number":"1781"}}
+              </state>
+              <embedded>
+              labels: dependencies
+              </embedded>
+              <forms>
+              github:close
+              github:comment
+              github:edit
+              github:label
+              github:merge
+              github:request-review
+              github:update-branch
+              </forms>
+              <links>
+              self
+              alternate "On GitHub"
+              github:issue "The pull request as an issue"
+              </links>
+              </held>
+              <answers>
+
+              </answers>
+    thinking:
+      type: enabled
+      budget_tokens: 300
+answers:
+  - model: qwen3:30b-a3b
+    turn: repo
+    status: 200
+    wall_s: 34.0
+    body:
+      id: msg_680dd7b8369b890ec8306f1b
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b
+      content:
+        - type: thinking
+          thinking: "Okay, let's see. The user wants to get the repository \"JogoShugh/heart-github-test\". Looking at the offers, I need to find an action that can retrieve a repository.\n\nFirst, check the available actions. There's \"github:repos-get\" which requires owner and repo. The owner would be \"JogoShugh\" and the repo \"heart-github-test\". The schema for repos-get has required fields owner and repo, which match the user's intent.\n\nWait, the user's intent says \"get repository JogoShugh/heart-github-test\". So owner is JogoShugh, repo is heart-github-test. The action github:repos-get needs those two fields. The other actions like issues-list or pulls-list don't seem relevant here. The links are empty, so no need to follow anything. \n\nCheck if all required fields are present. The user provided both owner and repo in the intent. So the act action should be used with owner: \"JogoShugh\", repo: \"heart-github-test\". The schema requires those, and the user provided them. So the correct action is to use \"act\" with those fields.\n"
+        - type: tool_use
+          id: call_bgxs70lt
+          name: select
+          input:
+            fields:
+              owner: JogoShugh
+              repo: heart-github-test
+            action: act
+            affordance: github:repos-get
+      stop_reason: tool_use
+      usage:
+        input_tokens: 4762
+        cache_read_input_tokens: 0
+        output_tokens: 296
+  - model: qwen3:30b-a3b
+    turn: merge
+    status: 200
+    wall_s: 6.0
+    body:
+      id: msg_5bc82b64703185e8edfbfcd2
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b
+      content:
+        - type: thinking
+          thinking: |
+            Okay, let's see. The user wants to merge the pull request by squashing. Looking at the offers, there's a github:merge action. The schema for merge includes a merge_method which can be 'merge', 'squash', or 'rebase'. The user specified "squashing", so the merge_method should be "squash".
+
+            I need to check if the required fields are present. The schema for merge has optional fields: commit_message, commit_title, merge_method. The user didn't mention commit message or title, so those can be omitted. The key part is setting merge_method to "squash".
+
+            The offers include github:merge, so the correct action is to use "act" with the merge_method set to "squash". Let me confirm: the user's intent is to merge by squashing, so the action is github:merge with merge_method: "squash". The other fields are optional, so they don't need to be included. Looks like this matches exactly.
+        - type: tool_use
+          id: call_sm6wh7hg
+          name: select
+          input:
+            action: act
+            affordance: github:merge
+            fields:
+              merge_method: squash
+      stop_reason: tool_use
+      usage:
+        input_tokens: 1747
+        cache_read_input_tokens: 598
+        output_tokens: 248
+  - model: qwen3:30b-a3b
+    turn: comment
+    status: 200
+    wall_s: 8.0
+    body:
+      id: msg_3c8105cd0c9e813583921f01
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b
+      content:
+        - type: thinking
+          thinking: |
+            Okay, let's break this down. The user wants to tell the author why the pull request wasn't merged and what to do next. The intent says the wait gave up, and the server's reason is that a draft can't be merged; they need to mark it ready for review first.
+
+            Looking at the state, the PR is a draft (draft: true). The offers include actions like github:edit, github:comment, etc. The user needs to communicate the reason to the author. The best action here would be to add a comment explaining the issue. The github:comment action requires a body. The intent specifies a one friendly sentence. So I need to craft a comment body that's one sentence, friendly, stating it's a draft so can't be merged, and to mark it ready.
+
+            Check the schema for github:comment: it needs a body (string). The user's intent says "one friendly sentence", so the body should be exactly that. The example in the intent says "A draft can't be merged; mark it ready for review first." So the comment should be something like "This is a draft PR and can't be merged. Please mark it as ready for review to proceed!" but need to make it one sentence, friendly.
+
+            Wait, the server's reason is "A draft can't be merged; mark it ready for review first." So the comment should mirror that. Let's make it friendly: "Since this is a draft PR, it can't be merged yet. Please mark it as ready for review to proceed!" That's one sentence.
+
+            So the action is github:comment with body as that sentence. Check if all required fields are present. The schema for comment requires "body", which we have. The intent gives the exact message to use, so no need to clarify. No other actions fit better. So the correct tool call is to "act" with github:comment and the body.
+        - type: tool_use
+          id: call_fyt5ruoq
+          name: select
+          input:
+            action: act
+            affordance: github:comment
+            fields:
+              body: This is a draft PR and can't be merged yet. Please mark it as ready for review to proceed!
+      stop_reason: tool_use
+      usage:
+        input_tokens: 1729
+        cache_read_input_tokens: 606
+        output_tokens: 456
+  - model: qwen3:30b-a3b
+    turn: plan
+    status: 200
+    wall_s: 17.0
+    body:
+      id: msg_8d8e7fa59d01ee76344ebc48
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b
+      content:
+        - type: thinking
+          thinking: |-
+            Okay, let's see. The user wants to merge a pull request once it can be merged by squashing. The current resource is the pull request at https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781. The state shows it's open, mergeable, and has the label 'dependencies'.
+
+            Looking at the <forms> available, there's 'github:merge' which is the form needed to merge. The step says to merge by squashing, so I need to use the merge form. The merge form probably requires selecting a merge method, like squash. But the form's exact parameters aren't specified here. However, the task says "merge it by squashing," so the form should have an option for that.
+
+            The current held resource is the PR, and the forms include 'github:merge'. So the next move should be to act using that form. The user input mentions $label, $hold, etc., but for merging, the necessary form is 'github:merge'. The 'opens' should be true because merging will create a new state (merged PR), so the next step might be to check if it's merged.
+
+            Wait, the step is "Once it can be merged, merge it by squashing." So the action here is to merge. The form 'github:merge' is available. So the act should be "merge it by squashing" using that form. The 'opens' flag should be set to true because merging leads to a new resource (the merged PR).
+
+            I need to specify the words as "merge it by squashing" and set opens to true. The sentence number is 2 (since the step is the second in the goal, but the steps are numbered in the goal. Wait, the goal has two sub-steps after, but the current step is "Once it can be merged, merge it by squashing." So the sentence number here is 2? Wait, the <steps> show [now] as the current step, which is sentence 2 in the goal. Wait, the steps are:
+
+            [done] Open an issue titled... (1)
+            [done] Whenever a PR labeled... (2)
+              [done] If labeled hold... (2.1)
+              [done] If labeled told... (2.2)
+              [now] Once it can be merged... (2.3)
+
+            So the current step is 2.3, so the sentence number is 2? Or does it count as the third step? Wait, the <now> says "Once it can be merged, merge it by squashing." which is the third bullet point in the steps. But the numbering in the steps might be based on the order. The user's step is the third one, but the sentence numbers in the inputs might be per the goal's sentences.
+
+            Wait, the <steps> are structured as a tree. The current step is the one labeled [now], which is the third sub-step under "Whenever a pull request...", so the sentence number for the current step is 3. But the user's input says "the goal, numbered by sentence, each marked [done] or [ ]". The goal's sentences are:
+
+            1. Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+            2. Whenever a pull request labelled {label} changes `as pr`
+               2.1 If it's labelled {hold}, leave it, and say so once.
+               2.2 If it's labelled {told}, leave it.
+               2.3 Once it can be merged, merge it by squashing. (2 sub-steps after)
+
+            So the current step is 2.3, which is the third sentence. But the sentence number to reference is 2.3? Wait, the instructions say "the number of the sentence it serves". The user's step is labeled as [now], and the sentence is "Once it can be merged, merge it by squashing." So the sentence number here is 3 (if starting count from 1), but the steps are structured as 1, 2, 2.1, 2.2, 2.3. However, the problem states that the goal is numbered by sentence. So the main sentences are 1, 2, and 3. Wait, the <steps> show:
+
+            [in] In {owner}/{repo}
+              [done] Open an issue titled... (sentence 1)
+              [in] Whenever a PR... (sentence 2)
+                [done] If hold... (sub-step 2.1)
+                [done] If told... (sub-step 2.2)
+                [now] Once it can be merged... (sub-step 2.3)
+
+            So the current step is the third sentence in the goal (sentence 3), but since it's a sub-step of 2,
+      stop_reason: max_tokens
+      usage:
+        input_tokens: 2148
+        cache_read_input_tokens: 4
+        output_tokens: 1024
+  - model: gpt-oss:20b
+    turn: repo
+    status: 200
+    wall_s: 29.0
+    body:
+      id: msg_21a5f7bff9e2ff65338f7dc3
+      type: message
+      role: assistant
+      model: gpt-oss:20b
+      content:
+        - type: thinking
+          thinking: |+
+            We have user intent: get repository JogoShugh/heart-github-test. The offers include "github:repos-get" which retrieves a repository. Required fields: owner and repo. Owner: JogoShugh. Repo: heart-github-test. The user didn't specify state, so we can directly act.
+
+            We need to produce a "act" with action "github:repos-get" and fields owner: "JogoShugh", repo: "heart-github-test".
+
+            We don't need to ask for anything else.
+
+            Thus output a call to the select function with action "act", action name "github:repos-get", fields accordingly.
+
+            Check the format: we need to call select with parameters: action: string, affordance: string? Wait the function signature:
+
+            type select = (_: {
+              action: string,
+              affordance: string,
+              fields: Record<string, any>,
+              question: string,
+              rel: string,
+              title: string,
+            }) => any;
+
+            We need to provide all these fields. In previous interactions, we usually provide the affordance? I'm not entirely sure what the "affordance" is. The "action" is the action name. The "affordance" might be the title or description? Probably the same as the title? Let's examine prior usage. In instructions, they say: "Call the select tool exactly once." They didn't specify what to put in each field. The example likely expects us to supply "action" and "fields". The other fields maybe optional. But we need to provide something. In prior knowledge, "affordance" likely refers to the action's affordance, maybe the title? The "title" field maybe the title? The "rel" maybe a relation? But since there are no links, maybe we don't need "rel". Could set empty strings.
+
+            We can set: action: "github:repos-get", affordance: "Get a repository", fields: {owner: "JogoShugh", repo: "heart-github-test"}, question: "", rel: "", title: "Get a repository".
+
+            But maybe better to use title from the offer: "Get a repository". So "title": "Get a repository".
+
+            We should also provide "affordance": same? Might be "github:repos-get". But I'm not sure. The instruction says the function has fields: action, affordance, fields, question, rel, title. We can guess. Probably "affordance" is the action's name. Let's set it as "github:repos-get". The "title" is "Get a repository". "rel" might be empty string.
+
+            Thus we call select with those values.
+
+        - type: tool_use
+          id: call_yk6wp07p
+          name: select
+          input:
+            action: github:repos-get
+            affordance: github:repos-get
+            fields:
+              owner: JogoShugh
+              repo: heart-github-test
+            question: ""
+            rel: ""
+            title: Get a repository
+      stop_reason: tool_use
+      usage:
+        input_tokens: 4548
+        cache_read_input_tokens: 0
+        output_tokens: 611
+  - model: gpt-oss:20b
+    turn: merge
+    status: 200
+    wall_s: 4.0
+    body:
+      id: msg_aea9931f550779082b5a0afa
+      type: message
+      role: assistant
+      model: gpt-oss:20b
+      content:
+        - type: thinking
+          thinking: |+
+            We have a PR open, the user wants to merge by squashing. We need to call action "github:merge" with merge_method "squash". The optional commit_title/commit_message we can omit or provide none. We need to supply JSON fields for action. The schema says optional: commit_message, commit_title, merge_method. We must provide merge_method. We'll use "squash". No other fields required. Let's produce.
+
+        - type: tool_use
+          id: call_u4mg5kf6
+          name: select
+          input:
+            action: github:merge
+            affordance: Merge
+            fields:
+              merge_method: squash
+            question: ""
+            rel: ""
+            title: Merge
+      stop_reason: tool_use
+      usage:
+        input_tokens: 2218
+        cache_read_input_tokens: 0
+        output_tokens: 140
+  - model: gpt-oss:20b
+    turn: comment
+    status: 200
+    wall_s: 7.0
+    body:
+      id: msg_c33e7ecbe43ece7cca4d498d
+      type: message
+      role: assistant
+      model: gpt-oss:20b
+      content:
+        - type: thinking
+          thinking: |-
+            We need to match intent: "tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first."
+
+            So we need to comment. The action "github:comment" is available. We need to provide body: one friendly sentence explaining reason and next steps: e.g., "Hey @JogoShugh, your PR is still a draft, so it can't be merged yet—please mark it as ready for review to proceed."
+
+            We need to fill "body". Ensure it's one friendly sentence. Maybe "Hi @JogoShugh, this pull request is still a draft and can't be merged; please mark it ready for review so it can be processed." That's one sentence.
+
+            We need to mention "mark it ready for review" as next step. That's fine.
+
+            Thus we perform action "act" with action "github:comment". Provide body.
+        - type: tool_use
+          id: call_3q3qayk9
+          name: select
+          input:
+            action: github:comment
+            affordance: Comment
+            fields:
+              body: Hi @JogoShugh, this pull request is still a draft and can't be merged; please mark it ready for review so it can be processed.
+            question: ""
+            rel: ""
+            title: ""
+      stop_reason: tool_use
+      usage:
+        input_tokens: 2197
+        cache_read_input_tokens: 0
+        output_tokens: 274
+  - model: gpt-oss:20b
+    turn: plan
+    status: 200
+    wall_s: 11.0
+    body:
+      id: msg_d46839771b7842ee1d1f017e
+      type: message
+      role: assistant
+      model: gpt-oss:20b
+      content:
+        - type: thinking
+          thinking: |-
+            We need to finish step: Once it can be merged, merge it by squashing. The pull request is currently mergeable, state shows mergeable: true, mergeable_state: clean. We have forms including github:merge. Need to act with merge form, specifying squash strategy. Usually the form requires parameter merge_method: squash. The user inputs include label values but not merge method. We'll produce act: "github:merge" with merge_method=squash, maybe title? Actually we can say: "github:merge: squash". The sentence number? We need the number of the sentence it's serving. The step is the one that merges once can be merged. Which sentence number? In steps, there were two sub-steps after "Once it can be merged, merge it by squashing." But the step itself likely is sentence 3? Let's count: The steps list includes:
+            [done] Open an issue titled "Merge watch"... (1)
+            [done] If it's labelled hold... (2)
+            [done] If it's labelled told... (3)
+            [now] Once it can be merged, merge it by squashing. (4)
+
+            So sentence number 4. We'll use that. The act words should be "squash merge". We should include the form name "github:merge" and the value "squash". Provide as words: "merge: squash". Let's format: "github:merge squash". But the spec says: "Write a value that is one of the inputs as $name, never its value." Here we don't have an input for merge_method. But maybe we can supply a literal? The requirement: write a value that is one of the inputs as $name. If none, we can just supply the string? Maybe just "github:merge squash". That uses form name then argument.
+
+            Also need opens: true if we will make more moves at what the act leads to, or come back. Merge leads to the pull request resource itself? Actually merge action will change state to merged. The next steps? None. We just want to finish this sub-step. No further moves needed after merging. So opens can be false. Let's set opens: false.
+
+            We need sentence number 4. Provide words: "squash" as merge_method. The move: act.
+
+            We'll call move.
+        - type: tool_use
+          id: call_ya5xhita
+          name: move
+          input:
+            facts: {}
+            move: act
+            opens: false
+            question: ""
+            relation: ""
+            sentence: 4
+            to: ""
+            why: Merge the pull request by squashing as per the step requirement.
+            words: github:merge squash
+      stop_reason: tool_use
+      usage:
+        input_tokens: 2026
+        cache_read_input_tokens: 0
+        output_tokens: 540
+  - model: gpt-oss:20b
+    turn: plan-4k
+    status: 200
+    wall_s: 54.0
+    body:
+      id: msg_e9aa4a740c9461dd1e543be8
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b
+      content:
+        - type: thinking
+          thinking: |
+            Okay, let's see. The user's task is to merge a pull request by squashing once it can be merged. The current resource is the pull request at https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781. The goal is to merge it, so I need to find the right form to do that.
+
+            Looking at the <forms> section, there's a "github:merge" form. That's probably the one to use. The pull request is in a state where it's mergeable ("mergeable": true, "mergeable_state": "clean"), so the merge form should be available.
+
+            The step says "merge it by squashing," so the merge method needs to be set to squash. But the form might require specifying the method. Wait, the form's parameters aren't listed here, but the user's input mentions "squashing," so I need to make sure the merge action uses that method.
+
+            The form name is "github:merge," so the act should be "merge: squash" or something similar. But the instruction says to fill the form's fields. Since the exact fields aren't specified, maybe the form expects a "method" parameter. But the example given in the problem statement uses "comment on it: Fixed in 1.2 by #132." So maybe for merge, it's "merge: squash" as the words.
+
+            Wait, the form might have a field for the merge method. Since it's a squash merge, the words should indicate that. So the act would be "merge by squashing" or "squash merge".
+
+            The user's input says "merge it by squashing," so the correct action is to use the github:merge form with the squash method. But how to phrase it. The example uses "comment on it: ...", so maybe "merge: squash".
+
+            Check the <forms> again: "github:merge" is listed. So the move should be to act on that form with the necessary parameters. Since the user specified "squashing," the words should include "squash".
+
+            So the act would be "merge by squashing" or "squash merge". Let's go with "squash merge" as the words.
+
+            The sentence number is 2 (since the step is "Once it can be merged, merge it by squashing. (2 sub-steps after)", but the current step is the main step, so sentence number 2. Wait, the steps are numbered. The step "Once it can be merged..." is the current step, which is the one to do. The sentence number in the steps is probably 2, but the exact number might be given. Wait, the <steps> section says:
+
+            [done] If it's labelled {hold}, leave it, and say so once.
+            [done] If it's labelled {told}, leave it.
+            [now] Once it can be merged, merge it by squashing. (2 sub-steps after)
+
+            So the current step is the "now" step, which is sentence 2 (since the first two are done, and this is the now step). Wait, the steps are listed as [done] for the first two, then [now] for the third. But the numbering might be per the goal's sentences. The user's goal has three sentences: the first two are done, the third is the current step. So the current step's sentence number is 3? Wait, the problem says "each marked [done] or [ ]", so the current step is the third sentence, but the numbering in the steps might be 1,2,3. Wait, the steps are:
+
+            - [done] Open an issue... (sentence 1)
+            - [done] Whenever a pull request... (sentence 2)
+            - [done] If it's labelled... (sentence 3)
+            - [done] If it's labelled... (sentence 4)
+            - [now] Once it can be merged... (sentence 5)
+
+            Wait, maybe the steps are numbered as per the context. The context says "Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed." Then the steps are:
+
+            1. Open an issue titled "Merge watch"...
+            2. Whenever a pull request labelled {label} changes...
+               a. If it's labelled {hold}, leave it...
+               b. If it's labelled {told}, leave it...
+               c. Once it can be merged, merge it by squashing.
+
+            So the current step is step 2c, which is sentence 5? But the problem states that the step to do now is "Once it can be merged, merge it by squashing." So the sentence number for this step is 3 (since the first two steps are done, and this is the third). Wait, the steps are structured with [done] for the first two, then [now] for the third. So the sentence number is 3. But the user's input says "the current step is the one marked [now]".
+
+            In the <steps> section, the current step is "Once it can be merged, merge it by squashing. (2 sub-steps after)", so the sentence number to mark as done is 3. But the move should specify the sentence number. Wait, the problem says "Set opens to true when you will make more moves at what the act leads to, or will come back here after it". Since merging a pull request will create a new state (merged), but the step is to merge it, so after merging, the PR will be closed, and the step is done. So the "opens" should be false because we don't need to make more moves here; the merge action completes the step.
+
+            Wait, but the step says "merge it by squashing", so the act of merging is the step. Once merged, the step is done. So the "act" should be the merge with squash, then mark the step as done.
+
+            So the correct move is to use "act" with the words "merge by squashing" and sentence number 3 (since it's the current step, which is the third sentence in the goal's steps). Wait, the goal's sentences are:
+
+            1. Merge dependency bumps once they can be merged.
+            2. Keep watching until the watch's issue is closed.
+
+            But the steps are structured differently. The user's context has the goal as two sentences, but the steps are broken down into sub-steps. The actual step to do now is the third bullet point in the steps, which is the current step. But the problem says "each sentence" in the goal. Wait, the goal is:
+
+            "Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed."
+
+            So two sentences. But the steps are more detailed. However, the problem states "each marked [done] or [ ]", so the current step is the one marked [now], which is the third step in the steps list. But the sentence numbers might correspond to the goal's sentences. Wait, the user's <steps> section lists the steps with [done] and [now], but the actual goal sentences are two. Maybe the numbering is per the steps' order.
+
+            But the instruction says "Give the number of the sentence it serves." So the current step is the third sentence in the steps? Wait, the problem says "numbered by sentence, each marked [done] or [ ]". So the goal is split into sentences, each with a number. The user's goal has two sentences, but the steps are structured as a tree. However, the current step is the one marked [now], which is the third item in the steps list. But the problem states "the step now" and the sentence number.
+
+            Looking at the <steps> provided:
+
+            [in] In {owner}/{repo}
+              [done] Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+              [in] Whenever a pull request labelled {label} changes `as pr`
+                [done] If it's labelled {hold}, leave it, and say so once.
+                [done] If it's labelled {told}, leave it.
+                [now] Once it can be merged, merge it by squashing. (2 sub-steps after)
+
+            So the step to do now is the [now] step, which is the 5th line in the steps. But how to number it. The problem says "numbered by sentence", so each step's sentence is numbered. The "Once it can be merged..." is the sentence to handle, so it's sentence 3 (since the first two are done, and this is the third sentence in the steps). Wait, but the problem might count the sentences as they appear in the goal. The goal has two sentences, but the steps are broken into more. However, the user's instruction says "each marked [done] or [ ]", so the steps are considered as the sentences. The current step is the one marked [now], so it's the third sentence (since two are done). So the sentence number is 3.
+
+            Therefore, the move should be "act" with the words "merge by squashing" and sentence 3. The form is "github:merge", so the act is "merge: squash" perhaps. But the exact wording needs to match the form's expected input. Since the example uses "comment on it: ...", maybe the words should be "merge by squashing" or "squash merge".
+
+            Also, the form's name is "github:merge", so the act is to use that form. The problem states "Only act on forms in <forms>." So "github:merge" is in the forms.
+
+            So the act would be "merge: squash", but to be precise, the words should be "squash merge". Let's go with "squash merge" as the words.
+
+            The opens parameter should be false because after merging, the PR will be closed, and we don't need to make more moves here; the step is complete once merged.
+
+            So the move is:
+
+            act: words="squash merge", sentence=3, opens=false.
+
+            Wait, but the example in the problem statement says "comment on it: Fixed in 1.2 by #132." So the words should be a statement like "merge by squashing".
+
+            Alternatively, the form might require specifying the method, so "merge with squash method".
+
+            But since the exact fields aren't known, the safest is to follow the example and say "squash merge".
+
+            So the move would be:
+
+            act: words="squash merge", sentence=3.
+
+            Now, check if the form "github:merge" exists, which it does. The PR is mergeable, so this form should be available.
+
+            Therefore, the correct move is to use the "act" with "squash merge" as the words, sentence 3.
+        - type: tool_use
+          id: call_py9fgu1x
+          name: move
+          input:
+            sentence: 3
+            opens: false
+            move: act
+            words: squash merge
+      stop_reason: tool_use
+      usage:
+        input_tokens: 2152
+        cache_read_input_tokens: 0
+        output_tokens: 2320
+  - model: qwen3:30b-a3b-instruct-2507-q4_K_M
+    turn: repo
+    status: 200
+    wall_s: 32.0
+    body:
+      id: msg_b87024c9a3afa3cec8e8f233
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b-instruct-2507-q4_K_M
+      content:
+        - type: tool_use
+          id: t3ifVpSRUzqT7PaqLG9ZBruAVavIx7YS
+          name: select
+          input:
+            action: act
+            affordance: github:repos-get
+            fields:
+              owner: JogoShugh
+              repo: heart-github-test
+      stop_reason: tool_use
+      usage:
+        input_tokens: 4798
+        cache_read_input_tokens: 0
+        output_tokens: 52
+  - model: qwen3:30b-a3b-instruct-2507-q4_K_M
+    turn: merge
+    status: 200
+    wall_s: 3.0
+    body:
+      id: msg_633f07927ee53ec90b4c8197
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b-instruct-2507-q4_K_M
+      content:
+        - type: tool_use
+          id: oLIhrhdrm6QEWNHA4Jm6bQlenCOlLhTA
+          name: select
+          input:
+            action: act
+            affordance: github:merge
+            fields:
+              merge_method: squash
+      stop_reason: tool_use
+      usage:
+        input_tokens: 1745
+        cache_read_input_tokens: 636
+        output_tokens: 41
+  - model: qwen3:30b-a3b-instruct-2507-q4_K_M
+    turn: comment
+    status: 200
+    wall_s: 3.0
+    body:
+      id: msg_e6ab2fb4692ba2d0ec04b7eb
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b-instruct-2507-q4_K_M
+      content:
+        - type: tool_use
+          id: weF71tWN30jmxBC93096VsLN53jZewr2
+          name: select
+          input:
+            action: act
+            affordance: github:comment
+            fields:
+              body: This pull request is a draft and can't be merged yet. To proceed, please mark it as 'ready for review' so it can be evaluated and merged. Thanks!
+      stop_reason: tool_use
+      usage:
+        input_tokens: 1727
+        cache_read_input_tokens: 644
+        output_tokens: 73
+  - model: qwen3:30b-a3b-instruct-2507-q4_K_M
+    turn: plan
+    status: 200
+    wall_s: 4.0
+    body:
+      id: msg_cbd3d0f502e5cdaab18fcb01
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b-instruct-2507-q4_K_M
+      content:
+        - type: tool_use
+          id: hUkIYQb6K223oLlKHGxYuiByGXhE3xQX
+          name: move
+          input:
+            why: The pull request is open, mergeable, and has the 'dependencies' label, so it can be merged by squashing.
+            move: act
+            words: merge it by squashing
+            sentence: 1
+            opens: true
+            to: https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+            relation: github:merge
+      stop_reason: tool_use
+      usage:
+        input_tokens: 2200
+        cache_read_input_tokens: 4
+        output_tokens: 108
+  - model: qwen3:30b-a3b-instruct-2507-q4_K_M
+    turn: plan-4k
+    status: 200
+    wall_s: 63.0
+    body:
+      id: msg_42fead3e925a438811f5b32c
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b
+      content:
+        - type: thinking
+          thinking: |
+            Okay, let's see. The user's goal is to merge a pull request by squashing once it can be merged. The current step is "Once it can be merged, merge it by squashing." The resource held is the pull request at https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781.
+
+            Looking at the <held> information, the pull request's state is "open", and it's mergeable (mergeable_state: "clean"). The forms available include "github:merge", which is the one needed to merge. The user wants to merge by squashing, so the merge method should be specified as squash.
+
+            Wait, the form might require specifying the merge method. The available forms are listed as "github:merge", so I need to check if the form for merging with squash is part of that. The problem says "merge it by squashing," so the act should be to use the merge form with squash.
+
+            The <forms> section lists "github:merge" as an available form. So the next move should be to act using that form. The words would need to specify the merge method. Since it's a squash merge, the form might require a parameter for that. But the user's input doesn't specify any other parameters, so maybe the form accepts "squash" as the method.
+
+            The move should be "act" with the words "merge by squashing" or similar. The sentence number for this step is 2 (since the step is the second one in the steps list, as per the steps structure). Wait, the steps have [now] as the current step, which is the second sub-step. Wait, the steps are:
+
+            - [done] Open an issue titled "Merge watch", ... as watch
+            - [in] Whenever a pull request labelled {label} changes as pr
+              - [done] If it's labelled {hold}, leave it...
+              - [done] If it's labelled {told}, leave it.
+              - [now] Once it can be merged, merge it by squashing. (2 sub-steps after)
+
+            So the current step is the "Once it can be merged..." step, which is the third sub-step under the "Whenever..." step. The sentence number here would be 3? Wait, the steps are numbered in the steps list. Let me check.
+
+            In the steps, the current step is listed as [now] "Once it can be merged, merge it by squashing. (2 sub-steps after)". So this is the step to do now, and it's the third step in the sequence under the "Whenever..." block. But the actual sentence number in the goal is probably 2, since the first two steps are done. Wait, the user's steps are structured with [done] and [now], but the actual sentence numbers in the goal would be the order. The goal's context says "Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed." Then the steps are listed with numbered sentences.
+
+            Wait, the user's input has <steps> with [in] ... [now] the current step. The task is to perform the "Once it can be merged..." step. The sentence number for this step should be the one that's currently active. Since the previous steps (the ones marked [done]) are already completed, the current step is the next one. The step says "(2 sub-steps after)", but the actual move here is to merge, which is a single act.
+
+            The form "github:merge" is available. So the correct move is to act using "github:merge" with the merge method set to squash. The user needs to specify "squash" as the method. But how is that done in the form? Maybe the form requires a parameter like "merge_method": "squash". But the instructions say to write the words as a person would ask it, e.g., "comment on it: Fixed in 1.2 by #132."
+
+            So for merging by squashing, the words would be "merge by squashing" or "squash merge". The form might accept that. Since the step says "merge it by squashing", the action should be to merge with squash.
+
+            The <state> shows that the PR is already mergeable (mergeable_state: "clean"), so no need to wait or check anything else. The next move is to use the github:merge form.
+
+            So the correct move is "act" with words "merge by squashing", sentence number 3 (since it's the third step in the goal's steps, but the steps list shows the current step as the one with [now], which is the third sub-step). Wait, the steps are structured as:
+
+            - [done] Open an issue... (sentence 1)
+            - [in] Whenever... (sentence 2)
+              - [done] If it's labelled {hold}... (sub-step 2a)
+              - [done] If it's labelled {told}... (sub-step 2b)
+              - [now] Once it can be merged... (sub-step 2c)
+
+            So the current step (2c) is the third sentence in the overall goal. But the user's input has the <now> as "Once it can be merged...", so the sentence number is 3? Wait, the context mentions "Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed." Then the steps are:
+
+            1. Open an issue titled "Merge watch"...
+            2. Whenever a PR is labelled {label}, then:
+               a. If labelled {hold}, leave it.
+               b. If labelled {told}, leave it.
+               c. Once it can be merged, merge it by squashing.
+
+            So the current step is step 2c, which is the third step. Therefore, the sentence number is 3. But the actual step number in the steps list is 3, so the sentence number would be 3.
+
+            Wait, the user's input has "steps" as:
+
+            [in] In {owner}/{repo}
+              [done] Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+              [in] Whenever a pull request labelled {label} changes `as pr`
+                [done] If it's labelled {hold}, leave it, and say so once.
+                [done] If it's labelled {told}, leave it.
+                [now] Once it can be merged, merge it by squashing. (2 sub-steps after)
+
+            So the [now] step is the last one under the "Whenever..." step. The sentence number for this step is 3 (since the first two are done, this is the third part). Wait, but in the steps structure, each [done] and [now] are considered steps. So the first step is [done] Open an issue (sentence 1), then the next step is the [in] "Whenever...", which has sub-steps. The current [now] is the third step in the overall list. So the sentence number is 3.
+
+            But the user's instruction says "each sentence marked [done] or [ ]; <steps> are the steps so far as a tree: [done] ones, [in] the steps the one now is inside, and [now], with how many sub-steps come after it."
+
+            So the step to do now is the [now] step, which is the third in the sequence. Therefore, the sentence number for the act is 3.
+
+            So the move should be "act" with words "merge by squashing", sentence 3, and opens set to true because merging creates a new resource (the merged PR), so we need to open that.
+
+            Wait, the form "github:merge" when used should lead to the merged PR, so opens should be true. But the instructions say "Set opens to true when you will make more moves at what the act leads to, or will come back here after it." Since merging the PR leads to a new state (merged), but the step is just to merge it, and after merging, we might need to check something else, but the current step is done once merged. Wait, the step is "merge it by squashing," so once merged, the step is done. So after merging, the step is complete, so opens would be false? Or since merging leads to a new resource (the merged PR), but the step's work is done, so "done" should be called after the merge act.
+
+            Wait, the user's instruction says: "Call the move tool exactly once... Set opens to true when you will make more moves at what the act leads to, or will come back here after it."
+
+            In this case, merging the PR leads to the PR being merged, so the next step would be to check if the PR is merged, but the current step's work is just to merge it. So after the merge act, the step is done. Therefore, opens should be false, and then we call "done" for the sentence.
+
+            But according to the move structure, the act is the move, and after the act, if it leads to a new resource, you might need to do more, but in this case, the step is just to merge, so after the merge, the step is complete. So the act is the merge, and then "done" would be the next move. Wait, no: the act is the action, and the "done" is to mark the step as complete. Wait, the instructions say: "Mark each sentence done once it is." So the step is done when the act is performed. So after the act, we need to call "done" for that sentence.
+
+            Wait, no. The move "act" is the action, and then after the action is performed (as per the tool response), the next move would be to mark it as done. But the user's instructions say: "For a step with sub-steps, act only to reach the resource its sub-steps start from (an act that opens), then 'done'."
+
+            Wait, in this case, the step is "Once it can be merged, merge it by squashing." The act of merging is the step's work. So the move is to perform the merge (act), and then the step is done. So after the act, we should call "done" for the sentence.
+
+            But the user's tool calls allow only one move per step. The current step is the "Once it can be merged..." step, so the move should be the act to merge, and then after that, the step is done. However, the instruction says "Do each sentence once, in order where order matters." So for this step, the move is to act (the merge), and then in the next move, call "done" for the sentence.
+
+            But according to the tool's options, "done" is a move to mark a sentence as done. So the correct sequence would be:
+
+            1. Call "act" to merge the PR.
+            2. Then, when the merge is successful, call "done" for sentence 3.
+
+            But in the current context, the user is to make one move at a time. Since the current resource is the PR, and the form is available, the next move should be the "act" to merge. So the correct move now is to use "act" with the merge form.
+
+            The words for the act should specify "merge by squashing". The form name is "github:merge", so the act would be "merge by squashing".
+
+            The sentence number is 3 (as per the step's position in the goal).
+
+            So the move should be "act" with words "merge by squashing", sentence 3, opens: true (since merging leads to a new resource, the merged PR, but the step is done, so maybe opens should be false? Wait, opens is for when you will make more moves at what the act leads to. Since after merging, the PR is merged, and the next step would be to perhaps check if it's merged, but the current step is just to merge it. So after merging, the step is done, so opens would be false. Wait, the instruction says "opens to true when you will make more moves at what the act leads to, or will come back here after it."
+
+            Since the act leads to the merged PR, and the next step (if any) would be under the "Whenever..." step, but the current step is done once merged, so after merging, we don't need to stay here. So opens should be false.
+
+            Wait, but the act of merging creates a new state (the merged PR), but the step's work is done. So the "done" move should be called after the act. But the user can only make one move per turn. So the first move is the act, then the next move would be "done".
+
+            But in the current state, the user is to make the next move. So the next move is to perform the act (merge), and then after that, the next move would be "done". But since the user's current task is to make one move, the answer should be the "act" move.
+
+            Therefore, the correct tool call is to use "act" with the words "merge by squashing", sentence 3, and opens: false (since after merging, the step is done, no further moves needed here).
+
+            Wait, but the instruction says "Set opens to true when you will make more moves at what the act leads to, or will come back here after it." If merging leads to a new resource (the merged PR), but the step is done, then there's no need to stay there, so opens should be false. So opens: false.
+
+            So the arguments would be:
+
+            move: "act"
+
+            words: "merge by squashing"
+
+            sentence: 3
+
+            opens: false
+
+            Wait, but the step has "(2 sub-steps after)", but the current step is the merge, and the sub-steps might be for other things, but the current step is to merge, so the sub-steps might be for other parts of the process, but the user's current step is the merge. So the "merge by squashing" is the main action here.
+
+            I think the correct move is to act with "merge by squashing" using the github:merge form. The form name is "github:merge", so the words should be something like "merge by squashing" as the action.
+
+            So the JSON for the tool call should be:
+
+            {
+              "name": "move",
+              "arguments": {
+                "move": "act",
+                "words": "merge by squashing",
+                "sentence": 3,
+                "opens": false
+              }
+            }
+
+            Wait, but the "sentence" number. The steps list shows that the current step is the [now] step, which is the third step. The first step is [done] Open an issue, then the next step is the [in] Whenever..., and under that, the [now] is the third step. So the sentence number is 3.
+
+            Yes, so sentence: 3.
+
+            Therefore, the tool call should have sentence: 3.
+        - type: tool_use
+          id: call_ozcelhy3
+          name: move
+          input:
+            opens: false
+            move: act
+            words: merge by squashing
+            sentence: 3
+      stop_reason: tool_use
+      usage:
+        input_tokens: 2152
+        cache_read_input_tokens: 0
+        output_tokens: 3228
+  - model: qwen3:30b-a3b
+    turn: plan-nothink
+    status: 200
+    wall_s: 19.0
+    body:
+      id: msg_5e7ca16e8545c3ca0e6dcffd
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b
+      content:
+        - type: text
+          text: |-
+            Okay, let's see. The current step is "Once it can be merged, merge it by squashing." The held resource is the pull request #1781, which is open and mergeable (state shows mergeable: true). The goal is to merge it by squashing.
+
+            Looking at the forms available for this pull request, there's a "github:merge" form. Since the PR is mergeable, the next step should be to use that form. The user mentioned merging by squashing, so the merge method should be specified. The form likely requires selecting the merge method, like squash, merge commit, or rebase. Since the task says "merge by squashing," I need to make sure the form is filled with the squash option.
+
+            The forms listed include "github:merge," so I should act on that form. The words for the act should specify squashing. The input values don't include a merge method, so I'll have to use the correct parameter. The move should be an "act" with the form "github:merge" and the method set to squash. Wait, but the form might require a specific field. Let's check the form's expected parameters. Since it's a GitHub-like service, merging by squashing would typically involve selecting the squash option. So the act should be something like "merge by squashing: squash" or similar.
+
+            Wait, the user's instruction says "merge it by squashing," so the form needs to have the squash option selected. The form's name is "github:merge," so the act should be to use that form with the squash method. The exact wording might be "merge: squash" or similar. The form might have a field for merge method, so the value would be "squash."
+
+            So the move should be "act" with the words "merge by squashing: squash" and set opens to true because merging will lead to a new resource (the merged PR, which might have a different state). Wait, but after merging, the PR might close, so the next step would be to check if it's merged. But according to the steps, once merged, the step is done. However, the current step is to merge it, so the act should be the merge.
+
+            The current PR is open, mergeable, and the form "github:merge" is available. So the correct move is to use "github:merge" with the squash option. The user's inputs don't have a merge method, so I have to specify it in the act. So the words would be "merge: squash" or "merge by squashing: squash". Wait, the example given in the instructions was "comment on it: Fixed in 1.2 by #132." So maybe it's "merge: squash".
+
+            Wait, the exact wording for the form. Since the form is "github:merge", the parameters might be "merge_method" set to "squash". So the act should be "merge: squash". Let me confirm. The PR's state shows "mergeable": true, so merging is possible. The form "github:merge" should be the one to use.
+
+            Therefore, the correct move is to call "act" with the form "github:merge" and the words specifying the squash method. So "merge: squash" or "merge by squashing: squash". The example uses "comment on it: ...", so maybe "merge by squashing: squash" or just "squash merge".
+
+            Wait, the user says "merge it by squashing", so the action should be to merge with squash. So the words would be "merge by squashing: squash" or "squash merge". But the form might require a specific parameter. Since the form is named "github:merge", the act should fill in the necessary field. Let's assume the form expects a "merge_method" parameter with value "squash".
+
+            So the move would be "act" with words "merge method: squash" or similar. The exact wording might depend on the service's expected input, but based on the example, it's a natural language instruction. So "merge by squashing: squash" might be the way to go.
+
+            Wait, the example was "comment on it: Fixed in 1.2 by #132." So the structure is "action: value". So for merging, it would be "merge: squash".
+
+            Yes, that makes sense. So the words should be "merge: squash".
+
+            Also, since merging will create a new state (the PR is now merged), we need to set opens to true so that the next move can be made on the new resource (though the step is done after merging, so maybe "opens" is true to indicate we'll continue from there).
+
+            So the move is "act" with words "merge: squash", form "github:merge", and opens set to true.
+
+            Check the forms again: forms include "github:merge
+      stop_reason: max_tokens
+      usage:
+        input_tokens: 1
+        cache_read_input_tokens: 2151
+        output_tokens: 1024
+  - model: qwen3:30b-a3b
+    turn: plan-4k
+    status: 200
+    wall_s: 34.0
+    body:
+      id: msg_8dc00f0604140df71845b264
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b
+      content:
+        - type: thinking
+          thinking: |
+            Okay, let's break this down. The user wants to merge a pull request by squashing once it can be merged. The current resource is the PR at https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781. The PR is open, and the state shows it's mergeable (mergeable_state: "clean").
+
+            Looking at the forms available, there's a "github:merge" form. The step says to merge by squashing, so I need to use that form. The form probably requires specifying the merge method. Since the user says "merge it by squashing," the action should be to select the squash merge option.
+
+            I should check if the form "github:merge" allows specifying the method. The forms listed include "github:merge," so I'll use that. The words for the act should be something like "merge by squashing" with the necessary parameters. Since the goal specifies squashing, the form likely needs the method set to "squash." But I need to fill the form fields. The form might have a field for the merge method. So the act would be "merge: squash" or similar.
+
+            Wait, the instruction says to write the words as a person would ask, using input variables. The inputs here are $label, $hold, $told, but the merge method isn't an input here. So I just need to specify the merge method as "squash" in the form. So the act would be "merge by squashing" but the exact wording depends on the form's expected input.
+
+            Since the form is named "github:merge," the action should be to fill that form with the squash option. The user's step says "merge it by squashing," so the form's required field is probably the merge method. So the act would be "merge: squash" or "squash merge."
+
+            Looking at the available forms, "github:merge" is present. So the correct move is to use "act" with the words "merge by squashing" or "squash merge," and set opens to true because merging will create a new resource (the merged PR state).
+
+            Wait, the PR is currently open, merging it should close it, so the next resource would be the merged PR, but since the step is to merge it, the act should lead to the merged state. So opens should be true.
+
+            Check the forms again: the PR has "github:merge" as a form. So the correct action is to use that form with the squash method. The exact wording in the act should be "merge by squashing" or similar. The inputs don't include the merge method, so it's part of the action.
+
+            So the move would be "act" with the words "merge by squashing" (or "squash merge"), and opens: true. The sentence number is 2 (since the step is "Once it can be merged, merge it by squashing. (2 sub-steps after)" but the current step is "now" with the sentence being the one to do. Wait, the steps have "Now" as the step to do, which is "Once it can be merged, merge it by squashing." So the sentence number is 2 (since it's the second step in the steps list? Wait, the steps are structured with [done] and [now]. The current step is the "now" step, which is the third step in the list. But the step numbering might refer to the sentence number in the goal. The goal says "Once it can be merged, merge it by squashing. (2 sub-steps after)" so the sentence number is probably 2, but the exact numbering might be based on the context.
+
+            Wait, the inputs say "each marked [done] or [ ]" and the steps have [done] for previous steps. The current step is [now], so the sentence number to mark as done is 2 (since it's the second sub-step, but the step description says "2 sub-steps after," which might mean this step has two sub-steps, but the actual step here is the first of those two. Hmm, but the user's instruction says to mark each sentence done once it is. The current step is "Once it can be merged, merge it by squashing." So the sentence number is 2, perhaps. Wait, the steps are:
+
+            1. Open an issue titled "Merge watch"...
+            2. Whenever a pull request labelled {label} changes `as pr`
+               a. If it's labelled {hold}, leave it...
+               b. If it's labelled {told}, leave it.
+               c. Once it can be merged, merge it by squashing. (2 sub-steps after)
+
+            So the current step is step 2c, which is sentence number 2. But the step says "2 sub-steps after," so maybe the merge action is the first sub-step, and the second is something else. But the user's current task is to perform the merge, so the act is to merge by squashing.
+
+            Therefore, the move should be to use the "github:merge" form with the squash method. The words would be "merge by squashing" or "squash merge." The form likely requires specifying the method, so the act should include that.
+
+            So the correct move is "act" with words "merge by squashing" (or similar), opens true, and sentence 2 (since it's the second step in the goal's steps).
+
+            Wait, the step's number in the goal is the third bullet point, but the context says "2 sub-steps after" the previous steps. But the user's instruction says to set the sentence number to the one being done. The step now is the one marked [now], so the sentence number is 2 (assuming the steps are numbered as per the context). But looking at the provided steps:
+
+            [done] Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+            [in] Whenever a pull request labelled {label} changes `as pr`
+              [done] If it's labelled {hold}, leave it, and say so once.
+              [done] If it's labelled {told}, leave it.
+              [now] Once it can be merged, merge it by squashing. (2 sub-steps after)
+
+            So the [now] step is the third step under the [in] block. But the sentence number to refer to is the one that's currently being addressed. Since it's the [now] step, the sentence number is 2 (since the previous two steps are [done] and the current is the next one). Wait, the goal's steps are listed with numbers. The first step (sentence 1) is the issue creation. The second step (sentence 2) is the "Whenever a pull request..." block, but within that, the "Once it can be merged..." is the third point. However, the user's instruction says "each sentence" marked [done] or [ ]. The [now] step is the current sentence to do, so its number is 2 (assuming the first two steps are done, and this is the next one). But the actual numbering might be based on the context.
+
+            Wait, the context says "Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed." Then the steps are listed. The [now] step is "Once it can be merged, merge it by squashing." So in the goal's steps, this is the step to do now, so it's sentence number 2. The previous steps (opening the issue and the two checks) are done. So the sentence number for the current step is 2.
+
+            Therefore, the move should specify sentence 2. The act is to merge using the squash method. The form is "github:merge", so the words would be "merge by squashing" or "squash merge".
+
+            Checking the forms available, the PR has "github:merge" as a form. So the correct action is to use that form. The form likely has a parameter for the merge method, so the words should specify "squash".
+
+            Thus, the move is "act" with words "merge by squashing" (or "squash merge"), opens true, sentence 2.
+
+            Wait, the user's instruction says to write the value as a person would ask, e.g., "comment on it: Fixed in 1.2 by #132." So for merge, it might be "merge: squash" or "squash merge".
+
+            So the words would be "merge by squashing" or "squash merge".
+
+            Given that, the correct act is "merge by squashing" with opens true.
+
+            So the tool call should be:
+
+            {
+              "name": "move",
+              "arguments": {
+                "move": "act",
+                "words": "merge by squashing",
+                "opens": true,
+                "sentence": 2
+              }
+            }
+
+            Wait, the sentence number. The step is labeled [now], and the steps list has the current step as the third bullet point. But the user's instruction says "each sentence" in the goal. The goal's steps are written as sentences. The first sentence is the issue creation, second is the "Whenever..." block, third is the merge step. But since the [now] step is the third, but the sentence number might be 2 because the previous two steps are done. Wait, the steps are:
+
+            1. Open an issue...
+            2. Whenever a pull request... (this is the main step, with sub-steps)
+               a. If it's labelled {hold}...
+               b. If it's labelled {told}...
+               c. Once it can be merged...
+
+            So the current step is the third sub-step under the main step. But the numbering for sentence might be based on the main steps. The user's input says "the task, numbered by sentence, each marked [done] or [ ]". The main steps are numbered. The "Once it can be merged..." is sentence 2, perhaps. Wait, the steps are:
+
+            - [done] Open an issue... (sentence 1)
+            - [in] Whenever... (sentence 2, with sub-steps)
+              - [done] If it's labelled {hold}... (sub-step 2a)
+              - [done] If it's labelled {told}... (sub-step 2b)
+              - [now] Once it can be merged... (sub-step 2c)
+
+            So the current step is sub-step 2c, which is part of sentence 2. So the sentence number to reference is 2. Therefore, the 'sentence' argument should be 2.
+
+            Yes, so the sentence is 2.
+
+            Therefore, the correct move is to use "act" with words "merge by squashing", opens true, sentence 2.
+        - type: tool_use
+          id: call_52qtwpz5
+          name: move
+          input:
+            move: act
+            words: merge by squashing
+            opens: true
+            sentence: 2
+      stop_reason: tool_use
+      usage:
+        input_tokens: 1
+        cache_read_input_tokens: 2151
+        output_tokens: 2324
+  - model: qwen3:30b-a3b
+    turn: plan-budget
+    status: 200
+    wall_s: 21.0
+    body:
+      id: msg_f60f893f3b77772dbeef1129
+      type: message
+      role: assistant
+      model: qwen3:30b-a3b
+      content:
+        - type: thinking
+          thinking: |-
+            Okay, let's see. The task is to merge a pull request by squashing once it can be merged. The current resource is the pull request at https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781. The state shows it's open, mergeable, and has the label "dependencies".
+
+            The goal is to merge it by squashing. Looking at the forms available, there's "github:merge" which is probably the right form. The user needs to use that form. The instruction says "merge it by squashing," so the merge method should be squash. But the form might require specifying the method. Wait, the form might have parameters for merge method. The example in the problem statement mentions "squashing," so the act should include that.
+
+            The inputs don't mention a merge method, but the form might have a field for it. Since the user has to fill in the form, I need to specify the merge method as "squash" in the act. The form name is "github:merge", so the move should be an act with that form, and the words should say "merge by squashing" or specify the method.
+
+            Wait, the form might require the merge method. So the act would be something like "merge: squash". Let me check the possible forms. The forms listed are github:merge, so the act should use that. The user needs to provide the necessary fields. Since it's a squash merge, the form might need the method set to "squash". So the words for the act would be "squash merge" or "merge by squashing".
+
+            Looking at the example in the problem statement: "comment on it: Fixed in 1.2 by #132." So the format is "action: value". So here, it would be "merge: squash" or "squash merge".
+
+            The step says "merge it by squashing", so the act should be "squash merge". The form is github:merge, so the move is to act with that form, specifying the method as squash. The sentence number here is the current step, which is the "Once it can be merged..." step. The sentence number is 3 (since the steps are numbered, but the user's steps are listed with [now] being the third step). Wait, the steps are:
+
+            [done] Open an issue titled "Merge watch"...
+
+            [in] Whenever a pull request... [done] If it's labelled {hold}... [done] If it's labelled {told}... [now] Once it can be merged...
+
+            So the current step is the [now] one, which is the third sub-step. But the sentence number in the inputs might refer to the step number. The user message says "the number of the sentence it serves", so the current step is sentence 3 (if we count from 1). But looking at the steps:
+
+            The steps are:
+
+            1. Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch` (done)
+
+            2. Whenever a pull request labelled {label} changes `as pr` (in)
+
+               a. If it's labelled {hold}, leave it, and say so once. (done)
+
+               b. If it's labelled {told}, leave it. (done)
+
+               c. Once it can be merged, merge it by squashing. (now)
+
+            So the current step is sentence 3. So the sentence number is 3.
+
+            The held resource is the PR, which is mergeable (state says mergeable: true). So the correct action is to use the github:merge form with squash.
+
+            So the move should be "act" with the form "github:merge", and the words specifying to squash. The exact wording might need to be "squash merge" or "merge using squash". Since the example uses "comment on it: ...", here it's "merge: squash".
+
+            Wait, the form might require a parameter. Let's assume that the "github:merge" form has a field for the merge method, and the value should be "squash". So the words would be "merge: squash" or "merge method: squash".
+
+            But the user needs to fill the form's fields. Since the form's name is "github:merge", the act would be to submit that form with the merge method set to squash.
+
+            So the move is "act" with the words "merge by squashing" or "squash merge", and the sentence number 3.
+
+            Also, the "opens" should be true because merging a PR will create a new resource (the merged PR), so the next step would be there. But since the goal is to merge it, once merged, the step is done. Wait, the step says "Once it can be merged, merge it by squashing." So after merging, the PR is merged, and the
+      stop_reason: max_tokens
+      usage:
+        input_tokens: 1
+        cache_read_input_tokens: 2151
+        output_tokens: 1024

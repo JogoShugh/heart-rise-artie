@@ -1,0 +1,21 @@
+{
+  "name": "log-event",
+  "label": "core/log-event.sh (PostToolUse)",
+  "lang": "bash",
+  "path": "bdd-gates: core/log-event.sh",
+  "lines": "1–18",
+  "of": 18,
+  "text": "#!/usr/bin/env bash\n# PostToolUse (Edit|Write|MultiEdit). Records MAIN_WRITE / FEATURE_WRITE facts\n# in .claude/tdd-events.log for the pre-commit ordering check. Never blocks.\nset -o pipefail\n. \"$(dirname \"$0\")/lib.sh\"\n\nfile_path=$(bdd_hook_file_path)\n[ -n \"$file_path\" ] || exit 0\nbdd_has_config || exit 0\nbdd_load\n\nrel=$(bdd_rel \"$file_path\")\nif bdd_is_prod \"$rel\"; then\n  bdd_append \"MAIN_WRITE $rel\"\nelif bdd_is_feature \"$rel\"; then\n  bdd_append \"FEATURE_WRITE $rel\"\nfi\nexit 0",
+  "_links": {
+    "self": {
+      "href": "gherkin-first--log-event.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/bdd-gates-skill/blob/main/core/log-event.sh",
+      "title": "core/log-event.sh, lines 1–18"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}

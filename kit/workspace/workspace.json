@@ -1,0 +1,16 @@
+{
+  "title": "Workspace",
+  "about": "What one goal may work across, in three systems that know nothing of each other: each a link to where it starts.",
+  "_links": {
+    "self": { "href": "/workspace.json" },
+    "profile": { "href": "https://w3id.org/heart-rise/hal-schema-forms" },
+    "item": [
+      { "href": "http://localhost:8392/", "title": "GitHub", "type": "application/hal+json",
+        "profile": "https://w3id.org/heart-rise/hal-schema-forms" },
+      { "href": "http://localhost:8401/jobs/release", "title": "The release job, on the build service",
+        "type": "application/hal+json", "profile": "https://w3id.org/heart-rise/hal-schema-forms" },
+      { "href": "http://localhost:8402/apps/web", "title": "The web app, on the deploy service",
+        "type": "application/hal+json", "profile": "https://w3id.org/heart-rise/hal-schema-forms" }
+    ]
+  }
+}

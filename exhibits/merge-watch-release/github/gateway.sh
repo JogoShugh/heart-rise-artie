@@ -1,0 +1,29 @@
+#!/bin/sh
+# Serves real GitHub in scm's words on 8093: the HEART gateway with the github-scm connector, calling api.github.com
+# with the token in ~/.artie/credentials ([https://api.github.com], bearer), which is never printed. The release's
+# parties present GitHub's test token to it, as to the simulated GitHub on 8098. Every call it makes to GitHub is
+# kept in GATEWAY_RECORD (default: work/github-upstream.yaml).
+#   github/gateway.sh
+set -eu
+here=$(cd "$(dirname "$0")" && pwd)
+root=$(cd "$here/../../.." && pwd)
+connector="$root/heart/heart-gateway/connectors/github-scm"
+spec=${GITHUB_SPEC:-$HOME/.cache/artie/ghdesc/api.github.com.json}
+# GitHub's description as the release's pins were made against (github/rest-api-description, MIT), fetched once.
+ref=${GITHUB_DESCRIPTION_REF:-bb754941722779d8a5b3a2f25a5fbb7ce794e1ea}
+if [ ! -f "$spec" ]; then
+  mkdir -p "$(dirname "$spec")"
+  curl -fsSL -o "$spec" \
+    "https://raw.githubusercontent.com/github/rest-api-description/$ref/descriptions/api.github.com/api.github.com.json" \
+    || { rm -f "$spec"; echo "couldn't fetch GitHub's description to $spec"; exit 1; }
+fi
+UPSTREAM_TOKEN=$(awk '/\[https:\/\/api.github.com\]/{f=1} f&&/bearer/{print $3; exit}' "$HOME/.artie/credentials")
+[ -n "$UPSTREAM_TOKEN" ] || { echo "no GitHub token in ~/.artie/credentials"; exit 1; }
+HEART_AUTH_BEARER_TOKENS=$(printf '%s' github-token | shasum -a 256 | cut -d' ' -f1)
+export UPSTREAM_TOKEN HEART_AUTH_BEARER_TOKENS PORT=8093
+export GATEWAY_CONNECTOR="$connector" UPSTREAM_SPEC="$spec" UPSTREAM_URL=https://api.github.com UPSTREAM_AUTH=bearer
+export GATEWAY_RECORD=${GATEWAY_RECORD:-$here/../work/github-upstream.yaml}
+# The JDK this Mac runs with, when it is there; elsewhere, JAVA_HOME as set, or the java on the PATH (22 or newer).
+mac_java=$HOME/.sdkman/candidates/java/25.3.4+1.r25-graal
+[ -n "${JAVA_HOME:-}" ] || [ ! -d "$mac_java" ] || export JAVA_HOME="$mac_java"
+exec "$root/heart/heart-gateway/build/install/heart-gateway/bin/heart-gateway"

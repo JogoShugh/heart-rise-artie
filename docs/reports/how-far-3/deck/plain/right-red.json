@@ -1,0 +1,17 @@
+{
+  "name": "right-red",
+  "title": "Then It Has to Fail, for the Right Reason",
+  "part": "One behavior, start to finish",
+  "kicker": "Red first · and the right red",
+  "tone": "light",
+  "number": 9,
+  "of": 30,
+  "html": "<h2>Then It Has to Fail, for the Right Reason</h2>\n<div class=\"split\" style=\"grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch\">\n  <div class=\"panel\" style=\"border-color: var(--bad)\">\n    <span class=\"label\" style=\"color: var(--bad)\">Red, but not evidence</span>\n    <p>The step that reads the policy file doesn’t exist yet. The run fails, and says nothing about renewals.</p>\n  </div>\n  <div class=\"panel\" style=\"border-color: var(--leaf)\">\n    <span class=\"label\" style=\"color: var(--leaf)\">The right red</span>\n    <p>The old code always moves three weeks. Zero weeks expects <b>2026-11-12</b>, gets 2026-12-03. Six weeks expects <b>2026-12-24</b>, gets 2026-12-03.</p>\n  </div>\n</div>\n<div class=\"rows\" style=\"margin-top: 1rem\">\n  <div><h3>Every Run Through the Runner</h3><p>A raw test command is blocked; it would leave nothing in the log. Each run leaves one line: pass or fail, total, failures. No results at all is logged as a failure, with the reason.</p></div>\n</div>\n<p class=\"refs\"><deck-ref name=\"right-behavior\"></deck-ref> <deck-fragment name=\"bash-gate\">gate-bash.sh</deck-fragment> <deck-fragment name=\"run-logging\">bdd-run-logging.gradle.kts</deck-fragment></p>\n",
+  "say": "Next, the scenario has to fail before any code changes. That sounds simple. Here's the trap. If the step that reads the policy file doesn't exist yet, the run fails, and that's red, but it isn't evidence of anything about renewals. It's evidence that a step is missing. The right red is this: with the old code, every renewal moves three weeks, so the zero-weeks row expects the 12th of November and gets the 3rd of December, and the six-weeks row expects Christmas Eve and gets the 3rd of December too. That's the behavior missing, exactly where the table says it should be. The skill makes this checkable. Tests only run through its runner; a raw test command is blocked, because it would leave nothing in the log. Every run leaves one line: pass or fail, the total, the failures. And a run that produced no results is logged as a failure, with the reason, so it can't pass for the real thing.",
+  "sources": [
+    {
+      "label": "bdd-gates skill",
+      "href": "https://github.com/JogoShugh/bdd-gates-skill"
+    }
+  ]
+}
