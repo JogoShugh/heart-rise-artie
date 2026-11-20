@@ -1,0 +1,55 @@
+{
+  "name": "message-by-message",
+  "title": "The Release, Message by Message",
+  "part": "The release",
+  "kicker": "The same release in each dialect",
+  "tone": "light",
+  "number": 9,
+  "of": 15,
+  "html": "<h2>The Release, Message by Message</h2>\n<div class=\"seqx\" data-runs=\"hsf501,hf501,hf504\" data-labels='{\"hsf501\": \"HAL Schema Forms · 501\", \"hf501\": \"HAL-FORMS · 501\", \"hf504\": \"HAL-FORMS · 504, stopped\"}'>\n  <p class=\"note\">Read as HEART, this slide links a script (<code>deck:code</code>) that plays the release from the desk’s traces. Plain JSON carries no links, so no code arrives.</p>\n</div>\n<p class=\"sq-key\"><span><b class=\"k-clock\">◷</b> waiting for an answer</span><span><b class=\"k-mail\">✉</b> answering its reply</span><span><b class=\"k-gear\">⚙</b> building</span><span><b class=\"k-zzz\">zZ</b> a reply, resting</span></p>\n",
+  "say": "Here's pull request 501, played from the desk's own trace, in each dialect. Pick HAL Schema Forms or HAL-FORMS at the top. The watcher's clock while it waits, the envelope when it answers, the reply resting until the answer lands. The same parties, the same messages; only what each answer carries differs.",
+  "sources": [
+    {
+      "label": "Traces",
+      "href": "../merge-watch-two-dialects/runs/"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "message-by-message.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "dynamic.json",
+      "title": "The Release, Numbered"
+    },
+    "next": {
+      "href": "five-releases.json",
+      "title": "Five Releases in Each Dialect"
+    },
+    "alternate": {
+      "href": "message-by-message.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ],
+    "deck:code": {
+      "href": "../code/sequence.js",
+      "type": "text/javascript",
+      "title": "Plays the release's messages, and each party's state",
+      "integrity": "sha256-GEQwZQWIeuiJJkbrw2nAPqBwfDQM6xAwvBAk3wzuAtk="
+    }
+  }
+}

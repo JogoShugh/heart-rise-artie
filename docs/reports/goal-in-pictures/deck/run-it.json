@@ -1,0 +1,42 @@
+{
+  "name": "run-it",
+  "title": "Run It Yourself",
+  "part": "The release",
+  "kicker": "Walk, keep, replay",
+  "tone": "light",
+  "number": 14,
+  "of": 15,
+  "html": "<h2>Run It Yourself</h2>\n<pre class=\"cmd\">sh exhibits/merge-watch-release/hal-forms/run.sh          <span># walk once in HAL-FORMS, keep, replay five</span>\nsh exhibits/merge-watch-release/hal-forms/run.sh replay   <span># replay five, no model</span>\nRELEASE_RUNG=L2 sh exhibits/merge-watch-release/variants.sh OUT   <span># the HAL Schema Forms script, at L2</span>\nsh exhibits/two-dialects/build.sh                        <span># this deck</span></pre>\n<p class=\"note\">Needs Docker for Jenkins, and a model key for the walk only.</p>\n",
+  "say": "Three commands. The first walks the goal once with Claude in HAL-FORMS, keeps the script, and replays the five. The second replays only, with no model. The third replays the HAL Schema Forms script, at L0 or, with RELEASE_RUNG, at L2.",
+  "sources": [
+    {
+      "label": "hal-forms/run.sh",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/hal-forms/run.sh"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "run-it.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "nothing-broke.json",
+      "title": "Nothing Broke in HAL Schema Forms"
+    },
+    "next": {
+      "href": "close.json",
+      "title": "Plain Words, Either Dialect"
+    },
+    "alternate": {
+      "href": "run-it.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

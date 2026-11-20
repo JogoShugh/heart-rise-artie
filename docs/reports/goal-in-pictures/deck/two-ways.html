@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Pull Request, Two Dialects · The Goal in Pictures</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Pull request 501, just before the merge</span></header>
+<h2>One Pull Request, Two Dialects</h2>
+<div class="morph" data-start="hsf" data-cycles='[{"to": "hf", "label": "HAL-FORMS", "head": "One Pull Request, Two Dialects"}]'>
+  <div class="mo-stage">
+    <section class="mo-scene" data-scene="hsf">
+      <h3 class="mo-title">HAL Schema Forms: _forms</h3>
+      <pre class="offer">offered as: application/hal+json
+'_forms: <span class="tk" data-token="rel">scm:merge</span>':
+  title: Merge
+  description: Merge the pull request into its base branch.
+  _links:
+    target:
+      href: <span class="tk" data-token="target">/repos/acme/web/pulls/501/actions/merge</span>
+  method: <span class="tk aw-m" data-token="method">PUT</span>
+  contentType: application/json
+  hr:integrity: sha256-sGUdrPfHMytyy3aRS+Ep6H4votEj67pweUa6ioBBwF8=
+  schema:
+    required:
+      - method
+    properties:
+      commit_message:
+        description: Extra detail to append to automatic commit message.
+        title: Commit message
+        type: string
+      commit_title:
+        description: Title for the automatic commit message.
+        title: Commit title
+        type: string
+      method:
+        description: The merge method to use.
+        enum:
+          - merge
+          - squash
+          - rebase
+        title: Merge method
+        type: string
+ARTIE sent:
+  method: PUT
+  path: /repos/acme/web/pulls/501/actions/merge
+  body:
+    method: squash
+answered: 200</pre>
+    </section>
+    <section class="mo-scene" data-scene="hf">
+      <h3 class="mo-title">HAL-FORMS: _templates</h3>
+      <pre class="offer">offered as: application/prs.hal-forms+json
+'_templates: <span class="tk" data-token="rel">scm:merge</span>':
+  title: Merge
+  method: <span class="tk aw-m" data-token="method">PUT</span>
+  contentType: application/json
+  target: <span class="tk" data-token="target">/repos/acme/web/pulls/501/actions/merge</span>
+  properties:
+    - name: method
+      prompt: Merge method
+      required: true
+      type: text
+      options:
+        inline:
+          - merge
+          - squash
+          - rebase
+        minItems: 1
+        maxItems: 1
+    - name: commit_title
+      prompt: Commit title
+      required: false
+      type: text
+    - name: commit_message
+      prompt: Commit message
+      required: false
+      type: text
+ARTIE sent:
+  method: PUT
+  path: /repos/acme/web/pulls/501/actions/merge
+  body:
+    method: squash
+answered: 200</pre>
+    </section>
+  </div>
+  <p class="mo-still note">Two stills. Read as HEART, this slide links a script that turns one into the other (<code>deck:code</code>).</p>
+</div>
+<p class="lead">Same name, same method, same address, and the same act sent: <code>{method: squash}</code>.</p>
+<p class="refs"><a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors">scm:</a> <a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/spec/HAL-SCHEMA-FORMS-HR.md">HEART</a></p>
+</article>
+<nav class="foot"><a href="deck/map.html" rel="prev"><small>Back</small><b>The Release as a Map of Resources</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#two-ways">with heart-ts</a></span>
+<a href="deck/walk.html" rel="next"><small>Next</small><b>Walk Once with Claude, in HAL-FORMS</b></a></nav>
+</main></div></body></html>

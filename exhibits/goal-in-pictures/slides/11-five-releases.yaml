@@ -1,0 +1,24 @@
+name: five-releases
+part: "The release"
+title: "Five Releases in Each Dialect"
+kicker: No model, either way
+say: "Five pull requests, each with its own change and its own smoke-test inputs, released by each dialect's kept script with no model. Four promoted to Dev on both sides. 504 sets renewals to zero weeks; smoke scenario S3 fails, and the script comments on the pull request instead, in both dialects. Each outcome links to that release, step by step."
+sources:
+  - ["One Goal, Two Dialects (report)", "../merge-watch-two-dialects/"]
+html: |
+  <h2>Five Releases in Each Dialect</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>#</th><th>Its change</th><th>Smoke test given</th><th>HAL Schema Forms</th><th>HAL-FORMS</th></tr></thead>
+    <tbody>
+      <tr><td>501</td><td>renewals: 2 weeks</td><td>Charlotte's Web · damaged</td><td><a href="../merge-watch-two-dialects/runs/hsf/pr-501.html" target="_blank" rel="noopener">promoted</a></td><td><a href="../merge-watch-two-dialects/runs/hal-forms/pr-501.html" target="_blank" rel="noopener">promoted</a></td></tr>
+      <tr><td>502</td><td>renewals: 4 weeks</td><td>The Hobbit · wrong-book</td><td><a href="../merge-watch-two-dialects/runs/hsf/pr-502.html" target="_blank" rel="noopener">promoted</a></td><td><a href="../merge-watch-two-dialects/runs/hal-forms/pr-502.html" target="_blank" rel="noopener">promoted</a></td></tr>
+      <tr><td>503</td><td>renewals: 1 week</td><td>Matilda · lost</td><td><a href="../merge-watch-two-dialects/runs/hsf/pr-503.html" target="_blank" rel="noopener">promoted</a></td><td><a href="../merge-watch-two-dialects/runs/hal-forms/pr-503.html" target="_blank" rel="noopener">promoted</a></td></tr>
+      <tr><td>504</td><td>renewals: none (0 weeks)</td><td>Charlotte's Web · missing-pages</td><td><a href="../merge-watch-two-dialects/runs/hsf/pr-504.html" target="_blank" rel="noopener">S3 failed; commented</a></td><td><a href="../merge-watch-two-dialects/runs/hal-forms/pr-504.html" target="_blank" rel="noopener">S3 failed; commented</a></td></tr>
+      <tr><td>505</td><td>a README line only</td><td>The Hobbit · damaged</td><td><a href="../merge-watch-two-dialects/runs/hsf/pr-505.html" target="_blank" rel="noopener">promoted</a></td><td><a href="../merge-watch-two-dialects/runs/hal-forms/pr-505.html" target="_blank" rel="noopener">promoted</a></td></tr>
+    </tbody>
+  </table></div>
+  <div class="stats" style="grid-template-columns: repeat(3, minmax(0, 1fr))">
+    <div class="stat"><b>0</b><span>model calls per release, both dialects</span></div>
+    <div class="stat"><b>56–61</b><span>steps per release, HAL Schema Forms</span></div>
+    <div class="stat"><b>56–63</b><span>steps per release, HAL-FORMS</span></div>
+  </div>

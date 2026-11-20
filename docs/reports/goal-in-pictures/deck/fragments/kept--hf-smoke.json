@@ -1,0 +1,21 @@
+{
+  "name": "hf-smoke",
+  "label": "The promote, kept from the HAL-FORMS walk",
+  "lang": "yaml",
+  "path": "exhibits/merge-watch-release/hal-forms/release.heart.yaml",
+  "lines": "111–116",
+  "of": 130,
+  "text": "- act: env:promote\n  fields:\n    commit: ${merged.merge_commit_sha}\n    smoke: # review: the reasoner chose it, asked \"promote commit 39590c7cd6242a278c59c230eb17f387161f38be, with the smoke field as an object: {\"passed\": 5, \"of\": 5} (5 of 5 scenarios passed)\"\n      passed: ${smoke.passing}\n      of: ${smoke.of}",
+  "_links": {
+    "self": {
+      "href": "kept--hf-smoke.json"
+    },
+    "via": {
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/hal-forms/release.heart.yaml#L111-L116",
+      "title": "exhibits/merge-watch-release/hal-forms/release.heart.yaml, lines 111–116"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    }
+  }
+}
