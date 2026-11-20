@@ -51,12 +51,32 @@
         }
       },
       {
+        "name": "sync-reason-act",
+        "part": "The goal",
+        "_links": {
+          "self": {
+            "href": "sync-reason-act.json",
+            "title": "Sync, Reason, Act, on the Wire"
+          }
+        }
+      },
+      {
         "name": "map",
         "part": "The goal",
         "_links": {
           "self": {
             "href": "map.json",
             "title": "The Release as a Map of Resources"
+          }
+        }
+      },
+      {
+        "name": "city",
+        "part": "The goal",
+        "_links": {
+          "self": {
+            "href": "city.json",
+            "title": "The Release as a City"
           }
         }
       },
@@ -117,6 +137,26 @@
           "self": {
             "href": "five-releases.json",
             "title": "Five Releases in Each Dialect"
+          }
+        }
+      },
+      {
+        "name": "coupling",
+        "part": "Why it holds",
+        "_links": {
+          "self": {
+            "href": "coupling.json",
+            "title": "Wired to a Media Type, Not a Site"
+          }
+        }
+      },
+      {
+        "name": "drift",
+        "part": "Why it holds",
+        "_links": {
+          "self": {
+            "href": "drift.json",
+            "title": "When the Server Changes a Form"
           }
         }
       },

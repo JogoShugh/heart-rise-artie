@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wired to a Media Type, Not a Site · The Goal in Pictures</title>
+<base href="../">
+<link rel="stylesheet" href="../assets/deck.css">
+<link rel="stylesheet" href="deck-extra.css">
+</head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">What each client is coupled to, and what happens when the server changes</span></header>
+<h2>Wired to a Media Type, Not a Site</h2>
+<div class="pic pic-plugs" data-steps="4" data-intro="Press play: three clients, then the server changes." data-captions='["A browser is wired to one media type, text/html, never to a site. Sites come and go; the browser never learned one.", "A client generated from GitHub&#39;s OpenAPI description is wired to GitHub&#39;s paths: one cable per endpoint.", "ARTIE is wired like the browser: to a media type and a vocabulary of relations, hal+json with HAL Schema Forms, and scm:.", "Swap GitHub for GitLab. GitHub&#39;s paths don&#39;t exist there; every generated cable hangs loose. ARTIE asks the gateway for the same relations and carries on."]'>
+  <svg class="pic-svg" viewBox="0 0 960 420" role="img" aria-label="A browser, a generated OpenAPI client and ARTIE, and what each is wired to">
+    <defs><marker id="pl-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="context-stroke"/></marker></defs>
+    <g data-at="1">
+      <g class="node system"><rect class="shape" x="20" y="40" width="170" height="60" rx="8"/><text class="t" x="105" y="66" text-anchor="middle">A browser</text><text class="s" x="105" y="82" text-anchor="middle">knows HTML, no site</text></g>
+      <g class="edge own plug"><path d="M190 70 H318"/><text class="l" x="254" y="62" text-anchor="middle">text/html</text></g>
+      <circle class="hub" cx="326" cy="70" r="8"/>
+      <g class="sites">
+        <g class="site s1"><path d="M334 70 C380 70 380 38 420 38"/><rect x="420" y="22" width="120" height="32" rx="6"/><text x="480" y="42" text-anchor="middle">a bookshop</text></g>
+        <g class="site s2"><path d="M334 70 C390 70 520 104 560 104"/><rect x="560" y="88" width="120" height="32" rx="6"/><text x="620" y="108" text-anchor="middle">an encyclopedia</text></g>
+        <g class="site s3"><path d="M334 70 C420 70 640 38 700 38"/><rect x="700" y="22" width="110" height="32" rx="6"/><text x="755" y="42" text-anchor="middle">a bank</text></g>
+        <g class="site s4"><path d="M334 70 C420 70 780 104 830 104"/><rect x="830" y="88" width="120" height="32" rx="6"/><text x="890" y="108" text-anchor="middle">your library</text></g>
+      </g>
+    </g>
+    <g data-at="2" class="oa">
+      <g class="node system"><rect class="shape" x="20" y="176" width="170" height="60" rx="8"/><text class="t" x="105" y="200" text-anchor="middle">Generated client</text><text class="s" x="105" y="216" text-anchor="middle">from GitHub's OpenAPI</text></g>
+      <g class="cables">
+        <path d="M190 192 C260 192 260 158 330 158"/><text class="s" x="336" y="162">GET /repos/{o}/{r}/pulls/{n}</text>
+        <path d="M190 202 C260 202 260 188 330 188"/><text class="s" x="336" y="192">PUT /repos/{o}/{r}/pulls/{n}/merge</text>
+        <path d="M190 212 C260 212 260 218 330 218"/><text class="s" x="336" y="222">POST /repos/{o}/{r}/issues/{n}/comments</text>
+        <path d="M190 222 C260 222 260 248 330 248"/><text class="s" x="336" y="252">GET /repos/{o}/{r}/commits/{ref}/status</text>
+        <path class="to" d="M630 158 C700 158 720 196 788 196"/><path class="to" d="M640 188 C700 188 720 196 788 196"/>
+        <path class="to" d="M660 218 C710 218 730 200 788 200"/><path class="to" d="M650 248 C710 248 730 204 788 204"/>
+      </g>
+      <g class="snap" data-at="4"><text class="l" x="460" y="274" text-anchor="middle">✕ no such paths on GitLab</text></g>
+    </g>
+    <g data-at="3">
+      <g class="node system"><rect class="shape" x="20" y="320" width="170" height="60" rx="8"/><text class="t" x="105" y="346" text-anchor="middle">ARTIE</text><text class="s" x="105" y="362" text-anchor="middle">knows HAL Schema Forms</text></g>
+      <g class="edge own plug"><path d="M190 350 H330"/><text class="l" x="260" y="342" text-anchor="middle">hal+json · scm:</text></g>
+      <g class="node gate"><rect class="shape" x="332" y="314" width="250" height="72" rx="8"/><text class="t" x="457" y="336" text-anchor="middle">Forge gateway, HEART</text><text class="s chips" x="457" y="354" text-anchor="middle">scm:pulls-get · scm:merge</text><text class="s chips" x="457" y="370" text-anchor="middle">scm:comment · ci:status …</text></g>
+      <path class="gw gh-line" d="M582 340 C680 340 700 214 788 210"/>
+    </g>
+    <g class="node system gh-box"><rect class="shape" x="790" y="170" width="150" height="56" rx="8"/><text class="t" x="865" y="194" text-anchor="middle">GitHub</text><text class="s" x="865" y="210" text-anchor="middle">/repos/…/pulls/{n}</text></g>
+    <g data-at="4">
+      <g class="node system gl-box"><rect class="shape" x="790" y="300" width="150" height="70" rx="8"/><text class="t" x="865" y="322" text-anchor="middle">GitLab</text><text class="s" x="865" y="338" text-anchor="middle">/projects/{id}/</text><text class="s" x="865" y="352" text-anchor="middle">merge_requests/{iid}</text></g>
+      <path class="gw gl-line" d="M582 352 C680 352 700 336 788 336" marker-end="url(#pl-arrow)"/>
+      <text class="l ok-l" x="690" y="386" text-anchor="middle">✓ same relations, followed</text>
+    </g>
+  </svg>
+</div>
+<p class="refs"><a class="ref-plain" href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_5">UNIFORM-INTERFACE</a> <a class="ref-plain" href="https://github.com/JogoShugh/heart-rise-artie/tree/claude/auth-branch-4bnmhc/heart/heart-gateway/connectors">scm:</a></p>
+</article>
+<nav class="foot"><a href="deck/five-releases.html" rel="prev"><small>Back</small><b>Five Releases in Each Dialect</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#coupling">with heart-ts</a></span>
+<a href="deck/drift.html" rel="next"><small>Next</small><b>When the Server Changes a Form</b></a></nav>
+</main></div></body></html>

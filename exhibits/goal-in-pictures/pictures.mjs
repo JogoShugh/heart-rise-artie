@@ -1,4 +1,4 @@
-// Writes the deck's picture slides (slides/02..05, 09) from the layouts below: a C4 context of the release, the goal
+// Writes the deck's picture slides (slides/02, 03, 05, 10) from the layouts below: a C4 context of the release, the goal
 // becoming a swimlane activity, the release's resources as a map walked then replayed, and a C4 dynamic view of the
 // run. Each picture is plain SVG that reads whole with no script; code/pictures.js (deck:code) steps through it,
 // showing each element from the step its data-at names.
@@ -191,7 +191,7 @@ function slide({ file, name, part, title, kicker, say, sources = [], code = true
     "Replay: the kept script follows the same relations, holds each offer to its pin, and asks no model.",
   ];
   slide({
-    file: "04-map.yaml", name: "map", part: "The goal", title: "The Release as a Map of Resources",
+    file: "05-map.yaml", name: "map", part: "The goal", title: "The Release as a Map of Resources",
     kicker: "Walked once with Claude, then replayed by relation",
     say: "Same release, drawn as the web it is: resources, and the relations between them. Nobody hands ARTIE this map. It finds it, one representation at a time. On the walk, Claude picks each relation among the offers. Three hops are bookmarks, the inputs at the top of the goal; the rest are links. When we replay, the script follows the same relations, checks every offer against its pin, and asks no model at all. The path is the script.",
     sources: [["release.heart.yaml, the kept script", "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.heart.yaml"]],
@@ -244,7 +244,7 @@ function slide({ file, name, part, title, kicker, say, sources = [], code = true
   const rows = calls.map(([who, what, rel, s], i) =>
     `    <li class="keep ${s}" data-at="${i + 1}"><b>${i + 1}</b><span><strong>${esc(who)}</strong> ${esc(what)} <code>${esc(rel)}</code></span></li>`).join("\n");
   slide({
-    file: "09-dynamic.yaml", name: "dynamic", part: "The release", title: "The Release, Numbered",
+    file: "10-dynamic.yaml", name: "dynamic", part: "The release", title: "The Release, Numbered",
     kicker: "C4, dynamic: the run's calls, in order, on the same boxes",
     say: "Before every message, the same run in eleven numbered calls on the context boxes. C4 calls this a dynamic diagram; UML calls it a collaboration diagram. Red is HEART, green is RISE, blue is a party's own work. Notice who talks to whom: only ARTIE starts anything, and the two answers come back to its own replies, not to ARTIE itself. The next slide plays every message behind these eleven.",
     sources: [["C4 model: dynamic diagram", "https://c4model.com/diagrams/dynamic"]],

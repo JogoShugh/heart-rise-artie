@@ -1,0 +1,55 @@
+{
+  "name": "city",
+  "title": "The Release as a City",
+  "part": "The goal",
+  "kicker": "Servers are districts, resources buildings, links streets",
+  "tone": "light",
+  "number": 6,
+  "of": 19,
+  "html": "<h2>The Release as a City</h2>\n<div class=\"city\">\n  <p class=\"note\">Read as HEART, this slide links a script (<code>deck:code</code>) that draws the city and walks ARTIE through it. Without it, the route: forge index, <code>scm:pulls-get</code> to 501; by bookmark to the watcher, <code>watcher:watch</code>, rest; back to 501, <code>scm:merge</code>; by bookmark to the CI wrapper, <code>ci:build</code>, rest; <code>hr:in-reply-to</code> to the build; <code>ci:smoke-test</code> and <code>ci:deployment</code> to the library; by bookmark to Dev, <code>env:get-environment</code>, <code>env:promote</code>.</p>\n</div>\n",
+  "say": "Same map, as a city. Each server is a district. Each resource is a building. Each link is a street, named by its relation. ARTIE never gets a street map: it reads the signs at every corner. Three times it takes a cab, a bookmark from the goal's inputs. At the watcher and at Jenkins it sits and naps until the reply's answered. Press the walk: at every crossing Claude reads the signs and picks. Press the replay: same streets, faster, and at every crossing the sign is checked against the pin, and nobody's asked.",
+  "sources": [
+    {
+      "label": "release.heart.yaml, the kept script",
+      "href": "https://github.com/JogoShugh/heart-rise-artie/blob/main/exhibits/merge-watch-release/release.heart.yaml"
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "city.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "map.json",
+      "title": "The Release as a Map of Resources"
+    },
+    "next": {
+      "href": "two-ways.json",
+      "title": "One Pull Request, Two Dialects"
+    },
+    "alternate": {
+      "href": "city.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    },
+    "curies": [
+      {
+        "name": "deck",
+        "href": "../rels.html#{rel}",
+        "templated": true
+      }
+    ],
+    "deck:code": {
+      "href": "../code/scenes.js",
+      "type": "text/javascript",
+      "title": "Draws the city and walks ARTIE through it, walked and replayed",
+      "integrity": "sha256-IZzksm3SQJ1xfjWn+9TB93ISP/A9AJRjuo6PZAioe40="
+    }
+  }
+}
