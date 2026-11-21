@@ -185,22 +185,133 @@ the form still looks like the one in the booklet. If the server changed it, ARTI
 
 **Sam:** No! I played. Then it came in the mail.
 
-**Doca:** That's what I built. It's called RISE. Some jobs take a long time. Building a program can take minutes. A
-person reviewing your code can take a day. Without RISE, a program keeps asking "is it done? is it done? is it done?"
+**Doca:** That's RISE. Some jobs take a long time. Building a program can take minutes. A person reviewing your code
+can take a day. Without RISE, a program keeps asking "is it done? is it done? is it done?"
 
 **Sam:** That's annoying.
 
-**Doca:** Very annoying. With RISE, the program says "tell me when it's done, and here's my mailbox." It sends a
-*reply link* along with what it asks. The other side writes the answer to that mailbox when it's ready.
+**Doca:** Very annoying. With RISE, the program says "tell me when it's done, and here's where to send the answer."
+It writes its return address on every letter it sends. The other side doesn't have to remember anybody's address. It
+just looks at the letter.
+
+**Sam:** Like the corner of an envelope.
+
+**Doca:** Exactly like the corner of an envelope. Your dad already built one way to do it, using the Web. The return
+address is your house. When the answer's ready, the other side walks it right up to your door.
 
 **Josh:** And the answer is signed, so ARTIE knows it really came from who it says.
 
-**Doca:** And the mailbox is a HEART thing too. Same studs, same tubes. So ARTIE can ask a watcher "tell me when
-pull request 501 can be merged," go do nothing, and when the answer lands, it goes on and merges.
+**Doca:** But what if you live behind a gate?
+
+**Sam:** Like Grandma's neighborhood? With the guard?
+
+**Doca:** Like Grandma's. The mail carrier can't just walk in. Lots of programs live behind a gate like that,
+especially the ones on somebody's laptop. So with the Web way, you need a guard at your gate who takes the letter,
+checks who it's from, and carries it to your door. And sometimes a guard at the sender's gate too, who makes sure the
+letter goes out and tries again if nobody answers. Grown-ups have a program for that guard. It's called Envoy.
+
+**Sam:** That's a lot of guards.
+
+**Doca:** It is. So I'm working on another way. Do you know what a post office box is?
+
+**Sam:** No.
+
+**Doca:** It's a little locked box at the post office, with your number on it. Your mail doesn't come to your house.
+It goes to the post office and waits in your box. Whenever you're ready, you go and get it.
+
+**Sam:** So nobody has to get through the gate.
+
+**Doca:** Nobody has to get through the gate. You go out to the post office, and so does everybody else. That's easy,
+because going out is always allowed. Grown-ups call the post office a broker, and the line of letters waiting in your
+box a queue.
+
+**Sam:** Why a line?
+
+**Doca:** Because if lots of answers come while you're asleep, they wait in order. First one in, first one out.
+Nothing gets lost.
+
+**Josh:** Now tell him the good part. What's inside the letter.
+
+**Doca:** Okay, Sam. The best part is what *doesn't* change. Remember the Lego set page, with the picture, the price
+and the "add to bag" button?
+
+**Sam:** Information and controls.
+
+**Doca:** You were listening! When that page comes by post office box, the inside of the letter is exactly the same.
+Same picture, same price, same buttons. Not almost the same. The same, letter for letter. Nothing inside even says it
+came by post office.
+
+**Sam:** So the bricks are the same, just in a different box.
+
+**Doca:** Same bricks, different delivery truck. Only the outside of the envelope changes. Want to know what's written
+on the outside?
+
+**Sam:** Yeah.
+
+**Doca:** Four things. First, who it's to. Not "the post office." The exact thing you mean, like "pull request five
+oh one." Second, what you want, written small in the corner: "show me," or "merge it." Third, your return address,
+your box number. And fourth, a ticket number, so when the answer comes back you know which question it answers.
+
+**Sam:** Like at the deli! Number forty-two!
+
+**Doca:** Exactly like the deli. And the answer comes back with a number on the outside too. Two hundred means
+"done." Four twelve means "somebody changed it before you got there, look again."
+
+**Josh:** The same four twelve as on the Web.
+
+**Doca:** The same four twelve. Same meanings, same clutch power. And when ARTIE says "I'm doing this to the version I
+just looked at," that goes on the outside too, so the post office doesn't have to open your letter to deliver it.
+
+**Josh:** Here's the part I like best. Sam, the Lego store takes orders three ways. You can walk up to the counter.
+You can call on the phone. Or you can mail in a card. Three doors. Who packs your order?
+
+**Sam:** The person in the back?
+
+**Josh:** The same person in the back, every time. They look up the set, check it's still in stock, check you asked
+for one they actually sell, and pack it. The door only changes how the order gets in and how the answer gets out.
+
+**Doca:** The Web is the counter. The post office box is the mail-in card. Same person in the back. Same rules.
+
+**Sam:** What if the mail gets lost?
+
+**Doca:** The post office is careful. It keeps the letter until the person in the back says "got it, and I'm done."
+If they trip and drop it, the post office hands it to them again.
+
+**Sam:** Then they'd do it twice!
+
+**Doca:** Good catch. That's why ARTIE writes the version on the outside. The second time, the person in the back
+sees it was already done to that version, and says four twelve. Nothing happens twice.
+
+**Sam:** How does ARTIE know whether to use the house or the box?
+
+**Doca:** It reads the address. A Web address starts with h-t-t-p-s. A post office address starts with a-m-q-p-s. One
+answer can even have both. "Watch it over here, by post office box. Merge it over there, on the Web." ARTIE picks the
+truck from each address, one at a time.
+
+**Sam:** Can you mix them on one letter?
+
+**Doca:** You can. Little updates, like "half done," can go in the box, and the big final answer can come to the
+house. And there's one rule: if a letter came sealed, you never answer it on a postcard. The S at the end of
+a-m-q-p-s and h-t-t-p-s means sealed.
+
+**Josh:** And the post office checks ID?
+
+**Doca:** When you open your box, yes. And you can write "only worth answering until Tuesday" on the outside. After
+Tuesday, the post office throws it away, so nobody acts on old news.
+
+**Sam:** Can you get mail you didn't ask for? Like a magazine?
+
+**Doca:** That's my favorite part. You can subscribe. "Every time pull request five oh one changes, put a note in my
+box." Then ARTIE doesn't even ask "is it done?" It just checks its box.
+
+**Josh:** Same letter, same studs, same tubes.
+
+**Doca:** Same letter. The only difference is where it waits. Your dad's way, it comes to your door. My way, it waits
+in your box.
 
 **Sam:** So RISE is the mail.
 
-**Doca:** RISE is the mail. HEART is the bricks.
+**Doca:** RISE is the mail. HEART is the bricks. And the post office is just one more way to deliver them.
 
 ---
 
@@ -235,7 +346,19 @@ company with different words for everything, and ARTIE didn't have to change at 
   power"; Duplo is made to connect with standard bricks. Worth a quick look before this is read aloud anywhere.
 - Fielding's information-and-controls passage is paraphrased here, not quoted. If a slide quotes it, quote it whole
   from his source.
-- "Doca built RISE" stays inside the fiction, as in "Rest, then RISE." In the repository, RISE replies exist in
-  heart-core (Replies.kt) and the release runs on them; the push-and-signed mailbox Doca describes is that.
+- "Doca built RISE" stays inside the fiction, as in "Rest, then RISE." In the repository, RISE replies over HTTP exist
+  in heart-core (Replies.kt) and the release runs on them. The post office box, RISE over a broker with AMQP 1.0, is a
+  plan only: spec/ideas/amqp-binding.md, amqp-binding-vision.md and rise-awakening.md.
+- What the post office part stands for:
+  - the envelope's outside: the resource's URI in `to`, the method in `subject`, `reply-to`, and `message-id` with the
+    answer's `correlation-id`; the ETag in application properties; the status number in the answer's `subject`;
+  - "only worth answering until Tuesday": `absolute-expiry-time`;
+  - "same person in the back": one core behind every front door (HTTP, CoAP, and the planned heart-amqp);
+  - "got it, and I'm done": the front door settles the message only after the outcome is decided; a redelivery is
+    caught by the validator (412);
+  - "never answer a sealed letter on a postcard": no answer over a weaker scheme than the request came on;
+  - the subscription: change notices, an idea in amqp-binding.md.
+- Envoy as the gate guard: a proxy taking callbacks in for a client behind a firewall, and on the sender's side
+  sending them out with retries. The author's own framing, to confirm.
 - Sam is your son, written as he/him. Doca is he/him.
 - For speech synthesis, write Doca as "Docka."
