@@ -81,9 +81,28 @@ This skill sits beside `heart-client` and replaces nothing.
 
 ### Waiting on another party (RISE)
 
-- When a goal step asks to be told, the act carries a reply, kept by the step's name.
-  Wait until that reply is answered, then go on holding it. Never guess an outcome.
-  [goal-rise] (Rough: how a reply is read by hand isn't written out yet.)
+ARTIE never serves. A host runs it and keeps its replies: resources where another
+party's answer lands. This skill needs the same host. [goal-rise; client/heart-script
+Rise.kt; heart-core Replies.kt]
+
+1. **Ask.** For a step that asks to be told, `as NAME`: get a new reply from the
+   host. It gives the reply's address and where the host's keys are.
+2. Act on the form with the step's fields, plus the envelope:
+   `"_links": {"hr:reply-to": {"href": <reply>}, "hr:keys": {"href": <keys>}}`.
+   Keep the reply by NAME. Don't sign anything: the party answering signs, and the
+   host checks it.
+3. **Once NAME is answered.** Read the reply (GET, the usual headers). Its `standing`
+   is `awaiting`, `completed` or `failed`. While it is `awaiting`, read it again,
+   waiting longer each time. Each read is logged and counted.
+4. `completed`: go on holding the reply's result. Follow `hr:in-reply-to` to the
+   request it answers when the step says to. `failed`: report the reply's problem
+   document. No answer in the step's time: report that and stop.
+
+Never guess an outcome, and never answer a reply yourself.
+
+Where this differs from ARTIE: ARTIE waits for the host to say the reply changed;
+here Claude reads the reply again. That is the closest a curl client can come, and it
+costs model calls, which the score counts.
 
 ### Never
 
