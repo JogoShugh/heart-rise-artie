@@ -132,6 +132,11 @@ An answer that names no HEART profile, such as plain `application/json`:
 - When a service later names its profile, the same client takes the controls it offers, with no change of its own:
   the upgrade is the service's, and optional.
 
+Open decision: an answer in the HAL-FORMS media type (`application/prs.hal-forms+json`) is read as HAL-FORMS,
+forms included, even when it names no HEART profile (`dialectOf` in `src/client.ts`). This lets the client
+work with Spring HATEOAS and other toolchains that name no profile. It also means that such an answer gets
+its controls read without a profile, unlike plain JSON. Review whether the media type alone is enough.
+
 ## When an act is refused
 
 Every refusal is a `Refused`, with a `kind`, a `status`, a `message` and any
