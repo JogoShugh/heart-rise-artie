@@ -1,0 +1,2594 @@
+---
+run:
+  client: heart-cs (C#), HeartCs.Core over HeartCs.Http
+  service: the simulated employees service (heart-sims), http://employees.test/
+  walks:
+    - HAL-FORMS at L0
+    - HAL Schema Forms at L2
+    - moved, HAL Schema Forms at L2
+    - someone else acts first, HAL-FORMS at L0
+---
+at: '2026-11-23T11:40:26.435Z'
+ms: 4
+mode: script
+say: '{walk}: enter {entry}'
+params:
+  entry: http://employees.test/
+  walk: HAL-FORMS at L0
+request:
+  method: GET
+  url: http://employees.test/
+  headers:
+    Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+    Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+    Cache-Control: no-cache
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    ETag: '"index-hf-c98d2e44d266d261"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile", </>;
+      rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", </>;
+      rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </>;
+      rel="alternate"; type="text/html", </>; rel="alternate"; type="application/json", </openapi.json>;
+      rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
+    Vary: Accept, Prefer, Accept-Profile
+    Content-Type: application/prs.hal-forms+json
+  body:
+    title: Employees
+    _links:
+      self:
+        href: /
+      alternate:
+        - href: /
+          type: application/hal+json
+          profile: https://w3id.org/heart-rise/hal-schema-forms
+        - href: /
+          type: application/prs.hal-forms+json
+          profile: https://w3id.org/heart-rise/hal-forms
+        - href: /
+          type: text/html
+        - href: /
+          type: application/json
+      service-desc:
+        href: /openapi.json
+        type: application/vnd.oai.openapi+json;version=3.1
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+    _templates:
+      staff:search-employees:
+        title: Find employees by name
+        method: GET
+        target: /employees
+        properties:
+          - name: name
+            type: search
+            required: true
+            minLength: 1
+            prompt: Part of the employee's first or last name; case is ignored
+      staff:get-employee:
+        title: Get an employee by number
+        method: GET
+        target: /employees
+        properties:
+          - name: id
+            type: number
+            required: true
+            min: 1
+            prompt: Employee number
+      staff:hire:
+        title: Hire an employee
+        method: POST
+        contentType: application/json
+        target: /actions/hire
+        properties:
+          - name: firstName
+            required: true
+            type: text
+            minLength: 1
+          - name: lastName
+            required: true
+            type: text
+            minLength: 1
+          - name: role
+            required: true
+            type: text
+            minLength: 1
+entry: true
+---
+at: '2026-11-23T11:40:26.456Z'
+ms: 2
+mode: script
+say: '{walk}: act {relation}, body {body}'
+params:
+  relation: staff:hire
+  body: '{"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}'
+  walk: HAL-FORMS at L0
+expect: 201
+request:
+  method: POST
+  url: http://employees.test/actions/hire
+  headers:
+    Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+    Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+    If-Match: '"index-hf-c98d2e44d266d261"'
+    Content-Type: application/json
+    Authorization: Bearer <token>
+  body:
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+response:
+  status: 201
+  headers:
+    Location: /employees/3
+    ETag: '"seq-1.hf.L0.153148b8188b44c3"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile",
+      </employees/3>; rel="alternate"; type="application/hal+json";
+      profile="https://w3id.org/heart-rise/hal-schema-forms", </employees/3>; rel="alternate";
+      type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </employees/3>;
+      rel="alternate"; type="text/html", </employees/3>; rel="alternate"; type="application/json"
+    Vary: Accept, Accept-Profile
+    Content-Location: /employees/3
+    Content-Type: application/prs.hal-forms+json
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+    status: working
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+    _templates:
+      staff:dismiss:
+        title: Dismiss the employee
+        method: DELETE
+        target: /employees/3/actions/dismiss
+        properties: []
+      staff:update:
+        title: Update the employee
+        method: PUT
+        contentType: application/json
+        target: /employees/3/actions/update
+        properties:
+          - name: firstName
+            required: true
+            type: text
+            minLength: 1
+          - name: lastName
+            required: true
+            type: text
+            minLength: 1
+          - name: role
+            required: true
+            type: text
+            minLength: 1
+held:
+  url: http://employees.test/
+  body:
+    title: Employees
+    _links:
+      self:
+        href: /
+      alternate:
+        - href: /
+          type: application/hal+json
+          profile: https://w3id.org/heart-rise/hal-schema-forms
+        - href: /
+          type: application/prs.hal-forms+json
+          profile: https://w3id.org/heart-rise/hal-forms
+        - href: /
+          type: text/html
+        - href: /
+          type: application/json
+      service-desc:
+        href: /openapi.json
+        type: application/vnd.oai.openapi+json;version=3.1
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+    _templates:
+      staff:search-employees:
+        title: Find employees by name
+        method: GET
+        target: /employees
+        properties:
+          - name: name
+            type: search
+            required: true
+            minLength: 1
+            prompt: Part of the employee's first or last name; case is ignored
+      staff:get-employee:
+        title: Get an employee by number
+        method: GET
+        target: /employees
+        properties:
+          - name: id
+            type: number
+            required: true
+            min: 1
+            prompt: Employee number
+      staff:hire:
+        title: Hire an employee
+        method: POST
+        contentType: application/json
+        target: /actions/hire
+        properties:
+          - name: firstName
+            required: true
+            type: text
+            minLength: 1
+          - name: lastName
+            required: true
+            type: text
+            minLength: 1
+          - name: role
+            required: true
+            type: text
+            minLength: 1
+---
+at: '2026-11-23T11:40:26.459Z'
+ms: 2
+mode: script
+say: '{walk}: act {relation}, body {body}'
+params:
+  relation: staff:update
+  body: '{"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor"}'
+  walk: HAL-FORMS at L0
+request:
+  method: PUT
+  url: http://employees.test/employees/3/actions/update
+  headers:
+    Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+    Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+    If-Match: '"seq-1.hf.L0.153148b8188b44c3"'
+    Content-Type: application/json
+    Authorization: Bearer <token>
+  body:
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+response:
+  status: 200
+  headers:
+    ETag: '"seq-2.hf.L0.da2a9b590e13cdb7"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile",
+      </employees/3>; rel="alternate"; type="application/hal+json";
+      profile="https://w3id.org/heart-rise/hal-schema-forms", </employees/3>; rel="alternate";
+      type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </employees/3>;
+      rel="alternate"; type="text/html", </employees/3>; rel="alternate"; type="application/json"
+    Vary: Accept, Accept-Profile
+    Content-Location: /employees/3
+    Content-Type: application/prs.hal-forms+json
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+    status: working
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+    _templates:
+      staff:dismiss:
+        title: Dismiss the employee
+        method: DELETE
+        target: /employees/3/actions/dismiss
+        properties: []
+      staff:update:
+        title: Update the employee
+        method: PUT
+        contentType: application/json
+        target: /employees/3/actions/update
+        properties:
+          - name: firstName
+            required: true
+            type: text
+            minLength: 1
+          - name: lastName
+            required: true
+            type: text
+            minLength: 1
+          - name: role
+            required: true
+            type: text
+            minLength: 1
+held:
+  url: http://employees.test/actions/hire
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+    status: working
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+    _templates:
+      staff:dismiss:
+        title: Dismiss the employee
+        method: DELETE
+        target: /employees/3/actions/dismiss
+        properties: []
+      staff:update:
+        title: Update the employee
+        method: PUT
+        contentType: application/json
+        target: /employees/3/actions/update
+        properties:
+          - name: firstName
+            required: true
+            type: text
+            minLength: 1
+          - name: lastName
+            required: true
+            type: text
+            minLength: 1
+          - name: role
+            required: true
+            type: text
+            minLength: 1
+---
+at: '2026-11-23T11:40:26.463Z'
+ms: 1
+mode: script
+say: '{walk}: act {relation}'
+params:
+  relation: staff:dismiss
+  walk: HAL-FORMS at L0
+request:
+  method: DELETE
+  url: http://employees.test/employees/3/actions/dismiss
+  headers:
+    Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+    Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+    If-Match: '"seq-2.hf.L0.da2a9b590e13cdb7"'
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    ETag: '"seq-3.hf.L0.f7ef096ff0d60f34"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile",
+      </employees/3>; rel="alternate"; type="application/hal+json";
+      profile="https://w3id.org/heart-rise/hal-schema-forms", </employees/3>; rel="alternate";
+      type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </employees/3>;
+      rel="alternate"; type="text/html", </employees/3>; rel="alternate"; type="application/json"
+    Vary: Accept, Accept-Profile
+    Content-Location: /employees/3
+    Content-Type: application/prs.hal-forms+json
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+    status: dismissed
+    _links:
+      self:
+        href: /employees/3
+held:
+  url: http://employees.test/employees/3/actions/update
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+    status: working
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+    _templates:
+      staff:dismiss:
+        title: Dismiss the employee
+        method: DELETE
+        target: /employees/3/actions/dismiss
+        properties: []
+      staff:update:
+        title: Update the employee
+        method: PUT
+        contentType: application/json
+        target: /employees/3/actions/update
+        properties:
+          - name: firstName
+            required: true
+            type: text
+            minLength: 1
+          - name: lastName
+            required: true
+            type: text
+            minLength: 1
+          - name: role
+            required: true
+            type: text
+            minLength: 1
+---
+at: '2026-11-23T11:40:26.778Z'
+ms: 0
+mode: script
+say: '{walk}: enter {entry}'
+params:
+  entry: http://employees.test/
+  walk: HAL Schema Forms at L2
+request:
+  method: GET
+  url: http://employees.test/
+  headers:
+    Accept: application/hal+json
+    Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>
+    Prefer: forms=link, schema=link
+    Cache-Control: no-cache
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    ETag: '"index-hsf-67da75d62982b5af"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile", </>;
+      rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", </>;
+      rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </>;
+      rel="alternate"; type="text/html", </>; rel="alternate"; type="application/json", </openapi.json>;
+      rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
+    Vary: Accept, Prefer, Accept-Profile
+    Preference-Applied: forms=link, schema=link
+    Content-Type: application/hal+json
+  body:
+    title: Employees
+    _links:
+      self:
+        href: /
+      alternate:
+        - href: /
+          type: application/hal+json
+          profile: https://w3id.org/heart-rise/hal-schema-forms
+        - href: /
+          type: application/prs.hal-forms+json
+          profile: https://w3id.org/heart-rise/hal-forms
+        - href: /
+          type: text/html
+        - href: /
+          type: application/json
+      service-desc:
+        href: /openapi.json
+        type: application/vnd.oai.openapi+json;version=3.1
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:affordances:
+        href: /affordances
+        type: application/hal+json
+      hr:forms:
+        href: /affordance-sets/26a4d2cbee7acc42
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-JqTSy+56zEJ1ThVpaVbIuQ90QljU3FAJu+3hxoPPkUo=
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-45RetHbnG9ee1gyMErYZDrkXGKfL5i3OzBxoQCBxFhw=
+held:
+  url: http://employees.test/employees/3/actions/dismiss
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+    status: dismissed
+    _links:
+      self:
+        href: /employees/3
+---
+at: '2026-11-23T11:40:26.781Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: HAL Schema Forms at L2
+  address: /affordance-sets/26a4d2cbee7acc42
+request:
+  method: GET
+  url: http://employees.test/affordance-sets/26a4d2cbee7acc42
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/hal+json
+  body:
+    _forms:
+      staff:get-employee:
+        _links:
+          target:
+            href: /employees/{id}
+            templated: true
+        description: Goes to one employee, given their number.
+        hr:integrity: sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        method: GET
+        schema:
+          $ref: /schemas/a78a8664de2af7ca
+          hr:integrity: sha256-p4qGZN4q98pSi/EC79pkKr4am7ugblu/2b3cjJLORuY=
+        title: Get an employee by number
+      staff:hire:
+        _links:
+          target:
+            href: /actions/hire
+        contentType: application/json
+        description: Hires someone, in a role.
+        hr:integrity: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        method: POST
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Hire an employee
+      staff:search-employees:
+        _links:
+          target:
+            href: /employees{?name}
+            templated: true
+        description: Lists the employees whose name has the text.
+        hr:integrity: sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        method: GET
+        schema:
+          $ref: /schemas/9bbf50e7600cc5b9
+          hr:integrity: sha256-m79Q52AMxbltr0AqsenzLziuwmYghN2FlqR21zdoa0c=
+        title: Find employees by name
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+held:
+  url: http://employees.test/
+  body:
+    title: Employees
+    _links:
+      self:
+        href: /
+      alternate:
+        - href: /
+          type: application/hal+json
+          profile: https://w3id.org/heart-rise/hal-schema-forms
+        - href: /
+          type: application/prs.hal-forms+json
+          profile: https://w3id.org/heart-rise/hal-forms
+        - href: /
+          type: text/html
+        - href: /
+          type: application/json
+      service-desc:
+        href: /openapi.json
+        type: application/vnd.oai.openapi+json;version=3.1
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:affordances:
+        href: /affordances
+        type: application/hal+json
+      hr:forms:
+        href: /affordance-sets/26a4d2cbee7acc42
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-JqTSy+56zEJ1ThVpaVbIuQ90QljU3FAJu+3hxoPPkUo=
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-45RetHbnG9ee1gyMErYZDrkXGKfL5i3OzBxoQCBxFhw=
+---
+at: '2026-11-23T11:40:26.783Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: HAL Schema Forms at L2
+  address: /schemas/a78a8664de2af7ca
+request:
+  method: GET
+  url: http://employees.test/schemas/a78a8664de2af7ca
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/schema+json
+  body:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    properties:
+      id:
+        description: The employee's number
+        minimum: 1
+        title: Employee number
+        type: integer
+    required:
+      - id
+    type: object
+held:
+  url: http://employees.test/affordance-sets/26a4d2cbee7acc42
+  body:
+    _forms:
+      staff:get-employee:
+        _links:
+          target:
+            href: /employees/{id}
+            templated: true
+        description: Goes to one employee, given their number.
+        hr:integrity: sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        method: GET
+        schema:
+          $ref: /schemas/a78a8664de2af7ca
+          hr:integrity: sha256-p4qGZN4q98pSi/EC79pkKr4am7ugblu/2b3cjJLORuY=
+        title: Get an employee by number
+      staff:hire:
+        _links:
+          target:
+            href: /actions/hire
+        contentType: application/json
+        description: Hires someone, in a role.
+        hr:integrity: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        method: POST
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Hire an employee
+      staff:search-employees:
+        _links:
+          target:
+            href: /employees{?name}
+            templated: true
+        description: Lists the employees whose name has the text.
+        hr:integrity: sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        method: GET
+        schema:
+          $ref: /schemas/9bbf50e7600cc5b9
+          hr:integrity: sha256-m79Q52AMxbltr0AqsenzLziuwmYghN2FlqR21zdoa0c=
+        title: Find employees by name
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+---
+at: '2026-11-23T11:40:26.784Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: HAL Schema Forms at L2
+  address: /schemas/10847085ef79da90
+request:
+  method: GET
+  url: http://employees.test/schemas/10847085ef79da90
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/schema+json
+  body:
+    properties:
+      firstName:
+        minLength: 1
+        type: string
+      lastName:
+        minLength: 1
+        type: string
+      role:
+        minLength: 1
+        type: string
+    required:
+      - firstName
+      - lastName
+      - role
+    type: object
+held:
+  url: http://employees.test/affordance-sets/26a4d2cbee7acc42
+  body:
+    _forms:
+      staff:get-employee:
+        _links:
+          target:
+            href: /employees/{id}
+            templated: true
+        description: Goes to one employee, given their number.
+        hr:integrity: sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        method: GET
+        schema:
+          $ref: /schemas/a78a8664de2af7ca
+          hr:integrity: sha256-p4qGZN4q98pSi/EC79pkKr4am7ugblu/2b3cjJLORuY=
+        title: Get an employee by number
+      staff:hire:
+        _links:
+          target:
+            href: /actions/hire
+        contentType: application/json
+        description: Hires someone, in a role.
+        hr:integrity: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        method: POST
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Hire an employee
+      staff:search-employees:
+        _links:
+          target:
+            href: /employees{?name}
+            templated: true
+        description: Lists the employees whose name has the text.
+        hr:integrity: sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        method: GET
+        schema:
+          $ref: /schemas/9bbf50e7600cc5b9
+          hr:integrity: sha256-m79Q52AMxbltr0AqsenzLziuwmYghN2FlqR21zdoa0c=
+        title: Find employees by name
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+---
+at: '2026-11-23T11:40:26.784Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: HAL Schema Forms at L2
+  address: /schemas/9bbf50e7600cc5b9
+request:
+  method: GET
+  url: http://employees.test/schemas/9bbf50e7600cc5b9
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/schema+json
+  body:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    properties:
+      name:
+        description: Part of the employee's first or last name; case is ignored
+        minLength: 1
+        title: Name
+        type: string
+    required:
+      - name
+    type: object
+held:
+  url: http://employees.test/affordance-sets/26a4d2cbee7acc42
+  body:
+    _forms:
+      staff:get-employee:
+        _links:
+          target:
+            href: /employees/{id}
+            templated: true
+        description: Goes to one employee, given their number.
+        hr:integrity: sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        method: GET
+        schema:
+          $ref: /schemas/a78a8664de2af7ca
+          hr:integrity: sha256-p4qGZN4q98pSi/EC79pkKr4am7ugblu/2b3cjJLORuY=
+        title: Get an employee by number
+      staff:hire:
+        _links:
+          target:
+            href: /actions/hire
+        contentType: application/json
+        description: Hires someone, in a role.
+        hr:integrity: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        method: POST
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Hire an employee
+      staff:search-employees:
+        _links:
+          target:
+            href: /employees{?name}
+            templated: true
+        description: Lists the employees whose name has the text.
+        hr:integrity: sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        method: GET
+        schema:
+          $ref: /schemas/9bbf50e7600cc5b9
+          hr:integrity: sha256-m79Q52AMxbltr0AqsenzLziuwmYghN2FlqR21zdoa0c=
+        title: Find employees by name
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+---
+at: '2026-11-23T11:40:26.784Z'
+ms: 1
+mode: script
+say: '{walk}: act {relation}, body {body}'
+params:
+  relation: staff:hire
+  body: '{"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}'
+  walk: HAL Schema Forms at L2
+expect: 201
+request:
+  method: POST
+  url: http://employees.test/actions/hire
+  headers:
+    Accept: application/hal+json
+    Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>
+    Prefer: forms=link, schema=link
+    If-Match: '"index-hsf-67da75d62982b5af"'
+    Content-Type: application/json
+    Authorization: Bearer <token>
+  body:
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+response:
+  status: 201
+  headers:
+    Location: /employees/3
+    ETag: '"seq-1.hsf.L2.e2fb3b99798c9371"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile",
+      </employees/3>; rel="alternate"; type="application/hal+json";
+      profile="https://w3id.org/heart-rise/hal-schema-forms", </employees/3>; rel="alternate";
+      type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </employees/3>;
+      rel="alternate"; type="text/html", </employees/3>; rel="alternate"; type="application/json"
+    Vary: Accept, Prefer, Accept-Profile
+    Preference-Applied: forms=link, schema=link
+    Content-Location: /employees/3
+    Content-Type: application/hal+json
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+    status: working
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:forms:
+        href: /affordance-sets/2f822c4fedc9305e
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+held:
+  url: http://employees.test/affordance-sets/26a4d2cbee7acc42
+  body:
+    _forms:
+      staff:get-employee:
+        _links:
+          target:
+            href: /employees/{id}
+            templated: true
+        description: Goes to one employee, given their number.
+        hr:integrity: sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        method: GET
+        schema:
+          $ref: /schemas/a78a8664de2af7ca
+          hr:integrity: sha256-p4qGZN4q98pSi/EC79pkKr4am7ugblu/2b3cjJLORuY=
+        title: Get an employee by number
+      staff:hire:
+        _links:
+          target:
+            href: /actions/hire
+        contentType: application/json
+        description: Hires someone, in a role.
+        hr:integrity: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        method: POST
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Hire an employee
+      staff:search-employees:
+        _links:
+          target:
+            href: /employees{?name}
+            templated: true
+        description: Lists the employees whose name has the text.
+        hr:integrity: sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        method: GET
+        schema:
+          $ref: /schemas/9bbf50e7600cc5b9
+          hr:integrity: sha256-m79Q52AMxbltr0AqsenzLziuwmYghN2FlqR21zdoa0c=
+        title: Find employees by name
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+---
+at: '2026-11-23T11:40:26.785Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: HAL Schema Forms at L2
+  address: /affordance-sets/2f822c4fedc9305e
+request:
+  method: GET
+  url: http://employees.test/affordance-sets/2f822c4fedc9305e
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/hal+json
+  body:
+    _forms:
+      staff:dismiss:
+        _links:
+          target:
+            href: /employees/{id}/actions/dismiss
+            templated: true
+        description: Dismisses the employee, who stays on record.
+        hr:integrity: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        hr:templatePointers:
+          id: /id
+        method: DELETE
+        schema:
+          $ref: /schemas/efddc7bd8bbcef73
+          hr:integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+        title: Dismiss the employee
+      staff:update:
+        _links:
+          target:
+            href: /employees/{id}/actions/update
+            templated: true
+        contentType: application/json
+        description: Sets the employee's name and role.
+        hr:integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+        hr:templatePointers:
+          id: /id
+        method: PUT
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Update the employee
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+      hr:unavailable:
+        href: /unavailable/fc81f545088ea825
+        integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+        type: application/json
+held:
+  url: http://employees.test/actions/hire
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+    status: working
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:forms:
+        href: /affordance-sets/2f822c4fedc9305e
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+---
+at: '2026-11-23T11:40:26.786Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: HAL Schema Forms at L2
+  address: /schemas/efddc7bd8bbcef73
+request:
+  method: GET
+  url: http://employees.test/schemas/efddc7bd8bbcef73
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/schema+json
+  body:
+    properties: {}
+    type: object
+held:
+  url: http://employees.test/affordance-sets/2f822c4fedc9305e
+  body:
+    _forms:
+      staff:dismiss:
+        _links:
+          target:
+            href: /employees/{id}/actions/dismiss
+            templated: true
+        description: Dismisses the employee, who stays on record.
+        hr:integrity: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        hr:templatePointers:
+          id: /id
+        method: DELETE
+        schema:
+          $ref: /schemas/efddc7bd8bbcef73
+          hr:integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+        title: Dismiss the employee
+      staff:update:
+        _links:
+          target:
+            href: /employees/{id}/actions/update
+            templated: true
+        contentType: application/json
+        description: Sets the employee's name and role.
+        hr:integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+        hr:templatePointers:
+          id: /id
+        method: PUT
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Update the employee
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+      hr:unavailable:
+        href: /unavailable/fc81f545088ea825
+        integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+        type: application/json
+---
+at: '2026-11-23T11:40:26.788Z'
+ms: 1
+mode: script
+say: '{walk}: act {relation}, body {body}'
+params:
+  relation: staff:update
+  body: '{"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor"}'
+  walk: HAL Schema Forms at L2
+request:
+  method: PUT
+  url: http://employees.test/employees/3/actions/update
+  headers:
+    Accept: application/hal+json
+    Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>
+    Prefer: forms=link, schema=link
+    If-Match: '"seq-1.hsf.L2.e2fb3b99798c9371"'
+    Content-Type: application/json
+    Authorization: Bearer <token>
+  body:
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+response:
+  status: 200
+  headers:
+    ETag: '"seq-2.hsf.L2.16fffd3408a98fa8"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile",
+      </employees/3>; rel="alternate"; type="application/hal+json";
+      profile="https://w3id.org/heart-rise/hal-schema-forms", </employees/3>; rel="alternate";
+      type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </employees/3>;
+      rel="alternate"; type="text/html", </employees/3>; rel="alternate"; type="application/json"
+    Vary: Accept, Prefer, Accept-Profile
+    Preference-Applied: forms=link, schema=link
+    Content-Location: /employees/3
+    Content-Type: application/hal+json
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+    status: working
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:forms:
+        href: /affordance-sets/2f822c4fedc9305e
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+held:
+  url: http://employees.test/affordance-sets/2f822c4fedc9305e
+  body:
+    _forms:
+      staff:dismiss:
+        _links:
+          target:
+            href: /employees/{id}/actions/dismiss
+            templated: true
+        description: Dismisses the employee, who stays on record.
+        hr:integrity: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        hr:templatePointers:
+          id: /id
+        method: DELETE
+        schema:
+          $ref: /schemas/efddc7bd8bbcef73
+          hr:integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+        title: Dismiss the employee
+      staff:update:
+        _links:
+          target:
+            href: /employees/{id}/actions/update
+            templated: true
+        contentType: application/json
+        description: Sets the employee's name and role.
+        hr:integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+        hr:templatePointers:
+          id: /id
+        method: PUT
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Update the employee
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+      hr:unavailable:
+        href: /unavailable/fc81f545088ea825
+        integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+        type: application/json
+---
+at: '2026-11-23T11:40:26.789Z'
+ms: 1
+mode: script
+say: '{walk}: act {relation}'
+params:
+  relation: staff:dismiss
+  walk: HAL Schema Forms at L2
+request:
+  method: DELETE
+  url: http://employees.test/employees/3/actions/dismiss
+  headers:
+    Accept: application/hal+json
+    Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>
+    Prefer: forms=link, schema=link
+    If-Match: '"seq-2.hsf.L2.16fffd3408a98fa8"'
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    ETag: '"seq-3.hsf.L2.fb47587bf72eda6a"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile",
+      </employees/3>; rel="alternate"; type="application/hal+json";
+      profile="https://w3id.org/heart-rise/hal-schema-forms", </employees/3>; rel="alternate";
+      type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </employees/3>;
+      rel="alternate"; type="text/html", </employees/3>; rel="alternate"; type="application/json"
+    Vary: Accept, Prefer, Accept-Profile
+    Preference-Applied: forms=link, schema=link
+    Content-Location: /employees/3
+    Content-Type: application/hal+json
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+    status: dismissed
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:forms:
+        href: /affordance-sets/ac590afdae777f84
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-rFkK/a53f4QFh4dSELNzFL+IeQ5IfRYKl03FngrDzpg=
+held:
+  url: http://employees.test/employees/3/actions/update
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+    status: working
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:forms:
+        href: /affordance-sets/2f822c4fedc9305e
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+---
+at: '2026-11-23T11:40:26.791Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: HAL Schema Forms at L2
+  address: /affordance-sets/ac590afdae777f84
+request:
+  method: GET
+  url: http://employees.test/affordance-sets/ac590afdae777f84
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/hal+json
+  body:
+    _forms: {}
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+      hr:unavailable:
+        href: /unavailable/d7183d8fde7a5d4a
+        integrity: sha256-1xg9j956XUr/i1KvzEPs3WrLkEywNSXcv4c1TJ53SNE=
+        type: application/json
+held:
+  url: http://employees.test/employees/3/actions/dismiss
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+    status: dismissed
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:forms:
+        href: /affordance-sets/ac590afdae777f84
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-rFkK/a53f4QFh4dSELNzFL+IeQ5IfRYKl03FngrDzpg=
+---
+at: '2026-11-23T11:40:27.160Z'
+ms: 0
+mode: script
+say: '{walk}: enter {entry}'
+params:
+  entry: http://employees.test/
+  walk: moved, HAL Schema Forms at L2
+request:
+  method: GET
+  url: http://employees.test/
+  headers:
+    Accept: application/hal+json
+    Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>
+    Prefer: forms=link, schema=link
+    Cache-Control: no-cache
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    ETag: '"index-hsf-fec41f8912082713"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile", </>;
+      rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", </>;
+      rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </>;
+      rel="alternate"; type="text/html", </>; rel="alternate"; type="application/json", </openapi.json>;
+      rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
+    Vary: Accept, Prefer, Accept-Profile
+    Preference-Applied: forms=link, schema=link
+    Content-Type: application/hal+json
+  body:
+    title: Employees
+    _links:
+      self:
+        href: /
+      alternate:
+        - href: /
+          type: application/hal+json
+          profile: https://w3id.org/heart-rise/hal-schema-forms
+        - href: /
+          type: application/prs.hal-forms+json
+          profile: https://w3id.org/heart-rise/hal-forms
+        - href: /
+          type: text/html
+        - href: /
+          type: application/json
+      service-desc:
+        href: /openapi.json
+        type: application/vnd.oai.openapi+json;version=3.1
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:affordances:
+        href: /affordances
+        type: application/hal+json
+      hr:forms:
+        href: /affordance-sets/4949bea49657d555
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-SUm+pJZX1VWoceoVxVZ1bu5xyWi7b+Z6GEjGED3KuWg=
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-4ZS7YGt7UeRuwLxUwmSmKWIg8cwGIYKKEUqo0Ve/oBU=
+        staff:get-employee:
+          - sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        staff:hire:
+          - sha256-/RPFDi1Xj3tW7JmHYq05eXapW+tFvtRwj+4wkdUWB04=
+        staff:search-employees:
+          - sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        staff:update:
+          - sha256-zqXw21JQKyhbfKDJom1kvKerZiJ/LnzwG0Uw8lJ91+M=
+      digest: sha256-LFCro02GU0JfpwR6pmQ7IfjRYrfiB98pJovr1KHqWI8=
+held:
+  url: http://employees.test/affordance-sets/ac590afdae777f84
+  body:
+    _forms: {}
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+      hr:unavailable:
+        href: /unavailable/d7183d8fde7a5d4a
+        integrity: sha256-1xg9j956XUr/i1KvzEPs3WrLkEywNSXcv4c1TJ53SNE=
+        type: application/json
+---
+at: '2026-11-23T11:40:27.161Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: moved, HAL Schema Forms at L2
+  address: /affordance-sets/4949bea49657d555
+request:
+  method: GET
+  url: http://employees.test/affordance-sets/4949bea49657d555
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/hal+json
+  body:
+    _forms:
+      staff:get-employee:
+        _links:
+          target:
+            href: /employees/{id}
+            templated: true
+        description: Goes to one employee, given their number.
+        hr:integrity: sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        method: GET
+        schema:
+          $ref: /schemas/a78a8664de2af7ca
+          hr:integrity: sha256-p4qGZN4q98pSi/EC79pkKr4am7ugblu/2b3cjJLORuY=
+        title: Get an employee by number
+      staff:hire:
+        _links:
+          target:
+            href: /actions/take-on
+        contentType: application/json
+        description: Hires someone, in a role.
+        hr:integrity: sha256-/RPFDi1Xj3tW7JmHYq05eXapW+tFvtRwj+4wkdUWB04=
+        method: POST
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Hire an employee
+      staff:search-employees:
+        _links:
+          target:
+            href: /employees{?name}
+            templated: true
+        description: Lists the employees whose name has the text.
+        hr:integrity: sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        method: GET
+        schema:
+          $ref: /schemas/9bbf50e7600cc5b9
+          hr:integrity: sha256-m79Q52AMxbltr0AqsenzLziuwmYghN2FlqR21zdoa0c=
+        title: Find employees by name
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+held:
+  url: http://employees.test/
+  body:
+    title: Employees
+    _links:
+      self:
+        href: /
+      alternate:
+        - href: /
+          type: application/hal+json
+          profile: https://w3id.org/heart-rise/hal-schema-forms
+        - href: /
+          type: application/prs.hal-forms+json
+          profile: https://w3id.org/heart-rise/hal-forms
+        - href: /
+          type: text/html
+        - href: /
+          type: application/json
+      service-desc:
+        href: /openapi.json
+        type: application/vnd.oai.openapi+json;version=3.1
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:affordances:
+        href: /affordances
+        type: application/hal+json
+      hr:forms:
+        href: /affordance-sets/4949bea49657d555
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-SUm+pJZX1VWoceoVxVZ1bu5xyWi7b+Z6GEjGED3KuWg=
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-4ZS7YGt7UeRuwLxUwmSmKWIg8cwGIYKKEUqo0Ve/oBU=
+        staff:get-employee:
+          - sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        staff:hire:
+          - sha256-/RPFDi1Xj3tW7JmHYq05eXapW+tFvtRwj+4wkdUWB04=
+        staff:search-employees:
+          - sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        staff:update:
+          - sha256-zqXw21JQKyhbfKDJom1kvKerZiJ/LnzwG0Uw8lJ91+M=
+      digest: sha256-LFCro02GU0JfpwR6pmQ7IfjRYrfiB98pJovr1KHqWI8=
+---
+at: '2026-11-23T11:40:27.161Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: moved, HAL Schema Forms at L2
+  address: /schemas/a78a8664de2af7ca
+request:
+  method: GET
+  url: http://employees.test/schemas/a78a8664de2af7ca
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/schema+json
+  body:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    properties:
+      id:
+        description: The employee's number
+        minimum: 1
+        title: Employee number
+        type: integer
+    required:
+      - id
+    type: object
+held:
+  url: http://employees.test/affordance-sets/4949bea49657d555
+  body:
+    _forms:
+      staff:get-employee:
+        _links:
+          target:
+            href: /employees/{id}
+            templated: true
+        description: Goes to one employee, given their number.
+        hr:integrity: sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        method: GET
+        schema:
+          $ref: /schemas/a78a8664de2af7ca
+          hr:integrity: sha256-p4qGZN4q98pSi/EC79pkKr4am7ugblu/2b3cjJLORuY=
+        title: Get an employee by number
+      staff:hire:
+        _links:
+          target:
+            href: /actions/take-on
+        contentType: application/json
+        description: Hires someone, in a role.
+        hr:integrity: sha256-/RPFDi1Xj3tW7JmHYq05eXapW+tFvtRwj+4wkdUWB04=
+        method: POST
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Hire an employee
+      staff:search-employees:
+        _links:
+          target:
+            href: /employees{?name}
+            templated: true
+        description: Lists the employees whose name has the text.
+        hr:integrity: sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        method: GET
+        schema:
+          $ref: /schemas/9bbf50e7600cc5b9
+          hr:integrity: sha256-m79Q52AMxbltr0AqsenzLziuwmYghN2FlqR21zdoa0c=
+        title: Find employees by name
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+---
+at: '2026-11-23T11:40:27.161Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: moved, HAL Schema Forms at L2
+  address: /schemas/10847085ef79da90
+request:
+  method: GET
+  url: http://employees.test/schemas/10847085ef79da90
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/schema+json
+  body:
+    properties:
+      firstName:
+        minLength: 1
+        type: string
+      lastName:
+        minLength: 1
+        type: string
+      role:
+        minLength: 1
+        type: string
+    required:
+      - firstName
+      - lastName
+      - role
+    type: object
+held:
+  url: http://employees.test/affordance-sets/4949bea49657d555
+  body:
+    _forms:
+      staff:get-employee:
+        _links:
+          target:
+            href: /employees/{id}
+            templated: true
+        description: Goes to one employee, given their number.
+        hr:integrity: sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        method: GET
+        schema:
+          $ref: /schemas/a78a8664de2af7ca
+          hr:integrity: sha256-p4qGZN4q98pSi/EC79pkKr4am7ugblu/2b3cjJLORuY=
+        title: Get an employee by number
+      staff:hire:
+        _links:
+          target:
+            href: /actions/take-on
+        contentType: application/json
+        description: Hires someone, in a role.
+        hr:integrity: sha256-/RPFDi1Xj3tW7JmHYq05eXapW+tFvtRwj+4wkdUWB04=
+        method: POST
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Hire an employee
+      staff:search-employees:
+        _links:
+          target:
+            href: /employees{?name}
+            templated: true
+        description: Lists the employees whose name has the text.
+        hr:integrity: sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        method: GET
+        schema:
+          $ref: /schemas/9bbf50e7600cc5b9
+          hr:integrity: sha256-m79Q52AMxbltr0AqsenzLziuwmYghN2FlqR21zdoa0c=
+        title: Find employees by name
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+---
+at: '2026-11-23T11:40:27.162Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: moved, HAL Schema Forms at L2
+  address: /schemas/9bbf50e7600cc5b9
+request:
+  method: GET
+  url: http://employees.test/schemas/9bbf50e7600cc5b9
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/schema+json
+  body:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    properties:
+      name:
+        description: Part of the employee's first or last name; case is ignored
+        minLength: 1
+        title: Name
+        type: string
+    required:
+      - name
+    type: object
+held:
+  url: http://employees.test/affordance-sets/4949bea49657d555
+  body:
+    _forms:
+      staff:get-employee:
+        _links:
+          target:
+            href: /employees/{id}
+            templated: true
+        description: Goes to one employee, given their number.
+        hr:integrity: sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        method: GET
+        schema:
+          $ref: /schemas/a78a8664de2af7ca
+          hr:integrity: sha256-p4qGZN4q98pSi/EC79pkKr4am7ugblu/2b3cjJLORuY=
+        title: Get an employee by number
+      staff:hire:
+        _links:
+          target:
+            href: /actions/take-on
+        contentType: application/json
+        description: Hires someone, in a role.
+        hr:integrity: sha256-/RPFDi1Xj3tW7JmHYq05eXapW+tFvtRwj+4wkdUWB04=
+        method: POST
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Hire an employee
+      staff:search-employees:
+        _links:
+          target:
+            href: /employees{?name}
+            templated: true
+        description: Lists the employees whose name has the text.
+        hr:integrity: sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        method: GET
+        schema:
+          $ref: /schemas/9bbf50e7600cc5b9
+          hr:integrity: sha256-m79Q52AMxbltr0AqsenzLziuwmYghN2FlqR21zdoa0c=
+        title: Find employees by name
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+---
+at: '2026-11-23T11:40:27.162Z'
+ms: 1
+mode: script
+say: '{walk}: act {relation}, body {body}'
+params:
+  relation: staff:hire
+  body: '{"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}'
+  walk: moved, HAL Schema Forms at L2
+expect: 201
+request:
+  method: POST
+  url: http://employees.test/actions/take-on
+  headers:
+    Accept: application/hal+json
+    Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>
+    Prefer: forms=link, schema=link
+    If-Match: '"index-hsf-fec41f8912082713"'
+    Content-Type: application/json
+    Authorization: Bearer <token>
+  body:
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+response:
+  status: 201
+  headers:
+    Location: /employees/3
+    ETag: '"seq-1.hsf.L2.893f32360eadbfda"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile",
+      </employees/3>; rel="alternate"; type="application/hal+json";
+      profile="https://w3id.org/heart-rise/hal-schema-forms", </employees/3>; rel="alternate";
+      type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </employees/3>;
+      rel="alternate"; type="text/html", </employees/3>; rel="alternate"; type="application/json"
+    Vary: Accept, Prefer, Accept-Profile
+    Preference-Applied: forms=link, schema=link
+    Content-Location: /employees/3
+    Content-Type: application/hal+json
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+    status: working
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:forms:
+        href: /affordance-sets/63724ec16931af3d
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-Y3JOwWkxrz1/mF1oBejsaBKjxZJFK1CJoEIxest+a2Q=
+held:
+  url: http://employees.test/affordance-sets/4949bea49657d555
+  body:
+    _forms:
+      staff:get-employee:
+        _links:
+          target:
+            href: /employees/{id}
+            templated: true
+        description: Goes to one employee, given their number.
+        hr:integrity: sha256-uvX5Q0AshQt+rmvHeeMlnj89V68Iy6mvmcDqaSTWO2w=
+        method: GET
+        schema:
+          $ref: /schemas/a78a8664de2af7ca
+          hr:integrity: sha256-p4qGZN4q98pSi/EC79pkKr4am7ugblu/2b3cjJLORuY=
+        title: Get an employee by number
+      staff:hire:
+        _links:
+          target:
+            href: /actions/take-on
+        contentType: application/json
+        description: Hires someone, in a role.
+        hr:integrity: sha256-/RPFDi1Xj3tW7JmHYq05eXapW+tFvtRwj+4wkdUWB04=
+        method: POST
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Hire an employee
+      staff:search-employees:
+        _links:
+          target:
+            href: /employees{?name}
+            templated: true
+        description: Lists the employees whose name has the text.
+        hr:integrity: sha256-CTccR1LI7PlfUrTMUuE/3e9uYRPkXbMUyyzrgJT42kg=
+        method: GET
+        schema:
+          $ref: /schemas/9bbf50e7600cc5b9
+          hr:integrity: sha256-m79Q52AMxbltr0AqsenzLziuwmYghN2FlqR21zdoa0c=
+        title: Find employees by name
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+---
+at: '2026-11-23T11:40:27.163Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: moved, HAL Schema Forms at L2
+  address: /affordance-sets/63724ec16931af3d
+request:
+  method: GET
+  url: http://employees.test/affordance-sets/63724ec16931af3d
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/hal+json
+  body:
+    _forms:
+      staff:dismiss:
+        _links:
+          target:
+            href: /employees/{id}/actions/let-go
+            templated: true
+        description: Dismisses the employee, who stays on record.
+        hr:integrity: sha256-4ZS7YGt7UeRuwLxUwmSmKWIg8cwGIYKKEUqo0Ve/oBU=
+        hr:templatePointers:
+          id: /id
+        method: DELETE
+        schema:
+          $ref: /schemas/efddc7bd8bbcef73
+          hr:integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+        title: Dismiss the employee
+      staff:update:
+        _links:
+          target:
+            href: /employees/{id}/actions/revise
+            templated: true
+        contentType: application/json
+        description: Sets the employee's name and role.
+        hr:integrity: sha256-zqXw21JQKyhbfKDJom1kvKerZiJ/LnzwG0Uw8lJ91+M=
+        hr:templatePointers:
+          id: /id
+        method: PUT
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Update the employee
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+      hr:unavailable:
+        href: /unavailable/fc81f545088ea825
+        integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+        type: application/json
+held:
+  url: http://employees.test/actions/take-on
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+    status: working
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:forms:
+        href: /affordance-sets/63724ec16931af3d
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-Y3JOwWkxrz1/mF1oBejsaBKjxZJFK1CJoEIxest+a2Q=
+---
+at: '2026-11-23T11:40:27.163Z'
+ms: 0
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: moved, HAL Schema Forms at L2
+  address: /schemas/efddc7bd8bbcef73
+request:
+  method: GET
+  url: http://employees.test/schemas/efddc7bd8bbcef73
+  headers:
+    Accept: application/hal+json, application/schema+json, application/json
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    Content-Type: application/schema+json
+  body:
+    properties: {}
+    type: object
+held:
+  url: http://employees.test/affordance-sets/63724ec16931af3d
+  body:
+    _forms:
+      staff:dismiss:
+        _links:
+          target:
+            href: /employees/{id}/actions/let-go
+            templated: true
+        description: Dismisses the employee, who stays on record.
+        hr:integrity: sha256-4ZS7YGt7UeRuwLxUwmSmKWIg8cwGIYKKEUqo0Ve/oBU=
+        hr:templatePointers:
+          id: /id
+        method: DELETE
+        schema:
+          $ref: /schemas/efddc7bd8bbcef73
+          hr:integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+        title: Dismiss the employee
+      staff:update:
+        _links:
+          target:
+            href: /employees/{id}/actions/revise
+            templated: true
+        contentType: application/json
+        description: Sets the employee's name and role.
+        hr:integrity: sha256-zqXw21JQKyhbfKDJom1kvKerZiJ/LnzwG0Uw8lJ91+M=
+        hr:templatePointers:
+          id: /id
+        method: PUT
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Update the employee
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+      hr:unavailable:
+        href: /unavailable/fc81f545088ea825
+        integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+        type: application/json
+---
+at: '2026-11-23T11:40:27.164Z'
+ms: 1
+mode: script
+say: '{walk}: act {relation}, body {body}'
+params:
+  relation: staff:update
+  body: '{"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor"}'
+  walk: moved, HAL Schema Forms at L2
+request:
+  method: PUT
+  url: http://employees.test/employees/3/actions/revise
+  headers:
+    Accept: application/hal+json
+    Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>
+    Prefer: forms=link, schema=link
+    If-Match: '"seq-1.hsf.L2.893f32360eadbfda"'
+    Content-Type: application/json
+    Authorization: Bearer <token>
+  body:
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+response:
+  status: 200
+  headers:
+    ETag: '"seq-2.hsf.L2.d389c90946589347"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile",
+      </employees/3>; rel="alternate"; type="application/hal+json";
+      profile="https://w3id.org/heart-rise/hal-schema-forms", </employees/3>; rel="alternate";
+      type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </employees/3>;
+      rel="alternate"; type="text/html", </employees/3>; rel="alternate"; type="application/json"
+    Vary: Accept, Prefer, Accept-Profile
+    Preference-Applied: forms=link, schema=link
+    Content-Location: /employees/3
+    Content-Type: application/hal+json
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+    status: working
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:forms:
+        href: /affordance-sets/63724ec16931af3d
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-Y3JOwWkxrz1/mF1oBejsaBKjxZJFK1CJoEIxest+a2Q=
+held:
+  url: http://employees.test/affordance-sets/63724ec16931af3d
+  body:
+    _forms:
+      staff:dismiss:
+        _links:
+          target:
+            href: /employees/{id}/actions/let-go
+            templated: true
+        description: Dismisses the employee, who stays on record.
+        hr:integrity: sha256-4ZS7YGt7UeRuwLxUwmSmKWIg8cwGIYKKEUqo0Ve/oBU=
+        hr:templatePointers:
+          id: /id
+        method: DELETE
+        schema:
+          $ref: /schemas/efddc7bd8bbcef73
+          hr:integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+        title: Dismiss the employee
+      staff:update:
+        _links:
+          target:
+            href: /employees/{id}/actions/revise
+            templated: true
+        contentType: application/json
+        description: Sets the employee's name and role.
+        hr:integrity: sha256-zqXw21JQKyhbfKDJom1kvKerZiJ/LnzwG0Uw8lJ91+M=
+        hr:templatePointers:
+          id: /id
+        method: PUT
+        schema:
+          $ref: /schemas/10847085ef79da90
+          hr:integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+        title: Update the employee
+    _links:
+      curies:
+        - href: /profiles/staff#{rel}
+          name: staff
+          templated: true
+        - href: https://w3id.org/heart-rise/rels/{rel}
+          name: hr
+          templated: true
+      hr:unavailable:
+        href: /unavailable/fc81f545088ea825
+        integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+        type: application/json
+---
+at: '2026-11-23T11:40:27.459Z'
+ms: 0
+mode: script
+say: '{walk}: enter {entry}'
+params:
+  entry: http://employees.test/
+  walk: someone else acts first, HAL-FORMS at L0
+request:
+  method: GET
+  url: http://employees.test/
+  headers:
+    Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+    Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+    Cache-Control: no-cache
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    ETag: '"index-hf-c98d2e44d266d261"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile", </>;
+      rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", </>;
+      rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </>;
+      rel="alternate"; type="text/html", </>; rel="alternate"; type="application/json", </openapi.json>;
+      rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
+    Vary: Accept, Prefer, Accept-Profile
+    Content-Type: application/prs.hal-forms+json
+  body:
+    title: Employees
+    _links:
+      self:
+        href: /
+      alternate:
+        - href: /
+          type: application/hal+json
+          profile: https://w3id.org/heart-rise/hal-schema-forms
+        - href: /
+          type: application/prs.hal-forms+json
+          profile: https://w3id.org/heart-rise/hal-forms
+        - href: /
+          type: text/html
+        - href: /
+          type: application/json
+      service-desc:
+        href: /openapi.json
+        type: application/vnd.oai.openapi+json;version=3.1
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+    _templates:
+      staff:search-employees:
+        title: Find employees by name
+        method: GET
+        target: /employees
+        properties:
+          - name: name
+            type: search
+            required: true
+            minLength: 1
+            prompt: Part of the employee's first or last name; case is ignored
+      staff:get-employee:
+        title: Get an employee by number
+        method: GET
+        target: /employees
+        properties:
+          - name: id
+            type: number
+            required: true
+            min: 1
+            prompt: Employee number
+      staff:hire:
+        title: Hire an employee
+        method: POST
+        contentType: application/json
+        target: /actions/hire
+        properties:
+          - name: firstName
+            required: true
+            type: text
+            minLength: 1
+          - name: lastName
+            required: true
+            type: text
+            minLength: 1
+          - name: role
+            required: true
+            type: text
+            minLength: 1
+held:
+  url: http://employees.test/employees/3/actions/revise
+  body:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener, mayor
+    status: working
+    _links:
+      self:
+        href: /employees/3
+      curies:
+        - name: hr
+          href: https://w3id.org/heart-rise/rels/{rel}
+          templated: true
+      hr:forms:
+        href: /affordance-sets/63724ec16931af3d
+        type: application/hal+json
+        profile: https://w3id.org/heart-rise/hal-schema-forms
+        integrity: sha256-Y3JOwWkxrz1/mF1oBejsaBKjxZJFK1CJoEIxest+a2Q=
+---
+at: '2026-11-23T11:40:27.461Z'
+ms: 0
+mode: script
+say: '{walk}: act {relation}, name {name}'
+params:
+  relation: staff:search-employees
+  name: Frodo
+  walk: someone else acts first, HAL-FORMS at L0
+request:
+  method: GET
+  url: http://employees.test/employees?name=Frodo
+  headers:
+    Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+    Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+    Cache-Control: no-cache
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    ETag: '"page.hf.e6bf323802884276"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile", </>;
+      rel="alternate"; type="application/hal+json"; profile="https://w3id.org/heart-rise/hal-schema-forms", </>;
+      rel="alternate"; type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </>;
+      rel="alternate"; type="text/html", </>; rel="alternate"; type="application/json"
+    Vary: Accept, Accept-Profile
+    Content-Type: application/prs.hal-forms+json
+  body:
+    count: 1
+    _links:
+      self:
+        href: /employees?name=Frodo
+      item:
+        - href: /employees/1
+          title: Frodo Baggins
+held:
+  url: http://employees.test/
+  body:
+    title: Employees
+    _links:
+      self:
+        href: /
+      alternate:
+        - href: /
+          type: application/hal+json
+          profile: https://w3id.org/heart-rise/hal-schema-forms
+        - href: /
+          type: application/prs.hal-forms+json
+          profile: https://w3id.org/heart-rise/hal-forms
+        - href: /
+          type: text/html
+        - href: /
+          type: application/json
+      service-desc:
+        href: /openapi.json
+        type: application/vnd.oai.openapi+json;version=3.1
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+    _templates:
+      staff:search-employees:
+        title: Find employees by name
+        method: GET
+        target: /employees
+        properties:
+          - name: name
+            type: search
+            required: true
+            minLength: 1
+            prompt: Part of the employee's first or last name; case is ignored
+      staff:get-employee:
+        title: Get an employee by number
+        method: GET
+        target: /employees
+        properties:
+          - name: id
+            type: number
+            required: true
+            min: 1
+            prompt: Employee number
+      staff:hire:
+        title: Hire an employee
+        method: POST
+        contentType: application/json
+        target: /actions/hire
+        properties:
+          - name: firstName
+            required: true
+            type: text
+            minLength: 1
+          - name: lastName
+            required: true
+            type: text
+            minLength: 1
+          - name: role
+            required: true
+            type: text
+            minLength: 1
+---
+at: '2026-11-23T11:40:27.462Z'
+ms: 1
+mode: script
+say: '{walk}: follow {relation} titled {title}'
+params:
+  relation: item
+  title: Frodo Baggins
+  walk: someone else acts first, HAL-FORMS at L0
+request:
+  method: GET
+  url: http://employees.test/employees/1
+  headers:
+    Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+    Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+    Cache-Control: no-cache
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    ETag: '"seq-1.hf.L0.0cdd39c95cb13af5"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile",
+      </employees/1>; rel="alternate"; type="application/hal+json";
+      profile="https://w3id.org/heart-rise/hal-schema-forms", </employees/1>; rel="alternate";
+      type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </employees/1>;
+      rel="alternate"; type="text/html", </employees/1>; rel="alternate"; type="application/json"
+    Vary: Accept, Accept-Profile
+    Content-Type: application/prs.hal-forms+json
+  body:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer
+    status: working
+    _links:
+      self:
+        href: /employees/1
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+    _templates:
+      staff:dismiss:
+        title: Dismiss the employee
+        method: DELETE
+        target: /employees/1/actions/dismiss
+        properties: []
+      staff:update:
+        title: Update the employee
+        method: PUT
+        contentType: application/json
+        target: /employees/1/actions/update
+        properties:
+          - name: firstName
+            required: true
+            type: text
+            minLength: 1
+          - name: lastName
+            required: true
+            type: text
+            minLength: 1
+          - name: role
+            required: true
+            type: text
+            minLength: 1
+held:
+  url: http://employees.test/employees?name=Frodo
+  body:
+    count: 1
+    _links:
+      self:
+        href: /employees?name=Frodo
+      item:
+        - href: /employees/1
+          title: Frodo Baggins
+---
+at: '2026-11-23T11:40:27.463Z'
+ms: 1
+mode: script
+say: '{walk}: act {relation}, body {body}'
+params:
+  relation: staff:update
+  body: '{"firstName": "Frodo", "lastName": "Baggins", "role": "ring bearer, retired"}'
+  walk: someone else acts first, HAL-FORMS at L0
+expect: 412
+request:
+  method: PUT
+  url: http://employees.test/employees/1/actions/update
+  headers:
+    Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+    Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+    If-Match: '"seq-1.hf.L0.0cdd39c95cb13af5"'
+    Content-Type: application/json
+    Authorization: Bearer <token>
+  body:
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer, retired
+response:
+  status: 412
+  headers:
+    Content-Type: application/problem+json
+  body:
+    type: https://w3id.org/heart-rise/problems/stale
+    title: 'The act is stale: the state has changed'
+    status: 412
+    detail: the validator does not match the current one of the selected representation
+    _links:
+      about:
+        href: /employees/1
+held:
+  url: http://employees.test/employees/1
+  body:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer
+    status: working
+    _links:
+      self:
+        href: /employees/1
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+    _templates:
+      staff:dismiss:
+        title: Dismiss the employee
+        method: DELETE
+        target: /employees/1/actions/dismiss
+        properties: []
+      staff:update:
+        title: Update the employee
+        method: PUT
+        contentType: application/json
+        target: /employees/1/actions/update
+        properties:
+          - name: firstName
+            required: true
+            type: text
+            minLength: 1
+          - name: lastName
+            required: true
+            type: text
+            minLength: 1
+          - name: role
+            required: true
+            type: text
+            minLength: 1
+---
+at: '2026-11-23T11:40:27.465Z'
+ms: 1
+mode: script
+say: '{walk}: and the client reads {address}'
+params:
+  walk: someone else acts first, HAL-FORMS at L0
+  address: /employees/1
+request:
+  method: GET
+  url: http://employees.test/employees/1
+  headers:
+    Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
+    Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
+    Cache-Control: no-cache
+    Authorization: Bearer <token>
+response:
+  status: 200
+  headers:
+    ETag: '"seq-2.hf.L0.fe54130532168a84"'
+    Link: >-
+      <https://w3id.org/heart-rise/hal-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile",
+      </employees/1>; rel="alternate"; type="application/hal+json";
+      profile="https://w3id.org/heart-rise/hal-schema-forms", </employees/1>; rel="alternate";
+      type="application/prs.hal-forms+json"; profile="https://w3id.org/heart-rise/hal-forms", </employees/1>;
+      rel="alternate"; type="text/html", </employees/1>; rel="alternate"; type="application/json"
+    Vary: Accept, Accept-Profile
+    Content-Type: application/prs.hal-forms+json
+  body:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: keeper of the Red Book
+    status: working
+    _links:
+      self:
+        href: /employees/1
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+    _templates:
+      staff:dismiss:
+        title: Dismiss the employee
+        method: DELETE
+        target: /employees/1/actions/dismiss
+        properties: []
+      staff:update:
+        title: Update the employee
+        method: PUT
+        contentType: application/json
+        target: /employees/1/actions/update
+        properties:
+          - name: firstName
+            required: true
+            type: text
+            minLength: 1
+          - name: lastName
+            required: true
+            type: text
+            minLength: 1
+          - name: role
+            required: true
+            type: text
+            minLength: 1
+held:
+  url: http://employees.test/employees/1
+  body:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer
+    status: working
+    _links:
+      self:
+        href: /employees/1
+      curies:
+        - name: staff
+          href: /profiles/staff#{rel}
+          templated: true
+    _templates:
+      staff:dismiss:
+        title: Dismiss the employee
+        method: DELETE
+        target: /employees/1/actions/dismiss
+        properties: []
+      staff:update:
+        title: Update the employee
+        method: PUT
+        contentType: application/json
+        target: /employees/1/actions/update
+        properties:
+          - name: firstName
+            required: true
+            type: text
+            minLength: 1
+          - name: lastName
+            required: true
+            type: text
+            minLength: 1
+          - name: role
+            required: true
+            type: text
+            minLength: 1
