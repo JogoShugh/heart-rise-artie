@@ -43,13 +43,31 @@ sequenceDiagram
 
 ## You need
 
-- A Mac or Linux machine with git, and Docker Desktop running.
-- A GitHub account.
-- An Anthropic API key (console.anthropic.com).
+- A Mac or Linux machine with git, and Docker Desktop running, with about 10 GB of memory for Docker.
+- That's all, by default: the release kit runs in containers, at a small GitHub and at GitLab, with no account and
+  no key. It costs electricity only.
+- Opt in, if you like:
+  - **a GitHub account**: kept scripts replayed on a repository of yours, on real GitHub (`USE_GITHUB`);
+  - **an Anthropic API key** (console.anthropic.com): Claude walks goals written in words, billed to your key
+    (`USE_ANTHROPIC`).
 
 ### The quick way: one script
 
-It does every step below, saying what it does, and asks for your GitHub user, repository, token and Anthropic key.
+It does every step below, saying what it does: it builds and starts the release kit, then releases five pull
+requests at the small GitHub and the same five at GitLab, by kept scripts with no model. It asks about each opt in
+once, defaulting to no. A key you paste shows a `*` per character, then how many characters it got and their last
+four.
+
+Settle the opt ins ahead, if you like, in `kit/.env` (`cp kit/env.example kit/.env`):
+
+| `USE_GITHUB`, `USE_ANTHROPIC` | Setup |
+|---|---|
+| `ask` (the default) | asks; when `kit/.env` holds the key, asks whether to use it |
+| `yes` | uses it, asking only for what `kit/.env` lacks, and says so |
+| `no` | leaves it off, and says so |
+
+To run the releases again from the start: `kit/release.sh reset` puts the small GitHub and GitLab back as first
+seeded and clears their runs (`reset github` or `reset gitlab` for one).
 
 - **Windows**, in PowerShell (it installs WSL and Ubuntu if need be, clones this repository inside Ubuntu, and
   carries on there):
@@ -58,7 +76,8 @@ It does every step below, saying what it does, and asks for your GitHub user, re
   ```
 - **Ubuntu or macOS**, in a clone of this repository: `kit/setup.sh`
 
-Create the empty repository and the token first (Set up, once, steps 1 and 2); the script asks for them.
+To opt in to GitHub, create the empty repository and the token first (Set up, once, steps 1 and 2); the script
+asks for them.
 
 ### On Windows, by hand
 
@@ -72,7 +91,7 @@ Use WSL 2 with Ubuntu, and do everything below inside Ubuntu, not in PowerShell:
   - Docker inside Ubuntu: `sudo apt install docker.io docker-buildx docker-compose-v2`, then
     `sudo usermod -aG docker $USER`, and open a new terminal. Without `docker-buildx` the build stops with "the
     --mount option requires BuildKit".
-- **Memory** for WSL is set in `%UserProfile%\.wslconfig` (`[wsl2]`, `memory=8GB`), not in Docker Desktop.
+- **Memory** for WSL is set in `%UserProfile%\.wslconfig` (`[wsl2]`, `memory=12GB`), not in Docker Desktop.
 
 ## Set up, once
 
@@ -239,6 +258,7 @@ kit/release.sh run github      # five pull requests at a small GitHub inside the
 kit/release.sh up gitlab       # GitLab too: about 4 GB more memory, several minutes the first time
 kit/release.sh run gitlab      # the same five as GitLab merge requests
 kit/release.sh run github-live # the same five at OWNER/REPO on real GitHub
+kit/release.sh reset           # the small GitHub and GitLab back as first seeded, runs cleared
 kit/release.sh down
 ```
 

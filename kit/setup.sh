@@ -1,7 +1,11 @@
 #!/bin/sh
-# Sets up the kit on this machine, step by step, saying what it does as it goes, and asking for what only you know:
-# your GitHub user, the repository the kit works on, your GitHub token and your Anthropic key. Run it again any time;
-# it skips what is done already, and keeps what kit/.env holds unless you type something new.
+# Sets up the kit on this machine, step by step, saying what it does as it goes. By default it costs electricity only:
+# everything runs in containers here, a small GitHub, GitLab and Jenkins among them, with no account and no key.
+# Two things are opt in, each asked about once, or settled ahead in kit/.env (kit/env.example):
+#   USE_GITHUB=ask|yes|no      your GitHub account: kept scripts replayed on a repository of yours, on real GitHub
+#   USE_ANTHROPIC=ask|yes|no   an Anthropic key: Claude walks goals written in words (billed to your key)
+# With ask (the default), setup asks, and offers a key it finds in kit/.env; with yes or no it only says which.
+# Run it again any time; it skips what is done already, and keeps what kit/.env holds unless you type something new.
 #   kit/setup.sh
 # Ubuntu (WSL 2 on Windows, or Linux) and macOS. On Windows, kit/windows/setup.ps1 gets you here.
 set -eu
@@ -19,6 +23,12 @@ ask_yes() { # question; yes unless answered n
   printf '   %s [Y/n] ' "$1"; read -r answer
   case $answer in n* | N*) return 1 ;; *) return 0 ;; esac
 }
+ask_no() { # question; no unless answered y, and no when there is no terminal to ask in
+  interactive || return 1
+  printf '   %s [y/N] ' "$1"; read -r answer
+  case $answer in y* | Y*) return 0 ;; *) return 1 ;; esac
+}
+ending() { printf '%s' "$1" | tail -c 4; }
 
 # What kit/.env holds already, so Enter keeps it.
 . "$here/env.sh"
@@ -89,82 +99,188 @@ fi
 $docker_cmd buildx version > /dev/null 2>&1 \
   || stop "Docker has no BuildKit (buildx); the kit's build needs it. On Ubuntu: sudo apt-get install docker-buildx"
 ok "BuildKit is there"
+$docker_cmd compose version > /dev/null 2>&1 \
+  || stop "Docker has no compose; the release kit needs it. On Ubuntu: sudo apt-get install docker-compose-v2"
+ok "compose is there"
 memory=$($docker_cmd info --format '{{.MemTotal}}' 2> /dev/null || echo 0)
-if [ "$memory" -lt 6000000000 ] 2> /dev/null; then
-  note "Docker has $((memory / 1000000000)) GB of memory; the build wants about 6."
-  if [ -n "$wsl" ]; then note "Give WSL more in %UserProfile%\\.wslconfig ([wsl2], memory=8GB), then: wsl --shutdown"; fi
+if [ "$memory" -lt 10000000000 ] 2> /dev/null; then
+  note "Docker has $((memory / 1000000000)) GB of memory; the build and GitLab together want about 10."
+  if [ -n "$wsl" ]; then note "Give WSL more in %UserProfile%\\.wslconfig ([wsl2], memory=12GB), then: wsl --shutdown"; fi
+  if [ "$os" = Darwin ]; then note "Give Docker Desktop more in its Settings, Resources."; fi
 fi
 
-say "Your GitHub repository and keys"
-note "The kit works on a repository of yours: an empty one is best, named kit-trial say."
-note "Create it at https://github.com/new (no README, no template), if you haven't."
-prompt() { # NAME "question" [secret]; Enter keeps what kit/.env holds
+# A key, pasted or typed: one * per character as it comes, Backspace takes one back, Enter ends. Enter alone keeps
+# what kit/.env holds.
+nl=$(printf '\nx'); nl=${nl%x}
+cr=$(printf '\r'); bs=$(printf '\b'); del=$(printf '\177'); esc=$(printf '\033')
+read_secret() { # NAME "what to paste"
   eval "current=\${$1:-}"
-  if ! interactive; then
-    [ -n "$current" ] || stop "$1 is not set, and there's no terminal to ask in. Set it in kit/.env."
-    return
+  shown=""; [ -z "$current" ] || shown=" [Enter keeps the one ending …$(ending "$current")]"
+  printf '   %s%s: ' "$2" "$shown"
+  saved=$(stty -g)
+  trap 'stty "$saved"; echo; exit 130' INT TERM
+  stty -echo -icanon min 1 time 0
+  value=""
+  while :; do
+    c=$(dd bs=1 count=1 2> /dev/null; echo .)
+    c=${c%.}
+    case $c in
+      "$nl" | "$cr" | '') break ;;
+      "$bs" | "$del") if [ -n "$value" ]; then value=${value%?}; printf '\b \b'; fi ;;
+      "$esc") # an escape sequence, such as an arrow key or a terminal's paste markers: read to its end, and drop it
+        while :; do
+          c=$(dd bs=1 count=1 2> /dev/null; echo .); c=${c%.}
+          case $c in [A-Za-z~] | '') break ;; esac
+        done ;;
+      *[![:print:]]*) ;; # other control keys are no part of a key
+      *) value=$value$c; printf '*' ;;
+    esac
+  done
+  stty "$saved"; trap - INT TERM
+  echo
+  value=$(printf '%s' "$value" | tr -d '[:space:]')
+  if [ -n "$value" ]; then
+    eval "$1=\$value"
+    ok "got ${#value} characters, ending …$(ending "$value")"
+  elif [ -n "$current" ]; then
+    ok "kept the one in kit/.env, ending …$(ending "$current")"
   fi
-  shown=$current
-  if [ -n "${3:-}" ] && [ -n "$current" ]; then shown="kept, ends …$(printf '%s' "$current" | tail -c 4)"; fi
-  printf '   %s%s: ' "$2" "${shown:+ [$shown]}"
-  if [ -n "${3:-}" ]; then stty -echo; read -r value; stty echo; echo; else read -r value; fi
+}
+prompt() { # NAME "question": asked only when kit/.env doesn't hold it
+  eval "current=\${$1:-}"
+  [ -z "$current" ] || return 0
+  interactive || stop "$1 is not set, and there's no terminal to ask in. Set it in kit/.env."
+  printf '   %s: ' "$2"; read -r value
   [ -z "$value" ] || eval "$1=\$value"
   eval "[ -n \"\${$1:-}\" ]" || stop "$1 is needed."
 }
-[ "${OWNER:-}" = your-github-user ] && OWNER=""
-prompt OWNER "Your GitHub user name"
-REPO=${REPO:-kit-trial}
-prompt REPO "The repository's name"
-note "A token for that repository alone: https://github.com/settings/personal-access-tokens/new"
-note "  Repository access: Only select repositories, $REPO. Permissions: Issues, Pull requests, Contents: Read and write."
-prompt GITHUB_TOKEN "Paste the token (it isn't shown)" secret
-note "An Anthropic key (console.anthropic.com) lets Claude walk goals; replays don't need it. Enter skips it."
-if interactive; then
-  shown=""; [ -n "${ANTHROPIC_API_KEY:-}" ] && shown=" [kept, ends …$(printf '%s' "$ANTHROPIC_API_KEY" | tail -c 4)]"
-  printf '   Paste the Anthropic key (it isn'"'"'t shown)%s: ' "$shown"
-  stty -echo; read -r value; stty echo; echo
-  [ -z "$value" ] || ANTHROPIC_API_KEY=$value
+# Settles an opt in: its flag says yes or no, and setup says only that; or, with ask, the person is asked.
+opt_in() { # FLAG "what" KEY "the question when kit/.env has no key"
+  eval "flag=\${$1:-ask}"
+  case $(printf '%s' "$flag" | tr 'A-Z' 'a-z') in
+    yes | y | true | on | 1) ok "$2: on ($1=yes)"; return 0 ;;
+    no | n | false | off | 0) ok "$2: off ($1=no)"; return 1 ;;
+  esac
+  if ! interactive; then note "$2: off (no terminal to ask in; $1=yes in kit/.env opts in)"; return 1; fi
+  eval "key=\${$3:-}"
+  if [ -n "$key" ]; then
+    question="kit/.env holds $3, ending …$(ending "$key"). Use it?"
+  else
+    question=$4
+  fi
+  if ask_no "$question"; then ok "$2: on"; return 0; fi
+  ok "$2: off"; return 1
+}
+
+say "What runs here, and what's yours to opt in to"
+ok "the small GitHub, GitLab, Jenkins and the release's parties: containers on this machine, no account, no key"
+settled() { case $(printf '%s' "${1:-ask}" | tr 'A-Z' 'a-z') in yes | y | true | on | 1 | no | n | false | off | 0) ;; *) return 1 ;; esac; }
+if ! settled "${USE_GITHUB:-}" || ! settled "${USE_ANTHROPIC:-}"; then
+  note "Opt in, if you like (kit/.env can settle each ahead: USE_GITHUB, USE_ANTHROPIC = yes, no or ask):"
+  note "  - your GitHub account: kept scripts replayed on a repository of yours, on real GitHub;"
+  note "  - an Anthropic key: Claude walks goals written in words, on that repository, billed to your key."
+fi
+github=""
+if opt_in USE_GITHUB "your GitHub account" GITHUB_TOKEN "Use your GitHub account too?"; then github=yes; fi
+anthropic=""
+if opt_in USE_ANTHROPIC "an Anthropic key" ANTHROPIC_API_KEY "Use an Anthropic key too?"; then anthropic=yes; fi
+
+if [ -n "$github" ]; then
+  say "Your GitHub repository and token"
+  [ "${OWNER:-}" = your-github-user ] && OWNER=""
+  if [ -z "${OWNER:-}" ] || [ -z "${GITHUB_TOKEN:-}" ]; then
+    note "The kit works on a repository of yours: an empty one is best, named kit-trial say."
+    note "Create it at https://github.com/new (no README, no template), if you haven't."
+  fi
+  prompt OWNER "Your GitHub user name"
+  REPO=${REPO:-kit-trial}
+  if [ -z "${GITHUB_TOKEN:-}" ]; then
+    interactive || stop "USE_GITHUB is yes, but kit/.env has no GITHUB_TOKEN, and there's no terminal to ask in."
+    note "A token for $OWNER/$REPO alone: https://github.com/settings/personal-access-tokens/new"
+    note "  Repository access: Only select repositories, $REPO. Permissions: Issues, Pull requests, Contents: Read and write."
+    read_secret GITHUB_TOKEN "Paste the token"
+    [ -n "${GITHUB_TOKEN:-}" ] || stop "GITHUB_TOKEN is needed for your GitHub account; or run again and say no to it."
+  fi
+  note "checking the token can reach $OWNER/$REPO"
+  answer=$(curl -s -w '\n%{http_code}' -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
+    "https://api.github.com/repos/$OWNER/$REPO")
+  code=$(printf '%s' "$answer" | tail -n 1)
+  case $code in
+    200) ok "the token reaches $OWNER/$REPO" ;;
+    401) stop "GitHub refused the token (401): expired, deleted, or pasted wrong. Make a new one and run this again." ;;
+    404) stop "GitHub has no $OWNER/$REPO this token can see. Check the names, and that the token's access includes it." ;;
+    *) stop "GitHub answered $code for $OWNER/$REPO." ;;
+  esac
 fi
 
-note "checking the token can reach $OWNER/$REPO"
-answer=$(curl -s -w '\n%{http_code}' -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/$OWNER/$REPO")
-code=$(printf '%s' "$answer" | tail -n 1)
-case $code in
-  200) ok "the token reaches $OWNER/$REPO" ;;
-  401) stop "GitHub refused the token (401): expired, deleted, or pasted wrong. Make a new one and run this again." ;;
-  404) stop "GitHub has no $OWNER/$REPO this token can see. Check the names, and that the token's access includes it." ;;
-  *) stop "GitHub answered $code for $OWNER/$REPO." ;;
-esac
+if [ -n "$anthropic" ]; then
+  say "Your Anthropic key"
+  if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+    interactive || stop "USE_ANTHROPIC is yes, but kit/.env has no ANTHROPIC_API_KEY, and there's no terminal to ask in."
+    note "A key from console.anthropic.com. Replays of kept scripts never use it."
+    read_secret ANTHROPIC_API_KEY "Paste the key"
+    [ -n "${ANTHROPIC_API_KEY:-}" ] || stop "ANTHROPIC_API_KEY is needed for Claude; or run again and say no to it."
+  else
+    ok "the key in kit/.env, ending …$(ending "$ANTHROPIC_API_KEY")"
+  fi
+  [ -n "$github" ] || note "Claude walks goals on your GitHub repository, so with GitHub off it has none to walk yet."
+fi
 
+kept_umask=$(umask)
 umask 077
 {
   echo "# Written by kit/setup.sh. kit/env.example says what each line is; git and Docker builds never see this file."
-  echo "OWNER=$OWNER"
-  echo "REPO=$REPO"
-  echo "GITHUB_TOKEN=$GITHUB_TOKEN"
+  echo "USE_GITHUB=${USE_GITHUB:-ask}"
+  echo "USE_ANTHROPIC=${USE_ANTHROPIC:-ask}"
+  echo "OWNER=${OWNER:-}"
+  echo "REPO=${REPO:-kit-trial}"
+  echo "GITHUB_TOKEN=${GITHUB_TOKEN:-}"
   echo "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}"
 } > "$env_file"
+umask "$kept_umask"
 ok "saved in kit/.env, readable by you alone"
 export OWNER REPO GITHUB_TOKEN ANTHROPIC_API_KEY
 
-say "Build the kit and seed $OWNER/$REPO"
-note "The first build takes several minutes; later ones are quick."
-if [ "$docker_cmd" != docker ]; then
-  # Docker through sudo, until the next login makes this user one of its group.
-  sudo --preserve-env=OWNER,REPO,GITHUB_TOKEN,ANTHROPIC_API_KEY sh "$here/bootstrap.sh" < /dev/null
-else
-  sh "$here/bootstrap.sh" < /dev/null
+# The kit's own scripts, through sudo while this user isn't yet one of Docker's group.
+kit_sh() {
+  if [ "$docker_cmd" != docker ]; then
+    sudo --preserve-env=OWNER,REPO,GITHUB_TOKEN,ANTHROPIC_API_KEY sh "$here/$@"
+  else
+    sh "$here/$@"
+  fi
+}
+
+say "Build and start the release kit: the small GitHub, GitLab and Jenkins"
+note "The first build takes several minutes, and GitLab several more to start; later ones are quick."
+kit_sh release.sh up gitlab < /dev/null
+
+say "Release five pull requests at the small GitHub, by a kept script, with no model"
+kit_sh release.sh run github < /dev/null
+
+say "The same five as GitLab merge requests"
+kit_sh release.sh run gitlab < /dev/null
+
+if [ -n "$github" ]; then
+  say "Build the kit and seed $OWNER/$REPO, by a kept script, with no model"
+  kit_sh bootstrap.sh < /dev/null
+  if ask_no "Release the five at $OWNER/$REPO on real GitHub now? It opens pull requests there, on library/* branches."; then
+    kit_sh release.sh run github-live < /dev/null
+  fi
 fi
 
 say "Done"
 note "Next, in ${here%/kit}:"
-note "  kit/try.sh walk hello     Claude opens an issue, comments on it, and closes it"
-note "  kit/README.md             the other goals, keeping a walk as a script, and the release kit"
-if [ -n "${ANTHROPIC_API_KEY:-}" ] && ask_yes "Walk hello now?"; then
-  if [ "$docker_cmd" != docker ]; then
-    sudo --preserve-env=OWNER,REPO,GITHUB_TOKEN,ANTHROPIC_API_KEY sh "$here/try.sh" walk hello
-  else
-    sh "$here/try.sh" walk hello
-  fi
+note "  kit/release.sh run github     the five releases again, at the small GitHub (or: run gitlab)"
+note "  kit/release.sh reset          the small GitHub and GitLab back as first seeded, runs cleared"
+note "                                (reset github or reset gitlab for one)"
+note "  kit/release.sh down           stops the release kit; GitLab's data is kept"
+if [ -n "$github" ]; then
+  note "  kit/release.sh run github-live   the five at $OWNER/$REPO on real GitHub"
+fi
+if [ -n "$github" ] && [ -n "$anthropic" ]; then
+  note "  kit/try.sh walk hello         Claude opens an issue, comments on it, and closes it"
+fi
+note "  kit/README.md                 the rest"
+if [ -n "$github" ] && [ -n "$anthropic" ] && ask_no "Walk hello now? Claude uses your key."; then
+  kit_sh try.sh walk hello
 fi
