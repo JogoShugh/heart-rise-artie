@@ -3,6 +3,7 @@
 #   in-release.sh serve          the container's own command: shares the simulator with Jenkins, then waits
 #   in-release.sh variants SCM   releases the five variants at SCM: github (the small GitHub), gitlab, or
 #                                github-live (OWNER/REPO on real GitHub, with GITHUB_TOKEN); runs go to /work/runs/SCM
+#   in-release.sh reset [SCM]    puts github, gitlab or both (the default) back as first seeded, and clears their runs
 # No token is printed.
 set -eu
 here=/artie/exhibits/merge-watch-release
@@ -61,6 +62,29 @@ case ${1:-} in
       case $promoted in null | '') echo "pr-$n: not promoted to Dev" ;; *) echo "pr-$n: promoted to Dev at $promoted" ;; esac
     done
     echo "Each release's trace: work/runs/$scm/pr-N.yaml" ;;
+  reset)
+    # The small GitHub lives in the release's parties, which every release starts afresh; the app repository and
+    # GitLab's project are what a release leaves changed.
+    scm=${2:-all}
+    case $scm in github | gitlab | all) ;; *) echo "reset takes github, gitlab or all" >&2; exit 2 ;; esac
+    cd "$here"
+    sh make-app-repo.sh > /dev/null
+    echo "the library app's repository: as first made"
+    if [ "$scm" != gitlab ]; then
+      rm -rf /work/runs/github
+      echo "the small GitHub: fresh at the next release; its runs cleared"
+    fi
+    if [ "$scm" != github ]; then
+      if answers http://localhost:8929/users/sign_in; then
+        [ -f gitlab/gitlab.env ] || (umask 077; : > gitlab/gitlab.env)
+        sh gitlab/seed.sh 2>&1 | grep -v '^remote:' > /dev/null
+        echo "GitLab: acme/web and its five merge requests, as first seeded"
+      else
+        echo "GitLab isn't up, so there is nothing of it to reset (kit/release.sh up gitlab starts it)"
+      fi
+      rm -rf /work/runs/gitlab
+      echo "GitLab's runs cleared"
+    fi ;;
   *)
-    sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
+    sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
 esac

@@ -5,6 +5,7 @@
 #   kit/release.sh run github        five releases at the small GitHub inside the kit
 #   kit/release.sh run gitlab        the same five at GitLab (after up gitlab)
 #   kit/release.sh run github-live   the same five at OWNER/REPO on real GitHub, on library/* branches only
+#   kit/release.sh reset [github|gitlab]   the small GitHub, GitLab or both back as first seeded, runs cleared
 #   kit/release.sh down              stops everything; GitLab's data is kept
 #   kit/release.sh shell             a shell in the release's container
 # OWNER, REPO and GITHUB_TOKEN come from kit/.env (kit/env.example), for github-live only. Runs are in ./work.
@@ -15,7 +16,7 @@ export KIT_WORK=${WORK:-$PWD/work}
 mkdir -p "$KIT_WORK"
 compose() { docker compose -f "$here/release/compose.yaml" "$@"; }
 
-usage() { sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; }
 [ $# -gt 0 ] || { usage; exit 0; }
 command=$1; shift
 case $command in
@@ -33,6 +34,8 @@ case $command in
     echo "Next: kit/release.sh run github" ;;
   run)
     docker exec -i -e GITHUB_TOKEN -e OWNER -e REPO heart-release /kit/in-release.sh variants "${1:-github}" ;;
+  reset)
+    docker exec -i heart-release /kit/in-release.sh reset "${1:-all}" ;;
   down)
     compose --profile gitlab down ;;
   shell)

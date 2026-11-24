@@ -1,6 +1,6 @@
 # Sets up the kit on Windows, step by step: WSL 2 and Ubuntu, WSL's memory, this repository cloned inside Ubuntu,
-# then kit/setup.sh there, which installs Docker if need be, asks for your GitHub repository and keys, and builds
-# the kit. Run it again any time; it skips what is done already.
+# then kit/setup.sh there, which installs Docker if need be, asks whether to opt in to your GitHub and an Anthropic
+# key, and builds and runs the kit. Run it again any time; it skips what is done already.
 #
 # In PowerShell (not as administrator; it asks when it needs to):
 #   powershell -ExecutionPolicy Bypass -File setup.ps1
@@ -64,19 +64,19 @@ $config = Join-Path $env:USERPROFILE '.wslconfig'
 if ((Test-Path $config) -and (Select-String -Path $config -Pattern '^\s*memory\s*=' -Quiet)) {
     Ok "set in $config"
 } else {
-    Note "The kit's build wants about 6 GB. WSL's memory is set in $config."
-    if (Ask-Yes "Give WSL 8 GB?") {
+    Note "The kit's build and GitLab together want about 10 GB. WSL's memory is set in $config."
+    if (Ask-Yes "Give WSL 12 GB?") {
         if (Test-Path $config) {
             $text = Get-Content $config -Raw
-            if ($text -match '(?m)^\[wsl2\]') { $text = $text -replace '(?m)^\[wsl2\]', "[wsl2]`r`nmemory=8GB" }
-            else { $text = $text + "`r`n[wsl2]`r`nmemory=8GB`r`n" }
+            if ($text -match '(?m)^\[wsl2\]') { $text = $text -replace '(?m)^\[wsl2\]', "[wsl2]`r`nmemory=12GB" }
+            else { $text = $text + "`r`n[wsl2]`r`nmemory=12GB`r`n" }
             Set-Content -Path $config -Value $text -Encoding ASCII
         } else {
-            Set-Content -Path $config -Value "[wsl2]`r`nmemory=8GB" -Encoding ASCII
+            Set-Content -Path $config -Value "[wsl2]`r`nmemory=12GB" -Encoding ASCII
         }
         Note "restarting WSL so it counts"
         & wsl.exe --shutdown
-        Ok "WSL has 8 GB"
+        Ok "WSL has 12 GB"
     }
 }
 
@@ -105,7 +105,7 @@ fi
 if ($LASTEXITCODE -ne 0) { Stop-Setup "the clone failed; see above." }
 
 Say "The kit, set up inside Ubuntu"
-Note "kit/setup.sh takes it from here; it asks for your GitHub repository and keys."
+Note "kit/setup.sh takes it from here; it asks whether to opt in to your GitHub and an Anthropic key."
 & wsl.exe -d $Distro --cd '~/heart-rise-artie' -- sh kit/setup.sh
 if ($LASTEXITCODE -ne 0) { Stop-Setup "kit/setup.sh stopped; see above. Fix that, then run this again." }
 
