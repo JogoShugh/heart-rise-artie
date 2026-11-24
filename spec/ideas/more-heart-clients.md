@@ -1,6 +1,6 @@
 # Idea: more HEART clients, in other languages
 
-**Status:** idea only. Raised by the author on 2026-11-15. Nothing is built.
+**Status:** idea. Raised by the author on 2026-11-15. Since then heart-cs is built (C#, L1, 106 of 108 conformance scenarios, local only); Python is next, outlined below (2026-11-24).
 
 ## Why
 
@@ -59,6 +59,7 @@
 
 ## .NET: F# first, C# calls it
 
+- **Overtaken:** heart-cs was built in C# directly, with its libraries behind core ports (HTTP in `HeartCs.Http`, an architecture test keeping them out of `HeartCs.Core`). The F# idea below stays only as an option.
 - F# suits the media type: an act, a refusal (`412`, `409`, `405`) or a rung is a discriminated union, matched exhaustively.
 - Raw F# reads awkwardly from C#: unions, `option`, curried functions and `Async`.
 - So the library has a thin facade for C#: classes and methods, `Task`, nullable results and named refusals.
@@ -83,8 +84,64 @@
 6. Rust.
 7. The rest on demand.
 
+## Python: heart-py, built like heart-cs
+
+The author settled the open question on 2026-11-23: a Python client is wanted, with its own bdd-gates stack. Python is the subject of this work, so the no-crafted-Python rule does not apply to it.
+
+### The bdd-gates stack: `stacks/python-uv/`
+
+The template's five questions, answered:
+
+1. **Where things live.**
+   - Production: `packages/*/src/*.py`.
+   - Excluded: `tests/`, step definitions, `.venv`, build output.
+   - Features: `tests/features/*.feature`, copied word for word from artie.
+2. **BDD runner: pytest-bdd.**
+   - A scenario with a missing step is an error.
+   - It brings pytest's fixtures, plugins and coverage.
+   - behave (`--strict`) is the alternative.
+   - Gap to check: neither is known to write Cucumber's ndjson message stream. Either set `scenarioResults: false`, or write a small converter.
+3. **Logging: the wrapper**, as in heart-cs.
+   - `bddCommand`: `uv run pytest "$@"`.
+   - `bddRawCommandRegex` blocks bare `pytest` and `python -m pytest`.
+   - Native logging is possible: pytest's `pytest_sessionfinish` hook runs on failure too. It would mean protecting `conftest.py`, so the wrapper is simpler.
+4. **Complexity, at defaults.**
+   - Ruff `C901` and `PLR09xx`.
+   - mypy `--strict`.
+   - jscpd for duplication.
+   - `pytest-cov --cov-fail-under=80`.
+5. **Architecture as a failing test.**
+   - Structural first: a uv workspace with core and adapter packages.
+   - Then import-linter: core never imports `httpx`, `requests` or `jsonschema`.
+   - Protected files: `ruff.toml`, `.importlinter`, `.coveragerc`. They stay out of `pyproject.toml`, so protecting them never blocks adding dependencies.
+
+### The client: the same shape as heart-cs
+
+| heart-cs | heart-py |
+|---|---|
+| `HeartCs.Core`, no `System.Net.Http` | `heart-py-core`, standard library only |
+| `HeartCs.Http` adapter | `heart-py-httpx` adapter |
+| `ITransport`, `ILayerCache` ports | `Transport`, `LayerCache` Protocols |
+| `HeartClient(transport, auth, rung, dialect, cache)` | the same, async: `enter`, `refresh`, `choices`, `follow(rel, title)`, `act(name, body)` |
+| `Representation`, `Rung`, `Dialect` | a frozen dataclass and enums |
+| `RefusedException(Kind, Status)` | `RefusedError(kind, status)` |
+| Architecture tests | import-linter contracts |
+| `Serial.cs`, `Sims.cs` | pytest runs one test at a time by default; a sims fixture on `HEART_SIMS_URL` and `X-Sim-Host` |
+| JsonSchema.Net later, behind a port | `jsonschema` later, in its own adapter package |
+
+- **Slices:** in the same order as heart-cs, with the same shared features, through headless runs.
+- **Report:** pytest writes JUnit XML, not TRX. A JUnit reader in `docs/reports/assets/build-conformance-report.mjs` gives heart-py the same conformance page.
+- **L2:** heart-py could be the first replay runner outside Kotlin, ahead of heart-ts.
+
+### First step
+
+The `python-uv` stack folder in bdd-gates-skill, passing `scripts/selftest.sh`. Then the heart-py repo scaffold and install.
+
 ## Open
 
-- Python: whether a kept Python client sits within the no-crafted-Python rule. It would be a subject of the work, like the native trial's Python.
+- heart-py:
+  - pytest-bdd or behave? pytest-bdd is the recommendation.
+  - Async only, or a sync facade as well for data and notebook users?
+  - Repo `heart-py`, import name `heart_py`?
 - R: a client of its own, or the Python client through reticulate.
 - Zig waits until a BDD runner exists, or uses a cucumber wire protocol.
