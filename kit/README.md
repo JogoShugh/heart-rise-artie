@@ -4,8 +4,8 @@ ARTIE is a generic client for HEART, the way a browser is a generic client for H
 
 - Claude walks a goal written in plain words once.
 - ARTIE keeps that walk as a script, and the script runs again with no model.
-- Everything runs in one Docker container on your machine, on an empty GitHub repository of yours, with your own
-  token.
+- Everything runs in one Docker container on your machine: at a small GitHub inside it by default, or on an empty
+  GitHub repository of yours, with your own token.
 
 <details>
 <summary>Diagram: walk once, keep, replay with no model</summary>
@@ -43,31 +43,40 @@ sequenceDiagram
 
 ## You need
 
-- A Mac or Linux machine with git, and Docker Desktop running, with about 10 GB of memory for Docker.
-- That's all, by default: the release kit runs in containers, at a small GitHub and at GitLab, with no account and
-  no key. It costs electricity only.
+- A Mac or Linux machine with git, and Docker Desktop running, with about 10 GB of memory for Docker (6 without
+  GitLab).
+- That's all, by default. Everything runs in containers on your machine, with no account and no key, and no model:
+  - the kit's kept scripts (seed, hello, closeout, release) replay at a small GitHub inside the kit, repository
+    `acme/web`, through the same HEART gateway and GitHub connector as real GitHub;
+  - the release kit releases five pull requests at a small GitHub, and the same five at GitLab.
+- GitLab is on unless you opt out (`USE_GITLAB=no`): it wants about 4 GB more of Docker's memory.
 - Opt in, if you like:
-  - **a GitHub account**: kept scripts replayed on a repository of yours, on real GitHub (`USE_GITHUB`);
+  - **a GitHub account**: the same kept scripts replayed on a repository of yours, on real GitHub (`USE_GITHUB`);
   - **an Anthropic API key** (console.anthropic.com): Claude walks goals written in words, billed to your key
-    (`USE_ANTHROPIC`).
+    (`USE_ANTHROPIC`). Triage replays need it too: one of its steps is reasoned.
 
 ### The quick way: one script
 
-It does every step below, saying what it does: it builds and starts the release kit, then releases five pull
-requests at the small GitHub and the same five at GitLab, by kept scripts with no model. It asks about each opt in
-once, defaulting to no. A key you paste shows a `*` per character, then how many characters it got and their last
-four.
+It does every step below, saying what it does: it builds and starts the release kit and releases its five pull
+requests, then builds the kit and replays its kept scripts (`kit/try.sh tour`), all with no model. It asks about
+GitLab, defaulting to yes, and about each opt in, defaulting to no. A key you paste shows a `*` per character, then
+how many characters it got and their last four.
 
-Settle the opt ins ahead, if you like, in `kit/.env` (`cp kit/env.example kit/.env`):
+Settle each ahead, if you like, in `kit/.env` (`cp kit/env.example kit/.env`):
 
-| `USE_GITHUB`, `USE_ANTHROPIC` | Setup |
+| `USE_GITLAB`, `USE_GITHUB`, `USE_ANTHROPIC` | Setup |
 |---|---|
-| `ask` (the default) | asks; when `kit/.env` holds the key, asks whether to use it |
+| `ask` (the default) | asks; for a key `kit/.env` holds, asks whether to use it |
 | `yes` | uses it, asking only for what `kit/.env` lacks, and says so |
 | `no` | leaves it off, and says so |
 
-To run the releases again from the start: `kit/release.sh reset` puts the small GitHub and GitLab back as first
-seeded and clears their runs (`reset github` or `reset gitlab` for one).
+What you opt in to is written back as `yes`, so `kit/try.sh` knows it and the next setup only says so.
+
+To run things again from the start:
+
+- `kit/try.sh tour` starts the small GitHub afresh each time; `kit/try.sh reset` does that alone.
+- `kit/release.sh reset` puts the release's small GitHub and GitLab back as first seeded and clears their runs
+  (`reset github` or `reset gitlab` for one).
 
 - **Windows**, in PowerShell (it installs WSL and Ubuntu if need be, clones this repository inside Ubuntu, and
   carries on there):
@@ -95,6 +104,9 @@ Use WSL 2 with Ubuntu, and do everything below inside Ubuntu, not in PowerShell:
 
 ## Set up, once
 
+With no account and no key, there is nothing to set up: clone this repository and run `kit/try.sh tour`. What
+follows is for opting in to your GitHub by hand, as `kit/setup.sh` does.
+
 1. **On GitHub, create an empty repository**, named `kit-trial` say. Leave everything as it is: no README, no
    template.
 2. **Create a token** at https://github.com/settings/personal-access-tokens/new
@@ -109,7 +121,8 @@ Use WSL 2 with Ubuntu, and do everything below inside Ubuntu, not in PowerShell:
    Edit `kit/.env`:
    - `OWNER`: your GitHub user name.
    - `REPO`: `kit-trial`.
-   - `GITHUB_TOKEN` and `ANTHROPIC_API_KEY`.
+   - `GITHUB_TOKEN`, and `USE_GITHUB=yes`.
+   - `ANTHROPIC_API_KEY` and `USE_ANTHROPIC=yes`, for Claude's walks.
 
    Git ignores this file, and the kit's image never holds it.
 4. **Bootstrap:**
@@ -120,7 +133,22 @@ Use WSL 2 with Ubuntu, and do everything below inside Ubuntu, not in PowerShell:
 
 ## Run
 
-Each line is one goal, walked by Claude, live, on `kit-trial`:
+With no model, the kept scripts the kit ships, at the small GitHub (or on yours, with `USE_GITHUB=yes`):
+
+```sh
+kit/try.sh tour                          # seed, hello, closeout and release, one after another
+kit/try.sh replay hello                  # opens an issue, comments on it, closes it
+kit/try.sh replay closeout version=1.0   # closes the three marked ready-to-close; kit/try.sh stop closeout ends it
+kit/try.sh replay release version=1.1    # queues a build, deploys it, records the release on GitHub
+kit/try.sh reset                         # the small GitHub and the services as first started
+```
+
+- Each script is held strictly to its pins: `NAME.sim.pins.yaml` at the small GitHub, `NAME.pins.yaml` on real
+  GitHub. Each was made where it holds.
+- `kit/try.sh up` keeps the kit running between commands; the small GitHub's state lasts until `down` or `reset`.
+- `triage` isn't in the tour: one of its steps asks the model which label an issue's words call for.
+
+With an Anthropic key, each line is one goal, walked by Claude, live:
 
 ```sh
 kit/try.sh walk hello                  # opens an issue, comments on it, closes it
@@ -132,7 +160,8 @@ kit/try.sh walk release version=1.1    # queues a build, deploys it, records the
 `triage` and `closeout` keep watching until you stop them:
 
 - Each opens an issue named "Triage watch" or "Close-out watch".
-- When the issues it works on are done, close that watch issue on GitHub.
+- When the issues it works on are done, close that watch issue: `kit/try.sh stop triage` (or `closeout`), or by
+  hand on GitHub.
 - The command ends a few seconds later.
 
 Keep a walk as a script, and replay it with no model:

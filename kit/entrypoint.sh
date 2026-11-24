@@ -1,28 +1,28 @@
 #!/bin/sh
-# Starts the HEART gateway for GitHub on http://localhost:8392, then runs the command given, in /work.
-# The gateway calls GitHub with each caller's own token: artie's, which is GITHUB_TOKEN. The token is never written.
+# Starts GitHub's HEART gateway on http://localhost:8392, then runs the command given, in /work.
+# With GITHUB_TOKEN, the gateway calls real GitHub with each caller's own token: artie's, which is GITHUB_TOKEN. The
+# token is never written. Without it, the same gateway and connector stand in front of a small GitHub held in memory
+# (heart-sims' github.test): repository acme/web, credential github-token, started afresh with the kit.
 set -eu
-
-if [ -z "${GITHUB_TOKEN:-}" ]; then
-  echo "Set GITHUB_TOKEN: a fine-grained token for one scratch repository, with Contents, Issues and" >&2
-  echo "Pull requests read and write." >&2
-  exit 2
-fi
 
 mkdir -p /work/runs
 for file in /kit/goals/*.goal.md /kit/scripts/*; do
   [ -e "/work/$(basename "$file")" ] || cp "$file" /work/
 done
 
-(
-  cd /opt/heart-gateway
-  UPSTREAM_URL=https://api.github.com \
-  UPSTREAM_SPEC=/kit/github/api.github.com.json \
-  UPSTREAM_AUTH=caller \
-  GATEWAY_CONNECTOR=/opt/heart-gateway/connectors/github \
-  PORT=8392 \
-    exec bin/heart-gateway > /work/runs/gateway.log 2>&1
-) &
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  (
+    cd /opt/heart-gateway
+    UPSTREAM_URL=https://api.github.com \
+    UPSTREAM_SPEC=/kit/github/api.github.com.json \
+    UPSTREAM_AUTH=caller \
+    GATEWAY_CONNECTOR=/opt/heart-gateway/connectors/github \
+    PORT=8392 \
+      exec bin/heart-gateway > /work/runs/gateway.log 2>&1
+  ) &
+else
+  (cd /opt/heart-sims && exec java -cp 'lib/*' com.artie.heart.sims.MainKt 8392 github.test > /work/runs/gateway.log 2>&1) &
+fi
 
 # Two more systems, simulated, each a HEART service of its own: a narrow Jenkins and a narrow cloud deploy service.
 # They hold their state in memory, so each run of the kit starts them afresh. Their tokens are test tokens.
