@@ -38,7 +38,8 @@ case $issues in
 esac
 
 echo "Seeding $OWNER/$REPO with six issues, by a kept script, with no model…"
-"$here/try.sh" artie run seed.heart.yaml owner="$OWNER" repo="$REPO" --entry http://localhost:8392/ \
+# This is your repository on real GitHub, whatever USE_GITHUB says for the kit's other commands.
+USE_GITHUB=yes OWNER=$OWNER REPO=$REPO "$here/try.sh" artie run seed.heart.yaml owner="$OWNER" repo="$REPO" --entry http://localhost:8392/ \
   --trace runs/seed.trace.yaml
 
 cat <<EOF

@@ -1,0 +1,31 @@
+# Ends a watch, as a person does on GitHub: closes the open issue titled as the watch's issue is.
+# Written by hand, as the kept scripts are written by artie generate; no model.
+#   artie run stop-watch.heart.yaml owner=acme repo=web title="Close-out watch"
+#   kit/try.sh stop closeout     the same, for the kit's own watches (closeout, triage)
+heart: 1
+kind: kept
+start: http://localhost:8392/
+
+inputs:
+  owner:
+    question: Whose repository?
+  repo:
+    question: Which repository?
+  title:
+    question: Which watch's issue to close?
+
+steps:
+  - act: github:issues-list-for-repo
+    fields:
+      owner: ${owner}
+      repo: ${repo}
+      state: open
+    then:
+      - for-each: issue
+        then:
+          - given:
+              - field: title
+                is: ${title}
+            then:
+              - act: github:close
+                then: []

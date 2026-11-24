@@ -103,11 +103,14 @@ $docker_cmd compose version > /dev/null 2>&1 \
   || stop "Docker has no compose; the release kit needs it. On Ubuntu: sudo apt-get install docker-compose-v2"
 ok "compose is there"
 memory=$($docker_cmd info --format '{{.MemTotal}}' 2> /dev/null || echo 0)
-if [ "$memory" -lt 10000000000 ] 2> /dev/null; then
-  note "Docker has $((memory / 1000000000)) GB of memory; the build and GitLab together want about 10."
+gigabytes=$((memory / 1000000000))
+ok "Docker has $gigabytes GB of memory"
+more_memory() { # GB wanted
+  [ "$memory" -lt "$1"000000000 ] 2> /dev/null || return 0
+  note "Docker has $gigabytes GB of memory; this wants about $1."
   if [ -n "$wsl" ]; then note "Give WSL more in %UserProfile%\\.wslconfig ([wsl2], memory=12GB), then: wsl --shutdown"; fi
   if [ "$os" = Darwin ]; then note "Give Docker Desktop more in its Settings, Resources."; fi
-fi
+}
 
 # A key, pasted or typed: one * per character as it comes, Backspace takes one back, Enter ends. Enter alone keeps
 # what kit/.env holds.
@@ -172,13 +175,31 @@ opt_in() { # FLAG "what" KEY "the question when kit/.env has no key"
   ok "$2: off"; return 1
 }
 
-say "What runs here, and what's yours to opt in to"
-ok "the small GitHub, GitLab, Jenkins and the release's parties: containers on this machine, no account, no key"
+# Settles an opt out: on unless its flag says no, or the person says no.
+opt_out() { # FLAG "what" "the question"
+  eval "flag=\${$1:-ask}"
+  case $(printf '%s' "$flag" | tr 'A-Z' 'a-z') in
+    yes | y | true | on | 1) ok "$2: on ($1=yes)"; return 0 ;;
+    no | n | false | off | 0) ok "$2: off ($1=no)"; return 1 ;;
+  esac
+  if ask_yes "$3"; then ok "$2: on"; return 0; fi
+  ok "$2: off"; return 1
+}
 settled() { case $(printf '%s' "${1:-ask}" | tr 'A-Z' 'a-z') in yes | y | true | on | 1 | no | n | false | off | 0) ;; *) return 1 ;; esac; }
+
+say "What runs here, with no account and no key"
+ok "the small GitHub, Jenkins, a build and a deploy service, and the release's parties: containers on this machine"
+ok "every script they run is kept, and replays with no model"
+settled "${USE_GITLAB:-}" \
+  || note "GitLab runs too, unless you opt out: it wants about 4 GB more of Docker's memory (about 10 GB in all)."
+gitlab=""
+if opt_out USE_GITLAB "GitLab" "Run GitLab too?"; then gitlab=yes; more_memory 10; else more_memory 6; fi
+
+say "What's yours to opt in to"
 if ! settled "${USE_GITHUB:-}" || ! settled "${USE_ANTHROPIC:-}"; then
-  note "Opt in, if you like (kit/.env can settle each ahead: USE_GITHUB, USE_ANTHROPIC = yes, no or ask):"
-  note "  - your GitHub account: kept scripts replayed on a repository of yours, on real GitHub;"
-  note "  - an Anthropic key: Claude walks goals written in words, on that repository, billed to your key."
+  note "kit/.env can settle each ahead: USE_GITHUB, USE_ANTHROPIC = yes, no or ask."
+  note "  - your GitHub account: the same kept scripts replayed on a repository of yours, on real GitHub;"
+  note "  - an Anthropic key: Claude walks goals written in words, billed to your key."
 fi
 github=""
 if opt_in USE_GITHUB "your GitHub account" GITHUB_TOKEN "Use your GitHub account too?"; then github=yes; fi
@@ -211,25 +232,28 @@ if [ -n "$github" ]; then
     404) stop "GitHub has no $OWNER/$REPO this token can see. Check the names, and that the token's access includes it." ;;
     *) stop "GitHub answered $code for $OWNER/$REPO." ;;
   esac
+  USE_GITHUB=yes
 fi
 
 if [ -n "$anthropic" ]; then
   say "Your Anthropic key"
   if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
     interactive || stop "USE_ANTHROPIC is yes, but kit/.env has no ANTHROPIC_API_KEY, and there's no terminal to ask in."
-    note "A key from console.anthropic.com. Replays of kept scripts never use it."
+    note "A key from console.anthropic.com. Replays of kept scripts never use it, but triage's one reasoned step does."
     read_secret ANTHROPIC_API_KEY "Paste the key"
     [ -n "${ANTHROPIC_API_KEY:-}" ] || stop "ANTHROPIC_API_KEY is needed for Claude; or run again and say no to it."
   else
     ok "the key in kit/.env, ending …$(ending "$ANTHROPIC_API_KEY")"
   fi
-  [ -n "$github" ] || note "Claude walks goals on your GitHub repository, so with GitHub off it has none to walk yet."
+  USE_ANTHROPIC=yes
 fi
 
+# What was opted in to is kept as yes, so kit/try.sh knows it, and the next setup only says so; the rest as it was.
 kept_umask=$(umask)
 umask 077
 {
   echo "# Written by kit/setup.sh. kit/env.example says what each line is; git and Docker builds never see this file."
+  echo "USE_GITLAB=${USE_GITLAB:-ask}"
   echo "USE_GITHUB=${USE_GITHUB:-ask}"
   echo "USE_ANTHROPIC=${USE_ANTHROPIC:-ask}"
   echo "OWNER=${OWNER:-}"
@@ -239,30 +263,44 @@ umask 077
 } > "$env_file"
 umask "$kept_umask"
 ok "saved in kit/.env, readable by you alone"
-export OWNER REPO GITHUB_TOKEN ANTHROPIC_API_KEY
+export OWNER REPO GITHUB_TOKEN ANTHROPIC_API_KEY USE_GITHUB USE_ANTHROPIC
 
 # The kit's own scripts, through sudo while this user isn't yet one of Docker's group.
 kit_sh() {
   if [ "$docker_cmd" != docker ]; then
-    sudo --preserve-env=OWNER,REPO,GITHUB_TOKEN,ANTHROPIC_API_KEY sh "$here/$@"
+    sudo --preserve-env=OWNER,REPO,GITHUB_TOKEN,ANTHROPIC_API_KEY,USE_GITHUB,USE_ANTHROPIC sh "$here/$@"
   else
     sh "$here/$@"
   fi
 }
 
-say "Build and start the release kit: the small GitHub, GitLab and Jenkins"
-note "The first build takes several minutes, and GitLab several more to start; later ones are quick."
-kit_sh release.sh up gitlab < /dev/null
+if [ -n "$gitlab" ]; then
+  say "Build and start the release kit: the small GitHub, GitLab and Jenkins"
+  note "The first build takes several minutes, and GitLab several more to start; later ones are quick."
+  kit_sh release.sh up gitlab < /dev/null
+else
+  say "Build and start the release kit: the small GitHub and Jenkins"
+  note "The first build takes several minutes; later ones are quick."
+  kit_sh release.sh up < /dev/null
+fi
 
 say "Release five pull requests at the small GitHub, by a kept script, with no model"
 kit_sh release.sh run github < /dev/null
 
-say "The same five as GitLab merge requests"
-kit_sh release.sh run gitlab < /dev/null
+if [ -n "$gitlab" ]; then
+  say "The same five as GitLab merge requests"
+  kit_sh release.sh run gitlab < /dev/null
+fi
+
+say "Build the kit, and replay its kept scripts at the small GitHub, with no model"
+note "The first build takes several minutes; later ones are quick."
+(USE_GITHUB=no; export USE_GITHUB; kit_sh try.sh tour) < /dev/null
 
 if [ -n "$github" ]; then
-  say "Build the kit and seed $OWNER/$REPO, by a kept script, with no model"
-  kit_sh bootstrap.sh < /dev/null
+  if ask_no "Replay the same kept scripts at $OWNER/$REPO on real GitHub now? They open and close issues there."; then
+    say "The kept scripts at $OWNER/$REPO, on real GitHub, with no model"
+    kit_sh try.sh tour < /dev/null
+  fi
   if ask_no "Release the five at $OWNER/$REPO on real GitHub now? It opens pull requests there, on library/* branches."; then
     kit_sh release.sh run github-live < /dev/null
   fi
@@ -270,17 +308,22 @@ fi
 
 say "Done"
 note "Next, in ${here%/kit}:"
-note "  kit/release.sh run github     the five releases again, at the small GitHub (or: run gitlab)"
-note "  kit/release.sh reset          the small GitHub and GitLab back as first seeded, runs cleared"
-note "                                (reset github or reset gitlab for one)"
+note "  kit/try.sh tour               the kept scripts again, from a fresh small GitHub"
+note "  kit/try.sh replay hello       one of them again (hello, closeout, release; stop closeout ends its watch)"
+note "  kit/try.sh reset              the small GitHub and the services as first started; down stops them"
+note "  kit/release.sh run github     the five releases again, at the small GitHub"
+if [ -n "$gitlab" ]; then
+  note "  kit/release.sh run gitlab     the same five at GitLab"
+fi
+note "  kit/release.sh reset          the release's GitHub and GitLab back as first seeded, runs cleared"
 note "  kit/release.sh down           stops the release kit; GitLab's data is kept"
 if [ -n "$github" ]; then
   note "  kit/release.sh run github-live   the five at $OWNER/$REPO on real GitHub"
 fi
-if [ -n "$github" ] && [ -n "$anthropic" ]; then
-  note "  kit/try.sh walk hello         Claude opens an issue, comments on it, and closes it"
+if [ -n "$anthropic" ]; then
+  note "  kit/try.sh walk hello         Claude walks a goal in words, and kit/try.sh keep hello keeps it"
 fi
 note "  kit/README.md                 the rest"
-if [ -n "$github" ] && [ -n "$anthropic" ] && ask_no "Walk hello now? Claude uses your key."; then
+if [ -n "$anthropic" ] && ask_no "Walk hello now? Claude uses your key."; then
   kit_sh try.sh walk hello
 fi
