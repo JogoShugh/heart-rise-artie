@@ -1,0 +1,55 @@
+# What /Users/josh/repos/artie/exhibits/skill-vs-artie/release.gitlab.heart.yaml was recorded against, from /Users/josh/repos/artie/exhibits/skill-vs-artie/runs/walk-1.capture.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its
+# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
+# one offered in a set not recorded for it.
+rung: L0
+digest: sha256-SvUyl/9CqoSFC/+f7Wa/gvXiJBGnxDchQnnp5Ii9X/M=
+forms:
+  scm:pulls-get:
+    integrity: sha256-tQS1w+OD81F8EcmN1U6QlfqSfQ62xCGCFQhrJaRQVMQ=
+    act: sha256-B7wLyYSogXsEdls5tMDKWZwPVxeK/V+QbMQQkErNvnI=
+    method: GET
+    sets: []
+  watcher:watch:
+    integrity: sha256-CWNneaKU13k7VbnCNTtW5/KQ5s8cpjOCMWLIq5BnTfM=
+    act: sha256-BP5DJuXXCYR1hYukkCmPWqC6TEKrNx/I7Z9FE8/qaOM=
+    method: POST
+    sets: []
+  scm:merge:
+    integrity: sha256-z7WB9kZnYN42USh4/bQozBwtLhwApduF31bE3S9mLmY=
+    act: sha256-V7oWwVH8e3t1BZB8cX3jc5vKWA7xMSdw7u6HgtQKYng=
+    method: PUT
+    sets: []
+  ci:build:
+    integrity: sha256-WAdMzpFbTWMLQ4RuH+CATrBxvQQks5hNCJRG2wEVexg=
+    act: sha256-qJ7HrI90QtEXVcZRZlDwNEcsGBEeGqJq0mMH7+3hfV0=
+    method: POST
+    sets: []
+  library:search-loans:
+    integrity: sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4=
+    act: sha256-5wtqQPqmUp4K/83r2RD1kq9Xj+AlLmCX2s4cElGwbNE=
+    method: GET
+    sets: []
+  library:renew:
+    integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+    act: sha256-mKB6rkhzosKiuPOCcy+AO/8TOYuWyeVQhs5BrzlmKho=
+    method: POST
+    sets: []
+  library:report-problem:
+    integrity: sha256-NNKBxM1YmGEZODMn13mMYCF4VrWsV5PcSbJhaptai/k=
+    act: sha256-M7uvJU9wvS8gI9X3f9Fh2oELWtan92UFPWZES08rYYo=
+    method: POST
+    sets: []
+  env:get-environment:
+    integrity: sha256-UWb+xXKngRFe8ibTwO9SrpSUYNPBbji/5JjlwpAEKfQ=
+    act: sha256-Q2LRr+EzqClkiSbE8iPy6vdBIWMwspZ23FdKAdM6AAw=
+    method: GET
+    sets: []
+  env:promote:
+    integrity: sha256-TwXThZ20UPUIctrpRXRoHqarKKsEilvB0sVwvK1PY4s=
+    act: sha256-jMwh2mKzzspqL/XzQB6lCVqO3Kj+6/d12RidWAxXr1w=
+    method: POST
+    sets: []
+links:
+  hr:in-reply-to: ''
+  item: ''

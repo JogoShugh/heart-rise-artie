@@ -23,7 +23,7 @@ slug=${RELEASE_GITHUB_REPO:-JogoShugh/heart-github-test}
 . "$here/jenkins/jenkins.env.example"
 export JENKINS_ADMIN_USER JENKINS_ADMIN_PASSWORD JENKINS_HOOK_SECRET RELEASE_HOST="$host"
 export RELEASE_GITHUB_CONNECTOR=${RELEASE_GITHUB_CONNECTOR:-github-scm}
-export RELEASE_REPOSITORY="$here/work/library-app" RELEASE_SCRIPT="$here/release.heart.yaml"
+export RELEASE_REPOSITORY="$here/work/library-app" RELEASE_SCRIPT="${RELEASE_SCRIPT:-$here/release.heart.yaml}"
 # The JDK this Mac runs with, when it is there; elsewhere, JAVA_HOME as set, or the java on the PATH (22 or newer).
 mac_java=$HOME/.sdkman/candidates/java/25.3.4+1.r25-graal
 [ -n "${JAVA_HOME:-}" ] || [ ! -d "$mac_java" ] || export JAVA_HOME="$mac_java"

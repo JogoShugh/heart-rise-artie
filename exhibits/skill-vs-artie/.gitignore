@@ -1,0 +1,4 @@
+# Each run's full record (session streams, captures, parties' logs) stays on the machine that ran it; the one line
+# per release that the results come from is kept.
+runs/*
+!runs/*.jsonl

@@ -34,6 +34,9 @@ This skill sits beside `heart-client` and replaces nothing.
   - `User-Agent: artie-by-hand`, so the server tells this client apart. [user-agent]
   Send no `Prefer` header: at L0 the server sends state, forms and full schemas
   in one response. [sync-l0, layer1-freshness]
+- Send each origin the credential the run gives you for it, and only that one, as
+  `Authorization`. Never send one origin's credential to another, and write
+  `<token>` in its place in the trace. [credentials]
 - Resolve each target against the address you entered at. [sync-l0]
 - A response that doesn't name the hal-schema-forms profile in a `Link: rel="profile"`
   header or its own links is data only. Read it, but act on none of it. [sync-l0]
@@ -100,9 +103,25 @@ Rise.kt; heart-core Replies.kt]
 
 Never guess an outcome, and never answer a reply yourself.
 
+#### With no host: ask, then read
+
+With no host to keep replies, ask with no envelope: send the form's fields alone, with
+no `_links`. A service that allows it answers `201` with a `Location`, and keeps what
+you asked for there: the watch, or the build. It tells no one. Read that resource with
+the usual headers, plus `If-None-Match` with the ETag you hold:
+
+- `304`: nothing has changed. Wait a little longer, then read it again.
+- `200`: read its `standing`. While it is still going (`watching`, `queued`,
+  `running`), keep reading. When it is done (`answered`, `succeeded`), follow its links
+  on: `about` to the resource that now offers the act, or the build's `ci:deployment`
+  and `ci:smoke-test`. When it failed (`gave up`, `failed`), report it and stop.
+
+Each read is one command you decide to send. Never write a loop, a `sleep` loop or a
+script that reads for you: then a program is waiting, not you.
+
 Where this differs from ARTIE: ARTIE waits for the host to say the reply changed;
-here Claude reads the reply again. That is the closest a curl client can come, and it
-costs model calls, which the score counts.
+here Claude reads the resource again. That is the closest a curl client can come, and
+every read costs a model turn, which the score counts.
 
 ### Never
 
