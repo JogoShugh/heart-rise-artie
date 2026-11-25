@@ -76,9 +76,9 @@ kit/release.sh down
   irm https://raw.githubusercontent.com/JogoShugh/heart-rise-artie/feat/kit-model-free/kit/windows/setup.ps1 | iex
   ```
 - Options, in `kit/.env` (`cp kit/env.example kit/.env`):
-  - `USE_GITLAB`: GitLab for the release. Default yes. Needs about 4 GB more memory.
-  - `USE_GITHUB`: replay at your repository on real GitHub. Default no.
-  - `USE_ANTHROPIC`: Claude walks goals, billed to your key. Default no. Triage needs it.
+  - `USE_GITLAB`: GitLab for the release. Setup suggests yes. Needs about 4 GB more memory.
+  - `USE_GITHUB`: replay at your repository on real GitHub. Setup suggests no.
+  - `USE_ANTHROPIC`: Claude walks goals, billed to your key. Setup suggests no. Triage needs it.
 - Each option takes one of these values:
   - `ask` (default): setup asks.
   - `yes`: setup uses it and asks only for missing values.
