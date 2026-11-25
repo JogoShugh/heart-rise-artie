@@ -54,13 +54,23 @@ else
 fi
 export GITHUB_TOKEN
 
-docker image inspect "$image" > /dev/null 2>&1 || docker build -f "$here/Dockerfile" -t "$image" "$here/.."
 mkdir -p "$work/runs"
+# Built every time, so an image from an older checkout is never used; unchanged layers come from Docker's cache.
+if docker image inspect "$image" > /dev/null 2>&1; then
+  echo "Building the kit image (cached: seconds; log: work/runs/kit-build.log)…"
+  docker build -q -f "$here/Dockerfile" -t "$image" "$here/.." > "$work/runs/kit-build.log" 2>&1 \
+    || { tail -20 "$work/runs/kit-build.log" >&2; echo "The kit didn't build: $work/runs/kit-build.log" >&2; exit 1; }
+else
+  # The first build shows Docker's own progress, step by step.
+  echo "Building the kit image (the first time: a few minutes)…"
+  docker build -f "$here/Dockerfile" -t "$image" "$here/.." || { echo "The kit didn't build." >&2; exit 1; }
+fi
 
 tty=""; [ -t 0 ] && [ -t 1 ] && tty="-t"
 # Up, and with the GitHub asked for now: a kit up with the other one is not this one.
 running() {
-  [ "$(docker inspect -f '{{.State.Running}} {{index .Config.Labels "heart-kit.github"}}' "$name" 2> /dev/null)" = "true $mode" ]
+  [ "$(docker inspect -f '{{.State.Running}} {{index .Config.Labels "heart-kit.github"}} {{.Image}}' "$name" 2> /dev/null)" \
+    = "true $mode $(docker image inspect -f '{{.Id}}' "$image")" ]
 }
 # While the kit is up, each command runs in it, on the systems as earlier commands left them; else in a kit of its own.
 kit() {
@@ -73,18 +83,19 @@ kit() {
 need() { eval "[ -n \"\${$1:-}\" ]" || { echo "Set $1: $2" >&2; exit 2; }; }
 repository() { need OWNER "your GitHub account"; need REPO "the scratch repository to work on"; }
 up() {
-  running || {
-    down
-    docker run -d --name "$name" --label "heart-kit.github=$mode" $ports -e GITHUB_TOKEN -e ANTHROPIC_API_KEY \
-      -v "$work:/work" "$image" tail -f /dev/null > /dev/null
-  }
+  running && return
+  printf 'Starting the kit: GitHub gateway, workspace, build and deploy services'
+  down
+  docker run -d --name "$name" --label "heart-kit.github=$mode" $ports -e GITHUB_TOKEN -e ANTHROPIC_API_KEY \
+    -v "$work:/work" "$image" tail -f /dev/null > /dev/null
   # The entrypoint starts each system and waits for it, then becomes the command given, which holds the kit up.
   tries=0
   until docker exec "$name" sh -c 'tr "\0" " " < /proc/1/cmdline' 2> /dev/null | grep -q '^tail '; do
     tries=$((tries + 1))
-    [ "$tries" -le 120 ] || { docker logs "$name" >&2; exit 1; }
-    sleep 1
+    [ "$tries" -le 120 ] || { echo; echo "The kit didn't start in 120 s. Its log:" >&2; docker logs "$name" >&2; exit 1; }
+    printf .; sleep 1
   done
+  echo " up ($tries s)"
 }
 down() { docker rm -f "$name" > /dev/null 2>&1 || true; }
 replay() { # NAME [name=value …]
@@ -106,7 +117,11 @@ replay() { # NAME [name=value …]
 # Runs a command quietly, its output kept in runs/LOG.out: its last line when it ends well, its last lines when not.
 quiet() { # LOG command …
   log="$work/runs/$1.out"; shift
-  if "$@" < /dev/null > "$log" 2>&1; then tail -1 "$log"; else tail -5 "$log" >&2; exit 1; fi
+  start=$(date +%s)
+  { "$@" < /dev/null 2>&1; echo $? > "$log.status"; } | tee "$log" | awk '{ print "  " $0; fflush() }'
+  status=$(cat "$log.status"); rm -f "$log.status"
+  [ "$status" = 0 ] || { echo "failed after $(($(date +%s) - start)) s; full log: $log" >&2; exit 1; }
+  echo "  ($(($(date +%s) - start)) s)"
 }
 stop_watch() { # NAME
   case $1 in
@@ -124,16 +139,22 @@ watch_then_stop() { # NAME COUNT [name=value …]
   out="$work/runs/$goal-kept.out"
   replay "$goal" "$@" < /dev/null > "$out" 2>&1 &
   watcher=$!
-  tries=0
-  until [ "$(grep -c -E '^[0-9]+ act github:(close|close-not-planned|close-duplicate|label)' "$out" 2> /dev/null || true)" -ge "$count" ]; do
+  tries=0 shown=0
+  until shown=$(show_new "$out" "$shown"); [ "$(grep -c -E '^[0-9]+ act github:(close|close-not-planned|close-duplicate|label)' "$out" 2> /dev/null || true)" -ge "$count" ]; do
     tries=$((tries + 1))
     kill -0 "$watcher" 2> /dev/null || break
     [ "$tries" -le 120 ] || break
     sleep 1
   done
   stop_watch "$goal"
-  wait "$watcher" || { tail -5 "$out" >&2; return 1; }
-  tail -1 "$out"
+  wait "$watcher" || { show_new "$out" "$shown" > /dev/null; echo "failed; full log: $out" >&2; return 1; }
+  show_new "$out" "$shown" > /dev/null
+}
+# Prints, indented, the lines of FILE after its first SHOWN (to stderr, so it shows at once), and the new count.
+show_new() { # FILE SHOWN
+  total=$(wc -l < "$1" 2> /dev/null || echo 0)
+  [ "$total" -le "$2" ] || sed -n "$(($2 + 1)),${total}p" "$1" | sed 's/^/  /' >&2
+  echo "$total"
 }
 
 case $command in
