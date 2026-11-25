@@ -2,6 +2,70 @@
 
 ARTIE is a generic client for HEART, the way a browser is a generic client for HTML.
 
+## Quickstart
+
+Needs git, and Docker running with 10 GB of memory. No account, no key, no model.
+
+```sh
+git clone --branch feat/kit-model-free https://github.com/JogoShugh/heart-rise-artie.git
+cd heart-rise-artie
+```
+
+**1. Kept scripts at a small GitHub**
+
+```sh
+kit/try.sh tour
+```
+
+Expected (first run builds for a few minutes):
+
+```
+seed: six issues, three waiting for triage and three ready to close
+finished, 15 steps; acted: github:repos-get 1, github:open-issue 6
+
+hello: open an issue, comment on it, close it
+finished, 12 steps; acted: github:repos-get 1, github:open-issue 1, github:issues-get 1, github:comment 1, github:close 1
+
+closeout: …
+finished, 34 steps; acted: … github:close 1, github:close-not-planned 1, github:close-duplicate 1
+
+release: queue a build, deploy it to staging, record it on GitHub
+finished, 16 steps; acted: ci:build 1, cd:deploy 1, github:repos-get 1, github:open-issue 1
+```
+
+**2. The release at real Jenkins and GitLab**
+
+```sh
+kit/release.sh up gitlab
+kit/release.sh run gitlab
+```
+
+Expected (GitLab takes several minutes the first time):
+
+```
+waiting for Jenkins... up at http://localhost:8171
+waiting for GitLab (several minutes the first time)...... up at http://localhost:8929
+…
+pr-501: promoted to Dev at "…"
+pr-502: promoted to Dev at "…"
+pr-503: promoted to Dev at "…"
+pr-504: not promoted to Dev
+pr-505: promoted to Dev at "…"
+Each release's trace: work/runs/gitlab/pr-N.yaml
+```
+
+The same five at the small GitHub instead: `kit/release.sh run github`.
+
+**3. Look, then stop**
+
+```sh
+open work/runs/hello-kept/index.html   # every request and answer
+kit/try.sh down
+kit/release.sh down
+```
+
+Everything below is detail.
+
 - Claude walks a goal written in plain words once.
 - ARTIE keeps that walk as a script, and the script runs again with no model.
 - Everything runs in one Docker container on your machine: at a small GitHub inside it by default, or on an empty
@@ -81,7 +145,7 @@ To run things again from the start:
 - **Windows**, in PowerShell (it installs WSL and Ubuntu if need be, clones this repository inside Ubuntu, and
   carries on there):
   ```powershell
-  irm https://raw.githubusercontent.com/JogoShugh/heart-rise-artie/claude/auth-branch-4bnmhc/kit/windows/setup.ps1 | iex
+  irm https://raw.githubusercontent.com/JogoShugh/heart-rise-artie/feat/kit-model-free/kit/windows/setup.ps1 | iex
   ```
 - **Ubuntu or macOS**, in a clone of this repository: `kit/setup.sh`
 
@@ -114,7 +178,7 @@ follows is for opting in to your GitHub by hand, as `kit/setup.sh` does.
    - Permissions, Repository: **Issues**, **Pull requests** and **Contents**, each **Read and write**.
 3. **Clone this repository and put your keys in `kit/.env`:**
    ```sh
-   git clone --branch claude/auth-branch-4bnmhc https://github.com/JogoShugh/heart-rise-artie.git
+   git clone --branch feat/kit-model-free https://github.com/JogoShugh/heart-rise-artie.git
    cd heart-rise-artie
    cp kit/env.example kit/.env
    ```

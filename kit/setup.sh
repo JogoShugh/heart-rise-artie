@@ -44,7 +44,7 @@ case $os in
 esac
 case $here in
   /mnt/*) stop "this copy is on the Windows drive ($here), where builds are slow and scripts may not run. Clone it in
-Ubuntu's home instead: cd ~ && git clone --branch claude/auth-branch-4bnmhc https://github.com/JogoShugh/heart-rise-artie.git" ;;
+Ubuntu's home instead: cd ~ && git clone --branch feat/kit-model-free https://github.com/JogoShugh/heart-rise-artie.git" ;;
 esac
 ok "the repository is at ${here%/kit}"
 
