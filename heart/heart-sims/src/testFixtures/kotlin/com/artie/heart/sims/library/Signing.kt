@@ -5,6 +5,7 @@ import com.artie.heart.ProblemLinks
 import com.artie.heart.Signatures
 import com.artie.heart.Signed
 import com.artie.heart.Signer
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -48,6 +49,15 @@ object AnaKey : SigningKey("ana-2026-11") {
  */
 object SignedRequests {
     private val KEY_ID = Regex("keyid=\"([^\"]+)\"")
+
+    /**
+     * Whether [request]'s body names a reply to tell, in `_links`, as a request to be told does (RISE). One that names
+     * none asks to tell no one; a body that can't be read is taken to name one, so it must still be signed.
+     */
+    fun namesReply(request: Request): Boolean =
+        runCatching { MAPPER.readTree(request.bodyString())?.has("_links") ?: true }.getOrDefault(true)
+
+    private val MAPPER = ObjectMapper()
 
     /** The key id a request's signature names, if it carries one. */
     fun keyIdOf(request: Request): String? =

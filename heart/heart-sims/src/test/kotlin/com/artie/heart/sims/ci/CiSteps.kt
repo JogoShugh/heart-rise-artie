@@ -75,17 +75,28 @@ class CiSteps {
         replies.asked(reply, CiWrapper.ORIGIN + made.header("Location"))
     }
 
-    private fun ask(commit: String, reply: String, signed: Boolean): Response {
+    @When("^the caller asks the wrapper to build commit \"(\\w+)\", with no reply, unsigned$")
+    fun asksWithNoReply(commit: String) {
+        answer = ask(commit, reply = null, signed = false)
+    }
+
+    @Given("the caller has asked to build commit {string}, with no reply")
+    fun askedWithNoReply(commit: String) {
+        val made = ask(commit, reply = null, signed = false)
+        assertEquals(201, made.status.code, made.bodyString())
+    }
+
+    private fun ask(commit: String, reply: String?, signed: Boolean): Response {
         val etag = checkNotNull(wrapper.handler(get("/")).header("ETag"))
-        val body = mapper.writeValueAsString(
+        val links = reply?.let {
             mapOf(
-                "commit" to commit,
                 "_links" to mapOf(
-                    "hr:reply-to" to mapOf("href" to "$REPLIES/replies/$reply"),
+                    "hr:reply-to" to mapOf("href" to "$REPLIES/replies/$it"),
                     "hr:keys" to mapOf("href" to "$REPLIES${Signatures.KEYS}"),
                 ),
-            ),
-        )
+            )
+        }.orEmpty()
+        val body = mapper.writeValueAsString(mapOf("commit" to commit) + links)
         var request = get(CiWrapper.BUILD).method(Method.POST).header("Content-Type", "application/json")
             .header("If-Match", etag)
         if (signed) {

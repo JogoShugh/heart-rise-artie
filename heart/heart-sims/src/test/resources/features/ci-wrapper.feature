@@ -52,6 +52,25 @@ Feature: The CI wrapper: a real Jenkins job served as a HEART service that answe
       | ci:log        | /builds/1/log                                 |
     And reply r-91's result links the same three
 
+  Scenario: Asked to build a commit with no reply, and unsigned, the wrapper starts the job and answers the build
+    When the caller asks the wrapper to build commit "9b1e2d4", with no reply, unsigned
+    Then the wrapper answers 201, the build at "/builds/1"
+    And Jenkins was asked to build job app with these parameters
+      | name          | value   |
+      | SHA           | 9b1e2d4 |
+      | RELEASE_BUILD | 1       |
+
+  Scenario: With no reply, the caller reads the build to see how it went, and no reply is told
+    Given the caller has asked to build commit "9b1e2d4", with no reply
+    When Jenkins notifies the wrapper that build 1 is FINALIZED SUCCESS, with the secret
+    Then build 1 is "succeeded"
+    And build 1 links these
+      | relation      | href                                         |
+      | ci:deployment | http://localhost:8180/                        |
+      | ci:smoke-test | /builds/1/artifacts/smoke.heart.yaml          |
+      | ci:log        | /builds/1/log                                 |
+    And reply r-91 is now awaiting, unanswered
+
   Scenario: A notification without the secret is refused, and changes nothing
     Given the caller has asked to build commit "9b1e2d4", with reply r-91
     When Jenkins notifies the wrapper that build 1 is FINALIZED SUCCESS, with no secret
@@ -59,10 +78,14 @@ Feature: The CI wrapper: a real Jenkins job served as a HEART service that answe
     And build 1 is "queued"
     And reply r-91 is now awaiting, unanswered
 
-  Scenario: The build's log and the files it archived are read through the wrapper, as Jenkins keeps them
+  Scenario: The files a build archived are read through the wrapper, as Jenkins keeps them
     Given the caller has asked to build commit "9b1e2d4", with reply r-91
     And Jenkins notifies the wrapper that build 1 is FINALIZED SUCCESS, with the secret
     When the caller reads "/builds/1/artifacts/smoke.heart.yaml"
     Then the wrapper answers 200, with what Jenkins archived as "smoke.heart.yaml"
+
+  Scenario: A build's log is read through the wrapper, as Jenkins keeps it
+    Given the caller has asked to build commit "9b1e2d4", with reply r-91
+    And Jenkins notifies the wrapper that build 1 is FINALIZED SUCCESS, with the secret
     When the caller reads "/builds/1/log"
     Then the wrapper answers 200, with Jenkins' console text

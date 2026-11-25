@@ -44,7 +44,7 @@ data class OfferWatch(
     val id: Long,
     val target: String,
     val relation: String,
-    val reply: String,
+    val reply: String?,
     val maxLooks: Int?,
     val standing: String = WATCHING,
     val looks: Int = 0,
@@ -87,11 +87,11 @@ class OfferWatcher(
             bodyOf = { linkedMapOf("id" to it.id, "offers" to it.relation, "standing" to it.standing, "looks" to it.looks) },
             hypermediaOf = { watch ->
                 Hypermedia(
-                    links = mapOf(
+                    links = listOfNotNull(
                         "about" to mapOf("href" to watch.target),
-                        "hr:reply-to" to mapOf("href" to watch.reply),
+                        watch.reply?.let { "hr:reply-to" to mapOf("href" to it) },
                         "hr:keys" to mapOf("href" to Signatures.KEYS, "type" to Signatures.JWK_SET),
-                    ),
+                    ).toMap(),
                 )
             },
             keyField = "standing",
@@ -116,7 +116,8 @@ class OfferWatcher(
                 id = next.getAndIncrement(),
                 target = input.json["resource"].asText(),
                 relation = input.json["offers"].asText(),
-                reply = input.json["_links"]["hr:reply-to"]["href"].asText(),
+                // With no reply named, no one is told: the caller reads the watch at its Location to see how it stands.
+                reply = input.json.path("_links").path("hr:reply-to").path("href").takeIf { it.isTextual }?.asText(),
                 maxLooks = input.json["looks"]?.asInt(),
             )
             watches[watch.id] = watch
@@ -138,6 +139,11 @@ class OfferWatcher(
     /** One look at every watched resource: each that offers its act now is answered; each out of looks gives up. */
     fun look() = watches.values.filter { it.standing == OfferWatch.WATCHING }.forEach(::look)
 
+    /** Tells [watch]'s reply, signed, when it names one; a watch with none is only read. */
+    private fun tell(watch: OfferWatch, relation: String, body: Map<String, Any?>) {
+        watch.reply?.let { answerer.answer(it, relation, body) }
+    }
+
     private fun look(watch: OfferWatch) {
         val read = reader(Request(Method.GET, watch.target).header("Accept", Dialect.JSONSCHEMA.mediaType))
         val offered = read.status.successful && !mapper.readTree(read.bodyString()).path("_forms").path(watch.relation).isMissingNode
@@ -147,8 +153,8 @@ class OfferWatcher(
         when {
             offered -> {
                 watches[watch.id] = looked.copy(standing = OfferWatch.ANSWERED)
-                answerer.answer(
-                    watch.reply, "completed",
+                tell(
+                    watch, "completed",
                     mapOf(
                         "state" to "completed",
                         "result" to mapOf(
@@ -161,8 +167,8 @@ class OfferWatcher(
             }
             watch.maxLooks != null && looked.looks >= watch.maxLooks -> {
                 watches[watch.id] = looked.copy(standing = OfferWatch.GAVE_UP)
-                answerer.answer(
-                    watch.reply, "failed",
+                tell(
+                    watch, "failed",
                     mapOf(
                         "state" to "failed",
                         "type" to "$origin/problems/not-offered-in-time",
@@ -177,8 +183,8 @@ class OfferWatcher(
             else -> {
                 watches[watch.id] = looked
                 if (watch.looks == 0) {
-                    answerer.answer(
-                        watch.reply, "progress",
+                    tell(
+                        watch, "progress",
                         mapOf(
                             "state" to "awaiting", "percent" to 0,
                             "note" to "Still looking: ${watch.relation} is not offered yet",
@@ -190,10 +196,13 @@ class OfferWatcher(
         }
     }
 
-    /** Refuses, with 401, a request to watch that its caller did not sign with a key of the set it names. */
+    /**
+     * Refuses, with 401, a request to watch that names a reply but that its caller did not sign with a key of the set
+     * it names. A request that names no reply asks to tell no one, so it needs no signature: its bearer token is enough.
+     */
     private fun signedRequests(): Filter = Filter { next ->
         { request ->
-            if (request.method != Method.POST || request.uri.path != WATCH) {
+            if (request.method != Method.POST || request.uri.path != WATCH || !SignedRequests.namesReply(request)) {
                 next(request)
             } else {
                 val keys = runCatching {
@@ -217,13 +226,14 @@ class OfferWatcher(
 
         private const val WATCH_INPUT = """{
   "type": "object",
-  "required": ["resource", "offers", "_links"],
+  "required": ["resource", "offers"],
   "properties": {
     "resource": {"type": "string", "format": "uri", "title": "Resource", "description": "The resource to watch"},
     "offers": {"type": "string", "title": "Act", "description": "The relation of the act to wait for"},
     "looks": {"type": "integer", "minimum": 1, "title": "Looks", "description": "How many looks before giving up"},
     "_links": {
       "type": "object",
+      "description": "The reply to tell, and the keys the request is signed by; with none, read the watch",
       "required": ["hr:reply-to", "hr:keys"],
       "additionalProperties": true,
       "properties": {

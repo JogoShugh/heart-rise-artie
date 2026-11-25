@@ -49,7 +49,7 @@ object CiKey : SigningKey("ci-2026-11") {
 data class Build(
     val id: Long,
     val commit: String,
-    val reply: String,
+    val reply: String?,
     val standing: String = QUEUED,
     val version: Int = 0,
     val jenkinsNumber: Int? = null,
@@ -114,7 +114,9 @@ class CiWrapper(
         perform = { current, _, _ -> Acted(current) },
         find = { _, id -> builds.values.filter { id == null || it.id == id }.map { Found(it.id, "Build of ${it.commit}") } },
         performAtBookmark = { _, input ->
-            val build = Build(next.getAndIncrement(), input.json["commit"].asText(), input.json["_links"]["hr:reply-to"]["href"].asText())
+            // With no reply named, no one is told: the caller reads the build at its Location to see how it goes.
+            val reply = input.json.path("_links").path("hr:reply-to").path("href").takeIf { it.isTextual }?.asText()
+            val build = Build(next.getAndIncrement(), input.json["commit"].asText(), reply)
             builds[build.id] = build
             jenkins.build(job, mapOf("SHA" to build.commit, "RELEASE_BUILD" to build.id.toString()))
             Acted(build, created = "/builds/${build.id}")
@@ -178,15 +180,16 @@ class CiWrapper(
 
     /** The answer on the caller's reply that says how [build] stands now. */
     private fun tell(build: Build, said: JsonNode) {
+        val reply = build.reply ?: return
         val self = "$origin/builds/${build.id}"
         val inReplyTo = mapOf(Replies.IN_REPLY_TO to mapOf("href" to self))
         when (build.standing) {
             Build.RUNNING -> answerer.answer(
-                build.reply, "progress",
+                reply, "progress",
                 mapOf("state" to "awaiting", "percent" to STARTED_PERCENT, "note" to "Jenkins build #${build.jenkinsNumber} started", "_links" to inReplyTo),
             )
             Build.SUCCEEDED -> answerer.answer(
-                build.reply, "completed",
+                reply, "completed",
                 mapOf(
                     "state" to "completed",
                     "result" to mapOf("build" to self, "commit" to build.commit, "_links" to links(build, absolute = true)),
@@ -194,7 +197,7 @@ class CiWrapper(
                 ),
             )
             else -> answerer.answer(
-                build.reply, "failed",
+                reply, "failed",
                 mapOf(
                     "state" to "failed",
                     "type" to "$origin/problems/build-failed",
@@ -217,17 +220,20 @@ class CiWrapper(
         } else {
             emptyMap()
         }
-        val own = if (absolute) emptyMap() else mapOf(
-            "hr:reply-to" to mapOf("href" to build.reply),
+        val own = if (absolute) emptyMap() else listOfNotNull(
+            build.reply?.let { "hr:reply-to" to mapOf("href" to it) },
             "hr:keys" to mapOf("href" to Signatures.KEYS, "type" to Signatures.JWK_SET),
-        )
+        ).toMap()
         return own + made + (LOG to mapOf("href" to "$base/builds/${build.id}/log"))
     }
 
-    /** Refuses, with 401, a request to build that its caller did not sign with a key of the set it names. */
+    /**
+     * Refuses, with 401, a request to build that names a reply but that its caller did not sign with a key of the set
+     * it names. A request that names no reply asks to tell no one, so it needs no signature: its bearer token is enough.
+     */
     private fun signedRequests(): Filter = Filter { next ->
         { request ->
-            if (request.method != Method.POST || request.uri.path != BUILD) {
+            if (request.method != Method.POST || request.uri.path != BUILD || !SignedRequests.namesReply(request)) {
                 next(request)
             } else {
                 val keys = runCatching {
@@ -265,11 +271,12 @@ class CiWrapper(
 
         private const val BUILD_INPUT = """{
   "type": "object",
-  "required": ["commit", "_links"],
+  "required": ["commit"],
   "properties": {
     "commit": {"type": "string", "minLength": 7, "title": "Commit", "description": "The commit to build"},
     "_links": {
       "type": "object",
+      "description": "The reply to tell how the build goes, and the keys the request is signed by; with none, read the build",
       "required": ["hr:reply-to", "hr:keys"],
       "additionalProperties": true,
       "properties": {

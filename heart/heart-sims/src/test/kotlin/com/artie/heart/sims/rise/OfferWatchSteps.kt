@@ -74,6 +74,43 @@ class OfferWatchSteps {
         answer?.header("Location")?.let { replies.asked(reply, OfferWatcher.ORIGIN + it) }
     }
 
+    @Given("the caller has asked the watcher to be told when pull request {long} offers {string}, with reply {word}")
+    fun asked(number: Long, relation: String, reply: String) = asks(number, relation, reply, "signed")
+
+    @When("^the caller asks the watcher to watch pull request (\\d+) for \"([^\"]+)\", with no reply, unsigned$")
+    fun asksWithNoReply(number: Long, relation: String) {
+        val etag = checkNotNull(watcher.handler(get("/")).header("ETag"))
+        val body = mapper.writeValueAsString(
+            mapOf("resource" to "$GITHUB/repos/acme/web/pulls/$number", "offers" to relation),
+        )
+        answer = watcher.handler(
+            get(OfferWatcher.WATCH).method(Method.POST).header("Content-Type", "application/json")
+                .header("If-Match", etag).body(body),
+        )
+    }
+
+    @Given("the caller has asked the watcher to watch pull request {long} for {string}, with no reply")
+    fun askedWithNoReply(number: Long, relation: String) = asksWithNoReply(number, relation)
+
+    @Given("the watcher has looked, and merge is not offered yet")
+    fun lookedNotYet() = watcher.look()
+
+    @Then("reading watch {long}, it is {string}, about pull request {long}")
+    fun reading(id: Long, standing: String, number: Long) {
+        val read = watcher.handler(get("/watches/$id"))
+        assertEquals(200, read.status.code, read.bodyString())
+        val watch = mapper.readTree(read.bodyString())
+        assertEquals(standing, watch.path("standing").asText(), "$watch")
+        assertEquals("$GITHUB/repos/acme/web/pulls/$number", watch.path("_links").path("about").path("href").asText())
+    }
+
+    @Then("reply {word} was told nothing")
+    fun toldNothing(reply: String) {
+        val now = state(reply)
+        assertEquals("awaiting", now.path("state").asText(), "$now")
+        assertTrue(now.path("note").isMissingNode || now.path("note").isNull, "$now")
+    }
+
     @Then("the watcher answers {int}, the watch at {string}")
     fun created(status: Int, location: String) {
         assertEquals(status, answer?.status?.code, answer?.bodyString())
