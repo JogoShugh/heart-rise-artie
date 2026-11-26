@@ -56,15 +56,10 @@ export GITHUB_TOKEN
 
 mkdir -p "$work/runs"
 # Built every time, so an image from an older checkout is never used; unchanged layers come from Docker's cache.
-if docker image inspect "$image" > /dev/null 2>&1; then
-  echo "Building the kit image (cached: seconds; log: work/runs/kit-build.log)…"
-  docker build -q -f "$here/Dockerfile" -t "$image" "$here/.." > "$work/runs/kit-build.log" 2>&1 \
-    || { tail -20 "$work/runs/kit-build.log" >&2; echo "The kit didn't build: $work/runs/kit-build.log" >&2; exit 1; }
-else
-  # The first build shows Docker's own progress, step by step.
-  echo "Building the kit image (the first time: a few minutes)…"
-  docker build -f "$here/Dockerfile" -t "$image" "$here/.." || { echo "The kit didn't build." >&2; exit 1; }
-fi
+# Docker's own progress, step by step: seconds when nothing changed, minutes the first time or after a pull.
+echo "Building the kit image (the first time or after a pull: a few minutes)…"
+docker build --progress=plain -f "$here/Dockerfile" -t "$image" "$here/.." || { echo "The kit didn't build." >&2; exit 1; }
+echo "Built."
 
 tty=""; [ -t 0 ] && [ -t 1 ] && tty="-t"
 # Up, and with the GitHub asked for now: a kit up with the other one is not this one.
