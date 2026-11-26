@@ -13,11 +13,15 @@ mkdir -p "$logs"
 answers() { curl -s -o /dev/null "$1"; }
 wait_for() { # url what log
   tries=0
+  answers "$1" && return
+  echo "Waiting for $2…"
   until answers "$1"; do
     tries=$((tries + 1))
     [ "$tries" -le "${4:-120}" ] || { echo "$2 didn't answer at $1; its log is $3" >&2; exit 1; }
+    [ $((tries % 5)) -ne 0 ] || echo "  … $((tries * 2)) s"
     sleep 2
   done
+  echo "$2 is up."
 }
 
 case ${1:-} in
@@ -47,7 +51,7 @@ case ${1:-} in
         [ -f gitlab/gitlab.env ] || (umask 077; : > gitlab/gitlab.env)
         sh make-app-repo.sh > /dev/null
         echo "Seeding GitLab with the library app and five merge requests…"
-        sh gitlab/seed.sh 2>&1 | grep -v '^remote:'
+        sh gitlab/seed.sh 2>&1 | grep --line-buffered -v '^remote:'
         if ! answers http://localhost:8094/; then
           nohup sh gitlab/gateway.sh > "$logs/gitlab-gateway.log" 2>&1 &
           wait_for http://localhost:8094/ "The GitLab gateway" "work/logs/gitlab-gateway.log"
@@ -79,7 +83,7 @@ case ${1:-} in
     if [ "$scm" != github ]; then
       if answers http://localhost:8929/users/sign_in; then
         [ -f gitlab/gitlab.env ] || (umask 077; : > gitlab/gitlab.env)
-        sh gitlab/seed.sh 2>&1 | grep -v '^remote:' > /dev/null
+        sh gitlab/seed.sh 2>&1 | grep --line-buffered -v '^remote:' > /dev/null
         echo "GitLab: acme/web and its five merge requests, as first seeded"
       else
         echo "GitLab isn't up, so there is nothing of it to reset (kit/release.sh up gitlab starts it)"

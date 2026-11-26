@@ -13,9 +13,22 @@ env_file="$here/gitlab.env"
 # shellcheck disable=SC1090
 . "$env_file"
 
-rails() { docker exec -i merge-release-gitlab gitlab-rails runner - ; }
+# GitLab's Rails console takes half a minute or more to start, each time: a line every 10 seconds while it runs.
+rails() {
+  # Read first: a job sent to the background reads nothing from this shell's input.
+  script=$(cat)
+  printf '%s\n' "$script" | docker exec -i merge-release-gitlab gitlab-rails runner - &
+  job=$! waited=0
+  while kill -0 "$job" 2> /dev/null; do
+    sleep 1; waited=$((waited + 1))
+    [ $((waited % 10)) -ne 0 ] || echo "  … $waited s" >&2
+  done
+  wait "$job"
+}
+step() { echo "$*" >&2; }
 
 if [ -z "${GITLAB_TOKEN:-}" ]; then
+  step "GitLab: an API token for root (once)…"
   GITLAB_TOKEN="glpat-$(openssl rand -hex 16)"
   printf "u = User.find_by_username('root')
 t = u.personal_access_tokens.new(name: 'release-seed', scopes: %%w[api read_repository write_repository], expires_at: 300.days.from_now)
@@ -28,10 +41,12 @@ fi
 api() { curl -sf -H "PRIVATE-TOKEN: $GITLAB_TOKEN" "$@"; }
 
 # The group and project, once.
+step "GitLab: group acme and project acme/web…"
 api "$G/api/v4/groups/acme" >/dev/null 2>&1 \
   || api -X POST "$G/api/v4/groups" -d name=acme -d path=acme -d visibility=public >/dev/null
 group=$(api "$G/api/v4/groups/acme" | sed -E 's/^\{"id":([0-9]+).*/\1/')
 if ! api "$G/api/v4/projects/acme%2Fweb" >/dev/null 2>&1; then
+  step "GitLab: numbering merge requests from 501…"
   api -X POST "$G/api/v4/projects" -d name=web -d path=web -d "namespace_id=$group" -d default_branch=main \
     -d visibility=public >/dev/null
   # Merge requests are numbered as the pull requests they stand for: the next is 501.
@@ -41,6 +56,7 @@ InternalId.create!(project: p, usage: :merge_requests, last_value: 500) unless I
 fi
 
 # The app's branches, as made: every seed starts the app over, so main takes a force push (it is a demo's).
+step "GitLab: pushing main and pr-501 to pr-505…"
 api -X DELETE "$G/api/v4/projects/acme%2Fweb/protected_branches/main" >/dev/null 2>&1 || true
 auth=$(printf 'oauth2:%s' "$GITLAB_TOKEN" | base64)
 git -C "$repo" -c "http.extraHeader=Authorization: Basic $auth" push -q -f "$G/acme/web.git" \
@@ -48,6 +64,7 @@ git -C "$repo" -c "http.extraHeader=Authorization: Basic $auth" push -q -f "$G/a
 
 # A merge request for each variant, titled as its last commit, made afresh: a release merges one, and a merged merge
 # request can't be opened again. The ones before are deleted, and the numbering starts again at 501.
+step "GitLab: clearing the merge requests before…"
 printf "p = Project.find_by_full_path('acme/web')
 MergeRequest.where(target_project: p).find_each { |mr| mr.destroy! }
 InternalId.where(project: p, usage: :merge_requests).delete_all
