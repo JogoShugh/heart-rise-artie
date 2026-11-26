@@ -12,6 +12,7 @@
 #   kit/try.sh reset                         down, then up: the small GitHub and the services as first started
 #   kit/try.sh artie  …                      any artie command, in the kit
 #   kit/try.sh shell                         a shell in the kit
+#   Before the command: --docker-q builds the image quietly; --docker-args "ARGS" passes ARGS to docker build.
 # GitHub is a small one in the kit, repository acme/web, unless USE_GITHUB=yes in kit/.env: then it is real GitHub,
 # OWNER/REPO, with GITHUB_TOKEN. Each pins file holds to the GitHub it was made at: NAME.pins.yaml to real GitHub,
 # NAME.sim.pins.yaml to the small one. Goals, scripts and runs are in ./work.
@@ -19,6 +20,15 @@ set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 # Your keys and repository, from kit/.env when it is there.
 . "$here/env.sh"
+# Options for the image build, before the command.
+build_args="--progress=plain"
+while :; do
+  case ${1:-} in
+    --docker-q) build_args="-q"; shift ;;
+    --docker-args) build_args="$build_args ${2:?--docker-args takes ARGS}"; shift 2 ;;
+    *) break ;;
+  esac
+done
 work=${WORK:-$PWD/work}
 image=${IMAGE:-heart-kit}
 name=${KIT_NAME:-heart-kit}
@@ -32,7 +42,7 @@ The build service:            http://localhost:$3/jobs/release
 The deploy service:           http://localhost:$4/apps/web"
 shift 5
 
-usage() { sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'; }
 [ $# -gt 0 ] || { usage; exit 0; }
 command=$1; shift
 
@@ -58,10 +68,11 @@ mkdir -p "$work/runs"
 # Built every time, so an image from an older checkout is never used; unchanged layers come from Docker's cache.
 # Docker's own progress, step by step: seconds when nothing changed, minutes the first time or after a pull.
 echo "Building the kit image (the first time or after a pull: a few minutes)…"
-docker build --progress=plain -f "$here/Dockerfile" -t "$image" "$here/.." || { echo "The kit didn't build." >&2; exit 1; }
+docker build $build_args -f "$here/Dockerfile" -t "$image" "$here/.." || { echo "The kit didn't build." >&2; exit 1; }
 echo "Built."
 
-tty=""; [ -t 0 ] && [ -t 1 ] && tty="-t"
+# A terminal for the container only when this command has one in and out, asked at each call: the tour pipes both.
+tty() { if [ -t 0 ] && [ -t 1 ]; then echo -t; fi; }
 # Up, and with the GitHub asked for now: a kit up with the other one is not this one.
 running() {
   [ "$(docker inspect -f '{{.State.Running}} {{index .Config.Labels "heart-kit.github"}} {{.Image}}' "$name" 2> /dev/null)" \
@@ -70,9 +81,9 @@ running() {
 # While the kit is up, each command runs in it, on the systems as earlier commands left them; else in a kit of its own.
 kit() {
   if running; then
-    docker exec -i $tty -e GITHUB_TOKEN -e ANTHROPIC_API_KEY "$name" /kit/in.sh "$@"
+    docker exec -i $(tty) -e GITHUB_TOKEN -e ANTHROPIC_API_KEY "$name" /kit/in.sh "$@"
   else
-    docker run --rm -i $tty -e GITHUB_TOKEN -e ANTHROPIC_API_KEY -v "$work:/work" "$image" "$@"
+    docker run --rm -i $(tty) -e GITHUB_TOKEN -e ANTHROPIC_API_KEY -v "$work:/work" "$image" "$@"
   fi
 }
 need() { eval "[ -n \"\${$1:-}\" ]" || { echo "Set $1: $2" >&2; exit 2; }; }
@@ -113,7 +124,7 @@ replay() { # NAME [name=value …]
 quiet() { # LOG command …
   log="$work/runs/$1.out"; shift
   start=$(date +%s)
-  { "$@" < /dev/null 2>&1; echo $? > "$log.status"; } | tee "$log" | awk '{ print "  " $0; fflush() }'
+  { s=0; "$@" < /dev/null 2>&1 || s=$?; echo "$s" > "$log.status"; } | tee "$log" | awk '{ print "  " $0; fflush() }'
   status=$(cat "$log.status"); rm -f "$log.status"
   [ "$status" = 0 ] || { echo "failed after $(($(date +%s) - start)) s; full log: $log" >&2; exit 1; }
   echo "  ($(($(date +%s) - start)) s)"
