@@ -30,11 +30,14 @@ mac_java=$HOME/.sdkman/candidates/java/25.3.4+1.r25-graal
 
 release() { # pull fields-json
   pull=$1 fields=$2
+  began=$(date +%s)
+  echo "pr-$pull: watch, merge, build on Jenkins, smoke-test, promote to Dev…"
   sh "$here/make-app-repo.sh" >/dev/null
-  [ "$scm" = gitlab ] && sh "$here/gitlab/seed.sh" >/dev/null
+  [ "$scm" = gitlab ] && { sh "$here/gitlab/seed.sh" > "$out/pr-$pull.seed.log" 2>&1 \
+    || { echo "pr-$pull: GitLab's seed failed: $out/pr-$pull.seed.log" >&2; exit 1; }; }
   number=$pull
   if [ "$scm" = github-live ]; then
-    number=$(sh "$here/github/seed.sh" "$pull")
+    number=$(sh "$here/github/seed.sh" "$pull" 2> "$out/pr-$pull.seed.log")
     at="\"scm\": \"$H:8093/\", \"owner\": \"${slug%%/*}\", \"repo\": \"${slug#*/}\", "
     echo "variant $pull is pull request $number of $slug"
   fi
@@ -51,9 +54,14 @@ release() { # pull fields-json
     | tr -d '\r' | awk -F': ' 'tolower($1)=="location"{print $2; exit}')
   sleep 6
   [ "$scm" = github ] && curl -sf -X PUT -d true "$H:8098/_release/github/pulls/$pull/mergeable"
+  # A line every 15 seconds while it runs, so a person sees it is still going.
+  next=15
   while :; do
     said=$(curl -sf -H "$DESK" -H 'Accept: application/json' "$H:8160$loc")
-    case "$said" in *'"state":"running"'*) sleep 3 ;; *) break ;; esac
+    case "$said" in *'"state":"running"'*) ;; *) break ;; esac
+    took=$(( $(date +%s) - began ))
+    [ "$took" -lt "$next" ] || { echo "pr-$pull: running, $took s"; next=$((next + 15)); }
+    sleep 3
   done
   printf '%s\n' "$said" > "$out/pr-$pull.desk.json"
   curl -sf -H "$DESK" "$H:8160$loc/trace" > "$out/pr-$pull.yaml"
@@ -63,7 +71,13 @@ release() { # pull fields-json
   if [ -z "${RELEASE_ONE_DESK:-}" ]; then kill "$parties"; wait "$parties" 2>/dev/null || true; parties=; fi
   # A look at the forge as each release left it, when RELEASE_SHOT names a script: given the variant and its number.
   [ -n "${RELEASE_SHOT:-}" ] && sh "$RELEASE_SHOT" "$pull" "$number"
-  echo "pr-$pull: $said"
+  state=$(printf '%s' "$said" | sed -n 's/.*"state":"\([a-z]*\)".*/\1/p')
+  case $(cat "$out/pr-$pull.dev.json") in
+    *'"promotedAt":null'*) dev="not promoted to Dev" ;;
+    *'"promotedAt":"'*) dev="promoted to Dev" ;;
+    *) dev="Dev not read" ;;
+  esac
+  echo "pr-$pull: ${state:-no answer}, $dev ($(( $(date +%s) - began )) s)"
 }
 
 release 501 '"book": "Charlotte'"'"'s Web", "author": "E. B. White", "problem": "damaged", "comment": "Spine cracked."'

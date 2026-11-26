@@ -55,7 +55,9 @@ case ${1:-} in
       *) echo "SCM is github, gitlab or github-live" >&2; exit 2 ;;
     esac
     wait_for http://localhost:8171/login "Jenkins" "docker logs heart-release-jenkins"
-    RELEASE_SCM=$scm sh variants.sh "$out" 2>&1 | grep -v '^remote:' | sed -E 's/^(pr-[0-9]+): .*"state":"([a-z]+)".*/\1: \2/'
+    # Each release says when it starts, every 15 seconds while it runs, and how it ended; no pipe holds its lines back.
+    echo "Five releases, under a minute each:"
+    RELEASE_SCM=$scm sh variants.sh "$out"
     echo
     for n in 501 502 503 504 505; do
       promoted=$(sed -n 's/.*"promotedAt":\("[^"]*"\|null\).*/\1/p' "$out/pr-$n.dev.json")
