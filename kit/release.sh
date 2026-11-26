@@ -33,6 +33,10 @@ case $command in
     fi
     if [ -n "$profile" ]; then echo "Next: kit/release.sh run gitlab (or run github)"; else echo "Next: kit/release.sh run github"; fi ;;
   run)
+    # Built and started as this checkout has them, every time: Docker's cache makes it seconds when nothing changed.
+    profile=""; [ "${1:-github}" = gitlab ] && profile="--profile gitlab"
+    echo "Building and starting the release's containers (after a pull: a few minutes)…"
+    compose $profile up -d --build
     docker exec -i -e GITHUB_TOKEN -e OWNER -e REPO heart-release /kit/in-release.sh variants "${1:-github}" ;;
   reset)
     docker exec -i heart-release /kit/in-release.sh reset "${1:-all}" ;;
