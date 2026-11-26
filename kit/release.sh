@@ -31,7 +31,7 @@ case $command in
       until curl -s -o /dev/null http://127.0.0.1:8929/users/sign_in; do printf '.'; sleep 10; done
       echo " up at http://localhost:8929"
     fi
-    echo "Next: kit/release.sh run github" ;;
+    if [ -n "$profile" ]; then echo "Next: kit/release.sh run gitlab (or run github)"; else echo "Next: kit/release.sh run github"; fi ;;
   run)
     docker exec -i -e GITHUB_TOKEN -e OWNER -e REPO heart-release /kit/in-release.sh variants "${1:-github}" ;;
   reset)
