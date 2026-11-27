@@ -351,5 +351,8 @@ sequenceDiagram
 - Kept `release` reads the deploy region from the app's state, and marks that value for review.
 - A `release` replay refused at the deploy has already queued its build.
 - No browser sign-in yet for the build and deploy services.
+- `kit/release.sh run` replays the release unguarded: the release desk never loads `release.pins.yaml`, so a changed form would not stop it.
+  - `exhibits/merge-watch-release/release.pins.yaml` predates the watcher and Jenkins wrapper taking requests with no reply, so a guarded `artie run` of it would stop.
+  - Fix: the desk holds the script to its pins; then re-pin from a fresh walk.
 
 Trial runs and their output: `exhibits/kit-trial/`.
