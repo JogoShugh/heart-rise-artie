@@ -11,7 +11,7 @@ ARTIE is a generic client for HEART, the way a browser is a generic client for H
 Needs git, and Docker running with 10 GB of memory (6 GB with `USE_GITLAB=no`). No account, no key, no model.
 
 ```sh
-git clone --branch feat/kit-model-free https://github.com/JogoShugh/heart-rise-artie.git
+git clone https://github.com/JogoShugh/heart-rise-artie.git
 cd heart-rise-artie
 ```
 
@@ -73,7 +73,7 @@ kit/release.sh down
 - `kit/setup.sh` does the quickstart and asks about each option.
 - Windows, in PowerShell (installs WSL and Ubuntu if needed, clones inside Ubuntu, carries on there):
   ```powershell
-  irm https://raw.githubusercontent.com/JogoShugh/heart-rise-artie/feat/kit-model-free/kit/windows/setup.ps1 | iex
+  irm https://raw.githubusercontent.com/JogoShugh/heart-rise-artie/main/kit/windows/setup.ps1 | iex
   ```
 - Options, in `kit/.env` (`cp kit/env.example kit/.env`):
   - `USE_GITLAB`: GitLab for the release. Setup suggests yes. Needs about 4 GB more memory.

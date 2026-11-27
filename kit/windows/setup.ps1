@@ -5,11 +5,11 @@
 # In PowerShell (not as administrator; it asks when it needs to):
 #   powershell -ExecutionPolicy Bypass -File setup.ps1
 # or, without a copy of the repository yet:
-#   irm https://raw.githubusercontent.com/JogoShugh/heart-rise-artie/feat/kit-model-free/kit/windows/setup.ps1 | iex
+#   irm https://raw.githubusercontent.com/JogoShugh/heart-rise-artie/main/kit/windows/setup.ps1 | iex
 
 $ErrorActionPreference = 'Stop'
 $Distro = 'Ubuntu'
-$Branch = 'feat/kit-model-free'
+$Branch = 'main'
 $Url = 'https://github.com/JogoShugh/heart-rise-artie.git'
 $script:Step = 0
 
