@@ -71,6 +71,12 @@ release() { # pull fields-json
     case "$said" in *'"state":"running"'*) ;; *) break ;; esac
     took=$(( $(date +%s) - began ))
     [ "$took" -lt "$next" ] || { echo "pr-$pull: running, $took s"; next=$((took + 15)); }
+    # A run that failed inside the desk can stay "running": stop waiting after RELEASE_CAP seconds, and say where to look.
+    [ "$took" -lt "${RELEASE_CAP:-300}" ] || {
+      echo "pr-$pull: no end after $took s; the parties' log: $out/pr-$pull.parties.log" >&2
+      grep -m1 -i 'exception' "$out/pr-$pull.parties.log" >&2 || true
+      break
+    }
     sleep 3
   done
   printf '%s\n' "$said" > "$out/pr-$pull.desk.json"
